@@ -14,4 +14,4 @@ Apporach
 ========
 The basic part of the runtime, like resolving PE header, gathering meta information of types, and disassembling of IL instructions, we will take the same solution as L#, to use the Mono.Cecil library. 
 
-The intepreter part, we will try to take the similar approach as luagit, to utilize the native stack and register as much as possible. 
+The intepreter part, we will try to take the similar approach as luajit, to utilize the native stack and register as much as possible. 
