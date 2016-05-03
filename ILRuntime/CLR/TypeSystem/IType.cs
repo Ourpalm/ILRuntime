@@ -4,9 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using ILRuntime.CLR.Method;
+
 namespace ILRuntime.CLR.TypeSystem
 {
-    interface IType
+    public interface IType
     {
+        bool IsGenericInstance { get; }
+        Type TypeForCLR { get; }
+
+        IMethod GetMethod(string name);
     }
 }

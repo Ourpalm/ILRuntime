@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using ILRuntime.CLR.TypeSystem;
-
-namespace ILRuntime.Runtime.Intepreter
+namespace ILRuntime.CLR.Method
 {
-    class RuntimeInstance : ILTypeInstance
+    public interface IMethod
     {
     }
 }

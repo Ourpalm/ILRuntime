@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{79EF2F29-89D1-4097-986C-5E4EEFE0FA33}</ProjectGuid>
+    <ProjectGuid>{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ILRuntime</RootNamespace>
-    <AssemblyName>ILRuntime</AssemblyName>
+    <RootNamespace>TestCases</RootNamespace>
+    <AssemblyName>TestCases</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,7 +28,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,36 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLR\Method\ILMethod.cs" />
-    <Compile Include="CLR\Method\IMethod.cs" />
-    <Compile Include="CLR\TypeSystem\ILType.cs" />
-    <Compile Include="CLR\TypeSystem\CLRType.cs" />
-    <Compile Include="CLR\TypeSystem\ILTypeInstance.cs" />
-    <Compile Include="CLR\TypeSystem\IType.cs" />
+    <Compile Include="SimpleTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime\Enviorment\AppDomain.cs" />
-    <Compile Include="Runtime\Intepreter\ILIntepreter.cs" />
-    <Compile Include="Runtime\Intepreter\OpCodes\OpCode.cs" />
-    <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
-    <Compile Include="Runtime\Intepreter\RuntimeInstance.cs" />
-    <Compile Include="Runtime\Stack\RuntimeStack.cs" />
-    <Compile Include="Runtime\Stack\StackObject.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Mono.Cecil.20\Mono.Cecil.20.csproj">
-      <Project>{d3785d8b-4d85-4546-8763-47fc848c13e0}</Project>
-      <Name>Mono.Cecil.20</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Mdb\Mono.Cecil.Mdb.csproj">
-      <Project>{86f36240-e07c-4840-9c8b-9cd94c03ec62}</Project>
-      <Name>Mono.Cecil.Mdb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Pdb\Mono.Cecil.Pdb.csproj">
-      <Project>{cea7a85f-2523-4ad0-8296-6e8e0a2e6df7}</Project>
-      <Name>Mono.Cecil.Pdb</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

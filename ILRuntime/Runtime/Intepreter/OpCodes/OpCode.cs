@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using ILRuntime.CLR.TypeSystem;
-
-namespace ILRuntime.Runtime.Intepreter
+namespace ILRuntime.Runtime.Intepreter.OpCodes
 {
-    class RuntimeInstance : ILTypeInstance
+    struct OpCode
     {
+        public OpCodeEnum Code;
     }
 }
