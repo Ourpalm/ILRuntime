@@ -11,7 +11,7 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 
 namespace ILRuntime.Runtime.Intepreter
 {
-    class ILIntepreter
+    unsafe class ILIntepreter
     {
         Enviorment.AppDomain domain;
         RuntimeStack stack;
@@ -22,7 +22,7 @@ namespace ILRuntime.Runtime.Intepreter
             stack = new RuntimeStack(this);
         }
 
-        public unsafe void Run(ILMethod method)
+        public void Run(ILMethod method)
         {
             OpCode[] body = method.Body;
             StackObject v1 = new StackObject();
@@ -50,7 +50,7 @@ namespace ILRuntime.Runtime.Intepreter
                     switch (code)
                     {
                         case OpCodeEnum.Stloc_0:
-                            esp--;
+                            esp = Pop(esp);
                             v1 = *esp;
                             break;
                         case OpCodeEnum.Ldloc_0:
@@ -58,7 +58,7 @@ namespace ILRuntime.Runtime.Intepreter
                             esp++;
                             break;
                         case OpCodeEnum.Stloc_1:
-                            esp--;
+                            esp = Pop(esp);
                             v2 = *esp;
                             break;
                         case OpCodeEnum.Ldloc_1:
@@ -88,14 +88,19 @@ namespace ILRuntime.Runtime.Intepreter
                             }
                             break;
                         case OpCodeEnum.Ldind_I:
+                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I1:
+                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I2:
+                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I4:
+                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I8:
+                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ret:
                             returned = true;
@@ -109,5 +114,15 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        StackObject* Pop(StackObject* esp)
+        {
+            if(esp->ObjectType == ObjectTypes.Object)
+            {
+                if (esp->Value != stack.ManagedStack.Count)
+                    throw new NotSupportedException();
+                stack.ManagedStack.RemoveAt(esp->Value);
+            }
+            return esp - 1;
+        }
     }
 }
