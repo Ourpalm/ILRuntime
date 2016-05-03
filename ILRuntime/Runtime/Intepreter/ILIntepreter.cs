@@ -31,12 +31,19 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject v4 = new StackObject();
             StackObject v5 = new StackObject();
 
+            StackObject* stackBase = stack.StackBase;
+            StackObject* esp = stackBase;
+            StackObject* paramPtr;
+            StackObject* localVars = esp;
+            //esp += var count;
+            List<object> mStack = stack.ManagedStack;
+            int mStackBase = mStack.Count;
+
             fixed (OpCode* ptr = body)
             {
                 OpCode* ip = ptr;
                 OpCodeEnum code = ip->Code;
                 bool returned = false;
-                StackObject* esp = stack.StackBase;
                 while (!returned)
                 {
                     code = ip->Code;
@@ -60,7 +67,7 @@ namespace ILRuntime.Runtime.Intepreter
                             break;
                         case OpCodeEnum.Ldc_I4_0:
                             esp->Value = 0;
-                            esp->Length = 4;
+                            esp->ObjectType =  ObjectTypes.Integer;
                             esp++;
                             break;
                         case OpCodeEnum.Add:
@@ -68,14 +75,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 StackObject* a = esp - 1;
                                 StackObject* b = esp - 2;
                                 esp -= 2;
-                                if(a->Length ==8 || b->Length == 8)
+                                if(a->ObjectType == ObjectTypes.Long)
                                 {
-                                    esp->Length = 8;
+                                    esp->ObjectType = ObjectTypes.Long;
                                     *((long*)&esp->Value) = *((long*)&a->Value) + *((long*)&b->Value);
                                 }
                                 else
                                 {
-                                    esp->Length = 4;
+                                    esp->ObjectType = ObjectTypes.Integer;
                                     esp->Value = a->Value + b->Value;
                                 }
                             }
@@ -96,6 +103,9 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     ip++;
                 }
+
+                //ClearStack
+                mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             }
         }
 

@@ -14,6 +14,7 @@ namespace ILRuntime.Runtime.Stack
         ILIntepreter intepreter;
         StackObject* pointer;
         IntPtr nativePointer;
+        List<object> managedStack = new List<object>();
         public RuntimeStack(ILIntepreter intepreter)
         {
             this.intepreter = intepreter;
@@ -34,6 +35,8 @@ namespace ILRuntime.Runtime.Stack
                 return pointer;
             }
         }
+
+        public List<object> ManagedStack { get { return managedStack; } }
         
         public void Dispose()
         {

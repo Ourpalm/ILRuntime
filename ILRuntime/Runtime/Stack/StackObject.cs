@@ -9,8 +9,17 @@ namespace ILRuntime.Runtime.Stack
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     struct StackObject
     {
-        public int Length;
+        public ObjectTypes ObjectType;
         public int Value;
         public int ValueLow;
+    }
+
+    enum ObjectTypes
+    {
+        Integer,
+        Long,
+        Float,
+        Double,
+        Object
     }
 }
