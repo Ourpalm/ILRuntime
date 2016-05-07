@@ -26,7 +26,12 @@ namespace ILRuntimeTest
                 {
                     ILRuntime.Runtime.Enviorment.AppDomain app = new ILRuntime.Runtime.Enviorment.AppDomain();
                     app.LoadAssembly(fs);
-                    app.Invoke("TestCases.SimpleTest", "foo", 100);
+                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                    sw.Start();
+                    app.Invoke("TestCases.SimpleTest", "foo", 100); 
+                    sw.Stop();
+                    System.Diagnostics.Debugger.Log(2, "info", "Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
+                    
                 }
             }
         }

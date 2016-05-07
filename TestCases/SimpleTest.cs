@@ -33,7 +33,7 @@ namespace TestCases
         public static int foo(int init)
         {
             int b = init;
-            for( int i = 0; i < 10000; i++)
+            for( int i = 0; i < 500000; i++)
             {
                 b += i;
             }

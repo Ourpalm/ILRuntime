@@ -16,7 +16,7 @@ namespace ILRuntime.Runtime.Intepreter
     {
         Enviorment.AppDomain domain;
         RuntimeStack stack;
-
+        
         public ILIntepreter(Enviorment.AppDomain domain)
         {
             this.domain = domain;
@@ -31,8 +31,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* esp = PushParameters(stack.StackBase, method.Parameters, p);
             Execute(method, esp);
             //ClearStack
-            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
-
+            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);            
         }
         void Execute(ILMethod method, StackObject* esp)
         {
@@ -48,7 +47,10 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* arg = frame.LocalVarPointer - 1;
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
-
+            //Managed Stack reserved for local variable
+            for (int i = 0; i < method.LocalVariableCount; i++)
+                mStack.Add(null);
+            StackObject* tmp;
             fixed (OpCode* ptr = body)
             {
                 OpCode* ip = ptr;
@@ -68,19 +70,68 @@ namespace ILRuntime.Runtime.Intepreter
                             esp++;
                             break;
                         case OpCodeEnum.Stloc_0:
-                            esp = Pop(esp);
+                            esp--;
                             *v1 = *esp;
+                            if (v1->ObjectType == ObjectTypes.Object)
+                            {
+                                int idx = mStackBase;
+                                mStack[idx] = mStack[v1->Value];
+                                v1->Value = idx;
+                                Free(esp);
+                            }
                             break;
                         case OpCodeEnum.Ldloc_0:
                             *esp = *v1;
                             esp++;
                             break;
                         case OpCodeEnum.Stloc_1:
-                            esp = Pop(esp);
+                            esp--;
                             *v2 = *esp;
+                            if (v2->ObjectType == ObjectTypes.Object)
+                            {
+                                int idx = mStackBase + 1;
+                                mStack[idx] = mStack[v2->Value];
+                                v2->Value = idx;
+                                Free(esp);
+                            }
                             break;
                         case OpCodeEnum.Ldloc_1:
                             *esp = *v2;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Stloc_2:
+                            esp--;
+                            *v3 = *esp;
+                            if (v3->ObjectType == ObjectTypes.Object)
+                            {
+                                int idx = mStackBase + 2;
+                                mStack[idx] = mStack[v3->Value];
+                                v3->Value = idx;
+                                Free(esp);
+                            }
+                            break;
+                        case OpCodeEnum.Ldloc_2:
+                            *esp = *v3;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Stloc_3:
+                            esp--;
+                            *v4 = *esp;
+                            if (v4->ObjectType == ObjectTypes.Object)
+                            {
+                                int idx = mStackBase + 3;
+                                mStack[idx] = mStack[v4->Value];
+                                v4->Value = idx;
+                                Free(esp);
+                            }
+                            break;
+                        case OpCodeEnum.Ldloc_3:
+                            *esp = *v4;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_M1:
+                            esp->Value = -1;
+                            esp->ObjectType = ObjectTypes.Integer;
                             esp++;
                             break;
                         case OpCodeEnum.Ldc_I4_0:
@@ -88,11 +139,73 @@ namespace ILRuntime.Runtime.Intepreter
                             esp->ObjectType =  ObjectTypes.Integer;
                             esp++;
                             break;
+                        case OpCodeEnum.Ldc_I4_1:
+                            esp->Value = 1;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_2:
+                            esp->Value = 2;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_3:
+                            esp->Value = 3;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_4:
+                            esp->Value = 4;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_5:
+                            esp->Value = 5;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_6:
+                            esp->Value = 6;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_7:
+                            esp->Value = 7;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4_8:
+                            esp->Value = 8;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldc_I4:
+                            esp->Value = ip->TokenInteger;
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp++;
+                            break;
+                        case OpCodeEnum.Clt:
+                            {
+                                StackObject* b = esp - 1;
+                                StackObject* a = esp - 2;
+                                esp = esp - 2;
+                                if (a->ObjectType == ObjectTypes.Integer)
+                                {
+                                    if (a->Value < b->Value)
+                                        esp->Value = 1;
+                                    else
+                                        esp->Value = 0;
+                                }
+                                else
+                                    throw new NotSupportedException();
+                                esp++;
+                            }
+                            break;
                         case OpCodeEnum.Add:
                             {
-                                StackObject* a = esp - 1;
-                                StackObject* b = esp - 2;
-                                esp -= 2;
+                                StackObject* b = esp - 1;
+                                StackObject* a = esp - 2;
+                                esp = esp - 2;
                                 if(a->ObjectType == ObjectTypes.Long)
                                 {
                                     esp->ObjectType = ObjectTypes.Long;
@@ -103,29 +216,55 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp->ObjectType = ObjectTypes.Integer;
                                     esp->Value = a->Value + b->Value;
                                 }
+                                esp++;
                             }
                             break;
                         case OpCodeEnum.Ldind_I:
-                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I1:
-                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I2:
-                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I4:
-                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ldind_I8:
-                            esp = Pop(esp);
                             break;
                         case OpCodeEnum.Ret:
                             returned = true;
                             break;
-                        case OpCodeEnum.Br_S:
-                            ip = ptr + ip->TokenAddress;
+                        case OpCodeEnum.Brtrue:
+                        case OpCodeEnum.Brtrue_S:
+                            {
+                                esp--;
+                                if (esp->ObjectType == ObjectTypes.Integer && esp->Value > 0)
+                                {
+                                    ip = ptr + ip->TokenInteger;
+                                    continue;
+                                }
+                                else
+                                    Free(esp);
+                            }
                             break;
+                        case OpCodeEnum.Blt:
+                        case OpCodeEnum.Blt_S:
+                            {
+                                var b = esp - 1;
+                                var a = esp - 2;
+                                esp -= 2;
+                                if (esp->ObjectType == ObjectTypes.Integer)
+                                {
+                                    if (a->Value < b->Value)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+                                }
+                            }
+                            break;
+                        case OpCodeEnum.Br_S:
+                        case OpCodeEnum.Br:
+                            ip = ptr + ip->TokenInteger;
+                            continue;
                         case OpCodeEnum.Nop:
                             break;
                         default:
@@ -171,22 +310,35 @@ namespace ILRuntime.Runtime.Intepreter
             }
             return esp;
         }
-
-        StackObject* Pop(StackObject* esp)
+        StackObject* PushOne(StackObject* esp)
         {
-            if(esp->ObjectType == ObjectTypes.Object)
+            esp->ObjectType = ObjectTypes.Integer;
+            esp->Value = 1;
+            return esp + 1;
+        }
+
+        StackObject* PushZero(StackObject* esp)
+        {
+            esp->ObjectType = ObjectTypes.Integer;
+            esp->Value = 0;
+            return esp + 1;
+        }
+
+        void Free(StackObject* esp)
+        {
+            if (esp->ObjectType == ObjectTypes.Object)
             {
+                if (esp->Value == stack.ManagedStack.Count)
+                    stack.ManagedStack.RemoveAt(esp->Value);
 #if DEBUG
-                if (esp->Value != stack.ManagedStack.Count)
+                else
                     throw new NotSupportedException();
 #endif
-                stack.ManagedStack.RemoveAt(esp->Value);
             }
 #if DEBUG
             esp->ObjectType = ObjectTypes.Null;
             esp->Value = -1;
 #endif
-            return esp - 1;
         }
     }
 }

@@ -116,7 +116,10 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Blt_S:
                 case OpCodeEnum.Blt_Un:
                 case OpCodeEnum.Blt_Un_S:
-                    code.TokenAddress = addr[(Mono.Cecil.Cil.Instruction)token]; 
+                    code.TokenInteger = addr[(Mono.Cecil.Cil.Instruction)token]; 
+                    break;
+                case OpCodeEnum.Ldc_I4:
+                    code.TokenInteger = (int)token;
                     break;
             }
         }
