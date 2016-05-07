@@ -27,7 +27,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public IMethod GetMethod(string name)
+        public IMethod GetMethod(string name, int paramCount)
         {
             throw new NotImplementedException();
         }

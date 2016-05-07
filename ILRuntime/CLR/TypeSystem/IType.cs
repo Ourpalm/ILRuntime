@@ -13,6 +13,6 @@ namespace ILRuntime.CLR.TypeSystem
         bool IsGenericInstance { get; }
         Type TypeForCLR { get; }
 
-        IMethod GetMethod(string name);
+        IMethod GetMethod(string name, int paramCount);
     }
 }

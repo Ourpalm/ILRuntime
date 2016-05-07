@@ -22,20 +22,20 @@ namespace ILRuntime.Runtime.Intepreter
             stack = new RuntimeStack(this);
         }
 
-        public void Run(ILMethod method)
+        public void Run(ILMethod method, object[] p)
+        {
+
+        }
+        void Execute(ILMethod method, StackObject* esp)
         {
             OpCode[] body = method.Body;
-            StackObject v1 = new StackObject();
-            StackObject v2 = new StackObject();
-            StackObject v3 = new StackObject();
-            StackObject v4 = new StackObject();
-            StackObject v5 = new StackObject();
+            StackFrame frame = stack.PushFrame(method, esp);
+            StackObject* v1 = frame.LocalVarPointer;
+            StackObject* v2 = frame.LocalVarPointer + 1;
+            StackObject* v3 = frame.LocalVarPointer + 2;
+            StackObject* v4 = frame.LocalVarPointer + 3;
+            StackObject* v5 = frame.LocalVarPointer + 4;
 
-            StackObject* stackBase = stack.StackBase;
-            StackObject* esp = stackBase;
-            StackObject* paramPtr;
-            StackObject* localVars = esp;
-            //esp += var count;
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
 
@@ -51,18 +51,18 @@ namespace ILRuntime.Runtime.Intepreter
                     {
                         case OpCodeEnum.Stloc_0:
                             esp = Pop(esp);
-                            v1 = *esp;
+                            *v1 = *esp;
                             break;
                         case OpCodeEnum.Ldloc_0:
-                            *esp = v1;
+                            *esp = *v1;
                             esp++;
                             break;
                         case OpCodeEnum.Stloc_1:
                             esp = Pop(esp);
-                            v2 = *esp;
+                            *v2 = *esp;
                             break;
                         case OpCodeEnum.Ldloc_1:
-                            *esp = v2;
+                            *esp = *v2;
                             esp++;
                             break;
                         case OpCodeEnum.Ldc_I4_0:

@@ -27,6 +27,22 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public int LocalVariableCount
+        {
+            get
+            {
+                return def.HasBody ? def.Body.Variables.Count : 0;
+            }
+        }
+
+        public int ParameterCount
+        {
+            get
+            {
+                return def.HasParameters ? def.Parameters.Count : 0;
+            }
+        }
+
         void InitCodeBody()
         {
             if (def.HasBody)

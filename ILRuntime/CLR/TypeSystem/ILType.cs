@@ -12,7 +12,7 @@ namespace ILRuntime.CLR.TypeSystem
 {
     class ILType : IType
     {
-        Dictionary<string, IMethod> methods;
+        Dictionary<string, List<ILMethod>> methods;
         TypeDefinition definition;
 
         public TypeDefinition TypeDefinition { get { return definition; } }
@@ -98,22 +98,34 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public IMethod GetMethod(string name)
+        public IMethod GetMethod(string name, int paramCount)
         {
             if (methods == null)
                 InitializeMethods();
-            IMethod res;
-            if (methods.TryGetValue(name, out res))
-                return res;
+            List<ILMethod> lst;
+            if (methods.TryGetValue(name, out lst))
+            {
+                foreach(var i in lst)
+                {
+                    if (i.ParameterCount == paramCount)
+                        return i;
+                }
+            }
             return null;
         }
 
         void InitializeMethods()
         {
-            methods = new Dictionary<string, IMethod>();
+            methods = new Dictionary<string, List<ILMethod>>();
             foreach(var i in definition.Methods)
             {
-                methods[i.Name] = new ILMethod(i);
+                List<ILMethod> lst;
+                if(!methods.TryGetValue(i.Name, out lst))
+                {
+                    lst = new List<ILMethod>();
+                    methods[i.Name] = lst;
+                }
+                lst.Add(new ILMethod(i));
             }
         }
     }

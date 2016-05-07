@@ -69,10 +69,10 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        public object Invoke(string type, string method)
+        public object Invoke(string type, string method, params object[] p)
         {
             IType t = GetType(type);
-            var m = t.GetMethod(method);
+            var m = t.GetMethod(method, p.Length);
 
             if(m != null)
             {
@@ -86,7 +86,7 @@ namespace ILRuntime.Runtime.Enviorment
                         else
                             inteptreter = new ILIntepreter(this);
                     }
-                    inteptreter.Run((ILMethod)m);
+                    inteptreter.Run((ILMethod)m, p);
                 }
             }
             return null;
