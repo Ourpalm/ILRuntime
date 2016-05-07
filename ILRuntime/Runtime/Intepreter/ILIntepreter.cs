@@ -330,10 +330,6 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 if (esp->Value == stack.ManagedStack.Count)
                     stack.ManagedStack.RemoveAt(esp->Value);
-#if DEBUG
-                else
-                    throw new NotSupportedException();
-#endif
             }
 #if DEBUG
             esp->ObjectType = ObjectTypes.Null;
