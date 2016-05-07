@@ -14,6 +14,7 @@ namespace ILRuntime.CLR.TypeSystem
     {
         Dictionary<string, List<ILMethod>> methods;
         TypeDefinition definition;
+        ILRuntime.Runtime.Enviorment.AppDomain appdomain;
 
         public TypeDefinition TypeDefinition { get { return definition; } }
 
@@ -42,6 +43,7 @@ namespace ILRuntime.CLR.TypeSystem
 
         public void InitializeBaseType(Runtime.Enviorment.AppDomain domain)
         {
+            appdomain = domain;
             if (definition.BaseType != null)
             {
                 BaseType = domain.GetType(definition.BaseType.FullName);
@@ -125,7 +127,7 @@ namespace ILRuntime.CLR.TypeSystem
                     lst = new List<ILMethod>();
                     methods[i.Name] = lst;
                 }
-                lst.Add(new ILMethod(i));
+                lst.Add(new ILMethod(i, appdomain));
             }
         }
     }

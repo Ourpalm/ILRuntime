@@ -9,5 +9,6 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
     struct OpCode
     {
         public OpCodeEnum Code;
+        public int TokenAddress;
     }
 }

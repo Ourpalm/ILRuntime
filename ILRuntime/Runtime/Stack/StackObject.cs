@@ -16,6 +16,7 @@ namespace ILRuntime.Runtime.Stack
 
     enum ObjectTypes
     {
+        Null,
         Integer,
         Long,
         Float,

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.CLR.Method;
+using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 
 namespace ILRuntime.Runtime.Intepreter
@@ -24,6 +25,13 @@ namespace ILRuntime.Runtime.Intepreter
 
         public void Run(ILMethod method, object[] p)
         {
+            List<object> mStack = stack.ManagedStack;
+            int mStackBase = mStack.Count;
+
+            StackObject* esp = PushParameters(stack.StackBase, method.Parameters, p);
+            Execute(method, esp);
+            //ClearStack
+            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
 
         }
         void Execute(ILMethod method, StackObject* esp)
@@ -36,6 +44,8 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v4 = frame.LocalVarPointer + 3;
             StackObject* v5 = frame.LocalVarPointer + 4;
 
+            esp = frame.BasePointer;
+            StackObject* arg = frame.LocalVarPointer - 1;
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
 
@@ -49,6 +59,14 @@ namespace ILRuntime.Runtime.Intepreter
                     code = ip->Code;
                     switch (code)
                     {
+                        case OpCodeEnum.Ldarg_0:
+                            *esp = *(arg);
+                            esp++;
+                            break;
+                        case OpCodeEnum.Ldarg_1:
+                            *esp = *(arg - 1);
+                            esp++;
+                            break;
                         case OpCodeEnum.Stloc_0:
                             esp = Pop(esp);
                             *v1 = *esp;
@@ -105,6 +123,13 @@ namespace ILRuntime.Runtime.Intepreter
                         case OpCodeEnum.Ret:
                             returned = true;
                             break;
+                        case OpCodeEnum.Br_S:
+                            ip = ptr + ip->TokenAddress;
+                            break;
+                        case OpCodeEnum.Nop:
+                            break;
+                        default:
+                            throw new NotSupportedException("Not supported opcode " + code);
                     }
                     ip++;
                 }
@@ -114,14 +139,53 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        StackObject* PushParameters(StackObject* esp, List<IType> plist, object[] p)
+        {
+            List<object> mStack = stack.ManagedStack;
+            if (p != null && p.Length > 0)
+            {
+                if (plist.Count != p.Length)
+                    throw new ArgumentOutOfRangeException();
+                for (int i = p.Length - 1; i >= 0; i--)
+                {
+                    var t = plist[i];
+                    Type clrType = t.TypeForCLR;
+                    if (clrType == typeof(int))
+                    {
+                        esp->ObjectType = ObjectTypes.Integer;
+                        esp->Value = (int)p[i];
+                    }
+                    else if (clrType == typeof(float))
+                    {
+                        esp->ObjectType = ObjectTypes.Integer;
+                        *(float*)&esp->Value = (float)p[i];
+                    }
+                    else
+                    {
+                        esp->ObjectType = ObjectTypes.Object;
+                        esp->Value = mStack.Count;
+                        mStack.Add(p[i]);
+                    }
+                    esp++;
+                }
+            }
+            return esp;
+        }
+
         StackObject* Pop(StackObject* esp)
         {
             if(esp->ObjectType == ObjectTypes.Object)
             {
+#if DEBUG
                 if (esp->Value != stack.ManagedStack.Count)
                     throw new NotSupportedException();
+#endif
                 stack.ManagedStack.RemoveAt(esp->Value);
             }
+#if DEBUG
+            esp->ObjectType = ObjectTypes.Null;
+            esp->Value = -1;
+#endif
             return esp - 1;
         }
     }

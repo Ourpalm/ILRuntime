@@ -66,6 +66,13 @@ namespace ILRuntime.Runtime.Enviorment
             IType res;
             if (mapType.TryGetValue(fullname, out res))
                 return res;
+            Type t = Type.GetType(fullname);
+            if(t != null)
+            {
+                res = new CLRType(t);
+                mapType[fullname] = res;
+                return res;               
+            }
             return null;
         }
 

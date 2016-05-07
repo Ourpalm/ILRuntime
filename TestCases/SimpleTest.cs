@@ -41,7 +41,7 @@ namespace TestCases
             return b;
         }
 
-        public int foo()
+        public int foo2()
         {
             int b = a;
             for (int i = 0; i < 10000; i++)

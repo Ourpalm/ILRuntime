@@ -10,6 +10,11 @@ namespace ILRuntime.CLR.TypeSystem
     class CLRType : IType
     {
         Type clrType;
+
+        public CLRType(Type clrType)
+        {
+            this.clrType = clrType;
+        }
         
         public bool IsGenericInstance
         {

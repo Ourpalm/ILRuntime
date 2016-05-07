@@ -26,7 +26,7 @@ namespace ILRuntimeTest
                 {
                     ILRuntime.Runtime.Enviorment.AppDomain app = new ILRuntime.Runtime.Enviorment.AppDomain();
                     app.LoadAssembly(fs);
-                    app.Invoke("TestCases.SimpleTest", "foo");
+                    app.Invoke("TestCases.SimpleTest", "foo", 100);
                 }
             }
         }

@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -56,6 +56,7 @@
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
     <Compile Include="Runtime\Intepreter\RuntimeInstance.cs" />
     <Compile Include="Runtime\Stack\RuntimeStack.cs" />
+    <Compile Include="Runtime\Stack\StackFrame.cs" />
     <Compile Include="Runtime\Stack\StackObject.cs" />
   </ItemGroup>
   <ItemGroup>

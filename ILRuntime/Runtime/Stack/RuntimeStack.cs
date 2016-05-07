@@ -51,6 +51,13 @@ namespace ILRuntime.Runtime.Stack
             StackFrame res = new StackFrame();
             res.LocalVarPointer = esp;
             res.Method = method;
+#if DEBUG
+            for (int i = 0; i < method.LocalVariableCount; i++)
+            {
+                var p = esp + i;
+                p->ObjectType = ObjectTypes.Null;
+            }
+#endif
             res.BasePointer = esp + method.LocalVariableCount;
             framse.Push(res);
             return res;
