@@ -30,11 +30,11 @@ namespace ILRuntime.Runtime.Intepreter
             int mStackBase = mStack.Count;
 
             StackObject* esp = PushParameters(stack.StackBase, method.Parameters, p);
-            Execute(method, ref esp);
+            Execute(method, esp);
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);            
         }
-        void Execute(ILMethod method, ref StackObject* esp)
+        StackObject* Execute(ILMethod method, StackObject* esp)
         {
             OpCode[] body = method.Body;
             StackFrame frame = stack.PushFrame(method, esp);
@@ -272,7 +272,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 IMethod m = domain.GetMethod(ip->TokenInteger);
                                 if (m is ILMethod)
                                 {
-                                    Execute((ILMethod)m, ref esp);
+                                    esp = Execute((ILMethod)m, esp);
                                 }
                                 else
                                     throw new NotSupportedException();
@@ -288,7 +288,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                 //ClearStack
                 mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
-                esp = stack.PopFrame(ref frame, esp);
+                return stack.PopFrame(ref frame, esp);
             }
         }
 
