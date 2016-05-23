@@ -16,7 +16,7 @@ The basic part of the runtime, like resolving PE header, gathering meta informat
 
 The intepreter part, we will try to take elimminate the memory allcation for arthmetic operations and method invokation as much as possible. Also we want to make use of the advantage of unsafe code to boost the arthmetic operations and stack operation.
 
-A very simple test case shows dramastic performance improvement compared to LSharp:
+A very simple test case shows drastical performance improvement compared to LSharp:
 ```C#
         public static int foo(int init)
         {
