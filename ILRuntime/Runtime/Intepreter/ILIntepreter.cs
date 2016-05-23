@@ -23,17 +23,18 @@ namespace ILRuntime.Runtime.Intepreter
             stack = new RuntimeStack(this);
         }
 
+        public Enviorment.AppDomain AppDomain { get { return domain; } }
         public void Run(ILMethod method, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
 
             StackObject* esp = PushParameters(stack.StackBase, method.Parameters, p);
-            Execute(method, esp);
+            Execute(method, ref esp);
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);            
         }
-        void Execute(ILMethod method, StackObject* esp)
+        void Execute(ILMethod method, ref StackObject* esp)
         {
             OpCode[] body = method.Body;
             StackFrame frame = stack.PushFrame(method, esp);
@@ -180,6 +181,7 @@ namespace ILRuntime.Runtime.Intepreter
                             esp++;
                             break;
                         case OpCodeEnum.Ldc_I4:
+                        case OpCodeEnum.Ldc_I4_S:
                             esp->Value = ip->TokenInteger;
                             esp->ObjectType = ObjectTypes.Integer;
                             esp++;
@@ -265,6 +267,17 @@ namespace ILRuntime.Runtime.Intepreter
                         case OpCodeEnum.Br:
                             ip = ptr + ip->TokenInteger;
                             continue;
+                        case OpCodeEnum.Call:
+                            {
+                                IMethod m = domain.GetMethod(ip->TokenInteger);
+                                if (m is ILMethod)
+                                {
+                                    Execute((ILMethod)m, ref esp);
+                                }
+                                else
+                                    throw new NotSupportedException();
+                            }
+                            break;
                         case OpCodeEnum.Nop:
                             break;
                         default:
@@ -275,6 +288,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                 //ClearStack
                 mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
+                esp = stack.PopFrame(ref frame, esp);
             }
         }
 

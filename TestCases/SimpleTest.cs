@@ -22,9 +22,9 @@ namespace TestCases
         public static int foo()
         {
             int b = 0;
-            for( int i = 0; i < 10000; i++)
+            for( int i = 0; i < 50; i++)
             {
-                b += i;
+                b += foo(b);
             }
 
             return b;
@@ -33,7 +33,7 @@ namespace TestCases
         public static int foo(int init)
         {
             int b = init;
-            for( int i = 0; i < 500000; i++)
+            for( int i = 0; i < 10000; i++)
             {
                 b += i;
             }

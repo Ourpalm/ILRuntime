@@ -49,6 +49,7 @@
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
     <Compile Include="CLR\TypeSystem\ILTypeInstance.cs" />
     <Compile Include="CLR\TypeSystem\IType.cs" />
+    <Compile Include="CLR\Utils\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Enviorment\AppDomain.cs" />
     <Compile Include="Runtime\Intepreter\ILIntepreter.cs" />

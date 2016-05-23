@@ -15,9 +15,12 @@ namespace ILRuntime.CLR.Method
         MethodDefinition def;
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
-        public ILMethod(MethodDefinition def, ILRuntime.Runtime.Enviorment.AppDomain domain)
+        ILType declaringType;
+        public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.def = def;
+            declaringType = type;
+            ReturnType = domain.GetType(def.ReturnType.FullName);
             this.appdomain = domain;
         }
 
@@ -58,6 +61,12 @@ namespace ILRuntime.CLR.Method
                 }
                 return parameters;
             }
+        }
+
+        public IType ReturnType
+        {
+            get;
+            private set;
         }
         void InitCodeBody()
         {
@@ -120,6 +129,16 @@ namespace ILRuntime.CLR.Method
                     break;
                 case OpCodeEnum.Ldc_I4:
                     code.TokenInteger = (int)token;
+                    break;
+                case OpCodeEnum.Ldc_I4_S:
+                    code.TokenInteger = (sbyte)token;
+                    break;
+                case OpCodeEnum.Call:
+                    {
+                        var m = appdomain.GetMethod(token, declaringType);
+                        if (m != null)
+                            code.TokenInteger = token.GetHashCode();
+                    }
                     break;
             }
         }

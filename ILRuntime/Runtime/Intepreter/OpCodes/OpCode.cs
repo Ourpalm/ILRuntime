@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using ILRuntime.CLR.Method;
+
 namespace ILRuntime.Runtime.Intepreter.OpCodes
 {
     struct OpCode

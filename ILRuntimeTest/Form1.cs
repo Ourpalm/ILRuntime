@@ -28,7 +28,7 @@ namespace ILRuntimeTest
                     app.LoadAssembly(fs);
                     System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                     sw.Start();
-                    app.Invoke("TestCases.SimpleTest", "foo", 100); 
+                    app.Invoke("TestCases.SimpleTest", "foo"); 
                     sw.Stop();
                     System.Diagnostics.Debugger.Log(2, "info", "Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
                     

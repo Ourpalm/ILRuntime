@@ -10,7 +10,7 @@ using ILRuntime.CLR.Method;
 
 namespace ILRuntime.CLR.TypeSystem
 {
-    class ILType : IType
+    public class ILType : IType
     {
         Dictionary<string, List<ILMethod>> methods;
         TypeDefinition definition;
@@ -127,8 +127,13 @@ namespace ILRuntime.CLR.TypeSystem
                     lst = new List<ILMethod>();
                     methods[i.Name] = lst;
                 }
-                lst.Add(new ILMethod(i, appdomain));
+                lst.Add(new ILMethod(i, this, appdomain));
             }
+        }
+
+        public IMethod GetMethod(string name, List<IType> param)
+        {
+            return GetMethod(name, param.Count);
         }
     }
 }

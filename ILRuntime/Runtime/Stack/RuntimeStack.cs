@@ -63,12 +63,20 @@ namespace ILRuntime.Runtime.Stack
             return res;
         }
 
-        public void PopFrame(ref StackFrame frame)
+        public StackObject* PopFrame(ref StackFrame frame, StackObject* esp)
         {
             if (framse.Count > 0 && framse.Peek().BasePointer == frame.BasePointer)
                 framse.Pop();
             else
                 throw new NotSupportedException();
+            StackObject* returnVal = esp - 1;
+            StackObject* ret = frame.LocalVarPointer - frame.Method.ParameterCount;
+            if(frame.Method.ReturnType != intepreter.AppDomain.VoidType)
+            {
+                *ret = *returnVal;
+                ret++;
+            }
+            return ret;
         }
 
         

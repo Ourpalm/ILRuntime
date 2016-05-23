@@ -36,5 +36,10 @@ namespace ILRuntime.CLR.TypeSystem
         {
             throw new NotImplementedException();
         }
+
+        public IMethod GetMethod(string name, List<IType> param)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
