@@ -1,7 +1,7 @@
 ILRuntime
 ==========
 
-This project is inpired by L# intepreter, which is designed for the same purpose as we do, which is to provide a IL runtime to run c# code on enviorments without JIT. For example on iOS.
+This project is inpired by L# intepreter([LSharp Project](https://github.com/lightszero/LSharp "A Pure C# IL Runner,Run DLL as a Script" )), which is designed for the same purpose as we do, which is to provide a IL runtime to run c# code on enviorments without JIT. For example on iOS.
 
 L# is a great project which created a good code base to accomplish the task, but it also has some limitations.
 * L# doesn't support Generic types inside the runtime
