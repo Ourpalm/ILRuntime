@@ -16,8 +16,10 @@ namespace ILRuntime.Runtime.Stack
         StackObject* endOfMemory;
         IntPtr nativePointer;
         List<object> managedStack = new List<object>();
-        Stack<StackFrame> framse = new Stack<StackFrame>();
+        Stack<StackFrame> frames = new Stack<StackFrame>();
         const int MAXIMAL_STACK_OBJECTS = 1024 * 128;
+
+        public Stack<StackFrame> Frames { get { return frames; } }
         public RuntimeStack(ILIntepreter intepreter)
         {
             this.intepreter = intepreter;
@@ -46,12 +48,13 @@ namespace ILRuntime.Runtime.Stack
         {
             if (esp < pointer || esp >= endOfMemory)
                 throw new StackOverflowException();
-            if (framse.Count > 0 && framse.Peek().BasePointer > esp)
+            if (frames.Count > 0 && frames.Peek().BasePointer > esp)
                 throw new StackOverflowException();
             StackFrame res = new StackFrame();
             res.LocalVarPointer = esp;
             res.Method = method;
 #if DEBUG
+            res.Address = new IntegerReference();
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
                 var p = esp + i;
@@ -59,14 +62,14 @@ namespace ILRuntime.Runtime.Stack
             }
 #endif
             res.BasePointer = esp + method.LocalVariableCount;
-            framse.Push(res);
+            frames.Push(res);
             return res;
         }
 
         public StackObject* PopFrame(ref StackFrame frame, StackObject* esp)
         {
-            if (framse.Count > 0 && framse.Peek().BasePointer == frame.BasePointer)
-                framse.Pop();
+            if (frames.Count > 0 && frames.Peek().BasePointer == frame.BasePointer)
+                frames.Pop();
             else
                 throw new NotSupportedException();
             StackObject* returnVal = esp - 1;

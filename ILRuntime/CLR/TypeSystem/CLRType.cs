@@ -32,6 +32,14 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public string FullName
+        {
+            get
+            {
+                return clrType.FullName;
+            }
+        }
+
         public IMethod GetMethod(string name, int paramCount)
         {
             throw new NotImplementedException();

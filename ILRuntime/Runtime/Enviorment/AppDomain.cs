@@ -88,18 +88,24 @@ namespace ILRuntime.Runtime.Enviorment
 
             if(m != null)
             {
-                if(m is ILMethod)
+                return Invoke(m, p);
+            }
+            return null;
+        }
+
+        public object Invoke(IMethod m, params object[] p)
+        {
+            if (m is ILMethod)
+            {
+                ILIntepreter inteptreter = null;
+                lock (freeIntepreters)
                 {
-                    ILIntepreter inteptreter = null;
-                    lock (freeIntepreters)
-                    {
-                        if (freeIntepreters.Count > 0)
-                            inteptreter = freeIntepreters.Dequeue();
-                        else
-                            inteptreter = new ILIntepreter(this);
-                    }
-                    inteptreter.Run((ILMethod)m, p);
+                    if (freeIntepreters.Count > 0)
+                        inteptreter = freeIntepreters.Dequeue();
+                    else
+                        inteptreter = new ILIntepreter(this);
                 }
+                inteptreter.Run((ILMethod)m, p);
             }
             return null;
         }

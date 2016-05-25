@@ -15,7 +15,9 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<string, List<ILMethod>> methods;
         TypeDefinition definition;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
-
+        ILMethod staticConstructor;
+        List<ILMethod> constructors;
+        bool staticInitialized = false;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
         public IType BaseType { get; private set; }
@@ -38,6 +40,13 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return typeof(ILTypeInstance);
+            }
+        }
+        public string FullName
+        {
+            get
+            {
+                return definition.FullName;
             }
         }
 
@@ -119,15 +128,31 @@ namespace ILRuntime.CLR.TypeSystem
         void InitializeMethods()
         {
             methods = new Dictionary<string, List<ILMethod>>();
+            constructors = new List<ILMethod>();
             foreach(var i in definition.Methods)
             {
-                List<ILMethod> lst;
-                if(!methods.TryGetValue(i.Name, out lst))
+                if (i.IsConstructor)
                 {
-                    lst = new List<ILMethod>();
-                    methods[i.Name] = lst;
+                    if (i.IsStatic)
+                        staticConstructor = new ILMethod(i, this, appdomain);
+                    else
+                        constructors.Add(new ILMethod(i, this, appdomain));
                 }
-                lst.Add(new ILMethod(i, this, appdomain));
+                else
+                {
+                    List<ILMethod> lst;
+                    if (!methods.TryGetValue(i.Name, out lst))
+                    {
+                        lst = new List<ILMethod>();
+                        methods[i.Name] = lst;
+                    }
+                    lst.Add(new ILMethod(i, this, appdomain));
+                }
+            }
+
+            if (staticConstructor != null)
+            {
+                //appdomain.Invoke(staticConstructor);
             }
         }
 

@@ -12,6 +12,8 @@ namespace ILRuntime.CLR.Method
         int LocalVariableCount { get; }
         int ParameterCount { get; }
 
+        IType DeclearingType { get; }
+
         IType ReturnType { get; }
         List<IType> Parameters { get; }
     }

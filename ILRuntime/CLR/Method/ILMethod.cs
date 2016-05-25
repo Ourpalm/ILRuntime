@@ -16,6 +16,17 @@ namespace ILRuntime.CLR.Method
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         ILType declaringType;
+
+        public MethodDefinition Definition { get { return def; } }
+
+        public IType DeclearingType
+        {
+            get
+            {
+                return declaringType;
+            }
+        }
+
         public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.def = def;

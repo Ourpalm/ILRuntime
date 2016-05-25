@@ -8,7 +8,23 @@ namespace TestCases
 {
     public class SimpleTest
     {
+        static int b;
         int a;
+        int c = 2;
+        static SimpleTest()
+        {
+            b = 1;
+        }
+
+        public SimpleTest()
+            : this(1)
+        {
+            c = 2;
+        }
+        public SimpleTest(int a)
+        {
+            this.a = a;
+        }
         public static long bar()
         {
             long b = 0;
@@ -16,7 +32,7 @@ namespace TestCases
             {
                 b += i;
             }
-
+            
             return b;
         }
         public static int foo()
@@ -26,7 +42,6 @@ namespace TestCases
             {
                 b += foo(b);
             }
-
             return b;
         }
 
@@ -37,19 +52,31 @@ namespace TestCases
             {
                 b += i;
             }
-
+            SimpleTest.b = b;
             return b;
         }
 
-        public int foo2()
+        public static int foo2()
         {
-            int b = a;
-            for (int i = 0; i < 10000; i++)
+            int b = 0;
+            for (int i = 0; i < 500000; i++)
             {
                 b += i;
             }
 
             return b;
+        }
+
+        public static void InstanceTest()
+        {
+            SimpleTest t = new SimpleTest();
+            int a = t.c;
+            SimpleTest t2 = new SimpleTest(12);
+            int b = t2.c;
+            if (a == b)
+            {
+                Console.Write("true");
+            }
         }
     }
 }
