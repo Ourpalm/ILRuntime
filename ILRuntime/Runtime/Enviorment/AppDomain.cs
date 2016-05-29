@@ -118,13 +118,26 @@ namespace ILRuntime.Runtime.Enviorment
             List<IType> paramList = null;
             int hashCode = token.GetHashCode();
             IMethod method;
-            if(mapMethod.TryGetValue(hashCode, out method))
+            bool isConstructor = false;
+            if (mapMethod.TryGetValue(hashCode, out method))
                 return method;
             if (token is Mono.Cecil.MethodReference)
             {
                 Mono.Cecil.MethodReference _ref = (token as Mono.Cecil.MethodReference);
+                if (_ref.FullName == "System.Void System.Object::.ctor()")
+                {
+                    mapMethod[hashCode] = null;
+                    return null;
+                }
                 methodname = _ref.Name;
                 typename = _ref.DeclaringType.FullName;
+                if (token is Mono.Cecil.MethodDefinition)
+                {
+                    var def = _ref as MethodDefinition;
+                    isConstructor = def.IsConstructor;
+                }
+                else
+                    isConstructor = methodname == ".ctor";
 
                 paramList = _ref.GetParamList(this);
                 if (_ref.IsGenericInstance)
@@ -143,8 +156,13 @@ namespace ILRuntime.Runtime.Enviorment
             if (type == null)
                 throw new KeyNotFoundException("Cannot find type:" + typename);
 
-            method = type.GetMethod(methodname, paramList);
+            if (isConstructor)
+                method = type.GetConstructor(paramList);
+            else
+                method = type.GetMethod(methodname, paramList);
 
+            if (method == null)
+                throw new KeyNotFoundException("Cannot find method:" + methodname);
             mapMethod[hashCode] = method;
             return method;
         }

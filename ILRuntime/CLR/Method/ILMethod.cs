@@ -27,6 +27,14 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public bool HasThis
+        {
+            get
+            {
+                return def.HasThis;
+            }
+        }
+
         public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.def = def;
@@ -50,6 +58,14 @@ namespace ILRuntime.CLR.Method
             get
             {
                 return def.HasBody ? def.Body.Variables.Count : 0;
+            }
+        }
+
+        public bool IsConstructor
+        {
+            get
+            {
+                return def.IsConstructor;
             }
         }
 
@@ -145,19 +161,11 @@ namespace ILRuntime.CLR.Method
                     code.TokenInteger = (sbyte)token;
                     break;
                 case OpCodeEnum.Call:
+                case OpCodeEnum.Newobj:
                     {
                         var m = appdomain.GetMethod(token, declaringType);
                         if (m != null)
                             code.TokenInteger = token.GetHashCode();
-                    }
-                    break;
-                case OpCodeEnum.Newobj:
-                    {
-                        var m = appdomain.GetMethod(token, declaringType);
-                        if(m != null)
-                        {
-                            code.TokenInteger = token.GetHashCode();
-                        }
                     }
                     break;
             }

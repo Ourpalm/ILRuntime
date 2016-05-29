@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Mono.Cecil;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.CLR.TypeSystem
 {
@@ -17,10 +18,23 @@ namespace ILRuntime.CLR.TypeSystem
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         ILMethod staticConstructor;
         List<ILMethod> constructors;
+        IType[] fieldTypes;
+        Dictionary<string, int> fieldMapping;
+        Dictionary<int, int> fieldTokenMapping = new Dictionary<int, int>();
         bool staticInitialized = false;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
         public IType BaseType { get; private set; }
+
+        public IType[] FieldTypes
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields();
+                return fieldTypes;
+            }
+        }
 
         public ILType(TypeDefinition def)
         {
@@ -169,6 +183,37 @@ namespace ILRuntime.CLR.TypeSystem
                     return i;
             }
             return null;
+        }
+
+        public int GetFieldIndex(object token)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+
+            return -1;
+        }
+
+        void InitializeFields()
+        {
+            fieldMapping = new Dictionary<string, int>();
+            fieldTypes = new IType[definition.Fields.Count];
+            var fields = definition.Fields;
+            int idx = 0;
+            for (int i = 0; i < fields.Count; i++)
+            {
+                var field = fields[i];
+                if (field.IsStatic)
+                    continue;
+                fieldMapping[field.Name] = idx;
+                fieldTypes[idx] = appdomain.GetType(field.FieldType.FullName);
+                idx++;
+            }
+            Array.Resize(ref fieldTypes, idx);
+        }
+
+        internal ILTypeInstance Instantiate()
+        {
+            return new ILTypeInstance(this);
         }
     }
 }

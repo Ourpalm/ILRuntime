@@ -12,14 +12,13 @@ namespace ILRuntime.CLR.Method
 {
     class CLRMethod : IMethod
     {
-        OpCode[] body;
         MethodInfo def;
+        ConstructorInfo cDef;
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         CLRType declaringType;
         ParameterInfo[] param;
-
-        public MethodInfo Definition { get { return def; } }
+        bool isConstructor;
 
         public IType DeclearingType
         {
@@ -40,6 +39,20 @@ namespace ILRuntime.CLR.Method
                 ReturnType = domain.GetType(def.ReturnType.FullName);
                 InitParameters();
             }
+            isConstructor = false;
+        }
+        public CLRMethod(ConstructorInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
+        {
+            this.cDef = def;
+            declaringType = type;
+            this.appdomain = domain;
+            param = def.GetParameters();
+            if (!def.IsGenericMethod && !def.ContainsGenericParameters)
+            {
+                ReturnType = type;
+                InitParameters();
+            }
+            isConstructor = true;
         }
 
         public int ParameterCount
@@ -67,6 +80,14 @@ namespace ILRuntime.CLR.Method
         {
             get;
             private set;
+        }
+
+        public bool IsConstructor
+        {
+            get
+            {
+                return def.IsConstructor;
+            }
         }
 
         void InitParameters()

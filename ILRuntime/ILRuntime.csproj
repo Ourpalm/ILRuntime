@@ -48,7 +48,7 @@
     <Compile Include="CLR\Method\IMethod.cs" />
     <Compile Include="CLR\TypeSystem\ILType.cs" />
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
-    <Compile Include="CLR\TypeSystem\ILTypeInstance.cs" />
+    <Compile Include="Runtime\Intepreter\ILTypeInstance.cs" />
     <Compile Include="CLR\TypeSystem\IType.cs" />
     <Compile Include="CLR\Utils\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -58,7 +58,6 @@
     <Compile Include="Runtime\Intepreter\ILIntepreter.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCode.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
-    <Compile Include="Runtime\Intepreter\RuntimeInstance.cs" />
     <Compile Include="Runtime\Stack\RuntimeStack.cs" />
     <Compile Include="Runtime\Stack\StackFrame.cs" />
     <Compile Include="Runtime\Stack\StackObject.cs" />

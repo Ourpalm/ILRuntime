@@ -56,20 +56,17 @@ namespace ILRuntime.CLR.TypeSystem
             constructors = new List<CLRMethod>();
             foreach (var i in clrType.GetMethods())
             {
-                if (i.IsConstructor)
+                List<CLRMethod> lst;
+                if (!methods.TryGetValue(i.Name, out lst))
                 {
-                    constructors.Add(new CLRMethod(i, this, appdomain));
+                    lst = new List<CLRMethod>();
+                    methods[i.Name] = lst;
                 }
-                else
-                {
-                    List<CLRMethod> lst;
-                    if (!methods.TryGetValue(i.Name, out lst))
-                    {
-                        lst = new List<CLRMethod>();
-                        methods[i.Name] = lst;
-                    }
-                    lst.Add(new CLRMethod(i, this, appdomain));
-                }
+                lst.Add(new CLRMethod(i, this, appdomain));
+            }
+            foreach(var i in clrType.GetConstructors())
+            {
+
             }
         }
 

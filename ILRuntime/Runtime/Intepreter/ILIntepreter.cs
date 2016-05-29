@@ -277,8 +277,40 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Call:
                                 {
                                     IMethod m = domain.GetMethod(ip->TokenInteger);
+                                    if (m == null)
+                                    {
+                                        //Irrelevant method
+                                        Free(esp);
+                                        esp--;
+                                    }
+                                    else {
+                                        if (m is ILMethod)
+                                        {
+                                            ILMethod ilm = (ILMethod)m;
+                                            if (ilm.HasThis)
+                                            {
+                                                *esp = *arg;
+                                                esp->Value = mStack.Count;
+                                                mStack.Add(mStack[arg->Value]);
+                                                esp++;
+                                            }
+                                            esp = Execute(ilm, esp, out unhandledException);
+                                            if (unhandledException)
+                                                returned = true;
+                                        }
+                                        else
+                                            throw new NotSupportedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeEnum.Newobj:
+                                {
+                                    IMethod m = domain.GetMethod(ip->TokenInteger);
                                     if (m is ILMethod)
                                     {
+                                        ILType type = m.DeclearingType as ILType;
+                                        var obj = type.Instantiate();
+                                        esp = PushObject(esp, mStack, obj);
                                         esp = Execute((ILMethod)m, esp, out unhandledException);
                                         if (unhandledException)
                                             returned = true;
@@ -354,6 +386,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             esp->ObjectType = ObjectTypes.Integer;
             esp->Value = 0;
+            return esp + 1;
+        }
+
+        StackObject* PushObject(StackObject* esp, List<object> mStack, object obj)
+        {
+            esp->ObjectType = ObjectTypes.Object;
+            esp->Value = mStack.Count;
+            mStack.Add(obj);
             return esp + 1;
         }
 

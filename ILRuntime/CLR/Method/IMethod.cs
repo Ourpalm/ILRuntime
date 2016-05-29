@@ -15,5 +15,7 @@ namespace ILRuntime.CLR.Method
 
         IType ReturnType { get; }
         List<IType> Parameters { get; }
+
+        bool IsConstructor { get; }
     }
 }
