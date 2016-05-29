@@ -160,5 +160,15 @@ namespace ILRuntime.CLR.TypeSystem
         {
             return GetMethod(name, param.Count);
         }
+
+        public IMethod GetConstructor(List<IType> param)
+        {
+            foreach(var i in constructors)
+            {
+                if (i.ParameterCount == param.Count)
+                    return i;
+            }
+            return null;
+        }
     }
 }

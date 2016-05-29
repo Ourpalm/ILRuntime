@@ -151,6 +151,15 @@ namespace ILRuntime.CLR.Method
                             code.TokenInteger = token.GetHashCode();
                     }
                     break;
+                case OpCodeEnum.Newobj:
+                    {
+                        var m = appdomain.GetMethod(token, declaringType);
+                        if(m != null)
+                        {
+                            code.TokenInteger = token.GetHashCode();
+                        }
+                    }
+                    break;
             }
         }
 

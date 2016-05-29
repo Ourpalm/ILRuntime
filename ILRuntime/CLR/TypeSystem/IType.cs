@@ -18,5 +18,7 @@ namespace ILRuntime.CLR.TypeSystem
         IMethod GetMethod(string name, int paramCount);
 
         IMethod GetMethod(string name, List<IType> param);
+
+        IMethod GetConstructor(List<IType> param);
     }
 }
