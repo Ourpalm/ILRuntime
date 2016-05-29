@@ -34,7 +34,7 @@ namespace ILRuntime.Runtime.Intepreter
             bool unhandledException;
             Execute(method, esp, out unhandledException);
             //ClearStack
-            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);            
+            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
         }
         StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
         {
@@ -228,6 +228,24 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Sub:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    if (a->ObjectType == ObjectTypes.Long)
+                                    {
+                                        esp->ObjectType = ObjectTypes.Long;
+                                        *((long*)&esp->Value) = *((long*)&a->Value) - *((long*)&b->Value);
+                                    }
+                                    else
+                                    {
+                                        esp->ObjectType = ObjectTypes.Integer;
+                                        esp->Value = a->Value - b->Value;
+                                    }
+                                    esp++;
+                                }
+                                break;
                             case OpCodeEnum.Ldind_I:
                                 break;
                             case OpCodeEnum.Ldind_I1:
@@ -283,7 +301,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         Free(esp);
                                         esp--;
                                     }
-                                    else {
+                                    else
+                                    {
                                         if (m is ILMethod)
                                         {
                                             ILMethod ilm = (ILMethod)m;

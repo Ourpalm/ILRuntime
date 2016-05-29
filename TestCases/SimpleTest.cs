@@ -32,13 +32,13 @@ namespace TestCases
             {
                 b += i;
             }
-            
+
             return b;
         }
         public static int foo()
         {
             int b = 0;
-            for( int i = 0; i < 50; i++)
+            for (int i = 0; i < 50; i++)
             {
                 b += foo(b);
             }
@@ -48,7 +48,7 @@ namespace TestCases
         public static int foo(int init)
         {
             int b = init;
-            for( int i = 0; i < 10000; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 b += i;
             }
@@ -65,6 +65,14 @@ namespace TestCases
             }
 
             return b;
+        }
+
+        public static int foo3()
+        {
+            int b = 3;
+            int a = 4;
+            int c = 5;
+            return b + a - c;
         }
 
         public static void InstanceTest()
