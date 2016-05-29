@@ -189,7 +189,16 @@ namespace ILRuntime.CLR.TypeSystem
         {
             if (fieldMapping == null)
                 InitializeFields();
-
+            int idx;
+            int hashCode = token.GetHashCode();
+            if (fieldTokenMapping.TryGetValue(hashCode, out idx))
+                return idx;
+            FieldDefinition f = token as FieldDefinition;
+            if(fieldMapping.TryGetValue(f.Name, out idx))
+            {
+                fieldTokenMapping[hashCode] = idx;
+                return idx;
+            }
             return -1;
         }
 

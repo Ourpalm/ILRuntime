@@ -168,6 +168,11 @@ namespace ILRuntime.CLR.Method
                             code.TokenInteger = token.GetHashCode();
                     }
                     break;
+                case OpCodeEnum.Stfld:
+                    {
+                        code.TokenInteger = appdomain.GetFieldIndex(token);   
+                    }
+                    break;
             }
         }
 

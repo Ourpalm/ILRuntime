@@ -175,5 +175,16 @@ namespace ILRuntime.Runtime.Enviorment
 
             return null;
         }
+
+        public int GetFieldIndex(object token)
+        {
+            FieldDefinition f = token as FieldDefinition;
+            var type = GetType(f.DeclaringType.FullName);
+            if(type is ILType)
+            {
+                return ((ILType)type).GetFieldIndex(token);
+            }
+            throw new KeyNotFoundException();
+        }
     }
 }

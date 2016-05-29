@@ -319,6 +319,25 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NotSupportedException();
                                 }
                                 break;
+                            case OpCodeEnum.Stfld:
+                                {
+                                    StackObject* objRef = esp - 2;
+                                    var obj = mStack[objRef->Value];
+                                    if (obj != null)
+                                    {
+                                        if (obj is ILTypeInstance)
+                                        {
+                                            ILTypeInstance instance = obj as ILTypeInstance;
+                                            StackObject* val = esp - 1;
+                                            instance.AssignFromStack(val->Value, objRef, mStack);
+                                        }
+                                        else
+                                            throw new NotImplementedException();
+                                    }
+                                    else
+                                        throw new NullReferenceException();
+                                }
+                                break;
                             case OpCodeEnum.Nop:
                                 break;
                             default:
