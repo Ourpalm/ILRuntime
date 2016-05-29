@@ -9,7 +9,6 @@ namespace ILRuntime.CLR.Method
 {
     public interface IMethod
     {
-        int LocalVariableCount { get; }
         int ParameterCount { get; }
 
         IType DeclearingType { get; }

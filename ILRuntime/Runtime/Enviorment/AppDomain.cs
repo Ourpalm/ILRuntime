@@ -74,8 +74,9 @@ namespace ILRuntime.Runtime.Enviorment
             Type t = Type.GetType(fullname);
             if(t != null)
             {
-                res = new CLRType(t);
+                res = new CLRType(t, this);
                 mapType[fullname] = res;
+                ((CLRType)res).Initialize();
                 return res;               
             }
             return null;

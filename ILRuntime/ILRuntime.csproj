@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLR\Method\CLRMethod.cs" />
     <Compile Include="CLR\Method\ILMethod.cs" />
     <Compile Include="CLR\Method\IMethod.cs" />
     <Compile Include="CLR\TypeSystem\ILType.cs" />
