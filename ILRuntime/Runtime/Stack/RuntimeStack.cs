@@ -61,7 +61,7 @@ namespace ILRuntime.Runtime.Stack
                 p->ObjectType = ObjectTypes.Null;
             }
 #endif
-            res.BasePointer = esp + method.LocalVariableCount;
+            res.BasePointer = method.LocalVariableCount > 0 ? esp + method.LocalVariableCount + 1 : esp;
             frames.Push(res);
             return res;
         }

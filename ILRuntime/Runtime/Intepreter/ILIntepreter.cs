@@ -44,7 +44,6 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v2 = frame.LocalVarPointer + 1;
             StackObject* v3 = frame.LocalVarPointer + 2;
             StackObject* v4 = frame.LocalVarPointer + 3;
-            StackObject* v5 = frame.LocalVarPointer + 4;
 
             esp = frame.BasePointer;
             StackObject* arg = frame.LocalVarPointer - 1;
@@ -138,6 +137,29 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Ldloc_3:
                                 CopyToStack(esp, v4, mStack);
                                 esp++;
+                                break;
+                            case OpCodeEnum.Stloc:
+                            case OpCodeEnum.Stloc_S:
+                                {
+                                    esp--;
+                                    var v = frame.LocalVarPointer + ip->TokenInteger;
+                                    *v = *esp;
+                                    if (v->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        int idx = mStackBase + ip->TokenInteger;
+                                        mStack[idx] = mStack[v->Value];
+                                        v->Value = idx;
+                                        Free(esp);
+                                    }
+                                }
+                                break;
+                            case OpCodeEnum.Ldloc:
+                            case OpCodeEnum.Ldloc_S:
+                                {
+                                    var v = frame.LocalVarPointer + ip->TokenInteger;
+                                    CopyToStack(esp, v, mStack);
+                                    esp++;
+                                }
                                 break;
                             case OpCodeEnum.Ldc_I4_M1:
                                 esp->Value = -1;
@@ -397,6 +419,43 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                         throw new NullReferenceException();
+                                }
+                                break;
+                            case OpCodeEnum.Ceq:
+                                {
+                                    StackObject* obj1 = esp - 2;
+                                    StackObject* obj2 = esp - 1;
+                                    bool res = false;
+                                    if (obj1->ObjectType == obj2->ObjectType)
+                                    {
+                                        switch (obj1->ObjectType)
+                                        {
+                                            case ObjectTypes.Integer:
+                                            case ObjectTypes.Float:
+                                                res = obj1->Value == obj2->Value;
+                                                break;
+                                            case ObjectTypes.Object:
+                                                res = mStack[obj1->Value] == mStack[obj2->Value];
+                                                break;
+                                            case ObjectTypes.FieldReference:
+                                                res = mStack[obj1->Value] == mStack[obj2->Value] && obj1->ValueLow == obj2->ValueLow;
+                                                
+                                                break;
+                                            case ObjectTypes.Null:
+                                                res = true;
+                                                break;
+                                            default:
+                                                res = obj1->Value == obj2->Value && obj1->ValueLow == obj2->ValueLow;
+                                                break;
+                                        }
+                                    }
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    if (res)
+                                        esp = PushOne(esp - 2);
+                                    else
+                                        esp = PushZero(esp - 2);
+                                    
                                 }
                                 break;
                             case OpCodeEnum.Nop:

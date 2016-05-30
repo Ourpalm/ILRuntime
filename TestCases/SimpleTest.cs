@@ -78,6 +78,10 @@ namespace TestCases
             {
                 Console.Write("true");
             }
+            if (t != t2)
+            {
+                Console.Write("true 2");
+            }
         }
     }
 }

@@ -160,6 +160,16 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldc_I4_S:
                     code.TokenInteger = (sbyte)token;
                     break;
+
+                case OpCodeEnum.Stloc:
+                case OpCodeEnum.Stloc_S:
+                case OpCodeEnum.Ldloc:
+                case OpCodeEnum.Ldloc_S:
+                    {
+                        Mono.Cecil.Cil.VariableDefinition vd = (Mono.Cecil.Cil.VariableDefinition)token;
+                        code.TokenInteger = vd.Index;
+                    }
+                    break;
                 case OpCodeEnum.Call:
                 case OpCodeEnum.Newobj:
                     {
