@@ -19,6 +19,7 @@ namespace ILRuntime.Runtime.Enviorment
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
+        Dictionary<int, string> mapString = new Dictionary<int, string>();
         IType voidType;
         public AppDomain()
         {
@@ -185,6 +186,20 @@ namespace ILRuntime.Runtime.Enviorment
                 return ((ILType)type).GetFieldIndex(token);
             }
             throw new KeyNotFoundException();
+        }
+
+        public void CacheString(object token)
+        {
+            int hashCode = token.GetHashCode();
+            mapString[hashCode] = (string)token;
+        }
+
+        public string GetString(int hashCode)
+        {
+            string res = null;
+            if (mapString.TryGetValue(hashCode, out res))
+                return res;
+            return res;
         }
     }
 }

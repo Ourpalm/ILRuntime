@@ -185,6 +185,13 @@ namespace ILRuntime.CLR.Method
                         code.TokenInteger = appdomain.GetFieldIndex(token);   
                     }
                     break;
+                case OpCodeEnum.Ldstr:
+                    {
+                        int hashCode = token.GetHashCode();
+                        appdomain.CacheString(token);
+                        code.TokenInteger = hashCode;
+                    }
+                    break;
             }
         }
 

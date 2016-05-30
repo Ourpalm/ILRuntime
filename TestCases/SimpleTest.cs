@@ -76,7 +76,7 @@ namespace TestCases
             int b = t2.c;
             if (a == b)
             {
-                Console.Write("true");
+                Console.WriteLine("true");
             }
             if (t != t2)
             {

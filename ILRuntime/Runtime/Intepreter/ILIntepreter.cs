@@ -217,6 +217,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 esp->ObjectType = ObjectTypes.Integer;
                                 esp++;
                                 break;
+                            case OpCodeEnum.Ldstr:
+                                esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenInteger));
+                                break;
                             case OpCodeEnum.Clt:
                                 {
                                     StackObject* b = esp - 1;
