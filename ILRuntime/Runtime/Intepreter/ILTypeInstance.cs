@@ -47,12 +47,21 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, List<object> managedStack)
         {
-            
+            AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
         }
 
-        unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject esp, List<object> managedStack)
+        unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
         {
+            field = *esp;
+            if (field.ObjectType == ObjectTypes.Object)
+            {
+                managedObjs[fieldIdx] = managedStack[esp->Value];
+            }
+        }
 
+        public override string ToString()
+        {
+            return type.FullName;
         }
     }
 }

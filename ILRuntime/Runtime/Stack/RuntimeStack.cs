@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Stack
         StackObject* pointer;
         StackObject* endOfMemory;
         IntPtr nativePointer;
-        List<object> managedStack = new List<object>();
+        List<object> managedStack = new List<object>(32);
         Stack<StackFrame> frames = new Stack<StackFrame>();
         const int MAXIMAL_STACK_OBJECTS = 1024 * 128;
 
@@ -74,6 +74,8 @@ namespace ILRuntime.Runtime.Stack
                 throw new NotSupportedException();
             StackObject* returnVal = esp - 1;
             StackObject* ret = frame.LocalVarPointer - frame.Method.ParameterCount;
+            if (frame.Method.HasThis)
+                ret--;
             if(frame.Method.ReturnType != intepreter.AppDomain.VoidType)
             {
                 *ret = *returnVal;

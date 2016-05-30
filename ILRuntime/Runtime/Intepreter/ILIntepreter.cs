@@ -50,6 +50,8 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* arg = frame.LocalVarPointer - 1;
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
+            if (method.HasThis)//this parameter is always object reference
+                mStackBase--;
             unhandledException = false;
             //Managed Stack reserved for local variable
             for (int i = 0; i < method.LocalVariableCount; i++)
@@ -70,11 +72,11 @@ namespace ILRuntime.Runtime.Intepreter
                         switch (code)
                         {
                             case OpCodeEnum.Ldarg_0:
-                                *esp = *(arg);
+                                CopyToStack(esp, arg, mStack);
                                 esp++;
                                 break;
                             case OpCodeEnum.Ldarg_1:
-                                *esp = *(arg - 1);
+                                CopyToStack(esp, arg - 1, mStack);
                                 esp++;
                                 break;
                             case OpCodeEnum.Stloc_0:
@@ -89,7 +91,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_0:
-                                *esp = *v1;
+                                CopyToStack(esp, v1, mStack);
                                 esp++;
                                 break;
                             case OpCodeEnum.Stloc_1:
@@ -104,7 +106,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_1:
-                                *esp = *v2;
+                                CopyToStack(esp, v2, mStack);
                                 esp++;
                                 break;
                             case OpCodeEnum.Stloc_2:
@@ -119,7 +121,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_2:
-                                *esp = *v3;
+                                CopyToStack(esp, v3, mStack);
                                 esp++;
                                 break;
                             case OpCodeEnum.Stloc_3:
@@ -134,7 +136,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_3:
-                                *esp = *v4;
+                                CopyToStack(esp, v4, mStack);
                                 esp++;
                                 break;
                             case OpCodeEnum.Ldc_I4_M1:
@@ -280,7 +282,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (m == null)
                                     {
                                         //Irrelevant method
-                                        Free(esp);
+                                        Free(esp - 1);
                                         esp--;
                                     }
                                     else {
@@ -289,9 +291,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ILMethod ilm = (ILMethod)m;
                                             if (ilm.HasThis)
                                             {
-                                                *esp = *arg;
-                                                esp->Value = mStack.Count;
-                                                mStack.Add(mStack[arg->Value]);
+                                                CopyToStack(esp, arg, mStack);
                                                 esp++;
                                             }
                                             esp = Execute(ilm, esp, out unhandledException);
@@ -311,6 +311,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ILType type = m.DeclearingType as ILType;
                                         var obj = type.Instantiate();
                                         esp = PushObject(esp, mStack, obj);
+                                        esp = PushObject(esp, mStack, obj);//Second push is the this parameter for constructor
                                         esp = Execute((ILMethod)m, esp, out unhandledException);
                                         if (unhandledException)
                                             returned = true;
@@ -329,13 +330,16 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             ILTypeInstance instance = obj as ILTypeInstance;
                                             StackObject* val = esp - 1;
-                                            instance.AssignFromStack(val->Value, objRef, mStack);
+                                            instance.AssignFromStack(ip->TokenInteger, val, mStack);
                                         }
                                         else
                                             throw new NotImplementedException();
                                     }
                                     else
                                         throw new NullReferenceException();
+                                    Free(esp - 1); 
+                                    Free(objRef);
+                                    esp -= 2;
                                 }
                                 break;
                             case OpCodeEnum.Nop:
@@ -394,6 +398,16 @@ namespace ILRuntime.Runtime.Intepreter
             }
             return esp;
         }
+
+        void CopyToStack(StackObject* dst, StackObject* src, List<object> mStack)
+        {
+            *dst = *src;
+            if (dst->ObjectType == ObjectTypes.Object)
+            {
+                dst->Value = mStack.Count;
+                mStack.Add(mStack[src->Value]);
+            }
+        }
         StackObject* PushOne(StackObject* esp)
         {
             esp->ObjectType = ObjectTypes.Integer;
@@ -420,7 +434,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (esp->ObjectType == ObjectTypes.Object)
             {
-                if (esp->Value == stack.ManagedStack.Count)
+                if (esp->Value == stack.ManagedStack.Count - 1)
                     stack.ManagedStack.RemoveAt(esp->Value);
             }
 #if DEBUG
