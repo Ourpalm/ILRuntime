@@ -88,7 +88,27 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IMethod GetMethod(string name, List<IType> param)
         {
-            return GetMethod(name, param.Count);
+            if (methods == null)
+                InitializeMethods();
+            List<CLRMethod> lst;
+            if (methods.TryGetValue(name, out lst))
+            {
+                foreach (var i in lst)
+                {
+                    if (i.ParameterCount == param.Count)
+                    {
+                        bool match = true;
+                        for (int j = 0; j < param.Count; j++)
+                        {
+                            if (param[j] != i.Parameters[j])
+                                match = false;
+                        }
+                        if (match)
+                            return i;
+                    }
+                }
+            }
+            return null;
         }
 
         public IMethod GetConstructor(List<IType> param)

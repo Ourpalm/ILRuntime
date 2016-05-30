@@ -11,6 +11,8 @@ namespace ILRuntime.CLR.Method
     {
         int ParameterCount { get; }
 
+        bool HasThis { get; }
+
         IType DeclearingType { get; }
 
         IType ReturnType { get; }

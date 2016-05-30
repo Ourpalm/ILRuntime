@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.CLR.TypeSystem;
+using ILRuntime.Runtime.Stack;
 namespace ILRuntime.CLR.Method
 {
     class CLRMethod : IMethod
@@ -25,6 +26,14 @@ namespace ILRuntime.CLR.Method
             get
             {
                 return declaringType;
+            }
+        }
+
+        public bool HasThis
+        {
+            get
+            {
+                return isConstructor ? !cDef.IsStatic : !def.IsStatic;
             }
         }
 
@@ -97,6 +106,31 @@ namespace ILRuntime.CLR.Method
             {
                 IType type = appdomain.GetType(i.ParameterType.FullName);
                 parameters.Add(type);
+            }
+        }
+
+        public unsafe object Invoke(StackObject* esp, List<object> mStack)
+        {
+            if (isConstructor)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                int paramCount = ParameterCount;
+                object[] param = new object[paramCount];
+                for (int i = 1; i <= paramCount; i++)
+                {
+                    var p = esp - i;
+                    param[i - 1] = p->ToObject(mStack);
+                }
+                object instance = null;
+                if (!def.IsStatic)
+                {
+                    instance = (esp - paramCount - 1)->ToObject(mStack);
+                }
+                var res = def.Invoke(instance, param);
+                return res;
             }
         }
     }

@@ -32,27 +32,51 @@ namespace ILRuntime.Runtime.Intepreter
         {
             this.type = type;
             fields = new StackObject[type.FieldTypes.Length];
-            managedObjs = new List<object>(fields.Length);                   
+            managedObjs = new List<object>(fields.Length);
+            for (int i = 0; i < fields.Length; i++)
+                managedObjs.Add(null);
+        }
+
+        internal unsafe void PushFieldAddress(int fieldIdx, StackObject* esp, List<object> managedStack)
+        {
+            esp->ObjectType = ObjectTypes.FieldReference;
+            esp->Value = managedStack.Count;
+            managedStack.Add(this);
+            esp->ValueLow = fieldIdx;
         }
 
         internal unsafe void PushToStack(int fieldIdx, StackObject* esp, List<object> managedStack)
         {
-
+            PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
         }
 
         unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
         {
-
+            *esp = field;
+            if (field.ObjectType >= ObjectTypes.Object)
+            {
+                esp->Value = managedStack.Count;
+                managedStack.Add(managedObjs[fieldIdx]);
+            }
         }
 
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, List<object> managedStack)
         {
-            
+            AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
         }
 
-        unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject esp, List<object> managedStack)
+        unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
         {
+            field = *esp;
+            if (field.ObjectType >= ObjectTypes.Object)
+            {
+                managedObjs[fieldIdx] = managedStack[esp->Value];
+            }
+        }
 
+        public override string ToString()
+        {
+            return type.FullName;
         }
     }
 }
