@@ -82,7 +82,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_0:
                                 esp--;
                                 *v1 = *esp;
-                                if (v1->ObjectType == ObjectTypes.Object)
+                                if (v1->ObjectType >= ObjectTypes.Object)
                                 {
                                     int idx = mStackBase;
                                     mStack[idx] = mStack[v1->Value];
@@ -97,7 +97,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_1:
                                 esp--;
                                 *v2 = *esp;
-                                if (v2->ObjectType == ObjectTypes.Object)
+                                if (v2->ObjectType >= ObjectTypes.Object)
                                 {
                                     int idx = mStackBase + 1;
                                     mStack[idx] = mStack[v2->Value];
@@ -112,7 +112,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_2:
                                 esp--;
                                 *v3 = *esp;
-                                if (v3->ObjectType == ObjectTypes.Object)
+                                if (v3->ObjectType >= ObjectTypes.Object)
                                 {
                                     int idx = mStackBase + 2;
                                     mStack[idx] = mStack[v3->Value];
@@ -127,7 +127,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_3:
                                 esp--;
                                 *v4 = *esp;
-                                if (v4->ObjectType == ObjectTypes.Object)
+                                if (v4->ObjectType >= ObjectTypes.Object)
                                 {
                                     int idx = mStackBase + 3;
                                     mStack[idx] = mStack[v4->Value];
@@ -285,7 +285,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         Free(esp - 1);
                                         esp--;
                                     }
-                                    else {
+                                    else
+                                    {
                                         if (m is ILMethod)
                                         {
                                             ILMethod ilm = (ILMethod)m;
@@ -299,7 +300,24 @@ namespace ILRuntime.Runtime.Intepreter
                                                 returned = true;
                                         }
                                         else
-                                            throw new NotSupportedException();
+                                        {
+                                            CLRMethod cm = (CLRMethod)m;
+                                            object result = cm.Invoke(esp, mStack);
+                                            int paramCount = cm.ParameterCount;
+                                            for (int i = 1; i <= paramCount; i++)
+                                            {
+                                                Free(esp - i);
+                                            }
+                                            esp -=paramCount;
+                                            if (cm.HasThis)
+                                            {
+                                                Free(esp - 1);
+                                                esp--;
+                                            }
+                                            if (cm.ReturnType != AppDomain.VoidType)
+                                                esp = PushObject(esp - 1, mStack, result);
+                                        }
+                                             
                                     }
                                 }
                                 break;
@@ -310,9 +328,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         ILType type = m.DeclearingType as ILType;
                                         var obj = type.Instantiate();
-                                        esp = PushObject(esp, mStack, obj);
-                                        esp = PushObject(esp, mStack, obj);//Second push is the this parameter for constructor
+                                        esp = PushObject(esp, mStack, obj);//this parameter for constructor
                                         esp = Execute((ILMethod)m, esp, out unhandledException);
+                                        esp = PushObject(esp, mStack, obj); // constructed new object
                                         if (unhandledException)
                                             returned = true;
                                     }
@@ -340,6 +358,45 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 1); 
                                     Free(objRef);
                                     esp -= 2;
+                                }
+                                break;
+                            case OpCodeEnum.Ldfld:
+                                {
+                                    StackObject* objRef = esp - 1;
+                                    var obj = mStack[objRef->Value];
+                                    Free(objRef);
+                                    if (obj != null)
+                                    {
+                                        if (obj is ILTypeInstance)
+                                        {
+                                            ILTypeInstance instance = obj as ILTypeInstance;
+                                            instance.PushToStack(ip->TokenInteger, esp - 1, mStack);
+                                        }
+                                        else
+                                            throw new NotImplementedException();
+                                    }
+                                    else
+                                        throw new NullReferenceException();
+                                    
+                                }
+                                break;
+                            case OpCodeEnum.Ldflda:
+                                {
+                                    StackObject* objRef = esp - 1;
+                                    var obj = mStack[objRef->Value];
+                                    Free(objRef);
+                                    if (obj != null)
+                                    {
+                                        if (obj is ILTypeInstance)
+                                        {
+                                            ILTypeInstance instance = obj as ILTypeInstance;
+                                            instance.PushFieldAddress(ip->TokenInteger, esp - 1, mStack);
+                                        }
+                                        else
+                                            throw new NotImplementedException();
+                                    }
+                                    else
+                                        throw new NullReferenceException();
                                 }
                                 break;
                             case OpCodeEnum.Nop:
@@ -402,7 +459,7 @@ namespace ILRuntime.Runtime.Intepreter
         void CopyToStack(StackObject* dst, StackObject* src, List<object> mStack)
         {
             *dst = *src;
-            if (dst->ObjectType == ObjectTypes.Object)
+            if (dst->ObjectType >= ObjectTypes.Object)
             {
                 dst->Value = mStack.Count;
                 mStack.Add(mStack[src->Value]);
@@ -432,7 +489,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         void Free(StackObject* esp)
         {
-            if (esp->ObjectType == ObjectTypes.Object)
+            if (esp->ObjectType >= ObjectTypes.Object)
             {
                 if (esp->Value == stack.ManagedStack.Count - 1)
                     stack.ManagedStack.RemoveAt(esp->Value);

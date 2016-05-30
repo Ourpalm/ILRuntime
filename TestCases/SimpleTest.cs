@@ -72,6 +72,7 @@ namespace TestCases
             SimpleTest t = new SimpleTest();
             int a = t.c;
             SimpleTest t2 = new SimpleTest(12);
+            Console.Write(t2.a.ToString());
             int b = t2.c;
             if (a == b)
             {

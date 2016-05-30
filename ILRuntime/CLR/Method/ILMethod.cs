@@ -169,6 +169,8 @@ namespace ILRuntime.CLR.Method
                     }
                     break;
                 case OpCodeEnum.Stfld:
+                case OpCodeEnum.Ldfld:
+                case OpCodeEnum.Ldflda:
                     {
                         code.TokenInteger = appdomain.GetFieldIndex(token);   
                     }
