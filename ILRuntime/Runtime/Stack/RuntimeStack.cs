@@ -66,7 +66,7 @@ namespace ILRuntime.Runtime.Stack
             return res;
         }
 
-        public StackObject* PopFrame(ref StackFrame frame, StackObject* esp)
+        public StackObject* PopFrame(ref StackFrame frame, StackObject* esp, List<object> mStack, int mStackBase)
         {
             if (frames.Count > 0 && frames.Peek().BasePointer == frame.BasePointer)
                 frames.Pop();
@@ -79,8 +79,15 @@ namespace ILRuntime.Runtime.Stack
             if(frame.Method.ReturnType != intepreter.AppDomain.VoidType)
             {
                 *ret = *returnVal;
+                if(ret->ObjectType == ObjectTypes.Object)
+                {
+                    ret->Value = mStackBase;
+                    mStack[mStackBase] = mStack[returnVal->Value];
+                    mStackBase++;
+                }
                 ret++;
             }
+            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             return ret;
         }
 

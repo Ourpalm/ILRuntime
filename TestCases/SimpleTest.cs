@@ -52,7 +52,7 @@ namespace TestCases
             {
                 b += i;
             }
-            SimpleTest.b = b;
+            //SimpleTest.b = b;
             return b;
         }
 

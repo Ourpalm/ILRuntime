@@ -35,10 +35,9 @@ namespace ILRuntimeTest
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
                     System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                     sw.Start();
-                    app.Invoke("TestCases.SimpleTest", "InstanceTest"); 
+                    var res = app.Invoke(tbClass.Text, tbMethod.Text); 
                     sw.Stop();
-                    System.Diagnostics.Debugger.Log(2, "info", "Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
-                    
+                    MessageBox.Show(string.Format("Result={0}\nElapsed Time:{1}ms", res, sw.ElapsedMilliseconds));
                 }
             }
         }

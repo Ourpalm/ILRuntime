@@ -18,14 +18,17 @@ namespace ILRuntime.Runtime.Enviorment
         HashSet<string> loadedAssembly;
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
+        Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
-        IType voidType;
+        IType voidType, intType, boolType;
         public AppDomain()
         {
         }
 
         public IType VoidType { get { return voidType; } }
+        public IType IntType { get { return intType; } }
+        public IType BoolType { get { return boolType; } }
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);
@@ -65,6 +68,8 @@ namespace ILRuntime.Runtime.Enviorment
             }
 
             voidType = GetType("System.Void");
+            intType = GetType("System.Int32");
+            boolType = GetType("System.Boolean");
         }
         
         public IType GetType(string fullname)
@@ -81,6 +86,52 @@ namespace ILRuntime.Runtime.Enviorment
                 return res;               
             }
             return null;
+        }
+
+        public IType GetType(object token, IType contextType)
+        {
+            int hash = token.GetHashCode();
+            IType res;
+            if (mapTypeToken.TryGetValue(hash, out res))
+                return res;
+            Mono.Cecil.ModuleDefinition module = null;
+            string typename = null;
+            if (token is Mono.Cecil.TypeDefinition)
+            {
+                Mono.Cecil.TypeDefinition _def = (token as Mono.Cecil.TypeDefinition);
+                module = _def.Module;
+                typename = _def.FullName;
+            }
+            else if (token is Mono.Cecil.TypeReference)
+            {
+                Mono.Cecil.TypeReference _ref = (token as Mono.Cecil.TypeReference);
+                if (_ref.IsGenericParameter)
+                {
+                    /*foreach (var i in contextType.SubTypes)
+                    {
+                        if (i.Key == _ref.Name)
+                            return i.Value;
+                    }*/
+                }
+                module = _ref.Module;
+                typename = _ref.FullName;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            res = GetType(typename);
+            mapTypeToken[hash] = res;
+            return res;
+        }
+
+        public IType GetType(int hash)
+        {
+            IType res;
+            if (mapTypeToken.TryGetValue(hash, out res))
+                return res;
+            else
+                return null;
         }
 
         public object Invoke(string type, string method, params object[] p)
@@ -107,7 +158,7 @@ namespace ILRuntime.Runtime.Enviorment
                     else
                         inteptreter = new ILIntepreter(this);
                 }
-                inteptreter.Run((ILMethod)m, p);
+                return inteptreter.Run((ILMethod)m, p);
             }
             return null;
         }

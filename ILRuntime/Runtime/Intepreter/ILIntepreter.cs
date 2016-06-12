@@ -25,7 +25,7 @@ namespace ILRuntime.Runtime.Intepreter
         }
 
         public Enviorment.AppDomain AppDomain { get { return domain; } }
-        public void Run(ILMethod method, object[] p)
+        public object Run(ILMethod method, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
@@ -33,8 +33,10 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* esp = PushParameters(stack.StackBase, method.Parameters, p);
             bool unhandledException;
             Execute(method, esp, out unhandledException);
+            object result = method.ReturnType != domain.VoidType ? esp->ToObject(mStack) : null;
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
+            return result;
         }
         StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
         {
@@ -492,6 +494,37 @@ namespace ILRuntime.Runtime.Intepreter
                                     
                                 }
                                 break;
+                            case OpCodeEnum.Box:
+                                {
+                                    var obj = esp - 1;
+                                    var type = domain.GetType(ip->TokenInteger);
+                                    if (type != null)
+                                    {
+                                        if (type == domain.IntType)
+                                        {
+                                            if (obj->ObjectType == ObjectTypes.Integer)
+                                            {
+                                                esp = PushObject(obj, mStack, obj->Value);
+                                            }
+                                            else
+                                                throw new NotImplementedException();
+                                        }
+                                        else if (type == domain.BoolType)
+                                        {
+                                            if (obj->ObjectType == ObjectTypes.Integer)
+                                            {
+                                                esp = PushObject(obj, mStack, (obj->Value == 1));
+                                            }
+                                            else
+                                                throw new NotImplementedException();
+                                        }
+                                        else
+                                            throw new NotImplementedException();
+                                    }
+                                    else
+                                        throw new NullReferenceException();
+                                }
+                                break;
                             case OpCodeEnum.Nop:
                                 break;
                             default:
@@ -511,8 +544,7 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             }
             //ClearStack
-            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
-            return stack.PopFrame(ref frame, esp);
+            return stack.PopFrame(ref frame, esp, mStack, mStackBase);
 
         }
 
