@@ -491,11 +491,14 @@ namespace ILRuntime.Runtime.Intepreter
             catch (Exception ex)
             {
                 unhandledException = true;
-#if DEBUG
-                Debugger.DebugService.Instance.Break(this, ex);
-#else
+                //临时
                 throw new ExecutionEngineException("RuntimeError occured", ex);
-#endif
+
+                //#if DEBUG
+                //  Debugger.DebugService.Instance.Break(this, ex);
+                //#else
+                //  throw new ExecutionEngineException("RuntimeError occured", ex);
+                //#endif
             }
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
