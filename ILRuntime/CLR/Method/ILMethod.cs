@@ -178,6 +178,13 @@ namespace ILRuntime.CLR.Method
                             code.TokenInteger = token.GetHashCode();
                     }
                     break;
+                case OpCodeEnum.Box:
+                    {
+                        var t = appdomain.GetType(token, declaringType);
+                        if (t != null)
+                            code.TokenInteger = token.GetHashCode();
+                    }
+                    break;
                 case OpCodeEnum.Stfld:
                 case OpCodeEnum.Ldfld:
                 case OpCodeEnum.Ldflda:
