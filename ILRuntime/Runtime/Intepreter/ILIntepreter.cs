@@ -299,6 +299,19 @@ namespace ILRuntime.Runtime.Intepreter
                                         Free(esp);
                                 }
                                 break;
+                            case OpCodeEnum.Brfalse:
+                            case OpCodeEnum.Brfalse_S:
+                                {
+                                    esp--;
+                                    if(esp->ObjectType == ObjectTypes.Null || (esp->ObjectType== ObjectTypes.Integer && esp->Value == 0))
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+                                    else
+                                        Free(esp);
+                                }
+                                break;
                             case OpCodeEnum.Blt:
                             case OpCodeEnum.Blt_S:
                                 {
