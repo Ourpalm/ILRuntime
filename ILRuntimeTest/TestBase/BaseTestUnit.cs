@@ -95,8 +95,10 @@ namespace ILRuntimeTest.Test
             {
                 var sw = new System.Diagnostics.Stopwatch();
                 sw.Start();
-                _app.Invoke(type, method); //InstanceTest
+                var res = _app.Invoke(type, method); //InstanceTest
                 sw.Stop();
+                if (res != null)
+                    message.AppendLine("Return:" + res);
                 message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
                 _pass = true;
             }

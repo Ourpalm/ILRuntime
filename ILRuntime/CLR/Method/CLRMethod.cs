@@ -122,7 +122,7 @@ namespace ILRuntime.CLR.Method
                 for (int i = 1; i <= paramCount; i++)
                 {
                     var p = esp - i;
-                    param[i - 1] = p->ToObject(mStack);
+                    param[paramCount - i] = p->ToObject(mStack);
                 }
                 object instance = null;
                 if (!def.IsStatic)
