@@ -9,10 +9,16 @@ namespace ILRuntime.Runtime.Intepreter
     public class ILRuntimeException : Exception
     {
         string stackTrace;
-        internal ILRuntimeException(string message, ILIntepreter intepreter, Exception innerException = null)
+        string thisInfo, localInfo;
+        internal ILRuntimeException(string message, ILIntepreter intepreter, CLR.Method.ILMethod method, Exception innerException = null)
             : base(message, innerException)
         {
             stackTrace = Debugger.DebugService.Instance.GetStackTrance(intepreter);
+            if (method.HasThis)
+                thisInfo = Debugger.DebugService.Instance.GetThisInfo(intepreter);
+            else
+                thisInfo = "";
+            localInfo = Debugger.DebugService.Instance.GetLocalVariableInfo(intepreter);
         }
 
         public override string StackTrace
@@ -20,6 +26,19 @@ namespace ILRuntime.Runtime.Intepreter
             get
             {
                 return stackTrace;
+            }
+        }
+
+        public string ThisInfo
+        {
+            get { return thisInfo; }
+        }
+
+        public string LocalInfo
+        {
+            get
+            {
+                return localInfo;
             }
         }
     }

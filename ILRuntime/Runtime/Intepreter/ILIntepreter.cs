@@ -541,7 +541,7 @@ namespace ILRuntime.Runtime.Intepreter
                 if (!Debugger.DebugService.Instance.Break(this, ex))
 #endif
                 {
-                    throw new ILRuntimeException(ex.Message, this, ex);
+                    throw new ILRuntimeException(ex.Message, this, method, ex);
                 }
             }
             //ClearStack

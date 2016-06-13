@@ -30,6 +30,8 @@ namespace ILRuntime.Runtime.Stack
                         ILTypeInstance instance = mStack[Value] as ILTypeInstance;
                         return instance.Fields[ValueLow].ToObject(instance.ManagedObjects);
                     }
+                case ObjectTypes.Null:
+                    return "null";
                 default:
                     throw new NotImplementedException();
             }

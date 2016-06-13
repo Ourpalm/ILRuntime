@@ -61,6 +61,51 @@ namespace ILRuntime.Runtime.Debugger
             return sb.ToString();
         }
 
+        internal unsafe string GetThisInfo(ILIntepreter intepreter)
+        {
+            var topFrame = intepreter.Stack.Frames.Peek();
+            var arg = topFrame.LocalVarPointer - 1;
+            ILTypeInstance instance = intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance;
+            var fields = instance.Type.TypeDefinition.Fields;
+            int idx = 0;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < fields.Count; i++)
+            {
+                var f = fields[i];
+                if (f.IsStatic)
+                    continue;
+                var v = instance.Fields[idx].ToObject(instance.ManagedObjects);
+                string name = f.Name;
+                sb.AppendFormat("{0} {1} = {2}", f.FieldType.Name, name, v);
+                if ((idx % 3 == 0 && idx != 0) || idx == instance.Fields.Length - 1)
+                    sb.AppendLine();
+                else
+                    sb.Append(", ");
+                idx++;
+            }
+            return sb.ToString();
+        }
+
+        internal unsafe string GetLocalVariableInfo(ILIntepreter intepreter)
+        {
+            StackFrame topFrame = intepreter.Stack.Frames.Peek();
+            var m = topFrame.Method;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < m.LocalVariableCount; i++)
+            {
+                var lv = m.Definition.Body.Variables[i];
+                var val = topFrame.LocalVarPointer + i;
+                var v = val->ToObject(intepreter.Stack.ManagedStack);
+                string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
+                sb.AppendFormat("{0} {1} = {2}", lv.VariableType.Name, name, v);
+                if ((i % 3 == 0 && i != 0) || i == m.LocalVariableCount - 1)
+                    sb.AppendLine();
+                else
+                    sb.Append(", ");
+            }
+            return sb.ToString();
+        }
+
         Mono.Cecil.Cil.SequencePoint FindSequencePoint(Mono.Cecil.Cil.Instruction ins)
         {
             Mono.Cecil.Cil.Instruction cur = ins;

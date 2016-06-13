@@ -100,9 +100,16 @@ namespace ILRuntimeTest.Test
                 message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
                 _pass = true;
             }
-            catch (Exception e)
+            catch (ILRuntime.Runtime.Intepreter.ILRuntimeException e)
             {
                 message.AppendLine(e.Message);
+                if (!string.IsNullOrEmpty(e.ThisInfo))
+                {
+                    message.AppendLine("this:");
+                    message.AppendLine(e.ThisInfo);
+                }
+                message.AppendLine("Local Variables:");
+                message.AppendLine(e.LocalInfo);
                 message.AppendLine(e.StackTrace);
                 _pass = false;
             }
