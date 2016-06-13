@@ -29,7 +29,7 @@ namespace ILRuntimeTest.Test
                 _app = new ILRuntime.Runtime.Enviorment.AppDomain();
                 var path = System.IO.Path.GetDirectoryName(_assemblyName);
                 var name = System.IO.Path.GetFileNameWithoutExtension(_assemblyName);
-                using (var fs2 = new System.IO.FileStream($"{path}\\{name}.pdb", System.IO.FileMode.Open))
+                using (var fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb", path, name), System.IO.FileMode.Open))
                     _app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
             }
 

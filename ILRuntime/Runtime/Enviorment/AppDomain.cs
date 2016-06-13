@@ -29,6 +29,8 @@ namespace ILRuntime.Runtime.Enviorment
         public IType VoidType { get { return voidType; } }
         public IType IntType { get { return intType; } }
         public IType BoolType { get { return boolType; } }
+
+        public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);

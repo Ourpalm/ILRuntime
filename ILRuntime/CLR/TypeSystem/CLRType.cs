@@ -69,7 +69,17 @@ namespace ILRuntime.CLR.TypeSystem
 
             }
         }
+        public List<IMethod> GetMethods()
+        {
+            List<IMethod> res = new List<IMethod>();
+            foreach (var i in methods)
+            {
+                foreach (var j in i.Value)
+                    res.Add(j);
+            }
 
+            return res;
+        }
         public IMethod GetMethod(string name, int paramCount)
         {
             if (methods == null)

@@ -44,7 +44,7 @@ namespace ILRuntimeTest
                     var app = new ILRuntime.Runtime.Enviorment.AppDomain();
                     var path = System.IO.Path.GetDirectoryName(OD.FileName);
                     var name = System.IO.Path.GetFileNameWithoutExtension(OD.FileName);
-                    using (System.IO.FileStream fs2 = new System.IO.FileStream($"{path}\\{name}.pdb", System.IO.FileMode.Open))
+                    using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}}\\{1}.pdb",path,name), System.IO.FileMode.Open))
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
 
                     List<TestResultInfo> resList = new List<TestResultInfo>();
@@ -59,7 +59,7 @@ namespace ILRuntimeTest
                             var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                             foreach (var methodInfo in methods)
                             {
-                                string fullName = $"{type.Namespace}.{type.Name}";
+                                string fullName = string.Format("{0}.{1}", type.Namespace, type.Name);
                                 //Console.WriteLine("call the method:{0},return type {1},params count{2}", fullName + "." + methodInfo.Name, methodInfo.ReturnType, methodInfo.GetParameters().Length);
                                 //目前只支持无参数，无返回值测试
                                 if (methodInfo.GetParameters().Length == 0)

@@ -63,7 +63,17 @@ namespace ILRuntime.CLR.TypeSystem
                 return definition.FullName;
             }
         }
+        public List<IMethod> GetMethods()
+        {
+            List<IMethod> res = new List<IMethod>();
+            foreach (var i in methods)
+            {
+                foreach (var j in i.Value)
+                    res.Add(j);
+            }
 
+            return res;
+        }
         public void InitializeBaseType(Runtime.Enviorment.AppDomain domain)
         {
             appdomain = domain;
