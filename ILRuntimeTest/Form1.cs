@@ -20,15 +20,15 @@ namespace ILRuntimeTest
         public Form1()
         {
             InitializeComponent();
-            ILRuntime.Runtime.Debugger.DebugService.Instance.OnBreakPoint += (str) =>
+            /*ILRuntime.Runtime.Debugger.DebugService.Instance.OnBreakPoint += (str) =>
             {
                 MessageBox.Show(str);
-            };
+            };*/
 
             ColumnHeader[] row1 =
             {
                 new ColumnHeader() {Name = "TestName", Text = "TestName", Width = 300},
-                new ColumnHeader() {Name = "Result", Text = "TestResult", Width = 200}
+                new ColumnHeader() {Name = "Result", Text = "TestResult", Width = 200},
             };
 
             listView1.Columns.AddRange(row1);
@@ -44,7 +44,7 @@ namespace ILRuntimeTest
                     var app = new ILRuntime.Runtime.Enviorment.AppDomain();
                     var path = System.IO.Path.GetDirectoryName(OD.FileName);
                     var name = System.IO.Path.GetFileNameWithoutExtension(OD.FileName);
-                    using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}}\\{1}.pdb",path,name), System.IO.FileMode.Open))
+                    using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb",path,name), System.IO.FileMode.Open))
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
 
                     List<TestResultInfo> resList = new List<TestResultInfo>();
@@ -74,13 +74,22 @@ namespace ILRuntimeTest
                     }
 
                     listView1.Items.Clear();
+                    StringBuilder sb = new StringBuilder();
                     foreach (var resInfo in resList)
                     {
+                        sb.Append("Test:");
+                        sb.AppendLine(resInfo.TestName);
+                        sb.Append("TestResult:");
+                        sb.AppendLine(resInfo.Result.ToString());
+                        sb.AppendLine("Log:");
+                        sb.AppendLine(resInfo.Message);
+                        sb.AppendLine("=======================");
                         var item = new ListViewItem(resInfo.TestName);
                         item.SubItems.Add(resInfo.Result.ToString());
                         item.BackColor = resInfo.Result ? Color.Green : Color.Red;
                         listView1.Items.Add(item);
                     }
+                    tbLog.Text = sb.ToString();
                 }
             }
 

@@ -48,6 +48,7 @@
     <Compile Include="CLR\Method\IMethod.cs" />
     <Compile Include="CLR\TypeSystem\ILType.cs" />
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
+    <Compile Include="Runtime\Intepreter\ILRuntimeException.cs" />
     <Compile Include="Runtime\Intepreter\ILTypeInstance.cs" />
     <Compile Include="CLR\TypeSystem\IType.cs" />
     <Compile Include="CLR\Utils\Extensions.cs" />

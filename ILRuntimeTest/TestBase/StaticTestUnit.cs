@@ -24,7 +24,7 @@ namespace ILRuntimeTest.TestBase
 
         public override TestResultInfo CheckResult()
         {
-            return new TestResultInfo(_typeName + "." + _methodName, _pass);
+            return new TestResultInfo(_typeName + "." + _methodName, _pass, message.ToString());
         }
     }
 }

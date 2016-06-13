@@ -31,6 +31,7 @@
             this.OD = new System.Windows.Forms.OpenFileDialog();
             this.btnLoad = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.tbLog = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // OD
@@ -39,7 +40,8 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(485, 345);
+            this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnLoad.Location = new System.Drawing.Point(12, 379);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(2);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(95, 29);
@@ -50,23 +52,39 @@
             // 
             // listView1
             // 
+            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listView1.Location = new System.Drawing.Point(12, 12);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(457, 362);
+            this.listView1.Size = new System.Drawing.Size(664, 143);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
+            // 
+            // tbLog
+            // 
+            this.tbLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbLog.Location = new System.Drawing.Point(12, 161);
+            this.tbLog.Multiline = true;
+            this.tbLog.Name = "tbLog";
+            this.tbLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbLog.Size = new System.Drawing.Size(664, 206);
+            this.tbLog.TabIndex = 2;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(603, 386);
+            this.ClientSize = new System.Drawing.Size(688, 420);
+            this.Controls.Add(this.tbLog);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.btnLoad);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "TestAll";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -75,6 +93,7 @@
         private System.Windows.Forms.OpenFileDialog OD;
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.TextBox tbLog;
     }
 }
 

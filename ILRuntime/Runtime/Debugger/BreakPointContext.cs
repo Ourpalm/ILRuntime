@@ -58,19 +58,7 @@ namespace ILRuntime.Runtime.Debugger
                     sb.Append(", ");
             }
 
-            for (int i = 0; i < frames.Length; i++)
-            {
-                var f = frames[i];
-                m = f.Method;
-                var ins = m.Definition.Body.Instructions[f.Address.Value];
-                string document = "";
-                var seq = FindSequencePoint(ins);
-                if (seq != null)
-                {
-                    document = string.Format("{0}:Line {1}", seq.Document.Url, seq.StartLine);
-                }
-                sb.AppendFormat("at {0}.{1} {2}\n", m.DeclearingType.FullName, m.Definition.Name, document);
-            }
+            sb.Append(DebugService.Instance.GetStackTrance(Interpreter));
             return sb.ToString();
         }
 
@@ -96,15 +84,6 @@ namespace ILRuntime.Runtime.Debugger
                     break;
             }
             return v;
-        }
-
-        Mono.Cecil.Cil.SequencePoint FindSequencePoint(Mono.Cecil.Cil.Instruction ins)
-        {
-            Mono.Cecil.Cil.Instruction cur = ins;
-            while (cur.SequencePoint == null && cur.Previous != null)
-                cur = cur.Previous;
-
-            return cur.SequencePoint;
-        }
+        }        
     }
 }

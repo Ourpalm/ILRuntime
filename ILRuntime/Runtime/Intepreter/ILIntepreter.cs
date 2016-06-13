@@ -305,7 +305,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Brfalse_S:
                                 {
                                     esp--;
-                                    if(esp->ObjectType == ObjectTypes.Null || (esp->ObjectType== ObjectTypes.Integer && esp->Value == 0))
+                                    if (esp->ObjectType == ObjectTypes.Null || (esp->ObjectType == ObjectTypes.Integer && esp->Value == 0))
                                     {
                                         ip = ptr + ip->TokenInteger;
                                         continue;
@@ -366,7 +366,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 Free(esp - i);
                                             }
-                                            esp -=paramCount;
+                                            esp -= paramCount;
                                             if (cm.HasThis)
                                             {
                                                 Free(esp - 1);
@@ -375,7 +375,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (cm.ReturnType != AppDomain.VoidType)
                                                 esp = PushObject(esp - 1, mStack, result);
                                         }
-                                             
+
                                     }
                                 }
                                 break;
@@ -413,7 +413,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                         throw new NullReferenceException();
-                                    Free(esp - 1); 
+                                    Free(esp - 1);
                                     Free(objRef);
                                     esp -= 2;
                                 }
@@ -435,7 +435,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                         throw new NullReferenceException();
-                                    
+
                                 }
                                 break;
                             case OpCodeEnum.Ldflda:
@@ -475,7 +475,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             case ObjectTypes.FieldReference:
                                                 res = mStack[obj1->Value] == mStack[obj2->Value] && obj1->ValueLow == obj2->ValueLow;
-                                                
+
                                                 break;
                                             case ObjectTypes.Null:
                                                 res = true;
@@ -491,7 +491,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp = PushOne(esp - 2);
                                     else
                                         esp = PushZero(esp - 2);
-                                    
+
                                 }
                                 break;
                             case OpCodeEnum.Box:
@@ -537,19 +537,19 @@ namespace ILRuntime.Runtime.Intepreter
             catch (Exception ex)
             {
                 unhandledException = true;
-                //临时
-                throw new ExecutionEngineException("RuntimeError occured", ex);
-
-                //#if DEBUG
-                //  Debugger.DebugService.Instance.Break(this, ex);
-                //#else
-                //  throw new ExecutionEngineException("RuntimeError occured", ex);
-                //#endif
+#if DEBUG
+                if (!Debugger.DebugService.Instance.Break(this, ex))
+#endif
+                {
+                    throw new ILRuntimeException(ex.Message, this, ex);
+                }
             }
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
 
         }
+
+        
 
         StackObject* PushParameters(StackObject* esp, List<IType> plist, object[] p)
         {

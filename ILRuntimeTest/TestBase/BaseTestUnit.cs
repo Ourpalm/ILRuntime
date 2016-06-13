@@ -16,6 +16,7 @@ namespace ILRuntimeTest.Test
         protected string _typeName;
         protected string _methodName;
         protected bool _pass;
+        protected StringBuilder message = new StringBuilder();
 
         #region 接口方法
 
@@ -85,7 +86,7 @@ namespace ILRuntimeTest.Test
             sw.Start();
             _app.Invoke(type, method); //InstanceTest
             sw.Stop();
-            System.Diagnostics.Debugger.Log(2, "info", "Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
+            message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
         }
 
         public void Invoke(string type, string method)
@@ -96,11 +97,13 @@ namespace ILRuntimeTest.Test
                 sw.Start();
                 _app.Invoke(type, method); //InstanceTest
                 sw.Stop();
-                System.Diagnostics.Debugger.Log(2, "info", "Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
+                message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
                 _pass = true;
             }
             catch (Exception e)
             {
+                message.AppendLine(e.Message);
+                message.AppendLine(e.StackTrace);
                 _pass = false;
             }
         }
