@@ -160,7 +160,15 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldc_I4_S:
                     code.TokenInteger = (sbyte)token;
                     break;
-
+                case OpCodeEnum.Ldc_I8:
+                    code.TokenLong = (long)token;
+                    break;
+                case OpCodeEnum.Ldc_R4:
+                    code.TokenFloat = (float)token;
+                    break;
+                case OpCodeEnum.Ldc_R8:
+                    code.TokenDouble = (double)token;
+                    break;                    
                 case OpCodeEnum.Stloc:
                 case OpCodeEnum.Stloc_S:
                 case OpCodeEnum.Ldloc:

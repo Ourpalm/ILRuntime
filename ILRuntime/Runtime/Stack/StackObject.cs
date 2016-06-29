@@ -21,8 +21,20 @@ namespace ILRuntime.Runtime.Stack
                 case ObjectTypes.Integer:
                     return Value;
                 case ObjectTypes.Long:
-                    StackObject tmp = this;
-                    return *(long*)&tmp.Value;
+                    {
+                        StackObject tmp = this;
+                        return *(long*)&tmp.Value;
+                    }
+                case ObjectTypes.Float:
+                    {
+                        StackObject tmp = this;
+                        return *(float*)&tmp.Value;
+                    }
+                case ObjectTypes.Double:
+                    {
+                        StackObject tmp = this;
+                        return *(double*)&tmp.Value;
+                    }
                 case ObjectTypes.Object:
                     return mStack[Value];
                 case ObjectTypes.FieldReference:

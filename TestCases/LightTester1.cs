@@ -24,7 +24,7 @@ namespace TestCases
 
             //Vector3 v3 = new Vector3((252.0f / 255.0f), (207.0f / 255.0f), (20.0f / 255.0f));
             //Console.WriteLine("v3=" + v3);
-            return (2 + 55) * 3434;
+            return (2 + 55) * 3434 + a;
 
         }
         public static object UnitTest_1003()
@@ -60,6 +60,13 @@ namespace TestCases
         {
             byte b = 11;
             b.ToString();
+        }
+
+        public static byte UnitTest_1007()
+        {
+            byte b = 12;
+            byte c = 255;
+            return (byte)(b + c);
         }
     }
 }
