@@ -219,40 +219,55 @@ namespace ILRuntime.Runtime.Intepreter
                                 esp->ObjectType = ObjectTypes.Integer;
                                 esp++;
                                 break;
-                            case OpCodeEnum.Ldstr:
-                                esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenInteger));
-                                break;
-                            case OpCodeEnum.Clt:
+                            case OpCodeEnum.Ldc_I8:
                                 {
-                                    StackObject* b = esp - 1;
-                                    StackObject* a = esp - 2;
-                                    esp = esp - 2;
-                                    if (a->ObjectType == ObjectTypes.Integer)
-                                    {
-                                        if (a->Value < b->Value)
-                                            esp->Value = 1;
-                                        else
-                                            esp->Value = 0;
-                                    }
-                                    else
-                                        throw new NotSupportedException();
+                                    *(long*)(&esp->Value) = ip->TokenLong;
+                                    esp->ObjectType = ObjectTypes.Long;
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Ldc_R4:
+                                {
+                                    *(float*)(&esp->Value) = ip->TokenFloat;
+                                    esp->ObjectType = ObjectTypes.Float;
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Ldc_R8:
+                                {
+                                    *(double*)(&esp->Value) = ip->TokenDouble;
+                                    esp->ObjectType = ObjectTypes.Double;
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Ldstr:
+                                esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenInteger));
+                                break;                            
                             case OpCodeEnum.Add:
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 2;
                                     esp = esp - 2;
-                                    if (a->ObjectType == ObjectTypes.Long)
+                                    switch (a->ObjectType)
                                     {
-                                        esp->ObjectType = ObjectTypes.Long;
-                                        *((long*)&esp->Value) = *((long*)&a->Value) + *((long*)&b->Value);
-                                    }
-                                    else
-                                    {
-                                        esp->ObjectType = ObjectTypes.Integer;
-                                        esp->Value = a->Value + b->Value;
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) + *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value + b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            esp->ObjectType = ObjectTypes.Float;
+                                            *((float*)&esp->Value) = *((float*)&a->Value) + *((float*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            esp->ObjectType = ObjectTypes.Double;
+                                            *((double*)&esp->Value) = *((double*)&a->Value) + *((double*)&b->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
                                     }
                                     esp++;
                                 }
@@ -262,28 +277,87 @@ namespace ILRuntime.Runtime.Intepreter
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 2;
                                     esp = esp - 2;
-                                    if (a->ObjectType == ObjectTypes.Long)
+                                    switch (a->ObjectType)
                                     {
-                                        esp->ObjectType = ObjectTypes.Long;
-                                        *((long*)&esp->Value) = *((long*)&a->Value) - *((long*)&b->Value);
-                                    }
-                                    else
-                                    {
-                                        esp->ObjectType = ObjectTypes.Integer;
-                                        esp->Value = a->Value - b->Value;
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) - *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value - b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            esp->ObjectType = ObjectTypes.Float;
+                                            *((float*)&esp->Value) = *((float*)&a->Value) - *((float*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            esp->ObjectType = ObjectTypes.Double;
+                                            *((double*)&esp->Value) = *((double*)&a->Value) - *((double*)&b->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
                                     }
                                     esp++;
                                 }
                                 break;
-                            case OpCodeEnum.Ldind_I:
+                            case OpCodeEnum.Mul:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) * *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value * b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            esp->ObjectType = ObjectTypes.Float;
+                                            *((float*)&esp->Value) = *((float*)&a->Value) * *((float*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            esp->ObjectType = ObjectTypes.Double;
+                                            *((double*)&esp->Value) = *((double*)&a->Value) * *((double*)&b->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
                                 break;
-                            case OpCodeEnum.Ldind_I1:
-                                break;
-                            case OpCodeEnum.Ldind_I2:
-                                break;
-                            case OpCodeEnum.Ldind_I4:
-                                break;
-                            case OpCodeEnum.Ldind_I8:
+                            case OpCodeEnum.Div:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) / *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value / b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((float*)&esp->Value) = *((float*)&a->Value) / *((float*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((double*)&esp->Value) = *((double*)&a->Value) / *((double*)&b->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
                                 break;
                             case OpCodeEnum.Ret:
                                 returned = true;
@@ -320,14 +394,52 @@ namespace ILRuntime.Runtime.Intepreter
                                     var b = esp - 1;
                                     var a = esp - 2;
                                     esp -= 2;
-                                    if (esp->ObjectType == ObjectTypes.Integer)
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
                                     {
-                                        if (a->Value < b->Value)
-                                        {
-                                            ip = ptr + ip->TokenInteger;
-                                            continue;
-                                        }
+                                        case ObjectTypes.Integer:
+                                            transfer = a->Value < b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value < *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
                                     }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeEnum.Ble:
+                            case OpCodeEnum.Ble_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = a->Value <= b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value <= *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
                                 }
                                 break;
                             case OpCodeEnum.Br_S:
@@ -494,6 +606,56 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeEnum.Clt:
+                                {
+                                    StackObject* obj1 = esp - 2;
+                                    StackObject* obj2 = esp - 1;
+                                    bool res = false;
+                                    switch (obj1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = obj1->Value < obj2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&obj1->Value < *(long*)&obj2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        esp = PushOne(esp - 2);
+                                    else
+                                        esp = PushZero(esp - 2);
+                                }
+                                break;
+                            case OpCodeEnum.Clt_Un:
+                                {
+                                    StackObject* obj1 = esp - 2;
+                                    StackObject* obj2 = esp - 1;
+                                    bool res = false;
+                                    switch (obj1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = (uint)obj1->Value < (uint)obj2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = (ulong)*(long*)&obj1->Value < (ulong)*(long*)&obj2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        esp = PushOne(esp - 2);
+                                    else
+                                        esp = PushZero(esp - 2);
+                                }
+                                break;
                             case OpCodeEnum.Box:
                                 {
                                     var obj = esp - 1;
@@ -504,7 +666,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             if (obj->ObjectType == ObjectTypes.Integer)
                                             {
-                                                esp = PushObject(obj, mStack, obj->Value);
+                                                esp = PushObject(obj, mStack, obj->Value, true);
                                             }
                                             else
                                                 throw new NotImplementedException();
@@ -513,7 +675,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             if (obj->ObjectType == ObjectTypes.Integer)
                                             {
-                                                esp = PushObject(obj, mStack, (obj->Value == 1));
+                                                esp = PushObject(obj, mStack, (obj->Value == 1), true);
                                             }
                                             else
                                                 throw new NotImplementedException();
@@ -523,6 +685,44 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                         throw new NullReferenceException();
+                                }
+                                break;
+                            case OpCodeEnum.Conv_I4:
+                                {
+                                    var obj = esp - 1;
+                                    int val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val = obj->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            val = (int)*(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (int)*(double*)&obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Integer;
+                                    obj->Value = val;
+                                }
+                                break;
+                            case OpCodeEnum.Conv_I8:
+                                {
+                                    var obj = esp - 1;
+                                    long val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            val = obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Long;
+                                    *(long*)(&obj->Value) = val;
                                 }
                                 break;
                             case OpCodeEnum.Nop:
@@ -607,11 +807,43 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        StackObject* PushObject(StackObject* esp, List<object> mStack, object obj)
+        StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
         {
-            esp->ObjectType = ObjectTypes.Object;
-            esp->Value = mStack.Count;
-            mStack.Add(obj);
+            if (!isBox)
+            {
+                if (obj is int)
+                {
+                    esp->ObjectType = ObjectTypes.Integer;
+                    esp->Value = (int)obj;
+                }
+                else if (obj is long)
+                {
+                    esp->ObjectType = ObjectTypes.Long;
+                    *(long*)(&esp->Value) = (long)obj;
+                }
+                else if (obj is float)
+                {
+                    esp->ObjectType = ObjectTypes.Float;
+                    *(float*)(&esp->Value) = (float)obj;
+                }
+                else if (obj is double)
+                {
+                    esp->ObjectType = ObjectTypes.Double;
+                    *(double*)(&esp->Value) = (double)obj;
+                }
+                else
+                {
+                    esp->ObjectType = ObjectTypes.Object;
+                    esp->Value = mStack.Count;
+                    mStack.Add(obj);
+                }
+            }
+            else
+            {
+                esp->ObjectType = ObjectTypes.Object;
+                esp->Value = mStack.Count;
+                mStack.Add(obj);
+            }
             return esp + 1;
         }
 
