@@ -1,0 +1,43 @@
+1. Managed Object
+
+|---------------|                     |---------------|
+|  StackObject  |                     |  ManagedStack |
+|---------------|                     |---------------|
+|  Type:Object  |                     |   Slot(idx)   |
+|---------------|                     |---------------|
+|  Value:Index  |-------------------->|    ObjRef     |
+|---------------|                     |---------------|
+
+2.CallFrame
+
+EnterFrame:                            LeaveFrame:
+|---------------|                     |---------------|
+|   Argument1   |     |-------------->|  [ReturnVal]  |
+|---------------|     |               |---------------|
+|      ...      |     |               |     NULL      |
+|---------------|     |               |---------------|
+|   ArgumentN   |     |               |      ...      |
+|---------------|     |
+|   LocalVar1   |     |
+|---------------|     |
+|      ...      |     |
+|---------------|     |
+|   LocalVarN   |     |
+|---------------|     |
+|   FrameBase   |     |
+|---------------|     |
+|  [ReturnVal]  |------
+|---------------|
+
+
+3. ValueType
+Field1 - FieldN are Object Body, can be seperated from the Header, The ValueLow Field stores the pointer to Field1's StackObject
+|---------------|                             |---------------|
+|StackObj:Field1|                             |  StackObject  |
+|---------------|                             |---------------|
+|     ...       |                     /----\  | Type:ValueType|
+|---------------|---------------------     -> |---------------|  
+|StackObj:FieldN|                     \----/  |Value:TypeToken|
+|---------------|                             |---------------|
+|StackObj:ValTyp|<----Pointer at Here         |Value2:FieldPtr|
+|---------------|                             |---------------|
