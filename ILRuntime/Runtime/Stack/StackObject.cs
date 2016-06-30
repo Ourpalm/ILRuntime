@@ -58,6 +58,7 @@ namespace ILRuntime.Runtime.Stack
         Float,
         Double,
         Object,
-        FieldReference,
+        ValueTypeObject,//Value = typeToken, ValueLow = value offset
+        FieldReference,//Value = objIdx, ValueLow = fieldIdx
     }
 }

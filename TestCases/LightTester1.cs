@@ -68,5 +68,28 @@ namespace TestCases
             byte c = 255;
             return (byte)(b + c);
         }
+
+        struct TestStruc
+        {
+            public int a;
+            public float b;            
+        }
+
+        public static int UnitTest_1008()
+        {
+            TestStruc a, b;
+            a.a = 1;
+            a.b = 2.3f;
+            b = a;
+            b.a = 2;
+            b.b = 3.2f;
+            ValueTest(a);
+            return a.a;
+        }
+
+        static void ValueTest(TestStruc a)
+        {
+            a.a = 3;
+        }
     }
 }
