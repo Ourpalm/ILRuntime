@@ -10,6 +10,7 @@ namespace ILRuntime.Runtime.Stack
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     struct StackObject
     {
+        public static StackObject Null = new StackObject() { ObjectType = ObjectTypes.Null, Value = -1, ValueLow = 0 };
         public ObjectTypes ObjectType;
         public int Value;
         public int ValueLow;
@@ -42,6 +43,11 @@ namespace ILRuntime.Runtime.Stack
                         ILTypeInstance instance = mStack[Value] as ILTypeInstance;
                         return instance.Fields[ValueLow].ToObject(instance.ManagedObjects);
                     }
+                case ObjectTypes.StackObjectReference:
+                    {
+                        StackObject tmp = this;
+                        return (*(StackObject**)&tmp.Value)->ToObject(mStack);
+                    }
                 case ObjectTypes.Null:
                     return "null";
                 default:
@@ -57,8 +63,8 @@ namespace ILRuntime.Runtime.Stack
         Long,
         Float,
         Double,
+        StackObjectReference,//Value = pointer, 
         Object,
-        ValueTypeObject,//Value = typeToken, ValueLow = value offset
         FieldReference,//Value = objIdx, ValueLow = fieldIdx
     }
 }

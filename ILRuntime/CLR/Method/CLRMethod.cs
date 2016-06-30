@@ -122,16 +122,39 @@ namespace ILRuntime.CLR.Method
                 for (int i = 1; i <= paramCount; i++)
                 {
                     var p = esp - i;
-                    param[paramCount - i] = p->ToObject(mStack);
+                    var obj = CheckPrimitiveTypes(this.param[i - 1].ParameterType, p->ToObject(mStack));
+                    
+                    param[paramCount - i] = obj;
                 }
                 object instance = null;
                 if (!def.IsStatic)
                 {
-                    instance = (esp - paramCount - 1)->ToObject(mStack);
+                    instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(mStack));
                 }
+                
                 var res = def.Invoke(instance, param);
                 return res;
             }
+        }
+
+        object CheckPrimitiveTypes(Type pt, object obj)
+        {
+            if (pt.IsPrimitive)
+            {
+                if (pt == typeof(byte))
+                    obj = (byte)(int)obj;
+                else if (pt == typeof(short))
+                    obj = (short)(int)obj;
+                else if (pt == typeof(ushort))
+                    obj = (ushort)(int)obj;
+                else if (pt == typeof(sbyte))
+                    obj = (sbyte)(int)obj;
+                else if (pt == typeof(ulong))
+                    obj = (ulong)(int)obj;
+                else if (pt == typeof(bool))
+                    obj = (int)obj == 1;
+            }
+            return obj;
         }
     }
 }

@@ -48,17 +48,38 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v4 = frame.LocalVarPointer + 3;
 
             esp = frame.BasePointer;
-            StackObject* arg = frame.LocalVarPointer - 1;
+            StackObject* arg = frame.LocalVarPointer - method.ParameterCount;
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
             if (method.HasThis)//this parameter is always object reference
-                mStackBase--;
+            {
+                arg--;
+            }
             unhandledException = false;
-            //Managed Stack reserved for local variable
-            for (int i = 0; i < method.LocalVariableCount; i++)
-                mStack.Add(null);
+
             try
             {
+                //Managed Stack reserved for local variable
+                for (int i = 0; i < method.LocalVariableCount; i++)
+                {
+                    var v = method.Definition.Body.Variables[i];
+                    if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
+                    {
+                        var t = AppDomain.GetType(v.VariableType.FullName);
+                        if (t is ILType)
+                        {
+                            var obj = ((ILType)t).Instantiate();
+                            var loc = v1 + i;
+                            loc->ObjectType = ObjectTypes.Object;
+                            loc->Value = mStack.Count;
+                            mStack.Add(obj);
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
+                    else
+                        mStack.Add(null);
+                }
                 fixed (OpCode* ptr = body)
                 {
                     OpCode* ip = ptr;
@@ -77,8 +98,30 @@ namespace ILRuntime.Runtime.Intepreter
                                 esp++;
                                 break;
                             case OpCodeEnum.Ldarg_1:
-                                CopyToStack(esp, arg - 1, mStack);
+                                CopyToStack(esp, arg + 1, mStack);
                                 esp++;
+                                break;
+                            case OpCodeEnum.Ldarg_2:
+                                CopyToStack(esp, arg + 2, mStack);
+                                esp++;
+                                break;
+                            case OpCodeEnum.Ldarg_3:
+                                CopyToStack(esp, arg + 3, mStack);
+                                esp++;
+                                break;
+                            case OpCodeEnum.Ldarg:
+                            case OpCodeEnum.Ldarg_S:
+                                CopyToStack(esp, arg + ip->TokenInteger, mStack);
+                                esp++;
+                                break;
+                            case OpCodeEnum.Ldarga:
+                            case OpCodeEnum.Ldarga_S:
+                                {
+                                    var a = arg + ip->TokenInteger;
+                                    esp->ObjectType = ObjectTypes.StackObjectReference;
+                                    *(StackObject**)&esp->Value = a;
+                                    esp++;
+                                }
                                 break;
                             case OpCodeEnum.Stloc_0:
                                 esp--;
@@ -163,6 +206,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Ldloca:
+                            case OpCodeEnum.Ldloca_S:
+                                {
+                                    var v = frame.LocalVarPointer + ip->TokenInteger;
+                                    esp->ObjectType = ObjectTypes.StackObjectReference;
+                                    *(StackObject**)&esp->Value = v;
+                                    esp++;
+                                }
+                                break;
                             case OpCodeEnum.Ldc_I4_M1:
                                 esp->Value = -1;
                                 esp->ObjectType = ObjectTypes.Integer;
@@ -242,7 +294,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldstr:
                                 esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenInteger));
-                                break;                            
+                                break;
                             case OpCodeEnum.Add:
                                 {
                                     StackObject* b = esp - 1;
@@ -447,6 +499,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 ip = ptr + ip->TokenInteger;
                                 continue;
                             case OpCodeEnum.Call:
+                            case OpCodeEnum.Callvirt:
                                 {
                                     IMethod m = domain.GetMethod(ip->TokenInteger);
                                     if (m == null)
@@ -462,8 +515,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             ILMethod ilm = (ILMethod)m;
                                             if (ilm.HasThis)
                                             {
-                                                CopyToStack(esp, arg, mStack);
-                                                esp++;
+                                                //CopyToStack(esp, arg, mStack);
+                                                //esp++;
                                             }
                                             esp = Execute(ilm, esp, out unhandledException);
                                             if (unhandledException)
@@ -498,9 +551,22 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         ILType type = m.DeclearingType as ILType;
                                         var obj = type.Instantiate();
-                                        esp = PushObject(esp, mStack, obj);//this parameter for constructor
+                                        var a = esp - m.ParameterCount;
+                                        var objRef = PushObject(esp, mStack, obj);//this parameter for constructor
+                                        esp = objRef;
+                                        for (int i = 0; i < m.ParameterCount; i++)
+                                        {
+                                            CopyToStack(esp, a + i, mStack);
+                                            esp++;
+                                        }
                                         esp = Execute((ILMethod)m, esp, out unhandledException);
-                                        esp = PushObject(esp, mStack, obj); // constructed new object
+                                        for (int i = m.ParameterCount - 1; i >=0; i--)
+                                        {
+                                            Free(a + i);
+                                        }
+                                        Free(objRef - 1);
+                                        esp = a;
+                                        esp = PushObject(esp, mStack, obj);//new constructedObj
                                         if (unhandledException)
                                             returned = true;
                                     }
@@ -510,7 +576,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Stfld:
                                 {
-                                    StackObject* objRef = esp - 2;
+                                    StackObject* objRef = GetObjectAndResolveReference(esp - 2);
                                     var obj = mStack[objRef->Value];
                                     if (obj != null)
                                     {
@@ -526,15 +592,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                         throw new NullReferenceException();
                                     Free(esp - 1);
-                                    Free(objRef);
+                                    Free(esp - 2);
                                     esp -= 2;
                                 }
                                 break;
                             case OpCodeEnum.Ldfld:
                                 {
-                                    StackObject* objRef = esp - 1;
+                                    StackObject* objRef = GetObjectAndResolveReference(esp - 1);
                                     var obj = mStack[objRef->Value];
-                                    Free(objRef);
+                                    Free(esp - 1);
                                     if (obj != null)
                                     {
                                         if (obj is ILTypeInstance)
@@ -552,9 +618,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldflda:
                                 {
-                                    StackObject* objRef = esp - 1;
+                                    StackObject* objRef = GetObjectAndResolveReference(esp - 1);
                                     var obj = mStack[objRef->Value];
-                                    Free(objRef);
+                                    Free(esp - 1);
                                     if (obj != null)
                                     {
                                         if (obj is ILTypeInstance)
@@ -687,6 +753,32 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
                                 }
                                 break;
+                            case OpCodeEnum.Initobj:
+                                {
+                                    var objRef = GetObjectAndResolveReference(esp - 1);
+                                    var type = domain.GetType(ip->TokenInteger);
+                                    if (type is ILType)
+                                    {
+                                        var obj = mStack[objRef->Value];
+                                        if (obj != null)
+                                        {
+                                            if (obj is ILTypeInstance)
+                                            {
+                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                instance.Clear();
+                                            }
+                                            else
+                                                throw new NotSupportedException();
+                                        }
+                                        else
+                                            throw new NullReferenceException();
+                                    }
+                                    else
+                                        throw new NotImplementedException();
+                                    Free(esp - 1);
+                                    esp--;
+                                }
+                                break;
                             case OpCodeEnum.Conv_I4:
                                 {
                                     var obj = esp - 1;
@@ -725,6 +817,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     *(long*)(&obj->Value) = val;
                                 }
                                 break;
+                            case OpCodeEnum.Pop:
+                                {
+                                    Free(esp - 1);
+                                    esp--;
+                                }
+                                break;
                             case OpCodeEnum.Nop:
                                 break;
                             default:
@@ -749,7 +847,15 @@ namespace ILRuntime.Runtime.Intepreter
 
         }
 
-        
+        StackObject* GetObjectAndResolveReference(StackObject* esp)
+        {
+            if (esp->ObjectType == ObjectTypes.StackObjectReference)
+            {
+                return *(StackObject**)&esp->Value;
+            }
+            else
+                return esp;
+        }
 
         StackObject* PushParameters(StackObject* esp, List<IType> plist, object[] p)
         {
@@ -790,6 +896,17 @@ namespace ILRuntime.Runtime.Intepreter
             if (dst->ObjectType >= ObjectTypes.Object)
             {
                 dst->Value = mStack.Count;
+                var obj = mStack[src->Value];
+                if (obj is ILTypeInstance)
+                {
+                    ILTypeInstance ins = obj as ILTypeInstance;
+                    if (ins.IsValueType)
+                    {
+                        mStack.Add(ins.Clone());
+                        return;
+                    }
+                        
+                }
                 mStack.Add(mStack[src->Value]);
             }
         }
@@ -857,6 +974,7 @@ namespace ILRuntime.Runtime.Intepreter
 #if DEBUG
             esp->ObjectType = ObjectTypes.Null;
             esp->Value = -1;
+            esp->ValueLow = 0;
 #endif
         }
     }

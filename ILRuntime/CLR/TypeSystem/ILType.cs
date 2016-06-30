@@ -49,6 +49,14 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public bool IsValueType
+        {
+            get
+            {
+                return definition.IsValueType;
+            }
+        }
+
         public Type TypeForCLR
         {
             get
@@ -207,6 +215,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IMethod GetConstructor(List<IType> param)
         {
+            if (constructors == null)
+                InitializeMethods();
             foreach(var i in constructors)
             {
                 if (i.ParameterCount == param.Count)

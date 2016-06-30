@@ -56,7 +56,7 @@ namespace ILRuntime.Runtime.Enviorment
             if (module.HasTypes)
             {
                 List<ILType> types = new List<ILType>();
-                foreach (var t in module.Types)
+                foreach (var t in module.GetTypes())
                 {
                     ILType type = new ILType(t);
                     mapType[t.FullName] = type;

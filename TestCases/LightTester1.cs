@@ -56,10 +56,10 @@ namespace TestCases
             return 1;
         }
 
-        public static void UnitTest_1006()
+        public static string UnitTest_1006()
         {
             byte b = 11;
-            b.ToString();
+            return b.ToString();
         }
 
         public static byte UnitTest_1007()
@@ -72,7 +72,13 @@ namespace TestCases
         struct TestStruc
         {
             public int a;
-            public float b;            
+            public float b;
+
+            public TestStruc(int a, float b)
+            {
+                this.a = a;
+                this.b = b;
+            }
         }
 
         public static int UnitTest_1008()
@@ -80,10 +86,16 @@ namespace TestCases
             TestStruc a, b;
             a.a = 1;
             a.b = 2.3f;
+            b = new TestStruc();
+            b = new TestStruc(9, 10.2f);
+            Console.WriteLine("Value of b:");
+            Console.WriteLine(b.a);
+            Console.WriteLine(b.b);
             b = a;
             b.a = 2;
             b.b = 3.2f;
             ValueTest(a);
+            a.b = b.b;
             return a.a;
         }
 

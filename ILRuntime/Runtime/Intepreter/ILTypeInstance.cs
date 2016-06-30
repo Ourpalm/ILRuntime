@@ -27,6 +27,14 @@ namespace ILRuntime.Runtime.Intepreter
             get { return fields; }
         }
 
+        public bool IsValueType
+        {
+            get
+            {
+                return type.IsValueType;
+            }
+        }
+
         public List<object> ManagedObjects { get { return managedObjs; } }
         public ILTypeInstance(ILType type)
         {
@@ -60,6 +68,15 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        internal void Clear()
+        {
+            for (int i = 0; i < fields.Length; i++)
+            {
+                fields[i] = StackObject.Null;
+                managedObjs[i] = null;
+            }            
+        }
+
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, List<object> managedStack)
         {
             AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
@@ -77,6 +94,17 @@ namespace ILRuntime.Runtime.Intepreter
         public override string ToString()
         {
             return type.FullName;
+        }
+
+        public ILTypeInstance Clone()
+        {
+            ILTypeInstance ins = new ILTypeInstance(type);
+            for (int i = 0; i < fields.Length; i++)
+            {
+                ins.fields[i] = fields[i];
+                ins.managedObjs[i] = managedObjs[i];
+            }
+            return ins;
         }
     }
 }

@@ -173,13 +173,25 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Stloc_S:
                 case OpCodeEnum.Ldloc:
                 case OpCodeEnum.Ldloc_S:
+                case OpCodeEnum.Ldloca:
+                case OpCodeEnum.Ldloca_S:
                     {
                         Mono.Cecil.Cil.VariableDefinition vd = (Mono.Cecil.Cil.VariableDefinition)token;
                         code.TokenInteger = vd.Index;
                     }
                     break;
+                case OpCodeEnum.Ldarg_S:
+                case OpCodeEnum.Ldarg:
+                case OpCodeEnum.Ldarga:
+                case OpCodeEnum.Ldarga_S:
+                    {
+                        Mono.Cecil.ParameterDefinition vd = (Mono.Cecil.ParameterDefinition)token;
+                        code.TokenInteger = vd.Index;
+                    }
+                    break;
                 case OpCodeEnum.Call:
                 case OpCodeEnum.Newobj:
+                case OpCodeEnum.Callvirt:
                     {
                         var m = appdomain.GetMethod(token, declaringType);
                         if (m != null)
@@ -187,6 +199,7 @@ namespace ILRuntime.CLR.Method
                     }
                     break;
                 case OpCodeEnum.Box:
+                case OpCodeEnum.Initobj:
                     {
                         var t = appdomain.GetType(token, declaringType);
                         if (t != null)

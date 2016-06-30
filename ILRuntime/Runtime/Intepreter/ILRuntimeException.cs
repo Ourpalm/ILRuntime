@@ -12,13 +12,24 @@ namespace ILRuntime.Runtime.Intepreter
         string thisInfo, localInfo;
         internal ILRuntimeException(string message, ILIntepreter intepreter, CLR.Method.ILMethod method, Exception innerException = null)
             : base(message, innerException)
+        
         {
-            stackTrace = Debugger.DebugService.Instance.GetStackTrance(intepreter);
-            if (method.HasThis)
-                thisInfo = Debugger.DebugService.Instance.GetThisInfo(intepreter);
+            if (innerException is ILRuntimeException)
+            {
+                ILRuntimeException e = innerException as ILRuntimeException;
+                stackTrace = e.stackTrace;
+                thisInfo = e.thisInfo;
+                localInfo = e.localInfo;
+            }
             else
-                thisInfo = "";
-            localInfo = Debugger.DebugService.Instance.GetLocalVariableInfo(intepreter);
+            {
+                stackTrace = Debugger.DebugService.Instance.GetStackTrance(intepreter);
+                if (method.HasThis)
+                    thisInfo = Debugger.DebugService.Instance.GetThisInfo(intepreter);
+                else
+                    thisInfo = "";
+                localInfo = Debugger.DebugService.Instance.GetLocalVariableInfo(intepreter);
+            }
         }
 
         public override string StackTrace

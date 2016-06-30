@@ -44,11 +44,13 @@ namespace ILRuntime.Runtime.Debugger
             StringBuilder sb = new StringBuilder();
             ILRuntime.CLR.Method.ILMethod m;
             StackFrame[] frames = intepreper.Stack.Frames.ToArray();
+            var ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
+            sb.AppendLine(ins.ToString());
             for (int i = 0; i < frames.Length; i++)
             {
                 var f = frames[i];
                 m = f.Method;
-                var ins = m.Definition.Body.Instructions[f.Address.Value];
+                ins = m.Definition.Body.Instructions[f.Address.Value];
                 string document = "";
                 var seq = FindSequencePoint(ins);
                 if (seq != null)
@@ -64,7 +66,11 @@ namespace ILRuntime.Runtime.Debugger
         internal unsafe string GetThisInfo(ILIntepreter intepreter)
         {
             var topFrame = intepreter.Stack.Frames.Peek();
-            var arg = topFrame.LocalVarPointer - 1;
+            var arg = topFrame.LocalVarPointer - topFrame.Method.ParameterCount;
+            if (topFrame.Method.HasThis)
+                arg--;
+            if (arg->ObjectType == ObjectTypes.StackObjectReference)
+                arg = *(StackObject**)&arg->Value;
             ILTypeInstance instance = intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance;
             var fields = instance.Type.TypeDefinition.Fields;
             int idx = 0;

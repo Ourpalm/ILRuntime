@@ -25,6 +25,12 @@ namespace TestCases
         {
             this.a = a;
         }
+
+        public void Test(int a, int c)
+        {
+            this.a = a;
+            this.c = c;
+        }
         public static long bar()
         {
             long b = 0;
@@ -79,8 +85,11 @@ namespace TestCases
         {
             SimpleTest t = new SimpleTest();
             int a = t.c;
-            SimpleTest t2 = new SimpleTest(12);
-            Console.Write(t2.a.ToString());
+            SimpleTest t2 = new SimpleTest(12);            
+            Console.WriteLine(t2.a.ToString());
+            t2.Test(5, 4);
+            Console.WriteLine(t2.a.ToString());
+            Console.WriteLine(t2.c.ToString());
             int b = t2.c;
             if (a == b)
             {
