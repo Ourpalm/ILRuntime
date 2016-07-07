@@ -21,6 +21,8 @@ namespace ILRuntime.CLR.TypeSystem
         IType[] fieldTypes;
         Dictionary<string, int> fieldMapping;
         Dictionary<int, int> fieldTokenMapping = new Dictionary<int, int>();
+        int fieldStartIdx = -1;
+        int totalFieldCnt = -1;
         bool staticInitialized = false;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
@@ -33,6 +35,50 @@ namespace ILRuntime.CLR.TypeSystem
                 if (fieldMapping == null)
                     InitializeFields();
                 return fieldTypes;
+            }
+        }
+
+        int FieldStartIndex
+        {
+            get
+            {
+                if (fieldStartIdx < 0)
+                {
+                    if (BaseType != null)
+                    {
+                        if (BaseType is ILType)
+                        {
+                            fieldStartIdx = ((ILType)BaseType).TotalFieldCount;
+                        }
+                    }
+                    else
+                        fieldStartIdx = 0;
+                }
+                return fieldStartIdx;
+            }
+        }
+
+        public int TotalFieldCount
+        {
+            get
+            {
+                if (totalFieldCnt < 0)
+                {
+                    if (fieldMapping == null)
+                        InitializeFields();
+                    if (BaseType != null)
+                    {
+                        if (BaseType is ILType)
+                        {
+                            totalFieldCnt = ((ILType)BaseType).TotalFieldCount + fieldTypes.Length;
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
+                    else
+                        totalFieldCnt = fieldTypes.Length;
+                }
+                return totalFieldCnt;
             }
         }
 
@@ -96,6 +142,7 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     else
                     {
+                        throw new NotImplementedException();
                         //继承了其他系统类型
                         //env.logger.Log_Error("ScriptType:" + Name + " Based On a SystemType:" + BaseType.Name);
                         //HasSysBase = true;
@@ -247,17 +294,17 @@ namespace ILRuntime.CLR.TypeSystem
             fieldMapping = new Dictionary<string, int>();
             fieldTypes = new IType[definition.Fields.Count];
             var fields = definition.Fields;
-            int idx = 0;
+            int idx = FieldStartIndex;
             for (int i = 0; i < fields.Count; i++)
             {
                 var field = fields[i];
                 if (field.IsStatic)
                     continue;
                 fieldMapping[field.Name] = idx;
-                fieldTypes[idx] = appdomain.GetType(field.FieldType.FullName);
+                fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType.FullName);
                 idx++;
             }
-            Array.Resize(ref fieldTypes, idx);
+            Array.Resize(ref fieldTypes, idx - FieldStartIndex);
         }
 
         internal ILTypeInstance Instantiate()

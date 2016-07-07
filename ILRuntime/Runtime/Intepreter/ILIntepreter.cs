@@ -54,6 +54,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)//this parameter is always object reference
             {
                 arg--;
+                mStackBase--;
             }
             unhandledException = false;
 
@@ -512,12 +513,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         if (m is ILMethod)
                                         {
-                                            ILMethod ilm = (ILMethod)m;
-                                            if (ilm.HasThis)
-                                            {
-                                                //CopyToStack(esp, arg, mStack);
-                                                //esp++;
-                                            }
+                                            ILMethod ilm = (ILMethod)m;                                            
                                             esp = Execute(ilm, esp, out unhandledException);
                                             if (unhandledException)
                                                 returned = true;
@@ -538,7 +534,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp--;
                                             }
                                             if (cm.ReturnType != AppDomain.VoidType)
-                                                esp = PushObject(esp - 1, mStack, result);
+                                                esp = PushObject(esp, mStack, result);
                                         }
 
                                     }
@@ -750,7 +746,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             throw new NotImplementedException();
                                     }
                                     else
-                                        throw new NullReferenceException();
+                                        throw new NullReferenceException();                                    
                                 }
                                 break;
                             case OpCodeEnum.Initobj:
@@ -828,7 +824,7 @@ namespace ILRuntime.Runtime.Intepreter
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
-                        ip++;
+                        ip++;                        
                     }
                 }
             }

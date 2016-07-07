@@ -39,7 +39,7 @@ namespace ILRuntime.Runtime.Intepreter
         public ILTypeInstance(ILType type)
         {
             this.type = type;
-            fields = new StackObject[type.FieldTypes.Length];
+            fields = new StackObject[type.TotalFieldCount];
             managedObjs = new List<object>(fields.Length);
             for (int i = 0; i < fields.Length; i++)
                 managedObjs.Add(null);
