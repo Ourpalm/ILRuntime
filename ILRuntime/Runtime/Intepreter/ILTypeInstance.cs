@@ -105,6 +105,11 @@ namespace ILRuntime.Runtime.Intepreter
                 return type.FullName;
         }
 
+        public bool CanAssignTo(IType type)
+        {
+            return this.type.CanAssignTo(type);
+        }
+
         public ILTypeInstance Clone()
         {
             ILTypeInstance ins = new ILTypeInstance(type);

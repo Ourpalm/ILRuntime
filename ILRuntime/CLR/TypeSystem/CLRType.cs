@@ -126,6 +126,15 @@ namespace ILRuntime.CLR.TypeSystem
             }
             return null;
         }
+        public bool CanAssignTo(IType type)
+        {
+            if (this == type)
+            {
+                return true;
+            }
+            else
+                return false;
+        }
 
         public IMethod GetConstructor(List<IType> param)
         {

@@ -339,6 +339,18 @@ namespace ILRuntime.CLR.TypeSystem
             Array.Resize(ref fieldTypes, idx - FieldStartIndex);
         }
 
+        public bool CanAssignTo(IType type)
+        {
+            if (this == type)
+            {
+                return true;
+            }
+            else if (BaseType != null)
+                return BaseType.CanAssignTo(type);
+            else
+                return false;
+        }
+
         internal ILTypeInstance Instantiate()
         {
             return new ILTypeInstance(this);

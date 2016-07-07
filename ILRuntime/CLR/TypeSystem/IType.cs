@@ -24,5 +24,7 @@ namespace ILRuntime.CLR.TypeSystem
         List<IMethod> GetMethods();
 
         IMethod GetConstructor(List<IType> param);
+
+        bool CanAssignTo(IType type);
     }
 }

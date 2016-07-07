@@ -208,6 +208,7 @@ namespace ILRuntime.CLR.Method
                     break;
                 case OpCodeEnum.Box:
                 case OpCodeEnum.Initobj:
+                case OpCodeEnum.Isinst:
                     {
                         var t = appdomain.GetType(token, declaringType);
                         if (t != null)
