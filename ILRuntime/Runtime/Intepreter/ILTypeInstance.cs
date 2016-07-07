@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
 namespace ILRuntime.Runtime.Intepreter
@@ -93,7 +94,15 @@ namespace ILRuntime.Runtime.Intepreter
 
         public override string ToString()
         {
-            return type.FullName;
+            IMethod m = type.AppDomain.ObjectType.GetMethod("ToString", 0);
+            m = type.GetVirtualMethod(m);
+            if (m != null)
+            {
+                var res = type.AppDomain.Invoke(m, this);
+                return res.ToString();
+            }
+            else
+                return type.FullName;
         }
 
         public ILTypeInstance Clone()

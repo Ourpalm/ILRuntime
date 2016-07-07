@@ -113,6 +113,11 @@ namespace TestCases
                 A = 1;
                 B = false;
             }
+
+            public override string ToString()
+            {
+                return string.Format("A={0},B={1}", A, B);
+            }
         }
 
         class B : ClsA
@@ -124,6 +129,11 @@ namespace TestCases
             }
         }
 
+        class C : B
+        {
+
+        }
+
         public static bool UnitTest_1009()
         {
             B test = new B();
@@ -132,11 +142,12 @@ namespace TestCases
             ClsA test2 = (ClsA)test;
             test2.TestVirtual();
             Console.WriteLine(string.Format("A={0},B={1}", test2.A, test2.B));
-            test2 = new B();
+            test2 = new C();
             test2.TestVirtual();
             Console.WriteLine(string.Format("A={0},B={1}", test2.A, test2.B));            
             ClsA test3 = new ClsA();
             test3.TestVirtual();
+            Console.WriteLine(string.Format("A={0},B={1}", test3.A, test3.B));      
             test = test3 as B;
             if (test != null)
             {

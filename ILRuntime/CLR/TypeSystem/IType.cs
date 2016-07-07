@@ -15,6 +15,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         string FullName { get; }
 
+        ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
+
         IMethod GetMethod(string name, int paramCount);
 
         IMethod GetMethod(string name, List<IType> param);

@@ -9,6 +9,7 @@ namespace ILRuntime.CLR.Method
 {
     public interface IMethod
     {
+        string Name { get; }
         int ParameterCount { get; }
 
         bool HasThis { get; }

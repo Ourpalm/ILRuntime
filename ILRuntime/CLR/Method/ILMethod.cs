@@ -19,6 +19,14 @@ namespace ILRuntime.CLR.Method
 
         public MethodDefinition Definition { get { return def; } }
 
+        public string Name
+        {
+            get
+            {
+                return def.Name;
+            }
+        }
+
         public IType DeclearingType
         {
             get

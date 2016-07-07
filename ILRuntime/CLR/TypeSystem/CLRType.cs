@@ -13,7 +13,13 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
-
+        public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
+        {
+            get
+            {
+                return appdomain;
+            }
+        }
 
         public CLRType(Type clrType, Runtime.Enviorment.AppDomain appdomain)
         {

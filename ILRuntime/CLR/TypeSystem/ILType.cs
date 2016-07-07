@@ -37,6 +37,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return fieldTypes;
             }
         }
+        public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
+        {
+            get
+            {
+                return appdomain;
+            }
+        }
 
         int FieldStartIndex
         {
@@ -225,6 +232,7 @@ namespace ILRuntime.CLR.TypeSystem
                         lst = new List<ILMethod>();
                         methods[i.Name] = lst;
                     }
+                    var m = new ILMethod(i, this, appdomain);
                     lst.Add(new ILMethod(i, this, appdomain));
                 }
             }
@@ -233,6 +241,29 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 //appdomain.Invoke(staticConstructor);
             }
+        }
+
+        public IMethod GetVirtualMethod(IMethod method)
+        {
+            var m = GetMethod(method.Name, method.Parameters);
+            if (m == null)
+            {
+                if (BaseType != null)
+                {
+                    if (BaseType is ILType)
+                    {
+                        return ((ILType)BaseType).GetVirtualMethod(method);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+                else
+                    return null;
+            }
+            else
+                return m;
         }
 
         public IMethod GetMethod(string name, List<IType> param)
@@ -244,10 +275,11 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 foreach (var i in lst)
                 {
-                    if (i.ParameterCount == param.Count)
+                    int pCnt = param != null ? param.Count : 0;
+                    if (i.ParameterCount == pCnt)
                     {
                         bool match = true;
-                        for (int j = 0; j < param.Count; j++)
+                        for (int j = 0; j < pCnt; j++)
                         {
                             if (param[j] != i.Parameters[j])
                                 match = false;

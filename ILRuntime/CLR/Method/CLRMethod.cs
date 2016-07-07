@@ -28,7 +28,13 @@ namespace ILRuntime.CLR.Method
                 return declaringType;
             }
         }
-
+        public string Name
+        {
+            get
+            {
+                return def.Name;
+            }
+        }
         public bool HasThis
         {
             get

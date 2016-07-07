@@ -30,7 +30,7 @@ namespace ILRuntime.Runtime.Intepreter
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
 
-            StackObject* esp = PushParameters(stack.StackBase, method.Parameters, p);
+            StackObject* esp = PushParameters(method, stack.StackBase, p);
             bool unhandledException;
             Execute(method, esp, out unhandledException);
             object result = method.ReturnType != domain.VoidType ? esp->ToObject(mStack) : null;
@@ -513,7 +513,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         if (m is ILMethod)
                                         {
-                                            ILMethod ilm = (ILMethod)m;                                            
+                                            ILMethod ilm = (ILMethod)m;
+                                            if (code == OpCodeEnum.Callvirt)
+                                            {
+                                                var objRef = esp - ilm.ParameterCount - 1;
+                                                var obj = mStack[objRef->Value];
+                                                ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                            }
                                             esp = Execute(ilm, esp, out unhandledException);
                                             if (unhandledException)
                                                 returned = true;
@@ -853,17 +859,20 @@ namespace ILRuntime.Runtime.Intepreter
                 return esp;
         }
 
-        StackObject* PushParameters(StackObject* esp, List<IType> plist, object[] p)
+        StackObject* PushParameters(IMethod method, StackObject* esp, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
             if (p != null && p.Length > 0)
             {
-                if (plist.Count != p.Length)
+                var plist = method.Parameters;
+                int pCnt = plist != null ? plist.Count : 0;
+                if (method.HasThis)
+                    pCnt++;
+                if (pCnt != p.Length)
                     throw new ArgumentOutOfRangeException();
-                for (int i = p.Length - 1; i >= 0; i--)
+                for (int i = 0; i < p.Length; i++)
                 {
-                    var t = plist[i];
-                    Type clrType = t.TypeForCLR;
+                    Type clrType = p[i].GetType();
                     if (clrType == typeof(int))
                     {
                         esp->ObjectType = ObjectTypes.Integer;

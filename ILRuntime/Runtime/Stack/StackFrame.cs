@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Stack
     unsafe struct StackFrame
     {
         public ILMethod Method;
-        public StackObject*LocalVarPointer;
+        public StackObject* LocalVarPointer;
         public StackObject* BasePointer;
         public IntegerReference Address;
     }
