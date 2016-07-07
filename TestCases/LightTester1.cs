@@ -22,8 +22,8 @@ namespace TestCases
 
             int a = (int)(Math.Pow(1.4f, 5) * 5f);
 
-            //Vector3 v3 = new Vector3((252.0f / 255.0f), (207.0f / 255.0f), (20.0f / 255.0f));
-            //Console.WriteLine("v3=" + v3);
+            Vector3 v3 = new Vector3((252.0f / 255.0f), (207.0f / 255.0f), (20.0f / 255.0f));
+            Console.WriteLine("v3=" + v3);
             return (2 + 55) * 3434 + a;
 
         }
@@ -79,7 +79,7 @@ namespace TestCases
                 this.a = a;
                 this.b = b;
             }
-        }
+        }       
 
         public static int UnitTest_1008()
         {
@@ -102,6 +102,47 @@ namespace TestCases
         static void ValueTest(TestStruc a)
         {
             a.a = 3;
+        }
+        class ClsA
+        {
+            public int A { get; set; }
+            public bool B { get; set; }
+
+            public virtual void TestVirtual()
+            {
+                A = 1;
+                B = false;
+            }
+        }
+
+        class B : ClsA
+        {
+            public override void TestVirtual()
+            {
+                base.TestVirtual();
+                B = true;
+            }
+        }
+
+        public static bool UnitTest_1009()
+        {
+            B test = new B();
+            test.TestVirtual();
+            Console.WriteLine(string.Format("A={0},B={1}", test.A, test.B));
+            ClsA test2 = (ClsA)test;
+            test2.TestVirtual();
+            Console.WriteLine(string.Format("A={0},B={1}", test2.A, test2.B));
+            test2 = new B();
+            test2.TestVirtual();
+            Console.WriteLine(string.Format("A={0},B={1}", test2.A, test2.B));            
+            ClsA test3 = new ClsA();
+            test3.TestVirtual();
+            test = test3 as B;
+            if (test != null)
+            {
+                Console.WriteLine(string.Format("A={0},B={1}", test.A, test.B));            
+            }
+            return test3.B;
         }
     }
 }
