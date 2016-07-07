@@ -125,14 +125,18 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Stloc_0:
-                                esp--;
-                                *v1 = *esp;
-                                if (v1->ObjectType >= ObjectTypes.Object)
                                 {
+                                    esp--;
+                                    *v1 = *esp;
                                     int idx = mStackBase;
-                                    mStack[idx] = mStack[v1->Value];
-                                    v1->Value = idx;
-                                    Free(esp);
+                                    if (v1->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        mStack[idx] = mStack[v1->Value];
+                                        v1->Value = idx;
+                                        Free(esp);
+                                    }
+                                    else
+                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_0:
@@ -140,14 +144,18 @@ namespace ILRuntime.Runtime.Intepreter
                                 esp++;
                                 break;
                             case OpCodeEnum.Stloc_1:
-                                esp--;
-                                *v2 = *esp;
-                                if (v2->ObjectType >= ObjectTypes.Object)
                                 {
+                                    esp--;
+                                    *v2 = *esp;
                                     int idx = mStackBase + 1;
-                                    mStack[idx] = mStack[v2->Value];
-                                    v2->Value = idx;
-                                    Free(esp);
+                                    if (v2->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        mStack[idx] = mStack[v2->Value];
+                                        v2->Value = idx;
+                                        Free(esp);
+                                    }
+                                    else
+                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_1:
@@ -155,29 +163,37 @@ namespace ILRuntime.Runtime.Intepreter
                                 esp++;
                                 break;
                             case OpCodeEnum.Stloc_2:
-                                esp--;
-                                *v3 = *esp;
-                                if (v3->ObjectType >= ObjectTypes.Object)
                                 {
+                                    esp--;
+                                    *v3 = *esp;
                                     int idx = mStackBase + 2;
-                                    mStack[idx] = mStack[v3->Value];
-                                    v3->Value = idx;
-                                    Free(esp);
+                                    if (v3->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        mStack[idx] = mStack[v3->Value];
+                                        v3->Value = idx;
+                                        Free(esp);
+                                    }
+                                    else
+                                        mStack[idx] = null;
+                                    break;
                                 }
-                                break;
                             case OpCodeEnum.Ldloc_2:
                                 CopyToStack(esp, v3, mStack);
                                 esp++;
                                 break;
                             case OpCodeEnum.Stloc_3:
-                                esp--;
-                                *v4 = *esp;
-                                if (v4->ObjectType >= ObjectTypes.Object)
                                 {
+                                    esp--;
+                                    *v4 = *esp;
                                     int idx = mStackBase + 3;
-                                    mStack[idx] = mStack[v4->Value];
-                                    v4->Value = idx;
-                                    Free(esp);
+                                    if (v4->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        mStack[idx] = mStack[v4->Value];
+                                        v4->Value = idx;
+                                        Free(esp);
+                                    }
+                                    else
+                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_3:
@@ -190,13 +206,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     var v = frame.LocalVarPointer + ip->TokenInteger;
                                     *v = *esp;
+                                    int idx = mStackBase + ip->TokenInteger;
                                     if (v->ObjectType >= ObjectTypes.Object)
                                     {
-                                        int idx = mStackBase + ip->TokenInteger;
                                         mStack[idx] = mStack[v->Value];
                                         v->Value = idx;
                                         Free(esp);
                                     }
+                                    else
+                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc:
@@ -290,6 +308,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     *(double*)(&esp->Value) = ip->TokenDouble;
                                     esp->ObjectType = ObjectTypes.Double;
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Ldnull:
+                                {
+                                    esp->ObjectType = ObjectTypes.Null;
+                                    esp->Value = -1;
+                                    esp->ValueLow = 0;
                                     esp++;
                                 }
                                 break;
@@ -517,6 +543,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (code == OpCodeEnum.Callvirt)
                                             {
                                                 var objRef = esp - ilm.ParameterCount - 1;
+                                                if (objRef->ObjectType == ObjectTypes.Null)
+                                                    throw new NullReferenceException();
                                                 var obj = mStack[objRef->Value];
                                                 ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                             }
@@ -779,6 +807,47 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NotImplementedException();
                                     Free(esp - 1);
                                     esp--;
+                                }
+                                break;
+                            case OpCodeEnum.Isinst:
+                                {
+                                    var objRef = esp - 1;
+                                    var type = domain.GetType(ip->TokenInteger);
+                                    if (type != null)
+                                    {
+                                        var obj = mStack[objRef->Value];
+                                        Free(objRef);
+                                        if (obj != null)
+                                        {
+                                            if (obj is ILTypeInstance)
+                                            {
+                                                if (((ILTypeInstance)obj).CanAssignTo(type))
+                                                {
+                                                    esp = PushObject(objRef, mStack, obj);
+                                                }
+                                                else
+                                                {
+#if !DEBUG
+                                                    objRef->ObjectType = ObjectTypes.Null;
+                                                    objRef->Value = -1;
+                                                    objRef->ValueLow = 0;
+#endif
+                                                }
+                                            }
+                                            else
+                                                throw new NotImplementedException();
+                                        }
+                                        else
+                                        {
+#if !DEBUG
+                                            objRef->ObjectType = ObjectTypes.Null;
+                                            objRef->Value = -1;
+                                            objRef->ValueLow = 0;
+#endif
+                                        }
+                                    }
+                                    else
+                                        throw new NullReferenceException();
                                 }
                                 break;
                             case OpCodeEnum.Conv_I4:
