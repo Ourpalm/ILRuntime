@@ -912,6 +912,78 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp -= 3;
                                 }
                                 break;
+                            case OpCodeEnum.Conv_U1:
+                                {
+                                    var obj = esp - 1;
+                                    int val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            val = (byte)obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Integer;
+                                    obj->Value = val;
+                                    obj->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeEnum.Conv_I1:
+                                {
+                                    var obj = esp - 1;
+                                    int val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            val = (sbyte)obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Integer;
+                                    obj->Value = val;
+                                    obj->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeEnum.Conv_U2:
+                                {
+                                    var obj = esp - 1;
+                                    int val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            val = (ushort)obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Integer;
+                                    obj->Value = val;
+                                    obj->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeEnum.Conv_I2:
+                                {
+                                    var obj = esp - 1;
+                                    int val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            val = (short)(obj->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Integer;
+                                    obj->Value = val;
+                                    obj->ValueLow = 0;
+                                }
+                                break;
                             case OpCodeEnum.Conv_I4:
                                 {
                                     var obj = esp - 1;
@@ -919,7 +991,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (obj->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            val = obj->Value;
+                                            val = (int)*(long*)&obj->Value;
                                             break;
                                         case ObjectTypes.Float:
                                             val = (int)*(float*)&obj->Value;
@@ -934,6 +1006,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     obj->Value = val;
                                 }
                                 break;
+                            case OpCodeEnum.Conv_U8:
                             case OpCodeEnum.Conv_I8:
                                 {
                                     var obj = esp - 1;

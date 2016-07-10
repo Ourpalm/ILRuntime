@@ -68,6 +68,12 @@ namespace TestCases
             byte c = 255;
             return (byte)(b + c);
         }
+        public static sbyte UnitTest_1007_2()
+        {
+            sbyte b = 12;
+            sbyte c = 127;
+            return (sbyte)(b + c);
+        }
 
         struct TestStruc
         {
