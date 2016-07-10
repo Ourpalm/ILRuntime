@@ -32,9 +32,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             get
             {
-                return type.IsValueType;
+                return type.IsValueType && !Boxed;
             }
         }
+
+        /// <summary>
+        /// 是否已装箱
+        /// </summary>
+        public bool Boxed { get; set; }
 
         public List<object> ManagedObjects { get { return managedObjs; } }
         public ILTypeInstance(ILType type)

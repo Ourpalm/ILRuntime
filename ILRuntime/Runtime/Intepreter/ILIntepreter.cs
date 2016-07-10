@@ -54,7 +54,8 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)//this parameter is always object reference
             {
                 arg--;
-                mStackBase--;
+                if (arg->ObjectType != ObjectTypes.StackObjectReference)
+                    mStackBase--;
             }
             unhandledException = false;
 
@@ -791,7 +792,16 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else if (type.TypeForCLR == typeof(ILTypeInstance))
                                         {
-                                            throw new NotImplementedException();
+                                            var val = mStack[obj->Value];
+                                            Free(obj);
+                                            ILTypeInstance ins = (ILTypeInstance)val;
+                                            if (ins.IsValueType)
+                                            {
+                                                ins.Boxed = true;
+                                            }
+                                            else
+                                                throw new NotSupportedException();
+                                            esp = PushObject(obj, mStack, ins, true);
                                         }
                                         else
                                             throw new NotImplementedException();
