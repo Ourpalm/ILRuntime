@@ -758,23 +758,40 @@ namespace ILRuntime.Runtime.Intepreter
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type != null)
                                     {
-                                        if (type == domain.IntType)
+                                        if (type.TypeForCLR.IsPrimitive)
                                         {
-                                            if (obj->ObjectType == ObjectTypes.Integer)
+                                            if (type == domain.IntType)
                                             {
-                                                esp = PushObject(obj, mStack, obj->Value, true);
+                                                if (obj->ObjectType == ObjectTypes.Integer)
+                                                {
+                                                    esp = PushObject(obj, mStack, obj->Value, true);
+                                                }
+                                                else
+                                                    throw new NotImplementedException();
+                                            }
+                                            else if (type == domain.BoolType)
+                                            {
+                                                if (obj->ObjectType == ObjectTypes.Integer)
+                                                {
+                                                    esp = PushObject(obj, mStack, (obj->Value == 1), true);
+                                                }
+                                                else
+                                                    throw new NotImplementedException();
+                                            }
+                                            else if (type == domain.FloatType)
+                                            {
+                                                esp = PushObject(obj, mStack, *(float*)&obj->Value, true);
+                                            }
+                                            else if (type == domain.DoubleType)
+                                            {
+                                                esp = PushObject(obj, mStack, *(double*)&obj->Value, true);
                                             }
                                             else
                                                 throw new NotImplementedException();
                                         }
-                                        else if (type == domain.BoolType)
+                                        else if (type.TypeForCLR == typeof(ILTypeInstance))
                                         {
-                                            if (obj->ObjectType == ObjectTypes.Integer)
-                                            {
-                                                esp = PushObject(obj, mStack, (obj->Value == 1), true);
-                                            }
-                                            else
-                                                throw new NotImplementedException();
+                                            throw new NotImplementedException();
                                         }
                                         else
                                             throw new NotImplementedException();
@@ -850,6 +867,41 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
                                 }
                                 break;
+                            case OpCodeEnum.Newarr:
+                                {
+                                    var cnt = (esp - 1)->Value;
+                                    var type = domain.GetType(ip->TokenInteger);
+                                    object arr = null;
+                                    if (type != null)
+                                    {
+                                        if (type.TypeForCLR != typeof(ILTypeInstance))
+                                        {
+                                            arr = Array.CreateInstance(type.TypeForCLR, cnt);
+                                        }
+                                        else
+                                        {
+                                            arr = new ILTypeInstance[cnt];
+                                        }
+                                    }
+                                    esp->ObjectType = ObjectTypes.Object;
+                                    esp->Value = mStack.Count;
+                                    mStack.Add(arr);
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_Ref:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 2;
+                                    var arrRef = esp - 3;
+                                    Array arr = mStack[arrRef->Value] as Array;
+                                    arr.SetValue(mStack[val->Value], idx->Value);
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    Free(esp - 3);
+                                    esp -= 3;
+                                }
+                                break;
                             case OpCodeEnum.Conv_I4:
                                 {
                                     var obj = esp - 1;
@@ -892,6 +944,18 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     Free(esp - 1);
                                     esp--;
+                                }
+                                break;
+                            case OpCodeEnum.Dup:
+                                {
+                                    var obj = esp - 1;
+                                    *esp = *obj;
+                                    if(esp->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        esp->Value = mStack.Count;
+                                        mStack.Add(mStack[obj->Value]);
+                                    }
+                                    esp++;
                                 }
                                 break;
                             case OpCodeEnum.Nop:

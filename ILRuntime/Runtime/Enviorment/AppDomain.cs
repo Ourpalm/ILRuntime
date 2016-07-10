@@ -21,7 +21,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
-        IType voidType, intType, boolType, objectType;
+        IType voidType, intType, boolType, floatType, doubleType,objectType;
         public AppDomain()
         {
         }
@@ -29,7 +29,8 @@ namespace ILRuntime.Runtime.Enviorment
         public IType VoidType { get { return voidType; } }
         public IType IntType { get { return intType; } }
         public IType BoolType { get { return boolType; } }
-
+        public IType FloatType { get { return floatType; } }
+        public IType DoubleType { get { return doubleType; } }
         public IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
@@ -74,6 +75,8 @@ namespace ILRuntime.Runtime.Enviorment
             voidType = GetType("System.Void");
             intType = GetType("System.Int32");
             boolType = GetType("System.Boolean");
+            floatType = GetType("System.Single");
+            doubleType = GetType("System.Double");
             objectType = GetType("System.Object");
         }
         
