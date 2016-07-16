@@ -17,13 +17,19 @@ namespace TestCases
                 C6.A = 1;
                 Console.WriteLine(C5.A);
                 C6.foo();
-                Console.WriteLine(C6.B);                
+                Console.WriteLine(C6.B);
+                TestTryCatch();            
             }
+            else
+                TestTryCatch();
+            
+            
+        }
+        static void TestTryCatch()
+        {
             try
             {
-
-
-                throw new NotImplementedException("E2");
+                c5.bar();
             }
             catch (NotSupportedException err)
             {
@@ -37,10 +43,16 @@ namespace TestCases
             {
                 Console.WriteLine("Got 2.");
             }
+            finally
+            {
+                Console.WriteLine("Finally");
+            }
         }
+
         static C5 c5 = null;
     }
 
+    
     class C6 : C5
     {
         public static string B = "tt";
@@ -54,5 +66,10 @@ namespace TestCases
     class C5
     {
         public static int A = 4;
+
+        public void bar()
+        {
+            Console.WriteLine("bar = " + A);
+        }
     }
 }

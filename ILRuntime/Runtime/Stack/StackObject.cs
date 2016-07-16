@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using ILRuntime.Runtime.Intepreter;
 namespace ILRuntime.Runtime.Stack

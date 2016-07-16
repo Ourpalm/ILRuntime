@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
@@ -121,6 +120,11 @@ namespace ILRuntime.CLR.Method
                 {
                     var c = def.Body.Instructions[i];
                     InitToken(ref body[i], c.Operand, addr);
+                }
+
+                foreach (var i in def.Body.ExceptionHandlers)
+                {
+                    //Mono.Cecil.Cil.ExceptionHandlerType.
                 }
             }
             else

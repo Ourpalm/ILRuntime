@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ILRuntime</RootNamespace>
     <AssemblyName>ILRuntime</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLR\Method\CLRMethod.cs" />
+    <Compile Include="CLR\Method\ExceptionHandler.cs" />
     <Compile Include="CLR\Method\ILMethod.cs" />
     <Compile Include="CLR\Method\IMethod.cs" />
     <Compile Include="CLR\TypeSystem\ILType.cs" />
