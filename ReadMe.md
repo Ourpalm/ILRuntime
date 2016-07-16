@@ -10,6 +10,16 @@ L# is a great project which created a good code base to accomplish the task, but
 
 So this project aims to develop a solid IL runtime to support as many features of IL as possible, and with highly optimized performance which is  as competitive as luajit.
 
+Our Vision
+========
+Our vision is to create a reliable high performance IL runtime which is also as productive as possible. The entire runtime will include the following features
+
+* Full support for Generics, both for types inside and outside the ILRuntime
+* Full support for type Inheritance from ILRuntime to CLR
+* Complete framework for Debugging, which supports break points, and common debugger actions like Step in, Step out, Step through.
+* Framework for inspecting stack and object information
+* Either Visual Studio integration or Standalone Debugger with GUI.
+
 Apporach
 ========
 The basic part of the runtime, like resolving PE header, gathering meta information of types, and disassembling of IL instructions, we will take the same solution as L#, to use the Mono.Cecil library. 
