@@ -620,7 +620,17 @@ namespace ILRuntime.Runtime.Intepreter
                                             returned = true;
                                     }
                                     else
-                                        throw new NotSupportedException();
+                                    {
+                                        CLRMethod cm = (CLRMethod)m;
+                                        object result = cm.Invoke(esp, mStack);
+                                        int paramCount = cm.ParameterCount;
+                                        for (int i = 1; i <= paramCount; i++)
+                                        {
+                                            Free(esp - i);
+                                        }
+                                        esp -= paramCount;
+                                        esp = PushObject(esp, mStack, result);//new constructedObj
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Stfld:
@@ -1100,6 +1110,12 @@ namespace ILRuntime.Runtime.Intepreter
                                         mStack.Add(mStack[obj->Value]);
                                     }
                                     esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Throw:
+                                {
+                                    var obj = GetObjectAndResolveReference(esp - 1);
+
                                 }
                                 break;
                             case OpCodeEnum.Nop:

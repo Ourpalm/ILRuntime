@@ -27,7 +27,7 @@ namespace TestCases
             try
             {
                 c5.bar();
-                throw new NotImplementedException();
+                throw new NotImplementedException("new exception");
             }
             catch (NotSupportedException err)
             {

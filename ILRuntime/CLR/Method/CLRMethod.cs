@@ -116,29 +116,31 @@ namespace ILRuntime.CLR.Method
 
         public unsafe object Invoke(StackObject* esp, List<object> mStack)
         {
+            int paramCount = ParameterCount;
+            object[] param = new object[paramCount];
+            for (int i = 1; i <= paramCount; i++)
+            {
+                var p = esp - i;
+                var obj = CheckPrimitiveTypes(this.param[i - 1].ParameterType, p->ToObject(appdomain, mStack));
+
+                param[paramCount - i] = obj;
+            }
+            
             if (isConstructor)
             {
-                throw new NotImplementedException();
+                var res = cDef.Invoke(param);
+                return res;
             }
             else
             {
-                int paramCount = ParameterCount;
-                object[] param = new object[paramCount];
-                for (int i = 1; i <= paramCount; i++)
-                {
-                    var p = esp - i;
-                    var obj = CheckPrimitiveTypes(this.param[i - 1].ParameterType, p->ToObject(appdomain, mStack));
-                    
-                    param[paramCount - i] = obj;
-                }
                 object instance = null;
+                       
                 if (!def.IsStatic)
                 {
                     instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(appdomain, mStack));
                     if (instance == null)
                         throw new NullReferenceException();
-                }                
-                
+                }    
                 var res = def.Invoke(instance, param);
                 return res;
             }
