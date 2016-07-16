@@ -44,18 +44,25 @@ namespace ILRuntime.Runtime.Debugger
             StringBuilder sb = new StringBuilder();
             ILRuntime.CLR.Method.ILMethod m;
             StackFrame[] frames = intepreper.Stack.Frames.ToArray();
-            var ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
-            sb.AppendLine(ins.ToString());
+            Mono.Cecil.Cil.Instruction ins = null;
+            if (frames[0].Address != null)
+            {
+                ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
+                sb.AppendLine(ins.ToString());
+            }
             for (int i = 0; i < frames.Length; i++)
             {
                 var f = frames[i];
                 m = f.Method;
-                ins = m.Definition.Body.Instructions[f.Address.Value];
                 string document = "";
-                var seq = FindSequencePoint(ins);
-                if (seq != null)
+                if (f.Address != null)
                 {
-                    document = string.Format("{0}:Line {1}", seq.Document.Url, seq.StartLine);
+                    ins = m.Definition.Body.Instructions[f.Address.Value];
+                    var seq = FindSequencePoint(ins);
+                    if (seq != null)
+                    {
+                        document = string.Format("{0}:Line {1}", seq.Document.Url, seq.StartLine);
+                    }
                 }
                 sb.AppendFormat("at {0}.{1} {2}\r\n", m.DeclearingType.FullName, m.Definition.Name, document);
             }
