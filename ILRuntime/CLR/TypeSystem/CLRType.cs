@@ -72,7 +72,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
             foreach(var i in clrType.GetConstructors())
             {
-
+                constructors.Add(new CLRMethod(i, this, appdomain));
             }
         }
         public List<IMethod> GetMethods()

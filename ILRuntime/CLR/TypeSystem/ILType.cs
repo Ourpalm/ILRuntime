@@ -11,7 +11,7 @@ using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.CLR.TypeSystem
 {
-    public class ILType : IType
+    class ILType : IType
     {
         Dictionary<string, List<ILMethod>> methods;
         TypeDefinition definition;
@@ -19,7 +19,10 @@ namespace ILRuntime.CLR.TypeSystem
         ILMethod staticConstructor;
         List<ILMethod> constructors;
         IType[] fieldTypes;
+        IType[] staticFieldTypes;
         Dictionary<string, int> fieldMapping;
+        Dictionary<string, int> staticFieldMapping;
+        ILTypeStaticInstance staticInstance;
         Dictionary<int, int> fieldTokenMapping = new Dictionary<int, int>();
         int fieldStartIdx = -1;
         int totalFieldCnt = -1;
@@ -28,6 +31,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IType BaseType { get; private set; }
 
+        public ILTypeStaticInstance StaticInstance { get { return staticInstance; } }
+
         public IType[] FieldTypes
         {
             get
@@ -35,6 +40,16 @@ namespace ILRuntime.CLR.TypeSystem
                 if (fieldMapping == null)
                     InitializeFields();
                 return fieldTypes;
+            }
+        }
+
+        public IType[] StaticFieldTypes
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields(); 
+                return staticFieldTypes;
             }
         }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
@@ -239,7 +254,7 @@ namespace ILRuntime.CLR.TypeSystem
 
             if (staticConstructor != null)
             {
-                //appdomain.Invoke(staticConstructor);
+                appdomain.Invoke(staticConstructor);
             }
         }
 
@@ -313,10 +328,21 @@ namespace ILRuntime.CLR.TypeSystem
             if (fieldTokenMapping.TryGetValue(hashCode, out idx))
                 return idx;
             FieldDefinition f = token as FieldDefinition;
-            if(fieldMapping.TryGetValue(f.Name, out idx))
+            if (f.IsStatic)
             {
-                fieldTokenMapping[hashCode] = idx;
-                return idx;
+                if (staticFieldMapping.TryGetValue(f.Name, out idx))
+                {
+                    fieldTokenMapping[hashCode] = idx;
+                    return idx;
+                }
+            }
+            else
+            {
+                if (fieldMapping.TryGetValue(f.Name, out idx))
+                {
+                    fieldTokenMapping[hashCode] = idx;
+                    return idx;
+                }
             }
             return -1;
         }
@@ -327,16 +353,35 @@ namespace ILRuntime.CLR.TypeSystem
             fieldTypes = new IType[definition.Fields.Count];
             var fields = definition.Fields;
             int idx = FieldStartIndex;
+            int idxStatic = 0;
             for (int i = 0; i < fields.Count; i++)
             {
                 var field = fields[i];
                 if (field.IsStatic)
-                    continue;
-                fieldMapping[field.Name] = idx;
-                fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType.FullName);
-                idx++;
+                {
+                    if (staticFieldTypes == null)
+                    {
+                        staticFieldTypes = new IType[definition.Fields.Count];
+                        staticFieldMapping = new Dictionary<string, int>();
+                    }
+                    staticFieldMapping[field.Name] = idxStatic;
+                    staticFieldTypes[idxStatic] = appdomain.GetType(field.FieldType.FullName);
+                    idxStatic++;
+                }
+                else
+                {
+                    fieldMapping[field.Name] = idx;
+                    fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType.FullName);
+                    idx++;
+                }
             }
             Array.Resize(ref fieldTypes, idx - FieldStartIndex);
+
+            if (staticFieldTypes != null)
+            {
+                Array.Resize(ref staticFieldTypes, idxStatic);
+                staticInstance = new ILTypeStaticInstance(this);
+            }
         }
 
         public bool CanAssignTo(IType type)

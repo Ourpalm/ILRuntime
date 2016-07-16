@@ -128,14 +128,14 @@ namespace ILRuntime.CLR.Method
                 for (int i = 1; i <= paramCount; i++)
                 {
                     var p = esp - i;
-                    var obj = CheckPrimitiveTypes(this.param[i - 1].ParameterType, p->ToObject(mStack));
+                    var obj = CheckPrimitiveTypes(this.param[i - 1].ParameterType, p->ToObject(appdomain, mStack));
                     
                     param[paramCount - i] = obj;
                 }
                 object instance = null;
                 if (!def.IsStatic)
                 {
-                    instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(mStack));
+                    instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(appdomain, mStack));
                 }
                 
                 var res = def.Invoke(instance, param);

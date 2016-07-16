@@ -9,11 +9,23 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
 namespace ILRuntime.Runtime.Intepreter
 {
+    class ILTypeStaticInstance : ILTypeInstance
+    {
+        public ILTypeStaticInstance(ILType type)
+        {
+            this.type = type;
+            fields = new StackObject[type.StaticFieldTypes.Length];
+            managedObjs = new List<object>(fields.Length);
+            for (int i = 0; i < fields.Length; i++)
+                managedObjs.Add(null);
+        }
+    }
+
     class ILTypeInstance
     {
-        ILType type;
-        StackObject[] fields;
-        List<object> managedObjs;
+        protected ILType type;
+        protected StackObject[] fields;
+        protected List<object> managedObjs;
 
         public ILType Type
         {
@@ -42,6 +54,11 @@ namespace ILRuntime.Runtime.Intepreter
         public bool Boxed { get; set; }
 
         public List<object> ManagedObjects { get { return managedObjs; } }
+
+        protected ILTypeInstance()
+        {
+
+        }
         public ILTypeInstance(ILType type)
         {
             this.type = type;

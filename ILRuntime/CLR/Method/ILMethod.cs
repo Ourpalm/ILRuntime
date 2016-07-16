@@ -220,7 +220,15 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldfld:
                 case OpCodeEnum.Ldflda:
                     {
-                        code.TokenInteger = appdomain.GetFieldIndex(token);   
+                        code.TokenInteger = appdomain.GetFieldIndex(token, declaringType);   
+                    }
+                    break;
+
+                case OpCodeEnum.Stsfld:
+                case OpCodeEnum.Ldsfld:
+                case OpCodeEnum.Ldsflda:
+                    {
+                        code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType);   
                     }
                     break;
                 case OpCodeEnum.Ldstr:

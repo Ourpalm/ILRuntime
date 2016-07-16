@@ -33,7 +33,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* esp = PushParameters(method, stack.StackBase, p);
             bool unhandledException;
             Execute(method, esp, out unhandledException);
-            object result = method.ReturnType != domain.VoidType ? esp->ToObject(mStack) : null;
+            object result = method.ReturnType != domain.VoidType ? esp->ToObject(domain, mStack) : null;
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             return result;
@@ -666,6 +666,50 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
                                 }
                                 break;
+                            case OpCodeEnum.Stsfld:
+                                {
+                                    IType type = AppDomain.GetType((int)(ip->TokenLong >> 32));
+                                    if (type != null)
+                                    {
+                                        if (type is ILType)
+                                        {
+                                            ILType t = type as ILType;
+                                            StackObject* val = esp - 1;
+                                            t.StaticInstance.AssignFromStack((int)ip->TokenLong, val, mStack);
+                                        }
+                                        else
+                                            throw new NotImplementedException();
+                                    }
+                                    Free(esp - 1);
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Ldsfld:
+                                {
+                                    IType type = AppDomain.GetType((int)(ip->TokenLong >> 32));
+                                    if (type != null)
+                                    {
+                                        if (type is ILType)
+                                        {
+                                            ILType t = type as ILType;
+                                            t.StaticInstance.PushToStack((int)ip->TokenLong, esp, mStack);
+                                        }
+                                        else
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Ldsflda:
+                                {
+                                    int type = (int)(ip->TokenLong >> 32);
+                                    int fieldIdx = (int)(ip->TokenLong);
+                                    esp->ObjectType = ObjectTypes.StaticFieldReference;
+                                    esp->Value = type;
+                                    esp->ValueLow = fieldIdx;
+                                    esp++;
+                                }
+                                break;
                             case OpCodeEnum.Ceq:
                                 {
                                     StackObject* obj1 = esp - 2;
@@ -684,7 +728,6 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             case ObjectTypes.FieldReference:
                                                 res = mStack[obj1->Value] == mStack[obj2->Value] && obj1->ValueLow == obj2->ValueLow;
-
                                                 break;
                                             case ObjectTypes.Null:
                                                 res = true;

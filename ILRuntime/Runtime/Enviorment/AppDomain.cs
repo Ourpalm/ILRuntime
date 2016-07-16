@@ -171,7 +171,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        public IMethod GetMethod(object token, ILType contextType)
+        internal IMethod GetMethod(object token, ILType contextType)
         {
             string methodname = null;
             string typename = null;
@@ -236,13 +236,26 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        public int GetFieldIndex(object token)
+        public int GetFieldIndex(object token, IType contextType)
         {
             FieldDefinition f = token as FieldDefinition;
-            var type = GetType(f.DeclaringType.FullName);
+            var type = GetType(f.DeclaringType, contextType);
             if(type is ILType)
             {
                 return ((ILType)type).GetFieldIndex(token);
+            }
+            throw new KeyNotFoundException();
+        }
+
+        public long GetStaticFieldIndex(object token, IType contextType)
+        {
+            FieldDefinition f = token as FieldDefinition;
+            var type = GetType(f.DeclaringType, contextType);
+            if (type is ILType)
+            {
+                int idx = ((ILType)type).GetFieldIndex(token);
+                long res = ((long)f.DeclaringType.GetHashCode() << 32) | (uint)idx;
+                return res;
             }
             throw new KeyNotFoundException();
         }

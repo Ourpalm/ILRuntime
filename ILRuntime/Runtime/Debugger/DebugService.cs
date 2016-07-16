@@ -87,7 +87,7 @@ namespace ILRuntime.Runtime.Debugger
                 var f = fields[i];
                 if (f.IsStatic)
                     continue;
-                var v = instance.Fields[idx].ToObject(instance.ManagedObjects);
+                var v = instance.Fields[idx].ToObject(intepreter.AppDomain, instance.ManagedObjects);
                 string name = f.Name;
                 sb.AppendFormat("{0} {1} = {2}", f.FieldType.Name, name, v);
                 if ((idx % 3 == 0 && idx != 0) || idx == instance.Fields.Length - 1)
@@ -108,7 +108,7 @@ namespace ILRuntime.Runtime.Debugger
             {
                 var lv = m.Definition.Body.Variables[i];
                 var val = topFrame.LocalVarPointer + i;
-                var v = val->ToObject(intepreter.Stack.ManagedStack);
+                var v = val->ToObject(intepreter.AppDomain, intepreter.Stack.ManagedStack);
                 string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
                 sb.AppendFormat("{0} {1} = {2}", lv.VariableType.Name, name, v);
                 if ((i % 3 == 0 && i != 0) || i == m.LocalVariableCount - 1)
