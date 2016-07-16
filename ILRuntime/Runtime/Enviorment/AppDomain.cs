@@ -26,12 +26,12 @@ namespace ILRuntime.Runtime.Enviorment
         {
         }
 
-        public IType VoidType { get { return voidType; } }
-        public IType IntType { get { return intType; } }
-        public IType BoolType { get { return boolType; } }
-        public IType FloatType { get { return floatType; } }
-        public IType DoubleType { get { return doubleType; } }
-        public IType ObjectType { get { return objectType; } }
+        internal IType VoidType { get { return voidType; } }
+        internal IType IntType { get { return intType; } }
+        internal IType BoolType { get { return boolType; } }
+        internal IType FloatType { get { return floatType; } }
+        internal IType DoubleType { get { return doubleType; } }
+        internal IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
         public void LoadAssembly(System.IO.Stream stream)
@@ -96,7 +96,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        public IType GetType(object token, IType contextType)
+        internal IType GetType(object token, IType contextType)
         {
             int hash = token.GetHashCode();
             IType res;
@@ -133,7 +133,7 @@ namespace ILRuntime.Runtime.Enviorment
             return res;
         }
 
-        public IType GetType(int hash)
+        internal IType GetType(int hash)
         {
             IType res;
             if (mapTypeToken.TryGetValue(hash, out res))
@@ -227,7 +227,7 @@ namespace ILRuntime.Runtime.Enviorment
             return method;
         }
 
-        public IMethod GetMethod(int tokenHash)
+        internal IMethod GetMethod(int tokenHash)
         {
             IMethod res;
             if (mapMethod.TryGetValue(tokenHash, out res))
@@ -236,7 +236,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        public int GetFieldIndex(object token, IType contextType)
+        internal int GetFieldIndex(object token, IType contextType)
         {
             FieldDefinition f = token as FieldDefinition;
             var type = GetType(f.DeclaringType, contextType);
@@ -247,7 +247,7 @@ namespace ILRuntime.Runtime.Enviorment
             throw new KeyNotFoundException();
         }
 
-        public long GetStaticFieldIndex(object token, IType contextType)
+        internal long GetStaticFieldIndex(object token, IType contextType)
         {
             FieldDefinition f = token as FieldDefinition;
             var type = GetType(f.DeclaringType, contextType);
@@ -260,13 +260,13 @@ namespace ILRuntime.Runtime.Enviorment
             throw new KeyNotFoundException();
         }
 
-        public void CacheString(object token)
+        internal void CacheString(object token)
         {
             int hashCode = token.GetHashCode();
             mapString[hashCode] = (string)token;
         }
 
-        public string GetString(int hashCode)
+        internal string GetString(int hashCode)
         {
             string res = null;
             if (mapString.TryGetValue(hashCode, out res))
