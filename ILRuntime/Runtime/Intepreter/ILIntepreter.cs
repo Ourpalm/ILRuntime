@@ -58,35 +58,35 @@ namespace ILRuntime.Runtime.Intepreter
             }
             unhandledException = false;
 
-            try
+            //Managed Stack reserved for local variable
+            for (int i = 0; i < method.LocalVariableCount; i++)
             {
-                //Managed Stack reserved for local variable
-                for (int i = 0; i < method.LocalVariableCount; i++)
+                var v = method.Definition.Body.Variables[i];
+                if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
                 {
-                    var v = method.Definition.Body.Variables[i];
-                    if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
+                    var t = AppDomain.GetType(v.VariableType.FullName);
+                    if (t is ILType)
                     {
-                        var t = AppDomain.GetType(v.VariableType.FullName);
-                        if (t is ILType)
-                        {
-                            var obj = ((ILType)t).Instantiate();
-                            var loc = v1 + i;
-                            loc->ObjectType = ObjectTypes.Object;
-                            loc->Value = mStack.Count;
-                            mStack.Add(obj);
-                        }
-                        else
-                            throw new NotImplementedException();
+                        var obj = ((ILType)t).Instantiate();
+                        var loc = v1 + i;
+                        loc->ObjectType = ObjectTypes.Object;
+                        loc->Value = mStack.Count;
+                        mStack.Add(obj);
                     }
                     else
-                        mStack.Add(null);
+                        throw new NotImplementedException();
                 }
-                fixed (OpCode* ptr = body)
+                else
+                    mStack.Add(null);
+            }
+            fixed (OpCode* ptr = body)
+            {
+                OpCode* ip = ptr;
+                OpCodeEnum code = ip->Code;
+                bool returned = false;
+                while (!returned)
                 {
-                    OpCode* ip = ptr;
-                    OpCodeEnum code = ip->Code;
-                    bool returned = false;
-                    while (!returned)
+                    try
                     {
 #if DEBUG
                         frame.Address.Value = (int)(ip - ptr);
@@ -525,6 +525,25 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Br:
                                 ip = ptr + ip->TokenInteger;
                                 continue;
+                            case OpCodeEnum.Leave:
+                            case OpCodeEnum.Leave_S:
+                                {
+                                    if (method.ExceptionHandler != null)
+                                    {
+                                        int addr = (int)(ip - ptr);
+                                        var sql = from e in method.ExceptionHandler
+                                                  where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally
+                                                  select e;
+                                        var eh = sql.FirstOrDefault();
+                                        if (eh != null)
+                                        {
+                                            ip = ptr + eh.HandlerStart;
+                                            continue;
+                                        }
+                                    }
+                                    ip = ptr + ip->TokenInteger;
+                                    continue;
+                                }
                             case OpCodeEnum.Call:
                             case OpCodeEnum.Callvirt:
                                 {
@@ -590,7 +609,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             esp++;
                                         }
                                         esp = Execute((ILMethod)m, esp, out unhandledException);
-                                        for (int i = m.ParameterCount - 1; i >=0; i--)
+                                        for (int i = m.ParameterCount - 1; i >= 0; i--)
                                         {
                                             Free(a + i);
                                         }
@@ -849,7 +868,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             throw new NotImplementedException();
                                     }
                                     else
-                                        throw new NullReferenceException();                                    
+                                        throw new NullReferenceException();
                                 }
                                 break;
                             case OpCodeEnum.Initobj:
@@ -1075,7 +1094,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var obj = esp - 1;
                                     *esp = *obj;
-                                    if(esp->ObjectType >= ObjectTypes.Object)
+                                    if (esp->ObjectType >= ObjectTypes.Object)
                                     {
                                         esp->Value = mStack.Count;
                                         mStack.Add(mStack[obj->Value]);
@@ -1084,27 +1103,72 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Nop:
+                            case OpCodeEnum.Endfinally:
                                 break;
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
-                        ip++;                        
+                        ip++;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (unhandledException)
+                            throw ex;
+                        if (method.ExceptionHandler != null)
+                        {
+                            int addr =(int)(ip - ptr);
+                            var sql = from e in method.ExceptionHandler
+                                      where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Catch && CheckExceptionType(e.CatchType, ex, true)
+                                      select e;
+                            var eh = sql.FirstOrDefault();
+                            
+                            if (eh == null)
+                            {
+                                var sql2 = from e in method.ExceptionHandler
+                                          where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Catch && CheckExceptionType(e.CatchType, ex, false)
+                                          select e;
+                                eh = sql2.FirstOrDefault();
+                            }
+                            if (eh != null)
+                            {
+                                if (method.HasThis)
+                                    ex.Data["ThisInfo"] = Debugger.DebugService.Instance.GetThisInfo(this);
+                                else
+                                    ex.Data["ThisInfo"] = "";
+                                ex.Data["StackTrace"] = Debugger.DebugService.Instance.GetStackTrance(this);
+                                ex.Data["LocalInfo"] = Debugger.DebugService.Instance.GetLocalVariableInfo(this);
+                                esp = PushObject(esp, mStack, ex);
+                                ip = ptr + eh.HandlerStart;
+                                continue;
+                            }
+                        }
+                        unhandledException = true;
+                        returned = true;
+#if DEBUG
+                        if (!Debugger.DebugService.Instance.Break(this, ex))
+#endif
+                        {
+                            throw new ILRuntimeException(ex.Message, this, method, ex);
+                        }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                unhandledException = true;
-#if DEBUG
-                if (!Debugger.DebugService.Instance.Break(this, ex))
-#endif
-                {
-                    throw new ILRuntimeException(ex.Message, this, method, ex);
-                }
-            }
+
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
+        }
 
+        bool CheckExceptionType(IType catchType, object exception, bool explicitMatch)
+        {
+            if (catchType is CLRType)
+            {
+                if (explicitMatch)
+                    return exception.GetType() == catchType.TypeForCLR;
+                else
+                    return catchType.TypeForCLR.IsAssignableFrom(exception.GetType());
+            }
+            else
+                throw new NotImplementedException();
         }
 
         StackObject* GetObjectAndResolveReference(StackObject* esp)

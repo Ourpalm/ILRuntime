@@ -135,7 +135,9 @@ namespace ILRuntime.CLR.Method
                 if (!def.IsStatic)
                 {
                     instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(appdomain, mStack));
-                }
+                    if (instance == null)
+                        throw new NullReferenceException();
+                }                
                 
                 var res = def.Invoke(instance, param);
                 return res;

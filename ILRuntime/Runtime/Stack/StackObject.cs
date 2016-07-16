@@ -59,7 +59,7 @@ namespace ILRuntime.Runtime.Stack
                         return (*(StackObject**)&tmp.Value)->ToObject(appdomain, mStack);
                     }
                 case ObjectTypes.Null:
-                    return "null";
+                    return null;
                 default:
                     throw new NotImplementedException();
             }

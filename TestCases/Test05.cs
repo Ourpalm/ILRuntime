@@ -9,6 +9,7 @@ namespace TestCases
     {
         public static void Run()
         {
+            TestTryCatch();
             if (c5 == null)
             {
                 c5 = new C5();
@@ -20,33 +21,37 @@ namespace TestCases
                 Console.WriteLine(C6.B);
                 TestTryCatch();            
             }
-            else
-                TestTryCatch();
-            
-            
         }
         static void TestTryCatch()
         {
             try
             {
                 c5.bar();
+                throw new NotImplementedException();
             }
             catch (NotSupportedException err)
             {
                 Console.WriteLine("not here.");
+                Console.WriteLine(err.ToString());
+
+                return;
             }
             catch (NotImplementedException err)
             {
                 Console.WriteLine("Got.");
+
+                Console.WriteLine(err.ToString());
             }
             catch (Exception err)
             {
                 Console.WriteLine("Got 2.");
+                Console.WriteLine(err.ToString());
             }
             finally
             {
                 Console.WriteLine("Finally");
             }
+            Console.WriteLine("Finished");
         }
 
         static C5 c5 = null;

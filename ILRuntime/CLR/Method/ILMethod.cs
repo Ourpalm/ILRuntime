@@ -15,8 +15,19 @@ namespace ILRuntime.CLR.Method
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         ILType declaringType;
+        ExceptionHandler[] exceptionHandler;
 
         public MethodDefinition Definition { get { return def; } }
+
+        public ExceptionHandler[] ExceptionHandler
+        {
+            get
+            {
+                if (body == null)
+                    InitCodeBody(); 
+                return exceptionHandler;
+            }
+        }
 
         public string Name
         {
@@ -122,8 +133,29 @@ namespace ILRuntime.CLR.Method
                     InitToken(ref body[i], c.Operand, addr);
                 }
 
-                foreach (var i in def.Body.ExceptionHandlers)
+                for (int i = 0; i < def.Body.ExceptionHandlers.Count; i++)
                 {
+                    var eh = def.Body.ExceptionHandlers[i];
+                    if (exceptionHandler == null)
+                        exceptionHandler = new Method.ExceptionHandler[def.Body.ExceptionHandlers.Count];
+                    ExceptionHandler e = new ExceptionHandler();
+                    e.HandlerStart = addr[eh.HandlerStart];
+                    e.HandlerEnd = addr[eh.HandlerEnd] - 1;
+                    e.TryStart = addr[eh.TryStart];
+                    e.TryEnd = addr[eh.TryEnd] - 1;
+                    switch (eh.HandlerType)
+                    {
+                        case Mono.Cecil.Cil.ExceptionHandlerType.Catch:
+                            e.CatchType = appdomain.GetType(eh.CatchType, declaringType);
+                            e.HandlerType = ExceptionHandlerType.Catch;
+                            break;
+                        case Mono.Cecil.Cil.ExceptionHandlerType.Finally:
+                            e.HandlerType = ExceptionHandlerType.Finally;
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                    exceptionHandler[i] = e;
                     //Mono.Cecil.Cil.ExceptionHandlerType.
                 }
             }
