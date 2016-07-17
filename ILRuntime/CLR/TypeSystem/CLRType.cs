@@ -124,7 +124,7 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         for (int j = 0; j < param.Count; j++)
                         {
-                            if (param[j] != i.Parameters[j])
+                            if (param[j].TypeForCLR != i.Parameters[j].TypeForCLR)
                                 match = false;
                         }
                         if (match)

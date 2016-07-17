@@ -23,5 +23,48 @@ namespace TestCases
 
             return list3;
         }
+
+        public static object Run2()
+        {
+            Dictionary<string, int> test1 = new Dictionary<string, int>();
+            test1["aa"] = 100;
+            test1["bb"] = 200;
+
+            Console.WriteLine("Test dic start...");
+            Console.WriteLine("aa=" + test1["aa"]);
+            Console.WriteLine("bb=" + test1["bb"]);
+
+            Dictionary<string, DicTest> test2 = new Dictionary<string, DicTest>();
+            DicTest a = new DicTest();
+            a.Value = 100;
+            test2["aa"] = a;
+            a = new DicTest();
+            a.Value = 200;
+            test2["bb"] = a;
+
+            Console.WriteLine("Test dic2 start...");
+            Console.WriteLine("aa=" + test2["aa"].Value);
+            Console.WriteLine("bb=" + test2["bb"].Value);
+
+            Dictionary<DicTest, int> test3 = new Dictionary<DicTest, int>();
+            a = new DicTest();
+            a.Value = 100;
+            DicTest b = new DicTest();
+            b.Value = 200;
+
+            test3[a] = 100;
+            test3[b] = 200;
+
+            Console.WriteLine("Test dic3 start...");
+            Console.WriteLine("aa=" + test3[a]);
+            Console.WriteLine("bb=" + test3[b]);
+
+            return test3;
+        }
+
+        class DicTest
+        {
+            public int Value { get; set; }
+        }
     }
 }
