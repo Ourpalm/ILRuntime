@@ -19,6 +19,7 @@ namespace ILRuntime.CLR.Method
         CLRType declaringType;
         ParameterInfo[] param;
         bool isConstructor;
+        Func<object, object[], object> redirect;
 
         public IType DeclearingType
         {
@@ -51,6 +52,10 @@ namespace ILRuntime.CLR.Method
             if (!def.IsGenericMethod && !def.ContainsGenericParameters)
             {
                 ReturnType = domain.GetType(def.ReturnType.FullName);
+                if(def.Name.Contains("InitializeA"))
+                {
+
+                }
                 InitParameters();
             }
             isConstructor = false;
@@ -112,6 +117,8 @@ namespace ILRuntime.CLR.Method
                 IType type = appdomain.GetType(i.ParameterType.FullName);
                 parameters.Add(type);
             }
+            if (def != null)
+                appdomain.RedirectMap.TryGetValue(def, out redirect);
         }
 
         public unsafe object Invoke(StackObject* esp, List<object> mStack)
@@ -125,7 +132,7 @@ namespace ILRuntime.CLR.Method
 
                 param[paramCount - i] = obj;
             }
-            
+
             if (isConstructor)
             {
                 var res = cDef.Invoke(param);
@@ -134,14 +141,18 @@ namespace ILRuntime.CLR.Method
             else
             {
                 object instance = null;
-                       
+
                 if (!def.IsStatic)
                 {
                     instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(appdomain, mStack));
                     if (instance == null)
                         throw new NullReferenceException();
-                }    
-                var res = def.Invoke(instance, param);
+                }
+                object res = null;
+                if (redirect != null)
+                    res = redirect(instance, param);
+                else
+                    res = def.Invoke(instance, param);
                 return res;
             }
         }

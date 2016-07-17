@@ -20,9 +20,12 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
+        Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>>();
         IType voidType, intType, boolType, floatType, doubleType,objectType;
         public AppDomain()
         {
+            var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
         }
 
         internal IType VoidType { get { return voidType; } }
@@ -33,6 +36,7 @@ namespace ILRuntime.Runtime.Enviorment
         internal IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
+        internal Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>> RedirectMap { get { return redirectMap; } }
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);
@@ -77,6 +81,11 @@ namespace ILRuntime.Runtime.Enviorment
             floatType = GetType("System.Single");
             doubleType = GetType("System.Double");
             objectType = GetType("System.Object");
+        }
+
+        public void RegisterCLRMethodRedirection(System.Reflection.MethodInfo mi, Func<object, object[], object> func)
+        {
+            redirectMap[mi] = func;
         }
         
         public IType GetType(string fullname)

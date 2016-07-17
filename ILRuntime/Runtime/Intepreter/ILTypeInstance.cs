@@ -16,7 +16,22 @@ namespace ILRuntime.Runtime.Intepreter
             fields = new StackObject[type.StaticFieldTypes.Length];
             managedObjs = new List<object>(fields.Length);
             for (int i = 0; i < fields.Length; i++)
+            {
                 managedObjs.Add(null);
+            }
+            int idx = 0;
+            foreach(var i in type.TypeDefinition.Fields)
+            {
+                if (i.IsStatic)
+                {
+                    if (i.InitialValue != null)
+                    {
+                        fields[idx].ObjectType = ObjectTypes.Object;
+                        managedObjs[idx] = i.InitialValue;
+                    }
+                    idx++;
+                }
+            }
         }
     }
 

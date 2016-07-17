@@ -274,6 +274,17 @@ namespace ILRuntime.CLR.Method
                         code.TokenInteger = hashCode;
                     }
                     break;
+                case OpCodeEnum.Ldtoken:
+                    {
+                        if (token is FieldReference)
+                        {
+                            code.TokenInteger = 0;
+                            code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType);
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
+                    break;
             }
         }
 

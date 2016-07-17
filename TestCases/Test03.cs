@@ -61,6 +61,14 @@ namespace TestCases
 
             return test3;
         }
+        
+        public static object Run3()
+        {
+            int[] arr = new int[] { 1, 2, 3, 4, 5 };
+            int index = Array.IndexOf(arr, 3);
+            
+            return index;
+        }
 
         class DicTest
         {

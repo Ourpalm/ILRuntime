@@ -738,6 +738,31 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Ldtoken:
+                                {
+                                    switch (ip->TokenInteger)
+                                    {
+                                        case 0:
+                                            {
+                                                IType type = AppDomain.GetType((int)(ip->TokenLong >> 32));
+                                                if (type != null)
+                                                {
+                                                    if (type is ILType)
+                                                    {
+                                                        ILType t = type as ILType;
+                                                        t.StaticInstance.PushToStack((int)ip->TokenLong, esp, mStack);
+                                                    }
+                                                    else
+                                                        throw new NotImplementedException();
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }                                    
+                                    esp++;
+                                }
+                                break;
                             case OpCodeEnum.Ceq:
                                 {
                                     StackObject* obj1 = esp - 2;
