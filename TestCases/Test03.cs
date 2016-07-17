@@ -69,6 +69,7 @@ namespace TestCases
             List<int[]>[] arr2 = new List<int[]>[10];
             List<int[]> e = new List<int[]>();
             e.Add(arr);
+            e.Contains<int[]>(arr);
             arr2[3] = e;
             index = Array.IndexOf(arr2, e);
             return index;
