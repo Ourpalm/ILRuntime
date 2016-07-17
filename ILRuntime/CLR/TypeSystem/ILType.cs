@@ -115,6 +115,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return false;
             }
         }
+        public KeyValuePair<string, IType>[] GenericArguments
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         public bool IsValueType
         {
@@ -398,6 +405,10 @@ namespace ILRuntime.CLR.TypeSystem
         internal ILTypeInstance Instantiate()
         {
             return new ILTypeInstance(this);
+        }
+        public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
+        {
+            throw new NotImplementedException();
         }
     }
 }

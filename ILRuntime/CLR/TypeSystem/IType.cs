@@ -10,6 +10,7 @@ namespace ILRuntime.CLR.TypeSystem
     public interface IType
     {
         bool IsGenericInstance { get; }
+        KeyValuePair<string, IType>[] GenericArguments { get; }
         Type TypeForCLR { get; }
 
         string FullName { get; }
@@ -25,5 +26,7 @@ namespace ILRuntime.CLR.TypeSystem
         IMethod GetConstructor(List<IType> param);
 
         bool CanAssignTo(IType type);
+
+        IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments);
     }
 }

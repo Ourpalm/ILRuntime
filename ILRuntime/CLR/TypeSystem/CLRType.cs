@@ -12,6 +12,7 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
+        KeyValuePair<string,IType>[] genericArguments;
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
@@ -35,7 +36,15 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return false;
+                return genericArguments != null;
+            }
+        }
+
+        public KeyValuePair<string, IType>[] GenericArguments
+        {
+            get
+            {
+                return genericArguments;
             }
         }
 
@@ -143,6 +152,19 @@ namespace ILRuntime.CLR.TypeSystem
                     return i;
             }
             return null;
+        }
+
+        public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
+        {
+            Type[] args = new Type[genericArguments.Length];
+            for (int i = 0; i < genericArguments.Length; i++)
+            {
+                args[i] = genericArguments[i].Value.TypeForCLR;
+            }
+            Type newType = clrType.MakeGenericType(args);
+            var res = new CLRType(newType, appdomain);
+            res.genericArguments = genericArguments;
+            return res;
         }
     }
 }

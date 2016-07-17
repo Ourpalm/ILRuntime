@@ -102,6 +102,7 @@ namespace ILRuntime.Runtime.Enviorment
             if (mapTypeToken.TryGetValue(hash, out res))
                 return res;
             Mono.Cecil.ModuleDefinition module = null;
+            KeyValuePair<string, IType>[] genericArguments = null;
             string typename = null;
             if (token is Mono.Cecil.TypeDefinition)
             {
@@ -121,14 +122,39 @@ namespace ILRuntime.Runtime.Enviorment
                     }*/
                 }
                 module = _ref.Module;
-                typename = _ref.FullName;
+                if (_ref.IsGenericInstance)
+                {
+                    GenericInstanceType gType = (GenericInstanceType)_ref;
+                    typename = gType.ElementType.FullName;
+                    TypeReference tr = gType.ElementType;
+                    genericArguments = new KeyValuePair<string, IType>[gType.GenericArguments.Count];
+                    for(int i = 0; i < genericArguments.Length; i++)
+                    {
+                        string key = tr.GenericParameters[i].Name;
+                        IType val = GetType(gType.GenericArguments[i], contextType);
+                        genericArguments[i] = new KeyValuePair<string, IType>(key, val);
+                    }
+                }
+                else
+                {
+                    typename = _ref.FullName;
+                }
             }
             else
             {
                 throw new NotImplementedException();
             }
             res = GetType(typename);
+            if (genericArguments != null)
+            {
+                res = res.MakeGenericInstance(genericArguments);
+                mapType[res.FullName] = res;
+            }
             mapTypeToken[hash] = res;
+            if(res is CLRType)
+            {
+                ((CLRType)res).Initialize();
+            }
             return res;
         }
 
@@ -174,6 +200,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             string methodname = null;
             string typename = null;
+            TypeReference typeDef = null;
             List<IType> paramList = null;
             int hashCode = token.GetHashCode();
             IMethod method;
@@ -189,7 +216,7 @@ namespace ILRuntime.Runtime.Enviorment
                     return null;
                 }
                 methodname = _ref.Name;
-                typename = _ref.DeclaringType.FullName;
+                typeDef = _ref.DeclaringType;
                 if (token is Mono.Cecil.MethodDefinition)
                 {
                     var def = _ref as MethodDefinition;
@@ -198,7 +225,7 @@ namespace ILRuntime.Runtime.Enviorment
                 else
                     isConstructor = methodname == ".ctor";
 
-                paramList = _ref.GetParamList(this);
+                paramList = _ref.GetParamList(this, contextType);
                 if (_ref.IsGenericInstance)
                 {
                     throw new NotImplementedException();
@@ -211,7 +238,7 @@ namespace ILRuntime.Runtime.Enviorment
                 //genlist = new MethodParamList(environment, gmethod);
             }
 
-            var type = GetType(typename);
+            var type = GetType(typeDef, contextType);
             if (type == null)
                 throw new KeyNotFoundException("Cannot find type:" + typename);
 
