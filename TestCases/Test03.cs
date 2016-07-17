@@ -66,7 +66,11 @@ namespace TestCases
         {
             int[] arr = new int[] { 1, 2, 3, 4, 5 };
             int index = Array.IndexOf(arr, 3);
-            
+            List<int[]>[] arr2 = new List<int[]>[10];
+            List<int[]> e = new List<int[]>();
+            e.Add(arr);
+            arr2[3] = e;
+            index = Array.IndexOf(arr2, e);
             return index;
         }
 

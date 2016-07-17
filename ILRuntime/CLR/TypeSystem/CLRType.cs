@@ -110,11 +110,12 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
-        public IMethod GetMethod(string name, List<IType> param)
+        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments)
         {
             if (methods == null)
                 InitializeMethods();
             List<CLRMethod> lst;
+            IMethod genericMethod = null;
             if (methods.TryGetValue(name, out lst))
             {
                 foreach (var i in lst)
@@ -122,15 +123,31 @@ namespace ILRuntime.CLR.TypeSystem
                     if (i.ParameterCount == param.Count)
                     {
                         bool match = true;
-                        for (int j = 0; j < param.Count; j++)
+                        if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            if (param[j].TypeForCLR != i.Parameters[j].TypeForCLR)
-                                match = false;
+                            genericMethod = i;
                         }
-                        if (match)
-                            return i;
+                        else
+                        {
+                            for (int j = 0; j < param.Count; j++)
+                            {
+                                if (param[j].TypeForCLR != i.Parameters[j].TypeForCLR)
+                                {
+                                    match = false;
+                                    break;
+                                }
+                            }
+                            if (match)
+                                return i;
+                        }
                     }
                 }
+            }
+            if (genericArguments != null && genericMethod != null)
+            {
+                var m = genericMethod.MakeGenericMethod(genericArguments);
+                lst.Add((CLRMethod)m);
+                return m;
             }
             return null;
         }

@@ -18,6 +18,12 @@ namespace ILRuntime.CLR.Method
         IType ReturnType { get; }
         List<IType> Parameters { get; }
 
+        int GenericParameterCount { get; }
+
+        bool IsGenericInstance { get; }
+
         bool IsConstructor { get; }
+
+        IMethod MakeGenericMethod(IType[] genericArguments);
     }
 }

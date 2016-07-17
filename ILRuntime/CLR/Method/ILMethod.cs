@@ -52,7 +52,20 @@ namespace ILRuntime.CLR.Method
                 return def.HasThis;
             }
         }
-
+        public int GenericParameterCount
+        {
+            get
+            {
+                return 0;
+            }
+        }
+        public bool IsGenericInstance
+        {
+            get
+            {
+                return false;
+            }
+        }
         public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.def = def;
@@ -296,6 +309,11 @@ namespace ILRuntime.CLR.Method
                 IType type = appdomain.GetType(i.ParameterType.FullName);
                 parameters.Add(type);
             }
+        }
+
+        public IMethod MakeGenericMethod(IType[] genericArguments)
+        {
+            throw new NotImplementedException();
         }
     }
 }

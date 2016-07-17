@@ -42,6 +42,24 @@ namespace ILRuntime.CLR.Method
                 return isConstructor ? !cDef.IsStatic : !def.IsStatic;
             }
         }
+        public int GenericParameterCount
+        {
+            get
+            {
+                if (def.ContainsGenericParameters && def.IsGenericMethodDefinition)
+                {
+                    return def.GetGenericArguments().Length;
+                }
+                return 0;
+            }
+        }
+        public bool IsGenericInstance
+        {
+            get
+            {
+                return false;
+            }
+        }
 
         public CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
@@ -87,7 +105,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                if (param == null)
+                if (parameters == null)
                 {
                     InitParameters();
                 }
@@ -155,6 +173,17 @@ namespace ILRuntime.CLR.Method
                     res = def.Invoke(instance, param);
                 return res;
             }
+        }
+
+        public IMethod MakeGenericMethod(IType[] genericArguments)
+        {
+            Type[] p = new Type[genericArguments.Length];
+            for(int i = 0; i < genericArguments.Length; i++)
+            {
+                p[i] = genericArguments[i].TypeForCLR;
+            }
+            var t = def.MakeGenericMethod(p);
+            return new CLRMethod(t, declaringType, appdomain);            
         }
 
         object CheckPrimitiveTypes(Type pt, object obj)

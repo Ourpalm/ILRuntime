@@ -213,6 +213,7 @@ namespace ILRuntime.Runtime.Enviorment
             List<IType> paramList = null;
             int hashCode = token.GetHashCode();
             IMethod method;
+            IType[] genericArguments = null;
             bool isConstructor = false;
             if (mapMethod.TryGetValue(hashCode, out method))
                 return method;
@@ -237,7 +238,12 @@ namespace ILRuntime.Runtime.Enviorment
                 paramList = _ref.GetParamList(this, contextType);
                 if (_ref.IsGenericInstance)
                 {
-                    throw new NotImplementedException();
+                    GenericInstanceMethod gim = (GenericInstanceMethod)_ref;
+                    genericArguments = new IType[gim.GenericArguments.Count];
+                    for(int i = 0; i < genericArguments.Length; i++)
+                    {
+                        genericArguments[i] = GetType(gim.GenericArguments[i], contextType);
+                    }
                 }
             }
             else
@@ -254,7 +260,7 @@ namespace ILRuntime.Runtime.Enviorment
             if (isConstructor)
                 method = type.GetConstructor(paramList);
             else
-                method = type.GetMethod(methodname, paramList);
+                method = type.GetMethod(methodname, paramList, genericArguments);
 
             if (method == null)
                 throw new KeyNotFoundException("Cannot find method:" + methodname);

@@ -21,16 +21,38 @@ namespace ILRuntime.CLR.Utils
                     IType t = null;
                     if (i.ParameterType.IsGenericParameter)
                     {
-                        foreach(var j in dt.GenericArguments)
+                        if (dt.GenericArguments != null)
                         {
-                            if(j.Key == i.ParameterType.Name)
+                            foreach (var j in dt.GenericArguments)
                             {
-                                t = j.Value;
+                                if (j.Key == i.ParameterType.Name)
+                                {
+                                    t = j.Value;
+                                    break;
+                                }
+                            }
+                        }                        
+                    }
+                    if (t == null && def.IsGenericInstance)
+                    {
+                        GenericInstanceMethod gim = (GenericInstanceMethod)def;
+                        for (int j = 0; j < gim.GenericArguments.Count; j++)
+                        {
+                            var gp = gim.ElementMethod.GenericParameters[j];
+                            var ga = gim.GenericArguments[j];
+                            if(i.ParameterType.Name == gp.Name)
+                            {
+                                t = appdomain.GetType(ga, contextType);
+                                break;
+                            }
+                            else if (i.ParameterType.Name.Contains(gp.Name))
+                            {
+                                t = appdomain.GetType(i.ParameterType.FullName.Replace(gp.Name, ga.FullName));
                                 break;
                             }
                         }
                     }
-                    else
+                    if (t == null)
                     {
                         string typeName = i.ParameterType.FullName;
 
