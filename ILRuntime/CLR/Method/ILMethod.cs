@@ -16,6 +16,7 @@ namespace ILRuntime.CLR.Method
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         ILType declaringType;
         ExceptionHandler[] exceptionHandler;
+        KeyValuePair<string, IType>[] genericParameters;
 
         public MethodDefinition Definition { get { return def; } }
 
@@ -56,7 +57,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                return 0;
+                return def.GenericParameters.Count;
             }
         }
         public bool IsGenericInstance
@@ -70,8 +71,29 @@ namespace ILRuntime.CLR.Method
         {
             this.def = def;
             declaringType = type;
-            ReturnType = domain.GetType(def.ReturnType.FullName);
+            if (def.ReturnType.IsGenericParameter)
+            {
+                ReturnType = FindGenericArgument(def.ReturnType.Name);
+            }
+            else
+                ReturnType = domain.GetType(def.ReturnType, type);
             this.appdomain = domain;
+        }
+
+        IType FindGenericArgument(string name)
+        {
+            IType res = declaringType.FindGenericArgument(name);
+            if (res == null)
+            {
+                foreach (var i in genericParameters)
+                {
+                    if (i.Key == name)
+                        return i.Value;
+                }
+            }
+            else
+                return res;
+            return null;
         }
 
         public OpCode[] Body
@@ -306,14 +328,50 @@ namespace ILRuntime.CLR.Method
             parameters = new List<IType>();
             foreach (var i in def.Parameters)
             {
-                IType type = appdomain.GetType(i.ParameterType.FullName);
+                IType type = null;
+                
+                if (i.ParameterType.IsGenericParameter)
+                {
+                    type = FindGenericArgument(i.ParameterType.Name);
+                    if (type == null && def.HasGenericParameters)
+                    {
+                        bool found = false;
+                        foreach (var j in def.GenericParameters)
+                        {
+                            if (j.Name == i.ParameterType.Name)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                        {
+                            type = new ILGenericParameterType(i.ParameterType.Name);
+                        }
+                        else
+                            throw new NotSupportedException("Cannot find Generic Parameter " + i.ParameterType.Name + " in " + def.FullName);
+                    }
+                }
+                else
+                    type = appdomain.GetType(i.ParameterType, declaringType);
                 parameters.Add(type);
             }
         }
 
         public IMethod MakeGenericMethod(IType[] genericArguments)
         {
-            throw new NotImplementedException();
+            KeyValuePair<string, IType>[] genericParameters = new KeyValuePair<string, IType>[genericArguments.Length];
+            for (int i = 0; i < genericArguments.Length; i++)
+            {
+                string name = def.GenericParameters[i].Name;
+                IType val = genericArguments[i];
+                genericParameters[i] = new KeyValuePair<string, IType>(name, val);
+            }
+
+            ILMethod m = new ILMethod(def, declaringType, appdomain);
+            m.genericParameters = genericParameters;
+
+            return m;
         }
     }
 }

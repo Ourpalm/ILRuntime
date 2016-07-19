@@ -31,8 +31,8 @@ namespace ILRuntime.Runtime.Intepreter
 
             StackObject* esp = PushParameters(method, stack.StackBase, p);
             bool unhandledException;
-            Execute(method, esp, out unhandledException);
-            object result = method.ReturnType != domain.VoidType ? esp->ToObject(domain, mStack) : null;
+            esp = Execute(method, esp, out unhandledException);
+            object result = method.ReturnType != domain.VoidType ? (esp - 1)->ToObject(domain, mStack) : null;
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             return result;
@@ -50,6 +50,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* arg = frame.LocalVarPointer - method.ParameterCount;
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
+            int locBase = mStackBase;
             if (method.HasThis)//this parameter is always object reference
             {
                 arg--;
@@ -128,7 +129,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     *v1 = *esp;
-                                    int idx = mStackBase;
+                                    int idx = locBase;
                                     if (v1->ObjectType >= ObjectTypes.Object)
                                     {
                                         mStack[idx] = mStack[v1->Value];
@@ -147,7 +148,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     *v2 = *esp;
-                                    int idx = mStackBase + 1;
+                                    int idx = locBase + 1;
                                     if (v2->ObjectType >= ObjectTypes.Object)
                                     {
                                         mStack[idx] = mStack[v2->Value];
@@ -166,7 +167,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     *v3 = *esp;
-                                    int idx = mStackBase + 2;
+                                    int idx = locBase + 2;
                                     if (v3->ObjectType >= ObjectTypes.Object)
                                     {
                                         mStack[idx] = mStack[v3->Value];
@@ -185,7 +186,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     *v4 = *esp;
-                                    int idx = mStackBase + 3;
+                                    int idx = locBase + 3;
                                     if (v4->ObjectType >= ObjectTypes.Object)
                                     {
                                         mStack[idx] = mStack[v4->Value];
@@ -206,7 +207,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     var v = frame.LocalVarPointer + ip->TokenInteger;
                                     *v = *esp;
-                                    int idx = mStackBase + ip->TokenInteger;
+                                    int idx = locBase + ip->TokenInteger;
                                     if (v->ObjectType >= ObjectTypes.Object)
                                     {
                                         mStack[idx] = mStack[v->Value];
@@ -859,44 +860,82 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             if (type == domain.IntType)
                                             {
-                                                if (obj->ObjectType == ObjectTypes.Integer)
+                                                switch (obj->ObjectType)
                                                 {
-                                                    esp = PushObject(obj, mStack, obj->Value, true);
+                                                    case ObjectTypes.Integer:
+                                                        esp = PushObject(obj, mStack, obj->Value, true);
+                                                        break;
+                                                    case ObjectTypes.Null:
+                                                        esp = PushObject(obj, mStack, 0, true);
+                                                        break;
+                                                    case ObjectTypes.Object:
+                                                        break;
+                                                    default:
+                                                        throw new NotImplementedException();
                                                 }
-                                                else if (obj->ObjectType != ObjectTypes.Object)
-                                                    throw new NotImplementedException();
+                                            }
+                                            else if (type == domain.LongType)
+                                            {
+                                                switch (obj->ObjectType)
+                                                {
+                                                    case ObjectTypes.Long:
+                                                        esp = PushObject(obj, mStack, *(long*)&obj->Value, true);
+                                                        break;
+                                                    case ObjectTypes.Null:
+                                                        esp = PushObject(obj, mStack, 0L, true);
+                                                        break;
+                                                    case ObjectTypes.Object:
+                                                        break;
+                                                    default:
+                                                        throw new NotImplementedException();
+                                                }
                                             }
                                             else if (type == domain.BoolType)
                                             {
-                                                if (obj->ObjectType == ObjectTypes.Integer)
+                                                switch (obj->ObjectType)
                                                 {
-                                                    esp = PushObject(obj, mStack, (obj->Value == 1), true);
-                                                }
-                                                else if (obj->ObjectType != ObjectTypes.Object)
-                                                {
-                                                    throw new NotImplementedException();
+                                                    case ObjectTypes.Integer:
+                                                        esp = PushObject(obj, mStack, (obj->Value == 1), true);
+                                                        break;
+                                                    case ObjectTypes.Null:
+                                                        esp = PushObject(obj, mStack, false, true);
+                                                        break;
+                                                    case ObjectTypes.Object:
+                                                        break;
+                                                    default:
+                                                        throw new NotImplementedException();
                                                 }
                                             }
                                             else if (type == domain.FloatType)
                                             {
-                                                if (obj->ObjectType == ObjectTypes.Float)
+                                                switch (obj->ObjectType)
                                                 {
-                                                    esp = PushObject(obj, mStack, *(float*)&obj->Value, true);
-                                                }
-                                                else if (obj->ObjectType != ObjectTypes.Object)
-                                                {
-                                                    throw new NotImplementedException();
+                                                    case ObjectTypes.Float:
+                                                        esp = PushObject(obj, mStack, *(float*)&obj->Value, true);
+                                                        break;
+                                                    case ObjectTypes.Null:
+                                                        esp = PushObject(obj, mStack, 0f, true);
+                                                        break;
+                                                    case ObjectTypes.Object:
+                                                        break;
+                                                    default:
+                                                        throw new NotImplementedException();
                                                 }
                                             }
                                             else if (type == domain.DoubleType)
                                             {
-                                                if (obj->ObjectType == ObjectTypes.Double)
+                                                switch (obj->ObjectType)
                                                 {
-                                                    esp = PushObject(obj, mStack, *(double*)&obj->Value, true);
-                                                }
-                                                else if (obj->ObjectType != ObjectTypes.Object)
-                                                {
-                                                    throw new NotImplementedException();
+                                                    case ObjectTypes.Double:
+                                                        esp = PushObject(obj, mStack, *(double*)&obj->Value, true);
+                                                        break;
+                                                    case ObjectTypes.Null:
+                                                        esp = PushObject(obj, mStack, 0.0, true);
+                                                        break;
+                                                    case ObjectTypes.Object:
+                                                        break;
+                                                    default:
+                                                        throw new NotImplementedException();
                                                 }
                                             }
                                             else

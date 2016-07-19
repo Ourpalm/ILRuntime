@@ -13,6 +13,7 @@ namespace ILRuntime.CLR.TypeSystem
     class ILType : IType
     {
         Dictionary<string, List<ILMethod>> methods;
+        TypeReference typeRef;
         TypeDefinition definition;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         ILMethod staticConstructor;
@@ -25,10 +26,34 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, int> fieldTokenMapping = new Dictionary<int, int>();
         int fieldStartIdx = -1;
         int totalFieldCnt = -1;
-        bool staticInitialized = false;
+        KeyValuePair<string, IType>[] genericArguments;
+        IType baseType;
+        bool baseTypeInitialized = false;
+        List<ILType> genericInstances;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
-        public IType BaseType { get; private set; }
+        public TypeReference TypeReference
+        {
+            get { return typeRef; }
+            set
+            {
+                typeRef = value;
+                if (value is GenericInstanceType)
+                    definition = (TypeDefinition)((GenericInstanceType)value).ElementType;
+                else
+                    definition = (TypeDefinition)value;
+            }
+        }
+
+        public IType BaseType
+        {
+            get
+            {
+                if (!baseTypeInitialized)
+                    InitializeBaseType();
+                return baseType;
+            }
+        }
 
         public ILTypeStaticInstance StaticInstance { get { return staticInstance; } }
 
@@ -103,23 +128,28 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public ILType(TypeDefinition def)
+        public ILType(TypeReference def, Runtime.Enviorment.AppDomain domain)
         {
-            this.definition = def;
+            this.typeRef = def;
+            if (def is GenericInstanceType)
+                definition = (TypeDefinition)((GenericInstanceType)def).ElementType;
+            else
+                definition = (TypeDefinition)def;
+            appdomain = domain;            
         }
 
         public bool IsGenericInstance
         {
             get
             {
-                return false;
+                return genericArguments != null;
             }
         }
         public KeyValuePair<string, IType>[] GenericArguments
         {
             get
             {
-                return null;
+                return genericArguments;
             }
         }
 
@@ -138,11 +168,33 @@ namespace ILRuntime.CLR.TypeSystem
                 return typeof(ILTypeInstance);
             }
         }
+
+        string genericFullName;
         public string FullName
         {
             get
             {
-                return definition.FullName;
+                return typeRef.FullName;
+                /*if (genericArguments == null)
+                    return definition.FullName;
+                else
+                {
+                    if (string.IsNullOrEmpty(genericFullName))
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(definition.FullName);
+                        sb.Append('<');
+                        for (int i = 0; i < genericArguments.Length; i++)
+                        {
+                            if (i > 1)
+                                sb.Append(", ");
+                            sb.Append(genericArguments[i].Value.FullName);
+                        }
+                        sb.Append('>');
+                        genericFullName = sb.ToString();
+                    }
+                    return genericFullName;
+                }*/
             }
         }
         public List<IMethod> GetMethods()
@@ -156,17 +208,16 @@ namespace ILRuntime.CLR.TypeSystem
 
             return res;
         }
-        public void InitializeBaseType(Runtime.Enviorment.AppDomain domain)
+        void InitializeBaseType()
         {
-            appdomain = domain;
             if (definition.BaseType != null)
             {
-                BaseType = domain.GetType(definition.BaseType.FullName);
-                if (BaseType is CLRType)
+                baseType = appdomain.GetType(definition.BaseType, this);
+                if (baseType is CLRType)
                 {
-                    if (BaseType.TypeForCLR == typeof(Enum) || BaseType.TypeForCLR == typeof(object) || BaseType.TypeForCLR == typeof(ValueType) || BaseType.TypeForCLR == typeof(System.Enum))
+                    if (baseType.TypeForCLR == typeof(Enum) || baseType.TypeForCLR == typeof(object) || baseType.TypeForCLR == typeof(ValueType) || baseType.TypeForCLR == typeof(System.Enum))
                     {//都是这样，无所谓
-                        BaseType = null;
+                        baseType = null;
                     }
                     else
                     {
@@ -292,6 +343,7 @@ namespace ILRuntime.CLR.TypeSystem
             if (methods == null)
                 InitializeMethods();
             List<ILMethod> lst;
+            IMethod genericMethod = null;
             if (methods.TryGetValue(name, out lst))
             {
                 foreach (var i in lst)
@@ -300,15 +352,31 @@ namespace ILRuntime.CLR.TypeSystem
                     if (i.ParameterCount == pCnt)
                     {
                         bool match = true;
-                        for (int j = 0; j < pCnt; j++)
+                        if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            if (param[j] != i.Parameters[j])
-                                match = false;
+                            genericMethod = i;
                         }
-                        if (match)
-                            return i;
+                        else
+                        {
+                            for (int j = 0; j < pCnt; j++)
+                            {
+                                if (param[j] != i.Parameters[j])
+                                {
+                                    match = false;
+                                    break;
+                                }
+                            }
+                            if (match)
+                                return i;
+                        }
                     }
                 }
+            }
+            if (genericArguments != null && genericMethod != null)
+            {
+                var m = genericMethod.MakeGenericMethod(genericArguments);
+                lst.Add((ILMethod)m);
+                return m;
             }
             return null;
         }
@@ -371,13 +439,23 @@ namespace ILRuntime.CLR.TypeSystem
                         staticFieldMapping = new Dictionary<string, int>();
                     }
                     staticFieldMapping[field.Name] = idxStatic;
-                    staticFieldTypes[idxStatic] = appdomain.GetType(field.FieldType.FullName);
+                    if (field.FieldType.IsGenericParameter)
+                    {
+                        staticFieldTypes[idxStatic] = FindGenericArgument(field.FieldType.Name);
+                    }
+                    else
+                        staticFieldTypes[idxStatic] = appdomain.GetType(field.FieldType, this);
                     idxStatic++;
                 }
                 else
                 {
                     fieldMapping[field.Name] = idx;
-                    fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType.FullName);
+                    if (field.FieldType.IsGenericParameter)
+                    {
+                        fieldTypes[idx - FieldStartIndex] = FindGenericArgument(field.FieldType.Name);
+                    }
+                    else
+                        fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType, this);
                     idx++;
                 }
             }
@@ -388,6 +466,16 @@ namespace ILRuntime.CLR.TypeSystem
                 Array.Resize(ref staticFieldTypes, idxStatic);
                 staticInstance = new ILTypeStaticInstance(this);
             }
+        }
+
+        public IType FindGenericArgument(string key)
+        {
+            foreach (var i in genericArguments)
+            {
+                if (i.Key == key)
+                    return i.Value;
+            }
+            return null;
         }
 
         public bool CanAssignTo(IType type)
@@ -408,7 +496,63 @@ namespace ILRuntime.CLR.TypeSystem
         }
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
         {
-            throw new NotImplementedException();
+            if (genericInstances == null)
+                genericInstances = new List<ILType>();
+            foreach (var i in genericInstances)
+            {
+                bool match = true;
+                for (int j = 0; j < genericArguments.Length; j++)
+                {
+                    if(i.genericArguments[j].Value != genericArguments[j].Value)
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match)
+                    return i;
+            }
+            var res = new ILType(definition, appdomain);
+            res.genericArguments = genericArguments;
+
+            genericInstances.Add(res);
+            return res;
+        }
+
+        public IType ResolveGenericType(IType contextType)
+        {
+            var ga = contextType.GenericArguments;
+            IType[] kv = new IType[definition.GenericParameters.Count];
+            for (int i = 0; i < kv.Length; i++)
+            {
+                var gp = definition.GenericParameters[i];
+                string name = gp.Name;
+                foreach (var j in ga)
+                {
+                    if (j.Key == name)
+                    {
+                        kv[i] = j.Value;
+                        break;
+                    }
+                }
+            }
+
+            foreach (var i in genericInstances)
+            {
+                bool match=true;
+                for (int j = 0; j < kv.Length; j++)
+                {
+                    if (i.genericArguments[j].Value != kv[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match)
+                    return i;
+            }
+
+            return null;
         }
     }
 }

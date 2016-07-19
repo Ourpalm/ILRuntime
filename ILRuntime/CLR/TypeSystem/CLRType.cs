@@ -182,5 +182,10 @@ namespace ILRuntime.CLR.TypeSystem
             res.genericArguments = genericArguments;
             return res;
         }
+
+        public IType ResolveGenericType(IType contextType)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

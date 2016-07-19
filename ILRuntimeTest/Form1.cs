@@ -54,6 +54,8 @@ namespace ILRuntimeTest
                         var types = assembly.GetTypes();
                         foreach (var type in types)
                         {
+                            if (type.IsGenericTypeDefinition)
+                                continue;
                             //methods
                             var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                             foreach (var methodInfo in methods)

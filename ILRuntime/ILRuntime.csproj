@@ -47,6 +47,7 @@
     <Compile Include="CLR\Method\ExceptionHandler.cs" />
     <Compile Include="CLR\Method\ILMethod.cs" />
     <Compile Include="CLR\Method\IMethod.cs" />
+    <Compile Include="CLR\TypeSystem\ILGenericParameterType.cs" />
     <Compile Include="CLR\TypeSystem\ILType.cs" />
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
     <Compile Include="Runtime\Enviorment\CLRRedirections.cs" />

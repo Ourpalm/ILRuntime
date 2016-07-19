@@ -21,7 +21,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
         Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>>();
-        IType voidType, intType, boolType, floatType, doubleType,objectType;
+        IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         public AppDomain()
         {
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
@@ -30,6 +30,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal IType VoidType { get { return voidType; } }
         internal IType IntType { get { return intType; } }
+        internal IType LongType { get { return longType; } }
         internal IType BoolType { get { return boolType; } }
         internal IType FloatType { get { return floatType; } }
         internal IType DoubleType { get { return doubleType; } }
@@ -64,19 +65,15 @@ namespace ILRuntime.Runtime.Enviorment
                 List<ILType> types = new List<ILType>();
                 foreach (var t in module.GetTypes())
                 {
-                    ILType type = new ILType(t);
+                    ILType type = new ILType(t, this);
                     mapType[t.FullName] = type;
                     types.Add(type);
-                }
-
-                foreach (var t in types)
-                {
-                    t.InitializeBaseType(this);
                 }
             }
 
             voidType = GetType("System.Void");
             intType = GetType("System.Int32");
+            longType = GetType("System.Int64");
             boolType = GetType("System.Boolean");
             floatType = GetType("System.Single");
             doubleType = GetType("System.Double");
@@ -163,7 +160,7 @@ namespace ILRuntime.Runtime.Enviorment
             int cnt = 0;
             baseType = "";
             genericParams = null;
-            if (fullname.Substring(fullname.Length - 2) == "[]")
+            if (fullname.Length >2 && fullname.Substring(fullname.Length - 2) == "[]")
             {
                 fullname = fullname.Substring(0, fullname.Length - 2);
                 isArray = true;
@@ -221,6 +218,7 @@ namespace ILRuntime.Runtime.Enviorment
             KeyValuePair<string, IType>[] genericArguments = null;
             string typename = null;
             string scope = null;
+            bool dummyGenericInstance = false;
             if (token is Mono.Cecil.TypeDefinition)
             {
                 Mono.Cecil.TypeDefinition _def = (token as Mono.Cecil.TypeDefinition);
@@ -247,10 +245,17 @@ namespace ILRuntime.Runtime.Enviorment
                     scope = GetAssemblyName(gType.ElementType.Scope);
                     TypeReference tr = gType.ElementType;
                     genericArguments = new KeyValuePair<string, IType>[gType.GenericArguments.Count];
-                    for(int i = 0; i < genericArguments.Length; i++)
+                    for (int i = 0; i < genericArguments.Length; i++)
                     {
                         string key = tr.GenericParameters[i].Name;
-                        IType val = GetType(gType.GenericArguments[i], contextType);
+                        IType val;
+                        if (gType.GenericArguments[i].IsGenericParameter)
+                        {
+                            val = ((ILType)contextType).FindGenericArgument(gType.GenericArguments[i].Name);
+                            dummyGenericInstance = true;
+                        }
+                        else
+                            val = GetType(gType.GenericArguments[i], contextType);
                         genericArguments[i] = new KeyValuePair<string, IType>(key, val);
                     }
                 }
@@ -267,12 +272,19 @@ namespace ILRuntime.Runtime.Enviorment
             res = GetType(typename);
             if (res == null && scope != null)
                 res = GetType(typename + ", " + scope);
+            if (res == null)
+                throw new KeyNotFoundException("Cannot find Type:" + typename);
             if (genericArguments != null)
             {
                 res = res.MakeGenericInstance(genericArguments);
+                if (!dummyGenericInstance && res is ILType)
+                {
+                    ((ILType)res).TypeReference = (TypeReference)token;
+                }
                 mapType[res.FullName] = res;
             }
-            mapTypeToken[hash] = res;
+            if (!dummyGenericInstance)
+                mapTypeToken[hash] = res;
             return res;
         }
 
@@ -308,6 +320,11 @@ namespace ILRuntime.Runtime.Enviorment
                         inteptreter = freeIntepreters.Dequeue();
                     else
                         inteptreter = new ILIntepreter(this);
+                }
+                var res = inteptreter.Run((ILMethod)m, p);
+                lock (freeIntepreters)
+                {
+                    freeIntepreters.Enqueue(inteptreter);
                 }
                 return inteptreter.Run((ILMethod)m, p);
             }
@@ -399,12 +416,15 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal long GetStaticFieldIndex(object token, IType contextType)
         {
-            FieldDefinition f = token as FieldDefinition;
+            FieldReference f = token as FieldReference;
             var type = GetType(f.DeclaringType, contextType);
+            
             if (type is ILType)
             {
-                int idx = ((ILType)type).GetFieldIndex(token);
-                long res = ((long)f.DeclaringType.GetHashCode() << 32) | (uint)idx;
+                var it = (ILType)type;
+                int idx = it.GetFieldIndex(token);
+                long res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
+
                 return res;
             }
             throw new KeyNotFoundException();
