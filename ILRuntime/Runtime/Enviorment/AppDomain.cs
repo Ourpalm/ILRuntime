@@ -231,11 +231,9 @@ namespace ILRuntime.Runtime.Enviorment
                 Mono.Cecil.TypeReference _ref = (token as Mono.Cecil.TypeReference);
                 if (_ref.IsGenericParameter)
                 {
-                    /*foreach (var i in contextType.SubTypes)
-                    {
-                        if (i.Key == _ref.Name)
-                            return i.Value;
-                    }*/
+                    var t = ((ILType)contextType).FindGenericArgument(_ref.Name);
+                    if (t != null)
+                        return t;
                 }
                 module = _ref.Module;
                 if (_ref.IsGenericInstance)

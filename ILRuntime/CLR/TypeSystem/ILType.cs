@@ -401,23 +401,18 @@ namespace ILRuntime.CLR.TypeSystem
             int hashCode = token.GetHashCode();
             if (fieldTokenMapping.TryGetValue(hashCode, out idx))
                 return idx;
-            FieldDefinition f = token as FieldDefinition;
-            if (f.IsStatic)
+            FieldReference f = token as FieldReference;
+            if (staticFieldMapping != null && staticFieldMapping.TryGetValue(f.Name, out idx))
             {
-                if (staticFieldMapping.TryGetValue(f.Name, out idx))
-                {
-                    fieldTokenMapping[hashCode] = idx;
-                    return idx;
-                }
+                fieldTokenMapping[hashCode] = idx;
+                return idx;
             }
-            else
+            if (fieldMapping.TryGetValue(f.Name, out idx))
             {
-                if (fieldMapping.TryGetValue(f.Name, out idx))
-                {
-                    fieldTokenMapping[hashCode] = idx;
-                    return idx;
-                }
+                fieldTokenMapping[hashCode] = idx;
+                return idx;
             }
+
             return -1;
         }
 

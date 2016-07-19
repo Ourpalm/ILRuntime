@@ -284,7 +284,14 @@ namespace ILRuntime.CLR.Method
                     {
                         var t = appdomain.GetType(token, declaringType);
                         if (t != null)
-                            code.TokenInteger = token.GetHashCode();
+                        {
+                            if (t is ILType)
+                            {
+                                code.TokenInteger = ((ILType)t).TypeReference.GetHashCode();
+                            }
+                            else
+                                code.TokenInteger = token.GetHashCode();
+                        }
                     }
                     break;
                 case OpCodeEnum.Stfld:

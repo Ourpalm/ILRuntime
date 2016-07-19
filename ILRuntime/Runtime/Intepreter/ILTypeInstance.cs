@@ -24,7 +24,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 if (i.IsStatic)
                 {
-                    if (i.InitialValue != null)
+                    if (i.InitialValue != null && i.InitialValue.Length > 0)
                     {
                         fields[idx].ObjectType = ObjectTypes.Object;
                         managedObjs[idx] = i.InitialValue;
