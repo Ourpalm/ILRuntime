@@ -26,11 +26,6 @@ namespace ILRuntime.CLR.TypeSystem
             this.clrType = clrType;
             this.appdomain = appdomain;
         }
-
-        public void Initialize()
-        {
-            InitializeMethods();
-        }
         
         public bool IsGenericInstance
         {
@@ -85,6 +80,8 @@ namespace ILRuntime.CLR.TypeSystem
         }
         public List<IMethod> GetMethods()
         {
+            if (methods == null)
+                InitializeMethods();
             List<IMethod> res = new List<IMethod>();
             foreach (var i in methods)
             {
@@ -163,6 +160,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IMethod GetConstructor(List<IType> param)
         {
+            if (constructors == null)
+                InitializeMethods();
             foreach (var i in constructors)
             {
                 if (i.ParameterCount == param.Count)

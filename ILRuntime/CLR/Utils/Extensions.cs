@@ -45,7 +45,7 @@ namespace ILRuntime.CLR.Utils
                                 t = appdomain.GetType(ga, contextType);
                                 break;
                             }
-                            else if (i.ParameterType.Name.Contains(gp.Name))
+                            else if (i.ParameterType.FullName.Contains(gp.Name))
                             {
                                 t = appdomain.GetType(i.ParameterType.FullName.Replace(gp.Name, ga.FullName));
                                 break;

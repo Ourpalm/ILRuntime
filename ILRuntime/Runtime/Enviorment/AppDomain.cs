@@ -93,15 +93,122 @@ namespace ILRuntime.Runtime.Enviorment
             IType res;
             if (mapType.TryGetValue(fullname, out res))
                 return res;
-            Type t = Type.GetType(fullname);
-            if(t != null)
+            string baseType;
+            string[] genericParams;
+            bool isArray;
+            ParseGenericType(fullname, out baseType, out genericParams, out isArray);
+            if (genericParams != null || isArray)
             {
-                res = new CLRType(t, this);
-                mapType[fullname] = res;
-                ((CLRType)res).Initialize();
-                return res;               
+                IType bt = GetType(baseType);
+
+                if (genericParams != null)
+                {
+                    KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[genericParams.Length];
+                    for (int i = 0; i < genericArguments.Length; i++)
+                    {
+                        string key = "!" + i;
+                        IType val = GetType(genericParams[i]);
+                        genericArguments[i] = new KeyValuePair<string, IType>(key, val);
+                    }
+                    bt = bt.MakeGenericInstance(genericArguments);
+                    mapType[bt.FullName] = bt;
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(baseType);
+                    sb.Append('<');
+                    for (int i = 0; i < genericParams.Length; i++)
+                    {
+                        if (i > 0)
+                            sb.Append(", ");
+                        else
+                        {
+                            sb.Append(genericParams[i]);
+                        }
+                    }
+                    sb.Append('>');
+                    var asmName = sb.ToString();
+                    if (bt.FullName != asmName)
+                        mapType[asmName] = bt;
+                }
+
+                if (isArray)
+                {
+                    Type t = bt.TypeForCLR.MakeArrayType();
+                    res = new CLRType(t, this);
+                    mapType[fullname] = res;
+                    mapType[res.FullName] = res;
+                    return res;
+                }
+                else
+                    return bt;
+            }
+            else
+            {
+                Type t = Type.GetType(fullname);
+                if (t != null)
+                {
+                    res = new CLRType(t, this);
+                    mapType[fullname] = res;
+                    mapType[res.FullName] = res;
+                    return res;
+                }
             }
             return null;
+        }
+
+        static void ParseGenericType(string fullname, out string baseType, out string[] genericParams, out bool isArray)
+        {
+            StringBuilder sb = new StringBuilder();
+            int depth = 0;
+            int idx = 0;
+            int cnt = 0;
+            baseType = "";
+            genericParams = null;
+            if (fullname.Substring(fullname.Length - 2) == "[]")
+            {
+                fullname = fullname.Substring(0, fullname.Length - 2);
+                isArray = true;
+            }
+            else
+                isArray = false;
+            if (fullname.Contains('<'))
+            {
+                foreach (var i in fullname)
+                {
+                    if (i == '<')
+                    {
+                        depth++;
+                        if (depth == 1)
+                        {
+                            baseType = sb.ToString();
+                            sb.Length = 0;
+                            cnt = int.Parse(baseType.Substring(baseType.IndexOf('`') + 1));
+                            genericParams = new string[cnt];
+                            continue;
+                        }
+                    }
+                    if (i == ',' && depth == 1)
+                    {
+                        genericParams[idx++] = sb.ToString();
+                        sb.Length = 0;
+                    }
+                    if (i == '>')
+                    {
+                        depth--;
+                        if (depth == 0)
+                            continue;
+                    }
+                    sb.Append(i);
+                }
+                if (sb.Length > 0)
+                    genericParams[idx] = sb.ToString();
+            }
+            else
+                baseType = fullname;
+        }
+
+        string GetAssemblyName(IMetadataScope scope)
+        {
+            return scope is AssemblyNameReference ? ((AssemblyNameReference)scope).FullName : null;
         }
 
         internal IType GetType(object token, IType contextType)
@@ -113,11 +220,13 @@ namespace ILRuntime.Runtime.Enviorment
             Mono.Cecil.ModuleDefinition module = null;
             KeyValuePair<string, IType>[] genericArguments = null;
             string typename = null;
+            string scope = null;
             if (token is Mono.Cecil.TypeDefinition)
             {
                 Mono.Cecil.TypeDefinition _def = (token as Mono.Cecil.TypeDefinition);
                 module = _def.Module;
                 typename = _def.FullName;
+                scope = GetAssemblyName(_def.Scope);
             }
             else if (token is Mono.Cecil.TypeReference)
             {
@@ -135,6 +244,7 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     GenericInstanceType gType = (GenericInstanceType)_ref;
                     typename = gType.ElementType.FullName;
+                    scope = GetAssemblyName(gType.ElementType.Scope);
                     TypeReference tr = gType.ElementType;
                     genericArguments = new KeyValuePair<string, IType>[gType.GenericArguments.Count];
                     for(int i = 0; i < genericArguments.Length; i++)
@@ -147,6 +257,7 @@ namespace ILRuntime.Runtime.Enviorment
                 else
                 {
                     typename = _ref.FullName;
+                    scope = GetAssemblyName(_ref.Scope);
                 }
             }
             else
@@ -154,16 +265,14 @@ namespace ILRuntime.Runtime.Enviorment
                 throw new NotImplementedException();
             }
             res = GetType(typename);
+            if (res == null && scope != null)
+                res = GetType(typename + ", " + scope);
             if (genericArguments != null)
             {
                 res = res.MakeGenericInstance(genericArguments);
                 mapType[res.FullName] = res;
             }
             mapTypeToken[hash] = res;
-            if(res is CLRType)
-            {
-                ((CLRType)res).Initialize();
-            }
             return res;
         }
 

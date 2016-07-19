@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ILRuntimeTest.TestBase;
 using AppDomain = ILRuntime.Runtime.Enviorment.AppDomain;
 
