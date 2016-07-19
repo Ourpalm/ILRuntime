@@ -863,7 +863,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     esp = PushObject(obj, mStack, obj->Value, true);
                                                 }
-                                                else
+                                                else if (obj->ObjectType != ObjectTypes.Object)
                                                     throw new NotImplementedException();
                                             }
                                             else if (type == domain.BoolType)
@@ -872,16 +872,32 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     esp = PushObject(obj, mStack, (obj->Value == 1), true);
                                                 }
-                                                else
+                                                else if (obj->ObjectType != ObjectTypes.Object)
+                                                {
                                                     throw new NotImplementedException();
+                                                }
                                             }
                                             else if (type == domain.FloatType)
                                             {
-                                                esp = PushObject(obj, mStack, *(float*)&obj->Value, true);
+                                                if (obj->ObjectType == ObjectTypes.Float)
+                                                {
+                                                    esp = PushObject(obj, mStack, *(float*)&obj->Value, true);
+                                                }
+                                                else if (obj->ObjectType != ObjectTypes.Object)
+                                                {
+                                                    throw new NotImplementedException();
+                                                }
                                             }
                                             else if (type == domain.DoubleType)
                                             {
-                                                esp = PushObject(obj, mStack, *(double*)&obj->Value, true);
+                                                if (obj->ObjectType == ObjectTypes.Double)
+                                                {
+                                                    esp = PushObject(obj, mStack, *(double*)&obj->Value, true);
+                                                }
+                                                else if (obj->ObjectType != ObjectTypes.Object)
+                                                {
+                                                    throw new NotImplementedException();
+                                                }
                                             }
                                             else
                                                 throw new NotImplementedException();
