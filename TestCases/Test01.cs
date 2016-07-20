@@ -99,6 +99,7 @@ namespace TestCases
             SingletonTest2.Inst.Test = 2;
             Console.WriteLine(SingletonTest2.Inst.foo());
             Console.WriteLine(SingletonTest2.Inst.GetString<SingletonTest>(SingletonTest.Inst));
+            Console.WriteLine(SingletonTest2.IsSingletonInstance(new SingletonTest2()).ToString());
             Console.WriteLine(SingletonTest2.IsSingletonInstance(SingletonTest2.Inst).ToString());
         }
 
@@ -174,8 +175,7 @@ namespace TestCases
             {
                 if (_inst == null)
                 {
-                    //_inst = Activator.CreateInstance<T>();
-                    _inst = default(T);//L# 的default（T）等价于Activator.CreateInstance<T>()， Activator.CreateInstance<T>()会调用出错
+                    _inst = new T();
                 }
                 return _inst;
             }

@@ -3,11 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using ILRuntime.CLR.TypeSystem;
+
 namespace ILRuntime.Runtime.Enviorment
 {
     static class CLRRedirections
     {
-        public unsafe static object InitializeArray(object instance, object[] param)
+        public static object CreateInstance(object instance, object[] param, IType[] genericArguments)
+        {
+            if (genericArguments != null && genericArguments.Length == 1)
+            {
+                var t = genericArguments[0];
+                if (t is ILType)
+                {
+                    return ((ILType)t).Instantiate();
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else
+                throw new EntryPointNotFoundException();
+        }
+        public unsafe static object InitializeArray(object instance, object[] param, IType[] genericArguments)
         {
             object array = param[0];
             byte[] data = param[1] as byte[];

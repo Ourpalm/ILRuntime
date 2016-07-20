@@ -19,7 +19,8 @@ namespace ILRuntime.CLR.Method
         CLRType declaringType;
         ParameterInfo[] param;
         bool isConstructor;
-        Func<object, object[], object> redirect;
+        Func<object, object[], IType[], object> redirect;
+        IType[] genericArguments;
 
         public IType DeclearingType
         {
@@ -57,9 +58,11 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                return false;
+                return genericArguments != null;
             }
         }
+
+        public IType[] GenericArguments { get { return genericArguments; } }
 
         public CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
@@ -70,10 +73,6 @@ namespace ILRuntime.CLR.Method
             if (!def.IsGenericMethod && !def.ContainsGenericParameters)
             {
                 ReturnType = domain.GetType(def.ReturnType.FullName);
-                if(def.Name.Contains("InitializeA"))
-                {
-
-                }
                 InitParameters();
             }
             isConstructor = false;
@@ -136,11 +135,22 @@ namespace ILRuntime.CLR.Method
                 parameters.Add(type);
             }
             if (def != null)
-                appdomain.RedirectMap.TryGetValue(def, out redirect);
+            {
+                if (def.IsGenericMethod && !def.IsGenericMethodDefinition)
+                {
+                    appdomain.RedirectMap.TryGetValue(def.GetGenericMethodDefinition(), out redirect);
+                }
+                else
+                    appdomain.RedirectMap.TryGetValue(def, out redirect);
+            }
         }
 
         public unsafe object Invoke(StackObject* esp, List<object> mStack)
         {
+            if (parameters == null)
+            {
+                InitParameters();
+            }
             int paramCount = ParameterCount;
             object[] param = new object[paramCount];
             for (int i = 1; i <= paramCount; i++)
@@ -168,7 +178,7 @@ namespace ILRuntime.CLR.Method
                 }
                 object res = null;
                 if (redirect != null)
-                    res = redirect(instance, param);
+                    res = redirect(instance, param, genericArguments);
                 else
                     res = def.Invoke(instance, param);
                 return res;
@@ -183,7 +193,9 @@ namespace ILRuntime.CLR.Method
                 p[i] = genericArguments[i].TypeForCLR;
             }
             var t = def.MakeGenericMethod(p);
-            return new CLRMethod(t, declaringType, appdomain);            
+            var res = new CLRMethod(t, declaringType, appdomain);
+            res.genericArguments = genericArguments;
+            return res;   
         }
 
         object CheckPrimitiveTypes(Type pt, object obj)

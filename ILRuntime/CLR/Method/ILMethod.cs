@@ -64,7 +64,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                return false;
+                return genericParameters != null;
             }
         }
         public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
@@ -83,7 +83,7 @@ namespace ILRuntime.CLR.Method
         IType FindGenericArgument(string name)
         {
             IType res = declaringType.FindGenericArgument(name);
-            if (res == null)
+            if (res == null && genericParameters != null)
             {
                 foreach (var i in genericParameters)
                 {
@@ -266,6 +266,8 @@ namespace ILRuntime.CLR.Method
                     {
                         Mono.Cecil.ParameterDefinition vd = (Mono.Cecil.ParameterDefinition)token;
                         code.TokenInteger = vd.Index;
+                        if (HasThis)
+                            code.TokenInteger++;
                     }
                     break;
                 case OpCodeEnum.Call:
@@ -274,7 +276,12 @@ namespace ILRuntime.CLR.Method
                     {
                         var m = appdomain.GetMethod(token, declaringType);
                         if (m != null)
-                            code.TokenInteger = token.GetHashCode();
+                        {
+                            if (m.IsGenericInstance)
+                                code.TokenInteger = m.GetHashCode();
+                            else
+                                code.TokenInteger = token.GetHashCode();
+                        }
                     }
                     break;
                 case OpCodeEnum.Box:

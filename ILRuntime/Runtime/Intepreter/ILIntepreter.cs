@@ -314,10 +314,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldnull:
                                 {
-                                    esp->ObjectType = ObjectTypes.Null;
-                                    esp->Value = -1;
-                                    esp->ValueLow = 0;
-                                    esp++;
+                                    esp = PushNull(esp);
                                 }
                                 break;
                             case OpCodeEnum.Ldstr:
@@ -946,13 +943,18 @@ namespace ILRuntime.Runtime.Intepreter
                                             var val = mStack[obj->Value];
                                             Free(obj);
                                             ILTypeInstance ins = (ILTypeInstance)val;
-                                            if (ins.IsValueType)
+                                            if (ins != null)
                                             {
-                                                ins.Boxed = true;
+                                                if (ins.IsValueType)
+                                                {
+                                                    ins.Boxed = true;
+                                                }
+                                                esp = PushObject(obj, mStack, ins, true);
                                             }
                                             else
-                                                throw new NotSupportedException();
-                                            esp = PushObject(obj, mStack, ins, true);
+                                            {
+                                                esp = PushNull(esp);
+                                            }
                                         }
                                         else
                                             throw new NotImplementedException();
@@ -967,24 +969,58 @@ namespace ILRuntime.Runtime.Intepreter
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type is ILType)
                                     {
-                                        var obj = mStack[objRef->Value];
-                                        if (obj != null)
+                                        ILType it = (ILType)type;
+                                        if (it.IsValueType)
                                         {
-                                            if (obj is ILTypeInstance)
+                                            if (objRef->ObjectType != ObjectTypes.Object)
                                             {
-                                                ILTypeInstance instance = obj as ILTypeInstance;
-                                                instance.Clear();
+                                                var obj = mStack[objRef->Value];
+                                                if (obj != null)
+                                                {
+                                                    if (obj is ILTypeInstance)
+                                                    {
+                                                        ILTypeInstance instance = obj as ILTypeInstance;
+                                                        instance.Clear();
+                                                    }
+                                                    else
+                                                        throw new NotSupportedException();
+                                                }
+                                                else
+                                                    throw new NullReferenceException();
                                             }
                                             else
-                                                throw new NotSupportedException();
+                                                throw new NullReferenceException();
+
+                                            Free(esp - 1);
+                                            esp--;
                                         }
                                         else
-                                            throw new NullReferenceException();
+                                        {
+                                            PushNull(esp);
+                                            switch (objRef->ObjectType)
+                                            {
+                                                case ObjectTypes.StaticFieldReference:
+                                                    {
+                                                        var t = AppDomain.GetType(objRef->Value) as ILType;
+                                                        t.StaticInstance.AssignFromStack(objRef->ValueLow, esp, mStack);
+                                                    }
+                                                    break;
+                                                case ObjectTypes.FieldReference:
+                                                    {
+                                                        var instance = mStack[objRef->Value] as ILTypeInstance;
+                                                        instance.AssignFromStack(objRef->ValueLow, esp, mStack);
+                                                        Free(esp - 1);
+                                                        esp--;
+                                                    }
+                                                    break;
+                                                default:
+                                                    PushNull(objRef);
+                                                    break;
+                                            }
+                                        }
                                     }
                                     else
                                         throw new NotImplementedException();
-                                    Free(esp - 1);
-                                    esp--;
                                 }
                                 break;
                             case OpCodeEnum.Isinst:
@@ -1198,6 +1234,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeEnum.Constrained:
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Endfinally:
                                 break;
@@ -1344,6 +1381,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             esp->ObjectType = ObjectTypes.Integer;
             esp->Value = 0;
+            return esp + 1;
+        }
+
+        StackObject* PushNull(StackObject* esp)
+        {
+            esp->ObjectType = ObjectTypes.Null;
+            esp->Value = -1;
+            esp->ValueLow = 0;
             return esp + 1;
         }
 

@@ -20,12 +20,20 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
-        Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>>();
+        Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>>();
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         public AppDomain()
         {
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
+            foreach (var i in typeof(System.Activator).GetMethods())
+            {
+                if (i.Name == "CreateInstance" && i.IsGenericMethodDefinition)
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.CreateInstance);
+                }
+            }
+            
         }
 
         internal IType VoidType { get { return voidType; } }
@@ -37,7 +45,7 @@ namespace ILRuntime.Runtime.Enviorment
         internal IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
-        internal Dictionary<System.Reflection.MethodInfo, Func<object, object[], object>> RedirectMap { get { return redirectMap; } }
+        internal Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);
@@ -80,7 +88,7 @@ namespace ILRuntime.Runtime.Enviorment
             objectType = GetType("System.Object");
         }
 
-        public void RegisterCLRMethodRedirection(System.Reflection.MethodInfo mi, Func<object, object[], object> func)
+        public void RegisterCLRMethodRedirection(System.Reflection.MethodInfo mi, Func<object, object[], IType[], object> func)
         {
             redirectMap[mi] = func;
         }
@@ -338,6 +346,7 @@ namespace ILRuntime.Runtime.Enviorment
             int hashCode = token.GetHashCode();
             IMethod method;
             IType[] genericArguments = null;
+            bool invalidToken = false;
             bool isConstructor = false;
             if (mapMethod.TryGetValue(hashCode, out method))
                 return method;
@@ -364,8 +373,10 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     GenericInstanceMethod gim = (GenericInstanceMethod)_ref;
                     genericArguments = new IType[gim.GenericArguments.Count];
-                    for(int i = 0; i < genericArguments.Length; i++)
+                    for (int i = 0; i < genericArguments.Length; i++)
                     {
+                        if (gim.GenericArguments[i].IsGenericParameter)
+                            invalidToken = true;
                         genericArguments[i] = GetType(gim.GenericArguments[i], contextType);
                     }
                 }
@@ -384,11 +395,16 @@ namespace ILRuntime.Runtime.Enviorment
             if (isConstructor)
                 method = type.GetConstructor(paramList);
             else
+            {
                 method = type.GetMethod(methodname, paramList, genericArguments);
+                if (method.IsGenericInstance)
+                    mapMethod[method.GetHashCode()] = method;
+            }
 
             if (method == null)
                 throw new KeyNotFoundException("Cannot find method:" + methodname);
-            mapMethod[hashCode] = method;
+            if (!invalidToken)
+                mapMethod[hashCode] = method;
             return method;
         }
 

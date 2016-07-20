@@ -135,7 +135,26 @@ namespace ILRuntime.CLR.TypeSystem
                                 }
                             }
                             if (match)
-                                return i;
+                            {
+                                if (i.IsGenericInstance)
+                                {
+                                    if (i.GenericArguments.Length == genericArguments.Length)
+                                    {
+                                        for (int j = 0; j < genericArguments.Length; j++)
+                                        {
+                                            if(i.GenericArguments[j] != genericArguments[j])
+                                            {
+                                                match = false;
+                                                break;
+                                            }
+                                        }
+                                        if (match)
+                                            return i;
+                                    }
+                                }
+                                else
+                                    return i;
+                            }
                         }
                     }
                 }

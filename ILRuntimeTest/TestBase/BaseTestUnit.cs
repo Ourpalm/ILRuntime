@@ -112,6 +112,8 @@ namespace ILRuntimeTest.Test
                 message.AppendLine("Local Variables:");
                 message.AppendLine(e.LocalInfo);
                 message.AppendLine(e.StackTrace);
+                if (e.InnerException != null)
+                    message.AppendLine(e.InnerException.ToString());
                 _pass = false;
             }
         }
