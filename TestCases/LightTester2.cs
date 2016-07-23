@@ -45,5 +45,33 @@ namespace TestCases
                     break;
             }
         }
+
+        public static int UnitTest_2002()
+        {
+            bool cond = true;
+            int cnt = 0;
+            while (cond)
+            {
+                cnt++;
+                if (cnt > 100)
+                    cond = false;
+            }
+
+            return cnt;
+        }
+
+        public static int UnitTest_2003()
+        {
+            bool cond = true;
+            int cnt = 0;
+            do
+            {
+                cnt++;
+                if (cnt > 100)
+                    cond = false;
+            }
+            while (cond);
+            return cnt;
+        }
     }
 }

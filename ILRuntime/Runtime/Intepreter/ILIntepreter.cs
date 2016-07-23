@@ -966,6 +966,56 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp = PushZero(esp - 2);
                                 }
                                 break;
+                            case OpCodeEnum.Cgt:
+                                {
+                                    StackObject* obj1 = esp - 2;
+                                    StackObject* obj2 = esp - 1;
+                                    bool res = false;
+                                    switch (obj1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = obj1->Value > obj2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&obj1->Value > *(long*)&obj2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        esp = PushOne(esp - 2);
+                                    else
+                                        esp = PushZero(esp - 2);
+                                }
+                                break;
+                            case OpCodeEnum.Cgt_Un:
+                                {
+                                    StackObject* obj1 = esp - 2;
+                                    StackObject* obj2 = esp - 1;
+                                    bool res = false;
+                                    switch (obj1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = (uint)obj1->Value > (uint)obj2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = (ulong)*(long*)&obj1->Value > (ulong)*(long*)&obj2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        esp = PushOne(esp - 2);
+                                    else
+                                        esp = PushZero(esp - 2);
+                                }
+                                break;
                             #endregion
 
                             #region Initialization & Instantiation
