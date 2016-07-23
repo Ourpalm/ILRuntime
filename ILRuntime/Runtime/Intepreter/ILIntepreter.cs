@@ -321,6 +321,25 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PushNull(esp);
                                 }
                                 break;
+                            case OpCodeEnum.Ldind_I4:
+                                {
+                                    var val = GetObjectAndResolveReference(esp - 1);
+                                    var dst = esp - 1;
+                                    dst->ObjectType = ObjectTypes.Integer;
+                                    dst->Value = val->Value;
+                                    dst->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeEnum.Stind_I4:
+                                {
+                                    var dst = GetObjectAndResolveReference(esp - 2);
+                                    var val = esp - 1;
+                                    dst->Value = val->Value;
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    esp -= 2;
+                                }
+                                break;
                             case OpCodeEnum.Ldstr:
                                 esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenInteger));
                                 break;
