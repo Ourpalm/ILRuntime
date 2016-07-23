@@ -453,9 +453,10 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Brtrue_S:
                                 {
                                     esp--;
-                                    if (esp->ObjectType == ObjectTypes.Integer && esp->Value > 0)
+                                    if ((esp->ObjectType == ObjectTypes.Integer || esp->ObjectType == ObjectTypes.Object) && esp->Value > 0)
                                     {
                                         ip = ptr + ip->TokenInteger;
+                                        Free(esp);
                                         continue;
                                     }
                                     else
@@ -485,6 +486,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (esp->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
+                                        case ObjectTypes.Object:
                                             transfer = a->Value == b->Value;
                                             break;
                                         case ObjectTypes.Float:
@@ -512,6 +514,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (esp->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
+                                        case ObjectTypes.Object:
                                             transfer = (uint)a->Value != (uint)b->Value;
                                             break;
                                         case ObjectTypes.Float:
@@ -528,7 +531,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
 
                                 }
-                                break;
+                                break;                            
                             case OpCodeEnum.Blt:
                             case OpCodeEnum.Blt_S:
                                 {
@@ -556,6 +559,33 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeEnum.Blt_Un:
+                            case OpCodeEnum.Blt_Un_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)a->Value < (uint)b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value < *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeEnum.Ble:
                             case OpCodeEnum.Ble_S:
                                 {
@@ -567,6 +597,33 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         case ObjectTypes.Integer:
                                             transfer = a->Value <= b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value <= *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeEnum.Ble_Un:
+                            case OpCodeEnum.Ble_Un_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)a->Value <= (uint)b->Value;
                                             break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value <= *(float*)&b->Value;
@@ -1058,7 +1115,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ILType it = (ILType)type;
                                         if (it.IsValueType)
                                         {
-                                            if (objRef->ObjectType != ObjectTypes.Object)
+                                            if (objRef->ObjectType == ObjectTypes.Object)
                                             {
                                                 var obj = mStack[objRef->Value];
                                                 if (obj != null)
