@@ -21,6 +21,7 @@ namespace ILRuntime.CLR.Method
         bool isConstructor;
         Func<object, object[], IType[], object> redirect;
         IType[] genericArguments;
+        object[] invocationParam;
 
         public IType DeclearingType
         {
@@ -152,7 +153,9 @@ namespace ILRuntime.CLR.Method
                 InitParameters();
             }
             int paramCount = ParameterCount;
-            object[] param = new object[paramCount];
+            if (invocationParam == null)
+                invocationParam = new object[paramCount];
+            object[] param = invocationParam;
             for (int i = 1; i <= paramCount; i++)
             {
                 var p = esp - i;
