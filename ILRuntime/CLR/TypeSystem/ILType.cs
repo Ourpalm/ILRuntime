@@ -388,7 +388,21 @@ namespace ILRuntime.CLR.TypeSystem
             foreach(var i in constructors)
             {
                 if (i.ParameterCount == param.Count)
-                    return i;
+                {
+                    bool match = true;
+                    if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
+
+                        for (int j = 0; j < param.Count; j++)
+                        {
+                            if (param[j] != i.Parameters[j])
+                            {
+                                match = false;
+                                break;
+                            }
+                        }
+                    if (match)
+                        return i;
+                }
             }
             return null;
         }

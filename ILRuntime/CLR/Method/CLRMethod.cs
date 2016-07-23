@@ -188,32 +188,36 @@ namespace ILRuntime.CLR.Method
         public IMethod MakeGenericMethod(IType[] genericArguments)
         {
             Type[] p = new Type[genericArguments.Length];
-            for(int i = 0; i < genericArguments.Length; i++)
+            for (int i = 0; i < genericArguments.Length; i++)
             {
                 p[i] = genericArguments[i].TypeForCLR;
             }
             var t = def.MakeGenericMethod(p);
             var res = new CLRMethod(t, declaringType, appdomain);
             res.genericArguments = genericArguments;
-            return res;   
+            return res;
         }
 
         object CheckPrimitiveTypes(Type pt, object obj)
         {
-            if (pt.IsPrimitive)
+            if (pt.IsPrimitive && pt != typeof(int))
             {
-                if (pt == typeof(byte))
-                    obj = (byte)(int)obj;
-                else if (pt == typeof(short))
-                    obj = (short)(int)obj;
-                else if (pt == typeof(ushort))
-                    obj = (ushort)(int)obj;
-                else if (pt == typeof(sbyte))
-                    obj = (sbyte)(int)obj;
-                else if (pt == typeof(ulong))
-                    obj = (ulong)(int)obj;
-                else if (pt == typeof(bool))
+                if (pt == typeof(bool) && !(obj is bool))
+                {
                     obj = (int)obj == 1;
+                }
+                else if (pt == typeof(byte) && !(obj is byte))
+                    obj = (byte)(int)obj;
+                else if (pt == typeof(short) && !(obj is short))
+                    obj = (short)(int)obj;
+                else if (pt == typeof(ushort) && !(obj is ushort))
+                    obj = (ushort)(int)obj;
+                else if (pt == typeof(uint) && !(obj is uint))
+                    obj = (uint)(int)obj;
+                else if (pt == typeof(sbyte) && !(obj is sbyte))
+                    obj = (sbyte)(int)obj;
+                else if (pt == typeof(ulong) && !(obj is ulong))
+                    obj = (ulong)(int)obj;
             }
             return obj;
         }

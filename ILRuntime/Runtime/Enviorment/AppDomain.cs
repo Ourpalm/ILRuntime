@@ -124,10 +124,7 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (i > 0)
                             sb.Append(", ");
-                        else
-                        {
-                            sb.Append(genericParams[i]);
-                        }
+                        sb.Append(genericParams[i]);
                     }
                     sb.Append('>');
                     var asmName = sb.ToString();
@@ -195,6 +192,7 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         genericParams[idx++] = sb.ToString();
                         sb.Length = 0;
+                        continue;
                     }
                     if (i == '>')
                     {
@@ -275,6 +273,7 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 throw new NotImplementedException();
             }
+            typename = typename.Replace("/", "+");
             res = GetType(typename);
             if (res == null && scope != null)
                 res = GetType(typename + ", " + scope);

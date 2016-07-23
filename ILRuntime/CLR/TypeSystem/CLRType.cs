@@ -13,6 +13,7 @@ namespace ILRuntime.CLR.TypeSystem
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
         KeyValuePair<string,IType>[] genericArguments;
+        List<CLRType> genericInstances;
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
@@ -184,13 +185,45 @@ namespace ILRuntime.CLR.TypeSystem
             foreach (var i in constructors)
             {
                 if (i.ParameterCount == param.Count)
-                    return i;
+                {
+                    bool match = true;
+
+                    for (int j = 0; j < param.Count; j++)
+                    {
+                        if (param[j].TypeForCLR != i.Parameters[j].TypeForCLR)
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match)
+                    {
+                        return i;
+                    }
+                }
             }
+            
             return null;
         }
 
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
         {
+            if (genericInstances == null)
+                genericInstances = new List<CLRType>();
+            foreach (var i in genericInstances)
+            {
+                bool match = true;
+                for (int j = 0; j < genericArguments.Length; j++)
+                {
+                    if (i.genericArguments[j].Value != genericArguments[j].Value)
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match)
+                    return i;
+            }
             Type[] args = new Type[genericArguments.Length];
             for (int i = 0; i < genericArguments.Length; i++)
             {
@@ -199,6 +232,8 @@ namespace ILRuntime.CLR.TypeSystem
             Type newType = clrType.MakeGenericType(args);
             var res = new CLRType(newType, appdomain);
             res.genericArguments = genericArguments;
+
+            genericInstances.Add(res);
             return res;
         }
 
