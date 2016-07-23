@@ -273,8 +273,12 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 throw new NotImplementedException();
             }
-            typename = typename.Replace("/", "+");
             res = GetType(typename);
+            if (res == null)
+            {
+                typename = typename.Replace("/", "+");
+                res = GetType(typename);
+            }
             if (res == null && scope != null)
                 res = GetType(typename + ", " + scope);
             if (res == null)
