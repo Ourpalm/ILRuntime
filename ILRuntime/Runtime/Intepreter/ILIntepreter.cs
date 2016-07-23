@@ -95,6 +95,7 @@ namespace ILRuntime.Runtime.Intepreter
                         code = ip->Code;
                         switch (code)
                         {
+                            #region Arguments and Local Variable
                             case OpCodeEnum.Ldarg_0:
                                 CopyToStack(esp, arg, mStack);
                                 esp++;
@@ -235,6 +236,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            #endregion
+
+                            #region Load Constants
                             case OpCodeEnum.Ldc_I4_M1:
                                 esp->Value = -1;
                                 esp->ObjectType = ObjectTypes.Integer;
@@ -320,6 +324,9 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Ldstr:
                                 esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenInteger));
                                 break;
+                            #endregion
+
+                            #region Althemetics
                             case OpCodeEnum.Add:
                                 {
                                     StackObject* b = esp - 1;
@@ -436,6 +443,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            #endregion
+
+                            #region Control Flows
                             case OpCodeEnum.Ret:
                                 returned = true;
                                 break;
@@ -463,6 +473,60 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                         Free(esp);
+                                }
+                                break;
+                            case OpCodeEnum.Beq:
+                            case OpCodeEnum.Beq_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = a->Value == b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value == *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeEnum.Bne_Un:
+                            case OpCodeEnum.Bne_Un_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)a->Value != (uint)b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value != *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
                                 }
                                 break;
                             case OpCodeEnum.Blt:
@@ -523,6 +587,19 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Br:
                                 ip = ptr + ip->TokenInteger;
                                 continue;
+                            case OpCodeEnum.Switch:
+                                {
+                                    var val = (esp - 1)->Value;
+                                    Free(esp - 1);
+                                    esp--;
+                                    var table = method.JumpTables[ip->TokenInteger];
+                                    if (val < table.Length)
+                                    {
+                                        ip = ptr + table[val];
+                                        continue;
+                                    }
+                                }
+                                break;
                             case OpCodeEnum.Leave:
                             case OpCodeEnum.Leave_S:
                                 {
@@ -591,46 +668,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
-                            case OpCodeEnum.Newobj:
-                                {
-                                    IMethod m = domain.GetMethod(ip->TokenInteger);
-                                    if (m is ILMethod)
-                                    {
-                                        ILType type = m.DeclearingType as ILType;
-                                        var obj = type.Instantiate();
-                                        var a = esp - m.ParameterCount;
-                                        var objRef = PushObject(esp, mStack, obj);//this parameter for constructor
-                                        esp = objRef;
-                                        for (int i = 0; i < m.ParameterCount; i++)
-                                        {
-                                            CopyToStack(esp, a + i, mStack);
-                                            esp++;
-                                        }
-                                        esp = Execute((ILMethod)m, esp, out unhandledException);
-                                        for (int i = m.ParameterCount - 1; i >= 0; i--)
-                                        {
-                                            Free(a + i);
-                                        }
-                                        Free(objRef - 1);
-                                        esp = a;
-                                        esp = PushObject(esp, mStack, obj);//new constructedObj
-                                        if (unhandledException)
-                                            returned = true;
-                                    }
-                                    else
-                                    {
-                                        CLRMethod cm = (CLRMethod)m;
-                                        object result = cm.Invoke(esp, mStack);
-                                        int paramCount = cm.ParameterCount;
-                                        for (int i = 1; i <= paramCount; i++)
-                                        {
-                                            Free(esp - i);
-                                        }
-                                        esp -= paramCount;
-                                        esp = PushObject(esp, mStack, result);//new constructedObj
-                                    }
-                                }
-                                break;
+                            #endregion
+
+                            #region FieldOperation
                             case OpCodeEnum.Stfld:
                                 {
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 2);
@@ -761,6 +801,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            #endregion
+
+                            #region Compare
                             case OpCodeEnum.Ceq:
                                 {
                                     StackObject* obj1 = esp - 2;
@@ -845,6 +888,49 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp = PushOne(esp - 2);
                                     else
                                         esp = PushZero(esp - 2);
+                                }
+                                break;
+                            #endregion
+
+                            #region Initialization & Instantiation
+                            case OpCodeEnum.Newobj:
+                                {
+                                    IMethod m = domain.GetMethod(ip->TokenInteger);
+                                    if (m is ILMethod)
+                                    {
+                                        ILType type = m.DeclearingType as ILType;
+                                        var obj = type.Instantiate();
+                                        var a = esp - m.ParameterCount;
+                                        var objRef = PushObject(esp, mStack, obj);//this parameter for constructor
+                                        esp = objRef;
+                                        for (int i = 0; i < m.ParameterCount; i++)
+                                        {
+                                            CopyToStack(esp, a + i, mStack);
+                                            esp++;
+                                        }
+                                        esp = Execute((ILMethod)m, esp, out unhandledException);
+                                        for (int i = m.ParameterCount - 1; i >= 0; i--)
+                                        {
+                                            Free(a + i);
+                                        }
+                                        Free(objRef - 1);
+                                        esp = a;
+                                        esp = PushObject(esp, mStack, obj);//new constructedObj
+                                        if (unhandledException)
+                                            returned = true;
+                                    }
+                                    else
+                                    {
+                                        CLRMethod cm = (CLRMethod)m;
+                                        object result = cm.Invoke(esp, mStack);
+                                        int paramCount = cm.ParameterCount;
+                                        for (int i = 1; i <= paramCount; i++)
+                                        {
+                                            Free(esp - i);
+                                        }
+                                        esp -= paramCount;
+                                        esp = PushObject(esp, mStack, result);//new constructedObj
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Box:
@@ -1064,6 +1150,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
                                 }
                                 break;
+                            #endregion
+
+                            #region Array
                             case OpCodeEnum.Newarr:
                                 {
                                     var cnt = (esp - 1)->Value;
@@ -1099,6 +1188,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp -= 3;
                                 }
                                 break;
+                            #endregion
+
+                            #region Conversion
                             case OpCodeEnum.Conv_U1:
                                 {
                                     var obj = esp - 1;
@@ -1210,6 +1302,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     *(long*)(&obj->Value) = val;
                                 }
                                 break;
+                            #endregion
+
+                            #region Stack operation
                             case OpCodeEnum.Pop:
                                 {
                                     Free(esp - 1);
@@ -1228,6 +1323,8 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            #endregion
+
                             case OpCodeEnum.Throw:
                                 {
                                     var obj = GetObjectAndResolveReference(esp - 1);

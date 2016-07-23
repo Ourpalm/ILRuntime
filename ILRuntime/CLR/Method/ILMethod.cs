@@ -17,8 +17,11 @@ namespace ILRuntime.CLR.Method
         ILType declaringType;
         ExceptionHandler[] exceptionHandler;
         KeyValuePair<string, IType>[] genericParameters;
+        Dictionary<int, int[]> jumptables;
 
         public MethodDefinition Definition { get { return def; } }
+
+        public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
 
         public ExceptionHandler[] ExceptionHandler
         {
@@ -334,7 +337,31 @@ namespace ILRuntime.CLR.Method
                             throw new NotImplementedException();
                     }
                     break;
+                case OpCodeEnum.Switch:
+                    {
+                        PrepareJumpTable(token, addr);
+                        code.TokenInteger = token.GetHashCode();
+                    }
+                    break;
             }
+        }
+
+        void PrepareJumpTable(object token,Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
+        {
+            int hashCode = token.GetHashCode();
+
+            if (jumptables == null)
+                jumptables = new Dictionary<int, int[]>();
+            if (jumptables.ContainsKey(hashCode))
+                return;
+            Mono.Cecil.Cil.Instruction[] e = token as Mono.Cecil.Cil.Instruction[];
+            int[] addrs = new int[e.Length];
+            for (int i = 0; i < e.Length; i++)
+            {
+                addrs[i] = addr[e[i]];
+            }
+
+            jumptables[hashCode] = addrs;
         }
 
         void InitParameters()
