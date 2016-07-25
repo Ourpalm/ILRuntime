@@ -99,16 +99,20 @@ namespace ILRuntime.Runtime.Enviorment
             if (mapType.TryGetValue(fullname, out res))
                 return res;
             string baseType;
-            string[] genericParams;
+            List<string> genericParams;
             bool isArray;
             ParseGenericType(fullname, out baseType, out genericParams, out isArray);
             if (genericParams != null || isArray)
             {
                 IType bt = GetType(baseType);
+                if (bt == null)
+                {
+                    bt = GetType(baseType.Replace("/", "+"));
+                }
 
                 if (genericParams != null)
                 {
-                    KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[genericParams.Length];
+                    KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[genericParams.Count];
                     for (int i = 0; i < genericArguments.Length; i++)
                     {
                         string key = "!" + i;
@@ -120,10 +124,10 @@ namespace ILRuntime.Runtime.Enviorment
                     StringBuilder sb = new StringBuilder();
                     sb.Append(baseType);
                     sb.Append('<');
-                    for (int i = 0; i < genericParams.Length; i++)
+                    for (int i = 0; i < genericParams.Count; i++)
                     {
                         if (i > 0)
-                            sb.Append(", ");
+                            sb.Append(",");
                         sb.Append(genericParams[i]);
                     }
                     sb.Append('>');
@@ -157,12 +161,10 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        static void ParseGenericType(string fullname, out string baseType, out string[] genericParams, out bool isArray)
+        static void ParseGenericType(string fullname, out string baseType, out List<string> genericParams, out bool isArray)
         {
             StringBuilder sb = new StringBuilder();
             int depth = 0;
-            int idx = 0;
-            int cnt = 0;
             baseType = "";
             genericParams = null;
             if (fullname.Length >2 && fullname.Substring(fullname.Length - 2) == "[]")
@@ -183,14 +185,13 @@ namespace ILRuntime.Runtime.Enviorment
                         {
                             baseType = sb.ToString();
                             sb.Length = 0;
-                            cnt = int.Parse(baseType.Substring(baseType.IndexOf('`') + 1));
-                            genericParams = new string[cnt];
+                            genericParams = new List<string>();
                             continue;
                         }
                     }
                     if (i == ',' && depth == 1)
                     {
-                        genericParams[idx++] = sb.ToString();
+                        genericParams.Add(sb.ToString());
                         sb.Length = 0;
                         continue;
                     }
@@ -203,7 +204,7 @@ namespace ILRuntime.Runtime.Enviorment
                     sb.Append(i);
                 }
                 if (sb.Length > 0)
-                    genericParams[idx] = sb.ToString();
+                    genericParams.Add(sb.ToString());
             }
             else
                 baseType = fullname;

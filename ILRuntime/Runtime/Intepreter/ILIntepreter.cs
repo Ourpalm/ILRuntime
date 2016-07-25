@@ -75,7 +75,13 @@ namespace ILRuntime.Runtime.Intepreter
                         mStack.Add(obj);
                     }
                     else
-                        throw new NotImplementedException();
+                    {
+                        var obj = Activator.CreateInstance(t.TypeForCLR);
+                        var loc = v1 + i;
+                        loc->ObjectType = ObjectTypes.Object;
+                        loc->Value = mStack.Count;
+                        mStack.Add(obj);
+                    }
                 }
                 else
                     mStack.Add(null);
@@ -1308,6 +1314,19 @@ namespace ILRuntime.Runtime.Intepreter
                                     var arrRef = esp - 3;
                                     Array arr = mStack[arrRef->Value] as Array;
                                     arr.SetValue(mStack[val->Value], idx->Value);
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    Free(esp - 3);
+                                    esp -= 3;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_I1:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 2;
+                                    var arrRef = esp - 3;
+                                    byte[] arr = mStack[arrRef->Value] as byte[];
+                                    arr[idx->Value] = (byte)val->Value;
                                     Free(esp - 1);
                                     Free(esp - 2);
                                     Free(esp - 3);
