@@ -1332,6 +1332,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp -= 3;
                                 }
                                 break;
+                            case OpCodeEnum.Ldlen:
+                                {
+                                    var arrRef = esp - 1;
+                                    Array arr = mStack[arrRef->Value] as Array;
+                                    Free(esp - 1);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->Value = arr.Length;
+                                }
+                                break;
                             #endregion
 
                             #region Conversion
@@ -1421,6 +1431,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Double:
                                             val = (int)*(double*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            val = obj->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
