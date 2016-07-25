@@ -78,7 +78,7 @@ namespace ILRuntime.Runtime.Intepreter
                 var v = method.Definition.Body.Variables[i];
                 if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
                 {
-                    var t = AppDomain.GetType(v.VariableType.FullName);
+                    var t = AppDomain.GetType(v.VariableType, method.DeclearingType);
                     if (t is ILType)
                     {
                         var obj = ((ILType)t).Instantiate();
@@ -615,6 +615,27 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Xor:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) ^ *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value ^ b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
                             #endregion
 
                             #region Control Flows
@@ -890,7 +911,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 Free(esp - 1);
                                                 esp--;
                                             }
-                                            if (cm.ReturnType != AppDomain.VoidType)
+                                            if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
                                                 esp = PushObject(esp, mStack, result);
                                         }
 
@@ -1201,7 +1222,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         CLRMethod cm = (CLRMethod)m;
-                                        object result = cm.Invoke(esp, mStack);
+                                        object result = cm.Invoke(esp, mStack, true);
                                         int paramCount = cm.ParameterCount;
                                         for (int i = 1; i <= paramCount; i++)
                                         {
