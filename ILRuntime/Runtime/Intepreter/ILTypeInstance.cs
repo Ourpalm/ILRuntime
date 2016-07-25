@@ -124,6 +124,7 @@ namespace ILRuntime.Runtime.Intepreter
             field = *esp;
             if (field.ObjectType >= ObjectTypes.Object)
             {
+                field.Value = fieldIdx;
                 managedObjs[fieldIdx] = managedStack[esp->Value];
             }
         }

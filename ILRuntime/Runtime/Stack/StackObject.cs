@@ -42,6 +42,11 @@ namespace ILRuntime.Runtime.Stack
                         ILTypeInstance instance = mStack[Value] as ILTypeInstance;
                         return instance.Fields[ValueLow].ToObject(appdomain, instance.ManagedObjects);
                     }
+                case ObjectTypes.ArrayReference:
+                    {
+                        Array instance = mStack[Value] as Array;
+                        return instance.GetValue(ValueLow);
+                    }
                 case ObjectTypes.StaticFieldReference:
                     {
                         var t = appdomain.GetType(Value);
@@ -77,5 +82,6 @@ namespace ILRuntime.Runtime.Stack
         StaticFieldReference,
         Object,
         FieldReference,//Value = objIdx, ValueLow = fieldIdx
+        ArrayReference,//Value = objIdx, ValueLow = elemIdx
     }
 }

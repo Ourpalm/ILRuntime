@@ -123,7 +123,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                return def.IsConstructor;
+                return cDef != null;
             }
         }
 
@@ -146,7 +146,7 @@ namespace ILRuntime.CLR.Method
             }
         }
 
-        public unsafe object Invoke(StackObject* esp, List<object> mStack)
+        public unsafe object Invoke(StackObject* esp, List<object> mStack,bool isNewObj=false)
         {
             if (parameters == null)
             {
@@ -166,8 +166,27 @@ namespace ILRuntime.CLR.Method
 
             if (isConstructor)
             {
-                var res = cDef.Invoke(param);
-                return res;
+                if (!isNewObj)
+                {
+                    if (!cDef.IsStatic)
+                    {
+                        object instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(appdomain, mStack));
+                        if (instance == null)
+                            throw new NullReferenceException();
+                        cDef.Invoke(instance, param);
+                        return null;
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+                else
+                {
+                    var res = cDef.Invoke(param);
+                    return res;
+                }
+               
             }
             else
             {
