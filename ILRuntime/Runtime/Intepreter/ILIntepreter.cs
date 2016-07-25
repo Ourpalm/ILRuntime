@@ -1287,24 +1287,23 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Array
                             case OpCodeEnum.Newarr:
                                 {
-                                    var cnt = (esp - 1)->Value;
+                                    var cnt = (esp - 1);
                                     var type = domain.GetType(ip->TokenInteger);
                                     object arr = null;
                                     if (type != null)
                                     {
                                         if (type.TypeForCLR != typeof(ILTypeInstance))
                                         {
-                                            arr = Array.CreateInstance(type.TypeForCLR, cnt);
+                                            arr = Array.CreateInstance(type.TypeForCLR, cnt->Value);
                                         }
                                         else
                                         {
-                                            arr = new ILTypeInstance[cnt];
+                                            arr = new ILTypeInstance[cnt->Value];
                                         }
                                     }
-                                    esp->ObjectType = ObjectTypes.Object;
-                                    esp->Value = mStack.Count;
+                                    cnt->ObjectType = ObjectTypes.Object;
+                                    cnt->Value = mStack.Count;
                                     mStack.Add(arr);
-                                    esp++;
                                 }
                                 break;
                             case OpCodeEnum.Stelem_Ref:
