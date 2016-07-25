@@ -51,15 +51,28 @@ namespace ILRuntime.Runtime.Intepreter
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
             int locBase = mStackBase;
+            int paramCnt = method.ParameterCount;
             if (method.HasThis)//this parameter is always object reference
             {
                 arg--;
+                paramCnt++;
                 if (arg->ObjectType != ObjectTypes.StackObjectReference)
                     mStackBase--;
             }
             unhandledException = false;
 
-            //Managed Stack reserved for local variable
+            //Managed Stack reserved for arguments(In case of starg)
+            for (int i = 0; i < paramCnt; i++)
+            {
+                var a = arg + i;
+                if (a->ObjectType == ObjectTypes.Null)
+                {
+                    //Need to reserve place for null, in case of starg
+                    a->Value = mStack.Count;
+                    mStack.Add(null);
+                }
+            }
+                //Managed Stack reserved for local variable
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
                 var v = method.Definition.Body.Variables[i];
@@ -137,10 +150,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var a = arg + ip->TokenInteger;
                                     var val = esp - 1;
-                                    if (val->ObjectType != a->ObjectType)
-                                        throw new NotImplementedException();
                                     if (val->ObjectType >= ObjectTypes.Object)
                                     {
+                                        a->ObjectType = val->ObjectType;
                                         mStack[a->Value] = mStack[val->Value];
                                         a->ValueLow = val->ValueLow;
                                     }
@@ -1387,11 +1399,257 @@ namespace ILRuntime.Runtime.Intepreter
                                     var idx = esp - 2;
                                     var arrRef = esp - 3;
                                     byte[] arr = mStack[arrRef->Value] as byte[];
-                                    arr[idx->Value] = (byte)val->Value;
+                                    if (arr != null)
+                                    {
+                                        arr[idx->Value] = (byte)val->Value;
+                                    }
+                                    else
+                                    {
+                                        bool[] arr2 = mStack[arrRef->Value] as bool[];
+                                        if (arr2 != null)
+                                        {
+                                            arr2[idx->Value] = val->Value == 1;
+                                        }
+                                        else
+                                        {
+                                            sbyte[] arr3 = mStack[arrRef->Value] as sbyte[];
+                                            arr3[idx->Value] = (sbyte)val->Value;
+                                        }
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 2);
                                     Free(esp - 3);
                                     esp -= 3;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_I1:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    bool[] arr = mStack[arrRef->Value] as bool[];
+                                    int val;
+                                    if (arr != null)
+                                        val = arr[idx->Value] ? 1 : 0;
+                                    else
+                                    {
+                                        sbyte[] arr2 = mStack[arrRef->Value] as sbyte[];
+                                        val = arr2[idx->Value];
+                                    }
+
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->Value = val;
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_U1:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    byte[] arr = mStack[arrRef->Value] as byte[];
+                                    
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->Value = arr[idx->Value];
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_I2:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 2;
+                                    var arrRef = esp - 3;
+                                    short[] arr = mStack[arrRef->Value] as short[];
+                                    if (arr != null)
+                                    {
+                                        arr[idx->Value] = (short)val->Value;
+                                    }
+                                    else
+                                    {
+                                        ushort[] arr2 = mStack[arrRef->Value] as ushort[];
+                                        arr2[idx->Value] = (ushort)val->Value;
+                                    }
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    Free(esp - 3);
+                                    esp -= 3;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_I2:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    short[] arr = mStack[arrRef->Value] as short[];
+
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->Value = arr[idx->Value];
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_U2:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    ushort[] arr = mStack[arrRef->Value] as ushort[];
+
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->Value = arr[idx->Value];
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_I4:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 2;
+                                    var arrRef = esp - 3;
+                                    int[] arr = mStack[arrRef->Value] as int[];
+                                    if (arr != null)
+                                    {
+                                        arr[idx->Value] = val->Value;
+                                    }
+                                    else
+                                    {
+                                        uint[] arr2 = mStack[arrRef->Value] as uint[];
+                                        arr2[idx->Value] = (uint)val->Value;
+                                    }
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    Free(esp - 3);
+                                    esp -= 3;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_I4:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    int[] arr = mStack[arrRef->Value] as int[];
+
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->Value = arr[idx->Value];
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_U4:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    uint[] arr = mStack[arrRef->Value] as uint[];
+
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->Value = (int)arr[idx->Value];
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_I8:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 2;
+                                    var arrRef = esp - 3;
+                                    long[] arr = mStack[arrRef->Value] as long[];
+                                    if (arr != null)
+                                    {
+                                        arr[idx->Value] = *(long*)&val->Value;
+                                    }
+                                    else
+                                    {
+                                        ulong[] arr2 = mStack[arrRef->Value] as ulong[];
+                                        arr2[idx->Value] = *(ulong*)&val->Value;
+                                    }
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    Free(esp - 3);
+                                    esp -= 3;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_I8:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    long[] arr = mStack[arrRef->Value] as long[];
+                                    long val;
+                                    if (arr != null)
+                                        val = arr[idx->Value];
+                                    else
+                                    {
+                                        ulong[] arr2 = mStack[arrRef->Value] as ulong[];
+                                        val = (long)arr2[idx->Value];
+                                    }
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    *(long*)&arrRef->Value = val;
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_R4:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 2;
+                                    var arrRef = esp - 3;
+                                    float[] arr = mStack[arrRef->Value] as float[];
+                                    arr[idx->Value] = *(float*)&val->Value;
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    Free(esp - 3);
+                                    esp -= 3;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_R4:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    float[] arr = mStack[arrRef->Value] as float[];
+
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    *(float*)&arrRef->Value = arr[idx->Value];
+                                    esp -= 1;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_R8:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 2;
+                                    var arrRef = esp - 3;
+                                    double[] arr = mStack[arrRef->Value] as double[];
+                                    arr[idx->Value] = *(double*)&val->Value;
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    Free(esp - 3);
+                                    esp -= 3;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelem_R8:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    double[] arr = mStack[arrRef->Value] as double[];
+
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    *(double*)&arrRef->Value = arr[idx->Value];
+                                    esp -= 1;
                                 }
                                 break;
                             case OpCodeEnum.Ldlen:

@@ -73,5 +73,18 @@ namespace TestCases
             while (cond);
             return cnt;
         }
+
+        public static void UnitTest_2004()
+        {
+            Console.WriteLine("UnitTest_2004");
+            bool[] bb = new bool[10];
+            ArrayTest1(bb);
+            Console.WriteLine(bb[1]);
+        }
+
+        static void ArrayTest1(bool[] ab)
+        {
+            ab[1] = true;
+        }
     }
 }
