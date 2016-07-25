@@ -132,6 +132,26 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Starg:
+                            case OpCodeEnum.Starg_S:
+                                {
+                                    var a = arg + ip->TokenInteger;
+                                    var val = esp - 1;
+                                    if (val->ObjectType != a->ObjectType)
+                                        throw new NotImplementedException();
+                                    if (val->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        mStack[a->Value] = mStack[val->Value];
+                                        a->ValueLow = val->ValueLow;
+                                    }
+                                    else
+                                    {
+                                        *a = *val;
+                                    }
+                                    Free(val);
+                                    esp--;
+                                }
+                                break;
                             case OpCodeEnum.Stloc_0:
                                 {
                                     esp--;
@@ -461,6 +481,48 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Double:
                                             esp->ObjectType = ObjectTypes.Long;
                                             *((double*)&esp->Value) = *((double*)&a->Value) / *((double*)&b->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Rem:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) % *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value % b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Rem_Un:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((ulong*)&esp->Value) = *((ulong*)&a->Value) % *((ulong*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = (int)((uint)a->Value % (uint)b->Value);
                                             break;
                                         default:
                                             throw new NotImplementedException();

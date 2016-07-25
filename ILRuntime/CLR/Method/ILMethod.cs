@@ -266,6 +266,8 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldarg:
                 case OpCodeEnum.Ldarga:
                 case OpCodeEnum.Ldarga_S:
+                case OpCodeEnum.Starg:
+                case OpCodeEnum.Starg_S:
                     {
                         Mono.Cecil.ParameterDefinition vd = (Mono.Cecil.ParameterDefinition)token;
                         code.TokenInteger = vd.Index;
