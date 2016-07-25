@@ -310,6 +310,8 @@ namespace ILRuntime.Runtime.Enviorment
         public object Invoke(string type, string method, params object[] p)
         {
             IType t = GetType(type);
+            if (t == null)
+                return null;
             var m = t.GetMethod(method, p.Length);
 
             if(m != null)
@@ -423,7 +425,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal int GetFieldIndex(object token, IType contextType)
         {
-            FieldDefinition f = token as FieldDefinition;
+            FieldReference f = token as FieldReference;
             var type = GetType(f.DeclaringType, contextType);
             if(type is ILType)
             {
