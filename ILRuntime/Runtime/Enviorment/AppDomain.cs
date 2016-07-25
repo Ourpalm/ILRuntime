@@ -336,7 +336,7 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     freeIntepreters.Enqueue(inteptreter);
                 }
-                return inteptreter.Run((ILMethod)m, p);
+                return res;
             }
             return null;
         }
