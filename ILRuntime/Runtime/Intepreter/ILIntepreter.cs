@@ -1637,25 +1637,35 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (!isBox)
             {
-                if (obj is int)
+                if (obj.GetType().IsPrimitive)
                 {
-                    esp->ObjectType = ObjectTypes.Integer;
-                    esp->Value = (int)obj;
-                }
-                else if (obj is long)
-                {
-                    esp->ObjectType = ObjectTypes.Long;
-                    *(long*)(&esp->Value) = (long)obj;
-                }
-                else if (obj is float)
-                {
-                    esp->ObjectType = ObjectTypes.Float;
-                    *(float*)(&esp->Value) = (float)obj;
-                }
-                else if (obj is double)
-                {
-                    esp->ObjectType = ObjectTypes.Double;
-                    *(double*)(&esp->Value) = (double)obj;
+                    if (obj is int)
+                    {
+                        esp->ObjectType = ObjectTypes.Integer;
+                        esp->Value = (int)obj;
+                    }
+                    else if (obj is bool)
+                    {
+                        esp->ObjectType = ObjectTypes.Integer;
+                        esp->Value = (bool)(obj) ? 1 : 0;
+                    }
+                    else if (obj is long)
+                    {
+                        esp->ObjectType = ObjectTypes.Long;
+                        *(long*)(&esp->Value) = (long)obj;
+                    }
+                    else if (obj is float)
+                    {
+                        esp->ObjectType = ObjectTypes.Float;
+                        *(float*)(&esp->Value) = (float)obj;
+                    }
+                    else if (obj is double)
+                    {
+                        esp->ObjectType = ObjectTypes.Double;
+                        *(double*)(&esp->Value) = (double)obj;
+                    }
+                    else
+                        throw new NotImplementedException();
                 }
                 else
                 {
