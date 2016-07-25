@@ -293,6 +293,8 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Initobj:
                 case OpCodeEnum.Isinst:
                 case OpCodeEnum.Newarr:
+                case OpCodeEnum.Stobj:
+                case OpCodeEnum.Ldobj:
                     {
                         var t = appdomain.GetType(token, declaringType);
                         if (t != null)

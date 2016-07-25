@@ -274,6 +274,79 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Ldobj:
+                                {
+                                    var objRef = esp - 1;
+                                    switch (objRef->ObjectType)
+                                    {
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var t = AppDomain.GetType(ip->TokenInteger);
+                                                var nT = t.TypeForCLR;
+                                                var obj = mStack[objRef->Value];
+                                                var idx = objRef->ValueLow;
+                                                Free(objRef);
+                                                if (nT.IsPrimitive)
+                                                {
+                                                    if (nT == typeof(int))
+                                                    {
+                                                        int[] arr = obj as int[];
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = arr[idx];
+                                                        objRef->ValueLow = 0;
+                                                    }
+                                                    else if (nT == typeof(byte))
+                                                    {
+                                                        byte[] arr = obj as byte[];
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = arr[idx];
+                                                        objRef->ValueLow = 0;
+                                                    }
+                                                    else
+                                                        throw new NotImplementedException();
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeEnum.Stobj:
+                                {
+                                    var objRef = esp - 2;
+                                    var val = esp - 1;
+                                    switch (objRef->ObjectType)
+                                    {
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var t = AppDomain.GetType(ip->TokenInteger);
+                                                var nT = t.TypeForCLR;
+                                                if (nT.IsPrimitive)
+                                                {
+                                                    if (nT == typeof(int))
+                                                    {
+                                                        int[] arr = mStack[objRef->Value] as int[];
+                                                        arr[objRef->ValueLow] = val->Value;
+                                                    }
+                                                    else if (nT == typeof(byte))
+                                                    {
+                                                        byte[] arr = mStack[objRef->Value] as byte[];
+                                                        arr[objRef->ValueLow] = (byte)val->Value;
+                                                    }
+                                                    else
+                                                        throw new NotImplementedException();
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    esp -= 2;
+                                }
+                                break;
                             #endregion
 
                             #region Load Constants
@@ -1446,7 +1519,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldelem_U1:
                                 {
-                                    var idx = esp - 1;
+                                    var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     byte[] arr = mStack[arrRef->Value] as byte[];
                                     
@@ -1454,7 +1527,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = arr[idx->Value];
+                                    arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
                                 break;
@@ -1481,7 +1554,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldelem_I2:
                                 {
-                                    var idx = esp - 1;
+                                    var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     short[] arr = mStack[arrRef->Value] as short[];
 
@@ -1489,13 +1562,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = arr[idx->Value];
+                                    arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
                                 break;
                             case OpCodeEnum.Ldelem_U2:
                                 {
-                                    var idx = esp - 1;
+                                    var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     ushort[] arr = mStack[arrRef->Value] as ushort[];
 
@@ -1503,7 +1576,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = arr[idx->Value];
+                                    arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
                                 break;
@@ -1530,7 +1603,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldelem_I4:
                                 {
-                                    var idx = esp - 1;
+                                    var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     int[] arr = mStack[arrRef->Value] as int[];
 
@@ -1538,13 +1611,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = arr[idx->Value];
+                                    arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
                                 break;
                             case OpCodeEnum.Ldelem_U4:
                                 {
-                                    var idx = esp - 1;
+                                    var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     uint[] arr = mStack[arrRef->Value] as uint[];
 
@@ -1552,7 +1625,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = (int)arr[idx->Value];
+                                    arrRef->Value = (int)arr[idx];
                                     esp -= 1;
                                 }
                                 break;
@@ -1613,7 +1686,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldelem_R4:
                                 {
-                                    var idx = esp - 1;
+                                    var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     float[] arr = mStack[arrRef->Value] as float[];
 
@@ -1621,7 +1694,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    *(float*)&arrRef->Value = arr[idx->Value];
+                                    *(float*)&arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
                                 break;
@@ -1640,7 +1713,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldelem_R8:
                                 {
-                                    var idx = esp - 1;
+                                    var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     double[] arr = mStack[arrRef->Value] as double[];
 
@@ -1648,7 +1721,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    *(double*)&arrRef->Value = arr[idx->Value];
+                                    *(double*)&arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
                                 break;
@@ -1660,6 +1733,22 @@ namespace ILRuntime.Runtime.Intepreter
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
                                     arrRef->Value = arr.Length;
+                                }
+                                break;
+                            case OpCodeEnum.Ldelema:
+                                {
+                                    var arrRef = esp - 2;
+                                    var idx = (esp - 1)->Value;
+                                    
+                                    Array arr = mStack[arrRef->Value] as Array;
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    arrRef->ObjectType = ObjectTypes.ArrayReference;
+                                    arrRef->Value = mStack.Count;
+                                    mStack.Add(arr);
+                                    arrRef->ValueLow = idx;
+                                    esp--;
                                 }
                                 break;
                             #endregion
