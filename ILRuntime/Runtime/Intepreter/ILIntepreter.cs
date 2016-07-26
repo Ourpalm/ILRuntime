@@ -1604,7 +1604,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         ushort[] arr2 = mStack[arrRef->Value] as ushort[];
-                                        arr2[idx->Value] = (ushort)val->Value;
+                                        if (arr2 != null)
+                                        {
+                                            arr2[idx->Value] = (ushort)val->Value;
+                                        }
+                                        else
+                                        {
+                                            char[] arr3 = mStack[arrRef->Value] as char[];
+                                            arr3[idx->Value] = (char)val->Value;
+                                        }
                                     }
                                     Free(esp - 1);
                                     Free(esp - 2);
@@ -1617,7 +1625,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     short[] arr = mStack[arrRef->Value] as short[];
-
+                                    int val = 0;
+                                    if (arr != null)
+                                    {
+                                        val = arr[idx];
+                                    }
+                                    else
+                                    {
+                                        char[] arr2 = mStack[arrRef->Value] as char[];
+                                        val = arr2[idx];
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 2);
 
