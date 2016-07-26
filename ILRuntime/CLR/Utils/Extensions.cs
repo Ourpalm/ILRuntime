@@ -80,6 +80,8 @@ namespace ILRuntime.CLR.Utils
                     obj = (byte)(int)obj;
                 else if (pt == typeof(short) && !(obj is short))
                     obj = (short)(int)obj;
+                else if (pt == typeof(char) && !(obj is char))
+                    obj = (char)(int)obj;
                 else if (pt == typeof(ushort) && !(obj is ushort))
                     obj = (ushort)(int)obj;
                 else if (pt == typeof(uint) && !(obj is uint))

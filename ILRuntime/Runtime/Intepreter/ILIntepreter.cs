@@ -844,7 +844,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 1);
                                     esp--;
                                     var table = method.JumpTables[ip->TokenInteger];
-                                    if (val < table.Length)
+                                    if (val >=0 && val < table.Length)
                                     {
                                         ip = ptr + table[val];
                                         continue;
@@ -1382,7 +1382,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                         }
                                         else
-                                            throw new NotImplementedException();
+                                        {
+                                            //nothing to do for CLR type boxing
+                                        }
                                     }
                                     else
                                         throw new NullReferenceException();
@@ -1524,6 +1526,19 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
                                     Free(esp - 3);
                                     esp -= 3;
+                                }
+                                break;
+
+                            case OpCodeEnum.Ldelem_Ref:
+                                {
+                                    var idx = esp - 1;
+                                    var arrRef = esp - 2;
+                                    Array arr = mStack[arrRef->Value] as Array;
+                                    object val = arr.GetValue(idx->Value);
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+
+                                    esp = PushObject(esp - 2, mStack, val);
                                 }
                                 break;
                             case OpCodeEnum.Stelem_I1:
@@ -2134,37 +2149,46 @@ namespace ILRuntime.Runtime.Intepreter
 
         StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
         {
-            if (!isBox)
+            if (obj != null)
             {
-                if (obj.GetType().IsPrimitive)
+                if (!isBox)
                 {
-                    if (obj is int)
+                    if (obj.GetType().IsPrimitive)
                     {
-                        esp->ObjectType = ObjectTypes.Integer;
-                        esp->Value = (int)obj;
-                    }
-                    else if (obj is bool)
-                    {
-                        esp->ObjectType = ObjectTypes.Integer;
-                        esp->Value = (bool)(obj) ? 1 : 0;
-                    }
-                    else if (obj is long)
-                    {
-                        esp->ObjectType = ObjectTypes.Long;
-                        *(long*)(&esp->Value) = (long)obj;
-                    }
-                    else if (obj is float)
-                    {
-                        esp->ObjectType = ObjectTypes.Float;
-                        *(float*)(&esp->Value) = (float)obj;
-                    }
-                    else if (obj is double)
-                    {
-                        esp->ObjectType = ObjectTypes.Double;
-                        *(double*)(&esp->Value) = (double)obj;
+                        if (obj is int)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = (int)obj;
+                        }
+                        else if (obj is bool)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = (bool)(obj) ? 1 : 0;
+                        }
+                        else if (obj is long)
+                        {
+                            esp->ObjectType = ObjectTypes.Long;
+                            *(long*)(&esp->Value) = (long)obj;
+                        }
+                        else if (obj is float)
+                        {
+                            esp->ObjectType = ObjectTypes.Float;
+                            *(float*)(&esp->Value) = (float)obj;
+                        }
+                        else if (obj is double)
+                        {
+                            esp->ObjectType = ObjectTypes.Double;
+                            *(double*)(&esp->Value) = (double)obj;
+                        }
+                        else
+                            throw new NotImplementedException();
                     }
                     else
-                        throw new NotImplementedException();
+                    {
+                        esp->ObjectType = ObjectTypes.Object;
+                        esp->Value = mStack.Count;
+                        mStack.Add(obj);
+                    }
                 }
                 else
                 {
@@ -2175,9 +2199,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
             {
-                esp->ObjectType = ObjectTypes.Object;
-                esp->Value = mStack.Count;
-                mStack.Add(obj);
+                return PushNull(esp);
             }
             return esp + 1;
         }
