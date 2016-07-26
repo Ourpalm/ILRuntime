@@ -1103,6 +1103,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             f.SetValue(null, f.FieldType.CheckPrimitiveTypes(val->ToObject(AppDomain, mStack)));
                                         }
                                     }
+                                    else
+                                        throw new TypeLoadException();
                                     Free(esp - 1);
                                     esp -= 1;
                                 }
@@ -1126,6 +1128,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             PushObject(esp, mStack, val);
                                         }
                                     }
+                                    else
+                                        throw new TypeLoadException();
                                     esp++;
                                 }
                                 break;
