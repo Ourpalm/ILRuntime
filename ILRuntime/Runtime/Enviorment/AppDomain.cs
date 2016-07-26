@@ -111,6 +111,8 @@ namespace ILRuntime.Runtime.Enviorment
                     bt = GetType(baseType.Replace("/", "+"));
                 }
 
+                if (bt == null)
+                    return null;
                 if (genericParams != null)
                 {
                     KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[genericParams.Count];
@@ -118,6 +120,8 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         string key = "!" + i;
                         IType val = GetType(genericParams[i]);
+                        if (val == null)
+                            throw new TypeLoadException();
                         genericArguments[i] = new KeyValuePair<string, IType>(key, val);
                     }
                     bt = bt.MakeGenericInstance(genericArguments);
@@ -129,7 +133,10 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (i > 0)
                             sb.Append(",");
-                        sb.Append(genericParams[i]);
+                        if (genericParams[i].Contains(","))
+                            sb.Append(genericParams[i].Substring(0, genericParams[i].IndexOf(',')));
+                        else
+                            sb.Append(genericParams[i]);
                     }
                     sb.Append('>');
                     var asmName = sb.ToString();
@@ -156,6 +163,7 @@ namespace ILRuntime.Runtime.Enviorment
                     res = new CLRType(t, this);
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
+                    mapType[t.AssemblyQualifiedName] = res;
                     clrTypeMapping[t] = res;
                     return res;
                 }
@@ -176,11 +184,11 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
                 isArray = false;
-            if (fullname.Contains('<'))
+            if (fullname.Contains('<') || fullname.Contains('['))
             {
                 foreach (var i in fullname)
                 {
-                    if (i == '<')
+                    if (i == '<' || i == '[')
                     {
                         depth++;
                         if (depth == 1)
@@ -193,20 +201,34 @@ namespace ILRuntime.Runtime.Enviorment
                     }
                     if (i == ',' && depth == 1)
                     {
-                        genericParams.Add(sb.ToString());
+                        string name = sb.ToString();
+                        if (name.StartsWith("["))
+                            name = name.Substring(1, name.Length - 2);
+                        genericParams.Add(name);
                         sb.Length = 0;
                         continue;
                     }
-                    if (i == '>')
+                    if (i == '>' || i == ']')
                     {
                         depth--;
                         if (depth == 0)
+                        {
+                            string name = sb.ToString();
+                            if (name.StartsWith("["))
+                                name = name.Substring(1, name.Length - 2);
+                            genericParams.Add(name);
+                            sb.Length = 0;
                             continue;
+                        }
                     }
                     sb.Append(i);
                 }
                 if (sb.Length > 0)
-                    genericParams.Add(sb.ToString());
+                {
+                    baseType += sb.ToString();
+                }
+                if (genericParams != null && genericParams.Count == 0)
+                    genericParams = null;
             }
             else
                 baseType = fullname;

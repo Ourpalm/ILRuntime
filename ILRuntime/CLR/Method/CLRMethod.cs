@@ -134,6 +134,10 @@ namespace ILRuntime.CLR.Method
             foreach (var i in param)
             {
                 IType type = appdomain.GetType(i.ParameterType.FullName);
+                if (type == null)
+                    type = appdomain.GetType(i.ParameterType.AssemblyQualifiedName);
+                if (type == null)
+                    throw new TypeLoadException();
                 parameters.Add(type);
             }
             if (def != null)

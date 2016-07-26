@@ -36,27 +36,54 @@ namespace ILRuntime.CLR.Utils
                     if (t == null && def.IsGenericInstance)
                     {
                         GenericInstanceMethod gim = (GenericInstanceMethod)def;
+                        string name = i.ParameterType.FullName;
                         for (int j = 0; j < gim.GenericArguments.Count; j++)
                         {
                             var gp = gim.ElementMethod.GenericParameters[j];
                             var ga = gim.GenericArguments[j];
-                            if(i.ParameterType.Name == gp.Name)
+                            if(name == gp.Name)
                             {
                                 t = appdomain.GetType(ga, contextType);
                                 break;
                             }
-                            else if (i.ParameterType.FullName.Contains(gp.Name))
+                            else if (name.Contains(gp.Name))
                             {
-                                t = appdomain.GetType(i.ParameterType.FullName.Replace(gp.Name, ga.FullName));
-                                break;
+                                name = name.Replace(gp.Name, ga.FullName);
                             }
                         }
+                        if (t == null)
+                            t = appdomain.GetType(name);
+                    }
+                    if (t == null && i.ParameterType.IsGenericInstance)
+                    {
+                        if (dt.GenericArguments != null)
+                        {
+                            GenericInstanceType git = (GenericInstanceType)i.ParameterType;
+                            KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[git.GenericArguments.Count];
+                            for (int j = 0; j < genericArguments.Length; j++)
+                            {
+                                foreach (var k in dt.GenericArguments)
+                                {
+                                    if (k.Key == git.GenericArguments[j].Name)
+                                    {
+                                        string key=k.Key;
+                                        IType val = k.Value;
+                                        genericArguments[j] = new KeyValuePair<string,IType>(key,val);
+                                        break;
+                                    }
+                                }
+                            }
+                            var et = appdomain.GetType(git.ElementType, contextType);
+                            t = et.MakeGenericInstance(genericArguments);
+                        }   
                     }
                     if (t == null)
                     {
                         string typeName = i.ParameterType.FullName;
 
                         t = appdomain.GetType(typeName);
+                        if (t == null)
+                            t = appdomain.GetType(typeName.Replace("/", "+"));
                     }
                     if (t == null)
                         throw new KeyNotFoundException("Cannot find type:" + i.ParameterType);
@@ -90,6 +117,10 @@ namespace ILRuntime.CLR.Utils
                     obj = (sbyte)(int)obj;
                 else if (pt == typeof(ulong) && !(obj is ulong))
                     obj = (ulong)(int)obj;
+            }
+            else if (pt.IsByRef)
+            {
+                return CheckPrimitiveTypes(pt.GetElementType(), obj);
             }
             return obj;
         }
