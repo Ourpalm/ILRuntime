@@ -135,6 +135,18 @@ namespace ILRuntime.CLR.TypeSystem
 
             return -1;
         }
+        public IType FindGenericArgument(string key)
+        {
+            if (genericArguments != null)
+            {
+                foreach (var i in genericArguments)
+                {
+                    if (i.Key == key)
+                        return i.Value;
+                }
+            }
+            return null;
+        }
         public IMethod GetMethod(string name, int paramCount)
         {
             if (methods == null)

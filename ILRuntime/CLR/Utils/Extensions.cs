@@ -19,20 +19,7 @@ namespace ILRuntime.CLR.Utils
                 foreach (var i in def.Parameters)
                 {
                     IType t = null;
-                    if (i.ParameterType.IsGenericParameter)
-                    {
-                        if (dt.GenericArguments != null)
-                        {
-                            foreach (var j in dt.GenericArguments)
-                            {
-                                if (j.Key == i.ParameterType.Name)
-                                {
-                                    t = j.Value;
-                                    break;
-                                }
-                            }
-                        }                        
-                    }
+                    t = appdomain.GetType(i.ParameterType, dt);
                     if (t == null && def.IsGenericInstance)
                     {
                         GenericInstanceMethod gim = (GenericInstanceMethod)def;
@@ -53,37 +40,6 @@ namespace ILRuntime.CLR.Utils
                         }
                         if (t == null)
                             t = appdomain.GetType(name);
-                    }
-                    if (t == null && i.ParameterType.IsGenericInstance)
-                    {
-                        if (dt.GenericArguments != null)
-                        {
-                            GenericInstanceType git = (GenericInstanceType)i.ParameterType;
-                            KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[git.GenericArguments.Count];
-                            for (int j = 0; j < genericArguments.Length; j++)
-                            {
-                                foreach (var k in dt.GenericArguments)
-                                {
-                                    if (k.Key == git.GenericArguments[j].Name)
-                                    {
-                                        string key=k.Key;
-                                        IType val = k.Value;
-                                        genericArguments[j] = new KeyValuePair<string,IType>(key,val);
-                                        break;
-                                    }
-                                }
-                            }
-                            var et = appdomain.GetType(git.ElementType, contextType);
-                            t = et.MakeGenericInstance(genericArguments);
-                        }   
-                    }
-                    if (t == null)
-                    {
-                        string typeName = i.ParameterType.FullName;
-
-                        t = appdomain.GetType(typeName);
-                        if (t == null)
-                            t = appdomain.GetType(typeName.Replace("/", "+"));
                     }
                     if (t == null)
                         throw new KeyNotFoundException("Cannot find type:" + i.ParameterType);

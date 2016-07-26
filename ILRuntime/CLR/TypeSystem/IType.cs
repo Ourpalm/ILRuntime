@@ -30,6 +30,7 @@ namespace ILRuntime.CLR.TypeSystem
         bool CanAssignTo(IType type);
 
         IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments);
+        IType FindGenericArgument(string key);
 
         IType ResolveGenericType(IType contextType);
     }

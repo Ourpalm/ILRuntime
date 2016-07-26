@@ -75,7 +75,13 @@ namespace ILRuntime.CLR.TypeSystem
 
         public int GetFieldIndex(object token)
         {
-            throw new NotImplementedException();
+            return -1;
+        }
+
+
+        public IType FindGenericArgument(string key)
+        {
+            return null;
         }
     }
 }

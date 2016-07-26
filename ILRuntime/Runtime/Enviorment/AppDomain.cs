@@ -262,7 +262,7 @@ namespace ILRuntime.Runtime.Enviorment
                 Mono.Cecil.TypeReference _ref = (token as Mono.Cecil.TypeReference);
                 if (_ref.IsGenericParameter)
                 {
-                    var t = ((ILType)contextType).FindGenericArgument(_ref.Name);
+                    var t = contextType.FindGenericArgument(_ref.Name);
                     if (t != null)
                         return t;
                 }
@@ -280,8 +280,12 @@ namespace ILRuntime.Runtime.Enviorment
                         IType val;
                         if (gType.GenericArguments[i].IsGenericParameter)
                         {
-                            val = ((ILType)contextType).FindGenericArgument(gType.GenericArguments[i].Name);
+                            val = contextType.FindGenericArgument(gType.GenericArguments[i].Name);
                             dummyGenericInstance = true;
+                            if(val ==null)
+                            {
+                                return null;
+                            }
                         }
                         else
                             val = GetType(gType.GenericArguments[i], contextType);
