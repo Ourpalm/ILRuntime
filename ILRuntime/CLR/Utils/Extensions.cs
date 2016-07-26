@@ -67,5 +67,29 @@ namespace ILRuntime.CLR.Utils
             else
                 return emptyParamList;
         }
+
+        public static object CheckPrimitiveTypes(this Type pt, object obj)
+        {
+            if (pt.IsPrimitive && pt != typeof(int))
+            {
+                if (pt == typeof(bool) && !(obj is bool))
+                {
+                    obj = (int)obj == 1;
+                }
+                else if (pt == typeof(byte) && !(obj is byte))
+                    obj = (byte)(int)obj;
+                else if (pt == typeof(short) && !(obj is short))
+                    obj = (short)(int)obj;
+                else if (pt == typeof(ushort) && !(obj is ushort))
+                    obj = (ushort)(int)obj;
+                else if (pt == typeof(uint) && !(obj is uint))
+                    obj = (uint)(int)obj;
+                else if (pt == typeof(sbyte) && !(obj is sbyte))
+                    obj = (sbyte)(int)obj;
+                else if (pt == typeof(ulong) && !(obj is ulong))
+                    obj = (ulong)(int)obj;
+            }
+            return obj;
+        }
     }
 }

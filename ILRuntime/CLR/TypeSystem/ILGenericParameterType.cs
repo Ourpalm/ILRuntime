@@ -71,5 +71,11 @@ namespace ILRuntime.CLR.TypeSystem
         {
             throw new NotImplementedException();
         }
+
+
+        public int GetFieldIndex(object token)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

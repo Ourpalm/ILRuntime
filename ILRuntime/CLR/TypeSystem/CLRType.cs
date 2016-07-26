@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
+using Mono.Cecil;
 using ILRuntime.CLR.Method;
 namespace ILRuntime.CLR.TypeSystem
 {
@@ -14,6 +16,11 @@ namespace ILRuntime.CLR.TypeSystem
         List<CLRMethod> constructors;
         KeyValuePair<string,IType>[] genericArguments;
         List<CLRType> genericInstances;
+        Dictionary<string, int> fieldMapping;
+        Dictionary<int, FieldInfo> fieldInfoCache;
+        Dictionary<int, int> fieldTokenMapping;
+
+        public Dictionary<int, FieldInfo> Fields { get { return fieldInfoCache; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
@@ -91,6 +98,42 @@ namespace ILRuntime.CLR.TypeSystem
             }
 
             return res;
+        }
+
+        void InitializeFields()
+        {
+            fieldMapping = new Dictionary<string, int>();
+            fieldInfoCache = new Dictionary<int, FieldInfo>();
+
+            var fields = clrType.GetFields();
+            foreach (var i in fields)
+            {
+                if (i.IsPublic)
+                {
+                    int hashCode = i.GetHashCode();
+                    fieldMapping[i.Name] = hashCode;
+                    fieldInfoCache[hashCode] = i;
+                }
+            }
+        }
+        public int GetFieldIndex(object token)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            int idx;
+            int hashCode = token.GetHashCode();
+            if (fieldTokenMapping == null)
+                fieldTokenMapping = new Dictionary<int, int>();
+            if (fieldTokenMapping.TryGetValue(hashCode, out idx))
+                return idx;
+            FieldReference f = token as FieldReference;
+            if (fieldMapping.TryGetValue(f.Name, out idx))
+            {
+                fieldTokenMapping[hashCode] = idx;
+                return idx;
+            }
+
+            return -1;
         }
         public IMethod GetMethod(string name, int paramCount)
         {

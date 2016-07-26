@@ -8,6 +8,7 @@ using ILRuntime.Runtime.Stack;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter.OpCodes;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Intepreter
 {
@@ -934,7 +935,18 @@ namespace ILRuntime.Runtime.Intepreter
                                             instance.AssignFromStack(ip->TokenInteger, val, mStack);
                                         }
                                         else
-                                            throw new NotImplementedException();
+                                        {
+                                            var t = obj.GetType();
+                                            var type = AppDomain.GetType(t);
+                                            if (type != null)
+                                            {
+                                                var val = esp - 1;
+                                                var f = ((CLRType)type).Fields[ip->TokenInteger];
+                                                f.SetValue(obj, f.FieldType.CheckPrimitiveTypes(val->ToObject(AppDomain, mStack)));
+                                            }
+                                            else
+                                                throw new TypeLoadException();
+                                        }
                                     }
                                     else
                                         throw new NullReferenceException();
@@ -956,7 +968,17 @@ namespace ILRuntime.Runtime.Intepreter
                                             instance.PushToStack(ip->TokenInteger, esp - 1, mStack);
                                         }
                                         else
-                                            throw new NotImplementedException();
+                                        {
+                                            var t = obj.GetType();
+                                            var type = AppDomain.GetType(t);
+                                            if (type != null)
+                                            {
+                                                var val = ((CLRType)type).Fields[ip->TokenInteger].GetValue(obj);
+                                                PushObject(esp - 1, mStack, val);
+                                            }
+                                            else
+                                                throw new TypeLoadException();
+                                        }
                                     }
                                     else
                                         throw new NullReferenceException();
@@ -976,7 +998,12 @@ namespace ILRuntime.Runtime.Intepreter
                                             instance.PushFieldAddress(ip->TokenInteger, esp - 1, mStack);
                                         }
                                         else
-                                            throw new NotImplementedException();
+                                        {
+                                            esp->ObjectType = ObjectTypes.FieldReference;
+                                            esp->Value = mStack.Count;
+                                            mStack.Add(obj);
+                                            esp->ValueLow = ip->TokenInteger;
+                                        }
                                     }
                                     else
                                         throw new NullReferenceException();
@@ -994,7 +1021,13 @@ namespace ILRuntime.Runtime.Intepreter
                                             t.StaticInstance.AssignFromStack((int)ip->TokenLong, val, mStack);
                                         }
                                         else
-                                            throw new NotImplementedException();
+                                        {
+                                            CLRType t = type as CLRType;
+                                            int idx = (int)ip->TokenLong;
+                                            var f = t.Fields[idx];
+                                            StackObject* val = esp - 1;
+                                            f.SetValue(null, f.FieldType.CheckPrimitiveTypes(val->ToObject(AppDomain, mStack)));
+                                        }
                                     }
                                     Free(esp - 1);
                                     esp -= 1;
@@ -1011,7 +1044,13 @@ namespace ILRuntime.Runtime.Intepreter
                                             t.StaticInstance.PushToStack((int)ip->TokenLong, esp, mStack);
                                         }
                                         else
-                                            throw new NotImplementedException();
+                                        {
+                                            CLRType t = type as CLRType;
+                                            int idx = (int)ip->TokenLong;
+                                            var f = t.Fields[idx];
+                                            var val = f.GetValue(null);
+                                            PushObject(esp, mStack, val);
+                                        }
                                     }
                                     esp++;
                                 }

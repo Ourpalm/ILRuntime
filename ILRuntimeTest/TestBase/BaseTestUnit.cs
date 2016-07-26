@@ -116,6 +116,11 @@ namespace ILRuntimeTest.Test
                     message.AppendLine(e.InnerException.ToString());
                 _pass = false;
             }
+            catch (Exception ex)
+            {
+                message.AppendLine(ex.ToString());
+                _pass = false;
+            }
         }
 
         ////无返回值

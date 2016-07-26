@@ -23,6 +23,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         List<IMethod> GetMethods();
 
+        int GetFieldIndex(object token);
+
         IMethod GetConstructor(List<IType> param);
 
         bool CanAssignTo(IType type);

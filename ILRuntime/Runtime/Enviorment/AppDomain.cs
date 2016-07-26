@@ -17,6 +17,7 @@ namespace ILRuntime.Runtime.Enviorment
         HashSet<string> loadedAssembly;
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
+        Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
@@ -155,6 +156,7 @@ namespace ILRuntime.Runtime.Enviorment
                     res = new CLRType(t, this);
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
+                    clrTypeMapping[t] = res;
                     return res;
                 }
             }
@@ -307,6 +309,15 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
+        internal IType GetType(Type t)
+        {
+            IType res;
+            if (clrTypeMapping.TryGetValue(t, out res))
+                return res;
+            else
+                return null;
+        }
+
         public object Invoke(string type, string method, params object[] p)
         {
             IType t = GetType(type);
@@ -427,9 +438,9 @@ namespace ILRuntime.Runtime.Enviorment
         {
             FieldReference f = token as FieldReference;
             var type = GetType(f.DeclaringType, contextType);
-            if(type is ILType)
+            if(type != null)
             {
-                return ((ILType)type).GetFieldIndex(token);
+                return type.GetFieldIndex(token);
             }
             throw new KeyNotFoundException();
         }
@@ -438,12 +449,12 @@ namespace ILRuntime.Runtime.Enviorment
         {
             FieldReference f = token as FieldReference;
             var type = GetType(f.DeclaringType, contextType);
-            
-            if (type is ILType)
+
+            if (type != null)
             {
-                var it = (ILType)type;
+                var it = type;
                 int idx = it.GetFieldIndex(token);
-                long res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
+                long res = ((long)f.DeclaringType.GetHashCode() << 32) | (uint)idx;
 
                 return res;
             }
