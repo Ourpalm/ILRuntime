@@ -450,15 +450,21 @@ namespace ILRuntime.Runtime.Enviorment
             FieldReference f = token as FieldReference;
             var type = GetType(f.DeclaringType, contextType);
 
-            if (type != null)
+            if (type is ILType)
             {
-                var it = type;
+                var it = type as ILType;
                 int idx = it.GetFieldIndex(token);
+                long res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
+
+                return res;
+            }
+            else
+            {
+                int idx = type.GetFieldIndex(token);
                 long res = ((long)f.DeclaringType.GetHashCode() << 32) | (uint)idx;
 
                 return res;
             }
-            throw new KeyNotFoundException();
         }
 
         internal void CacheString(object token)

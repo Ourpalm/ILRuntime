@@ -283,29 +283,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.ArrayReference:
                                             {
                                                 var t = AppDomain.GetType(ip->TokenInteger);
-                                                var nT = t.TypeForCLR;
                                                 var obj = mStack[objRef->Value];
                                                 var idx = objRef->ValueLow;
                                                 Free(objRef);
-                                                if (nT.IsPrimitive)
-                                                {
-                                                    if (nT == typeof(int))
-                                                    {
-                                                        int[] arr = obj as int[];
-                                                        objRef->ObjectType = ObjectTypes.Integer;
-                                                        objRef->Value = arr[idx];
-                                                        objRef->ValueLow = 0;
-                                                    }
-                                                    else if (nT == typeof(byte))
-                                                    {
-                                                        byte[] arr = obj as byte[];
-                                                        objRef->ObjectType = ObjectTypes.Integer;
-                                                        objRef->Value = arr[idx];
-                                                        objRef->ValueLow = 0;
-                                                    }
-                                                    else
-                                                        throw new NotImplementedException();
-                                                }
+                                                LoadFromArrayReference(obj, idx, objRef, t);
                                             }
                                             break;
                                         default:
@@ -322,22 +303,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.ArrayReference:
                                             {
                                                 var t = AppDomain.GetType(ip->TokenInteger);
-                                                var nT = t.TypeForCLR;
-                                                if (nT.IsPrimitive)
-                                                {
-                                                    if (nT == typeof(int))
-                                                    {
-                                                        int[] arr = mStack[objRef->Value] as int[];
-                                                        arr[objRef->ValueLow] = val->Value;
-                                                    }
-                                                    else if (nT == typeof(byte))
-                                                    {
-                                                        byte[] arr = mStack[objRef->Value] as byte[];
-                                                        arr[objRef->ValueLow] = (byte)val->Value;
-                                                    }
-                                                    else
-                                                        throw new NotImplementedException();
-                                                }
+                                                StoreValueToArrayReference(objRef, val, t, mStack);
                                             }
                                             break;
                                         default:
@@ -725,7 +691,115 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
 
                                 }
-                                break;                            
+                                break;
+                            case OpCodeEnum.Bgt:
+                            case OpCodeEnum.Bgt_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = a->Value > b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value > *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeEnum.Bgt_Un:
+                            case OpCodeEnum.Bgt_Un_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)a->Value > (uint)b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value > *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeEnum.Bge:
+                            case OpCodeEnum.Bge_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = a->Value >= b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value >= *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeEnum.Bge_Un:
+                            case OpCodeEnum.Bge_Un_S:
+                                {
+                                    var b = esp - 1;
+                                    var a = esp - 2;
+                                    esp -= 2;
+                                    bool transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)a->Value >= (uint)b->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&a->Value >= *(float*)&b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->TokenInteger;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeEnum.Blt:
                             case OpCodeEnum.Blt_S:
                                 {
@@ -1986,9 +2060,11 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Throw:
                                 {
                                     var obj = GetObjectAndResolveReference(esp - 1);
-
+                                    var ex = mStack[obj->Value] as Exception;
+                                    Free(obj);
+                                    esp--;
+                                    throw ex;
                                 }
-                                break;
                             case OpCodeEnum.Constrained:
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Endfinally:
@@ -2044,6 +2120,135 @@ namespace ILRuntime.Runtime.Intepreter
 
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
+        }
+
+        void LoadFromArrayReference(object obj,int idx, StackObject* objRef, IType t)
+        {
+            var nT = t.TypeForCLR;
+            if (nT.IsPrimitive)
+            {
+                if (nT == typeof(int))
+                {
+                    int[] arr = obj as int[];
+                    objRef->ObjectType = ObjectTypes.Integer;
+                    objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(short))
+                {
+                    short[] arr = obj as short[];
+                    objRef->ObjectType = ObjectTypes.Integer;
+                    objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(long))
+                {
+                    long[] arr = obj as long[];
+                    objRef->ObjectType = ObjectTypes.Long;
+                    *(long*)&objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(float))
+                {
+                    float[] arr = obj as float[];
+                    objRef->ObjectType = ObjectTypes.Float;
+                    *(float*)&objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(double))
+                {
+                    double[] arr = obj as double[];
+                    objRef->ObjectType = ObjectTypes.Double;
+                    *(double*)&objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(byte))
+                {
+                    byte[] arr = obj as byte[];
+                    objRef->ObjectType = ObjectTypes.Integer;
+                    objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(char))
+                {
+                    char[] arr = obj as char[];
+                    objRef->ObjectType = ObjectTypes.Integer;
+                    objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(uint))
+                {
+                    uint[] arr = obj as uint[];
+                    objRef->ObjectType = ObjectTypes.Integer;
+                    *(uint*)&objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(sbyte))
+                {
+                    sbyte[] arr = obj as sbyte[];
+                    objRef->ObjectType = ObjectTypes.Integer;
+                    objRef->Value = arr[idx];
+                    objRef->ValueLow = 0;
+                }
+                else
+                    throw new NotImplementedException();
+            }
+
+        }
+
+        void StoreValueToArrayReference(StackObject* objRef, StackObject* val, IType t, List<object> mStack)
+        {
+            var nT = t.TypeForCLR;
+            if (nT.IsPrimitive)
+            {
+                if (nT == typeof(int))
+                {
+                    int[] arr = mStack[objRef->Value] as int[];
+                    arr[objRef->ValueLow] = val->Value;
+                }
+                else if (nT == typeof(short))
+                {
+                    short[] arr = mStack[objRef->Value] as short[];
+                    arr[objRef->ValueLow] = (short)val->Value;
+                }
+                else if (nT == typeof(long))
+                {
+                    long[] arr = mStack[objRef->Value] as long[];
+                    arr[objRef->ValueLow] = *(long*)&val->Value;
+                }
+                else if (nT == typeof(float))
+                {
+                    float[] arr = mStack[objRef->Value] as float[];
+                    arr[objRef->ValueLow] = *(float*)&val->Value;
+                }
+                else if (nT == typeof(double))
+                {
+                    double[] arr = mStack[objRef->Value] as double[];
+                    arr[objRef->ValueLow] = *(double*)&val->Value;
+                }
+                else if (nT == typeof(byte))
+                {
+                    byte[] arr = mStack[objRef->Value] as byte[];
+                    arr[objRef->ValueLow] = (byte)val->Value;
+                }
+                else if (nT == typeof(char))
+                {
+                    char[] arr = mStack[objRef->Value] as char[];
+                    arr[objRef->ValueLow] = (char)val->Value;
+                }
+                else if (nT == typeof(uint))
+                {
+                    uint[] arr = mStack[objRef->Value] as uint[];
+                    arr[objRef->ValueLow] = (uint)val->Value;
+                }
+                else if (nT == typeof(sbyte))
+                {
+                    sbyte[] arr = mStack[objRef->Value] as sbyte[];
+                    arr[objRef->ValueLow] = (sbyte)val->Value;
+                }
+                else
+                    throw new NotImplementedException();
+            }
         }
 
         bool CheckExceptionType(IType catchType, object exception, bool explicitMatch)
