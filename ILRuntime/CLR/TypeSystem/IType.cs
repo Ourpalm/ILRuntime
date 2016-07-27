@@ -23,11 +23,14 @@ namespace ILRuntime.CLR.TypeSystem
 
         List<IMethod> GetMethods();
 
+        int GetFieldIndex(object token);
+
         IMethod GetConstructor(List<IType> param);
 
         bool CanAssignTo(IType type);
 
         IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments);
+        IType FindGenericArgument(string key);
 
         IType ResolveGenericType(IType contextType);
     }

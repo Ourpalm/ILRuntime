@@ -17,6 +17,7 @@ namespace ILRuntime.Runtime.Enviorment
         HashSet<string> loadedAssembly;
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
+        Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
@@ -110,6 +111,8 @@ namespace ILRuntime.Runtime.Enviorment
                     bt = GetType(baseType.Replace("/", "+"));
                 }
 
+                if (bt == null)
+                    return null;
                 if (genericParams != null)
                 {
                     KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[genericParams.Count];
@@ -117,6 +120,8 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         string key = "!" + i;
                         IType val = GetType(genericParams[i]);
+                        if (val == null)
+                            throw new TypeLoadException();
                         genericArguments[i] = new KeyValuePair<string, IType>(key, val);
                     }
                     bt = bt.MakeGenericInstance(genericArguments);
@@ -128,7 +133,10 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (i > 0)
                             sb.Append(",");
-                        sb.Append(genericParams[i]);
+                        if (genericParams[i].Contains(","))
+                            sb.Append(genericParams[i].Substring(0, genericParams[i].IndexOf(',')));
+                        else
+                            sb.Append(genericParams[i]);
                     }
                     sb.Append('>');
                     var asmName = sb.ToString();
@@ -155,6 +163,8 @@ namespace ILRuntime.Runtime.Enviorment
                     res = new CLRType(t, this);
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
+                    mapType[t.AssemblyQualifiedName] = res;
+                    clrTypeMapping[t] = res;
                     return res;
                 }
             }
@@ -174,11 +184,11 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
                 isArray = false;
-            if (fullname.Contains('<'))
+            if (fullname.Contains('<') || fullname.Contains('['))
             {
                 foreach (var i in fullname)
                 {
-                    if (i == '<')
+                    if (i == '<' || i == '[')
                     {
                         depth++;
                         if (depth == 1)
@@ -191,20 +201,34 @@ namespace ILRuntime.Runtime.Enviorment
                     }
                     if (i == ',' && depth == 1)
                     {
-                        genericParams.Add(sb.ToString());
+                        string name = sb.ToString();
+                        if (name.StartsWith("["))
+                            name = name.Substring(1, name.Length - 2);
+                        genericParams.Add(name);
                         sb.Length = 0;
                         continue;
                     }
-                    if (i == '>')
+                    if (i == '>' || i == ']')
                     {
                         depth--;
                         if (depth == 0)
+                        {
+                            string name = sb.ToString();
+                            if (name.StartsWith("["))
+                                name = name.Substring(1, name.Length - 2);
+                            genericParams.Add(name);
+                            sb.Length = 0;
                             continue;
+                        }
                     }
                     sb.Append(i);
                 }
                 if (sb.Length > 0)
-                    genericParams.Add(sb.ToString());
+                {
+                    baseType += sb.ToString();
+                }
+                if (genericParams != null && genericParams.Count == 0)
+                    genericParams = null;
             }
             else
                 baseType = fullname;
@@ -238,7 +262,7 @@ namespace ILRuntime.Runtime.Enviorment
                 Mono.Cecil.TypeReference _ref = (token as Mono.Cecil.TypeReference);
                 if (_ref.IsGenericParameter)
                 {
-                    var t = ((ILType)contextType).FindGenericArgument(_ref.Name);
+                    var t = contextType.FindGenericArgument(_ref.Name);
                     if (t != null)
                         return t;
                 }
@@ -256,8 +280,12 @@ namespace ILRuntime.Runtime.Enviorment
                         IType val;
                         if (gType.GenericArguments[i].IsGenericParameter)
                         {
-                            val = ((ILType)contextType).FindGenericArgument(gType.GenericArguments[i].Name);
+                            val = contextType.FindGenericArgument(gType.GenericArguments[i].Name);
                             dummyGenericInstance = true;
+                            if(val ==null)
+                            {
+                                return null;
+                            }
                         }
                         else
                             val = GetType(gType.GenericArguments[i], contextType);
@@ -307,9 +335,20 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
+        internal IType GetType(Type t)
+        {
+            IType res;
+            if (clrTypeMapping.TryGetValue(t, out res))
+                return res;
+            else
+                return null;
+        }
+
         public object Invoke(string type, string method, params object[] p)
         {
             IType t = GetType(type);
+            if (t == null)
+                return null;
             var m = t.GetMethod(method, p.Length);
 
             if(m != null)
@@ -423,11 +462,11 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal int GetFieldIndex(object token, IType contextType)
         {
-            FieldDefinition f = token as FieldDefinition;
+            FieldReference f = token as FieldReference;
             var type = GetType(f.DeclaringType, contextType);
-            if(type is ILType)
+            if(type != null)
             {
-                return ((ILType)type).GetFieldIndex(token);
+                return type.GetFieldIndex(token);
             }
             throw new KeyNotFoundException();
         }
@@ -436,16 +475,22 @@ namespace ILRuntime.Runtime.Enviorment
         {
             FieldReference f = token as FieldReference;
             var type = GetType(f.DeclaringType, contextType);
-            
+
             if (type is ILType)
             {
-                var it = (ILType)type;
+                var it = type as ILType;
                 int idx = it.GetFieldIndex(token);
                 long res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
 
                 return res;
             }
-            throw new KeyNotFoundException();
+            else
+            {
+                int idx = type.GetFieldIndex(token);
+                long res = ((long)f.DeclaringType.GetHashCode() << 32) | (uint)idx;
+
+                return res;
+            }
         }
 
         internal void CacheString(object token)

@@ -8,6 +8,7 @@ using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
+using ILRuntime.CLR.Utils;
 namespace ILRuntime.CLR.Method
 {
     class CLRMethod : IMethod
@@ -133,6 +134,10 @@ namespace ILRuntime.CLR.Method
             foreach (var i in param)
             {
                 IType type = appdomain.GetType(i.ParameterType.FullName);
+                if (type == null)
+                    type = appdomain.GetType(i.ParameterType.AssemblyQualifiedName);
+                if (type == null)
+                    throw new TypeLoadException();
                 parameters.Add(type);
             }
             if (def != null)
@@ -159,7 +164,7 @@ namespace ILRuntime.CLR.Method
             for (int i = 1; i <= paramCount; i++)
             {
                 var p = esp - i;
-                var obj = CheckPrimitiveTypes(this.param[i - 1].ParameterType, p->ToObject(appdomain, mStack));
+                var obj = this.param[i - 1].ParameterType.CheckPrimitiveTypes(p->ToObject(appdomain, mStack));
 
                 param[paramCount - i] = obj;
             }
@@ -170,7 +175,7 @@ namespace ILRuntime.CLR.Method
                 {
                     if (!cDef.IsStatic)
                     {
-                        object instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(appdomain, mStack));
+                        object instance = declaringType.TypeForCLR.CheckPrimitiveTypes((esp - paramCount - 1)->ToObject(appdomain, mStack));
                         if (instance == null)
                             throw new NullReferenceException();
                         cDef.Invoke(instance, param);
@@ -194,7 +199,7 @@ namespace ILRuntime.CLR.Method
 
                 if (!def.IsStatic)
                 {
-                    instance = CheckPrimitiveTypes(declaringType.TypeForCLR, (esp - paramCount - 1)->ToObject(appdomain, mStack));
+                    instance = declaringType.TypeForCLR.CheckPrimitiveTypes((esp - paramCount - 1)->ToObject(appdomain, mStack));
                     if (instance == null)
                         throw new NullReferenceException();
                 }
@@ -218,30 +223,6 @@ namespace ILRuntime.CLR.Method
             var res = new CLRMethod(t, declaringType, appdomain);
             res.genericArguments = genericArguments;
             return res;
-        }
-
-        object CheckPrimitiveTypes(Type pt, object obj)
-        {
-            if (pt.IsPrimitive && pt != typeof(int))
-            {
-                if (pt == typeof(bool) && !(obj is bool))
-                {
-                    obj = (int)obj == 1;
-                }
-                else if (pt == typeof(byte) && !(obj is byte))
-                    obj = (byte)(int)obj;
-                else if (pt == typeof(short) && !(obj is short))
-                    obj = (short)(int)obj;
-                else if (pt == typeof(ushort) && !(obj is ushort))
-                    obj = (ushort)(int)obj;
-                else if (pt == typeof(uint) && !(obj is uint))
-                    obj = (uint)(int)obj;
-                else if (pt == typeof(sbyte) && !(obj is sbyte))
-                    obj = (sbyte)(int)obj;
-                else if (pt == typeof(ulong) && !(obj is ulong))
-                    obj = (ulong)(int)obj;
-            }
-            return obj;
         }
     }
 }

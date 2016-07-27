@@ -19,44 +19,27 @@ namespace ILRuntime.CLR.Utils
                 foreach (var i in def.Parameters)
                 {
                     IType t = null;
-                    if (i.ParameterType.IsGenericParameter)
-                    {
-                        if (dt.GenericArguments != null)
-                        {
-                            foreach (var j in dt.GenericArguments)
-                            {
-                                if (j.Key == i.ParameterType.Name)
-                                {
-                                    t = j.Value;
-                                    break;
-                                }
-                            }
-                        }                        
-                    }
+                    t = appdomain.GetType(i.ParameterType, dt);
                     if (t == null && def.IsGenericInstance)
                     {
                         GenericInstanceMethod gim = (GenericInstanceMethod)def;
+                        string name = i.ParameterType.FullName;
                         for (int j = 0; j < gim.GenericArguments.Count; j++)
                         {
                             var gp = gim.ElementMethod.GenericParameters[j];
                             var ga = gim.GenericArguments[j];
-                            if(i.ParameterType.Name == gp.Name)
+                            if(name == gp.Name)
                             {
                                 t = appdomain.GetType(ga, contextType);
                                 break;
                             }
-                            else if (i.ParameterType.FullName.Contains(gp.Name))
+                            else if (name.Contains(gp.Name))
                             {
-                                t = appdomain.GetType(i.ParameterType.FullName.Replace(gp.Name, ga.FullName));
-                                break;
+                                name = name.Replace(gp.Name, ga.FullName);
                             }
                         }
-                    }
-                    if (t == null)
-                    {
-                        string typeName = i.ParameterType.FullName;
-
-                        t = appdomain.GetType(typeName);
+                        if (t == null)
+                            t = appdomain.GetType(name);
                     }
                     if (t == null)
                         throw new KeyNotFoundException("Cannot find type:" + i.ParameterType);
@@ -66,6 +49,36 @@ namespace ILRuntime.CLR.Utils
             }
             else
                 return emptyParamList;
+        }
+
+        public static object CheckPrimitiveTypes(this Type pt, object obj)
+        {
+            if (pt.IsPrimitive && pt != typeof(int))
+            {
+                if (pt == typeof(bool) && !(obj is bool))
+                {
+                    obj = (int)obj == 1;
+                }
+                else if (pt == typeof(byte) && !(obj is byte))
+                    obj = (byte)(int)obj;
+                else if (pt == typeof(short) && !(obj is short))
+                    obj = (short)(int)obj;
+                else if (pt == typeof(char) && !(obj is char))
+                    obj = (char)(int)obj;
+                else if (pt == typeof(ushort) && !(obj is ushort))
+                    obj = (ushort)(int)obj;
+                else if (pt == typeof(uint) && !(obj is uint))
+                    obj = (uint)(int)obj;
+                else if (pt == typeof(sbyte) && !(obj is sbyte))
+                    obj = (sbyte)(int)obj;
+                else if (pt == typeof(ulong) && !(obj is ulong))
+                    obj = (ulong)(int)obj;
+            }
+            else if (pt.IsByRef)
+            {
+                return CheckPrimitiveTypes(pt.GetElementType(), obj);
+            }
+            return obj;
         }
     }
 }
