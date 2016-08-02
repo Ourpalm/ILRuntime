@@ -286,7 +286,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var obj = mStack[objRef->Value];
                                                 var idx = objRef->ValueLow;
                                                 Free(objRef);
-                                                LoadFromArrayReference(obj, idx, objRef, t);
+                                                LoadFromArrayReference(obj, idx, objRef, t, mStack);
                                             }
                                             break;
                                         default:
@@ -2206,7 +2206,7 @@ namespace ILRuntime.Runtime.Intepreter
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
         }
 
-        void LoadFromArrayReference(object obj,int idx, StackObject* objRef, IType t)
+        void LoadFromArrayReference(object obj,int idx, StackObject* objRef, IType t, List<object> mStack)
         {
             var nT = t.TypeForCLR;
             if (nT.IsPrimitive)
@@ -2277,7 +2277,14 @@ namespace ILRuntime.Runtime.Intepreter
                 else
                     throw new NotImplementedException();
             }
-
+            else
+            {
+                Array arr = obj as Array;
+                objRef->ObjectType = ObjectTypes.Object;
+                objRef->Value = mStack.Count;
+                mStack.Add(arr.GetValue(idx));
+                objRef->ValueLow = 0;
+            }
         }
 
         void StoreValueToArrayReference(StackObject* objRef, StackObject* val, IType t, List<object> mStack)
@@ -2332,6 +2339,11 @@ namespace ILRuntime.Runtime.Intepreter
                 }
                 else
                     throw new NotImplementedException();
+            }
+            else
+            {
+                Array arr = mStack[objRef->Value] as Array;
+                arr.SetValue(mStack[val->Value], objRef->ValueLow);
             }
         }
 
