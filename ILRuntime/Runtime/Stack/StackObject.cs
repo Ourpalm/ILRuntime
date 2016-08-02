@@ -40,7 +40,17 @@ namespace ILRuntime.Runtime.Stack
                 case ObjectTypes.FieldReference:
                     {
                         ILTypeInstance instance = mStack[Value] as ILTypeInstance;
-                        return instance.Fields[ValueLow].ToObject(appdomain, instance.ManagedObjects);
+                        if (instance != null)
+                        {
+                            return instance.Fields[ValueLow].ToObject(appdomain, instance.ManagedObjects);
+                        }
+                        else
+                        {
+                            var obj = mStack[Value];
+                            var t = appdomain.GetType(obj.GetType());
+                            var fi = ((CLR.TypeSystem.CLRType)t).Fields[ValueLow];
+                            return fi.GetValue(obj);
+                        }
                     }
                 case ObjectTypes.ArrayReference:
                     {
@@ -56,7 +66,11 @@ namespace ILRuntime.Runtime.Stack
                             return type.StaticInstance.Fields[ValueLow].ToObject(appdomain, type.StaticInstance.ManagedObjects);
                         }
                         else
-                            throw new NotImplementedException();
+                        {
+                            CLR.TypeSystem.CLRType type = (CLR.TypeSystem.CLRType)t;
+                            var fi = type.Fields[ValueLow];
+                            return fi.GetValue(null);
+                        }
                     }
                 case ObjectTypes.StackObjectReference:
                     {

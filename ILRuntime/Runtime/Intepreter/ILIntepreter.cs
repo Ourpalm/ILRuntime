@@ -1073,10 +1073,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            esp->ObjectType = ObjectTypes.FieldReference;
-                                            esp->Value = mStack.Count;
+                                            objRef->ObjectType = ObjectTypes.FieldReference;
+                                            objRef->Value = mStack.Count;
                                             mStack.Add(obj);
-                                            esp->ValueLow = ip->TokenInteger;
+                                            objRef->ValueLow = ip->TokenInteger;
                                         }
                                     }
                                     else
