@@ -72,11 +72,17 @@ namespace ILRuntime.CLR.Utils
                 else if (pt == typeof(sbyte) && !(obj is sbyte))
                     obj = (sbyte)(int)obj;
                 else if (pt == typeof(ulong) && !(obj is ulong))
-                    obj = (ulong)(int)obj;
+                {
+                    obj = (ulong)(long)obj;
+                }
             }
             else if (pt.IsByRef)
             {
                 return CheckPrimitiveTypes(pt.GetElementType(), obj);
+            }
+            else if (pt.IsEnum)
+            {
+                return Enum.ToObject(pt, obj);
             }
             return obj;
         }

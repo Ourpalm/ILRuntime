@@ -1916,7 +1916,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 1);
                                     Free(esp - 2);
 
-                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->ObjectType = ObjectTypes.Long;
                                     *(long*)&arrRef->Value = val;
                                     esp -= 1;
                                 }
@@ -1943,7 +1943,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 1);
                                     Free(esp - 2);
 
-                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->ObjectType = ObjectTypes.Float;
                                     *(float*)&arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
@@ -1970,7 +1970,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 1);
                                     Free(esp - 2);
 
-                                    arrRef->ObjectType = ObjectTypes.Integer;
+                                    arrRef->ObjectType = ObjectTypes.Double;
                                     *(double*)&arrRef->Value = arr[idx];
                                     esp -= 1;
                                 }
