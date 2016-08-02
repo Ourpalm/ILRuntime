@@ -103,7 +103,10 @@ namespace ILRuntime.Runtime.Enviorment
             List<string> genericParams;
             bool isArray;
             ParseGenericType(fullname, out baseType, out genericParams, out isArray);
-            if (genericParams != null || isArray)
+            bool isByRef = baseType.EndsWith("&");
+            if (isByRef)
+                baseType = baseType.Substring(0, baseType.Length - 1);
+            if (genericParams != null || isArray || isByRef)
             {
                 IType bt = GetType(baseType);
                 if (bt == null)
@@ -144,10 +147,20 @@ namespace ILRuntime.Runtime.Enviorment
                         mapType[asmName] = bt;
                 }
 
+                if (isByRef)
+                {
+                    bt = bt.MakeByRefType();
+                    mapType[bt.FullName] = bt;
+                    if (!isArray)
+                    {
+                        mapType[fullname] = bt;
+                        return bt;
+                    }
+                }
+
                 if (isArray)
                 {
-                    Type t = bt.TypeForCLR.MakeArrayType();
-                    res = new CLRType(t, this);
+                    res = bt.MakeArrayType();
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
                     return res;
@@ -204,7 +217,8 @@ namespace ILRuntime.Runtime.Enviorment
                         string name = sb.ToString();
                         if (name.StartsWith("["))
                             name = name.Substring(1, name.Length - 2);
-                        genericParams.Add(name);
+                        if (!string.IsNullOrEmpty(name))
+                            genericParams.Add(name);
                         sb.Length = 0;
                         continue;
                     }
@@ -216,7 +230,19 @@ namespace ILRuntime.Runtime.Enviorment
                             string name = sb.ToString();
                             if (name.StartsWith("["))
                                 name = name.Substring(1, name.Length - 2);
-                            genericParams.Add(name);
+                            if (!string.IsNullOrEmpty(name))
+                                genericParams.Add(name);
+                            else
+                            {
+                                if (!isArray)
+                                {
+                                    isArray = true;
+                                }
+                                else
+                                {
+                                    baseType += "[]";
+                                }
+                            }
                             sb.Length = 0;
                             continue;
                         }
@@ -263,8 +289,41 @@ namespace ILRuntime.Runtime.Enviorment
                 if (_ref.IsGenericParameter)
                 {
                     var t = contextType.FindGenericArgument(_ref.Name);
+                    return t;
+                }
+                if (_ref.IsByReference)
+                {
+                    var t = GetType(_ref.GetElementType(), contextType);
                     if (t != null)
-                        return t;
+                    {
+                        res = t.MakeByRefType();
+                        if (res is ILType)
+                        {
+                            ///Unify the TypeReference
+                            ((ILType)res).TypeReference = _ref;
+                        }
+                        mapTypeToken[hash] = res;
+                        mapType[res.FullName] = res;
+                        return res;
+                    }
+                    return null;
+                }
+                if (_ref.IsArray)
+                {
+                    var t = GetType(_ref.GetElementType(), contextType);
+                    if (t != null)
+                    {
+                        res = t.MakeArrayType();
+                        if (res is ILType)
+                        {
+                            ///Unify the TypeReference
+                            ((ILType)res).TypeReference = _ref;
+                        }
+                        mapTypeToken[hash] = res;
+                        mapType[res.FullName] = res;
+                        return res;
+                    }
+                    return t;
                 }
                 module = _ref.Module;
                 if (_ref.IsGenericInstance)

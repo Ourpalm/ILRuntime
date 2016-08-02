@@ -19,6 +19,7 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<string, int> fieldMapping;
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, int> fieldTokenMapping;
+        IType byRefType, arrayType;
 
         public Dictionary<int, FieldInfo> Fields { get { return fieldInfoCache; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
@@ -58,7 +59,20 @@ namespace ILRuntime.CLR.TypeSystem
                 return clrType;
             }
         }
-
+        public IType ByRefType
+        {
+            get
+            {
+                return byRefType;
+            }
+        }
+        public IType ArrayType
+        {
+            get
+            {
+                return arrayType;
+            }
+        }
         public string FullName
         {
             get
@@ -290,6 +304,25 @@ namespace ILRuntime.CLR.TypeSystem
 
             genericInstances.Add(res);
             return res;
+        }
+
+        public IType MakeByRefType()
+        {
+            if (byRefType == null)
+            {
+                Type t = clrType.MakeByRefType();
+                byRefType = new CLRType(t, appdomain);
+            }
+            return byRefType;
+        }
+        public IType MakeArrayType()
+        {
+            if (arrayType == null)
+            {
+                Type t = clrType.MakeArrayType();
+                arrayType = new CLRType(t, appdomain);
+            }
+            return arrayType;
         }
 
         public IType ResolveGenericType(IType contextType)

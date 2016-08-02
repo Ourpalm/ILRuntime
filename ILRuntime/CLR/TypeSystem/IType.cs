@@ -13,6 +13,10 @@ namespace ILRuntime.CLR.TypeSystem
         KeyValuePair<string, IType>[] GenericArguments { get; }
         Type TypeForCLR { get; }
 
+        IType ByRefType { get; }
+
+        IType ArrayType { get; }
+
         string FullName { get; }
 
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
@@ -30,6 +34,10 @@ namespace ILRuntime.CLR.TypeSystem
         bool CanAssignTo(IType type);
 
         IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments);
+
+        IType MakeByRefType();
+
+        IType MakeArrayType();
         IType FindGenericArgument(string key);
 
         IType ResolveGenericType(IType contextType);

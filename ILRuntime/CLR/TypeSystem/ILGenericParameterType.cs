@@ -83,5 +83,27 @@ namespace ILRuntime.CLR.TypeSystem
         {
             return null;
         }
+
+
+        public IType ByRefType
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IType MakeByRefType()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public IType ArrayType
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IType MakeArrayType()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

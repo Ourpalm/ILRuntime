@@ -27,7 +27,7 @@ namespace ILRuntime.CLR.TypeSystem
         int fieldStartIdx = -1;
         int totalFieldCnt = -1;
         KeyValuePair<string, IType>[] genericArguments;
-        IType baseType;
+        IType baseType, byRefType, arrayType;
         bool baseTypeInitialized = false;
         List<ILType> genericInstances;
         public TypeDefinition TypeDefinition { get { return definition; } }
@@ -168,7 +168,20 @@ namespace ILRuntime.CLR.TypeSystem
                 return typeof(ILTypeInstance);
             }
         }
-
+        public IType ByRefType
+        {
+            get
+            {
+                return byRefType;
+            }
+        }
+        public IType ArrayType
+        {
+            get
+            {
+                return arrayType;
+            }
+        }
         string genericFullName;
         public string FullName
         {
@@ -526,6 +539,26 @@ namespace ILRuntime.CLR.TypeSystem
 
             genericInstances.Add(res);
             return res;
+        }
+
+        public IType MakeByRefType()
+        {
+            if (byRefType == null)
+            {
+                var def = new ByReferenceType(typeRef);
+                byRefType = new ILType(def, appdomain);
+            }
+            return byRefType;
+        }
+
+        public IType MakeArrayType()
+        {
+            if (arrayType == null)
+            {
+                var def = new ArrayType(typeRef);
+                arrayType = new ILType(def, appdomain);
+            }
+            return arrayType;
         }
 
         public IType ResolveGenericType(IType contextType)
