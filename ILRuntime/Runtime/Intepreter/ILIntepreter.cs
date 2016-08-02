@@ -1443,20 +1443,23 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else if (type.TypeForCLR == typeof(ILTypeInstance))
                                         {
-                                            var val = mStack[obj->Value];
-                                            Free(obj);
-                                            ILTypeInstance ins = (ILTypeInstance)val;
-                                            if (ins != null)
+                                            if (obj->ObjectType != ObjectTypes.Null)
                                             {
-                                                if (ins.IsValueType)
+                                                var val = mStack[obj->Value];
+                                                Free(obj);
+                                                ILTypeInstance ins = (ILTypeInstance)val;
+                                                if (ins != null)
                                                 {
-                                                    ins.Boxed = true;
+                                                    if (ins.IsValueType)
+                                                    {
+                                                        ins.Boxed = true;
+                                                    }
+                                                    esp = PushObject(obj, mStack, ins, true);
                                                 }
-                                                esp = PushObject(obj, mStack, ins, true);
-                                            }
-                                            else
-                                            {
-                                                esp = PushNull(esp);
+                                                else
+                                                {
+                                                    esp = PushNull(obj);
+                                                }
                                             }
                                         }
                                         else
