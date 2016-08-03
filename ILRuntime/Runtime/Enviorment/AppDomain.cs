@@ -97,6 +97,10 @@ namespace ILRuntime.Runtime.Enviorment
         public IType GetType(string fullname)
         {
             IType res;
+            if (fullname == null)
+            {
+                return null;
+            }
             if (mapType.TryGetValue(fullname, out res))
                 return res;
             string baseType;
