@@ -613,7 +613,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Brtrue_S:
                                 {
                                     esp--;
-                                    if ((esp->ObjectType == ObjectTypes.Integer || esp->ObjectType == ObjectTypes.Object) && esp->Value > 0)
+                                    if ((esp->ObjectType == ObjectTypes.Integer && esp->Value > 0) || (esp->ObjectType == ObjectTypes.Object && esp->Value >= 0))
                                     {
                                         ip = ptr + ip->TokenInteger;
                                         Free(esp);
@@ -1605,7 +1605,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                     }
                                     else
-                                        throw new NotImplementedException();
+                                    {
+                                        //nothing to do for clr value Types
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Isinst:
@@ -2466,6 +2468,11 @@ namespace ILRuntime.Runtime.Intepreter
                             esp->ObjectType = ObjectTypes.Integer;
                             esp->Value = (bool)(obj) ? 1 : 0;
                         }
+                        else if (obj is short)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = (short)obj;
+                        }
                         else if (obj is long)
                         {
                             esp->ObjectType = ObjectTypes.Long;
@@ -2476,10 +2483,30 @@ namespace ILRuntime.Runtime.Intepreter
                             esp->ObjectType = ObjectTypes.Float;
                             *(float*)(&esp->Value) = (float)obj;
                         }
+                        else if (obj is byte)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = (byte)obj;
+                        }
+                        else if (obj is uint)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = (int)(uint)obj;
+                        }
                         else if (obj is double)
                         {
                             esp->ObjectType = ObjectTypes.Double;
                             *(double*)(&esp->Value) = (double)obj;
+                        }
+                        else if (obj is ulong)
+                        {
+                            esp->ObjectType = ObjectTypes.Long;
+                            *(ulong*)(&esp->Value) = (ulong)obj;
+                        }
+                        else if (obj is sbyte)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = (sbyte)obj;
                         }
                         else
                             throw new NotImplementedException();

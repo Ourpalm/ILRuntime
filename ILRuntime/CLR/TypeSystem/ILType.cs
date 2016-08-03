@@ -28,7 +28,9 @@ namespace ILRuntime.CLR.TypeSystem
         int totalFieldCnt = -1;
         KeyValuePair<string, IType>[] genericArguments;
         IType baseType, byRefType, arrayType;
+        IType[] interfaces;
         bool baseTypeInitialized = false;
+        bool interfaceInitialized = false;
         List<ILType> genericInstances;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
@@ -52,6 +54,16 @@ namespace ILRuntime.CLR.TypeSystem
                 if (!baseTypeInitialized)
                     InitializeBaseType();
                 return baseType;
+            }
+        }
+
+        public IType[] Implements
+        {
+            get
+            {
+                if (!interfaceInitialized)
+                    InitializeInterfaces();
+                return interfaces;
             }
         }
 
@@ -221,8 +233,21 @@ namespace ILRuntime.CLR.TypeSystem
 
             return res;
         }
+        void InitializeInterfaces()
+        {
+            interfaceInitialized = true;
+            if (definition.HasInterfaces)
+            {
+                interfaces = new IType[definition.Interfaces.Count];
+                for (int i = 0; i < interfaces.Length; i++)
+                {
+                    interfaces[i] = appdomain.GetType(definition.Interfaces[i], this);
+                }
+            }
+        }
         void InitializeBaseType()
         {
+            baseTypeInitialized = true;
             if (definition.BaseType != null)
             {
                 baseType = appdomain.GetType(definition.BaseType, this);
@@ -508,8 +533,17 @@ namespace ILRuntime.CLR.TypeSystem
             }
             else if (BaseType != null)
                 return BaseType.CanAssignTo(type);
-            else
-                return false;
+            else if (Implements != null)
+            {
+                for (int i = 0; i < interfaces.Length; i++)
+                {
+                    var im = interfaces[i];
+                    bool res = im.CanAssignTo(type);
+                    if (res)
+                        return true;
+                }
+            }
+            return false;
         }
 
         internal ILTypeInstance Instantiate()
