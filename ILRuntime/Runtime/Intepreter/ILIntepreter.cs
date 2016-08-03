@@ -641,21 +641,25 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var b = esp - 1;
                                     var a = esp - 2;
-                                    esp -= 2;
                                     bool transfer = false;
-                                    switch (esp->ObjectType)
+                                    if (a->ObjectType == b->ObjectType)
                                     {
-                                        case ObjectTypes.Integer:
-                                        case ObjectTypes.Object:
-                                            transfer = a->Value == b->Value;
-                                            break;
-                                        case ObjectTypes.Float:
-                                            transfer = *(float*)&a->Value == *(float*)&b->Value;
-                                            break;
-                                        default:
-                                            throw new NotImplementedException();
+                                        switch (a->ObjectType)
+                                        {
+                                            case ObjectTypes.Integer:
+                                            case ObjectTypes.Object:
+                                                transfer = a->Value == b->Value;
+                                                break;
+                                            case ObjectTypes.Float:
+                                                transfer = *(float*)&a->Value == *(float*)&b->Value;
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
                                     }
-
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    esp -= 2;
                                     if (transfer)
                                     {
                                         ip = ptr + ip->TokenInteger;
@@ -669,21 +673,27 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var b = esp - 1;
                                     var a = esp - 2;
-                                    esp -= 2;
                                     bool transfer = false;
-                                    switch (esp->ObjectType)
+                                    if (a->ObjectType == b->ObjectType)
                                     {
-                                        case ObjectTypes.Integer:
-                                        case ObjectTypes.Object:
-                                            transfer = (uint)a->Value != (uint)b->Value;
-                                            break;
-                                        case ObjectTypes.Float:
-                                            transfer = *(float*)&a->Value != *(float*)&b->Value;
-                                            break;
-                                        default:
-                                            throw new NotImplementedException();
+                                        switch (a->ObjectType)
+                                        {
+                                            case ObjectTypes.Integer:
+                                            case ObjectTypes.Object:
+                                                transfer = (uint)a->Value != (uint)b->Value;
+                                                break;
+                                            case ObjectTypes.Float:
+                                                transfer = *(float*)&a->Value != *(float*)&b->Value;
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
                                     }
-
+                                    else
+                                        transfer = true;
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    esp -= 2;
                                     if (transfer)
                                     {
                                         ip = ptr + ip->TokenInteger;
