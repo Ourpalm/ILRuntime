@@ -137,7 +137,9 @@ namespace ILRuntime.CLR.Method
                 if (type == null)
                     type = appdomain.GetType(i.ParameterType.AssemblyQualifiedName);
                 if (type == null)
-                    type = appdomain.GetType(i.ParameterType.Namespace + "." + i.ParameterType.Name);
+                    type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().FullName);
+                if (type == null)
+                    type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().AssemblyQualifiedName);
                 if (type == null)
                     throw new TypeLoadException();
                 parameters.Add(type);
