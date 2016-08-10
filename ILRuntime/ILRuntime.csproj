@@ -51,6 +51,7 @@
     <Compile Include="CLR\TypeSystem\ILType.cs" />
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
     <Compile Include="Runtime\Enviorment\CLRRedirections.cs" />
+    <Compile Include="Runtime\Extensions.cs" />
     <Compile Include="Runtime\Intepreter\ILRuntimeException.cs" />
     <Compile Include="Runtime\Intepreter\ILTypeInstance.cs" />
     <Compile Include="CLR\TypeSystem\IType.cs" />

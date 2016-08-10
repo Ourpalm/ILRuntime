@@ -650,8 +650,14 @@ namespace ILRuntime.Runtime.Intepreter
                                             case ObjectTypes.Object:
                                                 transfer = a->Value == b->Value;
                                                 break;
+                                            case ObjectTypes.Long:
+                                                 transfer = *(long*)&a->Value == *(long*)&b->Value;
+                                                break;
                                             case ObjectTypes.Float:
                                                 transfer = *(float*)&a->Value == *(float*)&b->Value;
+                                                break;
+                                            case ObjectTypes.Double:
+                                                transfer = *(double*)&a->Value == *(double*)&b->Value;
                                                 break;
                                             default:
                                                 throw new NotImplementedException();
@@ -684,6 +690,12 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             case ObjectTypes.Float:
                                                 transfer = *(float*)&a->Value != *(float*)&b->Value;
+                                                break;
+                                            case ObjectTypes.Long:
+                                                transfer = *(long*)&a->Value != *(long*)&b->Value;
+                                                break;
+                                            case ObjectTypes.Double:
+                                                transfer = *(double*)&a->Value != *(double*)&b->Value;
                                                 break;
                                             default:
                                                 throw new NotImplementedException();
@@ -1576,7 +1588,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     if (type == typeof(int))
                                                     {
-                                                        int val = (int)obj;
+                                                        int val = obj.ToInt32();
                                                         objRef->ObjectType = ObjectTypes.Integer;
                                                         objRef->Value = val;
                                                     }
@@ -1588,19 +1600,19 @@ namespace ILRuntime.Runtime.Intepreter
                                                     }
                                                     else if (type == typeof(short))
                                                     {
-                                                        short val = (short)obj;
+                                                        short val = obj.ToInt16();
                                                         objRef->ObjectType = ObjectTypes.Integer;
                                                         objRef->Value = val;
                                                     }
                                                     else if (type == typeof(long))
                                                     {
-                                                        long val = (long)obj;
+                                                        long val = obj.ToInt64();
                                                         objRef->ObjectType = ObjectTypes.Long;
                                                         *(long*)&objRef->Value = val;
                                                     }
                                                     else if (type == typeof(float))
                                                     {
-                                                        float val = (float)obj;
+                                                        float val = obj.ToFloat();
                                                         objRef->ObjectType = ObjectTypes.Float;
                                                         *(float*)&objRef->Value = val;
                                                     }
@@ -1612,7 +1624,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     }
                                                     else if (type == typeof(double))
                                                     {
-                                                        double val = (double)obj;
+                                                        double val = obj.ToDouble();
                                                         objRef->ObjectType = ObjectTypes.Double;
                                                         *(double*)&objRef->Value = val;
                                                     }
