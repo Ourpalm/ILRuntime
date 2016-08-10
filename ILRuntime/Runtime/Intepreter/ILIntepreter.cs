@@ -603,6 +603,48 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.And:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) & *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value & b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Or:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) | *((long*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value | b->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
                             #endregion
 
                             #region Control Flows
@@ -2250,6 +2292,50 @@ namespace ILRuntime.Runtime.Intepreter
                                     *(long*)(&obj->Value) = val;
                                 }
                                 break;
+                            case OpCodeEnum.Conv_R4:
+                                {
+                                    var obj = esp - 1;
+                                    float val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val = (float)*(long*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = *(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            val = obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Float;
+                                    *(float*)&obj->Value = val;
+                                }
+                                break;
+                            case OpCodeEnum.Conv_R8:
+                                {
+                                    var obj = esp - 1;
+                                    double val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val = (double)*(long*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            val = *(double*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            val = obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Double;
+                                    *(double*)&obj->Value = val;
+                                }
+                                break;
                             #endregion
 
                             #region Stack operation
@@ -2284,6 +2370,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Constrained:
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Endfinally:
+                            case OpCodeEnum.Volatile:
                                 break;
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);

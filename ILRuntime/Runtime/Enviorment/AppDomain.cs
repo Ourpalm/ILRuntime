@@ -433,12 +433,20 @@ namespace ILRuntime.Runtime.Enviorment
                     else
                         inteptreter = new ILIntepreter(this);
                 }
-                var res = inteptreter.Run((ILMethod)m, p);
-                lock (freeIntepreters)
+                try
                 {
-                    freeIntepreters.Enqueue(inteptreter);
+                    var res = inteptreter.Run((ILMethod)m, p);
+                    return res;
                 }
-                return res;
+                finally
+                {
+                    lock (freeIntepreters)
+                    {
+                        inteptreter.Stack.ManagedStack.Clear();
+                        inteptreter.Stack.Frames.Clear();
+                        freeIntepreters.Enqueue(inteptreter);
+                    }
+                }
             }
             return null;
         }
