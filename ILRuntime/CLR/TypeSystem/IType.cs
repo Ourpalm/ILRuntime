@@ -18,6 +18,7 @@ namespace ILRuntime.CLR.TypeSystem
         IType ArrayType { get; }
 
         string FullName { get; }
+        bool IsValueType { get; }
 
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
 

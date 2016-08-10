@@ -290,6 +290,8 @@ namespace ILRuntime.CLR.Method
                     }
                     break;
                 case OpCodeEnum.Box:
+                case OpCodeEnum.Unbox_Any:
+                case OpCodeEnum.Unbox:
                 case OpCodeEnum.Initobj:
                 case OpCodeEnum.Isinst:
                 case OpCodeEnum.Newarr:

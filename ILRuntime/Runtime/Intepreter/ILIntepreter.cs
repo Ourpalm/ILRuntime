@@ -997,7 +997,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp--;
                                             }
                                             if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
-                                                esp = PushObject(esp, mStack, result);
+                                                esp = PushObject(esp, mStack, result,cm.ReturnType.TypeForCLR == typeof(object));
                                         }
 
                                     }
@@ -1556,6 +1556,114 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                         throw new NullReferenceException();
+                                }
+                                break;
+                            case OpCodeEnum.Unbox:
+                            case OpCodeEnum.Unbox_Any:
+                                {
+                                    var objRef = esp - 1;
+                                    if (objRef->ObjectType == ObjectTypes.Object)
+                                    {
+                                        object obj = mStack[objRef->Value];
+                                        Free(esp - 1);
+                                        if (obj != null)
+                                        {
+                                            var t = domain.GetType(ip->TokenInteger);
+                                            if (t != null)
+                                            {
+                                                var type = t.TypeForCLR;
+                                                if (type.IsPrimitive)
+                                                {
+                                                    if (type == typeof(int))
+                                                    {
+                                                        int val = (int)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(bool))
+                                                    {
+                                                        bool val = (bool)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = val ? 1 : 0;
+                                                    }
+                                                    else if (type == typeof(short))
+                                                    {
+                                                        short val = (short)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(long))
+                                                    {
+                                                        long val = (long)obj;
+                                                        objRef->ObjectType = ObjectTypes.Long;
+                                                        *(long*)&objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(float))
+                                                    {
+                                                        float val = (float)obj;
+                                                        objRef->ObjectType = ObjectTypes.Float;
+                                                        *(float*)&objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(byte))
+                                                    {
+                                                        byte val = (byte)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(double))
+                                                    {
+                                                        double val = (double)obj;
+                                                        objRef->ObjectType = ObjectTypes.Double;
+                                                        *(double*)&objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(uint))
+                                                    {
+                                                        uint val = (uint)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = (int)val;
+                                                    }
+                                                    else if (type == typeof(ushort))
+                                                    {
+                                                        ushort val = (ushort)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(ulong))
+                                                    {
+                                                        ulong val = (ulong)obj;
+                                                        objRef->ObjectType = ObjectTypes.Long;
+                                                        *(ulong*)&objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(sbyte))
+                                                    {
+                                                        sbyte val = (sbyte)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        objRef->Value = val;
+                                                    }
+                                                    else
+                                                        throw new NotImplementedException();
+                                                }
+                                                else if (t.IsValueType)
+                                                {
+                                                    throw new NotImplementedException();
+                                                }
+                                                else
+                                                {
+                                                    throw new NotImplementedException();
+                                                }
+                                            }
+                                            else
+                                                throw new TypeLoadException();
+                                        }
+                                        else
+                                            throw new NullReferenceException();
+                                    }
+                                    else if (objRef->ObjectType == ObjectTypes.Null)
+                                    {
+                                        throw new NullReferenceException();
+                                    }
+                                    else
+                                        throw new InvalidCastException();
                                 }
                                 break;
                             case OpCodeEnum.Initobj:

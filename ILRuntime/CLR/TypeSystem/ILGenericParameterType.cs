@@ -105,5 +105,11 @@ namespace ILRuntime.CLR.TypeSystem
         {
             throw new NotImplementedException();
         }
+
+
+        public bool IsValueType
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

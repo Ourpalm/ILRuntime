@@ -50,9 +50,9 @@ namespace TestCases
             return b;
         }
 
-        public static int foo(int init)
+        public static int foo(object init)
         {
-            int b = init;
+            int b = (int)init;
             for (int i = 0; i < 10000; i++)
             {
                 b += i;

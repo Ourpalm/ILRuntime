@@ -73,6 +73,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return arrayType;
             }
         }
+        public bool IsValueType
+        {
+            get
+            {
+                return clrType.IsValueType;
+            }
+        }
         public string FullName
         {
             get
