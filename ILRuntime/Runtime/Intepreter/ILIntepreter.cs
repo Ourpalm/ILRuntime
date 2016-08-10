@@ -645,6 +645,90 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Shl:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    int bits = b->Value;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) << bits;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value << bits;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Shr:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    int bits = b->Value;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((long*)&esp->Value) = *((long*)&a->Value) >> bits;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            esp->Value = a->Value >> bits;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Shr_Un:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 2;
+                                    esp = esp - 2;
+                                    int bits = b->Value;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            esp->ObjectType = ObjectTypes.Long;
+                                            *((ulong*)&esp->Value) = *((ulong*)&a->Value) >> bits;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->ObjectType = ObjectTypes.Integer;
+                                            *(uint*)&esp->Value = (uint)a->Value >> bits;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
+                            case OpCodeEnum.Not:
+                                {
+                                    StackObject* a = esp - 1;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            a->ObjectType = ObjectTypes.Long;
+                                            *((long*)&a->Value) = ~*((long*)&a->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            a->ObjectType = ObjectTypes.Integer;
+                                            a->Value = ~a->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             #endregion
 
                             #region Control Flows
