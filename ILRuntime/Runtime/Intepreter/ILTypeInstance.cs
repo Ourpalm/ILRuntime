@@ -35,6 +35,50 @@ namespace ILRuntime.Runtime.Intepreter
         }
     }
 
+    unsafe class ILEnumTypeInstance : ILTypeInstance
+    {
+        public ILEnumTypeInstance(ILType type)
+        {
+            if (!type.IsEnum)
+                throw new NotSupportedException();
+            this.type = type;
+            fields = new StackObject[1];
+        }
+
+        public override string ToString()
+        {
+            var fields = type.TypeDefinition.Fields;
+            long longVal = 0;
+            int intVal = 0;
+            bool isLong = type.TypeForCLR == typeof(long);
+            if (isLong)
+            {
+                fixed (StackObject* f = this.fields)
+                    longVal = *(long*)&f->Value;
+            }
+            else
+                intVal = this.fields[0].Value;
+            for (int i = 0;i< fields.Count; i++)
+            {
+                var f = fields[i];
+                if (f.IsStatic)
+                {
+                    if (isLong)
+                    {
+                        if ((long)f.Constant == longVal)
+                            return f.Name;
+                    }
+                    else
+                    {
+                        if ((int)f.Constant == intVal)
+                            return f.Name;
+                    }
+                }
+            }
+            return isLong ? longVal.ToString() : intVal.ToString();
+        }
+    }
+
     class ILTypeInstance
     {
         protected ILType type;

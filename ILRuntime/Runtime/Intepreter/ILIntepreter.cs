@@ -1135,7 +1135,16 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp--;
                                             }
                                             if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
-                                                esp = PushObject(esp, mStack, result,cm.ReturnType.TypeForCLR == typeof(object));
+                                            {
+                                                try
+                                                {
+                                                    esp = PushObject(esp, mStack, result, cm.ReturnType.TypeForCLR == typeof(object));
+                                                }
+                                                catch
+                                                {
+
+                                                }
+                                            }
                                         }
 
                                     }
@@ -1504,192 +1513,205 @@ namespace ILRuntime.Runtime.Intepreter
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type != null)
                                     {
-                                        if (type.TypeForCLR.IsPrimitive)
+                                        if(type is ILType)
                                         {
-                                            var t = type.TypeForCLR;
-                                            if(t == typeof(int))
+                                            if (((ILType)type).IsEnum)
                                             {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Integer:
-                                                        esp = PushObject(obj, mStack, obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(bool))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Integer:
-                                                        esp = PushObject(obj, mStack, (obj->Value == 1), true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, false, true);
-                                                        break;
-                                                    case ObjectTypes.Object:
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(byte))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Integer:
-                                                        esp = PushObject(obj, mStack, (byte)obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0L, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(short))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Integer:
-                                                        esp = PushObject(obj, mStack, (short)obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0L, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(long))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Long:
-                                                        esp = PushObject(obj, mStack, *(long*)&obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0L, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }                                            
-                                            else if (t == typeof(float))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Float:
-                                                        esp = PushObject(obj, mStack, *(float*)&obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0f, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(double))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Double:
-                                                        esp = PushObject(obj, mStack, *(double*)&obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0.0, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(uint))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Integer:
-                                                        esp = PushObject(obj, mStack, (uint)obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0L, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(ushort))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Integer:
-                                                        esp = PushObject(obj, mStack, (ushort)obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0L, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(ulong))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Long:
-                                                        esp = PushObject(obj, mStack, *(ulong*)&obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0L, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
-                                            }
-                                            else if (t == typeof(sbyte))
-                                            {
-                                                switch (obj->ObjectType)
-                                                {
-                                                    case ObjectTypes.Integer:
-                                                        esp = PushObject(obj, mStack, (sbyte)obj->Value, true);
-                                                        break;
-                                                    case ObjectTypes.Null:
-                                                        esp = PushObject(obj, mStack, 0L, true);
-                                                        break;
-                                                    default:
-                                                        throw new NotImplementedException();
-                                                }
+                                                ILEnumTypeInstance ins = new Intepreter.ILEnumTypeInstance((ILType)type);
+                                                ins.AssignFromStack(0, obj, mStack);
+                                                ins.Boxed = true;
+                                                esp = PushObject(obj, mStack, ins, true);
                                             }
                                             else
-                                                throw new NotImplementedException();
-                                        }
-                                        else if (type.TypeForCLR == typeof(ILTypeInstance))
-                                        {
-                                            if (obj->ObjectType != ObjectTypes.Null)
                                             {
-                                                var val = mStack[obj->Value];
-                                                Free(obj);
-                                                ILTypeInstance ins = (ILTypeInstance)val;
-                                                if (ins != null)
+                                                if (obj->ObjectType != ObjectTypes.Null)
                                                 {
-                                                    if (ins.IsValueType)
+                                                    var val = mStack[obj->Value];
+                                                    Free(obj);
+                                                    ILTypeInstance ins = (ILTypeInstance)val;
+                                                    if (ins != null)
                                                     {
-                                                        ins.Boxed = true;
+                                                        if (ins.IsValueType)
+                                                        {
+                                                            ins.Boxed = true;
+                                                        }
+                                                        esp = PushObject(obj, mStack, ins, true);
                                                     }
-                                                    esp = PushObject(obj, mStack, ins, true);
-                                                }
-                                                else
-                                                {
-                                                    esp = PushNull(obj);
+                                                    else
+                                                    {
+                                                        esp = PushNull(obj);
+                                                    }
                                                 }
                                             }
                                         }
                                         else
                                         {
-                                            //nothing to do for CLR type boxing
+                                            if (type.TypeForCLR.IsPrimitive)
+                                            {
+                                                var t = type.TypeForCLR;
+                                                if (t == typeof(int))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(bool))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, (obj->Value == 1), true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, false, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(byte))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, (byte)obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(short))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, (short)obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(long))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Long:
+                                                            esp = PushObject(obj, mStack, *(long*)&obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(float))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Float:
+                                                            esp = PushObject(obj, mStack, *(float*)&obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0f, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(double))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Double:
+                                                            esp = PushObject(obj, mStack, *(double*)&obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0.0, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(uint))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, (uint)obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(ushort))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, (ushort)obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(ulong))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Long:
+                                                            esp = PushObject(obj, mStack, *(ulong*)&obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else if (t == typeof(sbyte))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, (sbyte)obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Null:
+                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else
+                                                    throw new NotImplementedException();
+                                            }
+                                            else
+                                            {
+                                                //nothing to do for CLR type boxing
+                                            }
                                         }
                                     }
                                     else
@@ -2010,15 +2032,22 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldelem_U1:
                                 {
-                                    var idx = (esp - 1)->Value;
+                                    var idx = (esp - 1);
                                     var arrRef = esp - 2;
                                     byte[] arr = mStack[arrRef->Value] as byte[];
-                                    
+                                    int val;
+                                    if (arr != null)
+                                        val = arr[idx->Value];
+                                    else
+                                    {
+                                        bool[] arr2 = mStack[arrRef->Value] as bool[];
+                                        val = arr2[idx->Value] ? 1 : 0;
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = arr[idx];
+                                    arrRef->Value = val;
                                     esp -= 1;
                                 }
                                 break;

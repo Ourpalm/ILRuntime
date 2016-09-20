@@ -27,7 +27,7 @@ namespace ILRuntime.CLR.TypeSystem
         int fieldStartIdx = -1;
         int totalFieldCnt = -1;
         KeyValuePair<string, IType>[] genericArguments;
-        IType baseType, byRefType, arrayType;
+        IType baseType, byRefType, arrayType, enumType;
         IType[] interfaces;
         bool baseTypeInitialized = false;
         bool interfaceInitialized = false;
@@ -177,7 +177,18 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return typeof(ILTypeInstance);
+                if (definition.IsEnum)
+                {
+                    if (enumType == null)
+                        InitializeFields();
+                    if (enumType == null)
+                    {
+
+                    }
+                    return enumType.TypeForCLR;
+                }
+                else
+                    return typeof(ILTypeInstance);
             }
         }
         public IType ByRefType
@@ -194,7 +205,14 @@ namespace ILRuntime.CLR.TypeSystem
                 return arrayType;
             }
         }
-        string genericFullName;
+
+        public bool IsEnum
+        {
+            get
+            {
+                return definition.IsEnum;
+            }
+        }
         public string FullName
         {
             get
@@ -503,6 +521,10 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     else
                         fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType, this);
+                    if (IsEnum)
+                    {
+                        enumType = fieldTypes[idx - FieldStartIndex];
+                    }
                     idx++;
                 }
             }

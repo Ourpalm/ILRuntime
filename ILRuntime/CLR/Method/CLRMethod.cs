@@ -72,10 +72,9 @@ namespace ILRuntime.CLR.Method
             declaringType = type;
             this.appdomain = domain;
             param = def.GetParameters();
-            if (!def.IsGenericMethod && !def.ContainsGenericParameters)
+            if (!def.ContainsGenericParameters)
             {
                 ReturnType = domain.GetType(def.ReturnType.FullName);
-                InitParameters();
             }
             isConstructor = false;
         }
@@ -85,10 +84,9 @@ namespace ILRuntime.CLR.Method
             declaringType = type;
             this.appdomain = domain;
             param = def.GetParameters();
-            if (!def.IsGenericMethod && !def.ContainsGenericParameters)
+            if (!def.ContainsGenericParameters)
             {
                 ReturnType = type;
-                InitParameters();
             }
             isConstructor = true;
         }
