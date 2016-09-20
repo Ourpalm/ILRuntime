@@ -50,7 +50,7 @@ namespace ILRuntime.Runtime.Intepreter
             var fields = type.TypeDefinition.Fields;
             long longVal = 0;
             int intVal = 0;
-            bool isLong = type.TypeForCLR == typeof(long);
+            bool isLong = this.fields[0].ObjectType == ObjectTypes.Long;
             if (isLong)
             {
                 fixed (StackObject* f = this.fields)
@@ -65,13 +65,29 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     if (isLong)
                     {
-                        if ((long)f.Constant == longVal)
+                        long val = f.Constant is long ? (long)f.Constant : (long)(ulong)f.Constant;
+                        if (val == longVal)
                             return f.Name;
                     }
                     else
                     {
-                        if ((int)f.Constant == intVal)
-                            return f.Name;
+                        if (f.Constant is int)
+                        {
+                            if ((int)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is short)
+                        {
+                            if ((short)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is byte)
+                        {
+                            if ((byte)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else
+                            throw new NotImplementedException();
                     }
                 }
             }
