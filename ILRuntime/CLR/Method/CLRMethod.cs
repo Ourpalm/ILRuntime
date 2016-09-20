@@ -167,10 +167,10 @@ namespace ILRuntime.CLR.Method
             if (invocationParam == null)
                 invocationParam = new object[paramCount];
             object[] param = invocationParam;
-            for (int i = 1; i <= paramCount; i++)
+            for (int i = paramCount; i >= 1; i--)
             {
                 var p = esp - i;
-                var obj = this.param[i - 1].ParameterType.CheckPrimitiveTypes(p->ToObject(appdomain, mStack));
+                var obj = this.param[paramCount - i].ParameterType.CheckPrimitiveTypes(p->ToObject(appdomain, mStack));
 
                 param[paramCount - i] = obj;
             }

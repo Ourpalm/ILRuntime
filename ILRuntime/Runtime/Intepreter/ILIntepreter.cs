@@ -1523,7 +1523,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            //Nothing to do for CLR types
+                                            if (type.TypeForCLR.IsEnum)
+                                            {
+                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(type.TypeForCLR, obj->ToObject(AppDomain, mStack)));
+                                            }
+                                            else
+                                            {
+                                                //Nothing to do for other CLR types
+                                            }
                                         }
                                     }
                                     else
@@ -1730,6 +1737,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                                 else
                                                     throw new NotImplementedException();
+                                            }
+                                            else if (type.TypeForCLR.IsEnum)
+                                            {
+                                                esp = PushObject(obj, mStack, Enum.ToObject(type.TypeForCLR, obj->ToObject(AppDomain, mStack)));
                                             }
                                             else
                                             {

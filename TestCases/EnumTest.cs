@@ -74,5 +74,26 @@ namespace TestCases
             TestEnum3 c = (TestEnum3)EnumTest.b;
             Console.WriteLine("c=" + c);
         }
+
+        public static string Test06()
+        {
+            System.IO.FileMode a = System.IO.FileMode.Create;
+
+            Console.WriteLine("a=" + a);
+            return a.ToString();
+        }
+
+        public static string Test07()
+        {
+            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Create))
+            {
+                fs.WriteByte(100);
+            }
+
+            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Open))
+            {
+                return fs.ReadByte().ToString();
+            }
+        }
     }
 }
