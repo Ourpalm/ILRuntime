@@ -425,5 +425,29 @@ namespace ILRuntime.CLR.Method
 
             return m;
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(declaringType.FullName);
+            sb.Append('.');
+            sb.Append(Name);
+            sb.Append('(');
+            bool isFirst = true;
+            if (parameters == null)
+                InitParameters();
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                if (isFirst)
+                    isFirst = false;
+                else
+                    sb.Append(", ");
+                sb.Append(parameters[i].Name);
+                sb.Append(' ');
+                sb.Append(def.Parameters[i].Name);
+            }
+            sb.Append(')');
+            return sb.ToString();
+        }
     }
 }

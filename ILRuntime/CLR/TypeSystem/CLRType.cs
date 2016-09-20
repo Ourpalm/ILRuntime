@@ -87,6 +87,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return clrType.FullName;
             }
         }
+        public string Name
+        {
+            get
+            {
+                return clrType.Name;
+            }
+        }
 
         void InitializeMethods()
         {

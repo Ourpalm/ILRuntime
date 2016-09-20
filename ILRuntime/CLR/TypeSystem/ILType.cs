@@ -218,26 +218,13 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return typeRef.FullName;
-                /*if (genericArguments == null)
-                    return definition.FullName;
-                else
-                {
-                    if (string.IsNullOrEmpty(genericFullName))
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append(definition.FullName);
-                        sb.Append('<');
-                        for (int i = 0; i < genericArguments.Length; i++)
-                        {
-                            if (i > 1)
-                                sb.Append(", ");
-                            sb.Append(genericArguments[i].Value.FullName);
-                        }
-                        sb.Append('>');
-                        genericFullName = sb.ToString();
-                    }
-                    return genericFullName;
-                }*/
+            }
+        }
+        public string Name
+        {
+            get
+            {
+                return typeRef.Name;
             }
         }
         public List<IMethod> GetMethods()

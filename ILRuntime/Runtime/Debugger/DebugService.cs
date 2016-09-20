@@ -63,7 +63,7 @@ namespace ILRuntime.Runtime.Debugger
                         document = string.Format("{0}:Line {1}", seq.Document.Url, seq.StartLine);
                     }
                 }
-                sb.AppendFormat("at {0}.{1} {2}\r\n", m.DeclearingType.FullName, m.Definition.Name, document);
+                sb.AppendFormat("at {0} {1}\r\n", m, document);
             }
 
             return sb.ToString();

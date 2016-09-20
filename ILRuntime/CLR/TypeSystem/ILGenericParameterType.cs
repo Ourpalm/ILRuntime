@@ -111,5 +111,13 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get { throw new NotImplementedException(); }
         }
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+        }
     }
 }
