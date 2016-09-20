@@ -21,5 +21,12 @@ namespace TestCases
 
             return a.ToString();
         }
+
+        public static string Test02()
+        {
+            TestEnum a = (TestEnum)1;
+            Console.WriteLine("a=" + a);
+            return a.ToString();
+        }
     }
 }

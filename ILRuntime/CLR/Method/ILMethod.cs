@@ -289,6 +289,7 @@ namespace ILRuntime.CLR.Method
                         }
                     }
                     break;
+                case OpCodeEnum.Constrained:
                 case OpCodeEnum.Box:
                 case OpCodeEnum.Unbox_Any:
                 case OpCodeEnum.Unbox:
@@ -299,6 +300,10 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldobj:
                     {
                         var t = appdomain.GetType(token, declaringType);
+                        if (t == null && token is TypeReference && ((TypeReference)token).IsGenericParameter)
+                        {
+                            t = FindGenericArgument(((TypeReference)token).Name);
+                        }
                         if (t != null)
                         {
                             if (t is ILType)

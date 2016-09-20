@@ -1136,14 +1136,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
                                             {
-                                                try
-                                                {
-                                                    esp = PushObject(esp, mStack, result, cm.ReturnType.TypeForCLR == typeof(object));
-                                                }
-                                                catch
-                                                {
-
-                                                }
+                                                esp = PushObject(esp, mStack, result, cm.ReturnType.TypeForCLR == typeof(object));
                                             }
                                         }
 
@@ -1505,6 +1498,36 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp -= paramCount;
                                         esp = PushObject(esp, mStack, result);//new constructedObj
                                     }
+                                }
+                                break;
+                            case OpCodeEnum.Constrained:
+                                {
+                                    var obj = GetObjectAndResolveReference(esp - 1);
+                                    var type = domain.GetType(ip->TokenInteger);
+                                    if (type != null)
+                                    {
+                                        if (type is ILType)
+                                        {
+                                            var t = (ILType)type;
+                                            if (t.IsEnum)
+                                            {
+                                                ILEnumTypeInstance ins = new ILEnumTypeInstance(t);
+                                                ins.AssignFromStack(0, obj, mStack);
+                                                ins.Boxed = true;
+                                                esp = PushObject(esp - 1, mStack, ins);
+                                            }
+                                            else
+                                            {
+                                                //Nothing to do for normal IL Types
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //Nothing to do for CLR types
+                                        }
+                                    }
+                                    else
+                                        throw new NullReferenceException();
                                 }
                                 break;
                             case OpCodeEnum.Box:
@@ -2480,7 +2503,6 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     throw ex;
                                 }
-                            case OpCodeEnum.Constrained:
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Endfinally:
                             case OpCodeEnum.Volatile:
