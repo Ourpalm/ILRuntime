@@ -75,6 +75,10 @@ namespace ILRuntime.CLR.Method
             if (!def.ContainsGenericParameters)
             {
                 ReturnType = domain.GetType(def.ReturnType.FullName);
+                if(ReturnType == null)
+                {
+                    ReturnType = domain.GetType(def.ReturnType.AssemblyQualifiedName);
+                }
             }
             isConstructor = false;
         }
