@@ -127,6 +127,7 @@ Roadmaps
 
 ##Planned
 * Delegates
+* Reflection support
 * Inheritance of classes and interfaces from 
 * All IL instructions
 
