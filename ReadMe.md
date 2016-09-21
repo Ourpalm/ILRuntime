@@ -107,3 +107,31 @@ EnterFrame:                            LeaveFrame:
 After entering the Call stack frame, the stack pointer(to simplify the whole thing we just call it 'esp') to the FrameBase in the illustration. The local variables are stored in esp - n to esp -1. And the arguments are stored before local varialbes, which are pushed onto stack by the caller.
 
 After executing the ret instruction, we copy the return value onto the position, where the first argument was, and zero out all the memories behind it, the esp is then pointed to the return value.
+
+Roadmaps
+==============================================
+
+##Implemented
+* Basic Stack operations
+* Majorities of IL instructions
+* Type Systems
+* Value types and Reference Types
+* Enums
+* Virtual Methods
+* Inheritance of classes inside the Runtime
+* Implementation of interfaces insided the Runtime
+* Generics for both inside the Runtime and for CLR types
+* Exception handling
+* CLR Method redirections
+* Call stack and local variable dumper
+
+##Planned
+* Delegates
+* Inheritance of classes and interfaces from 
+* All IL instructions
+
+##Experimental, timeline uncertain
+* Debugger support
+* Visual Studio integration
+* Debugging in Visual Studio
+* Remote debugging on other device
