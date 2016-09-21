@@ -51,3 +51,59 @@ A very simple test case shows drastical performance improvement compared to LSha
 ```
 
 Invokation of foo() takes about 1300ms in LSharp, but only takes about 40ms in ILRuntime.
+
+StackFrame and Managed Object Stack
+---------------------
+In order to make the arthmetic operation fast enough, we must use unsafe code and manage the stack ourselfs. To accomplish this task, we've designed a ValueType to represent every slot in managed Stack.
+```C#
+    struct StackObject
+    {
+        public ObjectTypes ObjectType;
+        public int Value;
+        public int ValueLow;
+    }
+    enum ObjectTypes
+    {
+        Null,
+        Integer,
+        Long,
+        Float,
+        Double,
+        StackObjectReference,//Value = pointer, 
+        StaticFieldReference,
+        Object,
+        FieldReference,//Value = objIdx, ValueLow = fieldIdx
+        ArrayReference,//Value = objIdx, ValueLow = elemIdx
+    }
+```
+With this structure we can represent all kinds of objects on a managed Stack. It has a field indicates, which type of object it is. And it has 2 32bits Value fields, which can represent values from byte to long, it is also capable to represent a field reference.
+
+This structure is not sufficient for storing a reference type value. Therefore we have to instantiate a List<object> to store object references. In such case, the Value field stores the index of the object reference in the List.
+
+Managed Call Stack
+-----------------------------
+In order to make function call, we need to push all parameters onto the stack, and we need to allocate memory for all local variables, and we need to pass the return value to the caller. The Stack manipulation of entering and leaving the method body is illustrated like below:
+
+```
+EnterFrame:                            LeaveFrame:
+|---------------|                     |---------------|
+|   Argument1   |     |-------------->|  [ReturnVal]  |
+|---------------|     |               |---------------|
+|      ...      |     |               |     NULL      |
+|---------------|     |               |---------------|
+|   ArgumentN   |     |               |      ...      |
+|---------------|     |
+|   LocalVar1   |     |
+|---------------|     |
+|      ...      |     |
+|---------------|     |
+|   LocalVarN   |     |
+|---------------|     |
+|   FrameBase   |     |
+|---------------|     |
+|  [ReturnVal]  |------
+|---------------|
+```
+After entering the Call stack frame, the stack pointer(to simplify the whole thing we just call it 'esp') to the FrameBase in the illustration. The local variables are stored in esp - n to esp -1. And the arguments are stored before local varialbes, which are pushed onto stack by the caller.
+
+After executing the ret instruction, we copy the return value onto the position, where the first argument was, and zero out all the memories behind it, the esp is then pointed to the return value.
