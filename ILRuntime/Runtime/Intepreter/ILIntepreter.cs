@@ -38,7 +38,7 @@ namespace ILRuntime.Runtime.Intepreter
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             return result;
         }
-        StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
+        internal StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
         {
             OpCode[] body = method.Body;
             StackFrame frame = stack.PushFrame(method, esp);

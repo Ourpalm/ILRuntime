@@ -14,7 +14,6 @@ namespace ILRuntime.Runtime.Enviorment
 {
     public class AppDomain
     {
-        HashSet<string> loadedAssembly;
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
@@ -23,6 +22,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<int, string> mapString = new Dictionary<int, string>();
         Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>>();
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
+        DelegateManager dMgr;
         public AppDomain()
         {
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
@@ -34,7 +34,13 @@ namespace ILRuntime.Runtime.Enviorment
                     RegisterCLRMethodRedirection(i, CLRRedirections.CreateInstance);
                 }
             }
-            
+            dMgr = new DelegateManager(this);
+            dMgr.RegisterDelegateConvertor<Action<int>>((adapter) =>
+            {
+                return adapter.Delegate;
+            });
+            dMgr.RegisterMethodDelegate<ILTypeInstance>();
+            dMgr.RegisterMethodDelegate<int>();
         }
 
         internal IType VoidType { get { return voidType; } }
@@ -47,6 +53,8 @@ namespace ILRuntime.Runtime.Enviorment
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
         internal Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
+
+        internal DelegateManager DelegateManager { get { return dMgr; } }
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);
