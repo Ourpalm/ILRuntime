@@ -119,5 +119,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return name;
             }
         }
+
+        public bool IsDelegate
+        {
+            get
+            {
+                return false;
+            }
+        }
     }
 }

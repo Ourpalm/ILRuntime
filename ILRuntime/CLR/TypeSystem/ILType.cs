@@ -32,6 +32,7 @@ namespace ILRuntime.CLR.TypeSystem
         bool baseTypeInitialized = false;
         bool interfaceInitialized = false;
         List<ILType> genericInstances;
+        bool isDelegate;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
         public TypeReference TypeReference
@@ -147,7 +148,7 @@ namespace ILRuntime.CLR.TypeSystem
                 definition = (TypeDefinition)((GenericInstanceType)def).ElementType;
             else
                 definition = (TypeDefinition)def;
-            appdomain = domain;            
+            appdomain = domain;
         }
 
         public bool IsGenericInstance
@@ -170,6 +171,14 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return definition.IsValueType;
+            }
+        }
+
+        public bool IsDelegate
+        {
+            get
+            {
+                return isDelegate;
             }
         }
 
@@ -261,6 +270,11 @@ namespace ILRuntime.CLR.TypeSystem
                     if (baseType.TypeForCLR == typeof(Enum) || baseType.TypeForCLR == typeof(object) || baseType.TypeForCLR == typeof(ValueType) || baseType.TypeForCLR == typeof(System.Enum))
                     {//都是这样，无所谓
                         baseType = null;
+                    }
+                    else if(baseType.TypeForCLR == typeof(MulticastDelegate))
+                    {
+                        baseType = null;
+                        isDelegate = true;
                     }
                     else
                     {

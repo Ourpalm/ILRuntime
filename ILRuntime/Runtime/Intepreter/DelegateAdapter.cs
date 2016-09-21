@@ -60,7 +60,6 @@ namespace ILRuntime.Runtime.Intepreter
             this.appdomain = appdomain;
             this.instance = instance;
             this.method = method;
-            action = InvokeILMethod;
         }
 
         public virtual Delegate Delegate
@@ -90,7 +89,9 @@ namespace ILRuntime.Runtime.Intepreter
 
         public virtual IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
         {
-            return new MethodDelegateAdapter(appdomain, instance, method);
+            var res = new MethodDelegateAdapter(appdomain, instance, method);
+            res.action = res.InvokeILMethod;
+            return res;
         }
     }
 

@@ -67,7 +67,7 @@ namespace ILRuntime.Runtime.Enviorment
                             }
                         }
                         if (match)
-                            return i.Adapter;
+                            return i.Adapter.Instantiate(appdomain, instance, method);
                     }
                 }
             }

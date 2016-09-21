@@ -277,6 +277,7 @@ namespace ILRuntime.CLR.Method
                     break;
                 case OpCodeEnum.Call:
                 case OpCodeEnum.Newobj:
+                case OpCodeEnum.Ldftn:
                 case OpCodeEnum.Callvirt:
                     {
                         var m = appdomain.GetMethod(token, declaringType);

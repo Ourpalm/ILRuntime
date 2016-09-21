@@ -1318,6 +1318,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Ldftn:
+                                {
+                                    IMethod m = domain.GetMethod(ip->TokenInteger);
+                                    esp = PushObject(esp, mStack, m);
+                                }
+                                break;
                             #endregion
 
                             #region Compare
@@ -1489,14 +1495,40 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         CLRMethod cm = (CLRMethod)m;
-                                        object result = cm.Invoke(esp, mStack, true);
-                                        int paramCount = cm.ParameterCount;
-                                        for (int i = 1; i <= paramCount; i++)
+                                        if (cm.DeclearingType.IsDelegate)
                                         {
-                                            Free(esp - i);
+                                            var objRef = esp - 2;
+                                            var mi = (IMethod)mStack[(esp - 1)->Value];
+                                            object ins;
+                                            if (objRef->ObjectType == ObjectTypes.Null)
+                                                ins = null;
+                                            else
+                                                ins = mStack[objRef->Value];
+                                            Free(esp - 1);
+                                            Free(esp - 2);
+                                            esp -= 2;
+                                            object dele;
+                                            if (mi is ILMethod)
+                                            {
+                                                dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                            }
+                                            else
+                                            {
+                                                throw new NotImplementedException();
+                                            }
+                                            esp = PushObject(esp, mStack, dele);
                                         }
-                                        esp -= paramCount;
-                                        esp = PushObject(esp, mStack, result);//new constructedObj
+                                        else
+                                        {
+                                            object result = cm.Invoke(esp, mStack, true);
+                                            int paramCount = cm.ParameterCount;
+                                            for (int i = 1; i <= paramCount; i++)
+                                            {
+                                                Free(esp - i);
+                                            }
+                                            esp -= paramCount;
+                                            esp = PushObject(esp, mStack, result);//new constructedObj
+                                        }
                                     }
                                 }
                                 break;

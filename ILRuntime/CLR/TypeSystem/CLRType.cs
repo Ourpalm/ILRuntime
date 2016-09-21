@@ -20,6 +20,7 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, int> fieldTokenMapping;
         IType byRefType, arrayType;
+        bool isDelegate;
 
         public Dictionary<int, FieldInfo> Fields { get { return fieldInfoCache; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
@@ -34,6 +35,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             this.clrType = clrType;
             this.appdomain = appdomain;
+            isDelegate = clrType.BaseType == typeof(MulticastDelegate);
         }
         
         public bool IsGenericInstance
@@ -78,6 +80,13 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return clrType.IsValueType;
+            }
+        }
+        public bool IsDelegate
+        {
+            get
+            {
+                return isDelegate;
             }
         }
         public string FullName
