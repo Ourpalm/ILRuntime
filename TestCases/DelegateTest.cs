@@ -10,6 +10,7 @@ namespace TestCases
         public static void DelegateTest01()
         {
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest;
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest2;
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest(123);
         }
 
@@ -20,7 +21,7 @@ namespace TestCases
 
         static void IntTest2(int a)
         {
-            Console.WriteLine("dele a=" + a);
+            Console.WriteLine("dele2 a=" + a);
         }
 
         class DelegateTestCls
@@ -32,12 +33,12 @@ namespace TestCases
             }
             public void IntTest(int a)
             {
-                Console.WriteLine("dele a=" + (a + b));
+                Console.WriteLine("dele3 a=" + (a + b));
             }
 
             public void IntTest2(int a)
             {
-                Console.WriteLine("dele a=" + (a + b));
+                Console.WriteLine("dele4 a=" + (a + b));
             }
         }
     }

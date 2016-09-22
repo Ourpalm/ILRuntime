@@ -168,13 +168,14 @@ namespace ILRuntime.Runtime.Enviorment
                             ((IDelegateAdapter)dele1).Combine((IDelegateAdapter)dele2);
                         else
                             ((IDelegateAdapter)dele1).Combine((Delegate)dele2);
+                        return dele1;
                     }
                     else
                     {
                         if (dele2 is IDelegateAdapter)
-                            Delegate.Combine((Delegate)dele1, domain.DelegateManager.ConvertToDelegate(dele1.GetType(), (IDelegateAdapter)dele2));
+                            return Delegate.Combine((Delegate)dele1, domain.DelegateManager.ConvertToDelegate(dele1.GetType(), (IDelegateAdapter)dele2));
                         else
-                            Delegate.Combine((Delegate)dele1, (Delegate)dele2);
+                            return Delegate.Combine((Delegate)dele1, (Delegate)dele2);
                     }
                 }
                 else
@@ -182,7 +183,6 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
                 return dele2;
-            return null;
         }
     }
 }

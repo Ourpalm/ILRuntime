@@ -83,10 +83,10 @@ namespace ILRuntime.CLR.Utils
             }
             else if (pt == typeof(Delegate) || pt.IsSubclassOf(typeof(Delegate)))
             {
-                if (pt == typeof(Delegate))
-                    return ((IDelegateAdapter)obj).Delegate;
                 if (obj is Delegate)
                     return obj;
+                if (pt == typeof(Delegate))
+                    return ((IDelegateAdapter)obj).Delegate;
                 return domain.DelegateManager.ConvertToDelegate(pt, (IDelegateAdapter)obj);
             }
             else if (pt.IsByRef)
