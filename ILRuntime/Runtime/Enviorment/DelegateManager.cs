@@ -37,6 +37,7 @@ namespace ILRuntime.Runtime.Enviorment
             node.Adapter = new MethodDelegateAdapter<T1>();
             node.ParameterTypes = new Type[] { typeof(T1) };
             methods.Add(node);
+            RegisterDelegateConvertor<Action<T1>>((dele) => dele);
         }
 
         internal Delegate ConvertToDelegate(Type clrDelegateType, IDelegateAdapter adapter)

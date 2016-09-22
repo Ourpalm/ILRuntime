@@ -12,7 +12,7 @@ namespace TestCases
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest;
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest2;
 
-            DelegateTestCls cls = new TestCases.DelegateTest.DelegateTestCls(1000);
+            DelegateTestCls cls = new DelegateTestCls(1000);
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += cls.IntTest;
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += cls.IntTest2;
 
@@ -25,9 +25,13 @@ namespace TestCases
             a += IntTest;
             a += IntTest2;
 
-            DelegateTestCls cls = new TestCases.DelegateTest.DelegateTestCls(1000);
+            DelegateTestCls cls = new DelegateTestCls(1000);
             a += cls.IntTest;
             a += cls.IntTest2;
+            a += (i) =>
+            {
+                Console.WriteLine("lambda a=" + i);
+            };
             a(123);
         }
 
