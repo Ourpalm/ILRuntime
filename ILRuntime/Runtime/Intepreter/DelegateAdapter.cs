@@ -10,7 +10,7 @@ using ILRuntime.Runtime.Enviorment;
 
 namespace ILRuntime.Runtime.Intepreter
 {
-    class MethodDelegateAdapter<T1> : MethodDelegateAdapter, IDelegateAdapter
+    class MethodDelegateAdapter<T1> : DelegateAdapter, IDelegateAdapter
     {
         Action<T1> action;
         
@@ -61,10 +61,9 @@ namespace ILRuntime.Runtime.Intepreter
         }
 
         protected MethodDelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+            : base(appdomain, instance, method)
         {
-            this.appdomain = appdomain;
-            this.instance = instance;
-            this.method = method;
+            action = InvokeILMethod;
         }
 
         public override Delegate Delegate
@@ -77,14 +76,15 @@ namespace ILRuntime.Runtime.Intepreter
 
         void InvokeILMethod()
         {
-            appdomain.Invoke(method);
+            if (method.HasThis)
+                appdomain.Invoke(method, instance);
+            else
+                appdomain.Invoke(method);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
         {
-            var res = new MethodDelegateAdapter(appdomain, instance, method);
-            res.action = res.InvokeILMethod;
-            return res;
+            return new MethodDelegateAdapter(appdomain, instance, method);
         }
 
         public override void Combine(Delegate dele)
@@ -101,6 +101,15 @@ namespace ILRuntime.Runtime.Intepreter
         IDelegateAdapter next;
 
         public abstract Delegate Delegate { get; }
+
+        protected DelegateAdapter() { }
+
+        protected DelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+        {
+            this.appdomain = appdomain;
+            this.instance = instance;
+            this.method = method;
+        }
 
         public override bool IsValueType
         {
