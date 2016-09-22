@@ -1124,21 +1124,35 @@ namespace ILRuntime.Runtime.Intepreter
                                         else
                                         {
                                             CLRMethod cm = (CLRMethod)m;
-                                            object result = cm.Invoke(esp, mStack);
-                                            int paramCount = cm.ParameterCount;
-                                            for (int i = 1; i <= paramCount; i++)
+                                            bool processed = false;
+                                            if (cm.IsDelegateInvoke)
                                             {
-                                                Free(esp - i);
+                                                var instance = (esp - cm.ParameterCount - 1)->ToObject(domain, mStack);
+                                                if (instance is IDelegateAdapter)
+                                                {
+                                                    esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
+                                                    processed = true;
+                                                }
                                             }
-                                            esp -= paramCount;
-                                            if (cm.HasThis)
+
+                                            if (!processed)
                                             {
-                                                Free(esp - 1);
-                                                esp--;
-                                            }
-                                            if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
-                                            {
-                                                esp = PushObject(esp, mStack, result, cm.ReturnType.TypeForCLR == typeof(object));
+                                                object result = cm.Invoke(esp, mStack);
+                                                int paramCount = cm.ParameterCount;
+                                                for (int i = 1; i <= paramCount; i++)
+                                                {
+                                                    Free(esp - i);
+                                                }
+                                                esp -= paramCount;
+                                                if (cm.HasThis)
+                                                {
+                                                    Free(esp - 1);
+                                                    esp--;
+                                                }
+                                                if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
+                                                {
+                                                    esp = PushObject(esp, mStack, result, cm.ReturnType.TypeForCLR == typeof(object));
+                                                }
                                             }
                                         }
 
@@ -2806,7 +2820,7 @@ namespace ILRuntime.Runtime.Intepreter
             return esp;
         }
 
-        void CopyToStack(StackObject* dst, StackObject* src, List<object> mStack)
+        public void CopyToStack(StackObject* dst, StackObject* src, List<object> mStack)
         {
             *dst = *src;
             if (dst->ObjectType >= ObjectTypes.Object)
@@ -2848,7 +2862,7 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
+        public StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
         {
             if (obj != null)
             {
@@ -2930,7 +2944,7 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        void Free(StackObject* esp)
+        public void Free(StackObject* esp)
         {
             if (esp->ObjectType >= ObjectTypes.Object)
             {

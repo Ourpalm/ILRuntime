@@ -24,6 +24,7 @@ namespace ILRuntime.CLR.Method
         Func<ILContext, object, object[], IType[], object> redirect;
         IType[] genericArguments;
         object[] invocationParam;
+        bool isDelegateInvoke;
 
         public IType DeclearingType
         {
@@ -65,6 +66,14 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public bool IsDelegateInvoke
+        {
+            get
+            {
+                return isDelegateInvoke;
+            }
+        }
+
         public IType[] GenericArguments { get { return genericArguments; } }
 
         public CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
@@ -81,6 +90,8 @@ namespace ILRuntime.CLR.Method
                     ReturnType = domain.GetType(def.ReturnType.AssemblyQualifiedName);
                 }
             }
+            if (type.IsDelegate && def.Name == "Invoke")
+                isDelegateInvoke = true;
             isConstructor = false;
         }
         public CLRMethod(ConstructorInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)

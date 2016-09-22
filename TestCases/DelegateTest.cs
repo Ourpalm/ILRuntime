@@ -11,7 +11,24 @@ namespace TestCases
         {
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest;
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest2;
+
+            DelegateTestCls cls = new TestCases.DelegateTest.DelegateTestCls(1000);
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += cls.IntTest;
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += cls.IntTest2;
+
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest(123);
+        }
+
+        public static void DelegateTest02()
+        {
+            Action<int> a = null;
+            a += IntTest;
+            a += IntTest2;
+
+            DelegateTestCls cls = new TestCases.DelegateTest.DelegateTestCls(1000);
+            a += cls.IntTest;
+            a += cls.IntTest2;
+            a(123);
         }
 
         static void IntTest(int a)

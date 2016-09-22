@@ -114,7 +114,7 @@ namespace ILRuntime.Runtime.Intepreter
             get { return fields; }
         }
 
-        public bool IsValueType
+        public virtual bool IsValueType
         {
             get
             {
