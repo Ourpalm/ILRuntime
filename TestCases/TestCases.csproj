@@ -35,12 +35,11 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DelegateTest.cs" />
     <Compile Include="LightTester2.cs" />
     <Compile Include="LightTester1.cs" />
     <Compile Include="EnumTest.cs" />
@@ -50,6 +49,12 @@
     <Compile Include="Test01.cs" />
     <Compile Include="Test03.cs" />
     <Compile Include="Test05.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ILRuntimeTest\ILRuntimeTest.csproj">
+      <Project>{e6dd179d-fa31-4425-bde1-9dd0be0a9be1}</Project>
+      <Name>ILRuntimeTest</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

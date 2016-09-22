@@ -50,6 +50,7 @@
     <Compile Include="CLR\TypeSystem\ILGenericParameterType.cs" />
     <Compile Include="CLR\TypeSystem\ILType.cs" />
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
+    <Compile Include="Runtime\Enviorment\ILContext.cs" />
     <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />
     <Compile Include="Runtime\Enviorment\DelegateManager.cs" />
     <Compile Include="Runtime\Enviorment\CLRRedirections.cs" />

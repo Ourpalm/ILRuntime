@@ -7,7 +7,7 @@ using ILRuntime.Runtime.Intepreter;
 namespace ILRuntime.Runtime.Stack
 {
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    struct StackObject
+    public struct StackObject
     {
         public static StackObject Null = new StackObject() { ObjectType = ObjectTypes.Null, Value = -1, ValueLow = 0 };
         public ObjectTypes ObjectType;
@@ -85,7 +85,7 @@ namespace ILRuntime.Runtime.Stack
         }
     }
 
-    enum ObjectTypes
+    public enum ObjectTypes
     {
         Null,
         Integer,

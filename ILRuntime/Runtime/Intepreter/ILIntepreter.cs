@@ -40,6 +40,8 @@ namespace ILRuntime.Runtime.Intepreter
         }
         internal StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
         {
+            if (method == null)
+                throw new NullReferenceException();
             OpCode[] body = method.Body;
             StackFrame frame = stack.PushFrame(method, esp);
             StackObject* v1 = frame.LocalVarPointer;
@@ -1166,7 +1168,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 var val = esp - 1;
                                                 var f = ((CLRType)type).Fields[ip->TokenInteger];
-                                                f.SetValue(obj, f.FieldType.CheckPrimitiveTypes(val->ToObject(AppDomain, mStack)));
+                                                f.SetValue(obj, f.FieldType.CheckCLRTypes(domain, val->ToObject(domain, mStack)));
                                             }
                                             else
                                                 throw new TypeLoadException();
@@ -1250,7 +1252,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             int idx = (int)ip->TokenLong;
                                             var f = t.Fields[idx];
                                             StackObject* val = esp - 1;
-                                            f.SetValue(null, f.FieldType.CheckPrimitiveTypes(val->ToObject(AppDomain, mStack)));
+                                            f.SetValue(null, f.FieldType.CheckCLRTypes(domain, val->ToObject(domain, mStack)));
                                         }
                                     }
                                     else
@@ -2549,6 +2551,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Endfinally:
                             case OpCodeEnum.Volatile:
+                            case OpCodeEnum.Castclass:
                                 break;
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);

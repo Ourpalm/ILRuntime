@@ -9,7 +9,7 @@ namespace ILRuntime.Runtime.Enviorment
 {
     static class CLRRedirections
     {
-        public static object CreateInstance(object instance, object[] param, IType[] genericArguments)
+        public static object CreateInstance(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
             if (genericArguments != null && genericArguments.Length == 1)
             {
@@ -24,7 +24,7 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 throw new EntryPointNotFoundException();
         }
-        public unsafe static object InitializeArray(object instance, object[] param, IType[] genericArguments)
+        public unsafe static object InitializeArray(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
             object array = param[0];
             byte[] data = param[1] as byte[];
@@ -144,6 +144,12 @@ namespace ILRuntime.Runtime.Enviorment
                     throw new NotImplementedException("array=" + array.GetType());
                 }
             }
+
+            return null;
+        }
+
+        public static object DelegateCombine(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
 
             return null;
         }

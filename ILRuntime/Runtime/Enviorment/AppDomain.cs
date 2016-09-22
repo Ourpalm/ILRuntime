@@ -20,7 +20,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
-        Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>>();
+        Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>>();
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         DelegateManager dMgr;
         public AppDomain()
@@ -32,6 +32,13 @@ namespace ILRuntime.Runtime.Enviorment
                 if (i.Name == "CreateInstance" && i.IsGenericMethodDefinition)
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.CreateInstance);
+                }
+            }
+            foreach (var i in typeof(System.Delegate).GetMethods())
+            {
+                if (i.Name == "Combine" && i.GetParameters().Length == 2)
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.DelegateCombine);
                 }
             }
             dMgr = new DelegateManager(this);
@@ -52,7 +59,7 @@ namespace ILRuntime.Runtime.Enviorment
         internal IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
-        internal Dictionary<System.Reflection.MethodInfo, Func<object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
+        internal Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
 
         internal DelegateManager DelegateManager { get { return dMgr; } }
         public void LoadAssembly(System.IO.Stream stream)
@@ -97,7 +104,7 @@ namespace ILRuntime.Runtime.Enviorment
             objectType = GetType("System.Object");
         }
 
-        public void RegisterCLRMethodRedirection(System.Reflection.MethodInfo mi, Func<object, object[], IType[], object> func)
+        public void RegisterCLRMethodRedirection(System.Reflection.MethodInfo mi, Func<ILContext, object, object[], IType[], object> func)
         {
             redirectMap[mi] = func;
         }

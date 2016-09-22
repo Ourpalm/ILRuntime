@@ -12,6 +12,7 @@ namespace ILRuntime.Runtime.Enviorment
     class DelegateManager
     {
         List<DelegateMapNode> methods = new List<DelegateMapNode>();
+        IDelegateAdapter zeroParamMethodAdapter = new MethodDelegateAdapter();
         Dictionary<Type, Func<IDelegateAdapter, Delegate>> clrDelegates = new Dictionary<Type, Func<IDelegateAdapter, Delegate>>();
         Enviorment.AppDomain appdomain;
         public DelegateManager(Enviorment.AppDomain appdomain)
@@ -46,13 +47,15 @@ namespace ILRuntime.Runtime.Enviorment
                 return func(adapter);
             }
             else
-                return null;
+                throw new KeyNotFoundException("Cannot find convertor for " + clrDelegateType);
         }
 
         public IDelegateAdapter FindDelegateAdapter(ILTypeInstance instance, ILMethod method)
         {
             if(method.ReturnType == appdomain.VoidType)
             {
+                if (method.ParameterCount == 0)
+                    return zeroParamMethodAdapter;
                 foreach(var i in methods)
                 {
                     if(i.ParameterTypes.Length == method.ParameterCount)

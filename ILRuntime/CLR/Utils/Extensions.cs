@@ -5,8 +5,11 @@ using System.Text;
 
 using ILRuntime.CLR.TypeSystem;
 using Mono.Cecil;
+using ILRuntime.Runtime.Intepreter;
 namespace ILRuntime.CLR.Utils
 {
+    public delegate TResult Func<T1, T2, T3, T4, T5, TResult>(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5);
+
     static class Extensions
     {
         static List<IType> emptyParamList = new List<IType>();
@@ -28,7 +31,7 @@ namespace ILRuntime.CLR.Utils
                         {
                             var gp = gim.ElementMethod.GenericParameters[j];
                             var ga = gim.GenericArguments[j];
-                            if(name == gp.Name)
+                            if (name == gp.Name)
                             {
                                 t = appdomain.GetType(ga, contextType);
                                 break;
@@ -51,8 +54,10 @@ namespace ILRuntime.CLR.Utils
                 return emptyParamList;
         }
 
-        public static object CheckPrimitiveTypes(this Type pt, object obj)
+        public static object CheckCLRTypes(this Type pt, Runtime.Enviorment.AppDomain domain, object obj)
         {
+            if (obj == null)
+                return null;
             if (pt.IsPrimitive && pt != typeof(int))
             {
                 if (pt == typeof(bool) && !(obj is bool))
@@ -76,9 +81,15 @@ namespace ILRuntime.CLR.Utils
                     obj = (ulong)(long)obj;
                 }
             }
+            else if (pt == typeof(Delegate) || pt.IsSubclassOf(typeof(Delegate)))
+            {
+                if (pt == typeof(Delegate))
+                    return ((IDelegateAdapter)obj).Delegate;
+                return domain.DelegateManager.ConvertToDelegate(pt, (IDelegateAdapter)obj);
+            }
             else if (pt.IsByRef)
             {
-                return CheckPrimitiveTypes(pt.GetElementType(), obj);
+                return CheckCLRTypes(pt.GetElementType(), domain, obj);
             }
             else if (pt.IsEnum)
             {

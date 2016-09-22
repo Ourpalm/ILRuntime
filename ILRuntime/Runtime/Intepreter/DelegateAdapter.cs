@@ -42,14 +42,16 @@ namespace ILRuntime.Runtime.Intepreter
         {
             return new MethodDelegateAdapter<T1>(appdomain, instance, method);
         }
-    }
-    class MethodDelegateAdapter : ILTypeInstance, IDelegateAdapter
-    {
-        protected ILMethod method;
-        protected ILTypeInstance instance;
-        protected Enviorment.AppDomain appdomain;
-        Action action;
 
+        public override void Combine(Delegate dele)
+        {
+            action += (Action<T1>)dele;
+        }
+    }
+    class MethodDelegateAdapter : DelegateAdapter
+    {
+        Action action;
+        
         public MethodDelegateAdapter()
         {
 
@@ -62,7 +64,7 @@ namespace ILRuntime.Runtime.Intepreter
             this.method = method;
         }
 
-        public virtual Delegate Delegate
+        public override Delegate Delegate
         {
             get
             {
@@ -75,10 +77,34 @@ namespace ILRuntime.Runtime.Intepreter
             appdomain.Invoke(method);
         }
 
+        public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+        {
+            var res = new MethodDelegateAdapter(appdomain, instance, method);
+            res.action = res.InvokeILMethod;
+            return res;
+        }
+
+        public override void Combine(Delegate dele)
+        {
+            action += (Action)dele;
+        }
+    }
+
+    abstract class DelegateAdapter : ILTypeInstance, IDelegateAdapter
+    {
+        protected ILMethod method;
+        protected ILTypeInstance instance;
+        protected Enviorment.AppDomain appdomain;
+        IDelegateAdapter next;
+
+        public abstract Delegate Delegate { get; }
+
         public unsafe StackObject* ILInvoke(ILIntepreter intp, StackObject* esp)
         {
             bool unhandled;
             var ret = intp.Execute(method, esp, out unhandled);
+            if (next != null)
+                ret = next.ILInvoke(intp, esp);
             return ret;
         }
 
@@ -87,11 +113,21 @@ namespace ILRuntime.Runtime.Intepreter
             throw new NotImplementedException();
         }
 
-        public virtual IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+        public abstract IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method);
+
+        public virtual void Combine(IDelegateAdapter adapter)
         {
-            var res = new MethodDelegateAdapter(appdomain, instance, method);
-            res.action = res.InvokeILMethod;
-            return res;
+            if (next != null)
+                next.Combine(adapter);
+            else
+                next = adapter;
+        }
+
+        public abstract void Combine(Delegate dele);
+
+        public override string ToString()
+        {
+            return method.ToString();
         }
     }
 
@@ -101,5 +137,6 @@ namespace ILRuntime.Runtime.Intepreter
         StackObject* ILInvoke(ILIntepreter intp, StackObject* esp);
         StackObject* ILInvokeVirtual(ILIntepreter intp, StackObject* esp);
         IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method);
+        void Combine(IDelegateAdapter adapter);
     }
 }
