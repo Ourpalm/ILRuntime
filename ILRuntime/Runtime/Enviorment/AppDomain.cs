@@ -42,9 +42,9 @@ namespace ILRuntime.Runtime.Enviorment
                 }
             }
             dMgr = new DelegateManager(this);
-            dMgr.RegisterDelegateConvertor<Action<int>>((adapter) =>
+            dMgr.RegisterDelegateConvertor<Action<int>>((dele) =>
             {
-                return adapter.Delegate;
+                return dele;
             });
             dMgr.RegisterMethodDelegate<ILTypeInstance>();
             dMgr.RegisterMethodDelegate<int>();
@@ -61,7 +61,7 @@ namespace ILRuntime.Runtime.Enviorment
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
         internal Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
 
-        internal DelegateManager DelegateManager { get { return dMgr; } }
+        public DelegateManager DelegateManager { get { return dMgr; } }
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);

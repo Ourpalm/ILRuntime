@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using ILRuntime.CLR.TypeSystem;
+using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -148,9 +149,39 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        public static object DelegateCombine(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        public unsafe static object DelegateCombine(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
+            var esp = ctx.ESP;
+            var mStack = ctx.ManagedStack;
+            var domain = ctx.AppDomain;
 
+            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele2 = (esp - 1)->ToObject(domain, mStack);
+
+            if (dele1 != null)
+            {
+                if (dele2 != null)
+                {
+                    if (dele1 is IDelegateAdapter)
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            ((IDelegateAdapter)dele1).Combine((IDelegateAdapter)dele2);
+                        else
+                            ((IDelegateAdapter)dele1).Combine((Delegate)dele2);
+                    }
+                    else
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            Delegate.Combine((Delegate)dele1, domain.DelegateManager.ConvertToDelegate(dele1.GetType(), (IDelegateAdapter)dele2));
+                        else
+                            Delegate.Combine((Delegate)dele1, (Delegate)dele2);
+                    }
+                }
+                else
+                    return dele1;
+            }
+            else
+                return dele2;
             return null;
         }
     }

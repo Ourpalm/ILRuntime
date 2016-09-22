@@ -9,18 +9,18 @@ using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.Runtime.Enviorment
 {
-    class DelegateManager
+    public class DelegateManager
     {
         List<DelegateMapNode> methods = new List<DelegateMapNode>();
         IDelegateAdapter zeroParamMethodAdapter = new MethodDelegateAdapter();
-        Dictionary<Type, Func<IDelegateAdapter, Delegate>> clrDelegates = new Dictionary<Type, Func<IDelegateAdapter, Delegate>>();
+        Dictionary<Type, Func<Delegate, Delegate>> clrDelegates = new Dictionary<Type, Func<Delegate, Delegate>>();
         Enviorment.AppDomain appdomain;
         public DelegateManager(Enviorment.AppDomain appdomain)
         {
             this.appdomain = appdomain;
         }
 
-        public void RegisterDelegateConvertor<T>(Func<IDelegateAdapter, Delegate> action)
+        public void RegisterDelegateConvertor<T>(Func<Delegate, Delegate> action)
         {
             var type = typeof(T);
             if (type.IsSubclassOf(typeof(Delegate)))
@@ -39,18 +39,18 @@ namespace ILRuntime.Runtime.Enviorment
             methods.Add(node);
         }
 
-        public Delegate ConvertToDelegate(Type clrDelegateType, IDelegateAdapter adapter)
+        internal Delegate ConvertToDelegate(Type clrDelegateType, IDelegateAdapter adapter)
         {
-            Func<IDelegateAdapter, Delegate> func;
+            Func<Delegate, Delegate> func;
             if (clrDelegates.TryGetValue(clrDelegateType, out func))
             {
-                return func(adapter);
+                return func(adapter.Delegate);
             }
             else
                 throw new KeyNotFoundException("Cannot find convertor for " + clrDelegateType);
         }
 
-        public IDelegateAdapter FindDelegateAdapter(ILTypeInstance instance, ILMethod method)
+        internal IDelegateAdapter FindDelegateAdapter(ILTypeInstance instance, ILMethod method)
         {
             if(method.ReturnType == appdomain.VoidType)
             {

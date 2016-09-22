@@ -138,5 +138,6 @@ namespace ILRuntime.Runtime.Intepreter
         StackObject* ILInvokeVirtual(ILIntepreter intp, StackObject* esp);
         IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method);
         void Combine(IDelegateAdapter adapter);
+        void Combine(Delegate dele);
     }
 }
