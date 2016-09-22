@@ -42,7 +42,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
             }
             dMgr = new DelegateManager(this);
-            dMgr.RegisterDelegateConvertor<Action<int>>((dele) =>
+            dMgr.RegisterDelegateConvertor<Action>((dele) =>
             {
                 return dele;
             });
