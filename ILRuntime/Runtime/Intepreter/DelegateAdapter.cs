@@ -10,6 +10,91 @@ using ILRuntime.Runtime.Enviorment;
 
 namespace ILRuntime.Runtime.Intepreter
 {
+    #region Functions
+    class FunctionDelegateAdapter<TResult> : DelegateAdapter, IDelegateAdapter
+    {
+        Func<TResult> action;
+
+        public FunctionDelegateAdapter()
+        {
+
+        }
+
+        private FunctionDelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+            : base(appdomain, instance, method)
+        {
+            action = InvokeILMethod;
+        }
+
+        public override Delegate Delegate
+        {
+            get
+            {
+                return action;
+            }
+        }
+
+        TResult InvokeILMethod()
+        {
+            if (method.HasThis)
+                return (TResult)appdomain.Invoke(method, instance);
+            else
+                return (TResult)appdomain.Invoke(method);
+        }
+
+        public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+        {
+            return new FunctionDelegateAdapter<TResult>(appdomain, instance, method);
+        }
+
+        public override void Combine(Delegate dele)
+        {
+            action += (Func<TResult>)dele;
+        }
+    }
+
+    class FunctionDelegateAdapter<T1, TResult> : DelegateAdapter, IDelegateAdapter
+    {
+        Func<T1, TResult> action;
+
+        public FunctionDelegateAdapter()
+        {
+
+        }
+
+        private FunctionDelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+            : base(appdomain, instance, method)
+        {
+            action = InvokeILMethod;
+        }
+
+        public override Delegate Delegate
+        {
+            get
+            {
+                return action;
+            }
+        }
+
+        TResult InvokeILMethod(T1 p1)
+        {
+            if (method.HasThis)
+                return (TResult)appdomain.Invoke(method, instance, p1);
+            else
+                return (TResult)appdomain.Invoke(method, p1);
+        }
+
+        public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+        {
+            return new FunctionDelegateAdapter<T1, TResult>(appdomain, instance, method);
+        }
+
+        public override void Combine(Delegate dele)
+        {
+            action += (Func<T1, TResult>)dele;
+        }
+    }
+    #endregion 
     class MethodDelegateAdapter<T1> : DelegateAdapter, IDelegateAdapter
     {
         Action<T1> action;

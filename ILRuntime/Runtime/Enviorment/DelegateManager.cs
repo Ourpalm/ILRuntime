@@ -12,6 +12,7 @@ namespace ILRuntime.Runtime.Enviorment
     public class DelegateManager
     {
         List<DelegateMapNode> methods = new List<DelegateMapNode>();
+        List<DelegateMapNode> functions = new List<DelegateMapNode>();
         IDelegateAdapter zeroParamMethodAdapter = new MethodDelegateAdapter();
         Dictionary<Type, Func<Delegate, Delegate>> clrDelegates = new Dictionary<Type, Func<Delegate, Delegate>>();
         Enviorment.AppDomain appdomain;
@@ -38,6 +39,24 @@ namespace ILRuntime.Runtime.Enviorment
             node.ParameterTypes = new Type[] { typeof(T1) };
             methods.Add(node);
             RegisterDelegateConvertor<Action<T1>>((dele) => dele);
+        }
+
+        public void RegisterFunctionDelegate<TResult>()
+        {
+            DelegateMapNode node = new Enviorment.DelegateManager.DelegateMapNode();
+            node.Adapter = new FunctionDelegateAdapter<TResult>();
+            node.ParameterTypes = new Type[] { typeof(TResult) };
+            functions.Add(node);
+            RegisterDelegateConvertor<Func<TResult>>((dele) => dele);
+        }
+
+        public void RegisterFunctionDelegate<T1, TResult>()
+        {
+            DelegateMapNode node = new Enviorment.DelegateManager.DelegateMapNode();
+            node.Adapter = new FunctionDelegateAdapter<T1, TResult>();
+            node.ParameterTypes = new Type[] {typeof(T1), typeof(TResult) };
+            functions.Add(node);
+            RegisterDelegateConvertor<Func<T1, TResult>>((dele) => dele);
         }
 
         internal Delegate ConvertToDelegate(Type clrDelegateType, IDelegateAdapter adapter)
@@ -77,15 +96,29 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
             {
-                throw new NotImplementedException();
+                foreach (var i in functions)
+                {
+                    if (i.ParameterTypes.Length == method.ParameterCount + 1)
+                    {
+                        bool match = true;
+                        for (int j = 0; j < method.ParameterCount; j++)
+                        {
+                            if (i.ParameterTypes[j] != method.Parameters[j].TypeForCLR)
+                            {
+                                match = false;
+                                break;
+                            }
+                        }
+                        if (match)
+                        {
+                            if (method.ReturnType.TypeForCLR == i.ParameterTypes[method.ParameterCount])
+                                return i.Adapter.Instantiate(appdomain, instance, method);
+                        }
+                    }
+                }
             }
 
             throw new KeyNotFoundException("Cannot find Delegate Adapter for:" + method);
-        }
-
-        public void RegisterFunctionDelegate<T1, TReturn>()
-        {
-
         }
 
         class DelegateMapNode

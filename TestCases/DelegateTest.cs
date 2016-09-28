@@ -35,6 +35,23 @@ namespace TestCases
             a(123);
         }
 
+        public static int DelegateTest03()
+        {
+            Func<int, int> a = null;
+            a += IntTest3;
+
+            DelegateTestCls cls = new DelegateTestCls(1000);
+            a += cls.IntTest3;
+            a += (i) =>
+            {
+                Console.WriteLine("lambda a=" + i);
+                return i + 300;
+            };
+            int val = a(123);
+
+            return val;
+        }
+
         static void IntTest(int a)
         {
             Console.WriteLine("dele a=" + a);
@@ -43,6 +60,12 @@ namespace TestCases
         static void IntTest2(int a)
         {
             Console.WriteLine("dele2 a=" + a);
+        }
+
+        static int IntTest3(int a)
+        {
+            Console.WriteLine("dele3 a=" + a);
+            return a + 100;
         }
 
         class DelegateTestCls
@@ -60,6 +83,11 @@ namespace TestCases
             public void IntTest2(int a)
             {
                 Console.WriteLine("dele4 a=" + (a + b));
+            }
+            public int IntTest3(int a)
+            {
+                Console.WriteLine("dele5 a=" + a);
+                return a + 200;
             }
         }
     }
