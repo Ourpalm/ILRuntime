@@ -1109,17 +1109,30 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (m is ILMethod)
                                         {
                                             ILMethod ilm = (ILMethod)m;
-                                            if (code == OpCodeEnum.Callvirt)
+                                            bool processed = false;
+                                            if (m.IsDelegateInvoke)
                                             {
-                                                var objRef = esp - ilm.ParameterCount - 1;
-                                                if (objRef->ObjectType == ObjectTypes.Null)
-                                                    throw new NullReferenceException();
-                                                var obj = mStack[objRef->Value];
-                                                ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                                var instance = (esp - m.ParameterCount - 1)->ToObject(domain, mStack);
+                                                if (instance is IDelegateAdapter)
+                                                {
+                                                    esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
+                                                    processed = true;
+                                                }
                                             }
-                                            esp = Execute(ilm, esp, out unhandledException);
-                                            if (unhandledException)
-                                                returned = true;
+                                            if (!processed)
+                                            {
+                                                if (code == OpCodeEnum.Callvirt)
+                                                {
+                                                    var objRef = esp - ilm.ParameterCount - 1;
+                                                    if (objRef->ObjectType == ObjectTypes.Null)
+                                                        throw new NullReferenceException();
+                                                    var obj = mStack[objRef->Value];
+                                                    ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                                }
+                                                esp = Execute(ilm, esp, out unhandledException);
+                                                if (unhandledException)
+                                                    returned = true;
+                                            }
                                         }
                                         else
                                         {
@@ -1488,23 +1501,49 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (m is ILMethod)
                                     {
                                         ILType type = m.DeclearingType as ILType;
-                                        var obj = type.Instantiate();
-                                        var a = esp - m.ParameterCount;
-                                        var objRef = PushObject(esp, mStack, obj);//this parameter for constructor
-                                        esp = objRef;
-                                        for (int i = 0; i < m.ParameterCount; i++)
+                                        if (type.IsDelegate)
                                         {
-                                            CopyToStack(esp, a + i, mStack);
-                                            esp++;
+                                            var objRef = esp - 2;
+                                            var mi = (IMethod)mStack[(esp - 1)->Value];
+                                            object ins;
+                                            if (objRef->ObjectType == ObjectTypes.Null)
+                                                ins = null;
+                                            else
+                                                ins = mStack[objRef->Value];
+                                            Free(esp - 1);
+                                            Free(esp - 2);
+                                            esp -= 2;
+                                            object dele;
+                                            if (mi is ILMethod)
+                                            {
+                                                dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                            }
+                                            else
+                                            {
+                                                throw new NotImplementedException();
+                                            }
+                                            esp = PushObject(esp, mStack, dele);
                                         }
-                                        esp = Execute((ILMethod)m, esp, out unhandledException);
-                                        for (int i = m.ParameterCount - 1; i >= 0; i--)
+                                        else
                                         {
-                                            Free(a + i);
+                                            var obj = type.Instantiate();
+                                            var a = esp - m.ParameterCount;
+                                            var objRef = PushObject(esp, mStack, obj);//this parameter for constructor
+                                            esp = objRef;
+                                            for (int i = 0; i < m.ParameterCount; i++)
+                                            {
+                                                CopyToStack(esp, a + i, mStack);
+                                                esp++;
+                                            }
+                                            esp = Execute((ILMethod)m, esp, out unhandledException);
+                                            for (int i = m.ParameterCount - 1; i >= 0; i--)
+                                            {
+                                                Free(a + i);
+                                            }
+                                            Free(objRef - 1);
+                                            esp = a;
+                                            esp = PushObject(esp, mStack, obj);//new constructedObj
                                         }
-                                        Free(objRef - 1);
-                                        esp = a;
-                                        esp = PushObject(esp, mStack, obj);//new constructedObj
                                         if (unhandledException)
                                             returned = true;
                                     }

@@ -178,6 +178,8 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
+                if (!baseTypeInitialized)
+                    InitializeBaseType();
                 return isDelegate;
             }
         }

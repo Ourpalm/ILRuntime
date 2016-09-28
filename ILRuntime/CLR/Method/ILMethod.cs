@@ -18,6 +18,7 @@ namespace ILRuntime.CLR.Method
         ExceptionHandler[] exceptionHandler;
         KeyValuePair<string, IType>[] genericParameters;
         Dictionary<int, int[]> jumptables;
+        bool isDelegateInvoke;
 
         public MethodDefinition Definition { get { return def; } }
 
@@ -80,6 +81,8 @@ namespace ILRuntime.CLR.Method
             }
             else
                 ReturnType = domain.GetType(def.ReturnType, type);
+            if (type.IsDelegate && def.Name == "Invoke")
+                isDelegateInvoke = true;
             this.appdomain = domain;
         }
 
@@ -122,6 +125,14 @@ namespace ILRuntime.CLR.Method
             get
             {
                 return def.IsConstructor;
+            }
+        }
+
+        public bool IsDelegateInvoke
+        {
+            get
+            {
+                return isDelegateInvoke;
             }
         }
 

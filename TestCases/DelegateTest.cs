@@ -7,6 +7,7 @@ namespace TestCases
 {
     public class DelegateTest
     {
+        static TestDelegate testDele;
         public static void DelegateTest01()
         {
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest;
@@ -37,6 +38,20 @@ namespace TestCases
 
         public static int DelegateTest03()
         {
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 += IntTest3;
+
+            DelegateTestCls cls = new DelegateTestCls(1000);
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 += cls.IntTest3;
+
+            int val = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(123);
+            return val;
+        }
+
+        delegate int TestDelegate(int b);
+
+
+        public static int DelegateTest04()
+        {
             Func<int, int> a = null;
             a += IntTest3;
 
@@ -52,6 +67,16 @@ namespace TestCases
             return val;
         }
 
+        public static int DelegateTest05()
+        {
+            testDele += IntTest3;
+
+            DelegateTestCls cls = new DelegateTestCls(1000);
+            testDele += cls.IntTest3;
+
+            int val = testDele(123);
+            return val;
+        }
         static void IntTest(int a)
         {
             Console.WriteLine("dele a=" + a);

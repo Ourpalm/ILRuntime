@@ -24,6 +24,8 @@ namespace ILRuntime.CLR.Method
 
         bool IsConstructor { get; }
 
+        bool IsDelegateInvoke { get; }
+
         IMethod MakeGenericMethod(IType[] genericArguments);
     }
 }
