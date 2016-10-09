@@ -401,7 +401,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PushNull(esp);
                                 }
                                 break;
+                            case OpCodeEnum.Ldind_I:
+                            case OpCodeEnum.Ldind_I1:
+                            case OpCodeEnum.Ldind_I2:
                             case OpCodeEnum.Ldind_I4:
+                            case OpCodeEnum.Ldind_U1:
+                            case OpCodeEnum.Ldind_U2:
+                            case OpCodeEnum.Ldind_U4:
                                 {
                                     var val = GetObjectAndResolveReference(esp - 1);
                                     var dst = esp - 1;
@@ -410,11 +416,52 @@ namespace ILRuntime.Runtime.Intepreter
                                     dst->ValueLow = 0;
                                 }
                                 break;
+                            case OpCodeEnum.Ldind_I8:
+                                {
+                                    var val = GetObjectAndResolveReference(esp - 1);
+                                    var dst = esp - 1;
+                                    *dst = *val;
+                                    dst->ObjectType = ObjectTypes.Long;
+                                }
+                                break;
+                            case OpCodeEnum.Ldind_R4:
+                                {
+                                    var val = GetObjectAndResolveReference(esp - 1);
+                                    var dst = esp - 1;
+                                    dst->ObjectType = ObjectTypes.Float;
+                                    dst->Value = val->Value;
+                                    dst->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeEnum.Ldind_R8:
+                                {
+                                    var val = GetObjectAndResolveReference(esp - 1);
+                                    var dst = esp - 1;
+                                    *dst = *val;
+                                    dst->ObjectType = ObjectTypes.Double;
+                                }
+                                break;
+                            case OpCodeEnum.Stind_I:
+                            case OpCodeEnum.Stind_I1:
+                            case OpCodeEnum.Stind_I2:
                             case OpCodeEnum.Stind_I4:
+                            case OpCodeEnum.Stind_R4:
                                 {
                                     var dst = GetObjectAndResolveReference(esp - 2);
                                     var val = esp - 1;
                                     dst->Value = val->Value;
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    esp -= 2;
+                                }
+                                break;
+                            case OpCodeEnum.Stind_I8:
+                            case OpCodeEnum.Stind_R8:
+                                {
+                                    var dst = GetObjectAndResolveReference(esp - 2);
+                                    var val = esp - 1;
+                                    dst->Value = val->Value;
+                                    dst->ValueLow = val->ValueLow;
                                     Free(esp - 1);
                                     Free(esp - 2);
                                     esp -= 2;
