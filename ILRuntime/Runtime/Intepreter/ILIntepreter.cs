@@ -441,6 +441,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     dst->ObjectType = ObjectTypes.Double;
                                 }
                                 break;
+                            case OpCodeEnum.Ldind_Ref:
+                                {
+                                    var val = GetObjectAndResolveReference(esp - 1);
+                                    var dst = esp - 1;
+                                    dst->ObjectType = ObjectTypes.Object;
+                                    dst->Value = mStack.Count;                                    
+                                    mStack.Add(mStack[val->Value]);
+                                }
+                                break;
                             case OpCodeEnum.Stind_I:
                             case OpCodeEnum.Stind_I1:
                             case OpCodeEnum.Stind_I2:
@@ -462,6 +471,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     var val = esp - 1;
                                     dst->Value = val->Value;
                                     dst->ValueLow = val->ValueLow;
+                                    Free(esp - 1);
+                                    Free(esp - 2);
+                                    esp -= 2;
+                                }
+                                break;
+                            case OpCodeEnum.Stind_Ref:
+                                {
+                                    var dst = GetObjectAndResolveReference(esp - 2);
+                                    var val = esp - 1;
+                                    mStack[dst->Value] =  mStack[val->Value];
                                     Free(esp - 1);
                                     Free(esp - 2);
                                     esp -= 2;
@@ -772,6 +791,32 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             a->ObjectType = ObjectTypes.Integer;
                                             a->Value = ~a->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeEnum.Neg:
+                                {
+                                    StackObject* a = esp - 1;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            a->ObjectType = ObjectTypes.Long;
+                                            *((long*)&a->Value) = -*((long*)&a->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            a->ObjectType = ObjectTypes.Integer;
+                                            a->Value = -a->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            a->ObjectType = ObjectTypes.Float;
+                                            *((float*)&a->Value) = -*((float*)&a->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            a->ObjectType = ObjectTypes.Double;
+                                            *((double*)&a->Value) = -*((double*)&a->Value);
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -2122,6 +2167,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Stelem_Ref:
+                            case OpCodeEnum.Stelem_Any:
                                 {
                                     var val = esp - 1;
                                     var idx = esp - 2;
@@ -2136,6 +2182,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
 
                             case OpCodeEnum.Ldelem_Ref:
+                            case OpCodeEnum.Ldelem_Any:
                                 {
                                     var idx = esp - 1;
                                     var arrRef = esp - 2;
@@ -2267,7 +2314,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = arr[idx];
+                                    arrRef->Value = val;
                                     esp -= 1;
                                 }
                                 break;
@@ -2276,12 +2323,21 @@ namespace ILRuntime.Runtime.Intepreter
                                     var idx = (esp - 1)->Value;
                                     var arrRef = esp - 2;
                                     ushort[] arr = mStack[arrRef->Value] as ushort[];
-
+                                    int val = 0;
+                                    if (arr != null)
+                                    {
+                                        val = arr[idx];
+                                    }
+                                    else
+                                    {
+                                        char[] arr2 = mStack[arrRef->Value] as char[];
+                                        val = arr2[idx];
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 2);
 
                                     arrRef->ObjectType = ObjectTypes.Integer;
-                                    arrRef->Value = arr[idx];
+                                    arrRef->Value = val;
                                     esp -= 1;
                                 }
                                 break;
@@ -3029,6 +3085,11 @@ namespace ILRuntime.Runtime.Intepreter
                         {
                             esp->ObjectType = ObjectTypes.Integer;
                             esp->Value = (int)(uint)obj;
+                        }
+                        else if(obj is char)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = (int)(char)obj;
                         }
                         else if (obj is double)
                         {
