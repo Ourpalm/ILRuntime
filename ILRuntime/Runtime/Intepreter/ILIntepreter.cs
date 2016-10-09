@@ -2413,6 +2413,8 @@ namespace ILRuntime.Runtime.Intepreter
 
                             #region Conversion
                             case OpCodeEnum.Conv_U1:
+                            case OpCodeEnum.Conv_Ovf_U1:
+                            case OpCodeEnum.Conv_Ovf_U1_Un:
                                 {
                                     var obj = esp - 1;
                                     int val;
@@ -2431,6 +2433,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Conv_I1:
+                            case OpCodeEnum.Conv_Ovf_I1:
+                            case OpCodeEnum.Conv_Ovf_I1_Un:
                                 {
                                     var obj = esp - 1;
                                     int val;
@@ -2449,6 +2453,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Conv_U2:
+                            case OpCodeEnum.Conv_Ovf_U2:
+                            case OpCodeEnum.Conv_Ovf_U2_Un:
                                 {
                                     var obj = esp - 1;
                                     int val;
@@ -2467,6 +2473,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Conv_I2:
+                            case OpCodeEnum.Conv_Ovf_I2:
+                            case OpCodeEnum.Conv_Ovf_I2_Un:
                                 {
                                     var obj = esp - 1;
                                     int val;
@@ -2484,7 +2492,33 @@ namespace ILRuntime.Runtime.Intepreter
                                     obj->ValueLow = 0;
                                 }
                                 break;
+                            case OpCodeEnum.Conv_U4:
+                            case OpCodeEnum.Conv_Ovf_U4:
+                            case OpCodeEnum.Conv_Ovf_U4_Un:
+                                {
+                                    var obj = esp - 1;
+                                    uint val;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val = (uint)*(long*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            val = (uint)obj->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    obj->ObjectType = ObjectTypes.Integer;
+                                    obj->Value = (int)val;
+                                    obj->ValueLow = 0;
+                                }
+                                break;
                             case OpCodeEnum.Conv_I4:
+                            case OpCodeEnum.Conv_Ovf_I:
+                            case OpCodeEnum.Conv_Ovf_I_Un:
+                            case OpCodeEnum.Conv_Ovf_I4:
+                            case OpCodeEnum.Conv_Ovf_I4_Un:
                                 {
                                     var obj = esp - 1;
                                     int val;
@@ -2511,6 +2545,10 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Conv_U8:
                             case OpCodeEnum.Conv_I8:
+                            case OpCodeEnum.Conv_Ovf_I8:
+                            case OpCodeEnum.Conv_Ovf_I8_Un:
+                            case OpCodeEnum.Conv_Ovf_U8:
+                            case OpCodeEnum.Conv_Ovf_U8_Un:
                                 {
                                     var obj = esp - 1;
                                     long val;
@@ -2570,6 +2608,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     *(double*)&obj->Value = val;
                                 }
                                 break;
+                                
                             #endregion
 
                             #region Stack operation
