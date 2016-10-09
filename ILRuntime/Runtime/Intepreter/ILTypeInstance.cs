@@ -17,6 +17,8 @@ namespace ILRuntime.Runtime.Intepreter
             managedObjs = new List<object>(fields.Length);
             for (int i = 0; i < fields.Length; i++)
             {
+                var t = type.StaticFieldTypes[i].TypeForCLR;
+                fields[i].Initialized(t);
                 managedObjs.Add(null);
             }
             int idx = 0;
@@ -139,7 +141,20 @@ namespace ILRuntime.Runtime.Intepreter
             fields = new StackObject[type.TotalFieldCount];
             managedObjs = new List<object>(fields.Length);
             for (int i = 0; i < fields.Length; i++)
+            {
                 managedObjs.Add(null);
+            }
+            InitializeFields(type);
+        }
+
+        void InitializeFields(ILType type)
+        {
+            for(int i = 0; i < type.FieldTypes.Length; i++)
+            {
+                fields[type.FieldStartIndex + i].Initialized(type.FieldTypes[i].TypeForCLR);
+            }
+            if (type.BaseType != null)
+                InitializeFields((ILType)type.BaseType);
         }
 
         internal unsafe void PushFieldAddress(int fieldIdx, StackObject* esp, List<object> managedStack)

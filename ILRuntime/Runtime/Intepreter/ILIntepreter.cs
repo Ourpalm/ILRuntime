@@ -100,7 +100,15 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                 }
                 else
+                {
+                    if (v.VariableType.IsPrimitive)
+                    {
+                        var t = AppDomain.GetType(v.VariableType, method.DeclearingType);
+                        var loc = v1 + i;
+                        loc->Initialized(t.TypeForCLR);
+                    }
                     mStack.Add(null);
+                }
             }
             fixed (OpCode* ptr = body)
             {
@@ -1432,11 +1440,22 @@ namespace ILRuntime.Runtime.Intepreter
                                                         throw new NotImplementedException();
                                                 }
                                             }
+                                            esp++;
+                                            break;
+                                        case 1:
+                                            {
+                                                IType type = AppDomain.GetType((int)ip->TokenLong);
+                                                if (type != null)
+                                                {
+                                                    esp = PushObject(esp, mStack, type.TypeForCLR);
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
+                                            }
                                             break;
                                         default:
                                             throw new NotImplementedException();
-                                    }                                    
-                                    esp++;
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Ldftn:
@@ -2127,7 +2146,20 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                             }
                                             else
-                                                throw new NotImplementedException();
+                                            {
+                                                if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
+                                                {
+                                                    esp = PushObject(objRef, mStack, obj);
+                                                }
+                                                else
+                                                {
+#if !DEBUG
+                                                    objRef->ObjectType = ObjectTypes.Null;
+                                                    objRef->Value = -1;
+                                                    objRef->ValueLow = 0;
+#endif
+                                                }
+                                            }
                                         }
                                         else
                                         {

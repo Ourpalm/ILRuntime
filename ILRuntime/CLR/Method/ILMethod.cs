@@ -311,20 +311,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Stobj:
                 case OpCodeEnum.Ldobj:
                     {
-                        var t = appdomain.GetType(token, declaringType);
-                        if (t == null && token is TypeReference && ((TypeReference)token).IsGenericParameter)
-                        {
-                            t = FindGenericArgument(((TypeReference)token).Name);
-                        }
-                        if (t != null)
-                        {
-                            if (t is ILType)
-                            {
-                                code.TokenInteger = ((ILType)t).TypeReference.GetHashCode();
-                            }
-                            else
-                                code.TokenInteger = token.GetHashCode();
-                        }
+                        code.TokenInteger = GetTypeTokenHashCode(token);
                     }
                     break;
                 case OpCodeEnum.Stfld:
@@ -356,6 +343,11 @@ namespace ILRuntime.CLR.Method
                             code.TokenInteger = 0;
                             code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType);
                         }
+                        else if(token is TypeReference)
+                        {
+                            code.TokenInteger = 1;
+                            code.TokenLong = GetTypeTokenHashCode(token);
+                        }
                         else
                             throw new NotImplementedException();
                     }
@@ -367,6 +359,25 @@ namespace ILRuntime.CLR.Method
                     }
                     break;
             }
+        }
+
+        int GetTypeTokenHashCode(object token)
+        {
+            var t = appdomain.GetType(token, declaringType);
+            if (t == null && token is TypeReference && ((TypeReference)token).IsGenericParameter)
+            {
+                t = FindGenericArgument(((TypeReference)token).Name);
+            }
+            if (t != null)
+            {
+                if (t is ILType)
+                {
+                    return ((ILType)t).TypeReference.GetHashCode();
+                }
+                else
+                    return token.GetHashCode();
+            }
+            return 0;
         }
 
         void PrepareJumpTable(object token,Dictionary<Mono.Cecil.Cil.Instruction, int> addr)

@@ -97,7 +97,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        int FieldStartIndex
+        internal int FieldStartIndex
         {
             get
             {
@@ -109,6 +109,8 @@ namespace ILRuntime.CLR.TypeSystem
                         {
                             fieldStartIdx = ((ILType)BaseType).TotalFieldCount;
                         }
+                        else
+                            throw new NotImplementedException();
                     }
                     else
                         fieldStartIdx = 0;

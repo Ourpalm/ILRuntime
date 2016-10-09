@@ -93,6 +93,7 @@ namespace ILRuntimeTest.Test
             try
             {
                 var sw = new System.Diagnostics.Stopwatch();
+                Console.WriteLine("Invoking {0}.{1}", type, method);
                 sw.Start();
                 var res = _app.Invoke(type, method); //InstanceTest
                 sw.Stop();

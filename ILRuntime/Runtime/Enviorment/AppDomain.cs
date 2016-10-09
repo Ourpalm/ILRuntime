@@ -41,6 +41,8 @@ namespace ILRuntime.Runtime.Enviorment
                     RegisterCLRMethodRedirection(i, CLRRedirections.DelegateCombine);
                 }
             }
+            mi = typeof(System.Type).GetMethod("GetTypeFromHandle");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.GetTypeFromHandle);
             dMgr = new DelegateManager(this);
             dMgr.RegisterDelegateConvertor<Action>((dele) =>
             {

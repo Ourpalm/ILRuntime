@@ -83,6 +83,43 @@ namespace ILRuntime.Runtime.Stack
                     throw new NotImplementedException();
             }
         }
+
+        public void Initialized(Type t)
+        {
+            if (t.IsPrimitive)
+            {
+                if (t == typeof(int) || t == typeof(uint) || t == typeof(short) || t == typeof(ushort) || t == typeof(byte) || t == typeof(sbyte) || t == typeof(char) || t == typeof(bool))
+                {
+                    ObjectType = ObjectTypes.Integer;
+                    Value = 0;
+                    ValueLow = 0;
+                }
+                else if (t == typeof(long) || t == typeof(ulong))
+                {
+                    ObjectType = ObjectTypes.Long;
+                    Value = 0;
+                    ValueLow = 0;
+                }
+                else if (t == typeof(float))
+                {
+                    ObjectType = ObjectTypes.Float;
+                    Value = 0;
+                    ValueLow = 0;
+                }
+                else if (t == typeof(double))
+                {
+                    ObjectType = ObjectTypes.Double;
+                    Value = 0;
+                    ValueLow = 0;
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else
+            {
+                this = Null;
+            }
+        }
     }
 
     public enum ObjectTypes

@@ -184,5 +184,10 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return dele2;
         }
+
+        public static object GetTypeFromHandle(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            return param[0];
+        }
     }
 }
