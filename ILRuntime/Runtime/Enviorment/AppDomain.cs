@@ -46,9 +46,6 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 return dele;
             });
-            dMgr.RegisterMethodDelegate<ILTypeInstance>();
-            dMgr.RegisterMethodDelegate<int>();
-            dMgr.RegisterFunctionDelegate<int, int>();
         }
 
         internal IType VoidType { get { return voidType; } }
