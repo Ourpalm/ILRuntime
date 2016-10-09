@@ -124,9 +124,10 @@ Roadmaps
 * Exception handling
 * CLR Method redirections
 * Call stack and local variable dumper
+* Delegates
 
 ##Planned
-* Delegates
+* Multi-dimensional Arrays
 * Reflection support
 * Inheritance of classes and interfaces from 
 * All IL instructions
