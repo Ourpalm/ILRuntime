@@ -137,3 +137,34 @@ Roadmaps
 * Visual Studio integration
 * Debugging in Visual Studio
 * Remote debugging on other device
+
+Known Issues and Limitations
+==============================
+* Code like below is not supported
+```C#
+//The following code is decleared in ILRuntime:
+class SubType : BaseType
+{
+
+}
+
+class Test
+{
+    void foo()
+    {
+        SubType instance = BaseType.Make<SubType>();
+        //This instance is invalid, because it is not able to create ILRuntime instance in CLR like this
+    }
+}
+
+//=====================================
+//This type is decleared in native CLR
+class BaseType
+{
+    public static T Make<T>()
+        where T:new()
+    {
+        return new T();
+    }
+}
+```
