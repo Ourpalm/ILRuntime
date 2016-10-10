@@ -108,6 +108,8 @@ namespace ILRuntime.Runtime.Debugger
                 var lv = m.Definition.Body.Variables[i];
                 var val = topFrame.LocalVarPointer + i;
                 var v = val->ToObject(intepreter.AppDomain, intepreter.Stack.ManagedStack);
+                if (v == null)
+                    v = "null";
                 string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
                 sb.AppendFormat("{0} {1} = {2}", lv.VariableType.Name, name, v);
                 if ((i % 3 == 0 && i != 0) || i == m.LocalVariableCount - 1)

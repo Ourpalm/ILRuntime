@@ -43,9 +43,63 @@ namespace ILRuntimeTest
                     var app = new ILRuntime.Runtime.Enviorment.AppDomain();
                     var path = System.IO.Path.GetDirectoryName(OD.FileName);
                     var name = System.IO.Path.GetFileNameWithoutExtension(OD.FileName);
-                    using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb",path,name), System.IO.FileMode.Open))
+                    using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb", path, name), System.IO.FileMode.Open))
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
-
+                    app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate>((action) =>
+                    {
+                        return new TestFramework.IntDelegate((a) =>
+                        {
+                            ((Action<int>)action)(a);
+                        });
+                    });
+                    app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate2>((action) =>
+                    {
+                        return new TestFramework.IntDelegate2((a) =>
+                        {
+                            return ((Func<int, int>)action)(a);
+                        });
+                    });
+                    /*app.RegisterCLRMethodRedirection(typeof(UnitTest.Logger).GetMethod("Log"), (ctx, instance, param, ga) =>
+                    {
+                        Console.WriteLine(param[0]);
+                        return null;
+                    });
+                    app.DelegateManager.RegisterDelegateConvertor<TestDele.Action2<int, string>>((action) =>
+                    {
+                        return new TestDele.Action2<int, string>((a, b) =>
+                        {
+                            ((Action<int, string>)action)(a, b);
+                        });
+                    });
+                    
+                    app.DelegateManager.RegisterDelegateConvertor<UnitTest.Perform.Action>((action) =>
+                    {
+                        return new UnitTest.Perform.Action(() =>
+                        {
+                            ((Action)action)();
+                        });
+                    });
+                    app.DelegateManager.RegisterDelegateConvertor<TestDele.myup>((action) =>
+                    {
+                        return new TestDele.myup(() =>
+                        {
+                            ((Action)action)();
+                        });
+                    });
+                   
+                    app.DelegateManager.RegisterDelegateConvertor<Comparison<int>>((action) =>
+                  {
+                      return new Comparison<int>((a, b) =>
+                      {
+                          return ((Func<int, int, int>)action)(a, b);
+                      });
+                  });
+                  */
+                    app.DelegateManager.RegisterMethodDelegate<int>();
+                    //app.DelegateManager.RegisterMethodDelegate<int, string>();
+                    app.DelegateManager.RegisterFunctionDelegate<int, int>();
+                    //app.DelegateManager.RegisterFunctionDelegate<int, int, int>();
+                    //app.DelegateManager.RegisterMethodDelegate<MyClass2>();
                     List<TestResultInfo> resList = new List<TestResultInfo>();
                     Assembly assembly = Assembly.LoadFrom(OD.FileName);
                     if (assembly != null)
