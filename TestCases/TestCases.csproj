@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InheritanceTest.cs" />
     <Compile Include="DelegateTest.cs" />
     <Compile Include="LightTester2.cs" />
     <Compile Include="LightTester1.cs" />

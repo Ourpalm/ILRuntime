@@ -8,7 +8,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
 namespace ILRuntime.Runtime.Intepreter
 {
-    class ILTypeStaticInstance : ILTypeInstance
+    public class ILTypeStaticInstance : ILTypeInstance
     {
         public ILTypeStaticInstance(ILType type)
         {
@@ -97,7 +97,7 @@ namespace ILRuntime.Runtime.Intepreter
         }
     }
 
-    class ILTypeInstance
+    public class ILTypeInstance
     {
         protected ILType type;
         protected StackObject[] fields;

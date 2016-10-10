@@ -15,6 +15,7 @@ namespace ILRuntime.Runtime.Enviorment
     public class AppDomain
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
+        Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
@@ -591,6 +592,11 @@ namespace ILRuntime.Runtime.Enviorment
             if (mapString.TryGetValue(hashCode, out res))
                 return res;
             return res;
+        }
+
+        public void RegisterCrossBindingAdaptor(CrossBindingAdaptor adaptor)
+        {
+            crossAdaptors[adaptor.BaseCLRType] = adaptor;
         }
     }
 }

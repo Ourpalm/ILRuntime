@@ -10,7 +10,7 @@ using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.CLR.TypeSystem
 {
-    class ILType : IType
+    public class ILType : IType
     {
         Dictionary<string, List<ILMethod>> methods;
         TypeReference typeRef;
