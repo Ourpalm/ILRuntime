@@ -8,6 +8,10 @@ using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.Runtime.Enviorment
 {
+    public interface CrossBindingAdaptorType
+    {
+        ILTypeInstance ILInstance { get; }
+    }
     /// <summary>
     /// This interface is used for inheritance and implementation of CLR Types or interfaces
     /// </summary>

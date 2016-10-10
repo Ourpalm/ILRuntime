@@ -32,7 +32,7 @@ namespace ILRuntimeTest.TestFramework
             return new Adaptor(appdomain, instance);
         }
 
-        class Adaptor : ClassInheritanceTest
+        class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -50,6 +50,9 @@ namespace ILRuntimeTest.TestFramework
                 this.appdomain = appdomain;
                 this.instance = instance;
             }
+
+            public ILTypeInstance ILInstance { get { return instance; } }
+
             public override void TestAbstract()
             {
                 if(mTestAbstract == null)

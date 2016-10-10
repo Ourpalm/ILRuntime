@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using ILRuntime.CLR.TypeSystem;
+using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 namespace ILRuntime.Runtime.Stack
 {
@@ -47,8 +49,14 @@ namespace ILRuntime.Runtime.Stack
                         else
                         {
                             var obj = mStack[Value];
-                            var t = appdomain.GetType(obj.GetType());
-                            var fi = ((CLR.TypeSystem.CLRType)t).Fields[ValueLow];
+                            IType t = null;
+                            if (obj is CrossBindingAdaptorType)
+                            {
+                                t = appdomain.GetType(((CrossBindingAdaptor)((CrossBindingAdaptorType)obj).ILInstance.Type.BaseType).BaseCLRType);
+                            }
+                            else
+                                t = appdomain.GetType(obj.GetType());
+                            var fi = ((CLRType)t).Fields[ValueLow];
                             return fi.GetValue(obj);
                         }
                     }

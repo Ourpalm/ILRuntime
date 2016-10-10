@@ -42,6 +42,45 @@ namespace TestCases
             cls.TestField();
         }
 
+        public static void InheritanceTest02()
+        {
+            GenericTestCls<TestCls> cls = new GenericTestCls<TestCls>();
+            GenericTestCls<TestCls2> cls2 = new GenericTestCls<TestCls2>();
+
+            cls.DoTest();
+            cls2.DoTest();
+        }
+
+        public static void InheritanceTest03()
+        {
+            List<TestCls> list = new List<TestCls>();
+            TestCls a = new TestCls();
+            a.TestVal2 = 243;
+            list.Add(a);
+
+            Console.WriteLine(list[0].TestVal2.ToString());
+        }
+
+        public static void InheritanceTest04()
+        {
+            List<GenericTestCls<TestCls>> list = new List<GenericTestCls<TestCls>>();
+            list.Add(new GenericTestCls<TestCls>());
+            list[0].DoTest();
+        }
+
+        class GenericTestCls<T>
+            where T : ClassInheritanceTest, new()
+        {
+            T instance = new T();
+
+            public void DoTest()
+            {
+                instance.TestAbstract();
+                instance.TestVirtual();
+                instance.TestField();
+            }
+        }
+
         class TestCls : ClassInheritanceTest
         {
             public TestCls()

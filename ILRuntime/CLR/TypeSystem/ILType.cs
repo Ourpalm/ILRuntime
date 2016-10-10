@@ -200,6 +200,10 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     return enumType.TypeForCLR;
                 }
+                else if(baseType != null && baseType is CrossBindingAdaptor)
+                {
+                    return ((CrossBindingAdaptor)baseType).RuntimeType.TypeForCLR;
+                }
                 else
                     return typeof(ILTypeInstance);
             }
