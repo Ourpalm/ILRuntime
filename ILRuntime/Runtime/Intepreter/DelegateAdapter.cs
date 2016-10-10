@@ -471,7 +471,7 @@ namespace ILRuntime.Runtime.Intepreter
             var ebp = esp;
             bool unhandled;
             if (method.HasThis)
-                esp = intp.PushObject(esp, mStack, instance);
+                esp = ILIntepreter.PushObject(esp, mStack, instance);
             int paramCnt = method.ParameterCount;
             for(int i = paramCnt; i > 0; i--)
             {

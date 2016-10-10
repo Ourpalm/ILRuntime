@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using ILRuntime.CLR.Utils;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
@@ -22,7 +23,7 @@ namespace ILRuntime.Runtime.Intepreter
                 managedObjs.Add(null);
             }
             int idx = 0;
-            foreach(var i in type.TypeDefinition.Fields)
+            foreach (var i in type.TypeDefinition.Fields)
             {
                 if (i.IsStatic)
                 {
@@ -60,7 +61,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
                 intVal = this.fields[0].Value;
-            for (int i = 0;i< fields.Count; i++)
+            for (int i = 0; i < fields.Count; i++)
             {
                 var f = fields[i];
                 if (f.IsStatic)
@@ -150,7 +151,7 @@ namespace ILRuntime.Runtime.Intepreter
             InitializeFields(type);
             if (type.BaseType is Enviorment.CrossBindingAdaptor)
             {
-                clrInstance = ((Enviorment.CrossBindingAdaptor)type.BaseType).CreateCLRInstance(this);
+                clrInstance = ((Enviorment.CrossBindingAdaptor)type.BaseType).CreateCLRInstance(type.AppDomain, this);
             }
             else
                 clrInstance = this;
@@ -158,7 +159,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         void InitializeFields(ILType type)
         {
-            for(int i = 0; i < type.FieldTypes.Length; i++)
+            for (int i = 0; i < type.FieldTypes.Length; i++)
             {
                 fields[type.FieldStartIndex + i].Initialized(type.FieldTypes[i].TypeForCLR);
             }
@@ -174,9 +175,22 @@ namespace ILRuntime.Runtime.Intepreter
             esp->ValueLow = fieldIdx;
         }
 
-        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, List<object> managedStack)
+        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)
         {
-            PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
+            if (fieldIdx < fields.Length)
+                PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
+            else
+            {
+                if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
+                {
+                    CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
+                    var field = clrType.Fields[fieldIdx];
+                    var obj = field.GetValue(clrInstance);
+                    ILIntepreter.PushObject(esp, managedStack, obj);
+                }
+                else
+                    throw new TypeLoadException();
+            }
         }
 
         unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
@@ -195,12 +209,24 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 fields[i] = StackObject.Null;
                 managedObjs[i] = null;
-            }            
+            }
         }
 
-        internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, List<object> managedStack)
+        internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)
         {
-            AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
+            if (fieldIdx < fields.Length)
+                AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
+            else
+            {
+                if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
+                {
+                    CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
+                    var field = clrType.Fields[fieldIdx];
+                    field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, esp->ToObject(appdomain, managedStack)));
+                }
+                else
+                    throw new TypeLoadException();
+            }
         }
 
         unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
@@ -219,8 +245,13 @@ namespace ILRuntime.Runtime.Intepreter
             m = type.GetVirtualMethod(m);
             if (m != null)
             {
-                var res = type.AppDomain.Invoke(m, this);
-                return res.ToString();
+                if (m is ILMethod)
+                {
+                    var res = type.AppDomain.Invoke(m, this);
+                    return res.ToString();
+                }
+                else
+                    return clrInstance.ToString();
             }
             else
                 return type.FullName;

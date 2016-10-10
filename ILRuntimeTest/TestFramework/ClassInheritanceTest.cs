@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 
@@ -26,21 +27,65 @@ namespace ILRuntimeTest.TestFramework
             }
         }
 
-        public override object CreateCLRInstance(ILTypeInstance instance)
+        public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
         {
-            return new Adaptor();
+            return new Adaptor(appdomain, instance);
         }
 
         class Adaptor : ClassInheritanceTest
         {
+            ILTypeInstance instance;
+            ILRuntime.Runtime.Enviorment.AppDomain appdomain;
+            IMethod mTestAbstract;
+            IMethod mTestVirtual;
+            bool isTestVirtualInvoking = false;
+
+            public Adaptor()
+            {
+
+            }
+
+            public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+            {
+                this.appdomain = appdomain;
+                this.instance = instance;
+            }
             public override void TestAbstract()
             {
-                throw new NotImplementedException();
+                if(mTestAbstract == null)
+                {
+                    mTestAbstract = instance.Type.GetMethod("TestAbstract", 0);
+                }
+                if (mTestAbstract != null)
+                    appdomain.Invoke(mTestAbstract, instance);
             }
 
             public override void TestVirtual()
             {
-                base.TestVirtual();
+                if (mTestVirtual == null)
+                {
+                    mTestVirtual = instance.Type.GetMethod("TestVirtual", 0);
+                }
+                if (mTestVirtual != null && !isTestVirtualInvoking)
+                {
+                    isTestVirtualInvoking = true;
+                    appdomain.Invoke(mTestVirtual, instance);
+                    isTestVirtualInvoking = false;
+                }
+                else
+                    base.TestVirtual();
+            }
+
+            public override string ToString()
+            {
+                IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
+                m = instance.Type.GetVirtualMethod(m);
+                if (m == null || m is ILMethod)
+                {
+                    return instance.ToString();
+                }
+                else
+                    return instance.Type.FullName;
             }
         }
     }
@@ -60,6 +105,15 @@ namespace ILRuntimeTest.TestFramework
         public void TestField()
         {
             Console.WriteLine("testVal = " + testVal);
+        }
+
+        public static void Test3(ClassInheritanceTest ins)
+        {
+            Console.WriteLine("Testing invoking instance from CLR...");
+            ins.TestAbstract();
+            ins.TestVirtual();
+            ins.testVal = 233;
+            ins.TestField();
         }
     }
 }

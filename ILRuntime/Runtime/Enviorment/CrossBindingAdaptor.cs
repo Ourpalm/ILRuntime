@@ -21,7 +21,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public abstract Type AdaptorType { get; }
 
-        public abstract object CreateCLRInstance(ILTypeInstance instance);
+        public abstract object CreateCLRInstance(Enviorment.AppDomain appdomain, ILTypeInstance instance);
 
         internal IType RuntimeType { get { return type; } set { type = value; } }
 

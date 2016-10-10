@@ -22,7 +22,15 @@ namespace ILRuntime.CLR.TypeSystem
         IType byRefType, arrayType;
         bool isDelegate;
 
-        public Dictionary<int, FieldInfo> Fields { get { return fieldInfoCache; } }
+        public Dictionary<int, FieldInfo> Fields
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields();
+                return fieldInfoCache;
+            }
+        }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
@@ -142,10 +150,10 @@ namespace ILRuntime.CLR.TypeSystem
             fieldMapping = new Dictionary<string, int>();
             fieldInfoCache = new Dictionary<int, FieldInfo>();
 
-            var fields = clrType.GetFields();
+            var fields = clrType.GetFields(BindingFlags.Public| BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
             foreach (var i in fields)
             {
-                if (i.IsPublic)
+                if (i.IsPublic || i.IsFamily)
                 {
                     int hashCode = i.GetHashCode();
                     fieldMapping[i.Name] = hashCode;

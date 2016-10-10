@@ -15,10 +15,12 @@ namespace TestCases
             TestCls2 cls2 = new TestCases.InheritanceTest.TestCls2();
 
             Console.WriteLine("Test invoking from sub type...");
+            Console.WriteLine(cls.ToString());
             cls.TestAbstract();
             cls.TestVirtual();
             cls.TestField();
 
+            Console.WriteLine(cls2.ToString());
             cls2.TestAbstract();
             cls2.TestVirtual();
             cls2.TestField();
@@ -28,6 +30,8 @@ namespace TestCases
 
             Console.WriteLine("TestCls.TestVal2 = " + cls.TestVal2);
 
+            ClassInheritanceTest.Test3(cls);
+            ClassInheritanceTest.Test3(cls2);
         }
 
         static void Test01Sub(ClassInheritanceTest cls)
@@ -53,6 +57,11 @@ namespace TestCases
             {
                 base.TestVirtual();
                 Console.WriteLine("This is TestCls.TestVirtual");
+            }
+
+            public override string ToString()
+            {
+                return "This is TestCls";
             }
         }
 

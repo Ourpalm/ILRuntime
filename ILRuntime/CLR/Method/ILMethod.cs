@@ -8,7 +8,7 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.CLR.TypeSystem;
 namespace ILRuntime.CLR.Method
 {
-    class ILMethod : IMethod
+    public class ILMethod : IMethod
     {
         OpCode[] body;
         MethodDefinition def;
@@ -24,7 +24,7 @@ namespace ILRuntime.CLR.Method
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
 
-        public ExceptionHandler[] ExceptionHandler
+        internal ExceptionHandler[] ExceptionHandler
         {
             get
             {
@@ -102,7 +102,7 @@ namespace ILRuntime.CLR.Method
             return null;
         }
 
-        public OpCode[] Body
+        internal OpCode[] Body
         {
             get
             {

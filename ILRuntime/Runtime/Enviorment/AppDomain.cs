@@ -51,13 +51,13 @@ namespace ILRuntime.Runtime.Enviorment
             });
         }
 
-        internal IType VoidType { get { return voidType; } }
-        internal IType IntType { get { return intType; } }
-        internal IType LongType { get { return longType; } }
-        internal IType BoolType { get { return boolType; } }
-        internal IType FloatType { get { return floatType; } }
-        internal IType DoubleType { get { return doubleType; } }
-        internal IType ObjectType { get { return objectType; } }
+        public IType VoidType { get { return voidType; } }
+        public IType IntType { get { return intType; } }
+        public IType LongType { get { return longType; } }
+        public IType BoolType { get { return boolType; } }
+        public IType FloatType { get { return floatType; } }
+        public IType DoubleType { get { return doubleType; } }
+        public IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
         internal Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }

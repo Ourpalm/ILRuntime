@@ -1285,7 +1285,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             ILTypeInstance instance = obj as ILTypeInstance;
                                             StackObject* val = esp - 1;
-                                            instance.AssignFromStack(ip->TokenInteger, val, mStack);
+                                            instance.AssignFromStack(ip->TokenInteger, val, AppDomain, mStack);
                                         }
                                         else
                                         {
@@ -1318,7 +1318,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (obj is ILTypeInstance)
                                         {
                                             ILTypeInstance instance = obj as ILTypeInstance;
-                                            instance.PushToStack(ip->TokenInteger, esp - 1, mStack);
+                                            instance.PushToStack(ip->TokenInteger, esp - 1, AppDomain, mStack);
                                         }
                                         else
                                         {
@@ -1371,7 +1371,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             ILType t = type as ILType;
                                             StackObject* val = esp - 1;
-                                            t.StaticInstance.AssignFromStack((int)ip->TokenLong, val, mStack);
+                                            t.StaticInstance.AssignFromStack((int)ip->TokenLong, val, AppDomain, mStack);
                                         }
                                         else
                                         {
@@ -1396,7 +1396,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (type is ILType)
                                         {
                                             ILType t = type as ILType;
-                                            t.StaticInstance.PushToStack((int)ip->TokenLong, esp, mStack);
+                                            t.StaticInstance.PushToStack((int)ip->TokenLong, esp, AppDomain, mStack);
                                         }
                                         else
                                         {
@@ -1434,7 +1434,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (type is ILType)
                                                     {
                                                         ILType t = type as ILType;
-                                                        t.StaticInstance.PushToStack((int)ip->TokenLong, esp, mStack);
+                                                        t.StaticInstance.PushToStack((int)ip->TokenLong, esp, AppDomain, mStack);
                                                     }
                                                     else
                                                         throw new NotImplementedException();
@@ -1710,7 +1710,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (t.IsEnum)
                                             {
                                                 ILEnumTypeInstance ins = new ILEnumTypeInstance(t);
-                                                ins.AssignFromStack(0, obj, mStack);
+                                                ins.AssignFromStack(0, obj, AppDomain, mStack);
                                                 ins.Boxed = true;
                                                 esp = PushObject(esp - 1, mStack, ins);
                                             }
@@ -1746,7 +1746,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (((ILType)type).IsEnum)
                                             {
                                                 ILEnumTypeInstance ins = new Intepreter.ILEnumTypeInstance((ILType)type);
-                                                ins.AssignFromStack(0, obj, mStack);
+                                                ins.AssignFromStack(0, obj, AppDomain, mStack);
                                                 ins.Boxed = true;
                                                 esp = PushObject(obj, mStack, ins, true);
                                             }
@@ -2097,13 +2097,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                 case ObjectTypes.StaticFieldReference:
                                                     {
                                                         var t = AppDomain.GetType(objRef->Value) as ILType;
-                                                        t.StaticInstance.AssignFromStack(objRef->ValueLow, esp, mStack);
+                                                        t.StaticInstance.AssignFromStack(objRef->ValueLow, esp, AppDomain, mStack);
                                                     }
                                                     break;
                                                 case ObjectTypes.FieldReference:
                                                     {
                                                         var instance = mStack[objRef->Value] as ILTypeInstance;
-                                                        instance.AssignFromStack(objRef->ValueLow, esp, mStack);
+                                                        instance.AssignFromStack(objRef->ValueLow, esp, AppDomain, mStack);
                                                         Free(esp - 1);
                                                         esp--;
                                                     }
@@ -3067,7 +3067,7 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        StackObject* PushNull(StackObject* esp)
+        static StackObject* PushNull(StackObject* esp)
         {
             esp->ObjectType = ObjectTypes.Null;
             esp->Value = -1;
@@ -3075,7 +3075,7 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        public StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
+        public static StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
         {
             if (obj != null)
             {

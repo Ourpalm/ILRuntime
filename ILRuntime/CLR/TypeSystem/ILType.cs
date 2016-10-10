@@ -395,7 +395,7 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     else
                     {
-                        throw new NotImplementedException();
+                        return method;
                     }
                 }
                 else
