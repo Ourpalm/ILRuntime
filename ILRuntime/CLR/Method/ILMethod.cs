@@ -291,10 +291,11 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldftn:
                 case OpCodeEnum.Callvirt:
                     {
-                        var m = appdomain.GetMethod(token, declaringType);
+                        bool invalidToken;
+                        var m = appdomain.GetMethod(token, declaringType, out invalidToken);
                         if (m != null)
                         {
-                            if (m.IsGenericInstance)
+                            if (invalidToken)
                                 code.TokenInteger = m.GetHashCode();
                             else
                                 code.TokenInteger = token.GetHashCode();

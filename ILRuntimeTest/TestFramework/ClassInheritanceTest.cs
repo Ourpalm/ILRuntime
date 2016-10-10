@@ -18,6 +18,14 @@ namespace ILRuntimeTest.TestFramework
             }
         }
 
+        public override Type AdaptorType
+        {
+            get
+            {
+                return typeof(Adaptor);
+            }
+        }
+
         public override object CreateCLRInstance(ILTypeInstance instance)
         {
             return new Adaptor();

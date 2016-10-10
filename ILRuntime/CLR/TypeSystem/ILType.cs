@@ -110,7 +110,7 @@ namespace ILRuntime.CLR.TypeSystem
                             fieldStartIdx = ((ILType)BaseType).TotalFieldCount;
                         }
                         else
-                            throw new NotImplementedException();
+                            fieldStartIdx = 0;
                     }
                     else
                         fieldStartIdx = 0;
@@ -134,7 +134,7 @@ namespace ILRuntime.CLR.TypeSystem
                             totalFieldCnt = ((ILType)BaseType).TotalFieldCount + fieldTypes.Length;
                         }
                         else
-                            throw new NotImplementedException();
+                            totalFieldCnt = fieldTypes.Length;
                     }
                     else
                         totalFieldCnt = fieldTypes.Length;
@@ -282,7 +282,13 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     else
                     {
-                        throw new NotImplementedException();
+                        CrossBindingAdaptor adaptor;
+                        if (appdomain.CrossBindingAdaptors.TryGetValue(baseType.TypeForCLR, out adaptor))
+                        {
+                            baseType = adaptor;
+                        }
+                        else
+                            throw new TypeLoadException("Cannot find Adaptor for:" + baseType.TypeForCLR.ToString());
                         //继承了其他系统类型
                         //env.logger.Log_Error("ScriptType:" + Name + " Based On a SystemType:" + BaseType.Name);
                         //HasSysBase = true;

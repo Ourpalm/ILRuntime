@@ -97,6 +97,10 @@ namespace ILRuntime.CLR.Utils
             {
                 return Enum.ToObject(pt, obj);
             }
+            else if(obj is ILTypeInstance)
+            {
+                return ((ILTypeInstance)obj).CLRInstance;
+            }
             return obj;
         }
     }

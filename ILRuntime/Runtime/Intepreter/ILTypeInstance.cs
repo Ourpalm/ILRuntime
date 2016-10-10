@@ -102,6 +102,7 @@ namespace ILRuntime.Runtime.Intepreter
         protected ILType type;
         protected StackObject[] fields;
         protected List<object> managedObjs;
+        object clrInstance;
 
         public ILType Type
         {
@@ -131,6 +132,8 @@ namespace ILRuntime.Runtime.Intepreter
 
         public List<object> ManagedObjects { get { return managedObjs; } }
 
+        public object CLRInstance { get { return clrInstance; } }
+
         protected ILTypeInstance()
         {
 
@@ -145,6 +148,12 @@ namespace ILRuntime.Runtime.Intepreter
                 managedObjs.Add(null);
             }
             InitializeFields(type);
+            if (type.BaseType is Enviorment.CrossBindingAdaptor)
+            {
+                clrInstance = ((Enviorment.CrossBindingAdaptor)type.BaseType).CreateCLRInstance(this);
+            }
+            else
+                clrInstance = this;
         }
 
         void InitializeFields(ILType type)
@@ -153,7 +162,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 fields[type.FieldStartIndex + i].Initialized(type.FieldTypes[i].TypeForCLR);
             }
-            if (type.BaseType != null)
+            if (type.BaseType != null && type.BaseType is ILType)
                 InitializeFields((ILType)type.BaseType);
         }
 

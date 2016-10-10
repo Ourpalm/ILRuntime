@@ -13,75 +13,80 @@ namespace ILRuntime.Runtime.Enviorment
     /// </summary>
     public abstract class CrossBindingAdaptor : IType
     {
+        IType type;
         /// <summary>
         /// This returns the CLR type to be inherited or CLR interface to be implemented
         /// </summary>
         public abstract Type BaseCLRType { get; }
 
+        public abstract Type AdaptorType { get; }
+
         public abstract object CreateCLRInstance(ILTypeInstance instance);
+
+        internal IType RuntimeType { get { return type; } set { type = value; } }
+
+        #region IType Members
 
         public IMethod GetMethod(string name, int paramCount)
         {
-            throw new NotImplementedException();
+            return type.GetMethod(name, paramCount);
         }
 
         public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments)
         {
-            throw new NotImplementedException();
+            return type.GetMethod(name, param, genericArguments);
         }
 
         public List<IMethod> GetMethods()
         {
-            throw new NotImplementedException();
+            return type.GetMethods();
         }
 
         public int GetFieldIndex(object token)
         {
-            throw new NotImplementedException();
+            return type.GetFieldIndex(token);
         }
 
         public IMethod GetConstructor(List<IType> param)
         {
-            throw new NotImplementedException();
+            return type.GetConstructor(param);
         }
 
         public bool CanAssignTo(IType type)
         {
-            throw new NotImplementedException();
+            return type.CanAssignTo(type);
         }
 
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
         {
-            throw new NotImplementedException();
+            return type.MakeGenericInstance(genericArguments);
         }
 
         public IType MakeByRefType()
         {
-            throw new NotImplementedException();
+            return type.MakeByRefType();
         }
 
         public IType MakeArrayType()
         {
-            throw new NotImplementedException();
+            return type.MakeArrayType();
         }
 
         public IType FindGenericArgument(string key)
         {
-            throw new NotImplementedException();
+            return type.FindGenericArgument(key);
         }
 
         public IType ResolveGenericType(IType contextType)
         {
-            throw new NotImplementedException();
+            return type.ResolveGenericType(contextType);
         }
-
-        ILTypeInstance ILInstance { get; }
 
         public bool IsGenericInstance
         {
             get
             {
-                throw new NotImplementedException();
+                return type.IsGenericInstance;
             }
         }
 
@@ -89,7 +94,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.GenericArguments;
             }
         }
 
@@ -97,7 +102,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.TypeForCLR;
             }
         }
 
@@ -105,7 +110,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.ByRefType;
             }
         }
 
@@ -113,7 +118,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.ArrayType;
             }
         }
 
@@ -121,7 +126,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.FullName;
             }
         }
 
@@ -129,7 +134,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.Name;
             }
         }
 
@@ -137,7 +142,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.IsValueType;
             }
         }
 
@@ -145,7 +150,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.IsDelegate;
             }
         }
 
@@ -153,8 +158,9 @@ namespace ILRuntime.Runtime.Enviorment
         {
             get
             {
-                throw new NotImplementedException();
+                return type.AppDomain;
             }
         }
+        #endregion
     }
 }

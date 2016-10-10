@@ -61,6 +61,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
         internal Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
+        internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
 
         public DelegateManager DelegateManager { get { return dMgr; } }
         public void LoadAssembly(System.IO.Stream stream)
@@ -467,7 +468,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        internal IMethod GetMethod(object token, ILType contextType)
+        internal IMethod GetMethod(object token, ILType contextType, out bool invalidToken)
         {
             string methodname = null;
             string typename = null;
@@ -476,7 +477,7 @@ namespace ILRuntime.Runtime.Enviorment
             int hashCode = token.GetHashCode();
             IMethod method;
             IType[] genericArguments = null;
-            bool invalidToken = false;
+            invalidToken = false;
             bool isConstructor = false;
             if (mapMethod.TryGetValue(hashCode, out method))
                 return method;
@@ -532,7 +533,18 @@ namespace ILRuntime.Runtime.Enviorment
             }
 
             if (method == null)
-                throw new KeyNotFoundException("Cannot find method:" + methodname);
+            {
+                if (isConstructor && contextType.BaseType != null && contextType.BaseType is CrossBindingAdaptor && type.TypeForCLR == ((CrossBindingAdaptor)contextType.BaseType).BaseCLRType)
+                {
+                    method = contextType.BaseType.GetConstructor(paramList);
+                    if(method == null)
+                        throw new KeyNotFoundException("Cannot find method:" + methodname);
+                    invalidToken = true;
+                    mapMethod[method.GetHashCode()] = method;
+                }
+                else
+                    throw new KeyNotFoundException("Cannot find method:" + methodname);
+            }
             if (!invalidToken)
                 mapMethod[hashCode] = method;
             return method;
@@ -596,7 +608,20 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void RegisterCrossBindingAdaptor(CrossBindingAdaptor adaptor)
         {
-            crossAdaptors[adaptor.BaseCLRType] = adaptor;
+            if (!crossAdaptors.ContainsKey(adaptor.BaseCLRType))
+            {
+                var t = adaptor.AdaptorType;
+                var res = GetType(t);
+                if (res == null)
+                {
+                    res = new CLRType(t, this);
+                    mapType[res.FullName] = res;
+                    mapType[t.AssemblyQualifiedName] = res;
+                    clrTypeMapping[t] = res;
+                }
+                adaptor.RuntimeType = res;
+                crossAdaptors[adaptor.BaseCLRType] = adaptor;
+            }
         }
     }
 }

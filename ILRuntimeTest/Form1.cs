@@ -45,6 +45,8 @@ namespace ILRuntimeTest
                     var name = System.IO.Path.GetFileNameWithoutExtension(OD.FileName);
                     using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb", path, name), System.IO.FileMode.Open))
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
+
+                    app.RegisterCrossBindingAdaptor(new TestFramework.ClassInheritanceAdaptor());
                     app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate>((action) =>
                     {
                         return new TestFramework.IntDelegate((a) =>
