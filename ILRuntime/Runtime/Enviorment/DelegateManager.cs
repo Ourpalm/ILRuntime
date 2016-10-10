@@ -144,7 +144,12 @@ namespace ILRuntime.Runtime.Enviorment
                             }
                         }
                         if (match)
-                            return i.Adapter.Instantiate(appdomain, instance, method);
+                        {
+                            var res = i.Adapter.Instantiate(appdomain, instance, method);
+                            if (instance != null)
+                                instance.SetDelegateAdapter(method, res);
+                            return res;
+                        }
                     }
                 }
             }
@@ -166,7 +171,12 @@ namespace ILRuntime.Runtime.Enviorment
                         if (match)
                         {
                             if (method.ReturnType.TypeForCLR == i.ParameterTypes[method.ParameterCount])
-                                return i.Adapter.Instantiate(appdomain, instance, method);
+                            {
+                                var res = i.Adapter.Instantiate(appdomain, instance, method);
+                                if (instance != null)
+                                    instance.SetDelegateAdapter(method, res);
+                                return res;
+                            }
                         }
                     }
                 }

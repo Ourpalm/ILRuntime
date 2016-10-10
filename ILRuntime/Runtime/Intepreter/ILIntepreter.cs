@@ -1627,8 +1627,22 @@ namespace ILRuntime.Runtime.Intepreter
                                             object dele;
                                             if (mi is ILMethod)
                                             {
-                                                dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                                if (ins != null)
+                                                {
+                                                    dele = ((ILTypeInstance)ins).GetDelegateAdapter((ILMethod)mi);
+                                                    if (dele == null)
+                                                        dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                                }
+                                                else
+                                                {
+                                                    if (((ILMethod)mi).DelegateAdapter == null)
+                                                    {
+                                                        ((ILMethod)mi).DelegateAdapter = domain.DelegateManager.FindDelegateAdapter(null, (ILMethod)mi);
+                                                    }
+                                                    dele = ((ILMethod)mi).DelegateAdapter;
+                                                }
                                             }
+
                                             else
                                             {
                                                 throw new NotImplementedException();
@@ -1676,7 +1690,20 @@ namespace ILRuntime.Runtime.Intepreter
                                             object dele;
                                             if (mi is ILMethod)
                                             {
-                                                dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                                if (ins != null)
+                                                {
+                                                    dele = ((ILTypeInstance)ins).GetDelegateAdapter((ILMethod)mi);
+                                                    if (dele == null)
+                                                        dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                                }
+                                                else
+                                                {
+                                                    if (((ILMethod)mi).DelegateAdapter == null)
+                                                    {
+                                                        ((ILMethod)mi).DelegateAdapter = domain.DelegateManager.FindDelegateAdapter(null, (ILMethod)mi);
+                                                    }
+                                                    dele = ((ILMethod)mi).DelegateAdapter;
+                                                }
                                             }
                                             else
                                             {

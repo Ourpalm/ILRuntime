@@ -104,6 +104,7 @@ namespace ILRuntime.Runtime.Intepreter
         protected StackObject[] fields;
         protected List<object> managedObjs;
         object clrInstance;
+        Dictionary<ILMethod, IDelegateAdapter> delegates;
 
         public ILType Type
         {
@@ -271,6 +272,25 @@ namespace ILRuntime.Runtime.Intepreter
                 ins.managedObjs[i] = managedObjs[i];
             }
             return ins;
+        }
+
+        internal IDelegateAdapter GetDelegateAdapter(ILMethod method)
+        {
+            if (delegates == null)
+                delegates = new Dictionary<ILMethod, IDelegateAdapter>();
+
+            IDelegateAdapter res;
+            if (delegates.TryGetValue(method, out res))
+                return res;
+            return null;
+        }
+
+        internal void SetDelegateAdapter(ILMethod method, IDelegateAdapter adapter)
+        {
+            if (!delegates.ContainsKey(method))
+                delegates[method] = adapter;
+            else
+                throw new NotSupportedException();
         }
     }
 }

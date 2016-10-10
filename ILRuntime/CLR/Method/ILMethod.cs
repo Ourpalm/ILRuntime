@@ -5,6 +5,7 @@ using System.Text;
 
 using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
+using ILRuntime.Runtime.Intepreter;
 using ILRuntime.CLR.TypeSystem;
 namespace ILRuntime.CLR.Method
 {
@@ -23,6 +24,8 @@ namespace ILRuntime.CLR.Method
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
+
+        internal IDelegateAdapter DelegateAdapter { get; set; }
 
         internal ExceptionHandler[] ExceptionHandler
         {
