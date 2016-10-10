@@ -173,7 +173,7 @@ namespace ILRuntime.Runtime.Enviorment
                     else
                     {
                         if (dele2 is IDelegateAdapter)
-                            return Delegate.Combine((Delegate)dele1, domain.DelegateManager.ConvertToDelegate(dele1.GetType(), (IDelegateAdapter)dele2));
+                            return Delegate.Combine((Delegate)dele1, ((IDelegateAdapter)dele2).GetConvertor(dele1.GetType()));
                         else
                             return Delegate.Combine((Delegate)dele1, (Delegate)dele2);
                     }
@@ -183,6 +183,81 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
                 return dele2;
+        }
+
+        public unsafe static object DelegateEqulity(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            //op_Equality,op_Inequality
+            var esp = ctx.ESP;
+            var mStack = ctx.ManagedStack;
+            var domain = ctx.AppDomain;
+
+            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele2 = (esp - 1)->ToObject(domain, mStack);
+
+            if (dele1 != null)
+            {
+                if (dele2 != null)
+                {
+                    if (dele1 is IDelegateAdapter)
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            ((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2);
+                        else
+                            ((IDelegateAdapter)dele1).Equals((Delegate)dele2);
+                        return dele1;
+                    }
+                    else
+                    {
+                        if (dele2 is IDelegateAdapter)
+                        {
+                            return (Delegate)dele1 == ((IDelegateAdapter)dele2).GetConvertor(dele1.GetType());
+                        }
+                        else
+                            return (Delegate)dele1 == (Delegate)dele2;
+                    }
+                }
+                else
+                    return dele1 == null;
+            }
+            else
+                return dele2 == null;
+        }
+
+        public unsafe static object DelegateInequlity(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            //op_Equality,op_Inequality
+            var esp = ctx.ESP;
+            var mStack = ctx.ManagedStack;
+            var domain = ctx.AppDomain;
+
+            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele2 = (esp - 1)->ToObject(domain, mStack);
+
+            if (dele1 != null)
+            {
+                if (dele2 != null)
+                {
+                    if (dele1 is IDelegateAdapter)
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            return !((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2);
+                        else
+                            return !((IDelegateAdapter)dele1).Equals((Delegate)dele2);
+                    }
+                    else
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            return (Delegate)dele1 != ((IDelegateAdapter)dele2).GetConvertor(dele1.GetType());
+                        else
+                            return (Delegate)dele1 != (Delegate)dele2;
+                    }
+                }
+                else
+                    return dele1 != null;
+            }
+            else
+                return dele2 != null;
         }
 
         public static object GetTypeFromHandle(ILContext ctx, object instance, object[] param, IType[] genericArguments)

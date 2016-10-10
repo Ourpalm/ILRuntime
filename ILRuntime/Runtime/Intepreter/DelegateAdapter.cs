@@ -11,7 +11,7 @@ using ILRuntime.Runtime.Enviorment;
 namespace ILRuntime.Runtime.Intepreter
 {
     #region Functions
-    class FunctionDelegateAdapter<TResult> : DelegateAdapter, IDelegateAdapter
+    class FunctionDelegateAdapter<TResult> : DelegateAdapter
     {
         Func<TResult> action;
 
@@ -51,9 +51,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Func<TResult>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Func<TResult>)dele;
+        }
     }
 
-    class FunctionDelegateAdapter<T1, TResult> : DelegateAdapter, IDelegateAdapter
+    class FunctionDelegateAdapter<T1, TResult> : DelegateAdapter
     {
         Func<T1, TResult> action;
 
@@ -93,9 +98,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Func<T1, TResult>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Func<T1, TResult>)dele;
+        }
     }
 
-    class FunctionDelegateAdapter<T1, T2, TResult> : DelegateAdapter, IDelegateAdapter
+    class FunctionDelegateAdapter<T1, T2, TResult> : DelegateAdapter
     {
         Func<T1, T2, TResult> action;
 
@@ -135,9 +145,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Func<T1, T2, TResult>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Func<T1, T2, TResult>)dele;
+        }
     }
 
-    class FunctionDelegateAdapter<T1, T2, T3, TResult> : DelegateAdapter, IDelegateAdapter
+    class FunctionDelegateAdapter<T1, T2, T3, TResult> : DelegateAdapter
     {
         Func<T1, T2, T3, TResult> action;
 
@@ -177,9 +192,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Func<T1, T2, T3, TResult>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Func<T1, T2, T3, TResult>)dele;
+        }
     }
 
-    class FunctionDelegateAdapter<T1, T2, T3, T4, TResult> : DelegateAdapter, IDelegateAdapter
+    class FunctionDelegateAdapter<T1, T2, T3, T4, TResult> : DelegateAdapter
     {
         Func<T1, T2, T3, T4, TResult> action;
 
@@ -219,11 +239,16 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Func<T1, T2, T3, T4, TResult>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Func<T1, T2, T3, T4, TResult>)dele;
+        }
     }
     #endregion
 
     #region Methods
-    class MethodDelegateAdapter<T1> : DelegateAdapter, IDelegateAdapter
+    class MethodDelegateAdapter<T1> : DelegateAdapter
     {
         Action<T1> action;
 
@@ -263,9 +288,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Action<T1>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Action<T1>)dele;
+        }
     }
 
-    class MethodDelegateAdapter<T1, T2> : DelegateAdapter, IDelegateAdapter
+    class MethodDelegateAdapter<T1, T2> : DelegateAdapter
     {
         Action<T1, T2> action;
 
@@ -305,9 +335,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Action<T1, T2>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Action<T1, T2>)dele;
+        }
     }
 
-    class MethodDelegateAdapter<T1, T2, T3> : DelegateAdapter, IDelegateAdapter
+    class MethodDelegateAdapter<T1, T2, T3> : DelegateAdapter
     {
         Action<T1, T2, T3> action;
 
@@ -347,9 +382,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Action<T1, T2, T3>)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Action<T1, T2, T3>)dele;
+        }
     }
 
-    class MethodDelegateAdapter<T1, T2, T3, T4> : DelegateAdapter, IDelegateAdapter
+    class MethodDelegateAdapter<T1, T2, T3, T4> : DelegateAdapter
     {
         Action<T1, T2, T3, T4> action;
 
@@ -388,6 +428,11 @@ namespace ILRuntime.Runtime.Intepreter
         public override void Combine(Delegate dele)
         {
             action += (Action<T1, T2, T3, T4>)dele;
+        }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Action<T1, T2, T3, T4>)dele;
         }
     }
 
@@ -431,6 +476,11 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action += (Action)dele;
         }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Action)dele;
+        }
     }
     #endregion
     abstract class DelegateAdapter : ILTypeInstance, IDelegateAdapter
@@ -438,6 +488,7 @@ namespace ILRuntime.Runtime.Intepreter
         protected ILMethod method;
         protected ILTypeInstance instance;
         protected Enviorment.AppDomain appdomain;
+        Dictionary<Type, Delegate> converters;
         IDelegateAdapter next;
 
         public abstract Delegate Delegate { get; }
@@ -539,9 +590,55 @@ namespace ILRuntime.Runtime.Intepreter
 
         public abstract void Combine(Delegate dele);
 
+        public virtual void Remove(IDelegateAdapter adapter)
+        {
+            if (next != null)
+            {
+                if (next.Equals(adapter))
+                {
+                    next = ((DelegateAdapter)next).next;
+                }
+                else
+                    next.Remove(adapter);
+            }
+        }
+
+        public abstract void Remove(Delegate dele);
+
+        public virtual bool Equals(IDelegateAdapter adapter)
+        {
+            if (adapter is DelegateAdapter)
+            {
+                DelegateAdapter b = (DelegateAdapter)adapter;
+                return instance == b.instance && next == b.next && method == b.method && Delegate == b.Delegate;
+            }
+            else
+                return false;
+        }
+
+        public virtual bool Equals(Delegate dele)
+        {
+            return Delegate == dele;
+        }
+
         public override string ToString()
         {
             return method.ToString();
+        }
+
+        public Delegate GetConvertor(Type type)
+        {
+            if (converters == null)
+                converters = new Dictionary<System.Type, Delegate>();
+            Delegate res;
+            if (converters.TryGetValue(type, out res))
+                return res;
+            else
+            {
+                res = appdomain.DelegateManager.ConvertToDelegate(type, this);
+                converters[type] = res;
+                return res;
+            }
         }
     }
 
@@ -550,7 +647,12 @@ namespace ILRuntime.Runtime.Intepreter
         Delegate Delegate { get; }
         StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack);
         IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method);
+        Delegate GetConvertor(Type type);
         void Combine(IDelegateAdapter adapter);
         void Combine(Delegate dele);
+        void Remove(IDelegateAdapter adapter);
+        void Remove(Delegate dele);
+        bool Equals(IDelegateAdapter adapter);
+        bool Equals(Delegate dele);
     }
 }

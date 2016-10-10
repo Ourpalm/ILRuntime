@@ -87,7 +87,7 @@ namespace ILRuntime.CLR.Utils
                     return obj;
                 if (pt == typeof(Delegate))
                     return ((IDelegateAdapter)obj).Delegate;
-                return domain.DelegateManager.ConvertToDelegate(pt, (IDelegateAdapter)obj);
+                return ((IDelegateAdapter)obj).GetConvertor(pt);
             }
             else if (pt.IsByRef)
             {

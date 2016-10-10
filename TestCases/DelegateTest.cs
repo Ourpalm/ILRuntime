@@ -77,6 +77,31 @@ namespace TestCases
             int val = testDele(123);
             return val;
         }
+
+        public static void DelegateTest06()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest = null;
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest;
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest -= IntTest;
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest2;
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest(1000);
+        }
+
+        public static void DelegateTest07()
+        {
+            Test07Sub(IntTest);
+            Test07Sub2(IntTest);
+        }
+
+        static void Test07Sub(ILRuntimeTest.TestFramework.IntDelegate action)
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest = action;
+        }
+
+        static void Test07Sub2(ILRuntimeTest.TestFramework.IntDelegate action)
+        {
+            Console.WriteLine("Test Result=" + (ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest == action));
+        }
         static void IntTest(int a)
         {
             Console.WriteLine("dele a=" + a);

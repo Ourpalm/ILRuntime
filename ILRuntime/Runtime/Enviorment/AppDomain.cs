@@ -41,6 +41,14 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.DelegateCombine);
                 }
+                if(i.Name == "op_Equality")
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.DelegateEqulity);
+                }
+                if(i.Name == "op_Inequality")
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.DelegateInequlity);
+                }
             }
             mi = typeof(System.Type).GetMethod("GetTypeFromHandle");
             RegisterCLRMethodRedirection(mi, CLRRedirections.GetTypeFromHandle);
