@@ -583,9 +583,20 @@ namespace ILRuntime.CLR.TypeSystem
             return false;
         }
 
-        internal ILTypeInstance Instantiate()
+        static object[] param = new object[1];
+        internal ILTypeInstance Instantiate(bool callDefaultConstructor = true)
         {
-            return new ILTypeInstance(this);
+            var res = new ILTypeInstance(this);
+            if (callDefaultConstructor)
+            {
+                var m = GetConstructor(CLR.Utils.Extensions.EmptyParamList);
+                if (m != null)
+                {
+                    param[0] = res;
+                    appdomain.Invoke(m, param);
+                }
+            }
+            return res;
         }
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
         {

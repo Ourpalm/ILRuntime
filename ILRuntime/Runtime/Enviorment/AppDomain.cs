@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using System.Reflection;
 using Mono.Cecil.Cil;
 
 using ILRuntime.CLR.TypeSystem;
@@ -24,8 +25,10 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> redirectMap = new Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>>();
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         DelegateManager dMgr;
+        Assembly[] loadedAssemblies;
         public AppDomain()
         {
+            loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
             foreach (var i in typeof(System.Activator).GetMethods())
@@ -402,6 +405,35 @@ namespace ILRuntime.Runtime.Enviorment
             }
             if (res == null && scope != null)
                 res = GetType(typename + ", " + scope);
+            if (res == null)
+            {
+                if (scope != null)
+                {
+                    string aname = scope.Split(',')[0];
+                    foreach (var i in loadedAssemblies)
+                    {
+                        if (aname == i.GetName().Name)
+                        {
+                            res = GetType(typename + ", " + i.FullName);
+                            if (res != null)
+                                break;
+                        }
+                    }
+                }
+                if (res == null)
+                {
+                    foreach (var j in loadedAssemblies)
+                    {
+                        res = GetType(typename + ", " + j.FullName);
+                        if (res != null)
+                            break;
+                    }
+                }
+                if (res != null && scope != null)
+                {
+                    mapType[typename + ", " + scope] = res;
+                }
+            }
             if (res == null)
                 throw new KeyNotFoundException("Cannot find Type:" + typename);
             if (genericArguments != null)

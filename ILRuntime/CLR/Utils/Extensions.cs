@@ -12,7 +12,7 @@ namespace ILRuntime.CLR.Utils
 
     static class Extensions
     {
-        static List<IType> emptyParamList = new List<IType>();
+        public static List<IType> EmptyParamList = new List<IType>();
         public static List<IType> GetParamList(this MethodReference def, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IType contextType)
         {
             if (def.HasParameters)
@@ -51,7 +51,7 @@ namespace ILRuntime.CLR.Utils
                 return param;
             }
             else
-                return emptyParamList;
+                return EmptyParamList;
         }
 
         public static object CheckCLRTypes(this Type pt, Runtime.Enviorment.AppDomain domain, object obj)

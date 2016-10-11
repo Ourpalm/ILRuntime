@@ -47,6 +47,11 @@ namespace ILRuntimeTest
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
 
                     app.RegisterCrossBindingAdaptor(new TestFramework.ClassInheritanceAdaptor());
+                    app.DelegateManager.RegisterMethodDelegate<int>();
+                    //app.DelegateManager.RegisterMethodDelegate<int, string>();
+                    app.DelegateManager.RegisterFunctionDelegate<int, int>();
+                    //app.DelegateManager.RegisterFunctionDelegate<int, int, int>();
+                    //app.DelegateManager.RegisterMethodDelegate<MyClass2>();
                     app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate>((action) =>
                     {
                         return new TestFramework.IntDelegate((a) =>
@@ -97,11 +102,7 @@ namespace ILRuntimeTest
                       });
                   });
                   */
-                    app.DelegateManager.RegisterMethodDelegate<int>();
-                    //app.DelegateManager.RegisterMethodDelegate<int, string>();
-                    app.DelegateManager.RegisterFunctionDelegate<int, int>();
-                    //app.DelegateManager.RegisterFunctionDelegate<int, int, int>();
-                    //app.DelegateManager.RegisterMethodDelegate<MyClass2>();
+                   
                     List<TestResultInfo> resList = new List<TestResultInfo>();
                     Assembly assembly = Assembly.LoadFrom(OD.FileName);
                     if (assembly != null)

@@ -5,6 +5,7 @@ using System.Text;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -155,7 +156,8 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            //Don't ask me why not esp -2, unity won't return the right result
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
             var dele2 = (esp - 1)->ToObject(domain, mStack);
 
             if (dele1 != null)
@@ -202,7 +204,7 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
             var dele2 = (esp - 1)->ToObject(domain, mStack);
 
             if (dele1 != null)
@@ -244,7 +246,7 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
             var dele2 = (esp - 1)->ToObject(domain, mStack);
 
             if (dele1 != null)
@@ -282,7 +284,7 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
             var dele2 = (esp - 1)->ToObject(domain, mStack);
 
             if (dele1 != null)

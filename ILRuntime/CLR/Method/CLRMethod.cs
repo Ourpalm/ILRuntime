@@ -74,6 +74,8 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public MethodInfo MethodInfo { get { return def; } }
+
         public IType[] GenericArguments { get { return genericArguments; } }
 
         public CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
@@ -169,6 +171,11 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        unsafe StackObject* Minus(StackObject* a, int b)
+        {
+            return (StackObject*)((long)a - sizeof(StackObject) * b);
+        }
+
         public unsafe object Invoke(StackObject* esp, List<object> mStack,bool isNewObj=false)
         {
             if (parameters == null)
@@ -181,7 +188,7 @@ namespace ILRuntime.CLR.Method
             object[] param = invocationParam;
             for (int i = paramCount; i >= 1; i--)
             {
-                var p = esp - i;
+                var p = Minus(esp, i);
                 var obj = this.param[paramCount - i].ParameterType.CheckCLRTypes(appdomain, p->ToObject(appdomain, mStack));
 
                 param[paramCount - i] = obj;
@@ -193,7 +200,7 @@ namespace ILRuntime.CLR.Method
                 {
                     if (!cDef.IsStatic)
                     {
-                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (esp - paramCount - 1)->ToObject(appdomain, mStack));
+                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (Minus(esp, paramCount + 1))->ToObject(appdomain, mStack));
                         if (instance == null)
                             throw new NullReferenceException();
                         cDef.Invoke(instance, param);
@@ -217,7 +224,7 @@ namespace ILRuntime.CLR.Method
 
                 if (!def.IsStatic)
                 {
-                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (esp - paramCount - 1)->ToObject(appdomain, mStack));
+                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (Minus(esp, paramCount + 1))->ToObject(appdomain, mStack));
                     if (instance == null)
                         throw new NullReferenceException();
                 }
