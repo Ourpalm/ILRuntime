@@ -493,6 +493,8 @@ namespace ILRuntime.Runtime.Intepreter
 
         public abstract Delegate Delegate { get; }
 
+        public IDelegateAdapter Next { get { return next; } }
+
         protected DelegateAdapter() { }
 
         protected DelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -645,6 +647,7 @@ namespace ILRuntime.Runtime.Intepreter
     unsafe interface IDelegateAdapter
     {
         Delegate Delegate { get; }
+        IDelegateAdapter Next { get; }
         StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack);
         IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method);
         Delegate GetConvertor(Type type);

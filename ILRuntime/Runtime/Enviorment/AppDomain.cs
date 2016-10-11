@@ -41,6 +41,10 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.DelegateCombine);
                 }
+                if(i.Name == "Remove")
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.DelegateRemove);
+                }
                 if(i.Name == "op_Equality")
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.DelegateEqulity);

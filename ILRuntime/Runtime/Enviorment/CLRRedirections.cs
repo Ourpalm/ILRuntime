@@ -185,6 +185,47 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2;
         }
 
+        public unsafe static object DelegateRemove(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            var esp = ctx.ESP;
+            var mStack = ctx.ManagedStack;
+            var domain = ctx.AppDomain;
+
+            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele2 = (esp - 1)->ToObject(domain, mStack);
+
+            if (dele1 != null)
+            {
+                if (dele2 != null)
+                {
+                    if (dele1 is IDelegateAdapter)
+                    {
+                        if (dele2 is IDelegateAdapter)
+                        {
+                            if (dele1 == dele2)
+                                return ((IDelegateAdapter)dele1).Next;
+                            else
+                                ((IDelegateAdapter)dele1).Remove((IDelegateAdapter)dele2);
+                        }
+                        else
+                            ((IDelegateAdapter)dele1).Remove((Delegate)dele2);
+                        return dele1;
+                    }
+                    else
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            return Delegate.Remove((Delegate)dele1, ((IDelegateAdapter)dele2).GetConvertor(dele1.GetType()));
+                        else
+                            return Delegate.Remove((Delegate)dele1, (Delegate)dele2);
+                    }
+                }
+                else
+                    return dele1;
+            }
+            else
+                return null;
+        }
+
         public unsafe static object DelegateEqulity(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
             //op_Equality,op_Inequality
