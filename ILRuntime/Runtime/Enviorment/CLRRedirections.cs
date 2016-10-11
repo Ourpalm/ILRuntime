@@ -165,10 +165,21 @@ namespace ILRuntime.Runtime.Enviorment
                     if (dele1 is IDelegateAdapter)
                     {
                         if (dele2 is IDelegateAdapter)
-                            ((IDelegateAdapter)dele1).Combine((IDelegateAdapter)dele2);
+                        {
+                            var dele = ((IDelegateAdapter)dele1);
+                            //This means it's the default delegate which should be singleton to support == operator
+                            if (dele.Next == null)
+                            {
+                                dele = dele.Instantiate(domain, dele.Instance, dele.Method);
+                            }
+                            dele.Combine((IDelegateAdapter)dele2);
+                            return dele;
+                        }
                         else
+                        {
                             ((IDelegateAdapter)dele1).Combine((Delegate)dele2);
-                        return dele1;
+                            return dele1;
+                        }
                     }
                     else
                     {
@@ -243,10 +254,9 @@ namespace ILRuntime.Runtime.Enviorment
                     if (dele1 is IDelegateAdapter)
                     {
                         if (dele2 is IDelegateAdapter)
-                            ((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2);
+                            return ((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2);
                         else
-                            ((IDelegateAdapter)dele1).Equals((Delegate)dele2);
-                        return dele1;
+                            return ((IDelegateAdapter)dele1).Equals((Delegate)dele2);
                     }
                     else
                     {

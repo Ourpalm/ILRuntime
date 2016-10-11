@@ -495,6 +495,10 @@ namespace ILRuntime.Runtime.Intepreter
 
         public IDelegateAdapter Next { get { return next; } }
 
+        public ILTypeInstance Instance { get { return instance; } }
+
+        public ILMethod Method { get { return method; } }
+
         protected DelegateAdapter() { }
 
         protected DelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -648,6 +652,8 @@ namespace ILRuntime.Runtime.Intepreter
     {
         Delegate Delegate { get; }
         IDelegateAdapter Next { get; }
+        ILTypeInstance Instance { get; }
+        ILMethod Method { get; }
         StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack);
         IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method);
         Delegate GetConvertor(Type type);
