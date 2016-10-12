@@ -42,6 +42,9 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (method == null)
                 throw new NullReferenceException();
+#if UNITY_EDITOR || DEBUG
+            UnityEngine.Profiler.BeginSample(method.ToString());
+#endif
             OpCode[] body = method.Body;
             StackFrame frame = stack.PushFrame(method, esp);
             StackObject* v1 = frame.LocalVarPointer;
@@ -1250,7 +1253,13 @@ namespace ILRuntime.Runtime.Intepreter
 
                                             if (!processed)
                                             {
+#if UNITY_EDITOR || DEBUG
+                                                UnityEngine.Profiler.BeginSample(cm.ToString());
+#endif
                                                 object result = cm.Invoke(esp, mStack);
+#if UNITY_EDITOR || DEBUG
+                                                UnityEngine.Profiler.EndSample();
+#endif
                                                 int paramCount = cm.ParameterCount;
                                                 for (int i = 1; i <= paramCount; i++)
                                                 {
@@ -1965,7 +1974,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else if (type.TypeForCLR.IsEnum)
                                             {
-                                                esp = PushObject(obj, mStack, Enum.ToObject(type.TypeForCLR, obj->ToObject(AppDomain, mStack)));
+                                                esp = PushObject(obj, mStack, Enum.ToObject(type.TypeForCLR, obj->ToObject(AppDomain, mStack)), true);
                                             }
                                             else
                                             {
@@ -2855,7 +2864,9 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                 }
             }
-
+#if UNITY_EDITOR || DEBUG
+            UnityEngine.Profiler.EndSample();
+#endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
         }

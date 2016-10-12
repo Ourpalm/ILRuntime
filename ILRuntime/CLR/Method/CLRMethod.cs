@@ -251,5 +251,13 @@ namespace ILRuntime.CLR.Method
             res.genericArguments = genericArguments;
             return res;
         }
+
+        public override string ToString()
+        {
+            if (def != null)
+                return def.ToString();
+            else
+                return cDef.ToString();
+        }
     }
 }
