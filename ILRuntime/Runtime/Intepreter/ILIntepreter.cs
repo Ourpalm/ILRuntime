@@ -42,7 +42,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (method == null)
                 throw new NullReferenceException();
-#if UNITY_EDITOR || DEBUG
+#if UNITY_EDITOR
             UnityEngine.Profiler.BeginSample(method.ToString());
 #endif
             OpCode[] body = method.Body;
@@ -1253,11 +1253,11 @@ namespace ILRuntime.Runtime.Intepreter
 
                                             if (!processed)
                                             {
-#if UNITY_EDITOR || DEBUG
+#if UNITY_EDITOR
                                                 UnityEngine.Profiler.BeginSample(cm.ToString());
 #endif
                                                 object result = cm.Invoke(esp, mStack);
-#if UNITY_EDITOR || DEBUG
+#if UNITY_EDITOR
                                                 UnityEngine.Profiler.EndSample();
 #endif
                                                 int paramCount = cm.ParameterCount;
@@ -2864,7 +2864,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                 }
             }
-#if UNITY_EDITOR || DEBUG
+#if UNITY_EDITOR
             UnityEngine.Profiler.EndSample();
 #endif
             //ClearStack
