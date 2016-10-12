@@ -232,7 +232,9 @@ namespace ILRuntime.CLR.Method
                 if (redirect != null)
                     res = redirect(new ILContext(appdomain, esp, mStack, this), instance, param, genericArguments);
                 else
+                {
                     res = def.Invoke(instance, param);
+                }
                 return res;
             }
         }

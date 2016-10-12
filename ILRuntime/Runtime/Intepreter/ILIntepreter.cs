@@ -1256,7 +1256,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     Free(Minus(esp, i));
                                                 }
-                                                Minus(esp, paramCount);
+                                                esp = Minus(esp, paramCount);
                                                 if (cm.HasThis)
                                                 {
                                                     Free(esp - 1);
@@ -1719,7 +1719,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 Free(esp - i);
                                             }
-                                            Minus(esp, paramCount);
+                                            esp = Minus(esp, paramCount);
                                             esp = PushObject(esp, mStack, result);//new constructedObj
                                         }
                                     }
@@ -3037,24 +3037,7 @@ namespace ILRuntime.Runtime.Intepreter
                     throw new ArgumentOutOfRangeException();
                 for (int i = 0; i < p.Length; i++)
                 {
-                    Type clrType = p[i].GetType();
-                    if (clrType == typeof(int))
-                    {
-                        esp->ObjectType = ObjectTypes.Integer;
-                        esp->Value = (int)p[i];
-                    }
-                    else if (clrType == typeof(float))
-                    {
-                        esp->ObjectType = ObjectTypes.Integer;
-                        *(float*)&esp->Value = (float)p[i];
-                    }
-                    else
-                    {
-                        esp->ObjectType = ObjectTypes.Object;
-                        esp->Value = mStack.Count;
-                        mStack.Add(p[i]);
-                    }
-                    esp++;
+                    esp = PushObject(esp, mStack, p[i]);
                 }
             }
             return esp;
@@ -3171,7 +3154,7 @@ namespace ILRuntime.Runtime.Intepreter
                     else if (obj.GetType().IsEnum)
                     {
                         esp->ObjectType = ObjectTypes.Integer;
-                        esp->Value = (int)(obj);
+                        esp->Value = Convert.ToInt32(obj);
                     }
                     else
                     {
