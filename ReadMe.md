@@ -157,6 +157,14 @@ Before you can inherit a type declared outside ILRuntime, you need to define a A
         }
 ```
 
+Running Test Project
+-----------
+Running the test project is quite simple. 
+* Compile the whole solution
+* Run the ILRuntimeTest project
+* Select the TestCases.dll
+* The tests are run automatically and output the results in Console and Window
+
 Apporach
 ========
 The basic part of the runtime, like resolving PE header, gathering meta information of types, and disassembling of IL instructions, we will take the same solution as L#, to use the Mono.Cecil library. 
