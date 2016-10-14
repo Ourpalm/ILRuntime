@@ -31,6 +31,10 @@ If you want to use ILRuntime in Unity, you need to copy the following source cod
 
 The bin, obj, Properties sub folder should not be copied into unity folder, otherwise it may cause problem. The project files(.csproj) are not needed either, but it shoudn't cause any problem either.
 
+ILRuntime uses unsafe code, so you must enable unsafe mode to use ILRuntime, you can enable it like this:
+* Create a file named:smcs.rsp in Assets folder
+* Open smcs.rsp with text editor and add "-unsafe" to it.
+
 Visual Studio
 ----------
 For Visual Studio you only need to reference Mono.Cecil.20,ILRuntime,Mono.Cecil.Pdb or Mono.Cecil.Mdb's assembly.
