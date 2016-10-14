@@ -24,6 +24,8 @@ WARNING!
 ========
 Please mainly use this library for bug fixing!! ADDING/HIDING/CHANING features in your APP may violate some platform's guideline(for example iOS), your APP may get REJECTED or even BANNED if you do so.
 
+This libray should not be used for evading Apple's review system, if you do this, it will be on your own risk!
+
 Get Started
 ========
 Unity
