@@ -20,6 +20,143 @@ Our vision is to create a reliable high performance IL runtime which is also as 
 * Framework for inspecting stack and object information
 * Either Visual Studio integration or Standalone Debugger with GUI.
 
+Get Started
+========
+Unity
+----------
+If you want to use ILRuntime in Unity, you need to copy the following source code into your project's Assets folder:
+* Mono.Cecil.20
+* Mono.Cecil.Pdb for VS compiled assembly or Mono.Cecil.Mdb for mono compiled assembly
+* ILRuntime
+
+The bin, obj, Properties sub folder should not be copied into unity folder, otherwise it may cause problem. The project files(.csproj) are not needed either, but it shoudn't cause any problem either.
+
+Visual Studio
+----------
+For Visual Studio you only need to reference Mono.Cecil.20,ILRuntime,Mono.Cecil.Pdb or Mono.Cecil.Mdb's assembly.
+
+Usage
+----------
+For start using ILRuntime, you may follow these instructions:
+* Reference or copy the needed dependencies like described above
+* Make a instance of ILRuntime.Runtime.Enviorment.AppDomain, this class is the entry point of ILRuntime
+* Use appDomain.LoadAssembly to load a dll file, and the corresponding symbol file. You should specify the symbol reader if you want to use symbol file(for example, Mono.Cecil.Pdb.PdbReaderProvider for .pdb symbol)
+* Use appDomain.Invoke to run a static method of specified type
+* You can get all loaded types via appDomain.LoadedTypes property. All types in ILRuntime are represented with IType interface. You can instantiate a ILRuntime type by using: ((ILType)type).Instantiate()
+
+Delegates
+----------
+In order to support platforms, where JIT are not allowed, we can't use reflection to create delegate types. So you need to register the delegate type, before you can use it.
+
+You only need to register delegate types with different method signature, different delegate types with the same parameters and return value are only needed to register once.
+
+To register a delegate type, you need to call appDomain.DelegateManager.RegisterMethodDelegate<ParamType1,ParamType2...>() for methods, appDomain.DelegateManager.RegisterFunctionDelegate<ParamType1, ParamType2, ..., ReturnType>() for functions
+
+If you want to use an delegate instance created in ILRuntime outside ILRuntime, then you need to make a Delegate Converter for it. ILRuntime uses Action<T> and Func<T> internal for delegates, so such delegate types have builtin converter, and you don't need to write converter for such types.
+
+A typical Delegate Converter should look like this:
+```C#
+app.DelegateManager.RegisterDelegateConvertor<DelegateType>((action) =>
+{
+    return new DelegateType((a) =>
+    {
+       ((Action<ParamType1>)action)(a);
+    });
+});
+```
+
+Inheritance
+----------
+Before you can inherit a type declared outside ILRuntime, you need to define a Adaptor for it.  A typical Adaptor should look like this:
+```C#
+    //All adaptors should inherit CrossBindingAdaptor
+    public class ClassInheritanceAdaptor : CrossBindingAdaptor
+    {
+        public override Type BaseCLRType
+        {
+            get
+            {
+                return typeof(ClassInheritanceTest);//This is the type to be inherited
+            }
+        }
+
+        public override Type AdaptorType
+        {
+            get
+            {
+                return typeof(Adaptor);//This is the actual Adaptor class for it
+            }
+        }
+
+        public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+        {
+            return new Adaptor(appdomain, instance);//Creating a new instance
+        }
+
+		//The Adaptor class should inherit the type you want to inherit from ILRuntime, and implement the CrossBindingAdaptorType interface
+        class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
+        {
+            ILTypeInstance instance;
+            ILRuntime.Runtime.Enviorment.AppDomain appdomain;
+            IMethod mTestAbstract;
+            IMethod mTestVirtual;
+            bool isTestVirtualInvoking = false;
+
+            public Adaptor()
+            {
+
+            }
+
+            public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+            {
+                this.appdomain = appdomain;
+                this.instance = instance;
+            }
+
+            public ILTypeInstance ILInstance { get { return instance; } }
+            
+			//The adaptor class should override all virtual and abstract methods declared in the base type, and redirect the call to the ILRuntime instance
+            public override void TestAbstract()
+            {
+                if(mTestAbstract == null)
+                {
+                    mTestAbstract = instance.Type.GetMethod("TestAbstract", 0);
+                }
+                if (mTestAbstract != null)
+                    appdomain.Invoke(mTestAbstract, instance);
+            }
+
+            public override void TestVirtual()
+            {
+                if (mTestVirtual == null)
+                {
+                    mTestVirtual = instance.Type.GetMethod("TestVirtual", 0);
+                }
+				//For virtual method, you must add a bool variable to determine if it's already invoking, otherwise it will cause stackoverflow if you call base.TestVirtual() inside ILRuntime
+                if (mTestVirtual != null && !isTestVirtualInvoking)
+                {
+                    isTestVirtualInvoking = true;
+                    appdomain.Invoke(mTestVirtual, instance);
+                    isTestVirtualInvoking = false;
+                }
+                else
+                    base.TestVirtual();
+            }
+
+            public override string ToString()
+            {
+                IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
+                m = instance.Type.GetVirtualMethod(m);
+                if (m == null || m is ILMethod)
+                {
+                    return instance.ToString();
+                }
+                else
+                    return instance.Type.FullName;
+            }
+        }
+```
+
 Apporach
 ========
 The basic part of the runtime, like resolving PE header, gathering meta information of types, and disassembling of IL instructions, we will take the same solution as L#, to use the Mono.Cecil library. 
@@ -125,12 +262,13 @@ Roadmaps
 * CLR Method redirections
 * Call stack and local variable dumper
 * Delegates
+* Inheritance of classes outside ILRuntime
 
 ##Planned
 * Multi-dimensional Arrays
 * Reflection support
-* Inheritance of classes and interfaces from 
 * All IL instructions
+* Implementation of interfaces outside ILRuntime
 
 ##Experimental, timeline uncertain
 * Debugger support
