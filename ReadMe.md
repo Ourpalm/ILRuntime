@@ -20,6 +20,10 @@ Our vision is to create a reliable high performance IL runtime which is also as 
 * Framework for inspecting stack and object information
 * Either Visual Studio integration or Standalone Debugger with GUI.
 
+WARNING!
+========
+Please mainly use this library for bug fixing!! ADDING/HIDING/CHANING features in your APP may violate some platform's guideline(for example iOS), your APP may get REJECTED or even BANNED if you do so.
+
 Get Started
 ========
 Unity
