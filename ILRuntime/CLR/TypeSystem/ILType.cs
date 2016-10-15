@@ -7,6 +7,7 @@ using Mono.Cecil;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Reflection;
 
 namespace ILRuntime.CLR.TypeSystem
 {
@@ -33,6 +34,7 @@ namespace ILRuntime.CLR.TypeSystem
         bool interfaceInitialized = false;
         List<ILType> genericInstances;
         bool isDelegate;
+        ILRuntimeType reflectionType;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
         public TypeReference TypeReference
@@ -208,6 +210,17 @@ namespace ILRuntime.CLR.TypeSystem
                     return typeof(ILTypeInstance);
             }
         }
+
+        public Type ReflectionType
+        {
+            get
+            {
+                if (reflectionType == null)
+                    reflectionType = new ILRuntimeType(this);
+                return reflectionType;
+            }
+        }
+
         public IType ByRefType
         {
             get
@@ -336,6 +349,18 @@ namespace ILRuntime.CLR.TypeSystem
                     }*/
                 }
             }
+        }
+
+        public IMethod GetMethod(string name)
+        {
+            if (methods == null)
+                InitializeMethods();
+            List<ILMethod> lst;
+            if (methods.TryGetValue(name, out lst))
+            {
+                return lst[0];
+            }
+            return null;
         }
 
         public IMethod GetMethod(string name, int paramCount)

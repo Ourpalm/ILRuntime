@@ -176,7 +176,7 @@ namespace ILRuntime.CLR.Method
             return (StackObject*)((long)a - sizeof(StackObject) * b);
         }
 
-        public unsafe object Invoke(StackObject* esp, List<object> mStack,bool isNewObj=false)
+        public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, List<object> mStack,bool isNewObj=false)
         {
             if (parameters == null)
             {
@@ -216,7 +216,7 @@ namespace ILRuntime.CLR.Method
                     var res = cDef.Invoke(param);
                     return res;
                 }
-               
+
             }
             else
             {
@@ -230,7 +230,7 @@ namespace ILRuntime.CLR.Method
                 }
                 object res = null;
                 if (redirect != null)
-                    res = redirect(new ILContext(appdomain, esp, mStack, this), instance, param, genericArguments);
+                    res = redirect(new ILContext(appdomain, intepreter, esp, mStack, this), instance, param, genericArguments);
                 else
                 {
                     res = def.Invoke(instance, param);

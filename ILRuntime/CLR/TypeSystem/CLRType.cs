@@ -69,6 +69,14 @@ namespace ILRuntime.CLR.TypeSystem
                 return clrType;
             }
         }
+
+        public Type ReflectionType
+        {
+            get
+            {
+                return clrType;
+            }
+        }
         public IType ByRefType
         {
             get

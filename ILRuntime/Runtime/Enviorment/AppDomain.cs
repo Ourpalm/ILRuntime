@@ -57,8 +57,17 @@ namespace ILRuntime.Runtime.Enviorment
                     RegisterCLRMethodRedirection(i, CLRRedirections.DelegateInequlity);
                 }
             }
+            foreach(var i in typeof(MethodBase).GetMethods())
+            {
+                if(i.Name == "Invoke" && i.GetParameters().Length == 2)
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.MethodInfoInvoke);
+                }
+            }
             mi = typeof(System.Type).GetMethod("GetTypeFromHandle");
             RegisterCLRMethodRedirection(mi, CLRRedirections.GetTypeFromHandle);
+            mi = typeof(object).GetMethod("GetType");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.ObjectGetType);
             dMgr = new DelegateManager(this);
             dMgr.RegisterDelegateConvertor<Action>((dele) =>
             {

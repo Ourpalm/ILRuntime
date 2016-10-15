@@ -1256,7 +1256,7 @@ namespace ILRuntime.Runtime.Intepreter
 #if UNITY_EDITOR
                                                 UnityEngine.Profiler.BeginSample(cm.ToString());
 #endif
-                                                object result = cm.Invoke(esp, mStack);
+                                                object result = cm.Invoke(this, esp, mStack);
 #if UNITY_EDITOR
                                                 UnityEngine.Profiler.EndSample();
 #endif
@@ -1456,7 +1456,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 IType type = AppDomain.GetType((int)ip->TokenLong);
                                                 if (type != null)
                                                 {
-                                                    esp = PushObject(esp, mStack, type.TypeForCLR);
+                                                    esp = PushObject(esp, mStack, type.ReflectionType);
                                                 }
                                                 else
                                                     throw new TypeLoadException();
@@ -1722,7 +1722,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            object result = cm.Invoke(esp, mStack, true);
+                                            object result = cm.Invoke(this, esp, mStack, true);
                                             int paramCount = cm.ParameterCount;
                                             for (int i = 1; i <= paramCount; i++)
                                             {
@@ -3088,7 +3088,7 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        static StackObject* PushNull(StackObject* esp)
+        public static StackObject* PushNull(StackObject* esp)
         {
             esp->ObjectType = ObjectTypes.Null;
             esp->Value = -1;

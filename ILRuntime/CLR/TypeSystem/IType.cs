@@ -12,6 +12,7 @@ namespace ILRuntime.CLR.TypeSystem
         bool IsGenericInstance { get; }
         KeyValuePair<string, IType>[] GenericArguments { get; }
         Type TypeForCLR { get; }
+        Type ReflectionType { get; }
 
         IType ByRefType { get; }
 
