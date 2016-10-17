@@ -73,6 +73,8 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 return dele;
             });
+
+            RegisterCrossBindingAdaptor(new Adaptors.AttributeAdaptor());
         }
 
         public IType VoidType { get { return voidType; } }
@@ -538,6 +540,11 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 Mono.Cecil.MethodReference _ref = (token as Mono.Cecil.MethodReference);
                 if (_ref.FullName == "System.Void System.Object::.ctor()")
+                {
+                    mapMethod[hashCode] = null;
+                    return null;
+                }
+                if (_ref.FullName == "System.Void System.Attribute::.ctor()")
                 {
                     mapMethod[hashCode] = null;
                     return null;

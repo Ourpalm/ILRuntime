@@ -14,12 +14,68 @@ namespace ILRuntime.Reflection
     {
         ILType type;
         Runtime.Enviorment.AppDomain appdomain;
+        object[] customAttributes;
         
         public ILRuntimeType(ILType t)
         {
             type = t;
             appdomain = t.AppDomain;
         }
+
+        void InitializeCustomAttribute()
+        {
+            customAttributes = new object[type.TypeDefinition.CustomAttributes.Count];
+            List<IType> param = null;
+            for (int i = 0; i < type.TypeDefinition.CustomAttributes.Count; i++)
+            {
+                var attribute = type.TypeDefinition.CustomAttributes[i];
+                var at = appdomain.GetType(attribute.AttributeType, type);
+
+                if (at is ILType)
+                {
+                    var it = (ILType)at;
+                    object ins = null;
+                    if (!attribute.HasConstructorArguments)
+                        ins = it.Instantiate(true);
+                    else
+                    {
+                        ins = it.Instantiate(false);
+                        if (param == null)
+                            param = new List<IType>();
+                        param.Clear();
+                        object[] p = new object[attribute.ConstructorArguments.Count + 1];
+                        p[0] = ins;
+                        for (int j = 0; j < attribute.ConstructorArguments.Count; j++)
+                        {
+                            var ca = attribute.ConstructorArguments[j];
+                            param.Add(appdomain.GetType(ca.Type, type));
+                            p[j + 1] = ca.Value;
+                        }
+                        var ctor = it.GetConstructor(param);
+                        appdomain.Invoke(ctor, p);
+                    }
+
+                    if (attribute.HasProperties)
+                    {
+                        object[] p = new object[2];
+                        p[0] = ins;
+                        foreach (var j in attribute.Properties)
+                        {
+                            p[1] = j.Argument.Value;
+                            var setter = it.GetMethod("set_" + j.Name, 1);
+                            appdomain.Invoke(setter, p);
+                        }
+                    }
+                    customAttributes[i] = ins;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+        }
+
         public override Assembly Assembly
         {
             get
@@ -99,7 +155,10 @@ namespace ILRuntime.Reflection
 
         public override object[] GetCustomAttributes(bool inherit)
         {
-            throw new NotImplementedException();
+            if (customAttributes == null)
+                InitializeCustomAttribute();
+
+            return customAttributes;
         }
 
         public override object[] GetCustomAttributes(Type attributeType, bool inherit)

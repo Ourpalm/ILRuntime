@@ -52,6 +52,7 @@
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
     <Compile Include="Reflection\ILRuntimeMethodInfo.cs" />
     <Compile Include="Reflection\ILRuntimeType.cs" />
+    <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
     <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
     <Compile Include="Runtime\Enviorment\ILContext.cs" />
     <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />

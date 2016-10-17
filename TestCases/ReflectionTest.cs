@@ -38,9 +38,20 @@ namespace TestCases
             method2.Invoke(null, null);
         }
 
-        class TestCls 
+        public static void ReflectionTest04()
+        {
+            var arr = typeof(TestCls2).GetCustomAttributes(false);
+            foreach(var i in arr)
+            {
+                Console.WriteLine(i);
+            }
+        }
+
+        [Obsolete("gasdgas")]
+        class TestCls
         {
             int aa = 203;
+            [Microsoft.SqlServer.Server.SqlFunction(DataAccess = Microsoft.SqlServer.Server.DataAccessKind.Read)]
             public TestCls foo(int b)
             {
                 Console.WriteLine("foo" + (aa + b));
@@ -54,9 +65,27 @@ namespace TestCases
             }
         }
 
+        [Test(true, TestProp = "1234")]
+        [Test]
         class TestCls2
         {
-           
+
+        }
+
+        [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+        class TestAttribute : Attribute
+        {
+            bool testField;
+            public TestAttribute()
+            {
+
+            }
+            public TestAttribute(bool test)
+            {
+                testField = test;
+            }
+
+            public string TestProp { get; set; }
         }
     }
 }
