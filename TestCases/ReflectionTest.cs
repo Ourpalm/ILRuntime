@@ -45,6 +45,12 @@ namespace TestCases
             {
                 Console.WriteLine(i);
             }
+
+            arr = typeof(TestCls).GetCustomAttributes(false);
+            foreach (var i in arr)
+            {
+                Console.WriteLine(i);
+            }
         }
 
         [Obsolete("gasdgas")]

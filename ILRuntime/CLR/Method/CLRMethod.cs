@@ -76,6 +76,8 @@ namespace ILRuntime.CLR.Method
 
         public MethodInfo MethodInfo { get { return def; } }
 
+        public ConstructorInfo ConstructorInfo { get { return cDef; } }
+
         public IType[] GenericArguments { get { return genericArguments; } }
 
         public CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)

@@ -30,11 +30,11 @@ namespace ILRuntime.Reflection
             {
                 var attribute = type.TypeDefinition.CustomAttributes[i];
                 var at = appdomain.GetType(attribute.AttributeType, type);
+                object ins = null;
 
                 if (at is ILType)
                 {
                     var it = (ILType)at;
-                    object ins = null;
                     if (!attribute.HasConstructorArguments)
                         ins = it.Instantiate(true);
                     else
@@ -66,12 +66,33 @@ namespace ILRuntime.Reflection
                             appdomain.Invoke(setter, p);
                         }
                     }
-                    customAttributes[i] = ins;
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    param = new List<IType>();
+                    object[] p = null;
+                    if (attribute.HasConstructorArguments)
+                    {
+                        p = new object[attribute.ConstructorArguments.Count];
+                        for (int j = 0; j < attribute.ConstructorArguments.Count; j++)
+                        {
+                            var ca = attribute.ConstructorArguments[j];
+                            param.Add(appdomain.GetType(ca.Type, type));
+                            p[j] = ca.Value;
+                        }
+                    }
+                    ins = ((CLRMethod)at.GetConstructor(param)).ConstructorInfo.Invoke(p);
+                    if (attribute.HasProperties)
+                    {                        
+                        foreach (var j in attribute.Properties)
+                        {
+                            var prop = at.TypeForCLR.GetProperty(j.Name);
+                            prop.SetValue(ins, j.Argument.Value, null);
+                        }
+                    }
                 }
+
+                customAttributes[i] = ins;
             }
 
         }
