@@ -87,6 +87,8 @@ namespace ILRuntime.Runtime.Debugger
                 if (f.IsStatic)
                     continue;
                 var v = instance.Fields[idx].ToObject(intepreter.AppDomain, instance.ManagedObjects);
+                if (v == null)
+                    v = "null";
                 string name = f.Name;
                 sb.AppendFormat("{0} {1} = {2}", f.FieldType.Name, name, v);
                 if ((idx % 3 == 0 && idx != 0) || idx == instance.Fields.Length - 1)
