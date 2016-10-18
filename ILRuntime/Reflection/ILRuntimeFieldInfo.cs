@@ -10,6 +10,7 @@ using ILRuntime.CLR.Utils;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime;
 using ILRuntime.Runtime.Stack;
+using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.Reflection
@@ -140,7 +141,10 @@ namespace ILRuntime.Reflection
                 }
                 else
                 {
-                    ins = (ILTypeInstance)obj;
+                    if (obj is ILTypeInstance)
+                        ins = (ILTypeInstance)obj;
+                    else
+                        ins = ((CrossBindingAdaptorType)obj).ILInstance;
                 }
                 if (mStack == null)
                     mStack = new List<object>();
@@ -171,7 +175,10 @@ namespace ILRuntime.Reflection
                 }
                 else
                 {
-                    ins = (ILTypeInstance)obj;
+                    if (obj is ILTypeInstance)
+                        ins = (ILTypeInstance)obj;
+                    else
+                        ins = ((CrossBindingAdaptorType)obj).ILInstance;
                 }
 
                 ins.AssignFromStack(fieldIdx, &esp, ilType.AppDomain, mStack);
