@@ -454,7 +454,19 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            genericMethod = i;
+                            for (int j = 0; j < param.Count; j++)
+                            {
+                                if (param[j] != i.Parameters[j])
+                                {
+                                    match = false;
+                                    break;
+                                }
+                            }
+                            if (match)
+                            {
+                                genericMethod = i;
+                                break;
+                            }
                         }
                         else
                         {
