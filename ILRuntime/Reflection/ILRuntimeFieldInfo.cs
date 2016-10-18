@@ -29,6 +29,8 @@ namespace ILRuntime.Reflection
         object[] customAttributes;
         Type[] attributeTypes;
 
+        public IType ILFieldType { get { return fieldType; } }
+
         public ILRuntimeFieldInfo(FieldDefinition def, ILRuntimeType declaredType, bool isStatic, int fieldIdx)
         {
             definition = def;
@@ -46,15 +48,16 @@ namespace ILRuntime.Reflection
         void InitializeCustomAttribute()
         {
             customAttributes = new object[definition.CustomAttributes.Count];
+            attributeTypes = new Type[customAttributes.Length];
             for (int i = 0; i < definition.CustomAttributes.Count; i++)
             {
                 var attribute = definition.CustomAttributes[i];
-                var at = appdomain.GetType(attribute.AttributeType, ilType);
+                var at = appdomain.GetType(attribute.AttributeType, null);
                 object ins = attribute.CreateInstance(at, appdomain);
 
+                attributeTypes[i] = at.ReflectionType;
                 customAttributes[i] = ins;
             }
-
         }
         public override System.Reflection.FieldAttributes Attributes
         {

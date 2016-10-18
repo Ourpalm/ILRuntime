@@ -588,7 +588,7 @@ namespace ILRuntime.Runtime.Enviorment
             else
             {
                 method = type.GetMethod(methodname, paramList, genericArguments);
-                if (method.IsGenericInstance)
+                if (method != null && method.IsGenericInstance)
                     mapMethod[method.GetHashCode()] = method;
             }
 

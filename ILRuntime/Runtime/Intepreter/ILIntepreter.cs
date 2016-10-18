@@ -1601,7 +1601,13 @@ namespace ILRuntime.Runtime.Intepreter
                                             res = (ulong)*(long*)&obj1->Value > (ulong)*(long*)&obj2->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value;
+                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            res = obj2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Null:
+                                            res = false;
                                             break;
                                         default:
                                             throw new NotImplementedException();

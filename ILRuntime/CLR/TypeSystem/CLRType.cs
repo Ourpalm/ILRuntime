@@ -124,8 +124,10 @@ namespace ILRuntime.CLR.TypeSystem
         {
             methods = new Dictionary<string, List<CLRMethod>>();
             constructors = new List<CLRMethod>();
-            foreach (var i in clrType.GetMethods())
+            foreach (var i in clrType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
             {
+                if (i.IsPrivate)
+                    continue;
                 List<CLRMethod> lst;
                 if (!methods.TryGetValue(i.Name, out lst))
                 {
@@ -134,7 +136,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
                 lst.Add(new CLRMethod(i, this, appdomain));
             }
-            foreach(var i in clrType.GetConstructors())
+            foreach (var i in clrType.GetConstructors())
             {
                 constructors.Add(new CLRMethod(i, this, appdomain));
             }
@@ -158,7 +160,7 @@ namespace ILRuntime.CLR.TypeSystem
             fieldMapping = new Dictionary<string, int>();
             fieldInfoCache = new Dictionary<int, FieldInfo>();
 
-            var fields = clrType.GetFields(BindingFlags.Public| BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+            var fields = clrType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
             foreach (var i in fields)
             {
                 if (i.IsPublic || i.IsFamily)
