@@ -15,6 +15,10 @@ namespace ILRuntime.Reflection
         ILType type;
         Runtime.Enviorment.AppDomain appdomain;
         object[] customAttributes;
+        Type[] attributeTypes;
+        ILRuntimeFieldInfo[] fields;
+
+        public ILType ILType { get { return type; } }
         
         public ILRuntimeType(ILType t)
         {
@@ -25,76 +29,29 @@ namespace ILRuntime.Reflection
         void InitializeCustomAttribute()
         {
             customAttributes = new object[type.TypeDefinition.CustomAttributes.Count];
-            List<IType> param = null;
+            attributeTypes = new Type[customAttributes.Length];
             for (int i = 0; i < type.TypeDefinition.CustomAttributes.Count; i++)
             {
                 var attribute = type.TypeDefinition.CustomAttributes[i];
                 var at = appdomain.GetType(attribute.AttributeType, type);
-                object ins = null;
+                object ins = attribute.CreateInstance(at, appdomain);
 
-                if (at is ILType)
-                {
-                    var it = (ILType)at;
-                    if (!attribute.HasConstructorArguments)
-                        ins = it.Instantiate(true);
-                    else
-                    {
-                        ins = it.Instantiate(false);
-                        if (param == null)
-                            param = new List<IType>();
-                        param.Clear();
-                        object[] p = new object[attribute.ConstructorArguments.Count + 1];
-                        p[0] = ins;
-                        for (int j = 0; j < attribute.ConstructorArguments.Count; j++)
-                        {
-                            var ca = attribute.ConstructorArguments[j];
-                            param.Add(appdomain.GetType(ca.Type, type));
-                            p[j + 1] = ca.Value;
-                        }
-                        var ctor = it.GetConstructor(param);
-                        appdomain.Invoke(ctor, p);
-                    }
-
-                    if (attribute.HasProperties)
-                    {
-                        object[] p = new object[2];
-                        p[0] = ins;
-                        foreach (var j in attribute.Properties)
-                        {
-                            p[1] = j.Argument.Value;
-                            var setter = it.GetMethod("set_" + j.Name, 1);
-                            appdomain.Invoke(setter, p);
-                        }
-                    }
-                }
-                else
-                {
-                    param = new List<IType>();
-                    object[] p = null;
-                    if (attribute.HasConstructorArguments)
-                    {
-                        p = new object[attribute.ConstructorArguments.Count];
-                        for (int j = 0; j < attribute.ConstructorArguments.Count; j++)
-                        {
-                            var ca = attribute.ConstructorArguments[j];
-                            param.Add(appdomain.GetType(ca.Type, type));
-                            p[j] = ca.Value;
-                        }
-                    }
-                    ins = ((CLRMethod)at.GetConstructor(param)).ConstructorInfo.Invoke(p);
-                    if (attribute.HasProperties)
-                    {                        
-                        foreach (var j in attribute.Properties)
-                        {
-                            var prop = at.TypeForCLR.GetProperty(j.Name);
-                            prop.SetValue(ins, j.Argument.Value, null);
-                        }
-                    }
-                }
-
+                attributeTypes[i] = at.ReflectionType;
                 customAttributes[i] = ins;
             }
 
+        }
+
+        void InitializeFields()
+        {
+            fields = new ILRuntimeFieldInfo[type.TypeDefinition.Fields.Count];
+            for(int i = 0; i < type.TypeDefinition.Fields.Count; i++)
+            {
+                var fd = type.TypeDefinition.Fields[i];
+
+                ILRuntimeFieldInfo fi = fd.IsStatic ? new Reflection.ILRuntimeFieldInfo(fd, this, fd.IsStatic, type.StaticFieldMapping[fd.Name]) : new Reflection.ILRuntimeFieldInfo(fd, this, fd.IsStatic, type.FieldMapping[fd.Name]);
+                fields[i] = fi;
+            }
         }
 
         public override Assembly Assembly
@@ -184,7 +141,15 @@ namespace ILRuntime.Reflection
 
         public override object[] GetCustomAttributes(Type attributeType, bool inherit)
         {
-            throw new NotImplementedException();
+            if (customAttributes == null)
+                InitializeCustomAttribute();
+            List<object> res = new List<object>();
+            for(int i = 0; i < customAttributes.Length; i++)
+            {
+                if (attributeTypes[i] == attributeType)
+                    res.Add(customAttributes[i]);
+            }
+            return res.ToArray();
         }
 
         public override Type GetElementType()
@@ -204,12 +169,21 @@ namespace ILRuntime.Reflection
 
         public override FieldInfo GetField(string name, BindingFlags bindingAttr)
         {
-            throw new NotImplementedException();
+            if (fields == null)
+                InitializeFields();
+            foreach(var i in fields)
+            {
+                if (i.Name == name)
+                    return i;
+            }
+            return null;
         }
 
         public override FieldInfo[] GetFields(BindingFlags bindingAttr)
         {
-            throw new NotImplementedException();
+            if (fields == null)
+                InitializeFields();
+            return fields;
         }
 
         public override Type GetInterface(string name, bool ignoreCase)

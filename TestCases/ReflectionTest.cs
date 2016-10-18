@@ -40,10 +40,11 @@ namespace TestCases
 
         public static void ReflectionTest04()
         {
-            var arr = typeof(TestCls2).GetCustomAttributes(false);
+            var arr = typeof(TestCls2).GetCustomAttributes(typeof(TestAttribute), false);
             foreach(var i in arr)
             {
-                Console.WriteLine(i);
+                TestAttribute a = (TestAttribute)i;
+                Console.WriteLine(a.TestProp);
             }
 
             arr = typeof(TestCls).GetCustomAttributes(false);
@@ -53,10 +54,39 @@ namespace TestCases
             }
         }
 
+
+        public static void ReflectionTest05()
+        {
+            var fi = typeof(TestCls).GetField("aa");
+            var fi2 = typeof(TestCls).GetField("bb");
+
+            var a = new TestCls();
+
+            Console.WriteLine("aa=" + fi.GetValue(a));
+            Console.WriteLine("bb=" + fi2.GetValue(null));
+
+            fi.SetValue(a, 123);
+            fi2.SetValue(null, 233);
+            Console.WriteLine("aa=" + fi.GetValue(a));
+            Console.WriteLine("bb=" + fi2.GetValue(null));
+
+            a.foo(110);
+
+            var arr = fi.GetCustomAttributes(false);
+            foreach (var i in arr)
+            {
+                Console.WriteLine(i);
+            }
+        }
+
         [Obsolete("gasdgas")]
         class TestCls
         {
+            [ContextStatic]
             int aa = 203;
+
+            [ContextStatic]
+            static int bb = 333;
             [Microsoft.SqlServer.Server.SqlFunction(DataAccess = Microsoft.SqlServer.Server.DataAccessKind.Read)]
             public TestCls foo(int b)
             {
@@ -73,6 +103,7 @@ namespace TestCases
 
         [Test(true, TestProp = "1234")]
         [Test]
+        [Serializable]
         class TestCls2
         {
 

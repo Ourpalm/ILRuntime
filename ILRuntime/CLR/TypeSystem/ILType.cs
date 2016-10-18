@@ -91,6 +91,10 @@ namespace ILRuntime.CLR.TypeSystem
                 return staticFieldTypes;
             }
         }
+
+        public Dictionary<string, int> FieldMapping { get { return fieldMapping; } }
+
+        public Dictionary<string,int> StaticFieldMapping { get { return staticFieldMapping; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
