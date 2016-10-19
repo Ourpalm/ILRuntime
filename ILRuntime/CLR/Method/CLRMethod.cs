@@ -205,6 +205,8 @@ namespace ILRuntime.CLR.Method
                         object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (Minus(esp, paramCount + 1))->ToObject(appdomain, mStack));
                         if (instance == null)
                             throw new NullReferenceException();
+                        if (instance is CrossBindingAdaptorType)//It makes no sense to call the Adaptor's constructor
+                            return null;
                         cDef.Invoke(instance, param);
                         return null;
                     }

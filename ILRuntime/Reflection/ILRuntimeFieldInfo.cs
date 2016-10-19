@@ -167,6 +167,8 @@ namespace ILRuntime.Reflection
                 StackObject esp;
                 if (mStack == null)
                     mStack = new List<object>();
+                if (value is CrossBindingAdaptorType)
+                    value = ((CrossBindingAdaptorType)value).ILInstance;
                 ILIntepreter.PushObject(&esp, mStack, value);
                 ILTypeInstance ins;
                 if (isStatic)
@@ -180,7 +182,7 @@ namespace ILRuntime.Reflection
                     else
                         ins = ((CrossBindingAdaptorType)obj).ILInstance;
                 }
-
+                
                 ins.AssignFromStack(fieldIdx, &esp, ilType.AppDomain, mStack);
                 mStack.Clear();
             }
