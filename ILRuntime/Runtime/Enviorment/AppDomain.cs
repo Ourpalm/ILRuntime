@@ -171,7 +171,7 @@ namespace ILRuntime.Runtime.Enviorment
                         string key = "!" + i;
                         IType val = GetType(genericParams[i]);
                         if (val == null)
-                            throw new TypeLoadException();
+                            return null;
                         genericArguments[i] = new KeyValuePair<string, IType>(key, val);
                     }
                     bt = bt.MakeGenericInstance(genericArguments);

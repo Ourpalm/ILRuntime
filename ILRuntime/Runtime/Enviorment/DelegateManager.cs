@@ -129,7 +129,12 @@ namespace ILRuntime.Runtime.Enviorment
             if (method.ReturnType == appdomain.VoidType)
             {
                 if (method.ParameterCount == 0)
-                    return zeroParamMethodAdapter.Instantiate(appdomain, instance, method);
+                {
+                    var res = zeroParamMethodAdapter.Instantiate(appdomain, instance, method);
+                    if (instance != null)
+                        instance.SetDelegateAdapter(method, res);
+                    return res;
+                }
                 foreach (var i in methods)
                 {
                     if (i.ParameterTypes.Length == method.ParameterCount)

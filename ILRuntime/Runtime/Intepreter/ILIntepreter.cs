@@ -1072,8 +1072,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = a->Value > b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&a->Value > *(long*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value > *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value > *(double*)&b->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1099,8 +1105,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = (uint)a->Value > (uint)b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&a->Value > *(ulong*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value > *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value > *(double*)&b->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1126,9 +1138,16 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = a->Value >= b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&a->Value >= *(long*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value >= *(float*)&b->Value;
                                             break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value >= *(double*)&b->Value;
+                                            break;
+
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -1153,8 +1172,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = (uint)a->Value >= (uint)b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&a->Value >= *(ulong*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value >= *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value >= *(double*)&b->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1180,8 +1205,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = a->Value < b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&a->Value < *(long*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value < *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value < *(double*)&b->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1207,8 +1238,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = (uint)a->Value < (uint)b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&a->Value < *(ulong*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value < *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value < *(double*)&b->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1234,8 +1271,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = a->Value <= b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&a->Value <= *(long*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value <= *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value <= *(double*)&b->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1261,8 +1304,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             transfer = (uint)a->Value <= (uint)b->Value;
                                             break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&a->Value <= *(ulong*)&b->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&a->Value <= *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&a->Value <= *(double*)&b->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1644,6 +1693,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Float:
                                             res = *(float*)&obj1->Value < *(float*)&obj2->Value;
                                             break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&obj1->Value < *(double*)&obj2->Value;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -1668,6 +1720,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Float:
                                             res = *(float*)&obj1->Value < *(float*)&obj2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&obj1->Value < *(double*)&obj2->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1694,6 +1749,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Float:
                                             res = *(float*)&obj1->Value > *(float*)&obj2->Value;
                                             break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -1718,6 +1776,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Float:
                                             res = *(float*)&obj1->Value > *(float*)&obj2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value;
                                             break;
                                         case ObjectTypes.Object:
                                             res = obj2->ObjectType == ObjectTypes.Null;
