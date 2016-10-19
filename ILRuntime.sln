@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRuntime", "ILRuntime\ILRuntime.csproj", "{79EF2F29-89D1-4097-986C-5E4EEFE0FA33}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestCase", "TestCase", "{FA42778E-C31B-49E8-A235-9C69EECD9427}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCases", "TestCases\TestCases.csproj", "{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGenerationTools", "CodeGenerationTools\CodeGenerationTools.csproj", "{CFDF647B-9EA9-4967-9996-C33E295239F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFDF647B-9EA9-4967-9996-C33E295239F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFDF647B-9EA9-4967-9996-C33E295239F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFDF647B-9EA9-4967-9996-C33E295239F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFDF647B-9EA9-4967-9996-C33E295239F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

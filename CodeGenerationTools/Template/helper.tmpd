@@ -1,0 +1,21 @@
+
+using System;
+
+namespace ILRuntimeTest.TestFramework
+{
+    class ILRuntimeHelper
+    {
+        public static void Init(ILRuntime.Runtime.Enviorment.AppDomain app)
+        {
+            if (app == null)
+            {
+                //should log error
+                return;
+            }
+
+            {$AdptorInit}   
+
+            {$DelegateInit}
+        }
+    }
+}

@@ -1,0 +1,20 @@
+
+            IMethod m{$VMethodName};
+            bool is{$VMethodName}Invoking = false;
+
+            {$modifier} override {$returnType} {$VMethodName}({$args})
+            {
+                if (m{$VMethodName} == null)
+                {
+                    m{$VMethodName} = instance.Type.GetMethod("{$VMethodName}", 0);
+                }
+
+                if (m{$VMethodName} != null && !is{$VMethodName}Invoking)
+                {
+                    is{$VMethodName}Invoking = true;
+                    return ({$returnType})appdomain.Invoke(m{$VMethodName}, instance {$comma}{$args_no_type});
+                    is{$VMethodName}Invoking = false;
+                }
+                else
+                    return ({$returnType})base.{$VMethodName}({$args_no_type});
+            }

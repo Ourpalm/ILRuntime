@@ -61,6 +61,7 @@ namespace ILRuntimeTest
                             return ((Func<int, int>)action)(a);
                         });
                     });
+
                     /*app.RegisterCLRMethodRedirection(typeof(UnitTest.Logger).GetMethod("Log"), (ctx, instance, param, ga) =>
                     {
                         Console.WriteLine(param[0]);

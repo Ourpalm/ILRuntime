@@ -60,7 +60,7 @@ namespace ILRuntimeTest.TestFramework
                     mTestAbstract = instance.Type.GetMethod("TestAbstract", 0);
                 }
                 if (mTestAbstract != null)
-                    appdomain.Invoke(mTestAbstract, instance);
+                    appdomain.Invoke(mTestAbstract, instance); 
             }
 
             public override void TestVirtual()

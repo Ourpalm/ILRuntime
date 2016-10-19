@@ -1,0 +1,8 @@
+
+            app.DelegateManager.RegisterDelegateConvertor<{$DelegateName}>((action) =>
+            {
+                return new {$DelegateName}(({$args}) =>
+                {
+                    return ((Func<{$argsType},{$returnType}>)action)({$args});
+                });
+            });

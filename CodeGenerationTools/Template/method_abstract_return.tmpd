@@ -1,0 +1,18 @@
+
+            IMethod m{$AMethodName};
+            {$modifier} override {$returnType} {$AMethodName}({$args})
+            {
+                if(m{$AMethodName} == null)
+                {
+                    m{$AMethodName} = instance.Type.GetMethod("{$AMethodName}", 0);
+                }
+
+                if (m{$AMethodName} != null)
+                {
+                return ({$returnType})appdomain.Invoke(m{$AMethodName}, instance {$comma}{$args_no_type});
+                }
+                
+                {$returnDefault}
+            }
+
+
