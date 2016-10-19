@@ -154,10 +154,24 @@ namespace ILRuntime.CLR.Method
                 IType type = appdomain.GetType(i.ParameterType.FullName);
                 if (type == null)
                     type = appdomain.GetType(i.ParameterType.AssemblyQualifiedName);
-                if (type == null)
-                    type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().FullName);
-                if (type == null)
-                    type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().AssemblyQualifiedName);
+                if (i.ParameterType.IsGenericTypeDefinition)
+                {
+                    if (type == null)
+                        type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().FullName);
+                    if (type == null)
+                        type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().AssemblyQualifiedName);
+                }
+                if (i.ParameterType.ContainsGenericParameters)
+                {
+                    var t = i.ParameterType;
+                    if (t.HasElementType)
+                        t = i.ParameterType.GetElementType();
+                    else if (t.GetGenericArguments().Length > 0)
+                    {
+                        t = t.GetGenericArguments()[0];
+                    }
+                    type = new ILGenericParameterType(t.Name);
+                }
                 if (type == null)
                     throw new TypeLoadException();
                 parameters.Add(type);

@@ -26,6 +26,30 @@ namespace TestCases
             return (2 + 55) * 3434 + a;
 
         }
+
+        public static object UnitTest_10022()
+        {
+            Vector3 pos = Vector3.Zero;
+
+            pos.x += 1;
+            pos.y += 2;
+
+            if (pos.x > 10)
+                pos.x = 10;
+            if (pos.x < -10)
+                pos.x = -10;
+            if (pos.y > 10)
+                pos.y = 10;
+            if (pos.y < -10)
+                pos.y = -10;
+
+            return tttt(pos);
+        }
+
+        static object tttt(Vector3 a)
+        {
+            return a.y;
+        }
         public static object UnitTest_1003()
         {
             //1003 _1003_expression

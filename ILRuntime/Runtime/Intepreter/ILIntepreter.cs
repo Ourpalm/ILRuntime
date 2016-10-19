@@ -422,43 +422,119 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var val = GetObjectAndResolveReference(esp - 1);
                                     var dst = esp - 1;
-                                    dst->ObjectType = ObjectTypes.Integer;
-                                    dst->Value = val->Value;
-                                    dst->ValueLow = 0;
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->ObjectType = ObjectTypes.Integer;
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = 0;
+                                            }
+                                            break;
+                                    }                                   
                                 }
                                 break;
                             case OpCodeEnum.Ldind_I8:
                                 {
                                     var val = GetObjectAndResolveReference(esp - 1);
                                     var dst = esp - 1;
-                                    *dst = *val;
-                                    dst->ObjectType = ObjectTypes.Long;
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Long;
+                                                dst->ValueLow = 0;
+                                            }
+                                            break;
+                                    }                                    
                                 }
                                 break;
                             case OpCodeEnum.Ldind_R4:
                                 {
                                     var val = GetObjectAndResolveReference(esp - 1);
                                     var dst = esp - 1;
-                                    dst->ObjectType = ObjectTypes.Float;
-                                    dst->Value = val->Value;
-                                    dst->ValueLow = 0;
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->ObjectType = ObjectTypes.Float;
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = 0;
+                                            }
+                                            break;
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Ldind_R8:
                                 {
                                     var val = GetObjectAndResolveReference(esp - 1);
                                     var dst = esp - 1;
-                                    *dst = *val;
-                                    dst->ObjectType = ObjectTypes.Double;
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Double;
+                                            }
+                                            break;
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Ldind_Ref:
                                 {
                                     var val = GetObjectAndResolveReference(esp - 1);
                                     var dst = esp - 1;
-                                    dst->ObjectType = ObjectTypes.Object;
-                                    dst->Value = mStack.Count;                                    
-                                    mStack.Add(mStack[val->Value]);
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->ObjectType = ObjectTypes.Object;
+                                                dst->Value = mStack.Count;
+                                                mStack.Add(mStack[val->Value]);
+                                            }
+                                            break;
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Stind_I:
@@ -469,7 +545,19 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var dst = GetObjectAndResolveReference(esp - 1 - 1);
                                     var val = esp - 1;
-                                    dst->Value = val->Value;
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->Value = val->Value;
+                                            }
+                                            break;
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
                                     esp = esp - 1 - 1;
@@ -480,8 +568,21 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var dst = GetObjectAndResolveReference(esp - 1 - 1);
                                     var val = esp - 1;
-                                    dst->Value = val->Value;
-                                    dst->ValueLow = val->ValueLow;
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = val->ValueLow;
+                                            }
+                                            break;
+                                    }
+                                    
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
                                     esp = esp - 1 - 1;
@@ -491,7 +592,21 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var dst = GetObjectAndResolveReference(esp - 1 - 1);
                                     var val = esp - 1;
-                                    mStack[dst->Value] =  mStack[val->Value];
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                mStack[dst->Value] = mStack[val->Value];
+
+                                            }
+                                            break;
+                                    }
+
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
                                     esp = esp - 1 - 1;
@@ -1361,6 +1476,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
+                                            objRef = esp - 1;
                                             objRef->ObjectType = ObjectTypes.FieldReference;
                                             objRef->Value = mStack.Count;
                                             mStack.Add(obj);
@@ -2875,6 +2991,35 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
+        }
+
+        void LoadFromFieldReference(object obj, int idx, StackObject* dst, List<object> mStack)
+        {
+            if(obj is ILTypeInstance)
+            {
+                ((ILTypeInstance)obj).PushToStack(idx, dst, AppDomain, mStack);
+            }
+            else
+            {
+                CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
+                var fi = t.Fields[idx];
+                PushObject(dst, mStack, fi.GetValue(obj));
+            }
+        }
+
+        void StoreValueToFieldReference(object obj, int idx, StackObject* val, List<object> mStack)
+        {
+            if (obj is ILTypeInstance)
+            {
+                ((ILTypeInstance)obj).AssignFromStack(idx, val, AppDomain, mStack);
+            }
+            else
+            {
+                CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
+                var fi = t.Fields[idx];
+                var v = obj.GetType().CheckCLRTypes(AppDomain, val->ToObject(AppDomain, mStack));
+                fi.SetValue(obj, v);
+            }
         }
 
         void LoadFromArrayReference(object obj,int idx, StackObject* objRef, IType t, List<object> mStack)

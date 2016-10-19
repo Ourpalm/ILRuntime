@@ -102,7 +102,7 @@ namespace ILRuntime.CLR.Method
             this.appdomain = domain;
         }
 
-        IType FindGenericArgument(string name)
+        public IType FindGenericArgument(string name)
         {
             IType res = declaringType.FindGenericArgument(name);
             if (res == null && genericParameters != null)

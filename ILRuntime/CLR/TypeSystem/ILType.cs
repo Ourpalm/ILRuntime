@@ -456,7 +456,13 @@ namespace ILRuntime.CLR.TypeSystem
                         {
                             for (int j = 0; j < param.Count; j++)
                             {
-                                if (param[j] != i.Parameters[j])
+                                var p = i.Parameters[j];
+                                if (p is CLR.TypeSystem.ILGenericParameterType)
+                                {
+                                    //TODO should match the generic parameters;
+                                    continue;
+                                }
+                                if (param[j] != p)
                                 {
                                     match = false;
                                     break;
