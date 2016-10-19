@@ -165,6 +165,14 @@ namespace ILRuntime.Runtime.Enviorment
                 return type.AppDomain;
             }
         }
+
+        public Type ReflectionType
+        {
+            get
+            {
+                return type.ReflectionType;
+            }
+        }
         #endregion
     }
 }

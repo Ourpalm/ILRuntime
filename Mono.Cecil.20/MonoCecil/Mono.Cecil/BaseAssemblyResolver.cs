@@ -131,7 +131,14 @@ namespace Mono.Cecil {
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");
-			if (parameters == null)
+#if UNITY_5
+            if(name.Name == "mscorlib")
+            {
+                var path = typeof(int).Assembly.Location;
+                return AssemblyDefinition.ReadAssembly(path);
+            }
+#endif
+            if (parameters == null)
 				parameters = new ReaderParameters ();
 
 			var assembly = SearchDirectory (name, directories, parameters);

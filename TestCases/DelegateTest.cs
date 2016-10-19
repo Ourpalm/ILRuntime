@@ -93,6 +93,21 @@ namespace TestCases
             Test07Sub2(IntTest);
         }
 
+        public static void DelegateTest08()
+        {
+            testDele = null;
+            testDele += IntTest3;
+            testDele -= IntTest3;
+            testDele += IntTest3;
+            Console.WriteLine(testDele(1000));
+        }
+
+        public static void DelegateTest09()
+        {
+            Test09Sub(IntTest3);
+            Test09Sub2(IntTest3);
+        }
+
         static void Test07Sub(ILRuntimeTest.TestFramework.IntDelegate action)
         {
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest = action;
@@ -101,6 +116,16 @@ namespace TestCases
         static void Test07Sub2(ILRuntimeTest.TestFramework.IntDelegate action)
         {
             Console.WriteLine("Test Result=" + (ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest == action));
+        }
+
+        static void Test09Sub(TestDelegate action)
+        {
+            testDele = action;
+        }
+
+        static void Test09Sub2(TestDelegate action)
+        {
+            Console.WriteLine("Test Result=" + (testDele == action));
         }
         static void IntTest(int a)
         {

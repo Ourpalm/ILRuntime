@@ -178,7 +178,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal unsafe void PushToStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)
         {
-            if (fieldIdx < fields.Length)
+            if (fieldIdx < fields.Length && fieldIdx >= 0)
                 PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
             else
             {
@@ -215,7 +215,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)
         {
-            if (fieldIdx < fields.Length)
+            if (fieldIdx < fields.Length && fieldIdx >= 0)
                 AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
             else
             {

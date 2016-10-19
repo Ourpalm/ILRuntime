@@ -78,6 +78,8 @@ namespace ILRuntime.Runtime.Debugger
             if (arg->ObjectType == ObjectTypes.StackObjectReference)
                 arg = *(StackObject**)&arg->Value;
             ILTypeInstance instance = intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance;
+            if (instance == null)
+                return "null";
             var fields = instance.Type.TypeDefinition.Fields;
             int idx = 0;
             StringBuilder sb = new StringBuilder();
@@ -87,6 +89,8 @@ namespace ILRuntime.Runtime.Debugger
                 if (f.IsStatic)
                     continue;
                 var v = instance.Fields[idx].ToObject(intepreter.AppDomain, instance.ManagedObjects);
+                if (v == null)
+                    v = "null";
                 string name = f.Name;
                 sb.AppendFormat("{0} {1} = {2}", f.FieldType.Name, name, v);
                 if ((idx % 3 == 0 && idx != 0) || idx == instance.Fields.Length - 1)

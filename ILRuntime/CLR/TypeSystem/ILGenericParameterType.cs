@@ -127,5 +127,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return false;
             }
         }
+
+        public Type ReflectionType
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

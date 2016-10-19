@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Stack;
+using ILRuntime.Reflection;
 
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -155,7 +158,8 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            //Don't ask me why not esp -2, unity won't return the right result
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
             var dele2 = (esp - 1)->ToObject(domain, mStack);
 
             if (dele1 != null)
@@ -165,10 +169,21 @@ namespace ILRuntime.Runtime.Enviorment
                     if (dele1 is IDelegateAdapter)
                     {
                         if (dele2 is IDelegateAdapter)
-                            ((IDelegateAdapter)dele1).Combine((IDelegateAdapter)dele2);
+                        {
+                            var dele = ((IDelegateAdapter)dele1);
+                            //This means it's the default delegate which should be singleton to support == operator
+                            if (dele.Next == null)
+                            {
+                                dele = dele.Instantiate(domain, dele.Instance, dele.Method);
+                            }
+                            dele.Combine((IDelegateAdapter)dele2);
+                            return dele;
+                        }
                         else
+                        {
                             ((IDelegateAdapter)dele1).Combine((Delegate)dele2);
-                        return dele1;
+                            return dele1;
+                        }
                     }
                     else
                     {
@@ -185,14 +200,13 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2;
         }
 
-        public unsafe static object DelegateEqulity(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        public unsafe static object DelegateRemove(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
-            //op_Equality,op_Inequality
             var esp = ctx.ESP;
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
             var dele2 = (esp - 1)->ToObject(domain, mStack);
 
             if (dele1 != null)
@@ -202,10 +216,51 @@ namespace ILRuntime.Runtime.Enviorment
                     if (dele1 is IDelegateAdapter)
                     {
                         if (dele2 is IDelegateAdapter)
-                            ((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2);
+                        {
+                            if (dele1 == dele2)
+                                return ((IDelegateAdapter)dele1).Next;
+                            else
+                                ((IDelegateAdapter)dele1).Remove((IDelegateAdapter)dele2);
+                        }
                         else
-                            ((IDelegateAdapter)dele1).Equals((Delegate)dele2);
+                            ((IDelegateAdapter)dele1).Remove((Delegate)dele2);
                         return dele1;
+                    }
+                    else
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            return Delegate.Remove((Delegate)dele1, ((IDelegateAdapter)dele2).GetConvertor(dele1.GetType()));
+                        else
+                            return Delegate.Remove((Delegate)dele1, (Delegate)dele2);
+                    }
+                }
+                else
+                    return dele1;
+            }
+            else
+                return null;
+        }
+
+        public unsafe static object DelegateEqulity(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            //op_Equality,op_Inequality
+            var esp = ctx.ESP;
+            var mStack = ctx.ManagedStack;
+            var domain = ctx.AppDomain;
+
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
+            var dele2 = (esp - 1)->ToObject(domain, mStack);
+
+            if (dele1 != null)
+            {
+                if (dele2 != null)
+                {
+                    if (dele1 is IDelegateAdapter)
+                    {
+                        if (dele2 is IDelegateAdapter)
+                            return ((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2);
+                        else
+                            return ((IDelegateAdapter)dele1).Equals((Delegate)dele2);
                     }
                     else
                     {
@@ -231,7 +286,7 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 2)->ToObject(domain, mStack);
+            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
             var dele2 = (esp - 1)->ToObject(domain, mStack);
 
             if (dele1 != null)
@@ -263,6 +318,54 @@ namespace ILRuntime.Runtime.Enviorment
         public static object GetTypeFromHandle(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
             return param[0];
+        }
+
+        public unsafe static object MethodInfoInvoke(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            var esp = ctx.ESP;
+            var mStack = ctx.ManagedStack;
+            var domain = ctx.AppDomain;
+            var intp = ctx.Interpreter;
+            //Don't ask me why not esp - 3, unity won't return the right result
+            var obj = param[0];
+            var p = param[1];
+
+            if (instance is ILRuntimeMethodInfo)
+            {
+                if (obj != null)
+                    esp = ILIntepreter.PushObject(esp, mStack, obj);
+                if (p != null)
+                {
+                    object[] arr = (object[])p;
+                    foreach (var i in arr)
+                    {
+                        esp = ILIntepreter.PushObject(esp, mStack, i);
+                    }
+                }
+                bool unhandled;
+                var ilmethod = ((ILRuntimeMethodInfo)instance).ILMethod;
+                esp = intp.Execute(ilmethod, esp, out unhandled);
+                object res = null;
+                if (ilmethod.ReturnType != domain.VoidType)
+                {
+                    res = (esp - 1)->ToObject(domain, mStack);
+                    intp.Free(esp - 1);
+                }
+                return res;
+            }
+            else
+                return ((MethodInfo)instance).Invoke(obj, (object[])p);
+        }
+
+        public unsafe static object ObjectGetType(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            var type = instance.GetType();
+            if (type == typeof(ILTypeInstance))
+            {
+                return ((ILTypeInstance)instance).Type.ReflectionType;
+            }
+            else
+                return type;
         }
     }
 }

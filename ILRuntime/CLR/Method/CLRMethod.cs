@@ -74,6 +74,10 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public MethodInfo MethodInfo { get { return def; } }
+
+        public ConstructorInfo ConstructorInfo { get { return cDef; } }
+
         public IType[] GenericArguments { get { return genericArguments; } }
 
         public CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
@@ -150,10 +154,24 @@ namespace ILRuntime.CLR.Method
                 IType type = appdomain.GetType(i.ParameterType.FullName);
                 if (type == null)
                     type = appdomain.GetType(i.ParameterType.AssemblyQualifiedName);
-                if (type == null)
-                    type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().FullName);
-                if (type == null)
-                    type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().AssemblyQualifiedName);
+                if (i.ParameterType.IsGenericTypeDefinition)
+                {
+                    if (type == null)
+                        type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().FullName);
+                    if (type == null)
+                        type = appdomain.GetType(i.ParameterType.GetGenericTypeDefinition().AssemblyQualifiedName);
+                }
+                if (i.ParameterType.ContainsGenericParameters)
+                {
+                    var t = i.ParameterType;
+                    if (t.HasElementType)
+                        t = i.ParameterType.GetElementType();
+                    else if (t.GetGenericArguments().Length > 0)
+                    {
+                        t = t.GetGenericArguments()[0];
+                    }
+                    type = new ILGenericParameterType(t.Name);
+                }
                 if (type == null)
                     throw new TypeLoadException();
                 parameters.Add(type);
@@ -169,7 +187,12 @@ namespace ILRuntime.CLR.Method
             }
         }
 
-        public unsafe object Invoke(StackObject* esp, List<object> mStack,bool isNewObj=false)
+        unsafe StackObject* Minus(StackObject* a, int b)
+        {
+            return (StackObject*)((long)a - sizeof(StackObject) * b);
+        }
+
+        public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, List<object> mStack,bool isNewObj=false)
         {
             if (parameters == null)
             {
@@ -181,7 +204,7 @@ namespace ILRuntime.CLR.Method
             object[] param = invocationParam;
             for (int i = paramCount; i >= 1; i--)
             {
-                var p = esp - i;
+                var p = Minus(esp, i);
                 var obj = this.param[paramCount - i].ParameterType.CheckCLRTypes(appdomain, p->ToObject(appdomain, mStack));
 
                 param[paramCount - i] = obj;
@@ -193,9 +216,11 @@ namespace ILRuntime.CLR.Method
                 {
                     if (!cDef.IsStatic)
                     {
-                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (esp - paramCount - 1)->ToObject(appdomain, mStack));
+                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (Minus(esp, paramCount + 1))->ToObject(appdomain, mStack));
                         if (instance == null)
                             throw new NullReferenceException();
+                        if (instance is CrossBindingAdaptorType)//It makes no sense to call the Adaptor's constructor
+                            return null;
                         cDef.Invoke(instance, param);
                         return null;
                     }
@@ -209,7 +234,7 @@ namespace ILRuntime.CLR.Method
                     var res = cDef.Invoke(param);
                     return res;
                 }
-               
+
             }
             else
             {
@@ -217,15 +242,17 @@ namespace ILRuntime.CLR.Method
 
                 if (!def.IsStatic)
                 {
-                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (esp - paramCount - 1)->ToObject(appdomain, mStack));
+                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (Minus(esp, paramCount + 1))->ToObject(appdomain, mStack));
                     if (instance == null)
                         throw new NullReferenceException();
                 }
                 object res = null;
                 if (redirect != null)
-                    res = redirect(new ILContext(appdomain, esp, mStack, this), instance, param, genericArguments);
+                    res = redirect(new ILContext(appdomain, intepreter, esp, mStack, this), instance, param, genericArguments);
                 else
+                {
                     res = def.Invoke(instance, param);
+                }
                 return res;
             }
         }
@@ -241,6 +268,14 @@ namespace ILRuntime.CLR.Method
             var res = new CLRMethod(t, declaringType, appdomain);
             res.genericArguments = genericArguments;
             return res;
+        }
+
+        public override string ToString()
+        {
+            if (def != null)
+                return def.ToString();
+            else
+                return cDef.ToString();
         }
     }
 }

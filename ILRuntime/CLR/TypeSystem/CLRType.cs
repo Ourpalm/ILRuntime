@@ -69,6 +69,14 @@ namespace ILRuntime.CLR.TypeSystem
                 return clrType;
             }
         }
+
+        public Type ReflectionType
+        {
+            get
+            {
+                return clrType;
+            }
+        }
         public IType ByRefType
         {
             get
@@ -116,8 +124,10 @@ namespace ILRuntime.CLR.TypeSystem
         {
             methods = new Dictionary<string, List<CLRMethod>>();
             constructors = new List<CLRMethod>();
-            foreach (var i in clrType.GetMethods())
+            foreach (var i in clrType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
             {
+                if (i.IsPrivate)
+                    continue;
                 List<CLRMethod> lst;
                 if (!methods.TryGetValue(i.Name, out lst))
                 {
@@ -126,7 +136,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
                 lst.Add(new CLRMethod(i, this, appdomain));
             }
-            foreach(var i in clrType.GetConstructors())
+            foreach (var i in clrType.GetConstructors())
             {
                 constructors.Add(new CLRMethod(i, this, appdomain));
             }
@@ -150,7 +160,7 @@ namespace ILRuntime.CLR.TypeSystem
             fieldMapping = new Dictionary<string, int>();
             fieldInfoCache = new Dictionary<int, FieldInfo>();
 
-            var fields = clrType.GetFields(BindingFlags.Public| BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+            var fields = clrType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
             foreach (var i in fields)
             {
                 if (i.IsPublic || i.IsFamily)
@@ -223,7 +233,27 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            genericMethod = i;
+                            for (int j = 0; j < param.Count; j++)
+                            {
+                                var p = i.Parameters[j].TypeForCLR;
+                                var q = param[j].TypeForCLR;
+
+                                if (i.Parameters[j] is CLR.TypeSystem.ILGenericParameterType)
+                                {
+                                    //TODO should match the generic parameters;
+                                    continue;
+                                }
+                                if (q != p)
+                                {
+                                    match = false;
+                                    break;
+                                }
+                            }
+                            if (match)
+                            {
+                                genericMethod = i;
+                                break;
+                            }                            
                         }
                         else
                         {

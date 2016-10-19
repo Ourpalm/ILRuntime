@@ -25,7 +25,7 @@ namespace ILRuntime.Runtime.Stack
 
             nativePointer = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(StackObject) * MAXIMAL_STACK_OBJECTS);
             pointer = (StackObject*)nativePointer.ToPointer();
-            endOfMemory = pointer + MAXIMAL_STACK_OBJECTS;
+            endOfMemory = Add(pointer, MAXIMAL_STACK_OBJECTS);
         }
 
         ~RuntimeStack()
@@ -56,11 +56,11 @@ namespace ILRuntime.Runtime.Stack
             res.Address = new IntegerReference();
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
-                var p = esp + i;
+                var p = Add(esp, i);
                 p->ObjectType = ObjectTypes.Null;
             }
 #endif
-            res.BasePointer = method.LocalVariableCount > 0 ? esp + method.LocalVariableCount + 1 : esp;
+            res.BasePointer = method.LocalVariableCount > 0 ? Add(esp, method.LocalVariableCount + 1) : esp;
             frames.Push(res);
             return res;
         }
@@ -98,6 +98,11 @@ namespace ILRuntime.Runtime.Stack
                 System.Runtime.InteropServices.Marshal.FreeHGlobal(nativePointer);
                 nativePointer = IntPtr.Zero;
             }
+        }
+
+        StackObject* Add(StackObject* a, int b)
+        {
+            return (StackObject*)((long)a + sizeof(StackObject) * b);
         }
     }
 }

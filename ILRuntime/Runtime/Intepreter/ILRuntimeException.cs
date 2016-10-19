@@ -51,5 +51,22 @@ namespace ILRuntime.Runtime.Intepreter
                 return localInfo;
             }
         }
+
+        public override string ToString()
+        {
+            StringBuilder message = new StringBuilder();
+            message.AppendLine(Message);
+            if (!string.IsNullOrEmpty(ThisInfo))
+            {
+                message.AppendLine("this:");
+                message.AppendLine(ThisInfo);
+            }
+            message.AppendLine("Local Variables:");
+            message.AppendLine(LocalInfo);
+            message.AppendLine(StackTrace);
+            if (InnerException != null)
+                message.AppendLine(InnerException.ToString());
+            return message.ToString();
+        }
     }
 }

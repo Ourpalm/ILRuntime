@@ -7,6 +7,7 @@ using Mono.Cecil;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Reflection;
 
 namespace ILRuntime.CLR.TypeSystem
 {
@@ -33,6 +34,7 @@ namespace ILRuntime.CLR.TypeSystem
         bool interfaceInitialized = false;
         List<ILType> genericInstances;
         bool isDelegate;
+        ILRuntimeType reflectionType;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
         public TypeReference TypeReference
@@ -89,6 +91,10 @@ namespace ILRuntime.CLR.TypeSystem
                 return staticFieldTypes;
             }
         }
+
+        public Dictionary<string, int> FieldMapping { get { return fieldMapping; } }
+
+        public Dictionary<string,int> StaticFieldMapping { get { return staticFieldMapping; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
@@ -208,6 +214,17 @@ namespace ILRuntime.CLR.TypeSystem
                     return typeof(ILTypeInstance);
             }
         }
+
+        public Type ReflectionType
+        {
+            get
+            {
+                if (reflectionType == null)
+                    reflectionType = new ILRuntimeType(this);
+                return reflectionType;
+            }
+        }
+
         public IType ByRefType
         {
             get
@@ -338,6 +355,18 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public IMethod GetMethod(string name)
+        {
+            if (methods == null)
+                InitializeMethods();
+            List<ILMethod> lst;
+            if (methods.TryGetValue(name, out lst))
+            {
+                return lst[0];
+            }
+            return null;
+        }
+
         public IMethod GetMethod(string name, int paramCount)
         {
             if (methods == null)
@@ -425,7 +454,25 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            genericMethod = i;
+                            for (int j = 0; j < param.Count; j++)
+                            {
+                                var p = i.Parameters[j];
+                                if (p is CLR.TypeSystem.ILGenericParameterType)
+                                {
+                                    //TODO should match the generic parameters;
+                                    continue;
+                                }
+                                if (param[j] != p)
+                                {
+                                    match = false;
+                                    break;
+                                }
+                            }
+                            if (match)
+                            {
+                                genericMethod = i;
+                                break;
+                            }
                         }
                         else
                         {
@@ -583,9 +630,20 @@ namespace ILRuntime.CLR.TypeSystem
             return false;
         }
 
-        internal ILTypeInstance Instantiate()
+        static object[] param = new object[1];
+        internal ILTypeInstance Instantiate(bool callDefaultConstructor = true)
         {
-            return new ILTypeInstance(this);
+            var res = new ILTypeInstance(this);
+            if (callDefaultConstructor)
+            {
+                var m = GetConstructor(CLR.Utils.Extensions.EmptyParamList);
+                if (m != null)
+                {
+                    param[0] = res;
+                    appdomain.Invoke(m, param);
+                }
+            }
+            return res;
         }
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
         {

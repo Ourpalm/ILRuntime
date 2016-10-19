@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.CLR.TypeSystem;
+using ILRuntime.Reflection;
 namespace ILRuntime.CLR.Method
 {
     public class ILMethod : IMethod
@@ -20,12 +22,23 @@ namespace ILRuntime.CLR.Method
         KeyValuePair<string, IType>[] genericParameters;
         Dictionary<int, int[]> jumptables;
         bool isDelegateInvoke;
+        ILRuntimeMethodInfo refletionMethodInfo;
 
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
+
+        public MethodInfo ReflectionMethodInfo
+        {
+            get
+            {
+                if (refletionMethodInfo == null)
+                    refletionMethodInfo = new ILRuntimeMethodInfo(this);
+                return refletionMethodInfo;
+            }
+        }
 
         internal ExceptionHandler[] ExceptionHandler
         {
@@ -89,7 +102,7 @@ namespace ILRuntime.CLR.Method
             this.appdomain = domain;
         }
 
-        IType FindGenericArgument(string name)
+        public IType FindGenericArgument(string name)
         {
             IType res = declaringType.FindGenericArgument(name);
             if (res == null && genericParameters != null)
