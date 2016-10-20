@@ -34,10 +34,17 @@ namespace ILRuntime.Reflection
             {
                 var attribute = type.TypeDefinition.CustomAttributes[i];
                 var at = appdomain.GetType(attribute.AttributeType, type);
-                object ins = attribute.CreateInstance(at, appdomain);
+                try
+                {
+                    object ins = attribute.CreateInstance(at, appdomain);
 
-                attributeTypes[i] = at.ReflectionType;
-                customAttributes[i] = ins;
+                    attributeTypes[i] = at.ReflectionType;
+                    customAttributes[i] = ins;
+                }
+                catch
+                {
+                    attributeTypes[i] = typeof(Attribute);
+                }               
             }
 
         }

@@ -40,6 +40,7 @@ namespace Mono.Cecil
 
         AssemblyDefinition Resolve(string fullName);
         AssemblyDefinition Resolve(string fullName, ReaderParameters parameters);
+        event AssemblyResolveEventHandler ResolveFailure;
     }
 
     public interface IMetadataResolver

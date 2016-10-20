@@ -27,7 +27,7 @@ namespace ILRuntimeTest.TestFramework
     {
         public static IntDelegate IntDelegateTest;
         public static Int2Delegate IntDelegateTest1;
-        public static InitFloat IntDelegateTest2;
+        public static IntDelegate2 IntDelegateTest2;
         public static IntDelegate2 IntDelegateTestReturn;
         public static Int2Delegate2 IntDelegateTestReturn1;
         public static IntFloatDelegate2 IntDelegateTestReturn2;

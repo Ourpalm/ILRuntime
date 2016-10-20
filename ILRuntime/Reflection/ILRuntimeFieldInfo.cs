@@ -54,10 +54,17 @@ namespace ILRuntime.Reflection
             {
                 var attribute = definition.CustomAttributes[i];
                 var at = appdomain.GetType(attribute.AttributeType, null);
-                object ins = attribute.CreateInstance(at, appdomain);
+                try
+                {
+                    object ins = attribute.CreateInstance(at, appdomain);
 
-                attributeTypes[i] = at.ReflectionType;
-                customAttributes[i] = ins;
+                    attributeTypes[i] = at.ReflectionType;
+                    customAttributes[i] = ins;
+                }
+                catch
+                {
+                    attributeTypes[i] = typeof(Attribute);
+                }
             }
         }
         public override System.Reflection.FieldAttributes Attributes

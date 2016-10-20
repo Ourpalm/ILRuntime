@@ -83,9 +83,9 @@ namespace TestCases
         class TestCls
         {
             [ContextStatic]
+            [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.Collapsed)]
             int aa = 203;
 
-            [ContextStatic]
             static int bb = 333;
             [Microsoft.SqlServer.Server.SqlFunction(DataAccess = Microsoft.SqlServer.Server.DataAccessKind.Read)]
             public TestCls foo(int b)

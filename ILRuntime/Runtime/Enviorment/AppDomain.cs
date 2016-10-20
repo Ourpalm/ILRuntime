@@ -26,6 +26,7 @@ namespace ILRuntime.Runtime.Enviorment
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         DelegateManager dMgr;
         Assembly[] loadedAssemblies;
+        Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
         public AppDomain()
         {
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
@@ -130,6 +131,31 @@ namespace ILRuntime.Runtime.Enviorment
             floatType = GetType("System.Single");
             doubleType = GetType("System.Double");
             objectType = GetType("System.Object");
+            module.AssemblyResolver.ResolveFailure += AssemblyResolver_ResolveFailure;
+        }
+
+        /// <summary>
+        /// External reference should be added to the AppDomain by the method
+        /// </summary>
+        /// <param name="name">Assembly name, without .dll</param>
+        /// <param name="content">file content</param>
+        public void AddReferenceBytes(string name, byte[] content)
+        {
+            references[name] = content;
+        }
+
+        private AssemblyDefinition AssemblyResolver_ResolveFailure(object sender, AssemblyNameReference reference)
+        {
+            byte[] content;
+            if (references.TryGetValue(reference.Name, out content))
+            {
+                using (System.IO.MemoryStream ms = new System.IO.MemoryStream(content))
+                {
+                    return AssemblyDefinition.ReadAssembly(ms);
+                }
+            }
+            else
+                return null;
         }
 
         public void RegisterCLRMethodRedirection(System.Reflection.MethodInfo mi, Func<ILContext, object, object[], IType[], object> func)
