@@ -3260,7 +3260,8 @@ namespace ILRuntime.Runtime.Intepreter
                     throw new ArgumentOutOfRangeException();
                 for (int i = 0; i < p.Length; i++)
                 {
-                    esp = PushObject(esp, mStack, p[i]);
+                    var type = method.Parameters[i];
+                    esp = PushObject(esp, mStack, p[i], type == AppDomain.ObjectType);
                 }
             }
             return esp;
