@@ -3260,8 +3260,18 @@ namespace ILRuntime.Runtime.Intepreter
                     throw new ArgumentOutOfRangeException();
                 for (int i = 0; i < p.Length; i++)
                 {
-                    var type = method.Parameters[i];
-                    esp = PushObject(esp, mStack, p[i], type == AppDomain.ObjectType);
+                    bool isBox = false;
+                    int idx = 0;
+                    if (method.HasThis)
+                    {
+                        idx = i - 1;
+                    }
+                    else
+                        idx = i;
+
+                    if (idx >= 0 && plist != null && idx < plist.Count)
+                        isBox = plist[idx] == AppDomain.ObjectType;
+                    esp = PushObject(esp, mStack, p[i], isBox);
                 }
             }
             return esp;
