@@ -601,10 +601,13 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IType FindGenericArgument(string key)
         {
-            foreach (var i in genericArguments)
+            if (genericArguments != null)
             {
-                if (i.Key == key)
-                    return i.Value;
+                foreach (var i in genericArguments)
+                {
+                    if (i.Key == key)
+                        return i.Value;
+                }
             }
             return null;
         }
