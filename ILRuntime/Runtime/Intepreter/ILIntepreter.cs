@@ -33,7 +33,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* esp = PushParameters(method, stack.StackBase, p);
             bool unhandledException;
             esp = Execute(method, esp, out unhandledException);
-            object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(domain, (esp - 1)->ToObject(domain, mStack)) : null;
+            object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(domain, StackObject.ToObject((esp - 1),domain, mStack)) : null;
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             return result;
@@ -108,7 +108,7 @@ namespace ILRuntime.Runtime.Intepreter
                     {
                         var t = AppDomain.GetType(v.VariableType, method.DeclearingType);
                         var loc = Add(v1, i);
-                        loc->Initialized(t.TypeForCLR);
+                        StackObject.Initialized(loc, t.TypeForCLR);
                     }
                     mStack.Add(null);
                 }
@@ -1379,7 +1379,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             bool processed = false;
                                             if (m.IsDelegateInvoke)
                                             {
-                                                var instance = (Minus(esp, m.ParameterCount + 1))->ToObject(domain, mStack);
+                                                var instance = StackObject.ToObject((Minus(esp, m.ParameterCount + 1)), domain, mStack);
                                                 if (instance is IDelegateAdapter)
                                                 {
                                                     esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
@@ -1407,7 +1407,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             bool processed = false;
                                             if (cm.IsDelegateInvoke)
                                             {
-                                                var instance = (Minus(esp, cm.ParameterCount + 1))->ToObject(domain, mStack);
+                                                var instance = StackObject.ToObject((Minus(esp, cm.ParameterCount + 1)), domain, mStack);
                                                 if (instance is IDelegateAdapter)
                                                 {
                                                     esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
@@ -1468,7 +1468,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 var val = esp - 1;
                                                 var f = ((CLRType)type).Fields[ip->TokenInteger];
-                                                f.SetValue(obj, f.FieldType.CheckCLRTypes(domain, val->ToObject(domain, mStack)));
+                                                f.SetValue(obj, f.FieldType.CheckCLRTypes(domain, StackObject.ToObject(val, domain, mStack)));
                                             }
                                             else
                                                 throw new TypeLoadException();
@@ -1553,7 +1553,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             int idx = (int)ip->TokenLong;
                                             var f = t.Fields[idx];
                                             StackObject* val = esp - 1;
-                                            f.SetValue(null, f.FieldType.CheckCLRTypes(domain, val->ToObject(domain, mStack)));
+                                            f.SetValue(null, f.FieldType.CheckCLRTypes(domain, StackObject.ToObject(val, domain, mStack)));
                                         }
                                     }
                                     else
@@ -1942,7 +1942,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             if (type.TypeForCLR.IsEnum)
                                             {
-                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(type.TypeForCLR, obj->ToObject(AppDomain, mStack)));
+                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(type.TypeForCLR, StackObject.ToObject(obj, AppDomain, mStack)));
                                             }
                                             else
                                             {
@@ -2157,7 +2157,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else if (type.TypeForCLR.IsEnum)
                                             {
-                                                esp = PushObject(obj, mStack, Enum.ToObject(type.TypeForCLR, obj->ToObject(AppDomain, mStack)), true);
+                                                esp = PushObject(obj, mStack, Enum.ToObject(type.TypeForCLR, StackObject.ToObject(obj, AppDomain, mStack)), true);
                                             }
                                             else
                                             {
@@ -3078,7 +3078,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
                 var fi = t.Fields[idx];
-                var v = obj.GetType().CheckCLRTypes(AppDomain, val->ToObject(AppDomain, mStack));
+                var v = obj.GetType().CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack));
                 fi.SetValue(obj, v);
             }
         }

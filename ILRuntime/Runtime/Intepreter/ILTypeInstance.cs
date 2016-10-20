@@ -11,7 +11,7 @@ namespace ILRuntime.Runtime.Intepreter
 {
     public class ILTypeStaticInstance : ILTypeInstance
     {
-        public ILTypeStaticInstance(ILType type)
+        public unsafe ILTypeStaticInstance(ILType type)
         {
             this.type = type;
             fields = new StackObject[type.StaticFieldTypes.Length];
@@ -19,7 +19,7 @@ namespace ILRuntime.Runtime.Intepreter
             for (int i = 0; i < fields.Length; i++)
             {
                 var t = type.StaticFieldTypes[i].TypeForCLR;
-                fields[i].Initialized(t);
+                StackObject.Initialized(ref fields[i], t);
                 managedObjs.Add(null);
             }
             int idx = 0;
@@ -162,7 +162,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             for (int i = 0; i < type.FieldTypes.Length; i++)
             {
-                fields[type.FieldStartIndex + i].Initialized(type.FieldTypes[i].TypeForCLR);
+                StackObject.Initialized(ref fields[type.FieldStartIndex + i], type.FieldTypes[i].TypeForCLR);
             }
             if (type.BaseType != null && type.BaseType is ILType)
                 InitializeFields((ILType)type.BaseType);
@@ -223,7 +223,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
                     var field = clrType.Fields[fieldIdx];
-                    field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, esp->ToObject(appdomain, managedStack)));
+                    field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, StackObject.ToObject(esp, appdomain, managedStack)));
                 }
                 else
                     throw new TypeLoadException();

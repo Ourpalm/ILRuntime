@@ -159,8 +159,8 @@ namespace ILRuntime.Runtime.Enviorment
             var domain = ctx.AppDomain;
 
             //Don't ask me why not esp -2, unity won't return the right result
-            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
-            var dele2 = (esp - 1)->ToObject(domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
             {
@@ -206,8 +206,8 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
-            var dele2 = (esp - 1)->ToObject(domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
             {
@@ -248,8 +248,8 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
-            var dele2 = (esp - 1)->ToObject(domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
             {
@@ -286,8 +286,8 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = (esp - 1 - 1)->ToObject(domain, mStack);
-            var dele2 = (esp - 1)->ToObject(domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
             {
@@ -348,7 +348,7 @@ namespace ILRuntime.Runtime.Enviorment
                 object res = null;
                 if (ilmethod.ReturnType != domain.VoidType)
                 {
-                    res = (esp - 1)->ToObject(domain, mStack);
+                    res = StackObject.ToObject((esp - 1),domain, mStack);
                     intp.Free(esp - 1);
                 }
                 return res;

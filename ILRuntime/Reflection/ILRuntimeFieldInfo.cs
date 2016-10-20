@@ -156,7 +156,7 @@ namespace ILRuntime.Reflection
                 if (mStack == null)
                     mStack = new List<object>();
                 ins.PushToStack(fieldIdx, &esp, ilType.AppDomain, mStack);
-                var res = fieldType.TypeForCLR.CheckCLRTypes(ilType.AppDomain, esp.ToObject(ilType.AppDomain, mStack));
+                var res = fieldType.TypeForCLR.CheckCLRTypes(ilType.AppDomain, StackObject.ToObject(&esp, ilType.AppDomain, mStack));
                 mStack.Clear();
                 return res;
             }

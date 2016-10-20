@@ -72,7 +72,7 @@ namespace ILRuntime.Runtime.Debugger
         internal unsafe string GetThisInfo(ILIntepreter intepreter)
         {
             var topFrame = intepreter.Stack.Frames.Peek();
-            var arg = topFrame.LocalVarPointer - topFrame.Method.ParameterCount;
+            var arg = Minus(topFrame.LocalVarPointer, topFrame.Method.ParameterCount);
             if (topFrame.Method.HasThis)
                 arg--;
             if (arg->ObjectType == ObjectTypes.StackObjectReference)
@@ -88,7 +88,8 @@ namespace ILRuntime.Runtime.Debugger
                 var f = fields[i];
                 if (f.IsStatic)
                     continue;
-                var v = instance.Fields[idx].ToObject(intepreter.AppDomain, instance.ManagedObjects);
+                var field = instance.Fields[idx];
+                var v = StackObject.ToObject(&field, intepreter.AppDomain, instance.ManagedObjects);
                 if (v == null)
                     v = "null";
                 string name = f.Name;
@@ -110,8 +111,8 @@ namespace ILRuntime.Runtime.Debugger
             for (int i = 0; i < m.LocalVariableCount; i++)
             {
                 var lv = m.Definition.Body.Variables[i];
-                var val = topFrame.LocalVarPointer + i;
-                var v = val->ToObject(intepreter.AppDomain, intepreter.Stack.ManagedStack);
+                var val = Add(topFrame.LocalVarPointer, i);
+                var v = StackObject.ToObject(val, intepreter.AppDomain, intepreter.Stack.ManagedStack);
                 if (v == null)
                     v = "null";
                 string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
@@ -131,6 +132,16 @@ namespace ILRuntime.Runtime.Debugger
                 cur = cur.Previous;
 
             return cur.SequencePoint;
+        }
+
+        unsafe StackObject* Add(StackObject* a, int b)
+        {
+            return (StackObject*)((long)a + sizeof(StackObject) * b);
+        }
+
+        unsafe StackObject* Minus(StackObject* a, int b)
+        {
+            return (StackObject*)((long)a - sizeof(StackObject) * b);
         }
     }
 }

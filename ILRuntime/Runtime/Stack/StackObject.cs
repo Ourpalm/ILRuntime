@@ -16,39 +16,38 @@ namespace ILRuntime.Runtime.Stack
         public int Value;
         public int ValueLow;
 
-        public unsafe object ToObject(ILRuntime.Runtime.Enviorment.AppDomain appdomain, List<object> mStack)
+        //IL2CPP can't process esp->ToObject() properly, so I can only use static function for this
+        public static unsafe object ToObject(StackObject* esp, ILRuntime.Runtime.Enviorment.AppDomain appdomain, List<object> mStack)
         {
-            switch (ObjectType)
+            switch (esp->ObjectType)
             {
                 case ObjectTypes.Integer:
-                    return Value;
+                    return esp->Value;
                 case ObjectTypes.Long:
                     {
-                        StackObject tmp = this;
-                        return *(long*)&tmp.Value;
+                        return *(long*)&esp->Value;
                     }
                 case ObjectTypes.Float:
                     {
-                        StackObject tmp = this;
-                        return *(float*)&tmp.Value;
+                        return *(float*)&esp->Value;
                     }
                 case ObjectTypes.Double:
                     {
-                        StackObject tmp = this;
-                        return *(double*)&tmp.Value;
+                        return *(double*)&esp->Value;
                     }
                 case ObjectTypes.Object:
-                    return mStack[Value];
+                    return mStack[esp->Value];
                 case ObjectTypes.FieldReference:
                     {
-                        ILTypeInstance instance = mStack[Value] as ILTypeInstance;
+                        ILTypeInstance instance = mStack[esp->Value] as ILTypeInstance;
                         if (instance != null)
                         {
-                            return instance.Fields[ValueLow].ToObject(appdomain, instance.ManagedObjects);
+                            var tmp = instance.Fields[esp->ValueLow];
+                            return ToObject(&tmp, appdomain, instance.ManagedObjects);
                         }
                         else
                         {
-                            var obj = mStack[Value];
+                            var obj = mStack[esp->Value];
                             IType t = null;
                             if (obj is CrossBindingAdaptorType)
                             {
@@ -56,34 +55,34 @@ namespace ILRuntime.Runtime.Stack
                             }
                             else
                                 t = appdomain.GetType(obj.GetType());
-                            var fi = ((CLRType)t).Fields[ValueLow];
+                            var fi = ((CLRType)t).Fields[esp->ValueLow];
                             return fi.GetValue(obj);
                         }
                     }
                 case ObjectTypes.ArrayReference:
                     {
-                        Array instance = mStack[Value] as Array;
-                        return instance.GetValue(ValueLow);
+                        Array instance = mStack[esp->Value] as Array;
+                        return instance.GetValue(esp->ValueLow);
                     }
                 case ObjectTypes.StaticFieldReference:
                     {
-                        var t = appdomain.GetType(Value);
+                        var t = appdomain.GetType(esp->Value);
                         if (t is CLR.TypeSystem.ILType)
                         {
                             CLR.TypeSystem.ILType type = (CLR.TypeSystem.ILType)t;
-                            return type.StaticInstance.Fields[ValueLow].ToObject(appdomain, type.StaticInstance.ManagedObjects);
+                            var tmp = type.StaticInstance.Fields[esp->ValueLow];
+                            return ToObject(&tmp, appdomain, type.StaticInstance.ManagedObjects);
                         }
                         else
                         {
                             CLR.TypeSystem.CLRType type = (CLR.TypeSystem.CLRType)t;
-                            var fi = type.Fields[ValueLow];
+                            var fi = type.Fields[esp->ValueLow];
                             return fi.GetValue(null);
                         }
                     }
                 case ObjectTypes.StackObjectReference:
                     {
-                        StackObject tmp = this;
-                        return (*(StackObject**)&tmp.Value)->ToObject(appdomain, mStack);
+                        return ToObject((*(StackObject**)&esp->Value), appdomain, mStack);
                     }
                 case ObjectTypes.Null:
                     return null;
@@ -92,40 +91,78 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public void Initialized(Type t)
+        public unsafe static void Initialized(ref StackObject esp, Type t)
         {
             if (t.IsPrimitive)
             {
                 if (t == typeof(int) || t == typeof(uint) || t == typeof(short) || t == typeof(ushort) || t == typeof(byte) || t == typeof(sbyte) || t == typeof(char) || t == typeof(bool))
                 {
-                    ObjectType = ObjectTypes.Integer;
-                    Value = 0;
-                    ValueLow = 0;
+                    esp.ObjectType = ObjectTypes.Integer;
+                    esp.Value = 0;
+                    esp.ValueLow = 0;
                 }
                 else if (t == typeof(long) || t == typeof(ulong))
                 {
-                    ObjectType = ObjectTypes.Long;
-                    Value = 0;
-                    ValueLow = 0;
+                    esp.ObjectType = ObjectTypes.Long;
+                    esp.Value = 0;
+                    esp.ValueLow = 0;
                 }
                 else if (t == typeof(float))
                 {
-                    ObjectType = ObjectTypes.Float;
-                    Value = 0;
-                    ValueLow = 0;
+                    esp.ObjectType = ObjectTypes.Float;
+                    esp.Value = 0;
+                    esp.ValueLow = 0;
                 }
                 else if (t == typeof(double))
                 {
-                    ObjectType = ObjectTypes.Double;
-                    Value = 0;
-                    ValueLow = 0;
+                    esp.ObjectType = ObjectTypes.Double;
+                    esp.Value = 0;
+                    esp.ValueLow = 0;
                 }
                 else
                     throw new NotImplementedException();
             }
             else
             {
-                this = Null;
+                esp = Null;
+            }
+        }
+
+        //IL2CPP can't process esp->Initialized() properly, so I can only use static function for this
+        public unsafe static void Initialized(StackObject* esp, Type t)
+        {
+            if (t.IsPrimitive)
+            {
+                if (t == typeof(int) || t == typeof(uint) || t == typeof(short) || t == typeof(ushort) || t == typeof(byte) || t == typeof(sbyte) || t == typeof(char) || t == typeof(bool))
+                {
+                    esp->ObjectType = ObjectTypes.Integer;
+                    esp->Value = 0;
+                    esp->ValueLow = 0;
+                }
+                else if (t == typeof(long) || t == typeof(ulong))
+                {
+                    esp->ObjectType = ObjectTypes.Long;
+                    esp->Value = 0;
+                    esp->ValueLow = 0;
+                }
+                else if (t == typeof(float))
+                {
+                    esp->ObjectType = ObjectTypes.Float;
+                    esp->Value = 0;
+                    esp->ValueLow = 0;
+                }
+                else if (t == typeof(double))
+                {
+                    esp->ObjectType = ObjectTypes.Double;
+                    esp->Value = 0;
+                    esp->ValueLow = 0;
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else
+            {
+                *esp = Null;
             }
         }
     }

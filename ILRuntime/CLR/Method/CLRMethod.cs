@@ -205,7 +205,7 @@ namespace ILRuntime.CLR.Method
             for (int i = paramCount; i >= 1; i--)
             {
                 var p = Minus(esp, i);
-                var obj = this.param[paramCount - i].ParameterType.CheckCLRTypes(appdomain, p->ToObject(appdomain, mStack));
+                var obj = this.param[paramCount - i].ParameterType.CheckCLRTypes(appdomain, StackObject.ToObject(p, appdomain, mStack));
 
                 param[paramCount - i] = obj;
             }
@@ -216,7 +216,7 @@ namespace ILRuntime.CLR.Method
                 {
                     if (!cDef.IsStatic)
                     {
-                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (Minus(esp, paramCount + 1))->ToObject(appdomain, mStack));
+                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, StackObject.ToObject((Minus(esp, paramCount + 1)),appdomain, mStack));
                         if (instance == null)
                             throw new NullReferenceException();
                         if (instance is CrossBindingAdaptorType)//It makes no sense to call the Adaptor's constructor
@@ -242,7 +242,7 @@ namespace ILRuntime.CLR.Method
 
                 if (!def.IsStatic)
                 {
-                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, (Minus(esp, paramCount + 1))->ToObject(appdomain, mStack));
+                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, StackObject.ToObject((Minus(esp, paramCount + 1)),appdomain, mStack));
                     if (instance == null)
                         throw new NullReferenceException();
                 }
