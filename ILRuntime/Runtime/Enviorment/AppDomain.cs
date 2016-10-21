@@ -521,6 +521,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public object Invoke(IMethod m, params object[] p)
         {
+            object res = null;
             if (m is ILMethod)
             {
                 ILIntepreter inteptreter = null;
@@ -533,8 +534,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 try
                 {
-                    var res = inteptreter.Run((ILMethod)m, p);
-                    return res;
+                    res = inteptreter.Run((ILMethod)m, p);
                 }
                 finally
                 {
@@ -546,7 +546,8 @@ namespace ILRuntime.Runtime.Enviorment
                     }
                 }
             }
-            return null;
+
+            return res;
         }
 
         internal IMethod GetMethod(object token, ILType contextType, out bool invalidToken)
