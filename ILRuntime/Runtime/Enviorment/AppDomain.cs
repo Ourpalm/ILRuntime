@@ -595,7 +595,14 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (gim.GenericArguments[i].IsGenericParameter)
                             invalidToken = true;
-                        genericArguments[i] = GetType(gim.GenericArguments[i], contextType);
+                        var gt = GetType(gim.GenericArguments[i], contextType);
+                        if (gt == null)//This means it contains unresolved generic arguments, which means it's not searching the generic instance
+                        {
+                            genericArguments = null;
+                            break;
+                        }
+                        else
+                            genericArguments[i] = gt;
                     }
                 }
             }

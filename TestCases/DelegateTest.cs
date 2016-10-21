@@ -8,6 +8,7 @@ namespace TestCases
     public class DelegateTest
     {
         static TestDelegate testDele;
+
         public static void DelegateTest01()
         {
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += IntTest;

@@ -109,6 +109,19 @@ namespace TestCases
             Console.WriteLine(new List<NestedTest>().ToString());
         }
 
+        public static void UnitTest_Generics4()
+        {
+            object r = TestGeneric<object>();
+            Console.WriteLine("Result = " + r);
+        }
+
+        static T TestGeneric<T>() where T : new()
+        {
+            T obj = new T();
+            return obj;
+        }
+
+
         public static void UnitTest_NestedGenerics()
         {
             Console.WriteLine("UnitTest_NestedGenerics");
