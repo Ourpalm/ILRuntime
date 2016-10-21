@@ -23,7 +23,7 @@ namespace ILRuntime.Runtime.Enviorment
                     return ((ILType)t).Instantiate();
                 }
                 else
-                    throw new NotImplementedException();
+                    return Activator.CreateInstance(t.TypeForCLR);
             }
             else
                 throw new EntryPointNotFoundException();

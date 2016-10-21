@@ -308,7 +308,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Callvirt:
                     {
                         bool invalidToken;
-                        var m = appdomain.GetMethod(token, declaringType, out invalidToken);
+                        var m = appdomain.GetMethod(token, declaringType, this, out invalidToken);
                         if (m != null)
                         {
                             if (invalidToken)

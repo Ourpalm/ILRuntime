@@ -550,7 +550,7 @@ namespace ILRuntime.Runtime.Enviorment
             return res;
         }
 
-        internal IMethod GetMethod(object token, ILType contextType, out bool invalidToken)
+        internal IMethod GetMethod(object token, ILType contextType,ILMethod contextMethod, out bool invalidToken)
         {
             string methodname = null;
             string typename = null;
@@ -596,10 +596,16 @@ namespace ILRuntime.Runtime.Enviorment
                         if (gim.GenericArguments[i].IsGenericParameter)
                             invalidToken = true;
                         var gt = GetType(gim.GenericArguments[i], contextType);
-                        if (gt == null)//This means it contains unresolved generic arguments, which means it's not searching the generic instance
+                        if (gt == null)
                         {
-                            genericArguments = null;
-                            break;
+                            gt = contextMethod.FindGenericArgument(gim.GenericArguments[i].Name);
+                            if (gt == null)//This means it contains unresolved generic arguments, which means it's not searching the generic instance
+                            {
+                                genericArguments = null;
+                                break;
+                            }
+                            else
+                                genericArguments[i] = gt;
                         }
                         else
                             genericArguments[i] = gt;
