@@ -228,7 +228,7 @@ namespace ILRuntime.CLR.Method
                 body = new OpCode[0];
         }
 
-        void InitToken(ref OpCode code, object token, Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
+        unsafe void InitToken(ref OpCode code, object token, Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
         {
             switch (code.Code)
             {
@@ -273,10 +273,16 @@ namespace ILRuntime.CLR.Method
                     code.TokenLong = (long)token;
                     break;
                 case OpCodeEnum.Ldc_R4:
-                    code.TokenFloat = (float)token;
+                    {
+                        float val = (float)token;
+                        code.TokenInteger = *(int*)&val;
+                    }
                     break;
                 case OpCodeEnum.Ldc_R8:
-                    code.TokenDouble = (double)token;
+                    {
+                        double val = (double)token;
+                        code.TokenLong = *(long*)&val;
+                    }
                     break;                    
                 case OpCodeEnum.Stloc:
                 case OpCodeEnum.Stloc_S:

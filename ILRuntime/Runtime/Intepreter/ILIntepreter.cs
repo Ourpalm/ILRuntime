@@ -395,14 +395,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldc_R4:
                                 {
-                                    *(float*)(&esp->Value) = ip->TokenFloat;
+                                    *(float*)(&esp->Value) = *(float*)&ip->TokenInteger;
                                     esp->ObjectType = ObjectTypes.Float;
                                     esp++;
                                 }
                                 break;
                             case OpCodeEnum.Ldc_R8:
                                 {
-                                    *(double*)(&esp->Value) = ip->TokenDouble;
+                                    *(double*)(&esp->Value) = *(double*)&ip->TokenLong;
                                     esp->ObjectType = ObjectTypes.Double;
                                     esp++;
                                 }

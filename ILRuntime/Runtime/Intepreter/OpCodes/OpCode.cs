@@ -12,7 +12,5 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public OpCodeEnum Code;
         public int TokenInteger;
         public long TokenLong;
-        public float TokenFloat;
-        public double TokenDouble;
     }
 }
