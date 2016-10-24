@@ -289,6 +289,7 @@ namespace ILRuntime.Runtime.Intepreter
                 ins.fields[i] = fields[i];
                 ins.managedObjs[i] = managedObjs[i];
             }
+            ins.clrInstance = clrInstance;
             return ins;
         }
 

@@ -2269,13 +2269,24 @@ namespace ILRuntime.Runtime.Intepreter
                                                     else
                                                         throw new NotImplementedException();
                                                 }
-                                                else if (t.IsValueType)
+                                                else if(t.IsValueType)
                                                 {
-                                                    throw new NotImplementedException();
+                                                    if (obj is ILTypeInstance)
+                                                    {
+                                                        var res = ((ILTypeInstance)obj);
+                                                        if (res.Boxed)
+                                                        {
+                                                            res = res.Clone();
+                                                            res.Boxed = false;
+                                                        }
+                                                        PushObject(objRef, mStack, res);
+                                                    }
+                                                    else
+                                                        PushObject(objRef, mStack, obj);
                                                 }
                                                 else
                                                 {
-                                                    throw new NotImplementedException();
+                                                    PushObject(objRef, mStack, obj);
                                                 }
                                             }
                                             else
