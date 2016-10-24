@@ -13,9 +13,11 @@ namespace ILRuntimeDebugEngine.AD7
     [Guid("C90C1326-0C6D-4334-BA0D-E94D0F91D440")]
     public class AD7PortSupplier : IDebugPortSupplier2
     {
+        List<IDebugPort2> ports = new List<IDebugPort2>();
         public int AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
             ppPort = new AD7Port(this, pRequest);
+            ports.Add(ppPort);
             return 0;
         }
 
@@ -26,7 +28,8 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
-            throw new NotImplementedException();
+            ppEnum = new AD7PortEnum(ports.ToArray());
+            return Constants.S_OK;
         }
 
         public int GetPort(ref Guid guidPort, out IDebugPort2 ppPort)

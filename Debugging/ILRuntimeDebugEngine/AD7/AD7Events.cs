@@ -8,6 +8,15 @@ using System.Runtime.InteropServices;
 
 namespace ILRuntimeDebugEngine.AD7
 {
+    sealed class AD7LoadCompleteEvent : AD7StoppingEvent, IDebugLoadCompleteEvent2
+    {
+        public const string IID = "B1844850-1349-45D4-9F12-495212F5EB0B";
+
+        public AD7LoadCompleteEvent()
+        {
+        }
+    }
+
     sealed class AD7ProgramDestroyEvent : AD7SynchronousEvent, IDebugProgramDestroyEvent2
     {
         public const string IID = "E147E9E3-6440-4073-A7B7-A65592C714B5";
@@ -33,6 +42,17 @@ namespace ILRuntimeDebugEngine.AD7
     class AD7SynchronousEvent : IDebugEvent2
     {
         public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_SYNCHRONOUS;
+
+        int IDebugEvent2.GetAttributes(out uint eventAttributes)
+        {
+            eventAttributes = Attributes;
+            return Constants.S_OK;
+        }
+    }
+
+    class AD7StoppingEvent : IDebugEvent2
+    {
+        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_ASYNC_STOP;
 
         int IDebugEvent2.GetAttributes(out uint eventAttributes)
         {

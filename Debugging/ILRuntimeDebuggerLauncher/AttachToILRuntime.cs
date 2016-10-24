@@ -104,14 +104,20 @@ namespace ILRuntimeDebuggerLauncher
         {
             var debugger = (IVsDebugger4)this.ServiceProvider.GetService(typeof(IVsDebugger));
             VsDebugTargetInfo4[] debugTargets = new VsDebugTargetInfo4[1];
-            debugTargets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning;
+            debugTargets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
             debugTargets[0].bstrExe = filePath;
             debugTargets[0].bstrPortName = "1243";
             debugTargets[0].guidPortSupplier = new Guid(ILRuntimeDebugEngine.EngineConstants.PortSupplier);
             debugTargets[0].guidLaunchDebugEngine = new Guid(ILRuntimeDebugEngine.EngineConstants.EngineGUID);
             VsDebugTargetProcessInfo[] processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
-
-            debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
+            try
+            {
+                debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
+            }
+            catch (Exception ex)
+            {
+                
+            }
         }
     }
 }

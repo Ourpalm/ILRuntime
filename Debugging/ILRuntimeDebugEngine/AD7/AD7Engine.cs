@@ -57,6 +57,10 @@ namespace ILRuntimeDebugEngine.AD7
         {
             callback = pCallback;
             ppProcess = new AD7Process();
+            IDebugEvent2 evt = new AD7LoadCompleteEvent();
+            uint attribute;
+            evt.GetAttributes(out attribute);
+            callback.Event(this, ppProcess, null, null, evt, new Guid(AD7LoadCompleteEvent.IID), attribute);
             return 0;
         }
 

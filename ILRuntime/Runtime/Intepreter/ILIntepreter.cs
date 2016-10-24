@@ -2297,7 +2297,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else if (objRef->ObjectType == ObjectTypes.Null)
                                     {
-                                        throw new NullReferenceException();
+                                        //Nothing to do if unboxing a null reference
                                     }
                                     else
                                         throw new InvalidCastException();

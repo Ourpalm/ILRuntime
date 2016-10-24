@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace ILRuntimeDebugEngine.AD7
 {
-    class AD7Process : IDebugProcess2
+    class AD7Process : IDebugProcessEx2, IDebugProcess2
     {
         Guid guid = Guid.NewGuid();
         public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach)
@@ -48,22 +48,22 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int GetInfo(enum_PROCESS_INFO_FIELDS Fields, PROCESS_INFO[] pProcessInfo)
         {
-            pProcessInfo[0].bstrTitle = "Title";
-            pProcessInfo[0].bstrBaseName = "ILRuntime Test";
-            pProcessInfo[0].bstrFileName = "ffff.ttt";
+            pProcessInfo[0].bstrTitle = "ttt";
+            pProcessInfo[0].bstrBaseName = "ttt";
+            pProcessInfo[0].bstrFileName = "ttt";
             return Constants.S_OK;
         }
 
         public int GetName(enum_GETNAME_TYPE gnType, out string pbstrName)
         {
-            pbstrName = "ffff.ttt";
+            pbstrName = "ttt";
             return Constants.S_OK;
         }
 
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
-            pProcessId[0].guidProcessId = guid;
-            pProcessId[0].ProcessIdType = 1;   
+            pProcessId[0].dwProcessId = 1;
+            pProcessId[0].ProcessIdType = 0;   
             return 0;
         }
 
@@ -86,6 +86,21 @@ namespace ILRuntimeDebugEngine.AD7
         public int Terminate()
         {
             return 0;
+        }
+
+        int IDebugProcessEx2.AddImplicitProgramNodes(ref Guid guidLaunchingEngine, Guid[] rgguidSpecificEngines, uint celtSpecificEngines)
+        {
+            return Constants.S_OK;
+        }
+
+        int IDebugProcessEx2.Attach(IDebugSession2 pSession)
+        {
+            return Constants.S_OK;
+        }
+
+        int IDebugProcessEx2.Detach(IDebugSession2 pSession)
+        {
+            throw new NotImplementedException();
         }
     }
 }
