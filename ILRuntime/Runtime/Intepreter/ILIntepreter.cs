@@ -2371,39 +2371,50 @@ namespace ILRuntime.Runtime.Intepreter
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type != null)
                                     {
-                                        var obj = mStack[objRef->Value];
-                                        Free(objRef);
-                                        if (obj != null)
+                                        if (objRef->ObjectType != ObjectTypes.Null)
                                         {
-                                            if (obj is ILTypeInstance)
+                                            var obj = mStack[objRef->Value];
+                                            Free(objRef);
+                                            if (obj != null)
                                             {
-                                                if (((ILTypeInstance)obj).CanAssignTo(type))
+                                                if (obj is ILTypeInstance)
                                                 {
-                                                    esp = PushObject(objRef, mStack, obj);
-                                                }
-                                                else
-                                                {
+                                                    if (((ILTypeInstance)obj).CanAssignTo(type))
+                                                    {
+                                                        esp = PushObject(objRef, mStack, obj);
+                                                    }
+                                                    else
+                                                    {
 #if !DEBUG
                                                     objRef->ObjectType = ObjectTypes.Null;
                                                     objRef->Value = -1;
                                                     objRef->ValueLow = 0;
 #endif
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
+                                                    {
+                                                        esp = PushObject(objRef, mStack, obj);
+                                                    }
+                                                    else
+                                                    {
+#if !DEBUG
+                                                    objRef->ObjectType = ObjectTypes.Null;
+                                                    objRef->Value = -1;
+                                                    objRef->ValueLow = 0;
+#endif
+                                                    }
                                                 }
                                             }
                                             else
                                             {
-                                                if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
-                                                {
-                                                    esp = PushObject(objRef, mStack, obj);
-                                                }
-                                                else
-                                                {
 #if !DEBUG
-                                                    objRef->ObjectType = ObjectTypes.Null;
-                                                    objRef->Value = -1;
-                                                    objRef->ValueLow = 0;
+                                                objRef->ObjectType = ObjectTypes.Null;
+                                                objRef->Value = -1;
+                                                objRef->ValueLow = 0;
 #endif
-                                                }
                                             }
                                         }
                                         else
@@ -2419,9 +2430,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Array
+#region Array
                             case OpCodeEnum.Newarr:
                                 {
                                     var cnt = (esp - 1);
@@ -2789,9 +2800,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Conversion
+#region Conversion
                             case OpCodeEnum.Conv_U1:
                             case OpCodeEnum.Conv_Ovf_U1:
                             case OpCodeEnum.Conv_Ovf_U1_Un:
@@ -2989,9 +3000,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                                 
-                            #endregion
+#endregion
 
-                            #region Stack operation
+#region Stack operation
                             case OpCodeEnum.Pop:
                                 {
                                     Free(esp - 1);
@@ -3010,7 +3021,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
-                            #endregion
+#endregion
 
                             case OpCodeEnum.Throw:
                                 {
