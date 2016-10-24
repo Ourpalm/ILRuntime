@@ -281,6 +281,16 @@ namespace ILRuntime.CLR.TypeSystem
                 for (int i = 0; i < interfaces.Length; i++)
                 {
                     interfaces[i] = appdomain.GetType(definition.Interfaces[i], this);
+                    if(interfaces[i] is CLRType)
+                    {
+                        CrossBindingAdaptor adaptor;
+                        if (appdomain.CrossBindingAdaptors.TryGetValue(interfaces[i].TypeForCLR, out adaptor))
+                        {
+                            interfaces[i] = adaptor;
+                        }
+                        else
+                            throw new TypeLoadException("Cannot find Adaptor for:" + interfaces[i].TypeForCLR.ToString());
+                    }
                 }
             }
         }
@@ -315,42 +325,6 @@ namespace ILRuntime.CLR.TypeSystem
                         //HasSysBase = true;
                         //throw new Exception("不得继承系统类型，脚本类型系统和脚本类型系统是隔离的");
                     }
-                }
-                if (definition.HasInterfaces)
-                {
-                    /*_Interfaces = new List<ICLRType>();
-                    bool bWarning = true;
-                    foreach (var i in type_CLRSharp.Interfaces)
-                    {
-                        var itype = env.GetType(i.FullName);
-                        if (itype is ICLRType_System)
-                        {
-                            //继承了其他系统类型
-                            Type ts = (itype as ICLRType_System).TypeForSystem;
-
-                            if (bWarning & env.GetCrossBind(ts) == null)
-                            {
-
-                                if (ts.IsInterface)
-                                {
-                                    foreach (var t in ts.GetInterfaces())
-                                    {
-                                        if (env.GetCrossBind(t) != null)
-                                        {
-                                            bWarning = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (bWarning)
-                                {
-                                    env.logger.Log_Warning("警告:没有CrossBind的情况下直接继承\nScriptType:" + Name + " Based On a SystemInterface:" + itype.Name);
-                                }
-                            }
-                            HasSysBase = true;
-                        }
-                        _Interfaces.Add(itype);
-                    }*/
                 }
             }
         }

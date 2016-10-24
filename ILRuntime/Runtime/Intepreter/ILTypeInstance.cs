@@ -155,7 +155,25 @@ namespace ILRuntime.Runtime.Intepreter
                 clrInstance = ((Enviorment.CrossBindingAdaptor)type.BaseType).CreateCLRInstance(type.AppDomain, this);
             }
             else
+            {
                 clrInstance = this;
+            }
+
+            if (type.Implements != null)
+            {
+                foreach (var i in type.Implements)
+                {
+                    if (i is Enviorment.CrossBindingAdaptor)
+                    {
+                        if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
+                        {
+                            throw new NotSupportedException("Inheriting and implementing interface at the same time is not supported yet");
+                        }
+                        clrInstance = ((Enviorment.CrossBindingAdaptor)i).CreateCLRInstance(type.AppDomain, this);
+                        break;
+                    }
+                }
+            }
         }
 
         void InitializeFields(ILType type)

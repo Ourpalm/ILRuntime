@@ -47,6 +47,7 @@ namespace ILRuntimeTest
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
 
                     app.RegisterCrossBindingAdaptor(new TestFramework.ClassInheritanceAdaptor());
+                    app.RegisterCrossBindingAdaptor(new TestFramework.InterfaceTestAdaptor());
                     app.DelegateManager.RegisterMethodDelegate<int>();
                     //app.DelegateManager.RegisterMethodDelegate<int, string>();
                     app.DelegateManager.RegisterFunctionDelegate<int, int>();

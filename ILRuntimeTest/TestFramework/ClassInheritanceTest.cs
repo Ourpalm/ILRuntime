@@ -32,7 +32,7 @@ namespace ILRuntimeTest.TestFramework
             return new Adaptor(appdomain, instance);
         }
 
-        class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
+        internal class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -92,8 +92,31 @@ namespace ILRuntimeTest.TestFramework
             }
         }
     }
+    public class InterfaceTestAdaptor : CrossBindingAdaptor
+    {
+        public override Type BaseCLRType
+        {
+            get
+            {
+                return typeof(InterfaceTest);
+            }
+        }
 
-    public abstract class ClassInheritanceTest
+        public override Type AdaptorType
+        {
+            get
+            {
+                return typeof(ClassInheritanceAdaptor.Adaptor);
+            }
+        }
+
+        public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+        {
+            return new ClassInheritanceAdaptor.Adaptor(appdomain, instance);
+        }        
+    }
+
+    public abstract class ClassInheritanceTest: InterfaceTest
     {
         protected int testVal = 100;
         public int TestVal2 = 200;
@@ -110,13 +133,20 @@ namespace ILRuntimeTest.TestFramework
             Console.WriteLine("testVal = " + testVal);
         }
 
-        public static void Test3(ClassInheritanceTest ins)
+        public static void Test3(InterfaceTest ins)
         {
             Console.WriteLine("Testing invoking instance from CLR...");
             ins.TestAbstract();
             ins.TestVirtual();
-            ins.testVal = 233;
+            ((ClassInheritanceTest)ins).testVal = 233;
             ins.TestField();
         }
+    }
+
+    public interface InterfaceTest
+    {
+        void TestVirtual();
+        void TestAbstract();
+        void TestField();
     }
 }
