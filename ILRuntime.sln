@@ -19,6 +19,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCases", "TestCases\Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGenerationTools", "CodeGenerationTools\CodeGenerationTools.csproj", "{CFDF647B-9EA9-4967-9996-C33E295239F8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debugging", "Debugging", "{78227E23-29CF-4658-969E-1965210A11AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRuntimeDebuggerLauncher", "Debugging\ILRuntimeDebuggerLauncher\ILRuntimeDebuggerLauncher.csproj", "{2455AAFB-521F-484F-B00D-8A9BB7377A5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRuntimeDebugEngine", "Debugging\ILRuntimeDebugEngine\ILRuntimeDebugEngine.csproj", "{217AE15B-840C-4F8F-93CD-9D331AA4C81A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,11 +59,21 @@ Global
 		{CFDF647B-9EA9-4967-9996-C33E295239F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFDF647B-9EA9-4967-9996-C33E295239F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFDF647B-9EA9-4967-9996-C33E295239F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2455AAFB-521F-484F-B00D-8A9BB7377A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2455AAFB-521F-484F-B00D-8A9BB7377A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2455AAFB-521F-484F-B00D-8A9BB7377A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2455AAFB-521F-484F-B00D-8A9BB7377A5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{217AE15B-840C-4F8F-93CD-9D331AA4C81A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{217AE15B-840C-4F8F-93CD-9D331AA4C81A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{217AE15B-840C-4F8F-93CD-9D331AA4C81A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{217AE15B-840C-4F8F-93CD-9D331AA4C81A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55} = {FA42778E-C31B-49E8-A235-9C69EECD9427}
+		{2455AAFB-521F-484F-B00D-8A9BB7377A5E} = {78227E23-29CF-4658-969E-1965210A11AE}
+		{217AE15B-840C-4F8F-93CD-9D331AA4C81A} = {78227E23-29CF-4658-969E-1965210A11AE}
 	EndGlobalSection
 EndGlobal

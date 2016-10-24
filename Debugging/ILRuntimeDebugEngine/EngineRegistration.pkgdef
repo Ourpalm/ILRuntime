@@ -1,0 +1,40 @@
+﻿; This file registers the sample debug engine with Visual Studio.
+; The 'AD7Metrics\Engine\{guid}' section declares capabiliets of the engine.
+; Make sure to update the GUID in this file when changing EngineConstants.EngineId
+
+[$RootKey$\AD7Metrics\Engine\{AD200943-CDC3-4DD7-9CF0-18972BEA2ABC}]
+"CLSID"="{552856E6-0F4F-4D79-83A5-9AF4A1A7A4B0}"
+"ProgramProvider"="{795D4CA4-6029-48C2-B60E-84E7D6AA4458}"
+"Attach"=dword:00000001
+"AddressBP"=dword:00000000
+"AutoSelectPriority"=dword:00000004
+"CallstackBP"=dword:00000001
+"Name"="ILRuntime Debug Engine"
+"PortSupplier"="{C90C1326-0C6D-4334-BA0D-E94D0F91D440}"
+@="ILRuntime Debug Engine"
+
+[$RootKey$\AD7Metrics\PortSupplier\{B017A948-624D-499A-9A5B-A63EB38D7F80}]
+"CLSID"="{C90C1326-0C6D-4334-BA0D-E94D0F91D440}"
+"Name"="ILRuntime Port Supplier"
+@="ILRuntime Port Supplier"
+
+[$RootKey$\AD7Metrics\Engine\{AD200943-CDC3-4DD7-9CF0-18972BEA2ABC}\IncompatibleList]
+"guidCOMPlusNativeEng"="{92EF0900-2251-11D2-B72E-0000F87572EF}"
+"guidCOMPlusOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
+"guidNativeOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
+"guidScriptEng"="{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}"
+
+[$RootKey$\CLSID\{552856E6-0F4F-4D79-83A5-9AF4A1A7A4B0}]
+"Assembly"="ILRuntimeDebugEngine"
+"Class"="ILRuntimeDebugEngine.AD7.AD7Engine"
+"CodeBase"="$PackageFolder$\ILRuntimeDebugEngine.dll"
+
+[$RootKey$\CLSID\{795D4CA4-6029-48C2-B60E-84E7D6AA4458}]
+"Assembly"="ILRuntimeDebugEngine"
+"Class"="ILRuntimeDebugEngine.AD7.AD7ProgramProvider"
+"CodeBase"="$PackageFolder$\ILRuntimeDebugEngine.dll"
+
+[$RootKey$\CLSID\{C90C1326-0C6D-4334-BA0D-E94D0F91D440}]
+"Assembly"="ILRuntimeDebugEngine"
+"Class"="ILRuntimeDebugEngine.AD7.AD7PortSupplier"
+"CodeBase"="$PackageFolder$\ILRuntimeDebugEngine.dll"
