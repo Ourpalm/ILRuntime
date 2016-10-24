@@ -305,6 +305,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Call:
                 case OpCodeEnum.Newobj:
                 case OpCodeEnum.Ldftn:
+                case OpCodeEnum.Ldvirtftn:
                 case OpCodeEnum.Callvirt:
                     {
                         bool invalidToken;

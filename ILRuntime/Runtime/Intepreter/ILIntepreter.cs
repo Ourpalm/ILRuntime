@@ -1638,6 +1638,21 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PushObject(esp, mStack, m);
                                 }
                                 break;
+                            case OpCodeEnum.Ldvirtftn:
+                                {
+                                    IMethod m = domain.GetMethod(ip->TokenInteger);
+                                    var objRef = esp - 1;
+                                    if (m is ILMethod)
+                                    {
+                                        ILMethod ilm = (ILMethod)m;
+
+                                        var obj = mStack[objRef->Value];
+                                        m = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                    }
+                                    Free(objRef);
+                                    esp = PushObject(objRef, mStack, m);
+                                }
+                                break;
                             #endregion
 
                             #region Compare

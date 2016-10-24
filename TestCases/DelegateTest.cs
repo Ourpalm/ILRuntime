@@ -144,26 +144,36 @@ namespace TestCases
             return a + 100;
         }
 
-        class DelegateTestCls
+        class DelegateTestCls : DelegateTestClsBase
         {
-            int b;
             public DelegateTestCls(int b)
             {
                 this.b = b;
             }
-            public void IntTest(int a)
+            public override void IntTest(int a)
             {
+                base.IntTest(a);
                 Console.WriteLine("dele3 a=" + (a + b));
             }
 
-            public void IntTest2(int a)
-            {
-                Console.WriteLine("dele4 a=" + (a + b));
-            }
+
             public int IntTest3(int a)
             {
                 Console.WriteLine("dele5 a=" + a);
                 return a + 200;
+            }
+        }
+
+        class DelegateTestClsBase
+        {
+            protected int b;
+            public virtual void IntTest(int a)
+            {
+                Console.WriteLine("dele3base a=" + (a + b));
+            }
+            public virtual void IntTest2(int a)
+            {
+                Console.WriteLine("dele4 a=" + (a + b));
             }
         }
     }
