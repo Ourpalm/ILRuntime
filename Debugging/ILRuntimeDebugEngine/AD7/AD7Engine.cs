@@ -164,7 +164,10 @@ namespace ILRuntimeDebugEngine.AD7
 
         int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
         {
-            throw new NotImplementedException();
+            AD7PendingBreakPoint breakpoint = new AD7PendingBreakPoint(this, pBPRequest);
+            ppPendingBP = breakpoint;
+
+            return Constants.S_OK;
         }
 
         int IDebugEngine2.DestroyProgram(IDebugProgram2 pProgram)

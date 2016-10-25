@@ -85,7 +85,18 @@ namespace ILRuntimeDebugEngine.AD7
         }
     }
     #endregion Base Class
+    class AD7BoundBreakpointsEnum : AD7Enum<IDebugBoundBreakpoint2, IEnumDebugBoundBreakpoints2>, IEnumDebugBoundBreakpoints2
+    {
+        public AD7BoundBreakpointsEnum(IDebugBoundBreakpoint2[] breakpoints)
+            : base(breakpoints)
+        {
+        }
 
+        public int Next(uint celt, IDebugBoundBreakpoint2[] rgelt, ref uint celtFetched)
+        {
+            return Next(celt, rgelt, out celtFetched);
+        }
+    }
     class AD7PortEnum : AD7Enum<IDebugPort2, IEnumDebugPorts2>, IEnumDebugPorts2
     {
         public AD7PortEnum(IDebugPort2[] data) : base(data)
