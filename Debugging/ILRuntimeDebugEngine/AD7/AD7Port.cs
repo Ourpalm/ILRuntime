@@ -19,7 +19,7 @@ namespace ILRuntimeDebugEngine.AD7
             this.supplier = supplier;
             this.request = request;
             request.GetPortName(out portName);
-            AD7Process p = new AD7Process();
+            AD7Process p = new AD7Process(this);
             processes.Add(p);
         }
 

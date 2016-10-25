@@ -11,6 +11,11 @@ namespace ILRuntimeDebugEngine.AD7
     class AD7Process : IDebugProcessEx2, IDebugProcess2
     {
         Guid guid = Guid.NewGuid();
+        IDebugPort2 port;
+        public AD7Process(IDebugPort2 port)
+        {
+            this.port = port;
+        }
         public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach)
         {
             throw new NotImplementedException();
@@ -48,6 +53,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int GetInfo(enum_PROCESS_INFO_FIELDS Fields, PROCESS_INFO[] pProcessInfo)
         {
+            pProcessInfo[0].Fields = Fields;
             pProcessInfo[0].bstrTitle = "ttt";
             pProcessInfo[0].bstrBaseName = "ttt";
             pProcessInfo[0].bstrFileName = "ttt";
@@ -62,14 +68,15 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
-            pProcessId[0].dwProcessId = 1;
-            pProcessId[0].ProcessIdType = 0;   
+            pProcessId[0].guidProcessId = guid;
+            pProcessId[0].ProcessIdType = 1;   
             return 0;
         }
 
         public int GetPort(out IDebugPort2 ppPort)
         {
-            throw new NotImplementedException();
+            ppPort = port;
+            return Constants.S_OK;
         }
 
         public int GetProcessId(out Guid pguidProcessId)

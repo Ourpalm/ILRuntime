@@ -106,8 +106,8 @@ namespace ILRuntimeDebuggerLauncher
             VsDebugTargetInfo4[] debugTargets = new VsDebugTargetInfo4[1];
             debugTargets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
             debugTargets[0].bstrExe = filePath;
-            debugTargets[0].bstrPortName = "1243";
-            debugTargets[0].guidPortSupplier = new Guid(ILRuntimeDebugEngine.EngineConstants.PortSupplier);
+            //debugTargets[0].bstrPortName = "1243";
+            //debugTargets[0].guidPortSupplier = new Guid(ILRuntimeDebugEngine.EngineConstants.PortSupplier);
             debugTargets[0].guidLaunchDebugEngine = new Guid(ILRuntimeDebugEngine.EngineConstants.EngineGUID);
             VsDebugTargetProcessInfo[] processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
             try
@@ -116,7 +116,9 @@ namespace ILRuntimeDebuggerLauncher
             }
             catch (Exception ex)
             {
-                
+                var shell = (IVsUIShell)this.ServiceProvider.GetService(typeof(SVsUIShell));
+                string msg;
+                shell.GetErrorInfo(out msg);
             }
         }
     }
