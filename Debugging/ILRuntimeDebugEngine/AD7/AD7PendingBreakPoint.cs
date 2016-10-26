@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+using System.IO;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
 
@@ -50,6 +55,7 @@ namespace ILRuntimeDebugEngine.AD7
         public int Bind()
         {
             _boundBreakpoint = new AD7BoundBreakpoint(_engine, this);
+            TryBind();
             return Constants.S_OK;
         }
 
@@ -105,6 +111,49 @@ namespace ILRuntimeDebugEngine.AD7
         public int Virtualize(int fVirtualize)
         {
             return Constants.S_OK;
+        }
+
+        internal bool TryBind()
+        {
+            try
+            {
+                using (var stream = File.OpenRead(DocumentName))
+                {
+                    SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: DocumentName);
+                    TextLine textLine = syntaxTree.GetText().Lines[StartLine];
+                    Location location = syntaxTree.GetLocation(textLine.Span);
+                    SyntaxTree sourceTree = location.SourceTree;
+                    SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
+
+                    var method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
+                    string methodName = method.Identifier.Text;
+
+                    var cl = GetParentMethod<ClassDeclarationSyntax>(method);
+                    string className = cl.Identifier.Text;
+
+                    var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
+                    string nsname = ns.Name.ToString();
+
+                    string name = string.Format("{0}.{1}", nsname, className);
+                    System.Diagnostics.Debug.WriteLine("Bound");
+                    return true;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+            }
+            return false;
+        }
+
+        private T GetParentMethod<T>(SyntaxNode node) where T : SyntaxNode
+        {
+            if (node == null)
+                return null;
+
+            if (node is T)
+                return node as T;
+            return GetParentMethod<T>(node.Parent);
         }
     }
 }
