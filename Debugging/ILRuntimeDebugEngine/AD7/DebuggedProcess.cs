@@ -10,7 +10,12 @@ namespace ILRuntimeDebugEngine.AD7
 {
     class DebuggedProcess
     {
+        System.IO.MemoryStream sendStream = new System.IO.MemoryStream(64 * 1024);
+        System.IO.BinaryWriter bw;
         DebugSocket socket;
+        Dictionary<int, AD7PendingBreakPoint> breakpoints = new Dictionary<int, AD7PendingBreakPoint>();
+
+        public Action OnDisconnected { get; set; }
 
         public bool Connected { get; set; }
 
@@ -22,10 +27,12 @@ namespace ILRuntimeDebugEngine.AD7
 
         public DebuggedProcess(string host, int port)
         {
+            bw = new System.IO.BinaryWriter(sendStream);
             socket = new DebugSocket();
             socket.OnConnect = OnConnected;
             socket.OnConnectFailed = OnConnectFailed;
             socket.OnReciveMessage = OnReceiveMessage;
+            socket.OnClose = OnClose;
             socket.Connect(host, port);
             Connecting = true;      
         }
@@ -44,13 +51,20 @@ namespace ILRuntimeDebugEngine.AD7
 
         public void Close()
         {
+            socket.OnClose = null;
             socket.Close();
+        }
+
+        void OnClose()
+        {
+            if (OnDisconnected != null)
+                OnDisconnected();
         }
 
         bool waitingAttach;
         public bool CheckDebugServerVersion()
         {
-            socket.Send(DebugMessageType.Attach, new byte[0]);
+            socket.Send(DebugMessageType.CSAttach, new byte[0], 0);
             waitingAttach = true;
             DateTime now = DateTime.Now;
             while (waitingAttach)
@@ -73,7 +87,7 @@ namespace ILRuntimeDebugEngine.AD7
                 {
                     switch (type)
                     {
-                        case DebugMessageType.AttachResult:
+                        case DebugMessageType.SCAttachResult:
                             {
                                 SCAttachResult result = new SCAttachResult();
                                 result.Result = (AttachResults)br.ReadByte();
@@ -85,6 +99,22 @@ namespace ILRuntimeDebugEngine.AD7
                     }
                 }
             }
+        }
+
+        public void AddPendingBreakpoint(AD7PendingBreakPoint bp)
+        {
+            breakpoints[bp.GetHashCode()] = bp;
+        }
+
+        public void SendBindBreakpoint(CSBindBreakpoint msg)
+        {
+            sendStream.Position = 0;
+            bw.Write(msg.BreakpointHashCode);
+            bw.Write(msg.TypeName);
+            bw.Write(msg.MethodName);
+            bw.Write(msg.StartLine);
+            bw.Write(msg.EndLine);
+            socket.Send(DebugMessageType.CSBindBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
         }
     }
 }

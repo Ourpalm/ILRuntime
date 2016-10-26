@@ -20,6 +20,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         internal EngineCallback Callback { get { return callback; } }
         internal IDebugProcess2 RemoteProcess { get { return process; } }
+        internal DebuggedProcess DebuggedProcess { get { return debugged; } }
         internal bool ProgramCreateEventSent
         {
             get;
@@ -168,7 +169,7 @@ namespace ILRuntimeDebugEngine.AD7
         {
             AD7PendingBreakPoint breakpoint = new AD7PendingBreakPoint(this, pBPRequest);
             ppPendingBP = breakpoint;
-
+            debugged.AddPendingBreakpoint(breakpoint);
             return Constants.S_OK;
         }
 
@@ -204,7 +205,7 @@ namespace ILRuntimeDebugEngine.AD7
                     ppProcess = new AD7Process(pPort);
                     this.process = ppProcess;
                     callback = new AD7.EngineCallback(this, pCallback);
-
+                    debugged.OnDisconnected = OnDisconnected;
                     return Constants.S_OK;
                 }
                 else
@@ -271,8 +272,15 @@ namespace ILRuntimeDebugEngine.AD7
 
         int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 pProcess)
         {
+            debugged.Close();
+            debugged = null;
             Callback.ProgramDestroyed(this);
             return Constants.S_OK;
+        }
+
+        void OnDisconnected()
+        {
+            Callback.ProgramDestroyed(this);
         }
     }
 }

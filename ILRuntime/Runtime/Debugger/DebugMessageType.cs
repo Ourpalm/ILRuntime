@@ -7,7 +7,9 @@ namespace ILRuntime.Runtime.Debugger
 {
     public enum DebugMessageType
     {
-        Attach,
-        AttachResult,
+        CSAttach,
+        SCAttachResult,
+        CSBindBreakpoint,
+        SCBindBreakpointResult,
     }
 }

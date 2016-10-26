@@ -11,6 +11,7 @@ using System.IO;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
 
+using ILRuntime.Runtime.Debugger.Protocol;
 namespace ILRuntimeDebugEngine.AD7
 {
     class AD7PendingBreakPoint : IDebugPendingBreakpoint2
@@ -135,7 +136,15 @@ namespace ILRuntimeDebugEngine.AD7
                     string nsname = ns.Name.ToString();
 
                     string name = string.Format("{0}.{1}", nsname, className);
-                    System.Diagnostics.Debug.WriteLine("Bound");
+
+                    CSBindBreakpoint msg = new CSBindBreakpoint();
+                    msg.BreakpointHashCode = this.GetHashCode();
+                    msg.TypeName = name;
+                    msg.MethodName = methodName;
+                    msg.StartLine = StartLine;
+                    msg.EndLine = EndLine;
+
+                    _engine.DebuggedProcess.SendBindBreakpoint(msg);
                     return true;
                 }
             }

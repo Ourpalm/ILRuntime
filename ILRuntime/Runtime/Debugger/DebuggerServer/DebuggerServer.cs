@@ -18,6 +18,8 @@ namespace ILRuntime.Runtime.Debugger
         int port;
         Thread mainLoop;
         DebugSocket clientSocket;
+        System.IO.MemoryStream sendStream = new System.IO.MemoryStream(64 * 1024);
+        System.IO.BinaryWriter bw;
 
         /// <summary>
         /// 服务器监听的端口
@@ -25,6 +27,11 @@ namespace ILRuntime.Runtime.Debugger
         public int Port { get { return port; } set { this.port = value; } }
 
         public DebugSocket Client { get { return clientSocket; } }
+
+        public DebuggerServer()
+        {
+            bw = new System.IO.BinaryWriter(sendStream);
+        }
 
         public virtual bool Start()
         {
@@ -97,25 +104,34 @@ namespace ILRuntime.Runtime.Debugger
 
         void OnReceive(DebugMessageType type, byte[] buffer)
         {
+            Console.WriteLine("Received:" + type);
             if (clientSocket == null || clientSocket.Disconnected)
                 return;
             System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
             System.IO.BinaryReader br = new System.IO.BinaryReader(ms);
-            System.IO.MemoryStream ms2 = new System.IO.MemoryStream();
-            System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms2);
 
-            Console.WriteLine("Received:" + type);
             switch (type)
             {
-                case DebugMessageType.Attach:
+                case DebugMessageType.CSAttach:
                     {
-                        bw.Write((byte)AttachResults.OK);
-                        bw.Write(Version);
-                        clientSocket.Send(DebugMessageType.AttachResult, ms2.ToArray());
+                        SendAttachResult();
                     }
                     break;
             }
 
+        }
+
+        void SendAttachResult()
+        {
+            sendStream.Position = 0;
+            bw.Write((byte)AttachResults.OK);
+            bw.Write(Version);
+            DoSend(DebugMessageType.SCAttachResult);
+        }
+
+        void DoSend(DebugMessageType type)
+        {
+            clientSocket.Send(type, sendStream.GetBuffer(), (int)sendStream.Position);
         }
     }
 }

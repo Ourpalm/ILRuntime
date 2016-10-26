@@ -192,19 +192,19 @@ namespace ILRuntime.Runtime.Debugger
         }
 
         //len type msg
-        public void Send(DebugMessageType type, byte[] buffer)
+        public void Send(DebugMessageType type, byte[] buffer, int len)
         {
             if (!_ready)
                 return;
 
             //timeStamp = UnityEngine.Time.realtimeSinceStartup;
             _sendStream.Position = 0;
-            bw.Write(buffer.Length + HEAD_SIZE);
+            bw.Write(len + HEAD_SIZE);
             bw.Write((int)type);
-            bw.Write(buffer);
-            int len = (int)_sendStream.Position;
+            bw.Write(buffer, 0, len);
+            int totalLen = (int)_sendStream.Position;
 
-            RawSend(_socket, _sendBuffer, len);
+            RawSend(_socket, _sendBuffer, totalLen);
             //_socket.Send(_sendBuffer, len, SocketFlags.None);
         }
 
