@@ -161,5 +161,11 @@ namespace ILRuntime.Runtime.Debugger
         {
             return (StackObject*)((long)a - sizeof(StackObject) * b);
         }
+
+        internal void NotifyModuleLoaded(string moduleName)
+        {
+            if (server.IsAttached)
+                server.NotifyModuleLoaded(moduleName);
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace ILRuntimeDebugEngine.AD7
         System.IO.MemoryStream sendStream = new System.IO.MemoryStream(64 * 1024);
         System.IO.BinaryWriter bw;
         DebugSocket socket;
+        AD7Engine engine;
         Dictionary<int, AD7PendingBreakPoint> breakpoints = new Dictionary<int, AD7PendingBreakPoint>();
 
         public Action OnDisconnected { get; set; }
@@ -25,8 +26,9 @@ namespace ILRuntimeDebugEngine.AD7
         
         int RemoteDebugVersion { get; set; }
 
-        public DebuggedProcess(string host, int port)
+        public DebuggedProcess(AD7Engine engine, string host, int port)
         {
+            this.engine = engine;
             bw = new System.IO.BinaryWriter(sendStream);
             socket = new DebugSocket();
             socket.OnConnect = OnConnected;
@@ -104,6 +106,14 @@ namespace ILRuntimeDebugEngine.AD7
                                 OnReceivSendSCBindBreakpointResult(msg);
                             }
                             break;
+                        case DebugMessageType.SCModuleLoaded:
+                            {
+                                SCModuleLoaded msg = new SCModuleLoaded();
+                                msg.ModuleName = br.ReadString();
+
+                                OnReceiveSCModuleLoaded(msg);
+                            }
+                            break;
                     }
                 }
             }
@@ -131,6 +141,19 @@ namespace ILRuntimeDebugEngine.AD7
             if(breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
             {
                 bp.Bound(msg.Result);
+            }
+        }
+
+        void OnReceiveSCModuleLoaded(SCModuleLoaded msg)
+        {
+            engine.Callback.ModuleLoaded(new AD7Module(msg.ModuleName));
+
+            foreach(var i in breakpoints)
+            {
+                if (!i.Value.IsBound)
+                {
+                    i.Value.TryBind();
+                }
             }
         }
     }

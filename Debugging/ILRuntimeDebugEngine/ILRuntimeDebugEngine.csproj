@@ -95,6 +95,7 @@
     <Compile Include="AD7\AD7PendingBreakPoint.cs" />
     <Compile Include="AD7\AD7Port.cs" />
     <Compile Include="AD7\AD7PortSupplier.cs" />
+    <Compile Include="AD7\AD7Module.cs" />
     <Compile Include="AD7\AD7Process.cs" />
     <Compile Include="AD7\AD7ProgramNode.cs" />
     <Compile Include="AD7\AD7ProgramProvider.cs" />

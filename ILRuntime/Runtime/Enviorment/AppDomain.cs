@@ -129,14 +129,20 @@ namespace ILRuntime.Runtime.Enviorment
                 }
             }
 
-            voidType = GetType("System.Void");
-            intType = GetType("System.Int32");
-            longType = GetType("System.Int64");
-            boolType = GetType("System.Boolean");
-            floatType = GetType("System.Single");
-            doubleType = GetType("System.Double");
-            objectType = GetType("System.Object");
+            if (voidType == null)
+            {
+                voidType = GetType("System.Void");
+                intType = GetType("System.Int32");
+                longType = GetType("System.Int64");
+                boolType = GetType("System.Boolean");
+                floatType = GetType("System.Single");
+                doubleType = GetType("System.Double");
+                objectType = GetType("System.Object");
+            }
             module.AssemblyResolver.ResolveFailure += AssemblyResolver_ResolveFailure;
+#if DEBUG
+            debugService.NotifyModuleLoaded(module.Name);
+#endif
         }
 
         /// <summary>

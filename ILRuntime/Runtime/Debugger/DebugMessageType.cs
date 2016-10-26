@@ -11,5 +11,6 @@ namespace ILRuntime.Runtime.Debugger
         SCAttachResult,
         CSBindBreakpoint,
         SCBindBreakpointResult,
+        SCModuleLoaded,
     }
 }

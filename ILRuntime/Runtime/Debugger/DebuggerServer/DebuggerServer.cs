@@ -28,6 +28,8 @@ namespace ILRuntime.Runtime.Debugger
 
         public DebugSocket Client { get { return clientSocket; } }
 
+        public bool IsAttached { get { return clientSocket != null && !clientSocket.Disconnected; } }
+
         public DebuggerServer()
         {
             bw = new System.IO.BinaryWriter(sendStream);
@@ -142,7 +144,8 @@ namespace ILRuntime.Runtime.Debugger
 
         void DoSend(DebugMessageType type)
         {
-            clientSocket.Send(type, sendStream.GetBuffer(), (int)sendStream.Position);
+            if (clientSocket != null && !clientSocket.Disconnected)
+                clientSocket.Send(type, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
         void TryBindBreakpoint(CSBindBreakpoint msg)
@@ -160,6 +163,13 @@ namespace ILRuntime.Runtime.Debugger
             bw.Write(msg.BreakpointHashCode);
             bw.Write((byte)msg.Result);
             DoSend(DebugMessageType.SCBindBreakpointResult);
+        }
+
+        public void NotifyModuleLoaded(string modulename)
+        {
+            sendStream.Position = 0;
+            bw.Write(modulename);
+            DoSend(DebugMessageType.SCModuleLoaded);
         }
     }
 }

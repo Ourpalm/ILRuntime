@@ -95,6 +95,37 @@ namespace ILRuntimeDebugEngine.AD7
 
         #endregion
     }
+    sealed class AD7ModuleLoadEvent : AD7AsynchronousEvent, IDebugModuleLoadEvent2
+    {
+        public const string IID = "989DB083-0D7C-40D1-A9D9-921BF611A4B2";
+
+        readonly AD7Module m_module;
+        readonly bool m_fLoad;
+
+        public AD7ModuleLoadEvent(AD7Module module, bool fLoad)
+        {
+            m_module = module;
+            m_fLoad = fLoad;
+        }
+
+        int IDebugModuleLoadEvent2.GetModule(out IDebugModule2 module, ref string debugMessage, ref int fIsLoad)
+        {
+            module = m_module;
+
+            if (m_fLoad)
+            {
+                debugMessage = String.Concat("Loaded '", m_module.ModuleName, "'");
+                fIsLoad = 1;
+            }
+            else
+            {
+                debugMessage = String.Concat("Unloaded '", m_module.ModuleName, "'");
+                fIsLoad = 0;
+            }
+
+            return Constants.S_OK;
+        }
+    }
     internal sealed class AD7EngineCreateEvent : AD7AsynchronousEvent, IDebugEngineCreateEvent2
     {
         public const string IID = "FE5B734C-759D-4E59-AB04-F103343BDD06";

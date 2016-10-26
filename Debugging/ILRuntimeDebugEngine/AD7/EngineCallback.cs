@@ -88,6 +88,13 @@ namespace ILRuntimeDebugEngine.AD7
                 AD7AsynchronousEvent.Attributes);
         }
 
+        internal void ModuleLoaded(AD7Module module)
+        {
+            var iid = new Guid(AD7ModuleLoadEvent.IID);
+            _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, null, new AD7ModuleLoadEvent(module, true), ref iid,
+                AD7AsynchronousEvent.Attributes);
+        }
+
         /*internal void BreakpointHit(AD7PendingBreakpoint breakpoint, AD7Thread thread)
         {
             var iid = new Guid(AD7BreakpointEvent.IID);

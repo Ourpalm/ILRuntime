@@ -21,12 +21,14 @@ namespace ILRuntimeDebugEngine.AD7
         private BP_REQUEST_INFO _bpRequestInfo;
         private AD7BoundBreakpoint _boundBreakpoint;
         private AD7ErrorBreakpoint _errorBreakpoint;
-
+        CSBindBreakpoint bindRequest;
         public int StartLine { get; private set; }
         public int StartColumn { get; private set; }
         public int EndLine { get; private set; }
         public int EndColumn { get; private set; }
         public string DocumentName { get; set; }
+
+        public bool IsBound { get { return _boundBreakpoint != null; } }
 
         public AD7PendingBreakPoint(AD7Engine engine, IDebugBreakpointRequest2 pBPRequest)
         {
@@ -124,33 +126,36 @@ namespace ILRuntimeDebugEngine.AD7
         {
             try
             {
-                using (var stream = File.OpenRead(DocumentName))
+                if (bindRequest == null)
                 {
-                    SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: DocumentName);
-                    TextLine textLine = syntaxTree.GetText().Lines[StartLine];
-                    Location location = syntaxTree.GetLocation(textLine.Span);
-                    SyntaxTree sourceTree = location.SourceTree;
-                    SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
+                    using (var stream = File.OpenRead(DocumentName))
+                    {
+                        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: DocumentName);
+                        TextLine textLine = syntaxTree.GetText().Lines[StartLine];
+                        Location location = syntaxTree.GetLocation(textLine.Span);
+                        SyntaxTree sourceTree = location.SourceTree;
+                        SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
 
-                    var method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
-                    string methodName = method.Identifier.Text;
+                        var method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
+                        string methodName = method.Identifier.Text;
 
-                    var cl = GetParentMethod<ClassDeclarationSyntax>(method);
-                    string className = cl.Identifier.Text;
+                        var cl = GetParentMethod<ClassDeclarationSyntax>(method);
+                        string className = cl.Identifier.Text;
 
-                    var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
-                    string nsname = ns.Name.ToString();
+                        var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
+                        string nsname = ns.Name.ToString();
 
-                    string name = string.Format("{0}.{1}", nsname, className);
+                        string name = string.Format("{0}.{1}", nsname, className);
 
-                    CSBindBreakpoint msg = new CSBindBreakpoint();
-                    msg.BreakpointHashCode = this.GetHashCode();
-                    msg.TypeName = name;
-                    msg.MethodName = methodName;
-                    msg.StartLine = StartLine;
-                    msg.EndLine = EndLine;
+                        bindRequest = new CSBindBreakpoint();
+                        bindRequest.BreakpointHashCode = this.GetHashCode();
+                        bindRequest.TypeName = name;
+                        bindRequest.MethodName = methodName;
+                        bindRequest.StartLine = StartLine;
+                        bindRequest.EndLine = EndLine;
+                    }
 
-                    _engine.DebuggedProcess.SendBindBreakpoint(msg);
+                    _engine.DebuggedProcess.SendBindBreakpoint(bindRequest);
                     return true;
                 }
             }
