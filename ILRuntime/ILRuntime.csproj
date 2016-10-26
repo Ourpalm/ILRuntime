@@ -55,6 +55,10 @@
     <Compile Include="Reflection\ILRuntimeMethodInfo.cs" />
     <Compile Include="Reflection\ILRuntimeType.cs" />
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
+    <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
+    <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
+    <Compile Include="Runtime\Debugger\DebugSocket.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\SCAttachResult.cs" />
     <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
     <Compile Include="Runtime\Enviorment\ILContext.cs" />
     <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />

@@ -32,6 +32,8 @@ namespace ILRuntimeTest
 
             listView1.Columns.AddRange(row1);
             listView1.View = View.Details;
+
+            ILRuntime.Runtime.Debugger.DebugService.Instance.StartDebugService(56000);
         }
 
         private void button1_Click(object sender, EventArgs e)

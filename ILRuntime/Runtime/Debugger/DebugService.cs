@@ -11,10 +11,24 @@ namespace ILRuntime.Runtime.Debugger
     public class DebugService
     {
         BreakPointContext curBreakpoint;
+        DebuggerServer server;
         static DebugService instance = new DebugService();
 
         public Action<string> OnBreakPoint;
         public static DebugService Instance { get { return instance; } }
+
+        /// <summary>
+        /// Start Debugger Server
+        /// </summary>
+        /// <param name="port">Port to listen on</param>
+        public void StartDebugService(int port)
+        {
+#if DEBUG
+            server = new Debugger.DebuggerServer();
+            server.Port = port;
+            server.Start();
+#endif
+        }
 
         /// <summary>
         /// 中断运行

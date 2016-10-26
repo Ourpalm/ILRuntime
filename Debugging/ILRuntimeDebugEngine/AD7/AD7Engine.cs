@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
@@ -14,6 +15,7 @@ namespace ILRuntimeDebugEngine.AD7
     {
         EngineCallback callback;
         IDebugProcess2 process;
+        DebuggedProcess debugged;
         private Guid _programId;
 
         internal EngineCallback Callback { get { return callback; } }
@@ -188,10 +190,39 @@ namespace ILRuntimeDebugEngine.AD7
 
         int IDebugEngineLaunch2.LaunchSuspended(string pszServer, IDebugPort2 pPort, string pszExe, string pszArgs, string pszDir, string bstrEnv, string pszOptions, enum_LAUNCH_FLAGS dwLaunchFlags, uint hStdInput, uint hStdOutput, uint hStdError, IDebugEventCallback2 pCallback, out IDebugProcess2 ppProcess)
         {
-            ppProcess = new AD7Process(pPort);
-            this.process = ppProcess;
-            callback = new AD7.EngineCallback(this, pCallback);
-            return 0;
+            string[] p = pszExe.Split(':');
+            debugged = new AD7.DebuggedProcess(p[0], int.Parse(p[1]));
+            while (debugged.Connecting)
+            {
+                System.Threading.Thread.Sleep(10);
+            }
+
+            if (debugged.Connected)
+            {
+                if (debugged.CheckDebugServerVersion())
+                {
+                    ppProcess = new AD7Process(pPort);
+                    this.process = ppProcess;
+                    callback = new AD7.EngineCallback(this, pCallback);
+
+                    return Constants.S_OK;
+                }
+                else
+                {
+                    debugged.Close();
+                    MessageBox.Show("ILRuntime Debugger version mismatch", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    debugged = null;
+                    ppProcess = null;
+                    return Constants.S_FALSE;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Cannot connect to ILRuntime", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                debugged = null;
+                ppProcess = null;
+                return Constants.S_FALSE;
+            }
         }
 
         int IDebugEngine2.RemoveAllSetExceptions(ref Guid guidType)

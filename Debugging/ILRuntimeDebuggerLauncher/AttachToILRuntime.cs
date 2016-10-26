@@ -96,7 +96,7 @@ namespace ILRuntimeDebuggerLauncher
             FrmLauncher launcher = new ILRuntimeDebuggerLauncher.FrmLauncher();
             if(launcher.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                LaunchDebugTarget("ttt");
+                LaunchDebugTarget(launcher.Host);
             }
         }
 

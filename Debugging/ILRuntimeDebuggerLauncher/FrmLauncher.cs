@@ -12,6 +12,7 @@ namespace ILRuntimeDebuggerLauncher
 {
     public partial class FrmLauncher : Form
     {
+        public string Host { get; set; }
         public FrmLauncher()
         {
             InitializeComponent();
@@ -20,6 +21,7 @@ namespace ILRuntimeDebuggerLauncher
         private void button1_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
+            Host = tbAddress.Text;
             Close();
         }
     }
