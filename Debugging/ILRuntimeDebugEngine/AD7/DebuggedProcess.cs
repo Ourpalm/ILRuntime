@@ -96,6 +96,14 @@ namespace ILRuntimeDebugEngine.AD7
                                 waitingAttach = false;
                             }
                             break;
+                        case DebugMessageType.SCBindBreakpointResult:
+                            {
+                                SCBindBreakpointResult msg = new SCBindBreakpointResult();
+                                msg.BreakpointHashCode = br.ReadInt32();
+                                msg.Result = (BindBreakpointResults)br.ReadByte();
+                                OnReceivSendSCBindBreakpointResult(msg);
+                            }
+                            break;
                     }
                 }
             }
@@ -115,6 +123,15 @@ namespace ILRuntimeDebugEngine.AD7
             bw.Write(msg.StartLine);
             bw.Write(msg.EndLine);
             socket.Send(DebugMessageType.CSBindBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        void OnReceivSendSCBindBreakpointResult(SCBindBreakpointResult msg)
+        {
+            AD7PendingBreakPoint bp;
+            if(breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
+            {
+                bp.Bound(msg.Result);
+            }
         }
     }
 }

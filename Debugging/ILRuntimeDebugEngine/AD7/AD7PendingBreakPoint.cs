@@ -20,6 +20,7 @@ namespace ILRuntimeDebugEngine.AD7
         private readonly IDebugBreakpointRequest2 _pBPRequest;
         private BP_REQUEST_INFO _bpRequestInfo;
         private AD7BoundBreakpoint _boundBreakpoint;
+        private AD7ErrorBreakpoint _errorBreakpoint;
 
         public int StartLine { get; private set; }
         public int StartColumn { get; private set; }
@@ -55,7 +56,6 @@ namespace ILRuntimeDebugEngine.AD7
         }
         public int Bind()
         {
-            _boundBreakpoint = new AD7BoundBreakpoint(_engine, this);
             TryBind();
             return Constants.S_OK;
         }
@@ -77,14 +77,20 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
-            ppEnum = new AD7BoundBreakpointsEnum(new[] { _boundBreakpoint });
+            if (_boundBreakpoint != null)
+                ppEnum = new AD7BoundBreakpointsEnum(new[] { _boundBreakpoint });
+            else
+                ppEnum = null;
             return Constants.S_OK;
         }
 
         public int EnumErrorBreakpoints(enum_BP_ERROR_TYPE bpErrorType, out IEnumDebugErrorBreakpoints2 ppEnum)
         {
-            ppEnum = null;
-            return Constants.E_NOTIMPL;
+            if (_errorBreakpoint != null)
+                ppEnum = new AD7ErrorBreakpointsEnum(new[] { _errorBreakpoint });
+            else
+                ppEnum = null;
+            return Constants.S_OK;
         }
 
         public int GetBreakpointRequest(out IDebugBreakpointRequest2 ppBPRequest)
@@ -163,6 +169,19 @@ namespace ILRuntimeDebugEngine.AD7
             if (node is T)
                 return node as T;
             return GetParentMethod<T>(node.Parent);
+        }
+
+        public void Bound(BindBreakpointResults result)
+        {
+            if(result== BindBreakpointResults.OK)
+            {
+                _boundBreakpoint = new AD7BoundBreakpoint(_engine, this);
+            }
+            else
+            {
+                _errorBreakpoint = new AD7ErrorBreakpoint(_engine, this);
+                _engine.Callback.ErrorBreakpoint(_errorBreakpoint);
+            }
         }
     }
 }

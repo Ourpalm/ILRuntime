@@ -117,6 +117,17 @@ namespace ILRuntime.Runtime.Debugger
                         SendAttachResult();
                     }
                     break;
+                case DebugMessageType.CSBindBreakpoint:
+                    {
+                        CSBindBreakpoint msg = new Protocol.CSBindBreakpoint();
+                        msg.BreakpointHashCode = br.ReadInt32();
+                        msg.TypeName = br.ReadString();
+                        msg.MethodName = br.ReadString();
+                        msg.StartLine = br.ReadInt32();
+                        msg.EndLine = br.ReadInt32();
+                        TryBindBreakpoint(msg);
+                    }
+                    break;
             }
 
         }
@@ -132,6 +143,23 @@ namespace ILRuntime.Runtime.Debugger
         void DoSend(DebugMessageType type)
         {
             clientSocket.Send(type, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        void TryBindBreakpoint(CSBindBreakpoint msg)
+        {
+            SCBindBreakpointResult res = new Protocol.SCBindBreakpointResult();
+            res.BreakpointHashCode = msg.BreakpointHashCode;
+            res.Result = BindBreakpointResults.TypeNotFound;
+
+            SendSCBindBreakpointResult(res);
+        }
+
+        void SendSCBindBreakpointResult(SCBindBreakpointResult msg)
+        {
+            sendStream.Position = 0;
+            bw.Write(msg.BreakpointHashCode);
+            bw.Write((byte)msg.Result);
+            DoSend(DebugMessageType.SCBindBreakpointResult);
         }
     }
 }

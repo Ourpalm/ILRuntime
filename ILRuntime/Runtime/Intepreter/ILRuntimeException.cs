@@ -13,6 +13,7 @@ namespace ILRuntime.Runtime.Intepreter
             : base(message, innerException)
         
         {
+            var ds = intepreter.AppDomain.DebugService;
             if (innerException is ILRuntimeException)
             {
                 ILRuntimeException e = innerException as ILRuntimeException;
@@ -22,12 +23,12 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
             {
-                stackTrace = Debugger.DebugService.Instance.GetStackTrance(intepreter);
+                stackTrace = ds.GetStackTrance(intepreter);
                 if (method.HasThis)
-                    thisInfo = Debugger.DebugService.Instance.GetThisInfo(intepreter);
+                    thisInfo = ds.GetThisInfo(intepreter);
                 else
                     thisInfo = "";
-                localInfo = Debugger.DebugService.Instance.GetLocalVariableInfo(intepreter);
+                localInfo = ds.GetLocalVariableInfo(intepreter);
             }
         }
 

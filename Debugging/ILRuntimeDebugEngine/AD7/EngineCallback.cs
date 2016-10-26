@@ -74,14 +74,21 @@ namespace ILRuntimeDebugEngine.AD7
             _eventCallback.Event(_engine, null, program, null, new AD7ProgramDestroyEvent(0), ref iid, AD7AsynchronousEvent.Attributes);
         }
 
-        /*internal void BoundBreakpoint(AD7PendingBreakpoint breakpoint)
+        internal void BoundBreakpoint(AD7PendingBreakPoint breakpoint)
         {
             var iid = new Guid(AD7BreakpointBoundEvent.IID);
             _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, null, new AD7BreakpointBoundEvent(breakpoint), ref iid,
                 AD7AsynchronousEvent.Attributes);
         }
 
-        internal void BreakpointHit(AD7PendingBreakpoint breakpoint, AD7Thread thread)
+        internal void ErrorBreakpoint(AD7ErrorBreakpoint breakpoint)
+        {
+            var iid = new Guid(AD7BreakpointErrorEvent.IID);
+            _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, null, new AD7BreakpointErrorEvent(breakpoint), ref iid,
+                AD7AsynchronousEvent.Attributes);
+        }
+
+        /*internal void BreakpointHit(AD7PendingBreakpoint breakpoint, AD7Thread thread)
         {
             var iid = new Guid(AD7BreakpointEvent.IID);
             _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new AD7BreakpointEvent(breakpoint), ref iid,

@@ -12,10 +12,14 @@ namespace ILRuntime.Runtime.Debugger
     {
         BreakPointContext curBreakpoint;
         DebuggerServer server;
-        static DebugService instance = new DebugService();
-
+        Runtime.Enviorment.AppDomain domain;
+        
         public Action<string> OnBreakPoint;
-        public static DebugService Instance { get { return instance; } }
+
+        public DebugService(Runtime.Enviorment.AppDomain domain)
+        {
+            this.domain = domain;
+        }
 
         /// <summary>
         /// Start Debugger Server

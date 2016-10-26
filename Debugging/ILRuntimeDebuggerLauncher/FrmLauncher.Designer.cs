@@ -70,7 +70,7 @@
             this.Controls.Add(this.btnAttach);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "FrmLauncher";
-            this.Text = "FrmLauncher";
+            this.Text = "Attach to ILRuntime Debugger...";
             this.ResumeLayout(false);
             this.PerformLayout();
 

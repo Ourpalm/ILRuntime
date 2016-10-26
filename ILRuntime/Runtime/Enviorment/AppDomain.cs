@@ -10,6 +10,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.Utils;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Debugger;
 using ILRuntime.Runtime.Stack;
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -27,6 +28,7 @@ namespace ILRuntime.Runtime.Enviorment
         DelegateManager dMgr;
         Assembly[] loadedAssemblies;
         Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
+        DebugService debugService;
         public AppDomain()
         {
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
@@ -76,6 +78,8 @@ namespace ILRuntime.Runtime.Enviorment
             });
 
             RegisterCrossBindingAdaptor(new Adaptors.AttributeAdaptor());
+
+            debugService = new Debugger.DebugService(this);
         }
 
         public IType VoidType { get { return voidType; } }
@@ -89,6 +93,7 @@ namespace ILRuntime.Runtime.Enviorment
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
         internal Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
         internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
+        public DebugService DebugService { get { return debugService; } }
 
         public DelegateManager DelegateManager { get { return dMgr; } }
         public void LoadAssembly(System.IO.Stream stream)

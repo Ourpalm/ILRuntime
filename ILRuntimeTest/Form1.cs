@@ -16,6 +16,7 @@ namespace ILRuntimeTest
 {
     public partial class Form1 : Form
     {
+        ILRuntime.Runtime.Enviorment.AppDomain app;
         public Form1()
         {
             InitializeComponent();
@@ -32,8 +33,8 @@ namespace ILRuntimeTest
 
             listView1.Columns.AddRange(row1);
             listView1.View = View.Details;
-
-            ILRuntime.Runtime.Debugger.DebugService.Instance.StartDebugService(56000);
+            app = new ILRuntime.Runtime.Enviorment.AppDomain();
+            app.DebugService.StartDebugService(56000);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -42,7 +43,6 @@ namespace ILRuntimeTest
             {
                 using (System.IO.FileStream fs = new System.IO.FileStream(OD.FileName, System.IO.FileMode.Open, System.IO.FileAccess.Read))
                 {
-                    var app = new ILRuntime.Runtime.Enviorment.AppDomain();
                     var path = System.IO.Path.GetDirectoryName(OD.FileName);
                     var name = System.IO.Path.GetFileNameWithoutExtension(OD.FileName);
                     using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb", path, name), System.IO.FileMode.Open))

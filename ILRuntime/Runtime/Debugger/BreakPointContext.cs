@@ -14,7 +14,7 @@ namespace ILRuntime.Runtime.Debugger
 
         public string DumpContext()
         {
-            StringBuilder sb = new StringBuilder();
+            /*StringBuilder sb = new StringBuilder();
             if (Exception != null)
                 sb.AppendLine(Exception.Message);
             StackFrame[] frames = Interpreter.Stack.Frames.ToArray();
@@ -30,7 +30,8 @@ namespace ILRuntime.Runtime.Debugger
             sb.AppendLine(DebugService.Instance.GetLocalVariableInfo(Interpreter));
 
             sb.Append(DebugService.Instance.GetStackTrance(Interpreter));
-            return sb.ToString();
+            return sb.ToString();*/
+            return null;
         }
 
         string GetStackObjectValue(StackObject val, List<object> mStack)

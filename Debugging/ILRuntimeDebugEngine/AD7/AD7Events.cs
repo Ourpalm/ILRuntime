@@ -8,6 +8,93 @@ using System.Runtime.InteropServices;
 
 namespace ILRuntimeDebugEngine.AD7
 {
+    internal sealed class AD7BreakpointErrorEvent : AD7AsynchronousEvent, IDebugBreakpointErrorEvent2
+    {
+        public const string IID = "ABB0CA42-F82B-4622-84E4-6903AE90F210";
+
+        private AD7ErrorBreakpoint _errorBreakpoint;
+
+        public AD7BreakpointErrorEvent(AD7ErrorBreakpoint errorBreakpoint = null)
+        {
+            _errorBreakpoint = errorBreakpoint;
+        }
+
+        #region IDebugBreakpointBoundEvent2 Members        
+
+        public int GetErrorBreakpoint(out IDebugErrorBreakpoint2 ppErrorBP)
+        {
+            ppErrorBP = _errorBreakpoint;
+            return Constants.S_OK;
+        }
+
+        #endregion
+    }
+    internal sealed class AD7BreakpointBoundEvent : AD7AsynchronousEvent, IDebugBreakpointBoundEvent2
+    {
+        public const string IID = "1dddb704-cf99-4b8a-b746-dabb01dd13a0";
+
+        private AD7PendingBreakPoint _pendingBreakpoint;
+        private AD7BoundBreakpoint _boundBreakpoint;
+
+        //public AD7BreakpointBoundEvent(AD7PendingBreakpoint pendingBreakpoint, AD7BoundBreakpoint boundBreakpoint)
+        public AD7BreakpointBoundEvent(AD7PendingBreakPoint pendingBreakpoint, AD7BoundBreakpoint boundBreakpoint = null)
+        {
+            _pendingBreakpoint = pendingBreakpoint;
+            _boundBreakpoint = boundBreakpoint;
+        }
+
+        #region IDebugBreakpointBoundEvent2 Members
+
+        int IDebugBreakpointBoundEvent2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
+        {
+            //IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[1];
+            //boundBreakpoints[0] = _boundBreakpoint;
+            //ppEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
+            //return Constants.S_OK;
+
+            return _pendingBreakpoint.EnumBoundBreakpoints(out ppEnum);
+        }
+
+        int IDebugBreakpointBoundEvent2.GetPendingBreakpoint(out IDebugPendingBreakpoint2 ppPendingBP)
+        {
+            ppPendingBP = _pendingBreakpoint;
+            return Constants.S_OK;
+        }
+
+        #endregion
+    }
+
+    // This Event is sent when a breakpoint is hit in the debuggee
+    //BreakPointHitEvent
+    internal sealed class AD7BreakpointEvent : AD7StoppingEvent, IDebugBreakpointEvent2
+    {
+        public const string IID = "501C1E21-C557-48B8-BA30-A1EAB0BC4A74";
+
+        //AD7PendingBreakpoint
+        //private IEnumDebugBoundBreakpoints2 _boundBreakpoints;
+        private readonly AD7PendingBreakPoint _boundBreakpoints;
+
+        public AD7BreakpointEvent(AD7PendingBreakPoint boundBreakpoints)
+        {
+            _boundBreakpoints = boundBreakpoints;
+        }
+
+        #region IDebugBreakpointEvent2 Members
+
+        int IDebugBreakpointEvent2.EnumBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
+        {
+            ppEnum = null;
+            if (_boundBreakpoints == null)
+                return Constants.S_OK;
+            else
+                return _boundBreakpoints.EnumBoundBreakpoints(out ppEnum);
+
+            //ppEnum = _boundBreakpoints;
+            //return Constants.S_OK;
+        }
+
+        #endregion
+    }
     internal sealed class AD7EngineCreateEvent : AD7AsynchronousEvent, IDebugEngineCreateEvent2
     {
         public const string IID = "FE5B734C-759D-4E59-AB04-F103343BDD06";

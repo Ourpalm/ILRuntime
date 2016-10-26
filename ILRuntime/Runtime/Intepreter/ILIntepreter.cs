@@ -3062,12 +3062,13 @@ namespace ILRuntime.Runtime.Intepreter
                             }
                             if (eh != null)
                             {
+                                var debugger = AppDomain.DebugService;
                                 if (method.HasThis)
-                                    ex.Data["ThisInfo"] = Debugger.DebugService.Instance.GetThisInfo(this);
+                                    ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
                                 else
                                     ex.Data["ThisInfo"] = "";
-                                ex.Data["StackTrace"] = Debugger.DebugService.Instance.GetStackTrance(this);
-                                ex.Data["LocalInfo"] = Debugger.DebugService.Instance.GetLocalVariableInfo(this);
+                                ex.Data["StackTrace"] = debugger.GetStackTrance(this);
+                                ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
                                 esp = PushObject(esp, mStack, ex);
                                 ip = ptr + eh.HandlerStart;
                                 continue;
@@ -3076,7 +3077,7 @@ namespace ILRuntime.Runtime.Intepreter
                         unhandledException = true;
                         returned = true;
 #if DEBUG
-                        if (!Debugger.DebugService.Instance.Break(this, ex))
+                        if (!AppDomain.DebugService.Break(this, ex))
 #endif
                         {
                             throw new ILRuntimeException(ex.Message, this, method, ex);
