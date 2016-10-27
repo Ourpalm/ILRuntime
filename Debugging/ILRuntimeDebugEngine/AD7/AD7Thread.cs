@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Debugger.Interop;
 
+using ILRuntime.Runtime.Debugger;
+
 namespace ILRuntimeDebugEngine.AD7
 {
     class AD7Thread : IDebugThread2
@@ -12,6 +14,20 @@ namespace ILRuntimeDebugEngine.AD7
         private readonly AD7Engine _engine;
         private string _threadName = "ILRuntime Thread";
         int threadHash;
+        AD7StackFrame[] frames;
+
+        public StackFrameInfo[] StackFrames
+        {
+            set
+            {
+                frames = new AD7StackFrame[value.Length];
+                for(int i = 0; i < value.Length; i++)
+                {
+                    AD7StackFrame f = new AD7StackFrame(_engine, this, value[i]);
+                    frames[i] = f;
+                }
+            }
+        }
        
         public AD7Thread(AD7Engine engine, int threadHash)//ThreadMirror threadMirror)
         {
@@ -26,9 +42,12 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 ppEnum)
         {
-            //StackFrame[] stackFrames = ThreadMirror.GetFrames();
-            //ppEnum = new AD7FrameInfoEnum(stackFrames.Select(x => new AD7StackFrame(_engine, this, x).GetFrameInfo(dwFieldSpec)).ToArray());
-            ppEnum = null;
+            FRAMEINFO[] info = new FRAMEINFO[frames.Length];
+            for(int i = 0; i < info.Length; i++)
+            {
+                info[i] = frames[i].GetFrameInfo(dwFieldSpec);
+            }
+            ppEnum = new AD7FrameInfoEnum(info);
             return Constants.S_OK;
         }
 

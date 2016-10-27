@@ -16,6 +16,7 @@ namespace ILRuntimeDebugEngine.AD7
         AD7Engine engine;
         Dictionary<int, AD7PendingBreakPoint> breakpoints = new Dictionary<int, AD7PendingBreakPoint>();
         Dictionary<int, AD7Thread> threads = new Dictionary<int, AD7Thread>();
+        public Dictionary<int, AD7Thread> Threads { get { return threads; } }
 
         public Action OnDisconnected { get; set; }
 
@@ -112,6 +113,23 @@ namespace ILRuntimeDebugEngine.AD7
                                 SCBreakpointHit msg = new SCBreakpointHit();
                                 msg.BreakpointHashCode = br.ReadInt32();
                                 msg.ThreadHashCode = br.ReadInt32();
+                                int len = br.ReadInt32();
+                                msg.StackFrame = new StackFrameInfo[len + 1];
+                                for(int i = 0; i < len; i++)
+                                {
+                                    StackFrameInfo info = new StackFrameInfo();
+                                    info.MethodName = br.ReadString();
+                                    info.DocumentName = br.ReadString();
+                                    info.StartLine = br.ReadInt32();
+                                    info.StartColumn = br.ReadInt32();
+                                    info.EndLine = br.ReadInt32();
+                                    info.EndColumn = br.ReadInt32();
+                                    msg.StackFrame[i] = info;
+                                }
+                                msg.StackFrame[len] = new StackFrameInfo()
+                                {
+                                    MethodName = "Transition to Native methods"
+                                };
                                 OnReceiveSCBreakpointHit(msg);
                             }
                             break;
@@ -182,7 +200,16 @@ namespace ILRuntimeDebugEngine.AD7
 
         void OnReceiveSCBreakpointHit(SCBreakpointHit msg)
         {
-
+            AD7PendingBreakPoint bp;
+            AD7Thread t;
+            if(breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
+            {
+                if(threads.TryGetValue(msg.ThreadHashCode, out t))
+                {
+                    t.StackFrames = msg.StackFrame;
+                    engine.Callback.BreakpointHit(bp, t);
+                }
+            }
         }
 
         void OnReceiveSCThreadStarted(SCThreadStarted msg)

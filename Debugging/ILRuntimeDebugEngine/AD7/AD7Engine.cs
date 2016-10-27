@@ -59,17 +59,22 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int EnumCodePaths(string pszHint, IDebugCodeContext2 pStart, IDebugStackFrame2 pFrame, int fSource, out IEnumCodePaths2 ppEnum, out IDebugCodeContext2 ppSafety)
         {
-            throw new NotImplementedException();
+            ppEnum = null;
+            ppSafety = null;
+            return Constants.E_NOTIMPL;
         }
 
         public int EnumModules(out IEnumDebugModules2 ppEnum)
         {
-            throw new NotImplementedException();
+            ppEnum = null;
+            return Constants.E_NOTIMPL;
         }
 
         public int EnumThreads(out IEnumDebugThreads2 ppEnum)
         {
-            throw new NotImplementedException();
+            var threads = debugged.Threads.Values.ToArray();
+            ppEnum = new AD7ThreadEnum(threads);
+            return Constants.S_OK;
         }
 
         public int Execute()

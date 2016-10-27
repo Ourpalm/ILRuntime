@@ -206,11 +206,21 @@ namespace ILRuntime.Runtime.Debugger
             DoSend(DebugMessageType.SCBindBreakpointResult);
         }
 
-        internal void SendSCBreakpointHit(int intpHash, int bpHash)
+        internal void SendSCBreakpointHit(int intpHash, int bpHash, StackFrameInfo[] info)
         {
             sendStream.Position = 0;
             bw.Write(bpHash);
             bw.Write(intpHash);
+            bw.Write(info.Length);
+            foreach(var i in info)
+            {
+                bw.Write(i.MethodName);
+                bw.Write(i.DocumentName);
+                bw.Write(i.StartLine);
+                bw.Write(i.StartColumn);
+                bw.Write(i.EndLine);
+                bw.Write(i.EndColumn);
+            }
             DoSend(DebugMessageType.SCBreakpointHit);
         }
 

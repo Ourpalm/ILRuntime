@@ -225,7 +225,34 @@ namespace ILRuntime.Runtime.Debugger
                             {
                                 if (i.StartLine == sp.StartLine)
                                 {
-                                    server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode);
+                                    StackFrame[] frames = intp.Stack.Frames.ToArray();
+                                    Mono.Cecil.Cil.Instruction ins = null;
+                                    ILMethod m;
+                                    StackFrameInfo[] frameInfos = new StackFrameInfo[frames.Length];
+                                    
+                                    for (int j = 0; j < frames.Length; j++)
+                                    {
+                                        StackFrameInfo info = new Debugger.StackFrameInfo();
+                                        var f = frames[j];
+                                        m = f.Method;
+                                        info.MethodName = m.ToString();
+                                        
+                                        if (f.Address != null)
+                                        {
+                                            ins = m.Definition.Body.Instructions[f.Address.Value];
+                                            var seq = FindSequencePoint(ins);
+                                            if (seq != null)
+                                            {
+                                                info.DocumentName = seq.Document.Url;
+                                                info.StartLine = seq.StartLine;
+                                                info.StartColumn = seq.StartColumn;
+                                                info.EndLine = seq.EndLine;
+                                                info.EndColumn = seq.EndColumn;
+                                            }
+                                        }
+                                        frameInfos[j] = info;
+                                    }
+                                    server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode, frameInfos);
                                     //Breakpoint hit
                                     evt.WaitOne();
                                 }

@@ -87,6 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AD7\AD7DocumentContext.cs" />
     <Compile Include="AD7\AD7ErrorBreakpoint.cs" />
     <Compile Include="AD7\AD7BoundBreakpoint.cs" />
     <Compile Include="AD7\AD7Engine.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="AD7\AD7Process.cs" />
     <Compile Include="AD7\AD7ProgramNode.cs" />
     <Compile Include="AD7\AD7ProgramProvider.cs" />
+    <Compile Include="AD7\AD7StackFrame.cs" />
     <Compile Include="AD7\AD7Thread.cs" />
     <Compile Include="AD7\Constants.cs" />
     <Compile Include="AD7\DebuggedProcess.cs" />

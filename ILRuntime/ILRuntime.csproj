@@ -65,6 +65,7 @@
     <Compile Include="Runtime\Debugger\Protocol\SCModuleLoaded.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCBindBreakpointResult.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCAttachResult.cs" />
+    <Compile Include="Runtime\Debugger\StackFrameInfo.cs" />
     <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
     <Compile Include="Runtime\Enviorment\ILContext.cs" />
     <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />
