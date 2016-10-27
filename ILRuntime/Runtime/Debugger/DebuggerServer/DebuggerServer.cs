@@ -218,7 +218,7 @@ namespace ILRuntime.Runtime.Debugger
             DoSend(DebugMessageType.SCBindBreakpointResult);
         }
 
-        internal void SendSCBreakpointHit(int intpHash, int bpHash, StackFrameInfo[] info)
+        internal void SendSCBreakpointHit(int intpHash, int bpHash, KeyValuePair<int, StackFrameInfo[]>[] info)
         {
             sendStream.Position = 0;
             bw.Write(bpHash);
@@ -226,12 +226,17 @@ namespace ILRuntime.Runtime.Debugger
             bw.Write(info.Length);
             foreach(var i in info)
             {
-                bw.Write(i.MethodName);
-                bw.Write(i.DocumentName);
-                bw.Write(i.StartLine);
-                bw.Write(i.StartColumn);
-                bw.Write(i.EndLine);
-                bw.Write(i.EndColumn);
+                bw.Write(i.Key);
+                bw.Write(i.Value.Length);
+                foreach (var j in i.Value)
+                {
+                    bw.Write(j.MethodName);
+                    bw.Write(j.DocumentName);
+                    bw.Write(j.StartLine);
+                    bw.Write(j.StartColumn);
+                    bw.Write(j.EndLine);
+                    bw.Write(j.EndColumn);
+                }
             }
             DoSend(DebugMessageType.SCBreakpointHit);
         }

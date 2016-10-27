@@ -17,6 +17,7 @@ namespace ILRuntime.Runtime.Enviorment
     public class AppDomain
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
+        Dictionary<int, ILIntepreter> intepreters = new Dictionary<int, ILIntepreter>();
         Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
@@ -94,6 +95,7 @@ namespace ILRuntime.Runtime.Enviorment
         internal Dictionary<System.Reflection.MethodInfo, Func<ILContext, object, object[], IType[], object>> RedirectMap { get { return redirectMap; } }
         internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
         public DebugService DebugService { get { return debugService; } }
+        internal Dictionary<int, ILIntepreter> Intepreters { get { return intepreters; } }
 
         public DelegateManager DelegateManager { get { return dMgr; } }
         public void LoadAssembly(System.IO.Stream stream)
@@ -571,7 +573,12 @@ namespace ILRuntime.Runtime.Enviorment
                     if (freeIntepreters.Count > 0)
                         inteptreter = freeIntepreters.Dequeue();
                     else
+                    {
                         inteptreter = new ILIntepreter(this);
+#if DEBUG
+                        intepreters[inteptreter.GetHashCode()] = inteptreter;
+#endif
+                    }
                 }
                 try
                 {

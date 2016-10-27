@@ -244,34 +244,17 @@ namespace ILRuntime.Runtime.Debugger
                             {
                                 if ((i.StartLine + 1) == sp.StartLine)
                                 {
-                                    StackFrame[] frames = intp.Stack.Frames.ToArray();
-                                    Mono.Cecil.Cil.Instruction ins = null;
-                                    ILMethod m;
-                                    StackFrameInfo[] frameInfos = new StackFrameInfo[frames.Length];
-                                    
-                                    for (int j = 0; j < frames.Length; j++)
+                                    KeyValuePair<int, StackFrameInfo[]>[] frames = new KeyValuePair<int, StackFrameInfo[]>[AppDomain.Intepreters.Count];
+                                    frames[0] = new KeyValuePair<int, StackFrameInfo[]>(intp.GetHashCode(), GetStackFrameInfo(intp));
+                                    int idx = 1;
+                                    foreach(var j in AppDomain.Intepreters)
                                     {
-                                        StackFrameInfo info = new Debugger.StackFrameInfo();
-                                        var f = frames[j];
-                                        m = f.Method;
-                                        info.MethodName = m.ToString();
-                                        
-                                        if (f.Address != null)
+                                        if(j.Value != intp)
                                         {
-                                            ins = m.Definition.Body.Instructions[f.Address.Value];
-                                            var seq = FindSequencePoint(ins);
-                                            if (seq != null)
-                                            {
-                                                info.DocumentName = seq.Document.Url;
-                                                info.StartLine = seq.StartLine - 1;
-                                                info.StartColumn = seq.StartColumn - 1;
-                                                info.EndLine = seq.EndLine - 1;
-                                                info.EndColumn = seq.EndColumn - 1;
-                                            }
+                                            frames[idx++] = new KeyValuePair<int, Debugger.StackFrameInfo[]>(j.Value.GetHashCode(), GetStackFrameInfo(j.Value));
                                         }
-                                        frameInfos[j] = info;
                                     }
-                                    server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode, frameInfos);
+                                    server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode, frames);
                                     //Breakpoint hit
                                     evt.WaitOne();
                                 }
@@ -280,6 +263,38 @@ namespace ILRuntime.Runtime.Debugger
                     }
                 }
             }
+        }
+
+        StackFrameInfo[] GetStackFrameInfo(ILIntepreter intp)
+        {
+            StackFrame[] frames = intp.Stack.Frames.ToArray();
+            Mono.Cecil.Cil.Instruction ins = null;
+            ILMethod m;
+            StackFrameInfo[] frameInfos = new StackFrameInfo[frames.Length];
+
+            for (int j = 0; j < frames.Length; j++)
+            {
+                StackFrameInfo info = new Debugger.StackFrameInfo();
+                var f = frames[j];
+                m = f.Method;
+                info.MethodName = m.ToString();
+
+                if (f.Address != null)
+                {
+                    ins = m.Definition.Body.Instructions[f.Address.Value];
+                    var seq = FindSequencePoint(ins);
+                    if (seq != null)
+                    {
+                        info.DocumentName = seq.Document.Url;
+                        info.StartLine = seq.StartLine - 1;
+                        info.StartColumn = seq.StartColumn - 1;
+                        info.EndLine = seq.EndLine - 1;
+                        info.EndColumn = seq.EndColumn - 1;
+                    }
+                }
+                frameInfos[j] = info;
+            }
+            return frameInfos;
         }
 
         internal void ThreadStarted(ILIntepreter intp)

@@ -9,6 +9,6 @@ namespace ILRuntime.Runtime.Debugger.Protocol
     {
         public int BreakpointHashCode { get; set; }
         public int ThreadHashCode { get; set; }
-        public StackFrameInfo[] StackFrame { get; set; }
+        public KeyValuePair<int, StackFrameInfo[]>[] StackFrame { get; set; }
     }
 }

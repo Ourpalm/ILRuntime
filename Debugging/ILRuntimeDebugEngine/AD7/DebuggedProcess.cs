@@ -114,22 +114,29 @@ namespace ILRuntimeDebugEngine.AD7
                                 msg.BreakpointHashCode = br.ReadInt32();
                                 msg.ThreadHashCode = br.ReadInt32();
                                 int len = br.ReadInt32();
-                                msg.StackFrame = new StackFrameInfo[len + 1];
-                                for(int i = 0; i < len; i++)
+                                msg.StackFrame = new KeyValuePair<int, StackFrameInfo[]>[len];
+                                for (int i = 0; i < len; i++)
                                 {
-                                    StackFrameInfo info = new StackFrameInfo();
-                                    info.MethodName = br.ReadString();
-                                    info.DocumentName = br.ReadString();
-                                    info.StartLine = br.ReadInt32();
-                                    info.StartColumn = br.ReadInt32();
-                                    info.EndLine = br.ReadInt32();
-                                    info.EndColumn = br.ReadInt32();
-                                    msg.StackFrame[i] = info;
+                                    int key = br.ReadInt32();
+                                    int cnt = br.ReadInt32();
+                                    StackFrameInfo[] arr = new StackFrameInfo[cnt + 1];
+                                    for (int j = 0; j < cnt; j++)
+                                    {
+                                        StackFrameInfo info = new StackFrameInfo();
+                                        info.MethodName = br.ReadString();
+                                        info.DocumentName = br.ReadString();
+                                        info.StartLine = br.ReadInt32();
+                                        info.StartColumn = br.ReadInt32();
+                                        info.EndLine = br.ReadInt32();
+                                        info.EndColumn = br.ReadInt32();
+                                        arr[j] = info;
+                                    }
+                                    arr[cnt] = new StackFrameInfo()
+                                    {
+                                        MethodName = "Transition to Native methods"
+                                    };
+                                    msg.StackFrame[i] = new KeyValuePair<int, StackFrameInfo[]>(key, arr);
                                 }
-                                msg.StackFrame[len] = new StackFrameInfo()
-                                {
-                                    MethodName = "Transition to Native methods"
-                                };
                                 OnReceiveSCBreakpointHit(msg);
                             }
                             break;
@@ -208,14 +215,20 @@ namespace ILRuntimeDebugEngine.AD7
         void OnReceiveSCBreakpointHit(SCBreakpointHit msg)
         {
             AD7PendingBreakPoint bp;
-            AD7Thread t;
+            AD7Thread t, bpThread = null;
             if(breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
             {
-                if(threads.TryGetValue(msg.ThreadHashCode, out t))
+                foreach(var i in msg.StackFrame)
                 {
-                    t.StackFrames = msg.StackFrame;
-                    engine.Callback.BreakpointHit(bp, t);
+                    if (threads.TryGetValue(i.Key, out t))
+                    {
+                        t.StackFrames = i.Value;
+                        if (i.Key == msg.ThreadHashCode)
+                            bpThread = t;
+                    }
                 }
+
+                engine.Callback.BreakpointHit(bp, bpThread);
             }
         }
 
@@ -232,6 +245,7 @@ namespace ILRuntimeDebugEngine.AD7
             if(threads.TryGetValue(msg.ThreadHashCode, out t))
             {
                 engine.Callback.ThreadEnded(t);
+                threads.Remove(msg.ThreadHashCode);
             }
         }
     }

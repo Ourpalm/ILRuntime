@@ -75,7 +75,7 @@ namespace ILRuntimeDebugEngine.AD7
         }
 
         public int GetThreadProperties(enum_THREADPROPERTY_FIELDS dwFields, THREADPROPERTIES[] ptp)
-        {
+        {   
             return Constants.S_OK;
         }
 
