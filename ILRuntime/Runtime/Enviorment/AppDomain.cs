@@ -545,6 +545,9 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 try
                 {
+#if DEBUG
+                    debugService.ThreadStarted(inteptreter);
+#endif
                     res = inteptreter.Run((ILMethod)m, p);
                 }
                 finally
@@ -554,6 +557,10 @@ namespace ILRuntime.Runtime.Enviorment
                         inteptreter.Stack.ManagedStack.Clear();
                         inteptreter.Stack.Frames.Clear();
                         freeIntepreters.Enqueue(inteptreter);
+#if DEBUG
+                        debugService.ThreadEnded(inteptreter);
+#endif
+
                     }
                 }
             }

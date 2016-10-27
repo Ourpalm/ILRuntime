@@ -7,6 +7,7 @@ using System.Reflection;
 using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Debugger;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Reflection;
 namespace ILRuntime.CLR.Method
@@ -29,6 +30,10 @@ namespace ILRuntime.CLR.Method
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
+
+        internal int StartLine { get; set; }
+
+        internal int EndLine { get; set; }
 
         public MethodInfo ReflectionMethodInfo
         {
@@ -100,6 +105,21 @@ namespace ILRuntime.CLR.Method
             if (type.IsDelegate && def.Name == "Invoke")
                 isDelegateInvoke = true;
             this.appdomain = domain;
+#if DEBUG
+            if (def.HasBody)
+            {
+                var sp = DebugService.FindSequencePoint(def.Body.Instructions[0]);
+                if(sp != null)
+                {
+                    StartLine = sp.StartLine;
+                    sp = DebugService.FindSequencePoint(def.Body.Instructions[def.Body.Instructions.Count - 1]);
+                    if (sp != null)
+                    {
+                        EndLine = sp.EndLine;
+                    }
+                }
+            }
+#endif
         }
 
         public IType FindGenericArgument(string name)

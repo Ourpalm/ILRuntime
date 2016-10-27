@@ -17,6 +17,7 @@ namespace ILRuntimeTest
     public partial class Form1 : Form
     {
         ILRuntime.Runtime.Enviorment.AppDomain app;
+        Assembly assembly;
         public Form1()
         {
             InitializeComponent();
@@ -38,6 +39,54 @@ namespace ILRuntimeTest
         }
 
         private void button1_Click(object sender, EventArgs e)
+        {
+            List<TestResultInfo> resList = new List<TestResultInfo>();
+            if (assembly != null)
+            {
+                //types
+                var types = assembly.GetTypes();
+                foreach (var type in types)
+                {
+                    if (type.IsGenericTypeDefinition)
+                        continue;
+                    //methods
+                    var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (var methodInfo in methods)
+                    {
+                        string fullName = string.Format("{0}.{1}", type.Namespace, type.Name);
+                        //Console.WriteLine("call the method:{0},return type {1},params count{2}", fullName + "." + methodInfo.Name, methodInfo.ReturnType, methodInfo.GetParameters().Length);
+                        //目前只支持无参数，无返回值测试
+                        if (methodInfo.GetParameters().Length == 0)
+                        {
+                            var testUnit = new StaticTestUnit();
+                            testUnit.Init(app, fullName, methodInfo.Name);
+                            testUnit.Run();
+                            resList.Add(testUnit.CheckResult());
+                        }
+                    }
+                }
+            }
+
+            listView1.Items.Clear();
+            StringBuilder sb = new StringBuilder();
+            foreach (var resInfo in resList)
+            {
+                sb.Append("Test:");
+                sb.AppendLine(resInfo.TestName);
+                sb.Append("TestResult:");
+                sb.AppendLine(resInfo.Result.ToString());
+                sb.AppendLine("Log:");
+                sb.AppendLine(resInfo.Message);
+                sb.AppendLine("=======================");
+                var item = new ListViewItem(resInfo.TestName);
+                item.SubItems.Add(resInfo.Result.ToString());
+                item.BackColor = resInfo.Result ? Color.Green : Color.Red;
+                listView1.Items.Add(item);
+            }
+            tbLog.Text = sb.ToString();
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
         {
             if (OD.ShowDialog() == DialogResult.OK)
             {
@@ -106,55 +155,10 @@ namespace ILRuntimeTest
                       });
                   });
                   */
-                   
-                    List<TestResultInfo> resList = new List<TestResultInfo>();
-                    Assembly assembly = Assembly.LoadFrom(OD.FileName);
-                    if (assembly != null)
-                    {
-                        //types
-                        var types = assembly.GetTypes();
-                        foreach (var type in types)
-                        {
-                            if (type.IsGenericTypeDefinition)
-                                continue;
-                            //methods
-                            var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                            foreach (var methodInfo in methods)
-                            {
-                                string fullName = string.Format("{0}.{1}", type.Namespace, type.Name);
-                                //Console.WriteLine("call the method:{0},return type {1},params count{2}", fullName + "." + methodInfo.Name, methodInfo.ReturnType, methodInfo.GetParameters().Length);
-                                //目前只支持无参数，无返回值测试
-                                if (methodInfo.GetParameters().Length == 0)
-                                {
-                                    var testUnit = new StaticTestUnit();
-                                    testUnit.Init(app, fullName, methodInfo.Name);
-                                    testUnit.Run();
-                                    resList.Add(testUnit.CheckResult());
-                                }
-                            }
-                        }
-                    }
 
-                    listView1.Items.Clear();
-                    StringBuilder sb = new StringBuilder();
-                    foreach (var resInfo in resList)
-                    {
-                        sb.Append("Test:");
-                        sb.AppendLine(resInfo.TestName);
-                        sb.Append("TestResult:");
-                        sb.AppendLine(resInfo.Result.ToString());
-                        sb.AppendLine("Log:");
-                        sb.AppendLine(resInfo.Message);
-                        sb.AppendLine("=======================");
-                        var item = new ListViewItem(resInfo.TestName);
-                        item.SubItems.Add(resInfo.Result.ToString());
-                        item.BackColor = resInfo.Result ? Color.Green : Color.Red;
-                        listView1.Items.Add(item);
-                    }
-                    tbLog.Text = sb.ToString();
+                    assembly = Assembly.LoadFrom(OD.FileName);
                 }
             }
-
         }
     }
 }

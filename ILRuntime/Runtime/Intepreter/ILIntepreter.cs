@@ -123,7 +123,9 @@ namespace ILRuntime.Runtime.Intepreter
                     try
                     {
 #if DEBUG
-                        frame.Address.Value = (int)(ip - ptr);
+                        var insOffset = (int)(ip - ptr);
+                        frame.Address.Value = insOffset;
+                        AppDomain.DebugService.CheckShouldBreak(method, insOffset);
 #endif
                         code = ip->Code;
                         switch (code)

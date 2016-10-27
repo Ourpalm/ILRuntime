@@ -8,6 +8,35 @@ using System.Runtime.InteropServices;
 
 namespace ILRuntimeDebugEngine.AD7
 {
+    // This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a thread is created in a program being debugged.
+    internal sealed class AD7ThreadCreateEvent : AD7AsynchronousEvent, IDebugThreadCreateEvent2
+    {
+        public const string IID = "2090CCFC-70C5-491D-A5E8-BAD2DD9EE3EA";
+    }
+
+    // This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a thread has exited.
+    internal sealed class AD7ThreadDestroyEvent : AD7AsynchronousEvent, IDebugThreadDestroyEvent2
+    {
+        public const string IID = "2C3B7532-A36F-4A6E-9072-49BE649B8541";
+
+        private readonly uint _exitCode;
+        public AD7ThreadDestroyEvent(uint exitCode)
+        {
+            _exitCode = exitCode;
+        }
+
+        #region IDebugThreadDestroyEvent2 Members
+
+        int IDebugThreadDestroyEvent2.GetExitCode(out uint exitCode)
+        {
+            exitCode = _exitCode;
+
+            return Constants.S_OK;
+        }
+
+        #endregion
+    }
+
     internal sealed class AD7BreakpointErrorEvent : AD7AsynchronousEvent, IDebugBreakpointErrorEvent2
     {
         public const string IID = "ABB0CA42-F82B-4622-84E4-6903AE90F210";

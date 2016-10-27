@@ -1,0 +1,85 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.Debugger.Interop;
+
+namespace ILRuntimeDebugEngine.AD7
+{
+    class AD7Thread : IDebugThread2
+    {
+        private readonly AD7Engine _engine;
+        private string _threadName = "Mono Thread";
+        int threadHash;
+       
+        public AD7Thread(AD7Engine engine, int threadHash)//ThreadMirror threadMirror)
+        {
+            _engine = engine;
+            this.threadHash = threadHash;
+        }
+
+        public int CanSetNextStatement(IDebugStackFrame2 pStackFrame, IDebugCodeContext2 pCodeContext)
+        {
+            return Constants.S_FALSE;
+        }
+
+        public int EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 ppEnum)
+        {
+            //StackFrame[] stackFrames = ThreadMirror.GetFrames();
+            //ppEnum = new AD7FrameInfoEnum(stackFrames.Select(x => new AD7StackFrame(_engine, this, x).GetFrameInfo(dwFieldSpec)).ToArray());
+            ppEnum = null;
+            return Constants.S_OK;
+        }
+
+        public int GetLogicalThread(IDebugStackFrame2 pStackFrame, out IDebugLogicalThread2 ppLogicalThread)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetName(out string pbstrName)
+        {
+            pbstrName = _threadName;
+            return Constants.S_OK;
+        }
+
+        public int GetProgram(out IDebugProgram2 ppProgram)
+        {
+            ppProgram = _engine;
+            return Constants.S_OK;
+        }
+
+        public int GetThreadId(out uint pdwThreadId)
+        {
+            pdwThreadId = (uint)threadHash;
+            return Constants.S_OK;
+        }
+
+        public int GetThreadProperties(enum_THREADPROPERTY_FIELDS dwFields, THREADPROPERTIES[] ptp)
+        {
+            return Constants.S_OK;
+        }
+
+        public int Resume(out uint pdwSuspendCount)
+        {
+            pdwSuspendCount = 0;
+            return Constants.E_NOTIMPL;
+        }
+
+        public int SetNextStatement(IDebugStackFrame2 pStackFrame, IDebugCodeContext2 pCodeContext)
+        {
+            return Constants.S_FALSE;
+        }
+
+        public int SetThreadName(string pszName)
+        {
+            return Constants.E_NOTIMPL;
+        }
+
+        public int Suspend(out uint pdwSuspendCount)
+        {
+            pdwSuspendCount = 0;
+            return Constants.E_NOTIMPL;
+        }
+    }
+}

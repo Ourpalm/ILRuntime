@@ -106,6 +106,13 @@ namespace ILRuntimeDebugEngine.AD7
                                 OnReceivSendSCBindBreakpointResult(msg);
                             }
                             break;
+                        case DebugMessageType.SCBreakpointHit:
+                            {
+                                SCBreakpointHit msg = new SCBreakpointHit();
+                                msg.BreakpointHashCode = br.ReadInt32();
+                                OnReceiveSCBreakpointHit(msg);
+                            }
+                            break;
                         case DebugMessageType.SCModuleLoaded:
                             {
                                 SCModuleLoaded msg = new SCModuleLoaded();
@@ -156,5 +163,12 @@ namespace ILRuntimeDebugEngine.AD7
                 }
             }
         }
+
+        void OnReceiveSCBreakpointHit(SCBreakpointHit msg)
+        {
+
+        }
+
+
     }
 }

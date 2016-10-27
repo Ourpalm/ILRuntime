@@ -95,7 +95,7 @@ namespace ILRuntimeDebugEngine.AD7
                 AD7AsynchronousEvent.Attributes);
         }
 
-        /*internal void BreakpointHit(AD7PendingBreakpoint breakpoint, AD7Thread thread)
+        internal void BreakpointHit(AD7PendingBreakPoint breakpoint, AD7Thread thread)
         {
             var iid = new Guid(AD7BreakpointEvent.IID);
             _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new AD7BreakpointEvent(breakpoint), ref iid,
@@ -104,12 +104,19 @@ namespace ILRuntimeDebugEngine.AD7
 
         internal void ThreadStarted(AD7Thread thread)
         {
-            var iid = new Guid(Microsoft.MIDebugEngine.AD7ThreadCreateEvent.IID);
-            _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new Microsoft.MIDebugEngine.AD7ThreadCreateEvent(), ref iid,
-                AD7StoppingEvent.Attributes);
+            var iid = new Guid(AD7ThreadCreateEvent.IID);
+            _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new AD7ThreadCreateEvent(), ref iid,
+                AD7AsynchronousEvent.Attributes);
         }
 
-        internal void StepCompleted(AD7Thread thread)
+        internal void ThreadEnded(AD7Thread thread)
+        {
+            var iid = new Guid(AD7ThreadDestroyEvent.IID);
+            _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new AD7ThreadDestroyEvent(0), ref iid,
+                AD7AsynchronousEvent.Attributes);
+        }
+
+        /*internal void StepCompleted(AD7Thread thread)
         {
             var iid = new Guid(Microsoft.MIDebugEngine.AD7StepCompleteEvent.IID);
             _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new Microsoft.MIDebugEngine.AD7StepCompleteEvent(), ref iid,

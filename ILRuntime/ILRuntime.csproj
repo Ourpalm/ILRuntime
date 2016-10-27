@@ -55,10 +55,12 @@
     <Compile Include="Reflection\ILRuntimeMethodInfo.cs" />
     <Compile Include="Reflection\ILRuntimeType.cs" />
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
+    <Compile Include="Runtime\Debugger\BreakpointInfo.cs" />
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
     <Compile Include="Runtime\Debugger\DebugSocket.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSBindBreakpoint.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\SCBreakpointHit.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCModuleLoaded.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCBindBreakpointResult.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCAttachResult.cs" />

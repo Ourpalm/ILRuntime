@@ -68,7 +68,7 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     ReceivePayload(e.Buffer, e.BytesTransferred);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Close();
                     return;

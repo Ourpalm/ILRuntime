@@ -154,10 +154,10 @@ namespace ILRuntimeDebugEngine.AD7
                         bindRequest.StartLine = StartLine;
                         bindRequest.EndLine = EndLine;
                     }
-
-                    _engine.DebuggedProcess.SendBindBreakpoint(bindRequest);
-                    return true;
                 }
+
+                _engine.DebuggedProcess.SendBindBreakpoint(bindRequest);
+                return true;
             }
             catch(Exception ex)
             {
@@ -181,6 +181,7 @@ namespace ILRuntimeDebugEngine.AD7
             if(result== BindBreakpointResults.OK)
             {
                 _boundBreakpoint = new AD7BoundBreakpoint(_engine, this);
+                _engine.Callback.BoundBreakpoint(this);
             }
             else
             {

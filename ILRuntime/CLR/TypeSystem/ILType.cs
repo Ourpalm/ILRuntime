@@ -263,6 +263,8 @@ namespace ILRuntime.CLR.TypeSystem
         }
         public List<IMethod> GetMethods()
         {
+            if (methods == null)
+                InitializeMethods();
             List<IMethod> res = new List<IMethod>();
             foreach (var i in methods)
             {
@@ -608,7 +610,7 @@ namespace ILRuntime.CLR.TypeSystem
         }
 
         static object[] param = new object[1];
-        internal ILTypeInstance Instantiate(bool callDefaultConstructor = true)
+        public ILTypeInstance Instantiate(bool callDefaultConstructor = true)
         {
             var res = new ILTypeInstance(this);
             if (callDefaultConstructor)

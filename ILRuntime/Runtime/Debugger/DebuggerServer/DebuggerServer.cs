@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Net.Sockets;
+using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Debugger.Protocol;
 
 namespace ILRuntime.Runtime.Debugger
@@ -20,6 +22,7 @@ namespace ILRuntime.Runtime.Debugger
         DebugSocket clientSocket;
         System.IO.MemoryStream sendStream = new System.IO.MemoryStream(64 * 1024);
         System.IO.BinaryWriter bw;
+        DebugService ds;
 
         /// <summary>
         /// 服务器监听的端口
@@ -30,8 +33,9 @@ namespace ILRuntime.Runtime.Debugger
 
         public bool IsAttached { get { return clientSocket != null && !clientSocket.Disconnected; } }
 
-        public DebuggerServer()
+        public DebuggerServer(DebugService ds)
         {
+            this.ds = ds;
             bw = new System.IO.BinaryWriter(sendStream);
         }
 
@@ -150,10 +154,47 @@ namespace ILRuntime.Runtime.Debugger
 
         void TryBindBreakpoint(CSBindBreakpoint msg)
         {
+            var domain = ds.AppDomain;
             SCBindBreakpointResult res = new Protocol.SCBindBreakpointResult();
             res.BreakpointHashCode = msg.BreakpointHashCode;
-            res.Result = BindBreakpointResults.TypeNotFound;
-
+            IType type;
+            if (domain.LoadedTypes.TryGetValue(msg.TypeName, out type))
+            {
+                if(type is ILType)
+                {
+                    ILType it = (ILType)type;
+                    ILMethod found = null;
+                    foreach(var i in it.GetMethods())
+                    {
+                        if(i.Name == msg.MethodName)
+                        {
+                            ILMethod ilm = (ILMethod)i;
+                            if (ilm.StartLine <= msg.StartLine && ilm.EndLine >= msg.StartLine)
+                            {
+                                found = ilm;
+                                break;
+                            }
+                        }
+                    }
+                    if(found != null)
+                    {
+                        ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine);
+                        res.Result = BindBreakpointResults.OK;
+                    }
+                    else
+                    {
+                        res.Result = BindBreakpointResults.CodeNotFound;
+                    }
+                }
+                else
+                {
+                    res.Result = BindBreakpointResults.TypeNotFound;
+                }
+            }
+            else
+            {
+                res.Result = BindBreakpointResults.TypeNotFound;
+            }
             SendSCBindBreakpointResult(res);
         }
 
@@ -163,6 +204,27 @@ namespace ILRuntime.Runtime.Debugger
             bw.Write(msg.BreakpointHashCode);
             bw.Write((byte)msg.Result);
             DoSend(DebugMessageType.SCBindBreakpointResult);
+        }
+
+        internal void SendSCBreakpointHit(int bpHash)
+        {
+            sendStream.Position = 0;
+            bw.Write(bpHash);
+            DoSend(DebugMessageType.SCBreakpointHit);
+        }
+
+        internal void SendSCThreadStarted(int threadHash)
+        {
+            sendStream.Position = 0;
+            bw.Write(threadHash);
+            DoSend(DebugMessageType.SCThreadStarted);
+        }
+
+        internal void SendSCThreadEnded(int threadHash)
+        {
+            sendStream.Position = 0;
+            bw.Write(threadHash);
+            DoSend(DebugMessageType.SCThreadEnded);
         }
 
         public void NotifyModuleLoaded(string modulename)
