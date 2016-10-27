@@ -129,6 +129,16 @@ namespace ILRuntimeDebugEngine.AD7
                                         info.StartColumn = br.ReadInt32();
                                         info.EndLine = br.ReadInt32();
                                         info.EndColumn = br.ReadInt32();
+                                        int vcnt = br.ReadInt32();
+                                        info.LocalVariables = new VariableInfo[vcnt];
+                                        for(int k = 0; k < vcnt; k++)
+                                        {
+                                            VariableInfo vinfo = new VariableInfo();
+                                            vinfo.Name = br.ReadString();
+                                            vinfo.Value = br.ReadString();
+                                            vinfo.Type = br.ReadString();
+                                            info.LocalVariables[k] = vinfo;
+                                        }
                                         arr[j] = info;
                                     }
                                     arr[cnt] = new StackFrameInfo()

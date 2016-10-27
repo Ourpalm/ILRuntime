@@ -13,5 +13,6 @@ namespace ILRuntime.Runtime.Debugger
         public int StartColumn { get; set; }
         public int EndLine { get; set; }
         public int EndColumn { get; set; }
+        public VariableInfo[] LocalVariables { get; set; }
     }
 }

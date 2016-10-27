@@ -236,6 +236,13 @@ namespace ILRuntime.Runtime.Debugger
                     bw.Write(j.StartColumn);
                     bw.Write(j.EndLine);
                     bw.Write(j.EndColumn);
+                    bw.Write(j.LocalVariables.Length);
+                    foreach(var k in j.LocalVariables)
+                    {
+                        bw.Write(k.Name);
+                        bw.Write(k.Value);
+                        bw.Write(k.Type);
+                    }
                 }
             }
             DoSend(DebugMessageType.SCBreakpointHit);

@@ -489,7 +489,10 @@ namespace ILRuntime.CLR.Method
 
             ILMethod m = new ILMethod(def, declaringType, appdomain);
             m.genericParameters = genericParameters;
-
+            if (m.def.ReturnType.IsGenericParameter)
+            {
+                m.ReturnType = m.FindGenericArgument(m.def.ReturnType.Name);
+            }
             return m;
         }
 

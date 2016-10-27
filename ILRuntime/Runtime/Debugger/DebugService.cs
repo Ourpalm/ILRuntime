@@ -18,6 +18,7 @@ namespace ILRuntime.Runtime.Debugger
         Dictionary<int, LinkedList<BreakpointInfo>> activeBreakpoints = new Dictionary<int, LinkedList<BreakpointInfo>>();
         Dictionary<int, BreakpointInfo> breakpointMapping = new Dictionary<int, BreakpointInfo>();
         AutoResetEvent evt = new AutoResetEvent(false);
+        bool noBreak = false;
         
         public Action<string> OnBreakPoint;
 
@@ -244,6 +245,7 @@ namespace ILRuntime.Runtime.Debugger
                             {
                                 if ((i.StartLine + 1) == sp.StartLine)
                                 {
+                                    noBreak = true;
                                     KeyValuePair<int, StackFrameInfo[]>[] frames = new KeyValuePair<int, StackFrameInfo[]>[AppDomain.Intepreters.Count];
                                     frames[0] = new KeyValuePair<int, StackFrameInfo[]>(intp.GetHashCode(), GetStackFrameInfo(intp));
                                     int idx = 1;
@@ -257,6 +259,7 @@ namespace ILRuntime.Runtime.Debugger
                                     server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode, frames);
                                     //Breakpoint hit
                                     evt.WaitOne();
+                                    noBreak = false;
                                 }
                             }
                         }
@@ -265,7 +268,7 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
-        StackFrameInfo[] GetStackFrameInfo(ILIntepreter intp)
+        unsafe StackFrameInfo[] GetStackFrameInfo(ILIntepreter intp)
         {
             StackFrame[] frames = intp.Stack.Frames.ToArray();
             Mono.Cecil.Cil.Instruction ins = null;
@@ -291,6 +294,23 @@ namespace ILRuntime.Runtime.Debugger
                         info.EndLine = seq.EndLine - 1;
                         info.EndColumn = seq.EndColumn - 1;
                     }
+                }
+                StackFrame topFrame = intp.Stack.Frames.Peek();
+                m = topFrame.Method;
+                info.LocalVariables = new VariableInfo[m.LocalVariableCount];
+                for (int i = 0; i < m.LocalVariableCount; i++)
+                {
+                    var lv = m.Definition.Body.Variables[i];
+                    var val = Add(topFrame.LocalVarPointer, i);
+                    var v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
+                    if (v == null)
+                        v = "null";
+                    string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
+                    VariableInfo vinfo = new Debugger.VariableInfo();
+                    vinfo.Name = name;
+                    vinfo.Value = v.ToString();
+                    vinfo.Type = lv.VariableType.Name;
+                    info.LocalVariables[i] = vinfo;
                 }
                 frameInfos[j] = info;
             }
