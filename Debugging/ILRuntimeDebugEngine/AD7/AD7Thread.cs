@@ -10,7 +10,7 @@ namespace ILRuntimeDebugEngine.AD7
     class AD7Thread : IDebugThread2
     {
         private readonly AD7Engine _engine;
-        private string _threadName = "Mono Thread";
+        private string _threadName = "ILRuntime Thread";
         int threadHash;
        
         public AD7Thread(AD7Engine engine, int threadHash)//ThreadMirror threadMirror)

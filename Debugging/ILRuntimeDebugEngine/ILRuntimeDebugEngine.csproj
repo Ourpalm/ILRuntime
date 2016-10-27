@@ -99,6 +99,7 @@
     <Compile Include="AD7\AD7Process.cs" />
     <Compile Include="AD7\AD7ProgramNode.cs" />
     <Compile Include="AD7\AD7ProgramProvider.cs" />
+    <Compile Include="AD7\AD7Thread.cs" />
     <Compile Include="AD7\Constants.cs" />
     <Compile Include="AD7\DebuggedProcess.cs" />
     <Compile Include="AD7\EngineCallback.cs" />

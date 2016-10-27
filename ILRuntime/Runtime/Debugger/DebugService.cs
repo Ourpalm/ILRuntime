@@ -208,7 +208,7 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
-        internal void CheckShouldBreak(ILMethod method, int ip)
+        internal void CheckShouldBreak(ILMethod method, ILIntepreter intp, int ip)
         {
             if (server != null && server.IsAttached)
             {
@@ -221,11 +221,11 @@ namespace ILRuntime.Runtime.Debugger
                         var sp = FindSequencePoint(method.Definition.Body.Instructions[ip]);
                         if (sp != null)
                         {
-                            foreach(var i in lst)
+                            foreach (var i in lst)
                             {
-                                if(i.StartLine == sp.StartLine)
+                                if (i.StartLine == sp.StartLine)
                                 {
-                                    server.SendSCBreakpointHit(i.BreakpointHashCode);
+                                    server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode);
                                     //Breakpoint hit
                                     evt.WaitOne();
                                 }

@@ -125,7 +125,7 @@ namespace ILRuntime.Runtime.Intepreter
 #if DEBUG
                         var insOffset = (int)(ip - ptr);
                         frame.Address.Value = insOffset;
-                        AppDomain.DebugService.CheckShouldBreak(method, insOffset);
+                        AppDomain.DebugService.CheckShouldBreak(method, this, insOffset);
 #endif
                         code = ip->Code;
                         switch (code)

@@ -60,6 +60,7 @@
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
     <Compile Include="Runtime\Debugger\DebugSocket.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSBindBreakpoint.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\SCThreadStarted.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCBreakpointHit.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCModuleLoaded.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCBindBreakpointResult.cs" />

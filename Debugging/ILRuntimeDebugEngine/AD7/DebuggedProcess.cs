@@ -15,6 +15,7 @@ namespace ILRuntimeDebugEngine.AD7
         DebugSocket socket;
         AD7Engine engine;
         Dictionary<int, AD7PendingBreakPoint> breakpoints = new Dictionary<int, AD7PendingBreakPoint>();
+        Dictionary<int, AD7Thread> threads = new Dictionary<int, AD7Thread>();
 
         public Action OnDisconnected { get; set; }
 
@@ -110,7 +111,22 @@ namespace ILRuntimeDebugEngine.AD7
                             {
                                 SCBreakpointHit msg = new SCBreakpointHit();
                                 msg.BreakpointHashCode = br.ReadInt32();
+                                msg.ThreadHashCode = br.ReadInt32();
                                 OnReceiveSCBreakpointHit(msg);
+                            }
+                            break;
+                        case DebugMessageType.SCThreadStarted:
+                            {
+                                SCThreadStarted msg = new SCThreadStarted();
+                                msg.ThreadHashCode = br.ReadInt32();
+                                OnReceiveSCThreadStarted(msg);
+                            }
+                            break;
+                        case DebugMessageType.SCThreadEnded:
+                            {
+                                SCThreadEnded msg = new SCThreadEnded();
+                                msg.ThreadHashCode = br.ReadInt32();
+                                OnReceiveSCThreadEnded(msg);
                             }
                             break;
                         case DebugMessageType.SCModuleLoaded:
@@ -169,6 +185,20 @@ namespace ILRuntimeDebugEngine.AD7
 
         }
 
+        void OnReceiveSCThreadStarted(SCThreadStarted msg)
+        {
+            AD7Thread t = new AD7Thread(engine, msg.ThreadHashCode);
+            threads[msg.ThreadHashCode] = t;
+            engine.Callback.ThreadStarted(t);
+        }
 
+        void OnReceiveSCThreadEnded(SCThreadEnded msg)
+        {
+            AD7Thread t;
+            if(threads.TryGetValue(msg.ThreadHashCode, out t))
+            {
+                engine.Callback.ThreadEnded(t);
+            }
+        }
     }
 }
