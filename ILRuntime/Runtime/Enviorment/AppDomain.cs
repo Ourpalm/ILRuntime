@@ -516,6 +516,13 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
+        /// <summary>
+        /// Invoke a method
+        /// </summary>
+        /// <param name="type">Type's fullname</param>
+        /// <param name="method">Method name</param>
+        /// <param name="p">Parameters</param>
+        /// <returns></returns>
         public object Invoke(string type, string method, params object[] p)
         {
             IType t = GetType(type);
@@ -525,6 +532,29 @@ namespace ILRuntime.Runtime.Enviorment
 
             if(m != null)
             {
+                return Invoke(m, p);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Invoke a generic method
+        /// </summary>
+        /// <param name="type">Type's fullname</param>
+        /// <param name="method">Method name</param>
+        /// <param name="genericArguments">Generic Arguments</param>
+        /// <param name="p">Parameters</param>
+        /// <returns></returns>
+        public object Invoke(string type, string method, IType[] genericArguments, params object[] p)
+        {
+            IType t = GetType(type);
+            if (t == null)
+                return null;
+            var m = t.GetMethod(method, p.Length);
+
+            if (m != null)
+            {
+                m = m.MakeGenericMethod(genericArguments);
                 return Invoke(m, p);
             }
             return null;
