@@ -14,6 +14,7 @@ namespace ILRuntimeDebugEngine.AD7
         public AD7Engine Engine { get; private set; }
         public AD7Thread Thread { get; private set; }
         public StackFrameInfo StackFrameInfo { get; private set; }
+        ILProperty[] localVars;
 
         private string _functionName;
 
@@ -27,7 +28,16 @@ namespace ILRuntimeDebugEngine.AD7
             this.StackFrameInfo = info;
 
             _functionName = info.MethodName;
-
+            if (info.LocalVariables != null)
+            {
+                localVars = new ILProperty[info.LocalVariables.Length];
+                for (int i = 0; i < localVars.Length; i++)
+                {
+                    localVars[i] = new ILProperty(info.LocalVariables[i]);
+                }
+            }
+            else
+                localVars = new ILProperty[0];
             docContext = new AD7DocumentContext(info);
 
         }
@@ -56,11 +66,14 @@ namespace ILRuntimeDebugEngine.AD7
         public int EnumProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout,
             out uint pcelt, out IEnumDebugPropertyInfo2 ppEnum)
         {
-            pcelt = 0;
-            ppEnum = null;
-            //ppEnum = new AD7PropertyInfoEnum(LocalVariables.Select(x => x.GetDebugPropertyInfo(dwFields)).ToArray());
-            //ppEnum.GetCount(out pcelt);
-            return Constants.E_NOTIMPL;
+            DEBUG_PROPERTY_INFO[] arr = new DEBUG_PROPERTY_INFO[localVars.Length];
+            for(int i = 0; i < localVars.Length; i++)
+            {
+                arr[i] = localVars[i].GetDebugPropertyInfo(dwFields);
+            }
+            ppEnum = new AD7PropertyInfoEnum(arr);
+            ppEnum.GetCount(out pcelt);
+            return Constants.S_OK;
         }
 
         public int GetCodeContext(out IDebugCodeContext2 ppCodeCxt)

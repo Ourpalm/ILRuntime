@@ -115,7 +115,6 @@ namespace ILRuntime.Runtime.Debugger
 
         void OnReceive(DebugMessageType type, byte[] buffer)
         {
-            Console.WriteLine("Received:" + type);
             if (clientSocket == null || clientSocket.Disconnected)
                 return;
             System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);

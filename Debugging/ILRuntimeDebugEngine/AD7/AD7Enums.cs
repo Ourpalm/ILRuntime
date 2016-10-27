@@ -85,6 +85,13 @@ namespace ILRuntimeDebugEngine.AD7
         }
     }
     #endregion Base Class
+    internal class AD7PropertyInfoEnum : AD7Enum<DEBUG_PROPERTY_INFO, IEnumDebugPropertyInfo2>, IEnumDebugPropertyInfo2
+    {
+        public AD7PropertyInfoEnum(DEBUG_PROPERTY_INFO[] data)
+            : base(data)
+        {
+        }
+    }
     class AD7ThreadEnum : AD7Enum<IDebugThread2, IEnumDebugThreads2>, IEnumDebugThreads2
     {
         public AD7ThreadEnum(IDebugThread2[] data)
