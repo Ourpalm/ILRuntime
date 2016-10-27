@@ -176,6 +176,13 @@ namespace ILRuntimeDebugEngine.AD7
             socket.Send(DebugMessageType.CSBindBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
+        public void SendDeleteBreakpoint(int bpHash)
+        {
+            sendStream.Position = 0;
+            bw.Write(bpHash);
+            socket.Send(DebugMessageType.CSDeleteBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
         void OnReceivSendSCBindBreakpointResult(SCBindBreakpointResult msg)
         {
             AD7PendingBreakPoint bp;

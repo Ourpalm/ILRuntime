@@ -80,7 +80,6 @@ namespace ILRuntime.Runtime.Debugger
                     if (clientSocket != null && clientSocket.Disconnected)
                     {
                         clientSocket = null;
-                        Console.WriteLine("Client Disconnected");
                     }
                     System.Threading.Thread.Sleep(1);
                 }
@@ -100,12 +99,18 @@ namespace ILRuntime.Runtime.Debugger
             sock.NoDelay = true;
             clientSocket = new DebugSocket(sock);           
             clientSocket.OnReciveMessage = OnReceive;
+            clientSocket.OnClose = OnClose;
             ClientConnected();
         }
 
         void ClientConnected()
         {
 
+        }
+
+        void OnClose()
+        {
+            ds.Detach();
         }
 
         void OnReceive(DebugMessageType type, byte[] buffer)
@@ -132,6 +137,13 @@ namespace ILRuntime.Runtime.Debugger
                         msg.StartLine = br.ReadInt32();
                         msg.EndLine = br.ReadInt32();
                         TryBindBreakpoint(msg);
+                    }
+                    break;
+                case DebugMessageType.CSDeleteBreakpoint:
+                    {
+                        CSDeleteBreakpoint msg = new Protocol.CSDeleteBreakpoint();
+                        msg.BreakpointHashCode = br.ReadInt32();
+                        ds.DeleteBreakpoint(msg.BreakpointHashCode);
                     }
                     break;
             }
@@ -169,7 +181,7 @@ namespace ILRuntime.Runtime.Debugger
                         if(i.Name == msg.MethodName)
                         {
                             ILMethod ilm = (ILMethod)i;
-                            if (ilm.StartLine <= msg.StartLine && ilm.EndLine >= msg.StartLine)
+                            if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
                             {
                                 found = ilm;
                                 break;

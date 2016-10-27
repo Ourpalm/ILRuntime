@@ -59,6 +59,7 @@
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
     <Compile Include="Runtime\Debugger\DebugSocket.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\CSDeleteBreakpoint.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSBindBreakpoint.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCThreadStarted.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCBreakpointHit.cs" />

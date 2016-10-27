@@ -23,6 +23,8 @@ namespace ILRuntime.Runtime.Debugger
 
         public Enviorment.AppDomain AppDomain { get { return domain; } }
 
+        public AutoResetEvent BlockEvent { get { return evt; } }
+
         public bool IsDebuggerAttached
         {
             get
@@ -208,6 +210,23 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
+        internal void DeleteBreakpoint(int bpHash)
+        {
+            lock (activeBreakpoints)
+            {
+                BreakpointInfo bpInfo;
+                if (breakpointMapping.TryGetValue(bpHash, out bpInfo))
+                {
+                    LinkedList<BreakpointInfo> lst;
+                    if(activeBreakpoints.TryGetValue(bpInfo.MethodHashCode, out lst))
+                    {
+                        lst.Remove(bpInfo);                        
+                    }
+                    breakpointMapping.Remove(bpHash);
+                }
+            }
+        }
+
         internal void CheckShouldBreak(ILMethod method, ILIntepreter intp, int ip)
         {
             if (server != null && server.IsAttached)
@@ -223,7 +242,7 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             foreach (var i in lst)
                             {
-                                if (i.StartLine == sp.StartLine)
+                                if ((i.StartLine + 1) == sp.StartLine)
                                 {
                                     StackFrame[] frames = intp.Stack.Frames.ToArray();
                                     Mono.Cecil.Cil.Instruction ins = null;
@@ -244,10 +263,10 @@ namespace ILRuntime.Runtime.Debugger
                                             if (seq != null)
                                             {
                                                 info.DocumentName = seq.Document.Url;
-                                                info.StartLine = seq.StartLine;
-                                                info.StartColumn = seq.StartColumn;
-                                                info.EndLine = seq.EndLine;
-                                                info.EndColumn = seq.EndColumn;
+                                                info.StartLine = seq.StartLine - 1;
+                                                info.StartColumn = seq.StartColumn - 1;
+                                                info.EndLine = seq.EndLine - 1;
+                                                info.EndColumn = seq.EndColumn - 1;
                                             }
                                         }
                                         frameInfos[j] = info;
@@ -277,6 +296,13 @@ namespace ILRuntime.Runtime.Debugger
             {
                 server.SendSCThreadEnded(intp.GetHashCode());
             }
+        }
+
+        internal void Detach()
+        {
+            activeBreakpoints.Clear();
+            breakpointMapping.Clear();
+            evt.Set();
         }
     }
 }

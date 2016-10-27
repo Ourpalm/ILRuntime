@@ -69,6 +69,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int Delete()
         {
+            _engine.DebuggedProcess.SendDeleteBreakpoint(GetHashCode());
             return Constants.S_OK;
         }
 
@@ -181,11 +182,13 @@ namespace ILRuntimeDebugEngine.AD7
             if(result== BindBreakpointResults.OK)
             {
                 _boundBreakpoint = new AD7BoundBreakpoint(_engine, this);
+                _errorBreakpoint = null;
                 _engine.Callback.BoundBreakpoint(this);
             }
             else
             {
                 _errorBreakpoint = new AD7ErrorBreakpoint(_engine, this);
+                _boundBreakpoint = null;
                 _engine.Callback.ErrorBreakpoint(_errorBreakpoint);
             }
         }

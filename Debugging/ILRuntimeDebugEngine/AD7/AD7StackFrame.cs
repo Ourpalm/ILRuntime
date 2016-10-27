@@ -128,14 +128,13 @@ namespace ILRuntimeDebugEngine.AD7
             var frameInfo = new FRAMEINFO();
             frameInfo.m_bstrFuncName = StackFrameInfo.MethodName;
             frameInfo.m_pFrame = this;
-            frameInfo.m_fHasDebugInfo = 1;
+            frameInfo.m_fHasDebugInfo = string.IsNullOrEmpty(StackFrameInfo.DocumentName) ? 0 : 1;
             frameInfo.m_fStaleCode = 0;
 
             frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FRAME;
             frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_STALECODE;
             frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO;
-            if (!string.IsNullOrEmpty(StackFrameInfo.DocumentName))
-                frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
+            frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             return frameInfo;
         }
     }
