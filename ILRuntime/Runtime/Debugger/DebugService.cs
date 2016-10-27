@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
+using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 
@@ -13,8 +15,25 @@ namespace ILRuntime.Runtime.Debugger
         BreakPointContext curBreakpoint;
         DebuggerServer server;
         Runtime.Enviorment.AppDomain domain;
+        Dictionary<int, LinkedList<BreakpointInfo>> activeBreakpoints = new Dictionary<int, LinkedList<BreakpointInfo>>();
+        Dictionary<int, BreakpointInfo> breakpointMapping = new Dictionary<int, BreakpointInfo>();
+        AutoResetEvent evt = new AutoResetEvent(false);
         
         public Action<string> OnBreakPoint;
+
+        public Enviorment.AppDomain AppDomain { get { return domain; } }
+
+        public bool IsDebuggerAttached
+        {
+            get
+            {
+#if DEBUG
+                return (server != null && server.IsAttached);
+#else
+                return false;
+#endif
+            }
+        }
 
         public DebugService(Runtime.Enviorment.AppDomain domain)
         {
@@ -28,7 +47,7 @@ namespace ILRuntime.Runtime.Debugger
         public void StartDebugService(int port)
         {
 #if DEBUG
-            server = new Debugger.DebuggerServer();
+            server = new Debugger.DebuggerServer(this);
             server.Port = port;
             server.Start();
 #endif
@@ -143,7 +162,7 @@ namespace ILRuntime.Runtime.Debugger
             return sb.ToString();
         }
 
-        Mono.Cecil.Cil.SequencePoint FindSequencePoint(Mono.Cecil.Cil.Instruction ins)
+        internal static Mono.Cecil.Cil.SequencePoint FindSequencePoint(Mono.Cecil.Cil.Instruction ins)
         {
             Mono.Cecil.Cil.Instruction cur = ins;
             while (cur.SequencePoint == null && cur.Previous != null)
@@ -164,8 +183,73 @@ namespace ILRuntime.Runtime.Debugger
 
         internal void NotifyModuleLoaded(string moduleName)
         {
-            if (server.IsAttached)
+            if (server != null && server.IsAttached)
                 server.NotifyModuleLoaded(moduleName);
+        }
+
+        internal void SetBreakPoint(int methodHash, int bpHash, int startLine)
+        {
+            lock (activeBreakpoints)
+            {
+                LinkedList<BreakpointInfo> lst;
+                if(!activeBreakpoints.TryGetValue(methodHash, out lst))
+                {
+                    lst = new LinkedList<Debugger.BreakpointInfo>();
+                    activeBreakpoints[methodHash] = lst;
+                }
+
+                BreakpointInfo bpInfo = new BreakpointInfo();
+                bpInfo.BreakpointHashCode = bpHash;
+                bpInfo.MethodHashCode = methodHash;
+                bpInfo.StartLine = startLine;
+
+                lst.AddLast(bpInfo);
+                breakpointMapping[bpHash] = bpInfo;
+            }
+        }
+
+        internal void CheckShouldBreak(ILMethod method, int ip)
+        {
+            if (server != null && server.IsAttached)
+            {
+                int methodHash = method.GetHashCode();
+                lock (activeBreakpoints)
+                {
+                    LinkedList<BreakpointInfo> lst;
+                    if (activeBreakpoints.TryGetValue(methodHash, out lst))
+                    {
+                        var sp = FindSequencePoint(method.Definition.Body.Instructions[ip]);
+                        if (sp != null)
+                        {
+                            foreach(var i in lst)
+                            {
+                                if(i.StartLine == sp.StartLine)
+                                {
+                                    server.SendSCBreakpointHit(i.BreakpointHashCode);
+                                    //Breakpoint hit
+                                    evt.WaitOne();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        internal void ThreadStarted(ILIntepreter intp)
+        {
+            if (server != null && server.IsAttached)
+            {
+                server.SendSCThreadStarted(intp.GetHashCode());
+            }
+        }
+
+        internal void ThreadEnded(ILIntepreter intp)
+        {
+            if (server != null && server.IsAttached)
+            {
+                server.SendSCThreadEnded(intp.GetHashCode());
+            }
         }
     }
 }
