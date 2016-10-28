@@ -7,6 +7,7 @@ using System.Threading;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Debugger
 {
@@ -309,7 +310,7 @@ namespace ILRuntime.Runtime.Debugger
                     object v = null;
                     string typeName = null;
                     var val = Add(arg, i);
-                    v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
+                    v =  StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
                     if (v == null)
                         v = "null";
                     if (argIdx >= 0)
@@ -317,6 +318,8 @@ namespace ILRuntime.Runtime.Debugger
                         var lv = m.Definition.Parameters[argIdx];
                         name = string.IsNullOrEmpty(lv.Name) ? "arg" + lv.Index : lv.Name;
                         typeName = lv.ParameterType.FullName;
+                        if (v != null)
+                            v = m.Parameters[argIdx].TypeForCLR.CheckCLRTypes(intp.AppDomain, v);
                     }
                     else
                     {
@@ -325,9 +328,12 @@ namespace ILRuntime.Runtime.Debugger
                     }
 
                     VariableInfo vinfo = new Debugger.VariableInfo();
+                    vinfo.Address = (long)val;
                     vinfo.Name = name;
                     vinfo.Value = v.ToString();
                     vinfo.TypeName = typeName;
+                    vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
+
                     info.LocalVariables[i] = vinfo;
                 }
                 for (int i = argumentCount; i < info.LocalVariables.Length; i++)
@@ -338,16 +344,37 @@ namespace ILRuntime.Runtime.Debugger
                     var v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
                     if (v == null)
                         v = "null";
+                    else
+                        v = intp.AppDomain.GetType(lv.VariableType, m.DeclearingType).TypeForCLR.CheckCLRTypes(intp.AppDomain, v);
                     string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
                     VariableInfo vinfo = new Debugger.VariableInfo();
+                    vinfo.Address = (long)val;
                     vinfo.Name = name;
                     vinfo.Value = v.ToString();
                     vinfo.TypeName = lv.VariableType.FullName;
+                    vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
                     info.LocalVariables[i] = vinfo;
                 }
                 frameInfos[j] = info;
             }
             return frameInfos;
+        }
+
+        unsafe bool GetValueExpandable(StackObject* esp, List<object> mStack)
+        {
+            if (esp->ObjectType < ObjectTypes.Object)
+                return false;
+            else
+            {
+                var obj = mStack[esp->Value];
+                if (obj is ILTypeInstance)
+                    return true;
+                else if (obj.GetType().IsPrimitive)
+                    return false;
+                else
+                    return true;
+
+            }
         }
 
         internal void ThreadStarted(ILIntepreter intp)

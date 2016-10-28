@@ -238,9 +238,13 @@ namespace ILRuntime.Runtime.Debugger
                     bw.Write(j.LocalVariables.Length);
                     foreach(var k in j.LocalVariables)
                     {
+                        bw.Write(k.Address);
+                        bw.Write((byte)k.Type);
+                        bw.Write(k.Offset);
                         bw.Write(k.Name);
                         bw.Write(k.Value);
                         bw.Write(k.TypeName);
+                        bw.Write(k.Expandable);
                     }
                 }
             }

@@ -15,6 +15,7 @@ namespace ILRuntimeDebugEngine.AD7
         public AD7Thread Thread { get; private set; }
         public StackFrameInfo StackFrameInfo { get; private set; }
         ILProperty[] localVars;
+        Dictionary<string, ILProperty> propertyMapping = new Dictionary<string, ILProperty>();
 
         private string _functionName;
 
@@ -34,6 +35,7 @@ namespace ILRuntimeDebugEngine.AD7
                 for (int i = 0; i < localVars.Length; i++)
                 {
                     localVars[i] = new ILProperty(info.LocalVariables[i]);
+                    propertyMapping[info.LocalVariables[i].Name] = localVars[i];
                 }
             }
             else
@@ -48,6 +50,12 @@ namespace ILRuntimeDebugEngine.AD7
             pbstrError = "";
             pichError = 0;
             ppExpr = null;
+            ILProperty prop;
+            if(propertyMapping.TryGetValue(pszCode, out prop))
+            {
+                ppExpr = new AD7Expression(prop);
+                return Constants.S_OK;
+            }
             /*string lookup = pszCode;
 
 

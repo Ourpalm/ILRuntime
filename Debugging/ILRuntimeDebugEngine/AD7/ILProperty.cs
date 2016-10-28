@@ -128,7 +128,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         private bool IsExpandable()
         {
-            return false;
+            return info.Expandable;
         }
     }
 }

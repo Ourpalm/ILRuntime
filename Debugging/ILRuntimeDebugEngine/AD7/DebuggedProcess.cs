@@ -134,9 +134,13 @@ namespace ILRuntimeDebugEngine.AD7
                                         for(int k = 0; k < vcnt; k++)
                                         {
                                             VariableInfo vinfo = new VariableInfo();
+                                            vinfo.Address = br.ReadInt64();
+                                            vinfo.Type = (VariableTypes)br.ReadByte();
+                                            vinfo.Offset = br.ReadInt32();
                                             vinfo.Name = br.ReadString();
                                             vinfo.Value = br.ReadString();
                                             vinfo.TypeName = br.ReadString();
+                                            vinfo.Expandable = br.ReadBoolean();
                                             info.LocalVariables[k] = vinfo;
                                         }
                                         arr[j] = info;
