@@ -17,5 +17,7 @@ namespace ILRuntime.Runtime.Debugger
         SCBreakpointHit,
         CSDeleteBreakpoint,
         CSExecute,
+        CSStep,
+        SCStepComplete,
     }
 }

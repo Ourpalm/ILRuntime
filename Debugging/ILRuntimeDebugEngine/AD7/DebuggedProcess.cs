@@ -113,45 +113,18 @@ namespace ILRuntimeDebugEngine.AD7
                                 SCBreakpointHit msg = new SCBreakpointHit();
                                 msg.BreakpointHashCode = br.ReadInt32();
                                 msg.ThreadHashCode = br.ReadInt32();
-                                int len = br.ReadInt32();
-                                msg.StackFrame = new KeyValuePair<int, StackFrameInfo[]>[len];
-                                for (int i = 0; i < len; i++)
-                                {
-                                    int key = br.ReadInt32();
-                                    int cnt = br.ReadInt32();
-                                    StackFrameInfo[] arr = new StackFrameInfo[cnt + 1];
-                                    for (int j = 0; j < cnt; j++)
-                                    {
-                                        StackFrameInfo info = new StackFrameInfo();
-                                        info.MethodName = br.ReadString();
-                                        info.DocumentName = br.ReadString();
-                                        info.StartLine = br.ReadInt32();
-                                        info.StartColumn = br.ReadInt32();
-                                        info.EndLine = br.ReadInt32();
-                                        info.EndColumn = br.ReadInt32();
-                                        int vcnt = br.ReadInt32();
-                                        info.LocalVariables = new VariableInfo[vcnt];
-                                        for(int k = 0; k < vcnt; k++)
-                                        {
-                                            VariableInfo vinfo = new VariableInfo();
-                                            vinfo.Address = br.ReadInt64();
-                                            vinfo.Type = (VariableTypes)br.ReadByte();
-                                            vinfo.Offset = br.ReadInt32();
-                                            vinfo.Name = br.ReadString();
-                                            vinfo.Value = br.ReadString();
-                                            vinfo.TypeName = br.ReadString();
-                                            vinfo.Expandable = br.ReadBoolean();
-                                            info.LocalVariables[k] = vinfo;
-                                        }
-                                        arr[j] = info;
-                                    }
-                                    arr[cnt] = new StackFrameInfo()
-                                    {
-                                        MethodName = "Transition to Native methods"
-                                    };
-                                    msg.StackFrame[i] = new KeyValuePair<int, StackFrameInfo[]>(key, arr);
-                                }
+                                msg.StackFrame = ReadStackFrames(br);
+                                
                                 OnReceiveSCBreakpointHit(msg);
+                            }
+                            break;
+
+                        case DebugMessageType.SCStepComplete:
+                            {
+                                SCStepComplete msg = new SCStepComplete();
+                                msg.ThreadHashCode = br.ReadInt32();
+                                msg.StackFrame = ReadStackFrames(br);
+                                OnReceiveSCStepComplete(msg);
                             }
                             break;
                         case DebugMessageType.SCThreadStarted:
@@ -181,6 +154,49 @@ namespace ILRuntimeDebugEngine.AD7
             }
         }
 
+        KeyValuePair<int, StackFrameInfo[]>[] ReadStackFrames(System.IO.BinaryReader br)
+        {
+            int len = br.ReadInt32();
+            KeyValuePair<int, StackFrameInfo[]>[] res = new KeyValuePair<int, StackFrameInfo[]>[len];
+            for (int i = 0; i < len; i++)
+            {
+                int key = br.ReadInt32();
+                int cnt = br.ReadInt32();
+                StackFrameInfo[] arr = new StackFrameInfo[cnt + 1];
+                for (int j = 0; j < cnt; j++)
+                {
+                    StackFrameInfo info = new StackFrameInfo();
+                    info.MethodName = br.ReadString();
+                    info.DocumentName = br.ReadString();
+                    info.StartLine = br.ReadInt32();
+                    info.StartColumn = br.ReadInt32();
+                    info.EndLine = br.ReadInt32();
+                    info.EndColumn = br.ReadInt32();
+                    int vcnt = br.ReadInt32();
+                    info.LocalVariables = new VariableInfo[vcnt];
+                    for (int k = 0; k < vcnt; k++)
+                    {
+                        VariableInfo vinfo = new VariableInfo();
+                        vinfo.Address = br.ReadInt64();
+                        vinfo.Type = (VariableTypes)br.ReadByte();
+                        vinfo.Offset = br.ReadInt32();
+                        vinfo.Name = br.ReadString();
+                        vinfo.Value = br.ReadString();
+                        vinfo.TypeName = br.ReadString();
+                        vinfo.Expandable = br.ReadBoolean();
+                        info.LocalVariables[k] = vinfo;
+                    }
+                    arr[j] = info;
+                }
+                arr[cnt] = new StackFrameInfo()
+                {
+                    MethodName = "Transition to Native methods"
+                };
+                res[i] = new KeyValuePair<int, StackFrameInfo[]>(key, arr);
+            }
+
+            return res;
+        }
         public void AddPendingBreakpoint(AD7PendingBreakPoint bp)
         {
             breakpoints[bp.GetHashCode()] = bp;
@@ -209,6 +225,14 @@ namespace ILRuntimeDebugEngine.AD7
             sendStream.Position = 0;
             bw.Write(threadHash);
             socket.Send(DebugMessageType.CSExecute, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        public void SendStep(int threadHash, StepTypes type)
+        {
+            sendStream.Position = 0;
+            bw.Write(threadHash);
+            bw.Write((byte)type);
+            socket.Send(DebugMessageType.CSStep, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
         void OnReceivSendSCBindBreakpointResult(SCBindBreakpointResult msg)
@@ -253,6 +277,23 @@ namespace ILRuntimeDebugEngine.AD7
             }
         }
 
+        void OnReceiveSCStepComplete(SCStepComplete msg)
+        {
+            AD7Thread t, bpThread = null;
+
+            foreach (var i in msg.StackFrame)
+            {
+                if (threads.TryGetValue(i.Key, out t))
+                {
+                    t.StackFrames = i.Value;
+                    if (i.Key == msg.ThreadHashCode)
+                        bpThread = t;
+                }
+            }
+            if (bpThread != null)
+                engine.Callback.StepCompleted(bpThread);
+
+        }
         void OnReceiveSCThreadStarted(SCThreadStarted msg)
         {
             AD7Thread t = new AD7Thread(engine, msg.ThreadHashCode);

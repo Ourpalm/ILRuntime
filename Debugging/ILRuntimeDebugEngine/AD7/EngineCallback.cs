@@ -116,14 +116,14 @@ namespace ILRuntimeDebugEngine.AD7
                 AD7AsynchronousEvent.Attributes);
         }
 
-        /*internal void StepCompleted(AD7Thread thread)
+        internal void StepCompleted(AD7Thread thread)
         {
-            var iid = new Guid(Microsoft.MIDebugEngine.AD7StepCompleteEvent.IID);
-            _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new Microsoft.MIDebugEngine.AD7StepCompleteEvent(), ref iid,
+            var iid = new Guid(AD7StepCompleteEvent.IID);
+            _eventCallback.Event(_engine, _engine.RemoteProcess, _engine, thread, new AD7StepCompleteEvent(), ref iid,
                 AD7StoppingEvent.Attributes);
         }
 
-        public void OnError(string message)
+        /*public void OnError(string message)
         {
             SendMessage(message, OutputMessage.Severity.Error, isAsync: true);
         }

@@ -8,6 +8,10 @@ using System.Runtime.InteropServices;
 
 namespace ILRuntimeDebugEngine.AD7
 {
+    internal sealed class AD7StepCompleteEvent : AD7StoppingEvent, IDebugStepCompleteEvent2
+    {
+        public const string IID = "0f7f24c1-74d9-4ea6-a3ea-7edb2d81441d";
+    }
     // This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a thread is created in a program being debugged.
     internal sealed class AD7ThreadCreateEvent : AD7AsynchronousEvent, IDebugThreadCreateEvent2
     {

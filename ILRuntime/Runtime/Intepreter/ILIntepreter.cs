@@ -9,6 +9,7 @@ using ILRuntime.Runtime.Stack;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter.OpCodes;
+using ILRuntime.Runtime.Debugger;
 using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Intepreter
@@ -22,6 +23,9 @@ namespace ILRuntime.Runtime.Intepreter
         public RuntimeStack Stack { get { return stack; } }
         public AutoResetEvent AutoResetEvent { get { return evt; } }
         public bool ShouldBreak { get; set; }
+        public StepTypes CurrentStepType { get; set; }
+        public StackObject* LastStepFrameBase { get; set; }
+        public int LastStepInstructionIndex { get; set; }
         public ILIntepreter(Enviorment.AppDomain domain)
         {
             this.domain = domain;
@@ -35,12 +39,22 @@ namespace ILRuntime.Runtime.Intepreter
 
         public void Break()
         {
+            //Clear old debug state
+            ClearDebugState();
             evt.WaitOne();
         }
 
         public void Resume()
         {
             evt.Set();
+        }
+
+        public void ClearDebugState()
+        {
+            ShouldBreak = false;
+            CurrentStepType = StepTypes.None;
+            LastStepFrameBase = (StackObject*)0;
+            LastStepInstructionIndex = 0;
         }
         public object Run(ILMethod method, object[] p)
         {

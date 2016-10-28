@@ -592,6 +592,21 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     lock (freeIntepreters)
                     {
+#if DEBUG
+                        if(inteptreter.CurrentStepType!= StepTypes.None)
+                        {
+                            //We should resume all other threads if we are currently doing stepping operation
+                            foreach(var i in intepreters)
+                            {
+                                if(i.Value != inteptreter)
+                                {
+                                    i.Value.ClearDebugState();
+                                    i.Value.Resume();
+                                }
+                            }
+                            inteptreter.ClearDebugState();
+                        }
+#endif
                         inteptreter.Stack.ManagedStack.Clear();
                         inteptreter.Stack.Frames.Clear();
                         freeIntepreters.Enqueue(inteptreter);

@@ -152,6 +152,14 @@ namespace ILRuntime.Runtime.Debugger
                         ds.ExecuteThread(msg.ThreadHashCode);
                     }
                     break;
+                case DebugMessageType.CSStep:
+                    {
+                        CSStep msg = new CSStep();
+                        msg.ThreadHashCode = br.ReadInt32();
+                        msg.StepType = (StepTypes)br.ReadByte();
+                        ds.StepThread(msg.ThreadHashCode, msg.StepType);
+                    }
+                    break;
             }
 
         }
@@ -229,8 +237,22 @@ namespace ILRuntime.Runtime.Debugger
             sendStream.Position = 0;
             bw.Write(bpHash);
             bw.Write(intpHash);
+            WriteStackFrames(info);
+            DoSend(DebugMessageType.SCBreakpointHit);
+        }
+
+        internal void SendSCStepComplete(int intpHash, KeyValuePair<int, StackFrameInfo[]>[] info)
+        {
+            sendStream.Position = 0;
+            bw.Write(intpHash);
+            WriteStackFrames(info);
+            DoSend(DebugMessageType.SCStepComplete);
+        }
+
+        void WriteStackFrames(KeyValuePair<int, StackFrameInfo[]>[] info)
+        {
             bw.Write(info.Length);
-            foreach(var i in info)
+            foreach (var i in info)
             {
                 bw.Write(i.Key);
                 bw.Write(i.Value.Length);
@@ -243,7 +265,7 @@ namespace ILRuntime.Runtime.Debugger
                     bw.Write(j.EndLine);
                     bw.Write(j.EndColumn);
                     bw.Write(j.LocalVariables.Length);
-                    foreach(var k in j.LocalVariables)
+                    foreach (var k in j.LocalVariables)
                     {
                         bw.Write(k.Address);
                         bw.Write((byte)k.Type);
@@ -255,7 +277,6 @@ namespace ILRuntime.Runtime.Debugger
                     }
                 }
             }
-            DoSend(DebugMessageType.SCBreakpointHit);
         }
 
         internal void SendSCThreadStarted(int threadHash)

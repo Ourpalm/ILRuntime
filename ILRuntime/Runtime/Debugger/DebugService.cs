@@ -235,13 +235,30 @@ namespace ILRuntime.Runtime.Debugger
                 foreach(var i in AppDomain.Intepreters)
                 {
                     //We should resume all threads on execute
-                    i.Value.ShouldBreak = false;
+                    i.Value.ClearDebugState();
                     i.Value.Resume();
                 }
             }
         }
 
-        internal void CheckShouldBreak(ILMethod method, ILIntepreter intp, int ip)
+        internal unsafe void StepThread(int threadHash, StepTypes type)
+        {
+            lock (AppDomain.FreeIntepreters)
+            {
+                ILIntepreter intp;
+                if(AppDomain.Intepreters.TryGetValue(threadHash, out intp))
+                {
+                    intp.ClearDebugState();
+                    intp.CurrentStepType = type;
+                    intp.LastStepFrameBase = intp.Stack.Frames.Count > 0 ? intp.Stack.Frames.Peek().BasePointer : (StackObject*)0;
+                    intp.LastStepInstructionIndex = intp.Stack.Frames.Count > 0 ? intp.Stack.Frames.Peek().Address.Value : 0;
+
+                    intp.Resume();
+                }
+            }
+        }
+
+        unsafe internal void CheckShouldBreak(ILMethod method, ILIntepreter intp, int ip)
         {
             if (server != null && server.IsAttached)
             {
@@ -249,6 +266,8 @@ namespace ILRuntime.Runtime.Debugger
                 lock (activeBreakpoints)
                 {
                     LinkedList<BreakpointInfo> lst;
+                    bool bpHit = false;
+
                     if (activeBreakpoints.TryGetValue(methodHash, out lst))
                     {
                         var sp = method.Definition.Body.Instructions[ip].SequencePoint;
@@ -258,26 +277,64 @@ namespace ILRuntime.Runtime.Debugger
                             {
                                 if ((i.StartLine + 1) == sp.StartLine)
                                 {
-                                    KeyValuePair<int, StackFrameInfo[]>[] frames = new KeyValuePair<int, StackFrameInfo[]>[AppDomain.Intepreters.Count];
-                                    frames[0] = new KeyValuePair<int, StackFrameInfo[]>(intp.GetHashCode(), GetStackFrameInfo(intp));
-                                    int idx = 1;
-                                    foreach(var j in AppDomain.Intepreters)
+                                    DoBreak(intp, i.BreakpointHashCode, false);
+                                    bpHit = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!bpHit)
+                    {
+                        var sp = method.Definition.Body.Instructions[ip].SequencePoint;
+                        if (sp != null)
+                        {
+                            switch (intp.CurrentStepType)
+                            {
+                                case StepTypes.Into:
+                                    DoBreak(intp, 0, true);
+                                    break;
+                                case StepTypes.Over:
+                                    if (intp.Stack.Frames.Peek().BasePointer == intp.LastStepFrameBase && ip != intp.LastStepInstructionIndex)
                                     {
-                                        if(j.Value != intp)
+                                        DoBreak(intp, 0, true);
+                                    }
+                                    break;
+                                case StepTypes.Out:
+                                    {
+                                        if (intp.Stack.Frames.Count > 0 && intp.Stack.Frames.Peek().BasePointer < intp.LastStepFrameBase)
                                         {
-                                            j.Value.ShouldBreak = true;
-                                            frames[idx++] = new KeyValuePair<int, Debugger.StackFrameInfo[]>(j.Value.GetHashCode(), GetStackFrameInfo(j.Value));
+                                            DoBreak(intp, 0, true);
                                         }
                                     }
-                                    server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode, frames);
-                                    //Breakpoint hit
-                                    intp.Break();
-                                }
+                                    break;
                             }
                         }
                     }
                 }
             }
+        }
+
+        void DoBreak(ILIntepreter intp, int bpHash, bool isStep)
+        {
+            KeyValuePair<int, StackFrameInfo[]>[] frames = new KeyValuePair<int, StackFrameInfo[]>[AppDomain.Intepreters.Count];
+            frames[0] = new KeyValuePair<int, StackFrameInfo[]>(intp.GetHashCode(), GetStackFrameInfo(intp));
+            int idx = 1;
+            foreach (var j in AppDomain.Intepreters)
+            {
+                if (j.Value != intp)
+                {
+                    j.Value.ShouldBreak = true;
+                    frames[idx++] = new KeyValuePair<int, Debugger.StackFrameInfo[]>(j.Value.GetHashCode(), GetStackFrameInfo(j.Value));
+                }
+            }
+            if (!isStep)
+                server.SendSCBreakpointHit(intp.GetHashCode(), bpHash, frames);
+            else
+                server.SendSCStepComplete(intp.GetHashCode(), frames);
+            //Breakpoint hit
+            intp.Break();
         }
 
         unsafe StackFrameInfo[] GetStackFrameInfo(ILIntepreter intp)
@@ -410,6 +467,7 @@ namespace ILRuntime.Runtime.Debugger
             breakpointMapping.Clear();
             foreach (var j in AppDomain.Intepreters)
             {
+                j.Value.ClearDebugState();
                 j.Value.Resume();
             }
         }

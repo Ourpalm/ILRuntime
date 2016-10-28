@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
 
+using ILRuntime.Runtime.Debugger;
+
 namespace ILRuntimeDebugEngine.AD7
 {
     [ComVisible(true)]
@@ -134,7 +136,23 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step)
         {
-            throw new NotImplementedException();
+            uint threadHash;
+            pThread.GetThreadId(out threadHash);
+            StepTypes type = StepTypes.None;
+            switch (sk)
+            {
+                case enum_STEPKIND.STEP_INTO:
+                    type = StepTypes.Into;
+                    break;
+                case enum_STEPKIND.STEP_OVER:
+                    type = StepTypes.Over;
+                    break;
+                case enum_STEPKIND.STEP_OUT:
+                    type = StepTypes.Out;
+                    break;
+            }
+            debugged.SendStep((int)threadHash, type);
+            return Constants.S_OK;
         }
 
         public int Terminate()

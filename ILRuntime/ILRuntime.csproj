@@ -59,14 +59,17 @@
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
     <Compile Include="Runtime\Debugger\DebugSocket.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\CSStep.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSExecute.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSDeleteBreakpoint.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSBindBreakpoint.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\SCStepComplete.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCThreadStarted.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCBreakpointHit.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCModuleLoaded.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCBindBreakpointResult.cs" />
     <Compile Include="Runtime\Debugger\Protocol\SCAttachResult.cs" />
+    <Compile Include="Runtime\Debugger\StepTypes.cs" />
     <Compile Include="Runtime\Debugger\VariableInfo.cs" />
     <Compile Include="Runtime\Debugger\StackFrameInfo.cs" />
     <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
