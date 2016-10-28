@@ -578,14 +578,12 @@ namespace ILRuntime.Runtime.Enviorment
                         inteptreter = new ILIntepreter(this);
 #if DEBUG
                         intepreters[inteptreter.GetHashCode()] = inteptreter;
+                        debugService.ThreadStarted(inteptreter);
 #endif
                     }
                 }
                 try
                 {
-#if DEBUG
-                    debugService.ThreadStarted(inteptreter);
-#endif
                     res = inteptreter.Run((ILMethod)m, p);
                 }
                 finally
@@ -611,7 +609,7 @@ namespace ILRuntime.Runtime.Enviorment
                         inteptreter.Stack.Frames.Clear();
                         freeIntepreters.Enqueue(inteptreter);
 #if DEBUG
-                        debugService.ThreadEnded(inteptreter);
+                        //debugService.ThreadEnded(inteptreter);
 #endif
 
                     }

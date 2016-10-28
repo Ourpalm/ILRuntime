@@ -77,10 +77,6 @@ namespace ILRuntime.Runtime.Debugger
                             CreateNewSession(listener);
                         }
                     }
-                    if (clientSocket != null && clientSocket.Disconnected)
-                    {
-                        clientSocket = null;
-                    }
                     System.Threading.Thread.Sleep(1);
                 }
                 catch (ThreadAbortException)
@@ -111,6 +107,7 @@ namespace ILRuntime.Runtime.Debugger
         void OnClose()
         {
             ds.Detach();
+            clientSocket = null;
         }
 
         void OnReceive(DebugMessageType type, byte[] buffer)
@@ -170,6 +167,13 @@ namespace ILRuntime.Runtime.Debugger
             bw.Write((byte)AttachResults.OK);
             bw.Write(Version);
             DoSend(DebugMessageType.SCAttachResult);
+            lock (ds.AppDomain.FreeIntepreters)
+            {
+                foreach (var i in ds.AppDomain.Intepreters)
+                {
+                    SendSCThreadStarted(i.Key);
+                }
+            }
         }
 
         void DoSend(DebugMessageType type)

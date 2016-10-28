@@ -261,9 +261,9 @@ namespace ILRuntimeDebugEngine.AD7
         {
             AD7PendingBreakPoint bp;
             AD7Thread t, bpThread = null;
-            if(breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
+            if (breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
             {
-                foreach(var i in msg.StackFrame)
+                foreach (var i in msg.StackFrame)
                 {
                     if (threads.TryGetValue(i.Key, out t))
                     {
@@ -272,8 +272,8 @@ namespace ILRuntimeDebugEngine.AD7
                             bpThread = t;
                     }
                 }
-
-                engine.Callback.BreakpointHit(bp, bpThread);
+                if (bpThread != null)
+                    engine.Callback.BreakpointHit(bp, bpThread);
             }
         }
 

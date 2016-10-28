@@ -42,12 +42,17 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 ppEnum)
         {
-            FRAMEINFO[] info = new FRAMEINFO[frames.Length];
-            for(int i = 0; i < info.Length; i++)
+            if (frames != null)
             {
-                info[i] = frames[i].GetFrameInfo(dwFieldSpec);
+                FRAMEINFO[] info = new FRAMEINFO[frames.Length];
+                for (int i = 0; i < info.Length; i++)
+                {
+                    info[i] = frames[i].GetFrameInfo(dwFieldSpec);
+                }
+                ppEnum = new AD7FrameInfoEnum(info);
             }
-            ppEnum = new AD7FrameInfoEnum(info);
+            else
+                ppEnum = null;
             return Constants.S_OK;
         }
 
