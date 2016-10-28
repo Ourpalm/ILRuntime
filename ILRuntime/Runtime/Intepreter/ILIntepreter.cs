@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Stack;
@@ -16,15 +17,31 @@ namespace ILRuntime.Runtime.Intepreter
     {
         Enviorment.AppDomain domain;
         RuntimeStack stack;
+        AutoResetEvent evt;
 
         public RuntimeStack Stack { get { return stack; } }
+        public AutoResetEvent AutoResetEvent { get { return evt; } }
+        public bool ShouldBreak { get; set; }
         public ILIntepreter(Enviorment.AppDomain domain)
         {
             this.domain = domain;
             stack = new RuntimeStack(this);
+#if DEBUG
+            evt = new AutoResetEvent(false);
+#endif
         }
 
         public Enviorment.AppDomain AppDomain { get { return domain; } }
+
+        public void Break()
+        {
+            evt.WaitOne();
+        }
+
+        public void Resume()
+        {
+            evt.Set();
+        }
         public object Run(ILMethod method, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
@@ -123,6 +140,8 @@ namespace ILRuntime.Runtime.Intepreter
                     try
                     {
 #if DEBUG
+                        if (ShouldBreak)
+                            Break();
                         var insOffset = (int)(ip - ptr);
                         frame.Address.Value = insOffset;
                         AppDomain.DebugService.CheckShouldBreak(method, this, insOffset);

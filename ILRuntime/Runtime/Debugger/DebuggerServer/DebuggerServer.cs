@@ -145,6 +145,13 @@ namespace ILRuntime.Runtime.Debugger
                         ds.DeleteBreakpoint(msg.BreakpointHashCode);
                     }
                     break;
+                case DebugMessageType.CSExecute:
+                    {
+                        CSExecute msg = new Protocol.CSExecute();
+                        msg.ThreadHashCode = br.ReadInt32();
+                        ds.ExecuteThread(msg.ThreadHashCode);
+                    }
+                    break;
             }
 
         }

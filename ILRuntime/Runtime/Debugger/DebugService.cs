@@ -19,7 +19,6 @@ namespace ILRuntime.Runtime.Debugger
         Dictionary<int, LinkedList<BreakpointInfo>> activeBreakpoints = new Dictionary<int, LinkedList<BreakpointInfo>>();
         Dictionary<int, BreakpointInfo> breakpointMapping = new Dictionary<int, BreakpointInfo>();
         AutoResetEvent evt = new AutoResetEvent(false);
-        bool noBreak = false;
         
         public Action<string> OnBreakPoint;
 
@@ -229,6 +228,19 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
+        internal void ExecuteThread(int threadHash)
+        {
+            lock (AppDomain.FreeIntepreters)
+            {
+                foreach(var i in AppDomain.Intepreters)
+                {
+                    //We should resume all threads on execute
+                    i.Value.ShouldBreak = false;
+                    i.Value.Resume();
+                }
+            }
+        }
+
         internal void CheckShouldBreak(ILMethod method, ILIntepreter intp, int ip)
         {
             if (server != null && server.IsAttached)
@@ -239,14 +251,13 @@ namespace ILRuntime.Runtime.Debugger
                     LinkedList<BreakpointInfo> lst;
                     if (activeBreakpoints.TryGetValue(methodHash, out lst))
                     {
-                        var sp = FindSequencePoint(method.Definition.Body.Instructions[ip]);
+                        var sp = method.Definition.Body.Instructions[ip].SequencePoint;
                         if (sp != null)
                         {
                             foreach (var i in lst)
                             {
                                 if ((i.StartLine + 1) == sp.StartLine)
                                 {
-                                    noBreak = true;
                                     KeyValuePair<int, StackFrameInfo[]>[] frames = new KeyValuePair<int, StackFrameInfo[]>[AppDomain.Intepreters.Count];
                                     frames[0] = new KeyValuePair<int, StackFrameInfo[]>(intp.GetHashCode(), GetStackFrameInfo(intp));
                                     int idx = 1;
@@ -254,13 +265,13 @@ namespace ILRuntime.Runtime.Debugger
                                     {
                                         if(j.Value != intp)
                                         {
+                                            j.Value.ShouldBreak = true;
                                             frames[idx++] = new KeyValuePair<int, Debugger.StackFrameInfo[]>(j.Value.GetHashCode(), GetStackFrameInfo(j.Value));
                                         }
                                     }
                                     server.SendSCBreakpointHit(intp.GetHashCode(), i.BreakpointHashCode, frames);
                                     //Breakpoint hit
-                                    evt.WaitOne();
-                                    noBreak = false;
+                                    intp.Break();
                                 }
                             }
                         }
@@ -397,7 +408,10 @@ namespace ILRuntime.Runtime.Debugger
         {
             activeBreakpoints.Clear();
             breakpointMapping.Clear();
-            evt.Set();
+            foreach (var j in AppDomain.Intepreters)
+            {
+                j.Value.Resume();
+            }
         }
     }
 }

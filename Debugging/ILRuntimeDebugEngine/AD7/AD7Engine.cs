@@ -84,7 +84,10 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int ExecuteOnThread(IDebugThread2 pThread)
         {
-            throw new NotImplementedException();
+            uint threadHash;
+            pThread.GetThreadId(out threadHash);
+            debugged.SendExecute((int)threadHash);
+            return Constants.S_OK;
         }
 
         public int GetDebugProperty(out IDebugProperty2 ppProperty)

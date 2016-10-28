@@ -96,6 +96,7 @@ namespace ILRuntime.Runtime.Enviorment
         internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
         public DebugService DebugService { get { return debugService; } }
         internal Dictionary<int, ILIntepreter> Intepreters { get { return intepreters; } }
+        internal Queue<ILIntepreter> FreeIntepreters { get { return freeIntepreters; } }
 
         public DelegateManager DelegateManager { get { return dMgr; } }
         public void LoadAssembly(System.IO.Stream stream)
