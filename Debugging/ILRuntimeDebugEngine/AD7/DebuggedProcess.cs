@@ -136,7 +136,7 @@ namespace ILRuntimeDebugEngine.AD7
                                             VariableInfo vinfo = new VariableInfo();
                                             vinfo.Name = br.ReadString();
                                             vinfo.Value = br.ReadString();
-                                            vinfo.Type = br.ReadString();
+                                            vinfo.TypeName = br.ReadString();
                                             info.LocalVariables[k] = vinfo;
                                         }
                                         arr[j] = info;

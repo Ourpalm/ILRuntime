@@ -95,7 +95,7 @@ namespace ILRuntimeDebugEngine.AD7
 
             if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE) != 0)
             {
-                propertyInfo.bstrType = info.Type;
+                propertyInfo.bstrType = info.TypeName;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE;
             }
 

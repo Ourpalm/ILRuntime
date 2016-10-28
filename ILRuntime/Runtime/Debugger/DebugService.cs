@@ -295,13 +295,46 @@ namespace ILRuntime.Runtime.Debugger
                         info.EndColumn = seq.EndColumn - 1;
                     }
                 }
-                StackFrame topFrame = intp.Stack.Frames.Peek();
+                StackFrame topFrame = f;
                 m = topFrame.Method;
-                info.LocalVariables = new VariableInfo[m.LocalVariableCount];
-                for (int i = 0; i < m.LocalVariableCount; i++)
+                int argumentCount = m.ParameterCount;
+                if (m.HasThis)
+                    argumentCount++;
+                info.LocalVariables = new VariableInfo[argumentCount + m.LocalVariableCount];
+                for(int i = 0; i < argumentCount; i++)
                 {
-                    var lv = m.Definition.Body.Variables[i];
-                    var val = Add(topFrame.LocalVarPointer, i);
+                    int argIdx = m.HasThis ? i - 1 : i;
+                    var arg = Minus(topFrame.LocalVarPointer, argumentCount);
+                    string name = null;
+                    object v = null;
+                    string typeName = null;
+                    var val = Add(arg, i);
+                    v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
+                    if (v == null)
+                        v = "null";
+                    if (argIdx >= 0)
+                    {
+                        var lv = m.Definition.Parameters[argIdx];
+                        name = string.IsNullOrEmpty(lv.Name) ? "arg" + lv.Index : lv.Name;
+                        typeName = lv.ParameterType.FullName;
+                    }
+                    else
+                    {
+                        name = "this";
+                        typeName = m.DeclearingType.FullName;
+                    }
+
+                    VariableInfo vinfo = new Debugger.VariableInfo();
+                    vinfo.Name = name;
+                    vinfo.Value = v.ToString();
+                    vinfo.TypeName = typeName;
+                    info.LocalVariables[i] = vinfo;
+                }
+                for (int i = argumentCount; i < info.LocalVariables.Length; i++)
+                {
+                    var locIdx = i - argumentCount;
+                    var lv = m.Definition.Body.Variables[locIdx];
+                    var val = Add(topFrame.LocalVarPointer, locIdx);
                     var v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
                     if (v == null)
                         v = "null";
@@ -309,7 +342,7 @@ namespace ILRuntime.Runtime.Debugger
                     VariableInfo vinfo = new Debugger.VariableInfo();
                     vinfo.Name = name;
                     vinfo.Value = v.ToString();
-                    vinfo.Type = lv.VariableType.Name;
+                    vinfo.TypeName = lv.VariableType.FullName;
                     info.LocalVariables[i] = vinfo;
                 }
                 frameInfos[j] = info;

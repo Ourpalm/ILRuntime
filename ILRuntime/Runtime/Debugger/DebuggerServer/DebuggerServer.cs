@@ -240,7 +240,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         bw.Write(k.Name);
                         bw.Write(k.Value);
-                        bw.Write(k.Type);
+                        bw.Write(k.TypeName);
                     }
                 }
             }
