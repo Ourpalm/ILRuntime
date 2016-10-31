@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AutoGenerate\helper.cs" />
     <Compile Include="AutoGenerate\TestClass2Adaptor.cs" />
+    <Compile Include="AutoGenerate\TestClass3Adaptor.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -59,6 +60,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="TestBase\BaseTestUnit.cs" />
+    <Compile Include="TestBase\InstanceTestUnit.cs" />
     <Compile Include="TestBase\ITestable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="TestFramework\DelegateTest.cs" />
     <Compile Include="TestFramework\NeedAdaptorAttribute.cs" />
     <Compile Include="TestFramework\TestClass2.cs" />
+    <Compile Include="TestFramework\TestClass3.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
