@@ -75,7 +75,7 @@ namespace CodeGenerationTools
 
                 foreach (var type in types)
                 {
-                    var attr = type.GetCustomAttribute(adptorAttr);
+                    var attr = type.GetCustomAttribute(adptorAttr, false);
                     if (attr == null)
                         continue;
                     OnProgress($"-----generate type:{type.FullName}-----------", index++ / count);
@@ -89,7 +89,7 @@ namespace CodeGenerationTools
                 var adptorStr = "";
                 foreach (var type in types)
                 {
-                    var attr = type.GetCustomAttribute(adptorAttr);
+                    var attr = type.GetCustomAttribute(adptorAttr, false);
                     if (attr == null)
                         continue;
                     adptorStr += CreateAdaptorInit(type);
@@ -99,7 +99,7 @@ namespace CodeGenerationTools
                 var delegateStr = "";
                 foreach (var type in types)
                 {
-                    var attr = type.GetCustomAttribute(delegateAttr);
+                    var attr = type.GetCustomAttribute(delegateAttr, false);
                     if (attr == null)
                         continue;
                     delegateStr += CreateDelegateInit(type);
