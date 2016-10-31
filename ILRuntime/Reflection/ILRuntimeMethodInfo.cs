@@ -9,7 +9,7 @@ using ILRuntime.CLR.Method;
 
 namespace ILRuntime.Reflection
 {
-    class ILRuntimeMethodInfo : MethodInfo
+    public class ILRuntimeMethodInfo : MethodInfo
     {
         ILMethod method;
         public ILRuntimeMethodInfo(ILMethod m)

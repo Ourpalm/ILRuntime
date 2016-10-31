@@ -10,7 +10,7 @@ using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.Reflection
 {
-    class ILRuntimeType : Type
+    public class ILRuntimeType : Type
     {
         ILType type;
         Runtime.Enviorment.AppDomain appdomain;
