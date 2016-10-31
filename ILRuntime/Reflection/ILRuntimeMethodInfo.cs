@@ -9,10 +9,9 @@ using ILRuntime.CLR.Method;
 
 namespace ILRuntime.Reflection
 {
-    class ILRuntimeMethodInfo : MethodInfo
+    public class ILRuntimeMethodInfo : MethodInfo
     {
         ILMethod method;
-        object[] param;
         public ILRuntimeMethodInfo(ILMethod m)
         {
             method = m;
@@ -96,19 +95,11 @@ namespace ILRuntime.Reflection
         {
             if (method.HasThis)
             {
-                if (param == null)
-                {
-                    param = new object[method.HasThis ? method.ParameterCount + 1 : method.ParameterCount];
-                }
-                param[0] = obj;
-                if (parameters != null)
-                    parameters.CopyTo(param, 1);
-                var res = method.DeclearingType.AppDomain.Invoke(method, param);
-                Array.Clear(param, 0, param.Length);
+                var res = method.DeclearingType.AppDomain.Invoke(method, obj, parameters);
                 return res;
             }
             else
-                return method.DeclearingType.AppDomain.Invoke(method, parameters);
+                return method.DeclearingType.AppDomain.Invoke(method, null, parameters);
         }
 
         public override bool IsDefined(Type attributeType, bool inherit)

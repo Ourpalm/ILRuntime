@@ -387,7 +387,7 @@ namespace ILRuntime.CLR.TypeSystem
 
             if (staticConstructor != null)
             {
-                appdomain.Invoke(staticConstructor);
+                appdomain.Invoke(staticConstructor, null, null);
             }
         }
 
@@ -471,6 +471,20 @@ namespace ILRuntime.CLR.TypeSystem
                 var m = genericMethod.MakeGenericMethod(genericArguments);
                 lst.Add((ILMethod)m);
                 return m;
+            }
+            return null;
+        }
+
+        public IMethod GetConstructor(int paramCnt)
+        {
+            if (constructors == null)
+                InitializeMethods();
+            foreach (var i in constructors)
+            {
+                if (i.ParameterCount == paramCnt)
+                {
+                    return i;
+                }
             }
             return null;
         }
@@ -609,7 +623,6 @@ namespace ILRuntime.CLR.TypeSystem
             return false;
         }
 
-        static object[] param = new object[1];
         public ILTypeInstance Instantiate(bool callDefaultConstructor = true)
         {
             var res = new ILTypeInstance(this);
@@ -618,8 +631,7 @@ namespace ILRuntime.CLR.TypeSystem
                 var m = GetConstructor(CLR.Utils.Extensions.EmptyParamList);
                 if (m != null)
                 {
-                    param[0] = res;
-                    appdomain.Invoke(m, param);
+                    appdomain.Invoke(m, res, null);
                 }
             }
             return res;

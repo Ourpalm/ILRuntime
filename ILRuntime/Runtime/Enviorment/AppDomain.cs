@@ -520,22 +520,63 @@ namespace ILRuntime.Runtime.Enviorment
         }
 
         /// <summary>
+        /// Create a instance of the specified type, which is inherited from a CLR Type
+        /// </summary>
+        /// <typeparam name="T">CLR Type</typeparam>
+        /// <param name="type">Full Name of the type</param>
+        /// <param name="args">Arguments for the constructor</param>
+        /// <returns></returns>
+        public T Instantiate<T>(string type, object[] args = null)
+        {
+            ILTypeInstance ins = Instantiate(type, args);
+            return (T)ins.CLRInstance;
+        }
+
+        /// <summary>
+        /// Create a instance of the specified type
+        /// </summary>
+        /// <param name="type">Full Name of the type</param>
+        /// <param name="args">Arguments for the constructor</param>
+        /// <returns></returns>
+        public ILTypeInstance Instantiate(string type, object[] args = null)
+        {
+            IType t;
+            if (mapType.TryGetValue(type, out t))
+            {
+                ILType ilType = t as ILType;
+                if(ilType != null)
+                {
+                    bool hasConstructor = args != null && args.Length != 0;
+                    var res = ilType.Instantiate(!hasConstructor);
+                    if (hasConstructor)
+                    {
+                        var ilm = ilType.GetConstructor(args.Length);
+                        Invoke(ilm, res, args);
+                    }
+                    return res;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Invoke a method
         /// </summary>
         /// <param name="type">Type's fullname</param>
         /// <param name="method">Method name</param>
         /// <param name="p">Parameters</param>
         /// <returns></returns>
-        public object Invoke(string type, string method, params object[] p)
+        public object Invoke(string type, string method, object instance, params object[] p)
         {
             IType t = GetType(type);
             if (t == null)
                 return null;
             var m = t.GetMethod(method, p.Length);
 
-            if(m != null)
+            if (m != null)
             {
-                return Invoke(m, p);
+                return Invoke(m, instance, p);
             }
             return null;
         }
@@ -546,9 +587,10 @@ namespace ILRuntime.Runtime.Enviorment
         /// <param name="type">Type's fullname</param>
         /// <param name="method">Method name</param>
         /// <param name="genericArguments">Generic Arguments</param>
+        /// <param name="instance">Object Instance of the method</param>
         /// <param name="p">Parameters</param>
         /// <returns></returns>
-        public object Invoke(string type, string method, IType[] genericArguments, params object[] p)
+        public object Invoke(string type, string method, IType[] genericArguments, object instance, params object[] p)
         {
             IType t = GetType(type);
             if (t == null)
@@ -558,12 +600,19 @@ namespace ILRuntime.Runtime.Enviorment
             if (m != null)
             {
                 m = m.MakeGenericMethod(genericArguments);
-                return Invoke(m, p);
+                return Invoke(m, instance, p);
             }
             return null;
         }
 
-        public object Invoke(IMethod m, params object[] p)
+        /// <summary>
+        /// Invokes a specific method
+        /// </summary>
+        /// <param name="m">Method</param>
+        /// <param name="instance">object instance</param>
+        /// <param name="p">Parameters</param>
+        /// <returns></returns>
+        public object Invoke(IMethod m, object instance, params object[] p)
         {
             object res = null;
             if (m is ILMethod)
@@ -588,7 +637,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 try
                 {
-                    res = inteptreter.Run((ILMethod)m, p);
+                    res = inteptreter.Run((ILMethod)m, instance, p);
                 }
                 finally
                 {

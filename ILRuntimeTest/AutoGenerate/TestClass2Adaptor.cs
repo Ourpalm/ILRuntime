@@ -59,7 +59,7 @@ namespace ILRuntimeTest.TestFramework
                 if (mVMethod1 != null && !isVMethod1Invoking)
                 {
                     isVMethod1Invoking = true;
-                    appdomain.Invoke(mVMethod1, instance );
+                    appdomain.Invoke(mVMethod1, instance);
                     isVMethod1Invoking = false;
                 }
                 else

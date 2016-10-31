@@ -15,7 +15,7 @@ using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntime.Reflection
 {
-    class ILRuntimeFieldInfo : FieldInfo
+    public class ILRuntimeFieldInfo : FieldInfo
     {
         System.Reflection.FieldAttributes attr = System.Reflection.FieldAttributes.Public;
         ILRuntimeType dType;

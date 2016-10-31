@@ -37,9 +37,9 @@ namespace ILRuntime.Runtime.Intepreter
         TResult InvokeILMethod()
         {
             if (method.HasThis)
-                return (TResult)appdomain.Invoke(method, instance);
+                return (TResult)appdomain.Invoke(method, instance, null);
             else
-                return (TResult)appdomain.Invoke(method);
+                return (TResult)appdomain.Invoke(method, null, null);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -86,7 +86,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 return (TResult)appdomain.Invoke(method, instance, p1);
             else
-                return (TResult)appdomain.Invoke(method, p1);
+                return (TResult)appdomain.Invoke(method, null, p1);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -133,7 +133,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 return (TResult)appdomain.Invoke(method, instance, p1, p2);
             else
-                return (TResult)appdomain.Invoke(method, p1, p2);
+                return (TResult)appdomain.Invoke(method, null, p1, p2);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -180,7 +180,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 return (TResult)appdomain.Invoke(method, instance, p1, p2, p3);
             else
-                return (TResult)appdomain.Invoke(method, p1, p2, p3);
+                return (TResult)appdomain.Invoke(method, null, p1, p2, p3);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -227,7 +227,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 return (TResult)appdomain.Invoke(method, instance, p1, p2, p3, p4);
             else
-                return (TResult)appdomain.Invoke(method, p1, p2, p3, p4);
+                return (TResult)appdomain.Invoke(method, null, p1, p2, p3, p4);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -276,7 +276,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 appdomain.Invoke(method, instance, p1);
             else
-                appdomain.Invoke(method, p1);
+                appdomain.Invoke(method, null, p1);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -323,7 +323,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 appdomain.Invoke(method, instance, p1, p2);
             else
-                appdomain.Invoke(method, p1, p2);
+                appdomain.Invoke(method, instance, p1, p2);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -370,7 +370,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 appdomain.Invoke(method, instance, p1, p2, p3);
             else
-                appdomain.Invoke(method, p1, p2, p3);
+                appdomain.Invoke(method, null, p1, p2, p3);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -417,7 +417,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 appdomain.Invoke(method, instance, p1, p2, p3, p4);
             else
-                appdomain.Invoke(method, p1, p2, p3, p4);
+                appdomain.Invoke(method, null, p1, p2, p3, p4);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -462,9 +462,9 @@ namespace ILRuntime.Runtime.Intepreter
         void InvokeILMethod()
         {
             if (method.HasThis)
-                appdomain.Invoke(method, instance);
+                appdomain.Invoke(method, instance, null);
             else
-                appdomain.Invoke(method);
+                appdomain.Invoke(method, null, null);
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)

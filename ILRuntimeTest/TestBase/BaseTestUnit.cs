@@ -83,7 +83,7 @@ namespace ILRuntimeTest.Test
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            _app.Invoke(type, method); //InstanceTest
+            _app.Invoke(type, method, null); //InstanceTest
             sw.Stop();
             message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
         }
@@ -95,7 +95,7 @@ namespace ILRuntimeTest.Test
                 var sw = new System.Diagnostics.Stopwatch();
                 Console.WriteLine("Invoking {0}.{1}", type, method);
                 sw.Start();
-                var res = _app.Invoke(type, method); //InstanceTest
+                var res = _app.Invoke(type, method, null); //InstanceTest
                 sw.Stop();
                 if (res != null)
                     message.AppendLine("Return:" + res);
