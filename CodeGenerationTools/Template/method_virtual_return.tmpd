@@ -12,8 +12,9 @@
                 if (m{$VMethodName} != null && !is{$VMethodName}Invoking)
                 {
                     is{$VMethodName}Invoking = true;
-                    return ({$returnType})appdomain.Invoke(m{$VMethodName}, instance {$comma}{$args_no_type});
+                    var res = ({$returnType})appdomain.Invoke(m{$VMethodName}, instance {$comma}{$args_no_type});
                     is{$VMethodName}Invoking = false;
+					return res;
                 }
                 else
                     return ({$returnType})base.{$VMethodName}({$args_no_type});

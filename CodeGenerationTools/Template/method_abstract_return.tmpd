@@ -9,7 +9,7 @@
 
                 if (m{$AMethodName} != null)
                 {
-                return ({$returnType})appdomain.Invoke(m{$AMethodName}, instance {$comma}{$args_no_type});
+					return ({$returnType})appdomain.Invoke(m{$AMethodName}, instance {$comma}{$args_no_type});
                 }
                 
                 {$returnDefault}

@@ -79,8 +79,9 @@ namespace ILRuntimeTest.TestFramework
                 if (mVMethod2 != null && !isVMethod2Invoking)
                 {
                     isVMethod2Invoking = true;
-                    return (Boolean)appdomain.Invoke(mVMethod2, instance );
+                    var res = (Boolean)appdomain.Invoke(mVMethod2, instance );
                     isVMethod2Invoking = false;
+					return res;
                 }
                 else
                     return (Boolean)base.VMethod2();
@@ -107,7 +108,7 @@ namespace ILRuntimeTest.TestFramework
 
                 if (mAbMethod2 != null)
                 {
-                return (Single)appdomain.Invoke(mAbMethod2, instance ,arg1);
+					return (Single)appdomain.Invoke(mAbMethod2, instance ,arg1);
                 }
                 
                 return 0;
