@@ -26,27 +26,25 @@ namespace ILRuntime.Reflection
                     if (param == null)
                         param = new List<IType>();
                     param.Clear();
-                    object[] p = new object[attribute.ConstructorArguments.Count + 1];
-                    p[0] = ins;
+                    object[] p = new object[attribute.ConstructorArguments.Count];
                     for (int j = 0; j < attribute.ConstructorArguments.Count; j++)
                     {
                         var ca = attribute.ConstructorArguments[j];
                         param.Add(appdomain.GetType(ca.Type, null));
-                        p[j + 1] = ca.Value;
+                        p[j] = ca.Value;
                     }
                     var ctor = it.GetConstructor(param);
-                    appdomain.Invoke(ctor, p);
+                    appdomain.Invoke(ctor, ins, p);
                 }
 
                 if (attribute.HasProperties)
                 {
-                    object[] p = new object[2];
-                    p[0] = ins;
+                    object[] p = new object[1];
                     foreach (var j in attribute.Properties)
                     {
-                        p[1] = j.Argument.Value;
+                        p[0] = j.Argument.Value;
                         var setter = it.GetMethod("set_" + j.Name, 1);
-                        appdomain.Invoke(setter, p);
+                        appdomain.Invoke(setter, ins, p);
                     }
                 }
             }

@@ -57,15 +57,17 @@ namespace ILRuntime.Runtime.Intepreter
             LastStepFrameBase = (StackObject*)0;
             LastStepInstructionIndex = 0;
         }
-        public object Run(ILMethod method, object[] p)
+        public object Run(ILMethod method, object instance, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
-
-            StackObject* esp = PushParameters(method, stack.StackBase, p);
+            StackObject* esp = stack.StackBase;
+            if (method.HasThis)
+                esp = PushObject(esp, mStack, instance);
+            esp = PushParameters(method, esp, p);
             bool unhandledException;
             esp = Execute(method, esp, out unhandledException);
-            object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(domain, StackObject.ToObject((esp - 1),domain, mStack)) : null;
+            object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(domain, StackObject.ToObject((esp - 1), domain, mStack)) : null;
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             return result;
@@ -3328,23 +3330,13 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 var plist = method.Parameters;
                 int pCnt = plist != null ? plist.Count : 0;
-                if (method.HasThis)
-                    pCnt++;
                 if (pCnt != p.Length)
                     throw new ArgumentOutOfRangeException();
                 for (int i = 0; i < p.Length; i++)
                 {
                     bool isBox = false;
-                    int idx = 0;
-                    if (method.HasThis)
-                    {
-                        idx = i - 1;
-                    }
-                    else
-                        idx = i;
-
-                    if (idx >= 0 && plist != null && idx < plist.Count)
-                        isBox = plist[idx] == AppDomain.ObjectType;
+                    if (plist != null && i < plist.Count)
+                        isBox = plist[i] == AppDomain.ObjectType;
                     esp = PushObject(esp, mStack, p[i], isBox);
                 }
             }

@@ -266,7 +266,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 if (m is ILMethod)
                 {
-                    var res = type.AppDomain.Invoke(m, this);
+                    var res = type.AppDomain.Invoke(m, this, null);
                     return res.ToString();
                 }
                 else
