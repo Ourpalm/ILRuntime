@@ -29,7 +29,7 @@ namespace ILRuntime.Runtime.Debugger
         private object socketLockObj = new object();
         private byte[] _sendHeaderBuffer = new byte[HEAD_SIZE];
 
-        public bool Disconnected { get { return _socket == null; } }
+        public bool Disconnected { get { return _socket == null || !_socket.Connected; } }
         public Action OnConnect { get; set; }
 
         public Action OnConnectFailed { get; set; }
@@ -62,7 +62,7 @@ namespace ILRuntime.Runtime.Debugger
 
         private void AsyncRecv_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError == SocketError.Success)
+            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
                 try
                 {

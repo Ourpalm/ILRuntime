@@ -18,10 +18,9 @@ namespace ILRuntime.Runtime.Intepreter
     {
         Enviorment.AppDomain domain;
         RuntimeStack stack;
-        AutoResetEvent evt;
+        object _lockObj;
 
         public RuntimeStack Stack { get { return stack; } }
-        public AutoResetEvent AutoResetEvent { get { return evt; } }
         public bool ShouldBreak { get; set; }
         public StepTypes CurrentStepType { get; set; }
         public StackObject* LastStepFrameBase { get; set; }
@@ -31,7 +30,7 @@ namespace ILRuntime.Runtime.Intepreter
             this.domain = domain;
             stack = new RuntimeStack(this);
 #if DEBUG
-            evt = new AutoResetEvent(false);
+            _lockObj = new object();
 #endif
         }
 
@@ -41,12 +40,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             //Clear old debug state
             ClearDebugState();
-            evt.WaitOne();
+            lock (_lockObj)
+                Monitor.Wait(_lockObj);
         }
 
         public void Resume()
         {
-            evt.Set();
+            lock (_lockObj)
+                Monitor.Pulse(_lockObj);
         }
 
         public void ClearDebugState()

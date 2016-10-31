@@ -92,7 +92,6 @@ namespace ILRuntime.Runtime.Debugger
         void CreateNewSession(TcpListener listener)
         {
             Socket sock = listener.AcceptSocket();
-            sock.NoDelay = true;
             clientSocket = new DebugSocket(sock);           
             clientSocket.OnReciveMessage = OnReceive;
             clientSocket.OnClose = OnClose;

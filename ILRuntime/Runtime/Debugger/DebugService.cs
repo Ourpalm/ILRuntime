@@ -288,15 +288,15 @@ namespace ILRuntime.Runtime.Debugger
                     if (!bpHit)
                     {
                         var sp = method.Definition.Body.Instructions[ip].SequencePoint;
-                        if (sp != null)
-                        {
+                        if (sp != null && IsSequenceValid(sp))
+                        {                            
                             switch (intp.CurrentStepType)
                             {
                                 case StepTypes.Into:
                                     DoBreak(intp, 0, true);
                                     break;
                                 case StepTypes.Over:
-                                    if (intp.Stack.Frames.Peek().BasePointer == intp.LastStepFrameBase && ip != intp.LastStepInstructionIndex)
+                                    if (intp.Stack.Frames.Peek().BasePointer <= intp.LastStepFrameBase && ip != intp.LastStepInstructionIndex)
                                     {
                                         DoBreak(intp, 0, true);
                                     }
@@ -314,6 +314,11 @@ namespace ILRuntime.Runtime.Debugger
                     }
                 }
             }
+        }
+
+        bool IsSequenceValid(Mono.Cecil.Cil.SequencePoint sp)
+        {
+            return sp.StartLine != sp.EndLine || sp.StartColumn != sp.EndColumn;
         }
 
         void DoBreak(ILIntepreter intp, int bpHash, bool isStep)
@@ -435,6 +440,8 @@ namespace ILRuntime.Runtime.Debugger
             else
             {
                 var obj = mStack[esp->Value];
+                if (obj == null)
+                    return false;
                 if (obj is ILTypeInstance)
                     return true;
                 else if (obj.GetType().IsPrimitive)

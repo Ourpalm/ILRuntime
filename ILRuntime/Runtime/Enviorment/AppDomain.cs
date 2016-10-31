@@ -572,7 +572,11 @@ namespace ILRuntime.Runtime.Enviorment
                 lock (freeIntepreters)
                 {
                     if (freeIntepreters.Count > 0)
+                    {
                         inteptreter = freeIntepreters.Dequeue();
+                        //Clear debug state, because it may be in ShouldBreak State
+                        inteptreter.ClearDebugState();
+                    }
                     else
                     {
                         inteptreter = new ILIntepreter(this);

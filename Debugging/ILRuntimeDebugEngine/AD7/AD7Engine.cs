@@ -218,6 +218,7 @@ namespace ILRuntimeDebugEngine.AD7
         int IDebugEngineLaunch2.LaunchSuspended(string pszServer, IDebugPort2 pPort, string pszExe, string pszArgs, string pszDir, string bstrEnv, string pszOptions, enum_LAUNCH_FLAGS dwLaunchFlags, uint hStdInput, uint hStdOutput, uint hStdError, IDebugEventCallback2 pCallback, out IDebugProcess2 ppProcess)
         {
             string[] p = pszExe.Split(':');
+            callback = new AD7.EngineCallback(this, pCallback);
             debugged = new AD7.DebuggedProcess(this, p[0], int.Parse(p[1]));
             while (debugged.Connecting)
             {
@@ -230,7 +231,6 @@ namespace ILRuntimeDebugEngine.AD7
                 {
                     ppProcess = new AD7Process(pPort);
                     this.process = ppProcess;
-                    callback = new AD7.EngineCallback(this, pCallback);
                     debugged.OnDisconnected = OnDisconnected;
                     return Constants.S_OK;
                 }
