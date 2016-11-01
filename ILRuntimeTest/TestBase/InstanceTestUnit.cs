@@ -11,7 +11,7 @@ namespace ILRuntimeTest.TestBase
         public override void Run()
         {
             //Invoke(_typeName, _methodName);
-            var obj = GetInstance(_typeName);
+            var obj = _app.Instantiate(_typeName);
             if (obj != null)
                 Invoke(obj, _typeName, _methodName);
         }
