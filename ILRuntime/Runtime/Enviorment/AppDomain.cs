@@ -590,7 +590,7 @@ namespace ILRuntime.Runtime.Enviorment
         /// <param name="instance">Object Instance of the method</param>
         /// <param name="p">Parameters</param>
         /// <returns></returns>
-        public object Invoke(string type, string method, IType[] genericArguments, object instance, params object[] p)
+        public object InvokeGenericMethod(string type, string method, IType[] genericArguments, object instance, params object[] p)
         {
             IType t = GetType(type);
             if (t == null)
