@@ -70,7 +70,17 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public ILTypeStaticInstance StaticInstance { get { return staticInstance; } }
+        public ILTypeStaticInstance StaticInstance
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields();
+                if (methods == null)
+                    InitializeMethods();
+                return staticInstance;
+            }
+        }
 
         public IType[] FieldTypes
         {

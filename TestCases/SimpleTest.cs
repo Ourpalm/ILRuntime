@@ -5,8 +5,13 @@ using System.Text;
 
 namespace TestCases
 {
+    class TestStatic
+    {
+        public static Dictionary<string, int> staticTest = new Dictionary<string, int>();
+    }
     public class SimpleTest
     {
+        
         static int b;
         int a;
         int c = 2;
@@ -78,6 +83,12 @@ namespace TestCases
             int a = 4;
             int c = 5;
             return b + a - c;
+        }
+
+        public static void StaticTest()
+        {
+            TestStatic.staticTest.Add("1", 1);
+            Console.WriteLine("Value for 1:" + TestStatic.staticTest["1"]);
         }
 
         public static void InstanceTest()
