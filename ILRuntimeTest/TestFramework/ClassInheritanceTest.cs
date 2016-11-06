@@ -9,113 +9,114 @@ using ILRuntime.Runtime.Intepreter;
 
 namespace ILRuntimeTest.TestFramework
 {
-    public class ClassInheritanceAdaptor : CrossBindingAdaptor
-    {
-        public override Type BaseCLRType
-        {
-            get
-            {
-                return typeof(ClassInheritanceTest);
-            }
-        }
+    //public class ClassInheritanceAdaptor : CrossBindingAdaptor
+    //{
+    //    public override Type BaseCLRType
+    //    {
+    //        get
+    //        {
+    //            return typeof(ClassInheritanceTest);
+    //        }
+    //    }
 
-        public override Type AdaptorType
-        {
-            get
-            {
-                return typeof(Adaptor);
-            }
-        }
+    //    public override Type AdaptorType
+    //    {
+    //        get
+    //        {
+    //            return typeof(Adaptor);
+    //        }
+    //    }
 
-        public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
-        {
-            return new Adaptor(appdomain, instance);
-        }
+    //    public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+    //    {
+    //        return new Adaptor(appdomain, instance);
+    //    }
 
-        internal class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
-        {
-            ILTypeInstance instance;
-            ILRuntime.Runtime.Enviorment.AppDomain appdomain;
-            IMethod mTestAbstract;
-            IMethod mTestVirtual;
-            bool isTestVirtualInvoking = false;
+    //    internal class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
+    //    {
+    //        ILTypeInstance instance;
+    //        ILRuntime.Runtime.Enviorment.AppDomain appdomain;
+    //        IMethod mTestAbstract;
+    //        IMethod mTestVirtual;
+    //        bool isTestVirtualInvoking = false;
 
-            public Adaptor()
-            {
+    //        public Adaptor()
+    //        {
 
-            }
+    //        }
 
-            public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
-            {
-                this.appdomain = appdomain;
-                this.instance = instance;
-            }
+    //        public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+    //        {
+    //            this.appdomain = appdomain;
+    //            this.instance = instance;
+    //        }
 
-            public ILTypeInstance ILInstance { get { return instance; } }
+    //        public ILTypeInstance ILInstance { get { return instance; } }
 
-            public override void TestAbstract()
-            {
-                if(mTestAbstract == null)
-                {
-                    mTestAbstract = instance.Type.GetMethod("TestAbstract", 0);
-                }
-                if (mTestAbstract != null)
-                    appdomain.Invoke(mTestAbstract, instance); 
-            }
+    //        public override void TestAbstract()
+    //        {
+    //            if(mTestAbstract == null)
+    //            {
+    //                mTestAbstract = instance.Type.GetMethod("TestAbstract", 0);
+    //            }
+    //            if (mTestAbstract != null)
+    //                appdomain.Invoke(mTestAbstract, instance); 
+    //        }
 
-            public override void TestVirtual()
-            {
-                if (mTestVirtual == null)
-                {
-                    mTestVirtual = instance.Type.GetMethod("TestVirtual", 0);
-                }
-                if (mTestVirtual != null && !isTestVirtualInvoking)
-                {
-                    isTestVirtualInvoking = true;
-                    appdomain.Invoke(mTestVirtual, instance);
-                    isTestVirtualInvoking = false;
-                }
-                else
-                    base.TestVirtual();
-            }
+    //        public override void TestVirtual()
+    //        {
+    //            if (mTestVirtual == null)
+    //            {
+    //                mTestVirtual = instance.Type.GetMethod("TestVirtual", 0);
+    //            }
+    //            if (mTestVirtual != null && !isTestVirtualInvoking)
+    //            {
+    //                isTestVirtualInvoking = true;
+    //                appdomain.Invoke(mTestVirtual, instance);
+    //                isTestVirtualInvoking = false;
+    //            }
+    //            else
+    //                base.TestVirtual();
+    //        }
 
-            public override string ToString()
-            {
-                IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
-                m = instance.Type.GetVirtualMethod(m);
-                if (m == null || m is ILMethod)
-                {
-                    return instance.ToString();
-                }
-                else
-                    return instance.Type.FullName;
-            }
-        }
-    }
-    public class InterfaceTestAdaptor : CrossBindingAdaptor
-    {
-        public override Type BaseCLRType
-        {
-            get
-            {
-                return typeof(InterfaceTest);
-            }
-        }
+    //        public override string ToString()
+    //        {
+    //            IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
+    //            m = instance.Type.GetVirtualMethod(m);
+    //            if (m == null || m is ILMethod)
+    //            {
+    //                return instance.ToString();
+    //            }
+    //            else
+    //                return instance.Type.FullName;
+    //        }
+    //    }
+    //}
+    //public class InterfaceTestAdaptor : CrossBindingAdaptor
+    //{
+    //    public override Type BaseCLRType
+    //    {
+    //        get
+    //        {
+    //            return typeof(InterfaceTest);
+    //        }
+    //    }
 
-        public override Type AdaptorType
-        {
-            get
-            {
-                return typeof(ClassInheritanceAdaptor.Adaptor);
-            }
-        }
+    //    public override Type AdaptorType
+    //    {
+    //        get
+    //        {
+    //            return typeof(ClassInheritanceAdaptor.Adaptor);
+    //        }
+    //    }
 
-        public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
-        {
-            return new ClassInheritanceAdaptor.Adaptor(appdomain, instance);
-        }        
-    }
+    //    public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+    //    {
+    //        return new ClassInheritanceAdaptor.Adaptor(appdomain, instance);
+    //    }        
+    //}
 
+    [NeedAdaptor]
     public abstract class ClassInheritanceTest: InterfaceTest
     {
         protected int testVal = 100;
@@ -142,7 +143,7 @@ namespace ILRuntimeTest.TestFramework
             ins.TestField();
         }
     }
-
+    
     public interface InterfaceTest
     {
         void TestVirtual();

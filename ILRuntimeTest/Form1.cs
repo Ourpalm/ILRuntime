@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntimeTest.Test;
 using ILRuntimeTest.TestBase;
+using ILRuntimeTest.TestFramework;
 
 namespace ILRuntimeTest
 {
@@ -97,27 +98,29 @@ namespace ILRuntimeTest
                     using (System.IO.FileStream fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb", path, name), System.IO.FileMode.Open))
                         app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
 
-                    app.RegisterCrossBindingAdaptor(new TestFramework.ClassInheritanceAdaptor());
-                    app.RegisterCrossBindingAdaptor(new TestFramework.InterfaceTestAdaptor());
-                    app.DelegateManager.RegisterMethodDelegate<int>();
-                    //app.DelegateManager.RegisterMethodDelegate<int, string>();
-                    app.DelegateManager.RegisterFunctionDelegate<int, int>();
-                    //app.DelegateManager.RegisterFunctionDelegate<int, int, int>();
-                    //app.DelegateManager.RegisterMethodDelegate<MyClass2>();
-                    app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate>((action) =>
-                    {
-                        return new TestFramework.IntDelegate((a) =>
-                        {
-                            ((Action<int>)action)(a);
-                        });
-                    });
-                    app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate2>((action) =>
-                    {
-                        return new TestFramework.IntDelegate2((a) =>
-                        {
-                            return ((Func<int, int>)action)(a);
-                        });
-                    });
+                    ILRuntimeHelper.Init(app);
+
+                    //app.RegisterCrossBindingAdaptor(new TestFramework.ClassInheritanceAdaptor());
+                    //app.RegisterCrossBindingAdaptor(new TestFramework.InterfaceTestAdaptor());
+                    //app.DelegateManager.RegisterMethodDelegate<int>();
+                    ////app.DelegateManager.RegisterMethodDelegate<int, string>();
+                    //app.DelegateManager.RegisterFunctionDelegate<int, int>();
+                    ////app.DelegateManager.RegisterFunctionDelegate<int, int, int>();
+                    ////app.DelegateManager.RegisterMethodDelegate<MyClass2>();
+                    //app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate>((action) =>
+                    //{
+                    //    return new TestFramework.IntDelegate((a) =>
+                    //    {
+                    //        ((Action<int>)action)(a);
+                    //    });
+                    //});
+                    //app.DelegateManager.RegisterDelegateConvertor<TestFramework.IntDelegate2>((action) =>
+                    //{
+                    //    return new TestFramework.IntDelegate2((a) =>
+                    //    {
+                    //        return ((Func<int, int>)action)(a);
+                    //    });
+                    //});
 
                     /*app.RegisterCLRMethodRedirection(typeof(UnitTest.Logger).GetMethod("Log"), (ctx, instance, param, ga) =>
                     {
@@ -148,13 +151,13 @@ namespace ILRuntimeTest
                     });
                    
                     app.DelegateManager.RegisterDelegateConvertor<Comparison<int>>((action) =>
-                  {
-                      return new Comparison<int>((a, b) =>
-                      {
-                          return ((Func<int, int, int>)action)(a, b);
-                      });
-                  });
-                  */
+                    {
+                        return new Comparison<int>((a, b) =>
+                        {
+                            return ((Func<int, int, int>)action)(a, b);
+                        });
+                    });
+                    */
 
                     assembly = Assembly.LoadFrom(OD.FileName);
                 }

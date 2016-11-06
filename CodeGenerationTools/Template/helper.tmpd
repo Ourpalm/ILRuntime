@@ -9,12 +9,17 @@ namespace ILRuntimeTest.TestFramework
         {
             if (app == null)
             {
-                //should log error
+                // should log error
                 return;
             }
 
-            {$AdptorInit}   
+			// adaptor register 
+            {$AdaptorInit}   
 
+			// delegate register 
+			{$DelegateRegInit}
+
+			// delegate convertor
             {$DelegateInit}
         }
     }

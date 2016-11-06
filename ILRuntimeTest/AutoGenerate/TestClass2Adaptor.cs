@@ -28,7 +28,7 @@ namespace ILRuntimeTest.TestFramework
             return new Adaptor(appdomain, instance);
         }
 
-        class Adaptor : TestClass2, CrossBindingAdaptorType
+		internal class Adaptor : TestClass2, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -59,7 +59,7 @@ namespace ILRuntimeTest.TestFramework
                 if (mVMethod1 != null && !isVMethod1Invoking)
                 {
                     isVMethod1Invoking = true;
-                    appdomain.Invoke(mVMethod1, instance);
+                    appdomain.Invoke(mVMethod1, instance );
                     isVMethod1Invoking = false;
                 }
                 else
@@ -131,4 +131,6 @@ namespace ILRuntimeTest.TestFramework
             }
         }
     }
+
+	
 }

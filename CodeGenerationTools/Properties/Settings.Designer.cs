@@ -46,5 +46,17 @@ namespace CodeGenerationTools.Properties {
                 this["assembly_path"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string assembly_path1 {
+            get {
+                return ((string)(this["assembly_path1"]));
+            }
+            set {
+                this["assembly_path1"] = value;
+            }
+        }
     }
 }

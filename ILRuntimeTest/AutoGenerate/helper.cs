@@ -9,14 +9,27 @@ namespace ILRuntimeTest.TestFramework
         {
             if (app == null)
             {
-                //should log error
+                // should log error
                 return;
             }
 
-            app.RegisterCrossBindingAdaptor(new ILRuntimeTest.TestFramework.TestClass2Adaptor());
-app.RegisterCrossBindingAdaptor(new ILRuntimeTest.TestFramework.TestClass3Adaptor());
-   
+			// adaptor register 
+                        
+			app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
+			app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
+			app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
+			app.RegisterCrossBindingAdaptor(new TestClass3Adaptor());   
 
+			// delegate register 
+						
+			app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Boolean>();
+			
+			app.DelegateManager.RegisterMethodDelegate<System.Int32>();
+			
+			app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Int32>();
+
+
+			// delegate convertor
             
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.IntDelegate>((action) =>
             {
@@ -38,7 +51,7 @@ app.RegisterCrossBindingAdaptor(new ILRuntimeTest.TestFramework.TestClass3Adapto
                 {
                     ((Action<Int32,Single>)action)(a,b);
                 });
-            });
+            });            
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.IntDelegate2>((action) =>
             {
                 return new ILRuntimeTest.TestFramework.IntDelegate2((a) =>
@@ -46,7 +59,7 @@ app.RegisterCrossBindingAdaptor(new ILRuntimeTest.TestFramework.TestClass3Adapto
                     return ((Func<Int32,Int32>)action)(a);
                 });
             });
-
+            
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.Int2Delegate2>((action) =>
             {
                 return new ILRuntimeTest.TestFramework.Int2Delegate2((a,b) =>
@@ -54,7 +67,7 @@ app.RegisterCrossBindingAdaptor(new ILRuntimeTest.TestFramework.TestClass3Adapto
                     return ((Func<Int32,Int32,Boolean>)action)(a,b);
                 });
             });
-
+            
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.IntFloatDelegate2>((action) =>
             {
                 return new ILRuntimeTest.TestFramework.IntFloatDelegate2((a,b) =>

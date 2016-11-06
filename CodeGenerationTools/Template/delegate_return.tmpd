@@ -1,4 +1,4 @@
-
+            
             app.DelegateManager.RegisterDelegateConvertor<{$DelegateName}>((action) =>
             {
                 return new {$DelegateName}(({$args}) =>

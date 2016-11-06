@@ -50,7 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoGenerate\ClassInheritanceTestAdaptor.cs" />
     <Compile Include="AutoGenerate\helper.cs" />
+    <Compile Include="AutoGenerate\InterfaceTestAdaptor.cs" />
     <Compile Include="AutoGenerate\TestClass2Adaptor.cs" />
     <Compile Include="AutoGenerate\TestClass3Adaptor.cs" />
     <Compile Include="Form1.cs">

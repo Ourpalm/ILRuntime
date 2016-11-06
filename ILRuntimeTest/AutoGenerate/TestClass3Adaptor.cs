@@ -28,7 +28,7 @@ namespace ILRuntimeTest.TestFramework
             return new Adaptor(appdomain, instance);
         }
 
-        class Adaptor : TestClass3, CrossBindingAdaptorType
+		internal class Adaptor : TestClass3, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -62,4 +62,6 @@ namespace ILRuntimeTest.TestFramework
             }
         }
     }
+
+	
 }
