@@ -58,5 +58,29 @@ namespace CodeGenerationTools.Properties {
                 this["assembly_path1"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string adaptor_export_attr {
+            get {
+                return ((string)(this["adaptor_export_attr"]));
+            }
+            set {
+                this["adaptor_export_attr"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string delegate_export_attr {
+            get {
+                return ((string)(this["delegate_export_attr"]));
+            }
+            set {
+                this["delegate_export_attr"] = value;
+            }
+        }
     }
 }

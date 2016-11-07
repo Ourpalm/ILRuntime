@@ -11,7 +11,8 @@ This tool is used to generate some necessary code for ILRuntime.AppDomain, which
 
 **How to Use**
 ============
-1. Click the first "Add" button to add the [Main Project] path to the tool;
-2. Click the second "Add" button to add the [ILScript Project] path to the tool;
-3. Click the "Load" button to generate code.
-4. Click the "Copy" button to copy the code to your [Main Project]'s folder named "AutoGenerate" 
+1. Click "Load Main Assembly" button to add the [Main Project] path to the tool;
+2. Set "Adaptor Export" and "Delegate Export" 's values. the value is a full name of a custom [System.Attribute] class to mark the class or delegate which is need to export.
+3. Click "Load ILScript Assembly" button to add the [ILScript Project] path to the tool;
+4. Click the "Generate" button to generate code.
+5. Click the "Copy" button to copy the code to your [Main Project]'s folder named "AutoGenerate" 

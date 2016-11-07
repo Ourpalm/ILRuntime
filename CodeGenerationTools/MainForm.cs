@@ -9,8 +9,10 @@ using Mono.Cecil.Cil;
 
 namespace CodeGenerationTools
 {
+
     public partial class MainForm : Form
     {
+        #region Fields
         private string _outputPath;
         private string _helperTmpd;
         private string _adaptorTmpd;
@@ -27,15 +29,20 @@ namespace CodeGenerationTools
         private string _actionRegisterTmpd;
         private string _functionRegisterTmpd;
 
-        private HashSet<Type> _adaptorSet = new HashSet<Type>();
-        private Dictionary<string, object> _delegateRegisterSet = new Dictionary<string, object>();
-        private HashSet<Type> _delegateSet = new HashSet<Type>();
+        private readonly HashSet<Type> _adaptorSet = new HashSet<Type>();
+        private readonly HashSet<Type> _delegateSet = new HashSet<Type>();
+        private readonly Dictionary<string, object> _delegateRegDic = new Dictionary<string, object>();
 
 
-        private static readonly string AdaptorAttrName = "ILRuntimeTest.TestFramework.NeedAdaptorAttribute";
-        private static readonly string DelegateAttrName = "ILRuntimeTest.TestFramework.DelegateExportAttribute";
-        private Type _adptorAttr;//= assembly.GetType("");
-        private Type _delegateAttr;//= assembly.GetType("");
+        private string _adaptorAttrName = "ILRuntimeTest.TestFramework.NeedAdaptorAttribute";
+        private string _delegateAttrName = "ILRuntimeTest.TestFramework.DelegateExportAttribute";
+
+        private Type _adptorAttr;
+        private Type _delegateAttr;
+
+        #endregion
+
+        #region WinForm Event
 
         public MainForm()
         {
@@ -47,79 +54,134 @@ namespace CodeGenerationTools
             _outputPath = Application.StartupPath + "/Output/";
             if (!Directory.Exists(_outputPath))
                 Directory.CreateDirectory(_outputPath);
+
             outputPath.Text = Properties.Settings.Default["out_path"] as string;
             sourcePath1.Text = Properties.Settings.Default["assembly_path"] as string;
             sourcePath2.Text = Properties.Settings.Default["assembly_path1"] as string;
+            adaptorTxt.Text = Properties.Settings.Default["adaptor_export_attr"] as string;
+            if (adaptorTxt.Text == "") adaptorTxt.Text = _adaptorAttrName;
+            delegateTxt.Text = Properties.Settings.Default["delegate_export_attr"] as string;
+            if (delegateTxt.Text == "") delegateTxt.Text = _delegateAttrName;
+            outputText.Text = "";
+
+            _adaptorSet.Clear();
+            _delegateSet.Clear();
+            _delegateRegDic.Clear();
 
             LoadTemplates();
         }
 
-        private void LoadButton_Click(object sender, EventArgs e)
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            //var targetPath = sourcePath1.Text;
+            Properties.Settings.Default["out_path"] = outputPath.Text;
+            Properties.Settings.Default["assembly_path"] = sourcePath1.Text;
+            Properties.Settings.Default["assembly_path1"] = sourcePath2.Text;
+            Properties.Settings.Default["adaptor_export_attr"] = adaptorTxt.Text;
+            Properties.Settings.Default["delegate_export_attr"] = delegateTxt.Text;
 
-            //if (targetPath == "")
-            //{
-            //    if (OD.ShowDialog() != DialogResult.OK) return;
+            Properties.Settings.Default.Save();
+        }
 
-            //    Properties.Settings.Default["assembly_path"] = OD.FileName;
-            //    Properties.Settings.Default.Save();
-            //    sourcePath1.Text = targetPath = OD.FileName;
-            //}
+        private void LoadMainProjectAssemblyClick(object sender, EventArgs e)
+        {
+            var targetPath = sourcePath1.Text;
 
-            //textBox1.Text = "";
+            if (targetPath == "")
+            {
+                if (OD.ShowDialog() != DialogResult.OK) return;
 
-            //var assembly = Assembly.LoadFrom(targetPath);
-            //if (assembly == null) return;
-            ////types
-            //var types = assembly.GetTypes();
+                Properties.Settings.Default["assembly_path"] = OD.FileName;
+                Properties.Settings.Default.Save();
+                sourcePath1.Text = targetPath = OD.FileName;
+            }
 
-            ////export adaptor
-            //int count = types.Length;
-            //int index = 0;
+            _adaptorAttrName = adaptorTxt.Text;
+            _delegateAttrName = delegateTxt.Text;
 
-            //var _adptorAttr = assembly.GetType("ILRuntimeTest.TestFramework.NeedAdaptorAttribute");
-            //var _delegateAttr = assembly.GetType("ILRuntimeTest.TestFramework.DelegateExportAttribute");
+            if (string.IsNullOrEmpty(_adaptorAttrName) || string.IsNullOrEmpty(_delegateAttrName))
+            {
+                Print("[Error] Adaptor Export Attribute or DelegateAttribute is Empty");
+                return;
+            }
 
-            //foreach (var type in types)
-            //{
-            //    var attr = type.GetCustomAttribute(_adptorAttr, false);
-            //    if (attr == null)
-            //        continue;
-            //    OnProgress($"-----generate type:{type.FullName}-----------", index++ / count);
-            //    CreateAdaptor(type);
-            //}
+            var assembly = Assembly.LoadFrom(targetPath);
+            if (assembly == null) return;
+            //types
+            var types = assembly.GetTypes();
+            _adptorAttr = assembly.GetType(_adaptorAttrName);
+            _delegateAttr = assembly.GetType(_delegateAttrName);
 
-            ////export helper
-            //var helperStr = _helperTmpd;
-            //Print("-------------------generate helper------------------------");
+            foreach (var type in types)
+            {
+                //load ad
+                var attr = type.GetCustomAttribute(_adptorAttr, false);
+                if (attr != null)
+                {
+                    Print("[adaptor]" + type.FullName);
+                    LoadAdaptor(type);
+                    continue;
+                }
 
-            //var adptorStr = "";
-            //foreach (var type in types)
-            //{
-            //    var attr = type.GetCustomAttribute(_adptorAttr, false);
-            //    if (attr == null)
-            //        continue;
-            //    adptorStr += CreateAdaptorInit(type);
-            //}
-            //helperStr = helperStr.Replace("{$AdptorInit}", adptorStr);
+                //load delegate
+                var attr1 = type.GetCustomAttribute(_delegateAttr, false);
+                if (attr1 != null)
+                {
+                    Print("[delegate convertor]" + type.FullName);
+                    LoadDelegateConvertor(type);
+                }
+            }
 
-            //var delegateStr = "";
-            //foreach (var type in types)
-            //{
-            //    var attr = type.GetCustomAttribute(_delegateAttr, false);
-            //    if (attr == null)
-            //        continue;
-            //    delegateStr += CreateDelegateInit(type);
-            //}
-            //helperStr = helperStr.Replace("{$DelegateInit}", delegateStr);
+        }
 
-            //using (var fs2 = File.Create(_outputPath + "helper.cs"))
-            //{
-            //    var sw = new StreamWriter(fs2);
-            //    sw.Write(helperStr);
-            //    sw.Flush();
-            //}
+        private void LoadILScriptAssemblyClick(object sender, EventArgs e)
+        {
+            var targetPath = sourcePath2.Text;
+
+            if (targetPath == "")
+            {
+                if (OD.ShowDialog() != DialogResult.OK) return;
+
+                Properties.Settings.Default["assembly_path1"] = OD.FileName;
+                Properties.Settings.Default.Save();
+                sourcePath2.Text = targetPath = OD.FileName;
+            }
+
+            using (var testFs = File.Open(targetPath, FileMode.Open))
+            {
+                var module = ModuleDefinition.ReadModule(testFs);
+                foreach (var typeDefinition in module.Types)
+                {
+                    foreach (var methodDefinition in typeDefinition.Methods)
+                    {
+                        foreach (var instruction in methodDefinition.Body.Instructions)
+                        {
+                            if (instruction.OpCode != OpCodes.Newobj || instruction.Previous == null ||
+                                instruction.Previous.OpCode != OpCodes.Ldftn) continue;
+
+                            var type = instruction.Operand as MethodReference;
+                            if (type == null ||
+                                (!type.DeclaringType.Name.Contains("Action") &&
+                                 !type.DeclaringType.Name.Contains("Func"))) continue;
+
+                            Print("[delegate register]" + type.DeclaringType.FullName);
+                            LoadDelegateRegister(type.DeclaringType.FullName, type.DeclaringType);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private void GenerateClick(object sender, EventArgs e)
+        {
+            if (_adaptorSet.Count <= 0 && _delegateSet.Count <= 0 && _delegateRegDic.Count <= 0)
+            {
+                Print("[Warnning] There is nothing to Generate");
+                return;
+            }
+
+
+            Print("[=============================Generate Begin==============================]");
 
             foreach (var type in _adaptorSet)
             {
@@ -128,29 +190,10 @@ namespace CodeGenerationTools
 
             CreateILRuntimeHelper();
 
-            Print("-------------------generate end------------------------");
+            Print("[=============================Generate End=================================]");
         }
 
-        private void LoadDelegateRegister(string key, object type)
-        {
-            if (!_delegateRegisterSet.ContainsKey(key))
-                _delegateRegisterSet.Add(key, type);
-        }
-
-        private void LoadDelegateConvertor(Type type)
-        {
-            if (!_delegateSet.Contains(type))
-                _delegateSet.Add(type);
-        }
-
-        private void LoadAdaptor(Type type)
-        {
-
-            if (!_adaptorSet.Contains(type))
-                _adaptorSet.Add(type);
-        }
-
-        private void CopyButton_Click(object sender, EventArgs e)
+        private void CopyFileClick(object sender, EventArgs e)
         {
             var targetPath = outputPath.Text;
 
@@ -184,15 +227,32 @@ namespace CodeGenerationTools
             MessageBox.Show("file copied");
         }
 
-        private void OnProgress(string s, int i)
-        {
-            textBox1.Text += s + "\r\n";
-            progressBar.Value = i;
-        }
-
         private void Print(string s)
         {
-            textBox1.Text += s + "\r\n";
+            outputText.Text += s + "\r\n";
+            Console.WriteLine(s);
+        }
+
+        #endregion
+
+        #region CodeGenerate Methods
+
+        private void LoadDelegateRegister(string key, object type)
+        {
+            if (!_delegateRegDic.ContainsKey(key))
+                _delegateRegDic.Add(key, type);
+        }
+
+        private void LoadDelegateConvertor(Type type)
+        {
+            if (!_delegateSet.Contains(type))
+                _delegateSet.Add(type);
+        }
+
+        private void LoadAdaptor(Type type)
+        {
+            if (!_adaptorSet.Contains(type))
+                _adaptorSet.Add(type);
         }
 
         private void LoadTemplates()
@@ -291,6 +351,8 @@ namespace CodeGenerationTools
 
         private void CreateILRuntimeHelper()
         {
+            Print($"==================Begin create helper:=====================");
+
             //export helper
             var helperStr = _helperTmpd;
 
@@ -309,7 +371,7 @@ namespace CodeGenerationTools
             helperStr = helperStr.Replace("{$DelegateInit}", delegateStr);
 
             var delegateRegStr = "";
-            foreach (var val in _delegateRegisterSet.Values)
+            foreach (var val in _delegateRegDic.Values)
             {
                 if (val is Type)
                 {
@@ -329,6 +391,8 @@ namespace CodeGenerationTools
                 sw.Write(helperStr);
                 sw.Flush();
             }
+
+            Print($"==============End create helper:===================");
         }
 
         private void CreateAdaptor(Type type)
@@ -336,6 +400,8 @@ namespace CodeGenerationTools
             if (type.IsInterface)
                 return;
 
+            Print($"================begin create adaptor:{type.Name}=======================");
+            
             var adaptorName = type.Name + "Adaptor";
             var classbody = _adaptorTmpd;
             var methodsbody = "";
@@ -370,6 +436,9 @@ namespace CodeGenerationTools
                 sw.Write(classbody);
                 sw.Flush();
             }
+
+            Print($"================end create adaptor:{type.Name}=======================");
+
         }
 
         private string CreateInterfaceAdaptor(Type type, Type childType)
@@ -438,91 +507,7 @@ namespace CodeGenerationTools
             return methodStr;
         }
 
-        private void LoadILAssemblyClick(object sender, EventArgs e)
-        {
-            var targetPath = sourcePath1.Text;
-
-            if (targetPath == "")
-            {
-                if (OD.ShowDialog() != DialogResult.OK) return;
-
-                Properties.Settings.Default["assembly_path"] = OD.FileName;
-                Properties.Settings.Default.Save();
-                sourcePath1.Text = targetPath = OD.FileName;
-            }
-
-            textBox1.Text = "";
-
-            var assembly = Assembly.LoadFrom(targetPath);
-            if (assembly == null) return;
-            //types
-            var types = assembly.GetTypes();
-            _adptorAttr = assembly.GetType(AdaptorAttrName);
-            _delegateAttr = assembly.GetType(DelegateAttrName);
-
-            foreach (var type in types)
-            {
-                //load ad
-                var attr = type.GetCustomAttribute(_adptorAttr, false);
-                if (attr != null)
-                {
-                    Console.WriteLine("[adaptor]" + type.FullName);
-                    LoadAdaptor(type);
-                    continue;
-                }
-
-                //load delegate
-                var attr1 = type.GetCustomAttribute(_delegateAttr, false);
-                if (attr1 != null)
-                {
-                    Console.WriteLine("[delegate convertor]" + type.FullName);
-                    LoadDelegateConvertor(type);
-                    //Console.WriteLine("[delegate register]" + type.FullName);
-                    //LoadDelegateRegister(type.FullName, type);
-                }
-            }
-
-        }
-
-        private void LoadUnityAssemblyClick(object sender, EventArgs e)
-        {
-            var targetPath = sourcePath2.Text;
-
-            if (targetPath == "")
-            {
-                if (OD.ShowDialog() != DialogResult.OK) return;
-
-                Properties.Settings.Default["assembly_path1"] = OD.FileName;
-                Properties.Settings.Default.Save();
-                sourcePath2.Text = targetPath = OD.FileName;
-            }
-
-            using (var testFs = File.Open(targetPath, FileMode.Open))
-            {
-                var module = ModuleDefinition.ReadModule(testFs);
-                foreach (var typeDefinition in module.Types)
-                {
-                    foreach (var methodDefinition in typeDefinition.Methods)
-                    {
-                        foreach (var instruction in methodDefinition.Body.Instructions)
-                        {
-                            if (instruction.OpCode != OpCodes.Newobj || instruction.Previous == null ||
-                                instruction.Previous.OpCode != OpCodes.Ldftn) continue;
-
-                            var type = instruction.Operand as MethodReference;
-                            if (type == null ||
-                                (!type.DeclaringType.Name.Contains("Action") &&
-                                 !type.DeclaringType.Name.Contains("Func"))) continue;
-
-                            Console.WriteLine("[delegate register]" + type.DeclaringType.FullName);
-                            LoadDelegateRegister(type.DeclaringType.FullName, type.DeclaringType);
-                        }
-                    }
-                }
-            }
-
-        }
-
+        #endregion
 
     }
 }
