@@ -11,7 +11,9 @@ namespace ILRuntimeDebugEngine.AD7
     class ILProperty : IDebugProperty2
     {
         VariableInfo info;
+        Dictionary<string, ILProperty> children = new Dictionary<string, ILProperty>();
 
+        public Dictionary<string, ILProperty> Children { get { return children; } }
         public ILProperty(VariableInfo info)
         {
             this.info = info;
@@ -129,6 +131,16 @@ namespace ILRuntimeDebugEngine.AD7
         private bool IsExpandable()
         {
             return info.Expandable;
+        }
+
+        public VariableReference GetVariableReference()
+        {
+            VariableReference res = new VariableReference();
+            res.Address = info.Address;
+            res.Type = info.Type;
+            res.Offset = info.Offset;
+
+            return res;
         }
     }
 }

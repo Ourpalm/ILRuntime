@@ -50,10 +50,26 @@ namespace ILRuntimeDebugEngine.AD7
             pbstrError = "";
             pichError = 0;
             ppExpr = null;
-            ILProperty prop;
-            if(propertyMapping.TryGetValue(pszCode, out prop))
+            string[] names = pszCode.Split('.');
+            ILProperty root = null;
+            if(!propertyMapping.TryGetValue(names[0], out root))
             {
-                ppExpr = new AD7Expression(prop);
+                if (!propertyMapping.TryGetValue("this", out root))
+                {
+                    pbstrError = "Unsupported Expression";
+                    pichError = (uint)pbstrError.Length;
+                    return Constants.S_FALSE;
+                }
+            }
+
+            if (names.Length < 2)
+            {
+                ppExpr = new AD7Expression(root);
+                return Constants.S_OK;
+            }
+            else
+            {
+                ppExpr = new AD7Expression(Engine, root, names);
                 return Constants.S_OK;
             }
             /*string lookup = pszCode;
@@ -65,10 +81,7 @@ namespace ILRuntimeDebugEngine.AD7
                 ppExpr = new AD7Expression(new MonoProperty(ThreadContext, result));
                 return VSConstants.S_OK;
             }
-            */
-            pbstrError = "Unsupported Expression";
-            pichError = (uint)pbstrError.Length;
-            return Constants.S_FALSE;
+            */            
         }
 
         public int EnumProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout,

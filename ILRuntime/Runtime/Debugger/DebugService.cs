@@ -433,6 +433,11 @@ namespace ILRuntime.Runtime.Debugger
             return frameInfos;
         }
 
+        internal VariableInfo ResolveVariable(VariableReference parent, string name)
+        {
+            return null;
+        }
+
         unsafe bool GetValueExpandable(StackObject* esp, List<object> mStack)
         {
             if (esp->ObjectType < ObjectTypes.Object)
