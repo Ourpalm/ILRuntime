@@ -12,6 +12,7 @@ This tool is used to generate some necessary code for ILRuntime.AppDomain, which
 **How to Use**
 ============
 ![picture1](./pic_1.png)
+
 1. Click "Load Main Assembly" button to add the [Main Project] path to the tool;
 2. Set "Adaptor Export" and "Delegate Export" 's values. the value is a full name of a custom [System.Attribute] class to mark the class or delegate which is need to export.
 3. Click "Load ILScript Assembly" button to add the [ILScript Project] path to the tool;
