@@ -507,17 +507,17 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (i.ParameterCount == param.Count)
                 {
+                    if (genericArguments != null && i.GenericParameterCount != genericArguments.Length)
+                        continue;
                     bool match = true;
-                    if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
-
-                        for (int j = 0; j < param.Count; j++)
+                    for (int j = 0; j < param.Count; j++)
+                    {
+                        if (param[j] != i.Parameters[j])
                         {
-                            if (param[j] != i.Parameters[j])
-                            {
-                                match = false;
-                                break;
-                            }
+                            match = false;
+                            break;
                         }
+                    }
                     if (match)
                         return i;
                 }
