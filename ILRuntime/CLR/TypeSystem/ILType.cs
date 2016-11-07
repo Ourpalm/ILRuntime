@@ -440,25 +440,7 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            for (int j = 0; j < param.Count; j++)
-                            {
-                                var p = i.Parameters[j];
-                                if (p is CLR.TypeSystem.ILGenericParameterType)
-                                {
-                                    //TODO should match the generic parameters;
-                                    continue;
-                                }
-                                if (param[j] != p)
-                                {
-                                    match = false;
-                                    break;
-                                }
-                            }
-                            if (match)
-                            {
-                                genericMethod = i;
-                                break;
-                            }
+                            genericMethod = CheckGenericParams(i, param, ref match);
                         }
                         else
                         {
@@ -485,6 +467,30 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
+        ILMethod CheckGenericParams(ILMethod i, List<IType> param, ref bool match)
+        {
+            ILMethod genericMethod = null;
+            for (int j = 0; j < param.Count; j++)
+            {
+                var p = i.Parameters[j];
+                if (p is CLR.TypeSystem.ILGenericParameterType)
+                {
+                    //TODO should match the generic parameters;
+                    continue;
+                }
+                if (param[j] != p)
+                {
+                    match = false;
+                    break;
+                }
+            }
+            if (match)
+            {
+                genericMethod = i;
+            }
+            return genericMethod;
+        }
+
         public IMethod GetConstructor(int paramCnt)
         {
             if (constructors == null)
@@ -509,7 +515,11 @@ namespace ILRuntime.CLR.TypeSystem
                 {
                     bool match = true;
                     if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
-
+                    {
+                        CheckGenericParams(i, param, ref match);
+                    }
+                    else
+                    {
                         for (int j = 0; j < param.Count; j++)
                         {
                             if (param[j] != i.Parameters[j])
@@ -518,6 +528,7 @@ namespace ILRuntime.CLR.TypeSystem
                                 break;
                             }
                         }
+                    }
                     if (match)
                         return i;
                 }
