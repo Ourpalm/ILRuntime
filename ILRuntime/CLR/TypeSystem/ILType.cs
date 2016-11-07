@@ -514,21 +514,16 @@ namespace ILRuntime.CLR.TypeSystem
                 if (i.ParameterCount == param.Count)
                 {
                     bool match = true;
-                    if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
+
+                    for (int j = 0; j < param.Count; j++)
                     {
-                        CheckGenericParams(i, param, ref match);
-                    }
-                    else
-                    {
-                        for (int j = 0; j < param.Count; j++)
+                        if (param[j] != i.Parameters[j])
                         {
-                            if (param[j] != i.Parameters[j])
-                            {
-                                match = false;
-                                break;
-                            }
+                            match = false;
+                            break;
                         }
                     }
+
                     if (match)
                         return i;
                 }
