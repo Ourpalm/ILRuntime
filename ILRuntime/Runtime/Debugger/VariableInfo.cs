@@ -9,7 +9,17 @@ namespace ILRuntime.Runtime.Debugger
     {
         Normal,
         FieldReference,
+        Error,
     }
+
+    public class VariableReference
+    {
+        public long Address { get; set; }
+        public VariableTypes Type { get; set; }
+        public int Offset { get; set; }
+        public VariableReference Parent { get; set; }
+    }
+
     public class VariableInfo
     {
         public long Address { get; set; }

@@ -257,6 +257,39 @@ namespace ILRuntimeDebugEngine.AD7
             }
         }
 
+        VariableInfo resolved;
+        public VariableInfo ResolveVariable(VariableReference reference, string name)
+        {
+            CSResolveVariable msg = new CSResolveVariable();
+            msg.Name = name;
+            msg.Parent = reference;
+            resolved = null;
+            SendResolveVariable(msg);
+
+            while(resolved == null)
+            {
+                System.Threading.Thread.Sleep(10);
+            }
+            return resolved;
+        }
+
+        void SendResolveVariable(CSResolveVariable msg)
+        {
+            sendStream.Position = 0;
+            bw.Write(msg.Name);
+            WriteVariableReference(msg.Parent);
+            socket.Send(DebugMessageType.CSResolveVariable, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        void WriteVariableReference(VariableReference reference)
+        {
+            bw.Write(reference != null);
+            bw.Write(reference.Address);
+            bw.Write((byte)reference.Type);
+            bw.Write(reference.Offset);
+            WriteVariableReference(reference.Parent);
+        }
+
         void OnReceiveSCBreakpointHit(SCBreakpointHit msg)
         {
             AD7PendingBreakPoint bp;

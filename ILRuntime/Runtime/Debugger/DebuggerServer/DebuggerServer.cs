@@ -156,8 +156,30 @@ namespace ILRuntime.Runtime.Debugger
                         ds.StepThread(msg.ThreadHashCode, msg.StepType);
                     }
                     break;
+                case DebugMessageType.CSResolveVariable:
+                    {
+                        CSResolveVariable msg = new CSResolveVariable();
+                        msg.Name = br.ReadString();
+                        msg.Parent = ReadVariableReference(br);
+                        var info = ds.ResolveVariable(msg.Parent, msg.Name);
+                    }
+                    break;
             }
 
+        }
+
+        VariableReference ReadVariableReference(System.IO.BinaryReader br)
+        {
+            VariableReference res = null;
+            if (br.ReadBoolean())
+            {
+                res = new Debugger.VariableReference();
+                res.Address = br.ReadInt64();
+                res.Type = (VariableTypes)br.ReadByte();
+                res.Offset = br.ReadInt32();
+                res.Parent = ReadVariableReference(br);
+            }
+            return res;
         }
 
         void SendAttachResult()
@@ -252,6 +274,13 @@ namespace ILRuntime.Runtime.Debugger
             DoSend(DebugMessageType.SCStepComplete);
         }
 
+        void SendSCResolveVariableResult(VariableInfo info)
+        {
+            sendStream.Position = 0;
+            WriteVariableInfo(info);
+            DoSend(DebugMessageType.SCResolveVariableResult);
+        }
+
         void WriteStackFrames(KeyValuePair<int, StackFrameInfo[]>[] info)
         {
             bw.Write(info.Length);
@@ -270,16 +299,21 @@ namespace ILRuntime.Runtime.Debugger
                     bw.Write(j.LocalVariables.Length);
                     foreach (var k in j.LocalVariables)
                     {
-                        bw.Write(k.Address);
-                        bw.Write((byte)k.Type);
-                        bw.Write(k.Offset);
-                        bw.Write(k.Name);
-                        bw.Write(k.Value);
-                        bw.Write(k.TypeName);
-                        bw.Write(k.Expandable);
+                        WriteVariableInfo(k);
                     }
                 }
             }
+        }
+
+        void WriteVariableInfo(VariableInfo k)
+        {
+            bw.Write(k.Address);
+            bw.Write((byte)k.Type);
+            bw.Write(k.Offset);
+            bw.Write(k.Name);
+            bw.Write(k.Value);
+            bw.Write(k.TypeName);
+            bw.Write(k.Expandable);
         }
 
         internal void SendSCThreadStarted(int threadHash)
