@@ -29,7 +29,7 @@ This tool is used to generate some necessary code for ILRuntime.AppDomain, which
 1. Click "Load Main Assembly" button to add the [Main Project] path to the tool;
 2. Click "Load ILScript Assembly" button to add the [ILScript Project] path to the tool;
 3. Click the "Generate" button to generate code.
-4. Click the "Copy" button to copy the code to your [Main Project]'s folder named "AutoGenerate" 
+4. Click the "Copy" button to copy the code to your [Main Project]'s folder named [Output Path]
 
 **Example**
 ==============
