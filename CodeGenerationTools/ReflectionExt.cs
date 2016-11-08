@@ -10,12 +10,12 @@ namespace CodeGenerationTools
     public static class ReflectionExt
     {
         public static readonly List<AccessModifier> AccessModifiers = new List<AccessModifier>
-    {
-        AccessModifier.Private,
-        AccessModifier.Protected,
-        AccessModifier.Internal,
-        AccessModifier.Public
-    };
+        {
+            AccessModifier.Private,
+            AccessModifier.Protected,
+            AccessModifier.Internal,
+            AccessModifier.Public
+        };
 
         public static AccessModifier Accessmodifier(this PropertyInfo propertyInfo)
         {

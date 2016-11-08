@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
+using ILRuntime.Other;
 
 namespace ILRuntimeTest.TestFramework
 {

@@ -41,16 +41,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.adaptorTxt = new System.Windows.Forms.TextBox();
-            this.delegateTxt = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // LoadButton
             // 
             this.LoadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.LoadButton.Location = new System.Drawing.Point(719, 548);
+            this.LoadButton.Location = new System.Drawing.Point(590, 412);
             this.LoadButton.Margin = new System.Windows.Forms.Padding(2);
             this.LoadButton.Name = "LoadButton";
             this.LoadButton.Size = new System.Drawing.Size(74, 32);
@@ -68,18 +64,18 @@
             this.outputText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.outputText.Location = new System.Drawing.Point(6, 120);
+            this.outputText.Location = new System.Drawing.Point(6, 79);
             this.outputText.Margin = new System.Windows.Forms.Padding(2);
             this.outputText.Multiline = true;
             this.outputText.Name = "outputText";
             this.outputText.ReadOnly = true;
-            this.outputText.Size = new System.Drawing.Size(871, 421);
+            this.outputText.Size = new System.Drawing.Size(742, 326);
             this.outputText.TabIndex = 2;
             // 
             // CopyButton
             // 
             this.CopyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CopyButton.Location = new System.Drawing.Point(797, 549);
+            this.CopyButton.Location = new System.Drawing.Point(668, 413);
             this.CopyButton.Margin = new System.Windows.Forms.Padding(2);
             this.CopyButton.Name = "CopyButton";
             this.CopyButton.Size = new System.Drawing.Size(80, 30);
@@ -92,10 +88,10 @@
             // 
             this.outputPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.outputPath.Location = new System.Drawing.Point(124, 556);
+            this.outputPath.Location = new System.Drawing.Point(124, 420);
             this.outputPath.Margin = new System.Windows.Forms.Padding(2);
             this.outputPath.Name = "outputPath";
-            this.outputPath.Size = new System.Drawing.Size(586, 21);
+            this.outputPath.Size = new System.Drawing.Size(457, 21);
             this.outputPath.TabIndex = 4;
             // 
             // sourcePath1
@@ -105,23 +101,23 @@
             this.sourcePath1.Location = new System.Drawing.Point(124, 14);
             this.sourcePath1.Margin = new System.Windows.Forms.Padding(2);
             this.sourcePath1.Name = "sourcePath1";
-            this.sourcePath1.Size = new System.Drawing.Size(586, 21);
+            this.sourcePath1.Size = new System.Drawing.Size(457, 21);
             this.sourcePath1.TabIndex = 5;
             // 
             // sourcePath2
             // 
             this.sourcePath2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.sourcePath2.Location = new System.Drawing.Point(124, 84);
+            this.sourcePath2.Location = new System.Drawing.Point(124, 49);
             this.sourcePath2.Margin = new System.Windows.Forms.Padding(2);
             this.sourcePath2.Name = "sourcePath2";
-            this.sourcePath2.Size = new System.Drawing.Size(586, 21);
+            this.sourcePath2.Size = new System.Drawing.Size(457, 21);
             this.sourcePath2.TabIndex = 6;
             // 
             // AddButton2
             // 
             this.AddButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.AddButton2.Location = new System.Drawing.Point(719, 78);
+            this.AddButton2.Location = new System.Drawing.Point(590, 43);
             this.AddButton2.Margin = new System.Windows.Forms.Padding(2);
             this.AddButton2.Name = "AddButton2";
             this.AddButton2.Size = new System.Drawing.Size(158, 32);
@@ -133,7 +129,7 @@
             // AddButton1
             // 
             this.AddButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.AddButton1.Location = new System.Drawing.Point(719, 7);
+            this.AddButton1.Location = new System.Drawing.Point(590, 7);
             this.AddButton1.Margin = new System.Windows.Forms.Padding(2);
             this.AddButton1.Name = "AddButton1";
             this.AddButton1.Size = new System.Drawing.Size(158, 32);
@@ -154,7 +150,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 88);
+            this.label2.Location = new System.Drawing.Point(12, 53);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(89, 12);
             this.label2.TabIndex = 10;
@@ -169,47 +165,11 @@
             this.label3.TabIndex = 11;
             this.label3.Text = "Output Path:";
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(24, 53);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(95, 12);
-            this.label4.TabIndex = 12;
-            this.label4.Text = "Adaptor Export:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(334, 53);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(101, 12);
-            this.label5.TabIndex = 13;
-            this.label5.Text = "Delegate Export:";
-            // 
-            // adaptorTxt
-            // 
-            this.adaptorTxt.Location = new System.Drawing.Point(124, 50);
-            this.adaptorTxt.Name = "adaptorTxt";
-            this.adaptorTxt.Size = new System.Drawing.Size(204, 21);
-            this.adaptorTxt.TabIndex = 14;
-            // 
-            // delegateTxt
-            // 
-            this.delegateTxt.Location = new System.Drawing.Point(441, 50);
-            this.delegateTxt.Name = "delegateTxt";
-            this.delegateTxt.Size = new System.Drawing.Size(269, 21);
-            this.delegateTxt.TabIndex = 15;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(888, 590);
-            this.Controls.Add(this.delegateTxt);
-            this.Controls.Add(this.adaptorTxt);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
+            this.ClientSize = new System.Drawing.Size(759, 454);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -246,10 +206,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox adaptorTxt;
-        private System.Windows.Forms.TextBox delegateTxt;
     }
 }
 

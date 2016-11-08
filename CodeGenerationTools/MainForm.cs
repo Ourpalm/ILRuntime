@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using ILRuntime.Other;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+
 
 namespace CodeGenerationTools
 {
@@ -14,6 +16,7 @@ namespace CodeGenerationTools
     {
         #region Fields
         private string _outputPath;
+
         private string _helperTmpd;
         private string _adaptorTmpd;
         private string _adaptorInterfaceTmpd;
@@ -34,11 +37,11 @@ namespace CodeGenerationTools
         private readonly Dictionary<string, object> _delegateRegDic = new Dictionary<string, object>();
 
 
-        private string _adaptorAttrName = "ILRuntimeTest.TestFramework.NeedAdaptorAttribute";
-        private string _delegateAttrName = "ILRuntimeTest.TestFramework.DelegateExportAttribute";
+        //private string _adaptorAttrName = "ILRuntimeTest.TestFramework.NeedAdaptorAttribute";
+        //private string _delegateAttrName = "ILRuntimeTest.TestFramework.DelegateExportAttribute";
 
-        private Type _adptorAttr;
-        private Type _delegateAttr;
+        //private Type _adptorAttr ;
+        //private Type _delegateAttr;
 
         #endregion
 
@@ -58,10 +61,10 @@ namespace CodeGenerationTools
             outputPath.Text = Properties.Settings.Default["out_path"] as string;
             sourcePath1.Text = Properties.Settings.Default["assembly_path"] as string;
             sourcePath2.Text = Properties.Settings.Default["assembly_path1"] as string;
-            adaptorTxt.Text = Properties.Settings.Default["adaptor_export_attr"] as string;
-            if (adaptorTxt.Text == "") adaptorTxt.Text = _adaptorAttrName;
-            delegateTxt.Text = Properties.Settings.Default["delegate_export_attr"] as string;
-            if (delegateTxt.Text == "") delegateTxt.Text = _delegateAttrName;
+            //adaptorTxt.Text = Properties.Settings.Default["adaptor_export_attr"] as string;
+            //if (adaptorTxt.Text == "") adaptorTxt.Text = _adaptorAttrName;
+            //delegateTxt.Text = Properties.Settings.Default["delegate_export_attr"] as string;
+            //if (delegateTxt.Text == "") delegateTxt.Text = _delegateAttrName;
             outputText.Text = "";
 
             _adaptorSet.Clear();
@@ -76,8 +79,8 @@ namespace CodeGenerationTools
             Properties.Settings.Default["out_path"] = outputPath.Text;
             Properties.Settings.Default["assembly_path"] = sourcePath1.Text;
             Properties.Settings.Default["assembly_path1"] = sourcePath2.Text;
-            Properties.Settings.Default["adaptor_export_attr"] = adaptorTxt.Text;
-            Properties.Settings.Default["delegate_export_attr"] = delegateTxt.Text;
+            //Properties.Settings.Default["adaptor_export_attr"] = adaptorTxt.Text;
+            //Properties.Settings.Default["delegate_export_attr"] = delegateTxt.Text;
 
             Properties.Settings.Default.Save();
         }
@@ -95,26 +98,15 @@ namespace CodeGenerationTools
                 sourcePath1.Text = targetPath = OD.FileName;
             }
 
-            _adaptorAttrName = adaptorTxt.Text;
-            _delegateAttrName = delegateTxt.Text;
-
-            if (string.IsNullOrEmpty(_adaptorAttrName) || string.IsNullOrEmpty(_delegateAttrName))
-            {
-                Print("[Error] Adaptor Export Attribute or DelegateAttribute is Empty");
-                return;
-            }
-
             var assembly = Assembly.LoadFrom(targetPath);
             if (assembly == null) return;
             //types
             var types = assembly.GetTypes();
-            _adptorAttr = assembly.GetType(_adaptorAttrName);
-            _delegateAttr = assembly.GetType(_delegateAttrName);
 
             foreach (var type in types)
             {
                 //load ad
-                var attr = type.GetCustomAttribute(_adptorAttr, false);
+                var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
                 if (attr != null)
                 {
                     Print("[adaptor]" + type.FullName);
@@ -123,7 +115,7 @@ namespace CodeGenerationTools
                 }
 
                 //load delegate
-                var attr1 = type.GetCustomAttribute(_delegateAttr, false);
+                var attr1 = type.GetCustomAttribute(typeof(DelegateExportAttribute), false);
                 if (attr1 != null)
                 {
                     Print("[delegate convertor]" + type.FullName);
@@ -180,6 +172,12 @@ namespace CodeGenerationTools
                 return;
             }
 
+            Print("===============================Clear Old Files================================");
+            var files = Directory.GetFiles(_outputPath);
+            foreach (var file in files)
+            {
+                File.Delete(file);
+            }
 
             Print("[=============================Generate Begin==============================]");
 
@@ -401,7 +399,7 @@ namespace CodeGenerationTools
                 return;
 
             Print($"================begin create adaptor:{type.Name}=======================");
-            
+
             var adaptorName = type.Name + "Adaptor";
             var classbody = _adaptorTmpd;
             var methodsbody = "";

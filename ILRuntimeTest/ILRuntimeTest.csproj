@@ -68,9 +68,7 @@
     <Compile Include="TestBase\StaticTestUnit.cs" />
     <Compile Include="TestBase\TestResultInfo.cs" />
     <Compile Include="TestFramework\ClassInheritanceTest.cs" />
-    <Compile Include="TestFramework\DelegateExportAttribute.cs" />
     <Compile Include="TestFramework\DelegateTest.cs" />
-    <Compile Include="TestFramework\NeedAdaptorAttribute.cs" />
     <Compile Include="TestFramework\TestClass2.cs" />
     <Compile Include="TestFramework\TestClass3.cs" />
     <EmbeddedResource Include="Form1.resx">
