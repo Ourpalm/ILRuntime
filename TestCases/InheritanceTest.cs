@@ -11,8 +11,8 @@ namespace TestCases
     {
         public static void InheritanceTest01()
         {
-            TestCls cls = new TestCases.InheritanceTest.TestCls();
-            TestCls2 cls2 = new TestCases.InheritanceTest.TestCls2();
+            TestCls cls = new TestCls();
+            TestCls2 cls2 = new TestCls2();
             TestCls3 cls3 = new TestCls3();
 
             Console.WriteLine("Test invoking from sub type...");
@@ -90,68 +90,69 @@ namespace TestCases
             }
         }
 
-        class TestCls : ClassInheritanceTest
+        
+    }
+    class TestCls : ClassInheritanceTest
+    {
+        public TestCls()
         {
-            public TestCls()
-            {
-                testVal = 1;
-            }
-            public override void TestAbstract()
-            {
-                Console.WriteLine("This is TestCls.TestAbstract");
-            }
-
-            public override void TestVirtual()
-            {
-                base.TestVirtual();
-                Console.WriteLine("This is TestCls.TestVirtual");
-            }
-
-            public override string ToString()
-            {
-                return "This is TestCls";
-            }
+            testVal = 1;
+        }
+        public override void TestAbstract()
+        {
+            Console.WriteLine("This is TestCls.TestAbstract");
         }
 
-        class TestCls2 : ClassInheritanceTest
+        public override void TestVirtual()
         {
-            public TestCls2()
-            {
-                testVal = 2;
-            }
-            public override void TestAbstract()
-            {
-                Console.WriteLine("This is TestCls2.TestAbstract");
-            }
-
-            public override void TestVirtual()
-            {
-                Console.WriteLine("This is TestCls2.TestVirtual");
-            }
+            base.TestVirtual();
+            Console.WriteLine("This is TestCls.TestVirtual");
         }
 
-        class TestCls3 : InterfaceTest
+        public override string ToString()
         {
-            int testVal;
+            return "This is TestCls";
+        }
+    }
 
-            public TestCls3()
-            {
-                testVal = 3;
-            }
-            public void TestAbstract()
-            {
-                Console.WriteLine("This is TestCls3.TestAbstract");
-            }
+    class TestCls2 : ClassInheritanceTest
+    {
+        public TestCls2()
+        {
+            testVal = 2;
+        }
+        public override void TestAbstract()
+        {
+            Console.WriteLine("This is TestCls2.TestAbstract");
+        }
 
-            public void TestField()
-            {
-                Console.WriteLine("testValChild = " + testVal);
-            }
+        public override void TestVirtual()
+        {
+            Console.WriteLine("This is TestCls2.TestVirtual");
+        }
+    }
 
-            public void TestVirtual()
-            {
-                Console.WriteLine("This is TestCls3.TestVirtual");
-            }
+    class TestCls3 : InterfaceTest
+    {
+        int testVal;
+
+        public TestCls3()
+        {
+            testVal = 3;
+        }
+        public void TestAbstract()
+        {
+            Console.WriteLine("This is TestCls3.TestAbstract");
+        }
+
+        public void TestField()
+        {
+            Console.WriteLine("testValChild = " + testVal);
+        }
+
+        public void TestVirtual()
+        {
+            Console.WriteLine("This is TestCls3.TestVirtual");
         }
     }
 }

@@ -7,6 +7,19 @@ namespace TestCases
 {
     class Test03
     {
+        public static void UnitTest_RefTest()
+        {
+            TestCls r = new TestCases.TestCls();
+            TestRef(ref r);
+            Console.WriteLine("Result = " + r.TestVal2);
+        }
+
+        static int TestRef(ref TestCls dest)
+        {
+            dest = new TestCases.TestCls();
+            dest.TestVal2 = 2;
+            return 0;
+        }
         public static object Run()
         {
             List<int> list1 = new List<int>();//c#Light 不支持模板，所以这里要注意一下

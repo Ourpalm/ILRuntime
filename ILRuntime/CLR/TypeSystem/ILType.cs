@@ -43,10 +43,7 @@ namespace ILRuntime.CLR.TypeSystem
             set
             {
                 typeRef = value;
-                if (value is GenericInstanceType)
-                    definition = (TypeDefinition)((GenericInstanceType)value).ElementType;
-                else
-                    definition = (TypeDefinition)value;
+                RetriveDefinitino(value);
             }
         }
 
@@ -162,11 +159,20 @@ namespace ILRuntime.CLR.TypeSystem
         public ILType(TypeReference def, Runtime.Enviorment.AppDomain domain)
         {
             this.typeRef = def;
+            RetriveDefinitino(def);
+            appdomain = domain;
+        }
+
+        void RetriveDefinitino(TypeReference def)
+        {
             if (def is GenericInstanceType)
                 definition = (TypeDefinition)((GenericInstanceType)def).ElementType;
+            else if (def is ByReferenceType)
+            {
+                definition = (TypeDefinition)((ByReferenceType)def).ElementType;
+            }
             else
                 definition = (TypeDefinition)def;
-            appdomain = domain;
         }
 
         public bool IsGenericInstance

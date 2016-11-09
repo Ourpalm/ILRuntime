@@ -101,7 +101,7 @@ namespace ILRuntimeTest
                     ILRuntimeHelper.Init(app);
 
                     //app.RegisterCrossBindingAdaptor(new TestFramework.ClassInheritanceAdaptor());
-                    //app.RegisterCrossBindingAdaptor(new TestFramework.InterfaceTestAdaptor());
+                    app.RegisterCrossBindingAdaptor(new TestFramework.InterfaceTestAdaptor());
                     //app.DelegateManager.RegisterMethodDelegate<int>();
                     ////app.DelegateManager.RegisterMethodDelegate<int, string>();
                     //app.DelegateManager.RegisterFunctionDelegate<int, int>();
