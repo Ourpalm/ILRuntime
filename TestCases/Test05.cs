@@ -5,8 +5,43 @@ using System.Collections.Generic;
 using System.Text;
 namespace TestCases
 {
+    class TestExplicit
+    {
+        bool boolVal;
+        double doubleVal;
+
+        public TestExplicit(bool boolVal)
+        {
+            this.boolVal = boolVal;
+        }
+
+        public TestExplicit(double doubleVal)
+        {
+            this.doubleVal = doubleVal;
+        }
+
+        public static explicit operator bool(TestExplicit data)
+        {
+            return data.boolVal;
+        } 
+
+        public static explicit operator double(TestExplicit data)
+        {
+            return data.doubleVal;
+        }
+    }
     class Test05
     {
+        public static void TestExplicit()
+        {
+            TestExplicit data = new TestCases.TestExplicit(true);
+            bool boolVal = (bool)data;
+            Console.WriteLine("bool=" + boolVal);
+
+            data = new TestCases.TestExplicit(1.2);
+            double doubleVal = (double)data;
+            Console.WriteLine("double=" + doubleVal);
+        }
         public static void Run()
         {
             TestTryCatch();
