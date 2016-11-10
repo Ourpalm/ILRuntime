@@ -572,7 +572,7 @@ namespace ILRuntime.Runtime.Enviorment
             IType t = GetType(type);
             if (t == null)
                 return null;
-            var m = t.GetMethod(method, p.Length);
+            var m = t.GetMethod(method, p != null ? p.Length : 0);
 
             if (m != null)
             {
