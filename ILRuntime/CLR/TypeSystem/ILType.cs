@@ -430,7 +430,7 @@ namespace ILRuntime.CLR.TypeSystem
                 return m;
         }
 
-        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments)
+        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null)
         {
             if (methods == null)
                 InitializeMethods();
@@ -457,6 +457,10 @@ namespace ILRuntime.CLR.TypeSystem
                                     match = false;
                                     break;
                                 }
+                            }
+                            if (match)
+                            {
+                                match = returnType == null || i.ReturnType == returnType;
                             }
                             if (match)
                                 return i;

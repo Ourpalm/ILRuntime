@@ -681,6 +681,7 @@ namespace ILRuntime.Runtime.Enviorment
             int hashCode = token.GetHashCode();
             IMethod method;
             IType[] genericArguments = null;
+            IType returnType;
             invalidToken = false;
             bool isConstructor = false;
             if (mapMethod.TryGetValue(hashCode, out method))
@@ -709,6 +710,7 @@ namespace ILRuntime.Runtime.Enviorment
                     isConstructor = methodname == ".ctor";
 
                 paramList = _ref.GetParamList(this, contextType);
+                returnType = GetType(_ref.ReturnType, contextType);
                 if (_ref.IsGenericInstance)
                 {
                     GenericInstanceMethod gim = (GenericInstanceMethod)_ref;
@@ -749,7 +751,7 @@ namespace ILRuntime.Runtime.Enviorment
                 method = type.GetConstructor(paramList);
             else
             {
-                method = type.GetMethod(methodname, paramList, genericArguments);
+                method = type.GetMethod(methodname, paramList, genericArguments, returnType);
                 if (method != null && method.IsGenericInstance)
                     mapMethod[method.GetHashCode()] = method;
             }

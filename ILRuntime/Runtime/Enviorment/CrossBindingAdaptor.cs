@@ -36,9 +36,9 @@ namespace ILRuntime.Runtime.Enviorment
             return type.GetMethod(name, paramCount);
         }
 
-        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments)
+        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null)
         {
-            return type.GetMethod(name, param, genericArguments);
+            return type.GetMethod(name, param, genericArguments, returnType);
         }
 
         public List<IMethod> GetMethods()

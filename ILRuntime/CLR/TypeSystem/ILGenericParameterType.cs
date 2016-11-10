@@ -42,7 +42,7 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
-        public Method.IMethod GetMethod(string name, List<IType> param, IType[] genericArguments)
+        public Method.IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null)
         {
             return null;
         }
