@@ -3009,7 +3009,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ip++;
                                             continue;
                                         case ObjectTypes.Double:
-                                            val = *(float*)&obj->Value;
+                                            val = (float)*(double*)&obj->Value;
                                             break;
                                         case ObjectTypes.Integer:
                                             val = obj->Value;
@@ -3031,7 +3031,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             val = (double)*(long*)&obj->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            val = *(double*)&obj->Value;
+                                            val = *(float*)&obj->Value;
                                             break;
                                         case ObjectTypes.Integer:
                                             val = obj->Value;
