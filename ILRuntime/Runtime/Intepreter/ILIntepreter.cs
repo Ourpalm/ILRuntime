@@ -74,6 +74,10 @@ namespace ILRuntime.Runtime.Intepreter
         }
         internal StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
         {
+            if (method.Name == "UnitTest_RefTest")
+            {
+
+            }
             if (method == null)
                 throw new NullReferenceException();
 #if UNITY_EDITOR
@@ -759,11 +763,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             esp->Value = a->Value / b->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            esp->ObjectType = ObjectTypes.Long;
+                                            esp->ObjectType = ObjectTypes.Float;
                                             *((float*)&esp->Value) = *((float*)&a->Value) / *((float*)&b->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            esp->ObjectType = ObjectTypes.Long;
+                                            esp->ObjectType = ObjectTypes.Double;
                                             *((double*)&esp->Value) = *((double*)&a->Value) / *((double*)&b->Value);
                                             break;
                                         default:

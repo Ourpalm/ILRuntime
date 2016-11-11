@@ -12,6 +12,10 @@ namespace TestCases
             TestCls r = new TestCases.TestCls();
             TestRef(ref r);
             Console.WriteLine("Result = " + r.TestVal2);
+            float a = 1.0f;
+            float b = a / 2;
+            var str = string.Format("{0:0.000}", b);
+            Console.WriteLine(str);
         }
 
         static int TestRef(ref TestCls dest)
