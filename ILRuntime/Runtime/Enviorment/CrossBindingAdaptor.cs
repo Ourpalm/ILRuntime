@@ -86,6 +86,11 @@ namespace ILRuntime.Runtime.Enviorment
             return type.ResolveGenericType(contextType);
         }
 
+        public IMethod GetVirtualMethod(IMethod method)
+        {
+            return type.GetVirtualMethod(method);
+        }
+
         public bool IsGenericInstance
         {
             get

@@ -1691,6 +1691,16 @@ namespace ILRuntime.Runtime.Intepreter
                                         var obj = mStack[objRef->Value];
                                         m = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                     }
+                                    else
+                                    {
+                                        var obj = mStack[objRef->Value];
+                                        if (obj is ILTypeInstance)
+                                            m = ((ILTypeInstance)obj).Type.GetVirtualMethod(m);
+                                        else if(obj is CrossBindingAdaptorType)
+                                        {
+                                            m = ((CrossBindingAdaptorType)obj).ILInstance.Type.BaseType.GetVirtualMethod(m);
+                                        }
+                                    }
                                     Free(objRef);
                                     esp = PushObject(objRef, mStack, m);
                                 }

@@ -31,6 +31,7 @@ namespace ILRuntime.CLR.TypeSystem
         IMethod GetMethod(string name, int paramCount);
 
         IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null);
+        IMethod GetVirtualMethod(IMethod method);
 
         List<IMethod> GetMethods();
 

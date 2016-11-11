@@ -409,7 +409,7 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IMethod GetVirtualMethod(IMethod method)
         {
-            var m = GetMethod(method.Name, method.Parameters, null);
+            var m = GetMethod(method.Name, method.Parameters, null, method.ReturnType);
             if (m == null)
             {
                 if (BaseType != null)

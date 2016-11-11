@@ -155,6 +155,17 @@ namespace ILRuntime.CLR.TypeSystem
             return res;
         }
 
+        public IMethod GetVirtualMethod(IMethod method)
+        {
+            var m = GetMethod(method.Name, method.Parameters, null, method.ReturnType);
+            if (m == null)
+            {
+                return method;
+            }
+            else
+                return m;
+        }
+
         void InitializeFields()
         {
             fieldMapping = new Dictionary<string, int>();
