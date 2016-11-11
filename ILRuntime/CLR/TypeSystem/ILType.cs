@@ -414,17 +414,10 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (BaseType != null)
                 {
-                    if (BaseType is ILType)
-                    {
-                        return ((ILType)BaseType).GetVirtualMethod(method);
-                    }
-                    else
-                    {
-                        return method;
-                    }
+                    return BaseType.GetVirtualMethod(method);
                 }
                 else
-                    return null;
+                    return method;
             }
             else
                 return m;
