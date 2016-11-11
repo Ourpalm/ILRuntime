@@ -262,7 +262,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             IMethod m = type.AppDomain.ObjectType.GetMethod("ToString", 0);
             m = type.GetVirtualMethod(m);
-            if (m != null)
+            if (m != null && m.DeclearingType.TypeForCLR != typeof(object))
             {
                 if (m is ILMethod)
                 {
