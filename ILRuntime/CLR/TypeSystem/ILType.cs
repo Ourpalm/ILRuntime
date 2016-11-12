@@ -417,7 +417,7 @@ namespace ILRuntime.CLR.TypeSystem
                     return BaseType.GetVirtualMethod(method);
                 }
                 else
-                    return method;
+                    return null;//BaseType == null means base type is Object or Enum
             }
             else
                 return m;
