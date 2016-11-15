@@ -46,6 +46,20 @@ namespace ILRuntime.Reflection
             fieldType = isStatic ? ilType.StaticFieldTypes[fieldIdx] : ilType.FieldTypes[fieldIdx];
         }
 
+        public ILRuntimeFieldInfo(FieldDefinition def, ILRuntimeType declaredType, int fieldIdx, IType fieldType)
+        {
+            definition = def;
+            this.name = def.Name;
+            dType = declaredType;
+            ilType = dType.ILType;
+            appdomain = ilType.AppDomain;
+            this.isStatic = false;
+            this.fieldIdx = fieldIdx;
+            if (isStatic)
+                attr |= System.Reflection.FieldAttributes.Static;
+            this.fieldType = fieldType;
+        }
+
         void InitializeCustomAttribute()
         {
             customAttributes = new object[definition.CustomAttributes.Count];

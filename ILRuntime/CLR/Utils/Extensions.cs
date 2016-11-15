@@ -44,8 +44,7 @@ namespace ILRuntime.CLR.Utils
                         if (t == null)
                             t = appdomain.GetType(name);
                     }
-                    if (t == null)
-                        throw new KeyNotFoundException("Cannot find type:" + i.ParameterType);
+
                     param.Add(t);
                 }
                 return param;

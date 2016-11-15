@@ -160,6 +160,8 @@ namespace TestCases
     class SingletonTest : Singleton<SingletonTest>
     {
         public string Test { get; set; }
+        public float testFloat;
+        public static int TestStaticField;
         public string foo()
         {
             return Inst.Test;
@@ -177,6 +179,7 @@ namespace TestCases
     class Singleton<T> where T : class,new()
     {
         private static T _inst;
+        public int testField;
 
         public Singleton()
         {

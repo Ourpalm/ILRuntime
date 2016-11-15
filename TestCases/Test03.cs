@@ -5,8 +5,69 @@ using System.Text;
 
 namespace TestCases
 {
+
     class Test03
     {
+        public class TestGenrRefBase
+        {
+            public int v;
+
+            public TestGenrRefBase()
+            {
+                v = 1;
+            }
+
+            public TestGenrRefBase(int val)
+            {
+                v = val;
+            }
+        }
+
+        public class TestGenrRef : TestGenrRefBase
+        {
+            public TestGenrRef()
+            {
+                v = 5;
+            }
+        }
+
+        public static void UnitTest_GenericsRefOut()
+        {
+            TestGenrRef t1 = new TestGenrRef();
+            t1.v = 2;
+            TestGenrRef t2 = ReadData<TestGenrRef>(ref t1);
+
+            Console.WriteLine("new val:" + t2.v);
+        }
+
+
+        static T ReadData<T>(ref T obj) where T : TestGenrRefBase, new()
+        {
+            obj = new T();
+            obj.v = 6;
+            return obj;
+        }
+
+        public static void UnitTest_GenericsRefOut2()
+        {
+
+            TestGenrRef t = ReadData2<TestGenrRef>(null, new TestGenrRef());
+
+            Console.WriteLine("new val:" + t.v);
+        }
+
+
+        static T ReadData2<T>(byte[] data, T obj) where T : TestGenrRefBase, new()
+        {   
+            return Read<T>(obj);
+        }
+
+        static T Read<T>(T dest) where T : TestGenrRefBase, new()
+        {
+            dest.v = 111;
+            return dest;
+        }
+
         public static void UnitTest_RefTest()
         {
             TestCls r = new TestCases.TestCls();
@@ -17,6 +78,16 @@ namespace TestCases
             var str = string.Format("{0:0.000}", b);
             Console.WriteLine(str);
         }
+
+        public static void UnitTest_RefTest2()
+        {
+            SingletonTest r = new TestCases.SingletonTest();
+            SingletonTest r2 = TestRef<SingletonTest>(ref r);
+
+            Console.WriteLine("Result = " + r.testFloat);
+            
+        }
+
 
         public static void UnitTest_OutTest()
         {
@@ -34,6 +105,14 @@ namespace TestCases
             dest.TestVal2 = 2;
             return 0;
         }
+
+        static T TestRef<T>(ref T obj) where T : SingletonTest, new()
+        {
+            obj.testFloat = 3;
+
+            return obj;
+        }
+
         public static object Run()
         {
             List<int> list1 = new List<int>();//c#Light 不支持模板，所以这里要注意一下

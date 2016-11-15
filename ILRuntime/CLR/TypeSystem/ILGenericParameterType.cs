@@ -92,7 +92,7 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IType MakeByRefType()
         {
-            throw new NotImplementedException();
+            return this;
         }
 
 
