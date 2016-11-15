@@ -347,6 +347,17 @@ namespace ILRuntime.Runtime.Intepreter
                                                 LoadFromArrayReference(obj, idx, objRef, t, mStack);
                                             }
                                             break;
+                                        case ObjectTypes.StackObjectReference:
+                                            {
+                                                var obj = GetObjectAndResolveReference(objRef);
+                                                *objRef = *obj;
+                                                if(objRef->ObjectType >= ObjectTypes.Object)
+                                                {
+                                                    objRef->Value = mStack.Count;
+                                                    mStack.Add(mStack[obj->Value]);
+                                                }
+                                            }
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -362,6 +373,20 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 var t = AppDomain.GetType(ip->TokenInteger);
                                                 StoreValueToArrayReference(objRef, val, t, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.StackObjectReference:
+                                            {
+                                                objRef = GetObjectAndResolveReference(objRef);
+                                                if(val->ObjectType >= ObjectTypes.Object)
+                                                {
+                                                    mStack[objRef->Value] = mStack[val->Value];
+                                                    objRef->ValueLow = val->ValueLow;
+                                                }
+                                                else
+                                                {
+                                                    *objRef = *val;
+                                                }
                                             }
                                             break;
                                         default:

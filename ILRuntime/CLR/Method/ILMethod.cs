@@ -448,16 +448,28 @@ namespace ILRuntime.CLR.Method
             foreach (var i in def.Parameters)
             {
                 IType type = null;
-                
-                if (i.ParameterType.IsGenericParameter)
+                bool isByRef = false;
+                bool isArray = false;
+                TypeReference pt = i.ParameterType;
+                if (i.ParameterType.IsByReference)
                 {
-                    type = FindGenericArgument(i.ParameterType.Name);
+                    isByRef = true;
+                    pt = pt.GetElementType();
+                }
+                if (i.ParameterType.IsArray)
+                {
+                    isArray = true;
+                    pt = pt.GetElementType();
+                }
+                if (pt.IsGenericParameter)
+                {
+                    type = FindGenericArgument(pt.Name);
                     if (type == null && def.HasGenericParameters)
                     {
                         bool found = false;
                         foreach (var j in def.GenericParameters)
                         {
-                            if (j.Name == i.ParameterType.Name)
+                            if (j.Name == pt.Name)
                             {
                                 found = true;
                                 break;
@@ -465,11 +477,16 @@ namespace ILRuntime.CLR.Method
                         }
                         if (found)
                         {
-                            type = new ILGenericParameterType(i.ParameterType.Name);
+                            type = new ILGenericParameterType(pt.Name);
                         }
                         else
-                            throw new NotSupportedException("Cannot find Generic Parameter " + i.ParameterType.Name + " in " + def.FullName);
+                            throw new NotSupportedException("Cannot find Generic Parameter " + pt.Name + " in " + def.FullName);
                     }
+
+                    if (isByRef)
+                        type = type.MakeByRefType();
+                    if (isArray)
+                        type = type.MakeArrayType();
                 }
                 else
                     type = appdomain.GetType(i.ParameterType, declaringType);

@@ -5,8 +5,49 @@ using System.Text;
 
 namespace TestCases
 {
+
     class Test03
     {
+        public class TestGenrRefBase
+        {
+            public int v;
+
+            public TestGenrRefBase()
+            {
+                v = 1;
+            }
+
+            public TestGenrRefBase(int val)
+            {
+                v = val;
+            }
+        }
+
+        public class TestGenrRef : TestGenrRefBase
+        {
+            public TestGenrRef()
+            {
+                v = 5;
+            }
+        }
+
+        public static void UnitTest_GenericsRefOut()
+        {
+            TestGenrRef t1 = new TestGenrRef();
+            t1.v = 2;
+            TestGenrRef t2 = ReadData<TestGenrRef>(ref t1);
+
+            Console.WriteLine("new val:" + t2.v);
+        }
+
+
+        static T ReadData<T>(ref T obj) where T : TestGenrRefBase, new()
+        {
+            obj = new T();
+            obj.v = 6;
+            return obj;
+        }
+
         public static void UnitTest_RefTest()
         {
             TestCls r = new TestCases.TestCls();
@@ -20,10 +61,10 @@ namespace TestCases
 
         public static void UnitTest_RefTest2()
         {
-            TestCls r = new TestCases.TestCls();
-            TestCls r2 = TestRef<TestCls>(ref r);
+            SingletonTest r = new TestCases.SingletonTest();
+            SingletonTest r2 = TestRef<SingletonTest>(ref r);
 
-            Console.WriteLine("Result = " + r.TestVal2);
+            Console.WriteLine("Result = " + r.testFloat);
             
         }
 
@@ -45,9 +86,9 @@ namespace TestCases
             return 0;
         }
 
-        static T TestRef<T>(ref T obj) where T : TestCls, new()
+        static T TestRef<T>(ref T obj) where T : SingletonTest, new()
         {
-            obj.TestVal2 = 3;
+            obj.testFloat = 3;
 
             return obj;
         }
