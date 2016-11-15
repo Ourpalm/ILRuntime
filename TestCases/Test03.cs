@@ -48,6 +48,26 @@ namespace TestCases
             return obj;
         }
 
+        public static void UnitTest_GenericsRefOut2()
+        {
+
+            TestGenrRef t = ReadData2<TestGenrRef>(null, new TestGenrRef());
+
+            Console.WriteLine("new val:" + t.v);
+        }
+
+
+        static T ReadData2<T>(byte[] data, T obj) where T : TestGenrRefBase, new()
+        {   
+            return Read<T>(obj);
+        }
+
+        static T Read<T>(T dest) where T : TestGenrRefBase, new()
+        {
+            dest.v = 111;
+            return dest;
+        }
+
         public static void UnitTest_RefTest()
         {
             TestCls r = new TestCases.TestCls();

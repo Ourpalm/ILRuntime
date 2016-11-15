@@ -1521,6 +1521,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stfld:
                                 {
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1 - 1);
+                                    if (objRef->ObjectType == ObjectTypes.Null)
+                                        throw new NullReferenceException();
                                     var obj = mStack[objRef->Value];
                                     if (obj != null)
                                     {
@@ -1554,6 +1556,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Ldfld:
                                 {
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1);
+                                    if (objRef->ObjectType == ObjectTypes.Null)
+                                        throw new NullReferenceException();
                                     var obj = mStack[objRef->Value];
                                     Free(esp - 1);
                                     if (obj != null)
@@ -1584,6 +1588,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Ldflda:
                                 {
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1);
+                                    if (objRef->ObjectType == ObjectTypes.Null)
+                                        throw new NullReferenceException();
                                     var obj = mStack[objRef->Value];
                                     Free(esp - 1);
                                     if (obj != null)
