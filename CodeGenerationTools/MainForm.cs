@@ -37,12 +37,6 @@ namespace CodeGenerationTools
         private readonly Dictionary<string, object> _delegateRegDic = new Dictionary<string, object>();
 
 
-        //private string _adaptorAttrName = "ILRuntimeTest.TestFramework.NeedAdaptorAttribute";
-        //private string _delegateAttrName = "ILRuntimeTest.TestFramework.DelegateExportAttribute";
-
-        //private Type _adptorAttr ;
-        //private Type _delegateAttr;
-
         #endregion
 
         #region WinForm Event
@@ -61,10 +55,7 @@ namespace CodeGenerationTools
             outputPath.Text = Properties.Settings.Default["out_path"] as string;
             sourcePath1.Text = Properties.Settings.Default["assembly_path"] as string;
             sourcePath2.Text = Properties.Settings.Default["assembly_path1"] as string;
-            //adaptorTxt.Text = Properties.Settings.Default["adaptor_export_attr"] as string;
-            //if (adaptorTxt.Text == "") adaptorTxt.Text = _adaptorAttrName;
-            //delegateTxt.Text = Properties.Settings.Default["delegate_export_attr"] as string;
-            //if (delegateTxt.Text == "") delegateTxt.Text = _delegateAttrName;
+
             outputText.Text = "";
 
             _adaptorSet.Clear();
@@ -79,9 +70,6 @@ namespace CodeGenerationTools
             Properties.Settings.Default["out_path"] = outputPath.Text;
             Properties.Settings.Default["assembly_path"] = sourcePath1.Text;
             Properties.Settings.Default["assembly_path1"] = sourcePath2.Text;
-            //Properties.Settings.Default["adaptor_export_attr"] = adaptorTxt.Text;
-            //Properties.Settings.Default["delegate_export_attr"] = delegateTxt.Text;
-
             Properties.Settings.Default.Save();
         }
 
@@ -97,11 +85,11 @@ namespace CodeGenerationTools
                 Properties.Settings.Default.Save();
                 sourcePath1.Text = targetPath = OD.FileName;
             }
-
+           
             var assembly = Assembly.LoadFrom(targetPath);
             if (assembly == null) return;
             //types
-            var types = assembly.GetTypes();
+            var types = assembly.GetExportedTypes();
 
             foreach (var type in types)
             {
