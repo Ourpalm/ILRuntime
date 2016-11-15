@@ -85,14 +85,29 @@ namespace CodeGenerationTools
                 Properties.Settings.Default.Save();
                 sourcePath1.Text = targetPath = OD.FileName;
             }
-           
+
+
             var assembly = Assembly.LoadFrom(targetPath);
             if (assembly == null) return;
             //types
-            var types = assembly.GetExportedTypes();
+            Type[] types;
+            try
+            {
+                types = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                types = ex.Types;
+            }
+            catch (IOException ioex)
+            {
+                Print(ioex.Message);
+                types = new Type[0];
+            }
 
             foreach (var type in types)
             {
+                if (type == null) continue;
                 //load ad
                 var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
                 if (attr != null)
@@ -111,6 +126,7 @@ namespace CodeGenerationTools
                 }
             }
 
+            Print("----------main assembly loaded");
         }
 
         private void LoadILScriptAssemblyClick(object sender, EventArgs e)
@@ -149,6 +165,8 @@ namespace CodeGenerationTools
                     }
                 }
             }
+
+            Print("----------ilscript assembly loaded");
 
         }
 
