@@ -79,6 +79,19 @@ namespace TestCases
             }
         }
 
+        public static void ReflectionTest06()
+        {
+            var arr = typeof(SingletonTest).GetFields();
+            foreach (var i in arr)
+            {
+                Console.WriteLine(i);
+            }
+
+            var fi = typeof(SingletonTest).GetField("testFloat");
+            fi.SetValue(SingletonTest.Inst, 1.2f);
+            Console.WriteLine(SingletonTest.Inst.testFloat);
+        }
+
         [Obsolete("gasdgas")]
         class TestCls
         {

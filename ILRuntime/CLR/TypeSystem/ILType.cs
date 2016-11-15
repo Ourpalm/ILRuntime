@@ -20,7 +20,9 @@ namespace ILRuntime.CLR.TypeSystem
         ILMethod staticConstructor;
         List<ILMethod> constructors;
         IType[] fieldTypes;
+        FieldDefinition[] fieldDefinitions;
         IType[] staticFieldTypes;
+        FieldDefinition[] staticFieldDefinitions;
         Dictionary<string, int> fieldMapping;
         Dictionary<string, int> staticFieldMapping;
         ILTypeStaticInstance staticInstance;
@@ -99,7 +101,24 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public Dictionary<string, int> FieldMapping { get { return fieldMapping; } }
+        public FieldDefinition[] StaticFieldDefinitions
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields();
+                return staticFieldDefinitions;
+            }
+        }
+
+        public Dictionary<string, int> FieldMapping
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields(); return fieldMapping;
+            }
+        }
 
         public Dictionary<string,int> StaticFieldMapping { get { return staticFieldMapping; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
@@ -568,10 +587,40 @@ namespace ILRuntime.CLR.TypeSystem
             return -1;
         }
 
+        public IType GetField(string name, out int fieldIdx)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldMapping.TryGetValue(name, out fieldIdx))
+            {
+                return fieldTypes[fieldIdx - FieldStartIndex];
+            }
+            else if (BaseType != null && BaseType is ILType)
+            {
+                return ((ILType)BaseType).GetField(name, out fieldIdx);
+            }
+            else
+                return null;
+        }
+
+        public IType GetField(int fieldIdx, out FieldDefinition fd)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldIdx < FieldStartIndex)
+                return ((ILType)BaseType).GetField(fieldIdx, out fd);
+            else
+            {
+                fd = fieldDefinitions[fieldIdx - FieldStartIndex];
+                return fieldTypes[fieldIdx - FieldStartIndex];
+            }
+        }
+
         void InitializeFields()
         {
             fieldMapping = new Dictionary<string, int>();
             fieldTypes = new IType[definition.Fields.Count];
+            fieldDefinitions = new FieldDefinition[definition.Fields.Count];
             var fields = definition.Fields;
             int idx = FieldStartIndex;
             int idxStatic = 0;
@@ -583,9 +632,11 @@ namespace ILRuntime.CLR.TypeSystem
                     if (staticFieldTypes == null)
                     {
                         staticFieldTypes = new IType[definition.Fields.Count];
+                        staticFieldDefinitions = new FieldDefinition[definition.Fields.Count];
                         staticFieldMapping = new Dictionary<string, int>();
                     }
                     staticFieldMapping[field.Name] = idxStatic;
+                    staticFieldDefinitions[idxStatic] = field;
                     if (field.FieldType.IsGenericParameter)
                     {
                         staticFieldTypes[idxStatic] = FindGenericArgument(field.FieldType.Name);
@@ -597,6 +648,7 @@ namespace ILRuntime.CLR.TypeSystem
                 else
                 {
                     fieldMapping[field.Name] = idx;
+                    fieldDefinitions[idx - FieldStartIndex] = field;
                     if (field.FieldType.IsGenericParameter)
                     {
                         fieldTypes[idx - FieldStartIndex] = FindGenericArgument(field.FieldType.Name);
@@ -611,10 +663,12 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
             Array.Resize(ref fieldTypes, idx - FieldStartIndex);
+            Array.Resize(ref fieldDefinitions, idx - FieldStartIndex);
 
             if (staticFieldTypes != null)
             {
                 Array.Resize(ref staticFieldTypes, idxStatic);
+                Array.Resize(ref staticFieldDefinitions, idxStatic);
                 staticInstance = new ILTypeStaticInstance(this);
             }
         }

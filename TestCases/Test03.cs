@@ -18,6 +18,16 @@ namespace TestCases
             Console.WriteLine(str);
         }
 
+        public static void UnitTest_RefTest2()
+        {
+            TestCls r = new TestCases.TestCls();
+            TestCls r2 = TestRef<TestCls>(ref r);
+
+            Console.WriteLine("Result = " + r.TestVal2);
+            
+        }
+
+
         public static void UnitTest_OutTest()
         {
             Dictionary<int, TestCls> dic = new Dictionary<int, TestCls>();
@@ -34,6 +44,14 @@ namespace TestCases
             dest.TestVal2 = 2;
             return 0;
         }
+
+        static T TestRef<T>(ref T obj) where T : TestCls, new()
+        {
+            obj.TestVal2 = 3;
+
+            return obj;
+        }
+
         public static object Run()
         {
             List<int> list1 = new List<int>();//c#Light 不支持模板，所以这里要注意一下
