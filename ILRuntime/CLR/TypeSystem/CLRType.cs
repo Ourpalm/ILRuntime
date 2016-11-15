@@ -270,7 +270,10 @@ namespace ILRuntime.CLR.TypeSystem
                         {
                             for (int j = 0; j < param.Count; j++)
                             {
-                                if (param[j].TypeForCLR != i.Parameters[j].TypeForCLR)
+                                var typeA = param[j].TypeForCLR.HasElementType ? param[j].TypeForCLR.GetElementType() : param[j].TypeForCLR;
+                                var typeB = i.Parameters[j].TypeForCLR.HasElementType ? i.Parameters[j].TypeForCLR.GetElementType() : i.Parameters[j].TypeForCLR;
+
+                                if (typeA != typeB)
                                 {
                                     match = false;
                                     break;

@@ -18,6 +18,16 @@ namespace TestCases
             Console.WriteLine(str);
         }
 
+        public static void UnitTest_OutTest()
+        {
+            Dictionary<int, TestCls> dic = new Dictionary<int, TestCls>();
+            dic[1] = new TestCls();
+            TestCls abc;
+            if(dic.TryGetValue(1, out abc))
+            {
+                Console.WriteLine(abc.TestVal2);
+            }
+        }
         static int TestRef(ref TestCls dest)
         {
             dest = new TestCases.TestCls();

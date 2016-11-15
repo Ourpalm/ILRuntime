@@ -232,6 +232,8 @@ namespace ILRuntime.CLR.Method
                 else
                 {
                     var res = cDef.Invoke(param);
+
+                    FixReference(paramCount, esp, param, mStack);
                     return res;
                 }
 
@@ -253,7 +255,28 @@ namespace ILRuntime.CLR.Method
                 {
                     res = def.Invoke(instance, param);
                 }
+
+                FixReference(paramCount, esp, param, mStack);
                 return res;
+            }
+        }
+
+        unsafe void FixReference(int paramCount, StackObject* esp, object[] param, List<object> mStack)
+        {
+            for (int i = paramCount; i >= 1; i--)
+            {
+                var p = Minus(esp, i);
+                if (p->ObjectType == ObjectTypes.StackObjectReference)
+                {
+                    var dst = *(StackObject**)&p->Value;
+                    if (dst->ObjectType >= ObjectTypes.Object)
+                    {
+                        var obj = param[paramCount - i];
+                        if (obj is CrossBindingAdaptorType)
+                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                        mStack[dst->Value] = obj;
+                    }
+                }
             }
         }
 

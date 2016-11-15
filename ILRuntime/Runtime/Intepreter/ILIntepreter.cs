@@ -108,6 +108,7 @@ namespace ILRuntime.Runtime.Intepreter
                 if (a->ObjectType == ObjectTypes.Null)
                 {
                     //Need to reserve place for null, in case of starg
+                    a->ObjectType = ObjectTypes.Object;
                     a->Value = mStack.Count;
                     mStack.Add(null);
                 }
@@ -143,6 +144,12 @@ namespace ILRuntime.Runtime.Intepreter
                         var t = AppDomain.GetType(v.VariableType, method.DeclearingType);
                         var loc = Add(v1, i);
                         StackObject.Initialized(loc, t.TypeForCLR);
+                    }
+                    else
+                    {
+                        var loc = Add(v1, i);
+                        loc->ObjectType = ObjectTypes.Object;
+                        loc->Value = mStack.Count;
                     }
                     mStack.Add(null);
                 }

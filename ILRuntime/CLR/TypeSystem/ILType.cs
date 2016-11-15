@@ -165,14 +165,23 @@ namespace ILRuntime.CLR.TypeSystem
 
         void RetriveDefinitino(TypeReference def)
         {
+            TypeReference res;
             if (def is GenericInstanceType)
-                definition = (TypeDefinition)((GenericInstanceType)def).ElementType;
+                res = ((GenericInstanceType)def).ElementType;
             else if (def is ByReferenceType)
             {
-                definition = (TypeDefinition)((ByReferenceType)def).ElementType;
+                res = ((ByReferenceType)def).ElementType;
+            }
+            else if (def.IsArray)
+            {
+                res = (TypeDefinition)def.GetElementType();
             }
             else
-                definition = (TypeDefinition)def;
+                res = (TypeDefinition)def;
+            if (!res.IsGenericParameter)
+            {
+                definition = res as TypeDefinition;
+            }
         }
 
         public bool IsGenericInstance
@@ -212,6 +221,8 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
+                if (!baseTypeInitialized)
+                    InitializeBaseType();
                 if (definition.IsEnum)
                 {
                     if (enumType == null)
