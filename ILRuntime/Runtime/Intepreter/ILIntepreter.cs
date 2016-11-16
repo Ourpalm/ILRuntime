@@ -1520,7 +1520,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 if (code == OpCodeEnum.Callvirt)
                                                 {
-                                                    var objRef = Minus(esp, ilm.ParameterCount + 1);
+                                                    var objRef = GetObjectAndResolveReference(Minus(esp, ilm.ParameterCount + 1));
                                                     if (objRef->ObjectType == ObjectTypes.Null)
                                                         throw new NullReferenceException();
                                                     var obj = mStack[objRef->Value];

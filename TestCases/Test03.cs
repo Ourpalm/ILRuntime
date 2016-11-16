@@ -21,6 +21,11 @@ namespace TestCases
             {
                 v = val;
             }
+
+            public string GetString()
+            {
+                return "1";
+            }
         }
 
         public class TestGenrRef : TestGenrRefBase
@@ -68,6 +73,7 @@ namespace TestCases
         {
             dest = new T();
             dest.v = 111;
+            dest.GetString();
             return dest;
         }
 
