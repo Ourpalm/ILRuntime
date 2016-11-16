@@ -482,6 +482,52 @@ namespace ILRuntime.Runtime.Intepreter
             action -= (Action)dele;
         }
     }
+
+    class DummyDelegateAdapter : DelegateAdapter
+    {
+        public DummyDelegateAdapter()
+        {
+
+        }
+
+        protected DummyDelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+            : base(appdomain, instance, method)
+        {
+            
+        }
+
+        public override Delegate Delegate
+        {
+            get
+            {
+                ThrowAdapterNotFound(method);
+                return null;
+            }
+        }
+
+        void InvokeILMethod()
+        {
+            if (method.HasThis)
+                appdomain.Invoke(method, instance, null);
+            else
+                appdomain.Invoke(method, null, null);
+        }
+
+        public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+        {
+            return new DummyDelegateAdapter(appdomain, instance, method);
+        }
+
+        public override void Combine(Delegate dele)
+        {
+            ThrowAdapterNotFound(method);
+        }
+
+        public override void Remove(Delegate dele)
+        {
+            ThrowAdapterNotFound(method);
+        }
+    }
     #endregion
     abstract class DelegateAdapter : ILTypeInstance, IDelegateAdapter
     {
@@ -532,7 +578,7 @@ namespace ILRuntime.Runtime.Intepreter
             int paramCnt = method.ParameterCount;
             for(int i = paramCnt; i > 0; i--)
             {
-                intp.CopyToStack(esp, ebp - paramCnt, mStack);
+                intp.CopyToStack(esp, Minus(ebp, i), mStack);
                 esp++;
             }
             var ret = intp.Execute(method, esp, out unhandled);
@@ -569,7 +615,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 intp.Free(ebp - i);
             }
-            var returnVal = ebp - paramCnt - 1;
+            var returnVal = Minus(ebp, paramCnt + 1);
             intp.Free(returnVal);//Free delegateInstance
             if (hasReturn)
             {
@@ -645,6 +691,62 @@ namespace ILRuntime.Runtime.Intepreter
                 converters[type] = res;
                 return res;
             }
+        }
+
+        unsafe StackObject* Minus(StackObject* a, int b)
+        {
+            return (StackObject*)((long)a - sizeof(StackObject) * b);
+        }
+
+        public static void ThrowAdapterNotFound(IMethod method)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Cannot find Delegate Adapter for:");
+            sb.Append(method.ToString());
+            if (method.ReturnType.Name != "Void" || method.ParameterCount > 0)
+            {
+                sb.AppendLine(", Please add following code:");
+                if (method.ReturnType.Name == "Void")
+                {
+                    sb.Append("appdomain.DelegateManager.RegisterMethodDelegate<");
+                    bool first = true;
+                    foreach(var i in method.Parameters)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            sb.Append(", ");
+                        }
+                        sb.Append(i.FullName);
+                    }
+                    sb.AppendLine(">");
+                }
+                else
+                {
+                    sb.Append("appdomain.DelegateManager.RegisterFunctionDelegate<");
+                    bool first = true;
+                    foreach (var i in method.Parameters)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            sb.Append(", ");
+                        }
+                        sb.Append(i.FullName);
+                    }
+                    if (!first)
+                        sb.Append(", ");
+                    sb.Append(method.ReturnType.FullName);
+                    sb.AppendLine(">");
+                }
+            }
+            throw new KeyNotFoundException(sb.ToString());
         }
     }
 

@@ -14,6 +14,7 @@ namespace ILRuntime.Runtime.Enviorment
         List<DelegateMapNode> methods = new List<DelegateMapNode>();
         List<DelegateMapNode> functions = new List<DelegateMapNode>();
         IDelegateAdapter zeroParamMethodAdapter = new MethodDelegateAdapter();
+        IDelegateAdapter dummyAdapter = new DummyDelegateAdapter();
         Dictionary<Type, Func<Delegate, Delegate>> clrDelegates = new Dictionary<Type, Func<Delegate, Delegate>>();
         Enviorment.AppDomain appdomain;
         public DelegateManager(Enviorment.AppDomain appdomain)
@@ -116,6 +117,11 @@ namespace ILRuntime.Runtime.Enviorment
         internal Delegate ConvertToDelegate(Type clrDelegateType, IDelegateAdapter adapter)
         {
             Func<Delegate, Delegate> func;
+            if(adapter is DummyDelegateAdapter)
+            {
+                DelegateAdapter.ThrowAdapterNotFound(adapter.Method);
+                return null;
+            }
             if (clrDelegates.TryGetValue(clrDelegateType, out func))
             {
                 return func(adapter.Delegate);
@@ -126,11 +132,12 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal IDelegateAdapter FindDelegateAdapter(ILTypeInstance instance, ILMethod method)
         {
+            IDelegateAdapter res;
             if (method.ReturnType == appdomain.VoidType)
             {
                 if (method.ParameterCount == 0)
                 {
-                    var res = zeroParamMethodAdapter.Instantiate(appdomain, instance, method);
+                    res = zeroParamMethodAdapter.Instantiate(appdomain, instance, method);
                     if (instance != null)
                         instance.SetDelegateAdapter(method, res);
                     return res;
@@ -150,7 +157,7 @@ namespace ILRuntime.Runtime.Enviorment
                         }
                         if (match)
                         {
-                            var res = i.Adapter.Instantiate(appdomain, instance, method);
+                            res = i.Adapter.Instantiate(appdomain, instance, method);
                             if (instance != null)
                                 instance.SetDelegateAdapter(method, res);
                             return res;
@@ -177,7 +184,7 @@ namespace ILRuntime.Runtime.Enviorment
                         {
                             if (method.ReturnType.TypeForCLR == i.ParameterTypes[method.ParameterCount])
                             {
-                                var res = i.Adapter.Instantiate(appdomain, instance, method);
+                                res = i.Adapter.Instantiate(appdomain, instance, method);
                                 if (instance != null)
                                     instance.SetDelegateAdapter(method, res);
                                 return res;
@@ -187,7 +194,10 @@ namespace ILRuntime.Runtime.Enviorment
                 }
             }
 
-            throw new KeyNotFoundException("Cannot find Delegate Adapter for:" + method);
+            res = dummyAdapter.Instantiate(appdomain, instance, method);
+            if (instance != null)
+                instance.SetDelegateAdapter(method, res);
+            return res;
         }
 
         class DelegateMapNode

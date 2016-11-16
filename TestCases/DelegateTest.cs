@@ -108,6 +108,15 @@ namespace TestCases
             Test09Sub(IntTest3);
             Test09Sub2(IntTest3);
         }
+        public static void DelegateTest10()
+        {
+            Action<int, string, string> a = (b, c, d) =>
+            {
+                Console.WriteLine(string.Format("{0},{1},{2}", b, c, d));
+            };
+
+            a(1, "2", "3");
+        }
 
         static void Test07Sub(ILRuntimeTest.TestFramework.IntDelegate action)
         {
