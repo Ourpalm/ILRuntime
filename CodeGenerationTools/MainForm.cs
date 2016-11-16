@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using CodeGenerationTools.Generator;
 using ILRuntime.Other;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -17,26 +18,12 @@ namespace CodeGenerationTools
         #region Fields
         private string _outputPath;
 
-        private string _helperTmpd;
-        private string _adaptorTmpd;
-        private string _adaptorInterfaceTmpd;
-        private string _vmVoidTmpd;
-        private string _vmReturnTmpd;
-        private string _abmVoidTmpd;
-        private string _abmReturnTmpd;
-
-        private string _delegateVoidTmpd;
-        private string _delegateReturnTmpd;
-
-        private string _adaptorRegisterTmpd;
-        private string _actionRegisterTmpd;
-        private string _functionRegisterTmpd;
-
         private readonly HashSet<Type> _adaptorSet = new HashSet<Type>();
         private readonly HashSet<Type> _delegateSet = new HashSet<Type>();
         private readonly Dictionary<string, object> _delegateRegDic = new Dictionary<string, object>();
 
-
+        private AdaptorGenerator _adGenerator;
+        private HelperGenerator _helpGenerator;
         #endregion
 
         #region WinForm Event
@@ -262,132 +249,21 @@ namespace CodeGenerationTools
         private void LoadTemplates()
         {
             var tmpdPath = Application.StartupPath + "/Template/";
-            //load helper.tmpd
-            _helperTmpd = File.ReadAllText(tmpdPath + "helper.tmpd");
-            //load adaptor.tmpd
-            _adaptorTmpd = File.ReadAllText(tmpdPath + "adaptor.tmpd");
-            _adaptorInterfaceTmpd = File.ReadAllText(tmpdPath + "adaptor_interface.tmpd");
-            //load vmethod.tmpd
-            _vmVoidTmpd = File.ReadAllText(tmpdPath + "method_virtual_void.tmpd");
-            _vmReturnTmpd = File.ReadAllText(tmpdPath + "method_virtual_return.tmpd");
-            //load abmethod.tmpd
-            _abmVoidTmpd = File.ReadAllText(tmpdPath + "method_abstract_void.tmpd");
-            _abmReturnTmpd = File.ReadAllText(tmpdPath + "method_abstract_return.tmpd");
-            //load the delegate.tmpd
-            _delegateVoidTmpd = File.ReadAllText(tmpdPath + "delegate_void.tmpd");
-            _delegateReturnTmpd = File.ReadAllText(tmpdPath + "delegate_return.tmpd");
-            //load delegateRegister template
-            _actionRegisterTmpd = File.ReadAllText(tmpdPath + "action_register.tmpd");
-            _functionRegisterTmpd = File.ReadAllText(tmpdPath + "function_register.tmpd");
-            _adaptorRegisterTmpd = File.ReadAllText(tmpdPath + "adaptor_register.tmpd");
+
+            _adGenerator = new AdaptorGenerator();
+            _adGenerator.LoadTemplateFromFile(tmpdPath + "adaptor.tmpd");
+
+            _helpGenerator = new HelperGenerator();
+            _helpGenerator.LoadTemplateFromFile(tmpdPath + "helper.tmpd");
 
         }
-
-        private string CreateAdaptorInit(Type type)
-        {
-            Print($"------adaptor Init:{type.Name}-----------");
-            var tmpd = _adaptorRegisterTmpd;
-            return tmpd.Replace("{$TypeName}", type.Name);
-            //return $"app.RegisterCrossBindingAdaptor(new {type.FullName + "Adaptor"}());\r\n";
-        }
-
-        private string CreateDelegateConvertorInit(Type type)
-        {
-            Print($"------delegate convertor Init:{type.Name}-----------");
-
-            var method = type.GetMethod("Invoke");
-            var tmpd = method.ReturnType == typeof(void) ? _delegateVoidTmpd : _delegateReturnTmpd;
-            var argsType = "";
-            var args = "";
-            var returnType = method.ReturnType == typeof(void) ? "" : method.ReturnType.Name;
-            foreach (var param in method.GetParameters())
-            {
-                argsType += param.ParameterType.Name + ",";
-                args += param.Name + ",";
-            }
-            argsType = argsType.Trim(',');
-            args = args.Trim(',');
-            tmpd = tmpd.Replace("{$DelegateName}", type.FullName);
-            tmpd = tmpd.Replace("{$argsType}", argsType);
-            tmpd = tmpd.Replace("{$args}", args);
-            if (method.ReturnType != typeof(void))
-                tmpd = tmpd.Replace("{$returnType}", returnType);
-
-            return tmpd;
-        }
-
-        private string CreateDelegateRegisterInit(Type type)
-        {
-            Print($"------delegate reg Init:{type.Name}-----------");
-
-            var method = type.GetMethod("Invoke");
-            var tmpd = method.ReturnType == typeof(void) ? _actionRegisterTmpd : _functionRegisterTmpd;
-            var argsType = "";
-            var returnType = method.ReturnType == typeof(void) ? "" : method.ReturnType.Name;
-            foreach (var param in method.GetParameters())
-            {
-                argsType += param.ParameterType.Name + ",";
-            }
-            argsType = argsType.Trim(',');
-            tmpd = tmpd.Replace("{$argsType}", argsType);
-            if (method.ReturnType != typeof(void))
-                tmpd = tmpd.Replace("{$returnType}", returnType);
-
-            return tmpd;
-        }
-
-        private string CreateDelegateRegisterInit(TypeReference type)
-        {
-            Print($"------delegate reg Init:{type.FullName}-----------");
-
-            var tmpd = type.FullName.Contains("Action") ? _actionRegisterTmpd : _functionRegisterTmpd;
-            var argsType = "";
-            var gtype = (GenericInstanceType)type;
-            foreach (var param in gtype.GenericArguments)
-            {
-                if (param != null)
-                    argsType += param.FullName + ",";
-            }
-            argsType = argsType.Trim(',');
-            tmpd = tmpd.Replace("{$argsType}", argsType);
-            return tmpd;
-        }
-
+        
         private void CreateILRuntimeHelper()
         {
             Print($"==================Begin create helper:=====================");
-
-            //export helper
-            var helperStr = _helperTmpd;
-
-            var adptorStr = "";
-            foreach (var type in _adaptorSet)
-            {
-                adptorStr += CreateAdaptorInit(type);
-            }
-            helperStr = helperStr.Replace("{$AdaptorInit}", adptorStr);
-
-            var delegateStr = "";
-            foreach (var type in _delegateSet)
-            {
-                delegateStr += CreateDelegateConvertorInit(type);
-            }
-            helperStr = helperStr.Replace("{$DelegateInit}", delegateStr);
-
-            var delegateRegStr = "";
-            foreach (var val in _delegateRegDic.Values)
-            {
-                if (val is Type)
-                {
-                    delegateRegStr += CreateDelegateRegisterInit(val as Type);
-                }
-                else if (val is TypeReference)
-                {
-                    delegateRegStr += CreateDelegateRegisterInit(val as TypeReference);
-                }
-            }
-            helperStr = helperStr.Replace("{$DelegateRegInit}", delegateRegStr);
-
+            
+            _helpGenerator.LoadData(new Tuple<HashSet<Type>, HashSet<Type>, Dictionary<string, object>>(_adaptorSet, _delegateSet, _delegateRegDic));
+            var helperStr = _helpGenerator.Generate();
 
             using (var fs2 = File.Create(_outputPath + "helper.cs"))
             {
@@ -407,34 +283,12 @@ namespace CodeGenerationTools
             Print($"================begin create adaptor:{type.Name}=======================");
 
             var adaptorName = type.Name + "Adaptor";
-            var classbody = _adaptorTmpd;
-            var methodsbody = "";
 
             using (var fs = File.Create(_outputPath + adaptorName + ".cs"))
             {
-                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);//| BindingFlags.DeclaredOnly
-                foreach (var methodInfo in methods.Where(methodInfo => methodInfo.DeclaringType != typeof(object)))
-                {
-                    if (methodInfo.IsAbstract)
-                    {
-                        methodsbody += CreateAbstractMethod(methodInfo);
-                    }
-                    else if (methodInfo.IsVirtual && !methodInfo.IsFinal)
-                    {
-                        methodsbody += CreateVirtualMethod(methodInfo);
-                    }
-                }
-
-                classbody = classbody.Replace("{$ClassName}", type.Name);
-                classbody = classbody.Replace("{$MethodArea}", methodsbody);
-
-                var interfaceStr = "";
-                foreach (var iface in type.GetInterfaces())
-                {
-                    interfaceStr += CreateInterfaceAdaptor(iface, type);
-                }
-
-                classbody = classbody.Replace("{$Interface}", interfaceStr);
+              
+                _adGenerator.LoadData(type);
+                var classbody = _adGenerator.Generate();
 
                 var sw = new StreamWriter(fs);
                 sw.Write(classbody);
@@ -444,73 +298,7 @@ namespace CodeGenerationTools
             Print($"================end create adaptor:{type.Name}=======================");
 
         }
-
-        private string CreateInterfaceAdaptor(Type type, Type childType)
-        {
-            var classbody = _adaptorInterfaceTmpd;
-            var adaptorName = childType.Name + "Adaptor.Adaptor";
-
-            classbody = classbody.Replace("{$ClassName}", type.Name);
-            classbody = classbody.Replace("{$AdaptorName}", adaptorName);
-
-            return classbody;
-        }
-
-        private string CreateVirtualMethod(MethodInfo methodInfo)
-        {
-            Print($"------method:{methodInfo.Name}-----{methodInfo.DeclaringType}------");
-            var methodStr = methodInfo.ReturnType == typeof(void) ? _vmVoidTmpd : _vmReturnTmpd;
-            var argStr = "";
-            var argNoTypeStr = "";
-            methodStr = methodStr.Replace("{$VMethodName}", methodInfo.Name);
-            foreach (var pInfo in methodInfo.GetParameters())
-            {
-                argStr += pInfo.ParameterType.Name + " " + pInfo.Name + ",";
-                argNoTypeStr += pInfo.Name + ",";
-            }
-            argStr = argStr.Trim(',');
-            argNoTypeStr = argNoTypeStr.Trim(',');
-            methodStr = methodStr.Replace("{$args}", argStr);
-            methodStr = methodStr.Replace("{$args_no_type}", argNoTypeStr);
-
-            methodStr = methodStr.Replace("{$comma}", argStr == "" ? "" : ",");
-            methodStr = methodStr.Replace("{$modifier}", methodInfo.Accessmodifier().ToString().ToLower());
-
-            if (methodInfo.ReturnType != typeof(void))
-                methodStr = methodStr.Replace("{$returnType}", methodInfo.ReturnType.Name);
-
-            return methodStr;
-        }
-
-        private string CreateAbstractMethod(MethodInfo methodInfo)
-        {
-            Print($"------method:{methodInfo.Name}-----{methodInfo.DeclaringType}------");
-            var methodStr = methodInfo.ReturnType == typeof(void) ? _abmVoidTmpd : _abmReturnTmpd;
-            string argStr = "";
-            string argNoTypeStr = "";
-            methodStr = methodStr.Replace("{$AMethodName}", methodInfo.Name);
-            foreach (var pInfo in methodInfo.GetParameters())
-            {
-                argStr += pInfo.ParameterType.Name + " " + pInfo.Name + ",";
-                argNoTypeStr += pInfo.Name + ",";
-            }
-            argStr = argStr.Trim(',');
-            argNoTypeStr = argNoTypeStr.Trim(',');
-            methodStr = methodStr.Replace("{$args}", argStr);
-            methodStr = methodStr.Replace("{$args_no_type}", argNoTypeStr);
-
-            methodStr = methodStr.Replace("{$comma}", argStr == "" ? "" : ",");
-            methodStr = methodStr.Replace("{$modifier}", methodInfo.Accessmodifier().ToString().ToLower());
-
-            if (methodInfo.ReturnType == typeof(void)) return methodStr;
-
-            methodStr = methodStr.Replace("{$returnType}", methodInfo.ReturnType.Name);
-            var returnStr = methodInfo.ReturnType.IsValueType ? "return 0;" : "return null;";
-            methodStr = methodStr.Replace("{$returnDefault}", returnStr);
-
-            return methodStr;
-        }
-
+        
         #endregion
 
     }

@@ -49,8 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Generator\GeneratorBase.cs" />
-    <Compile Include="Generator\TemplateConfigBase.cs" />
+    <Compile Include="Generator\Base\IGenerator.cs" />
+    <Compile Include="Generator\DelegateConveterGenerator.cs" />
+    <Compile Include="Generator\DelegateRegisterGenerator.cs" />
+    <Compile Include="Generator\AdaptorRegisterGenerator.cs" />
+    <Compile Include="Generator\AdaptorGenerator.cs" />
+    <Compile Include="Generator\AbstractMethodGenerator.cs" />
+    <Compile Include="Generator\Base\GeneratorBase.cs" />
+    <Compile Include="Generator\HelperGenerator.cs" />
+    <Compile Include="Generator\InterfaceGenerator.cs" />
+    <Compile Include="Generator\VirtualMethodGenerator.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
