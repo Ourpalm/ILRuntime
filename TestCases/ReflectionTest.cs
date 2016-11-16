@@ -40,7 +40,8 @@ namespace TestCases
 
         public static void ReflectionTest04()
         {
-            var arr = typeof(TestCls2).GetCustomAttributes(typeof(TestAttribute), false);
+            var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
+            var arr = t.GetCustomAttributes(typeof(TestAttribute), false);
             foreach(var i in arr)
             {
                 TestAttribute a = (TestAttribute)i;

@@ -28,6 +28,15 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 throw new EntryPointNotFoundException();
         }
+
+        public static object GetType(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            var t = ctx.AppDomain.GetType((string)param[0]);
+            if (t != null)
+                return t.ReflectionType;
+            else
+                return null;
+        }
         public unsafe static object InitializeArray(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
             object array = param[0];

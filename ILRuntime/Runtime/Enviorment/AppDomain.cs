@@ -42,6 +42,13 @@ namespace ILRuntime.Runtime.Enviorment
                     RegisterCLRMethodRedirection(i, CLRRedirections.CreateInstance);
                 }
             }
+            foreach (var i in typeof(System.Type).GetMethods())
+            {
+                if (i.Name == "GetType" && i.IsStatic)
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.GetType);
+                }
+            }
             foreach (var i in typeof(System.Delegate).GetMethods())
             {
                 if (i.Name == "Combine" && i.GetParameters().Length == 2)
