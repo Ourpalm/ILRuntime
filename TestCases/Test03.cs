@@ -51,26 +51,29 @@ namespace TestCases
         public static void UnitTest_GenericsRefOut2()
         {
 
-            TestGenrRef t = ReadData2<TestGenrRef>(null, new TestGenrRef());
+            TestGenrRef t = ReadData2<TestGenrRef>(null);
 
             Console.WriteLine("new val:" + t.v);
         }
 
 
-        static T ReadData2<T>(byte[] data, T obj) where T : TestGenrRefBase, new()
-        {   
-            return Read<T>(obj);
+        static T ReadData2<T>(byte[] data) where T : TestGenrRefBase, new()
+        {
+            T obj = null;
+            Read<T>(ref obj);
+            return obj;
         }
 
-        static T Read<T>(T dest) where T : TestGenrRefBase, new()
+        static T Read<T>(ref T dest) where T : TestGenrRefBase, new()
         {
+            dest = new T();
             dest.v = 111;
             return dest;
         }
 
         public static void UnitTest_RefTest()
         {
-            TestCls r = new TestCases.TestCls();
+            TestCls r = null;
             TestRef(ref r);
             Console.WriteLine("Result = " + r.TestVal2);
             float a = 1.0f;

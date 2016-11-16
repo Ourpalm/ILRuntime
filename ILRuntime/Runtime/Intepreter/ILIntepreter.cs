@@ -209,6 +209,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var a = Add(arg, ip->TokenInteger);
                                     var val = esp - 1;
+                                    int idx = a->Value;
+                                    bool isObj = a->ObjectType >= ObjectTypes.Object;
                                     if (val->ObjectType >= ObjectTypes.Object)
                                     {
                                         a->ObjectType = val->ObjectType;
@@ -218,6 +220,14 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         *a = *val;
+                                        if (isObj)
+                                        {
+                                            a->Value = idx;
+                                            if(val->ObjectType == ObjectTypes.Null)
+                                            {
+                                                mStack[a->Value] = null;
+                                            }
+                                        }
                                     }
                                     Free(val);
                                     esp--;
@@ -228,14 +238,24 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     *v1 = *esp;
                                     int idx = locBase;
-                                    if (v1->ObjectType >= ObjectTypes.Object)
+                                    switch (esp->ObjectType)
                                     {
-                                        mStack[idx] = mStack[v1->Value];
-                                        v1->Value = idx;
-                                        Free(esp);
+                                        case ObjectTypes.Null:
+                                            v1->ObjectType = ObjectTypes.Object;
+                                            v1->Value = idx;
+                                            mStack[idx] = null;
+                                            break;
+                                        case ObjectTypes.Object:
+                                        case ObjectTypes.FieldReference:
+                                        case ObjectTypes.ArrayReference:
+                                            mStack[idx] = mStack[v1->Value];
+                                            v1->Value = idx;
+                                            Free(esp);
+                                            break;
+                                        default:
+                                            mStack[idx] = null;
+                                            break;
                                     }
-                                    else
-                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_0:
@@ -247,14 +267,24 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     *v2 = *esp;
                                     int idx = locBase + 1;
-                                    if (v2->ObjectType >= ObjectTypes.Object)
+                                    switch (esp->ObjectType)
                                     {
-                                        mStack[idx] = mStack[v2->Value];
-                                        v2->Value = idx;
-                                        Free(esp);
+                                        case ObjectTypes.Null:
+                                            v2->ObjectType = ObjectTypes.Object;
+                                            v2->Value = idx;
+                                            mStack[idx] = null;
+                                            break;
+                                        case ObjectTypes.Object:
+                                        case ObjectTypes.FieldReference:
+                                        case ObjectTypes.ArrayReference:
+                                            mStack[idx] = mStack[v2->Value];
+                                            v2->Value = idx;
+                                            Free(esp);
+                                            break;
+                                        default:
+                                            mStack[idx] = null;
+                                            break;
                                     }
-                                    else
-                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_1:
@@ -266,14 +296,24 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     *v3 = *esp;
                                     int idx = locBase + 2;
-                                    if (v3->ObjectType >= ObjectTypes.Object)
+                                    switch (esp->ObjectType)
                                     {
-                                        mStack[idx] = mStack[v3->Value];
-                                        v3->Value = idx;
-                                        Free(esp);
+                                        case ObjectTypes.Null:
+                                            v3->ObjectType = ObjectTypes.Object;
+                                            v3->Value = idx;
+                                            mStack[idx] = null;
+                                            break;
+                                        case ObjectTypes.Object:
+                                        case ObjectTypes.FieldReference:
+                                        case ObjectTypes.ArrayReference:
+                                            mStack[idx] = mStack[v3->Value];
+                                            v3->Value = idx;
+                                            Free(esp);
+                                            break;
+                                        default:
+                                            mStack[idx] = null;
+                                            break;
                                     }
-                                    else
-                                        mStack[idx] = null;
                                     break;
                                 }
                             case OpCodeEnum.Ldloc_2:
@@ -285,14 +325,24 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     *v4 = *esp;
                                     int idx = locBase + 3;
-                                    if (v4->ObjectType >= ObjectTypes.Object)
+                                    switch (esp->ObjectType)
                                     {
-                                        mStack[idx] = mStack[v4->Value];
-                                        v4->Value = idx;
-                                        Free(esp);
+                                        case ObjectTypes.Null:
+                                            v4->ObjectType = ObjectTypes.Object;
+                                            v4->Value = idx;
+                                            mStack[idx] = null;
+                                            break;
+                                        case ObjectTypes.Object:
+                                        case ObjectTypes.FieldReference:
+                                        case ObjectTypes.ArrayReference:
+                                            mStack[idx] = mStack[v4->Value];
+                                            v4->Value = idx;
+                                            Free(esp);
+                                            break;
+                                        default:
+                                            mStack[idx] = null;
+                                            break;
                                     }
-                                    else
-                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_3:
@@ -306,14 +356,24 @@ namespace ILRuntime.Runtime.Intepreter
                                     var v = Add(frame.LocalVarPointer, ip->TokenInteger);
                                     *v = *esp;
                                     int idx = locBase + ip->TokenInteger;
-                                    if (v->ObjectType >= ObjectTypes.Object)
+                                    switch (esp->ObjectType)
                                     {
-                                        mStack[idx] = mStack[v->Value];
-                                        v->Value = idx;
-                                        Free(esp);
+                                        case ObjectTypes.Null:
+                                            v->ObjectType = ObjectTypes.Object;
+                                            v->Value = idx;
+                                            mStack[idx] = null;
+                                            break;
+                                        case ObjectTypes.Object:
+                                        case ObjectTypes.FieldReference:
+                                        case ObjectTypes.ArrayReference:
+                                            mStack[idx] = mStack[v->Value];
+                                            v->Value = idx;
+                                            Free(esp);
+                                            break;
+                                        default:
+                                            mStack[idx] = null;
+                                            break;
                                     }
-                                    else
-                                        mStack[idx] = null;
                                 }
                                 break;
                             case OpCodeEnum.Ldloc:
@@ -2440,7 +2500,12 @@ namespace ILRuntime.Runtime.Intepreter
                                                     }
                                                     break;
                                                 default:
-                                                    PushNull(objRef);
+                                                    {
+                                                        if (objRef->ObjectType >= ObjectTypes.Object)
+                                                            mStack[objRef->Value] = null;
+                                                        else
+                                                            PushNull(objRef);
+                                                    }
                                                     break;
                                             }
                                         }
