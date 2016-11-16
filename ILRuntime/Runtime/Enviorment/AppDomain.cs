@@ -41,6 +41,10 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.CreateInstance);
                 }
+                else if(i.Name == "CreateInstance" && i.GetParameters().Length == 1)
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.CreateInstance2);
+                }
             }
             foreach (var i in typeof(System.Type).GetMethods())
             {

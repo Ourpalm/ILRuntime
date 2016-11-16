@@ -41,13 +41,16 @@ namespace TestCases
         public static void ReflectionTest04()
         {
             var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
+            var obj = Activator.CreateInstance(t);
+            Console.WriteLine(obj);
+
             var arr = t.GetCustomAttributes(typeof(TestAttribute), false);
             foreach(var i in arr)
             {
                 TestAttribute a = (TestAttribute)i;
                 Console.WriteLine(a.TestProp);
             }
-
+            
             arr = typeof(TestCls).GetCustomAttributes(false);
             foreach (var i in arr)
             {

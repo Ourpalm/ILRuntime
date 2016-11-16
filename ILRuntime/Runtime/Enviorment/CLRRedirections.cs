@@ -29,6 +29,22 @@ namespace ILRuntime.Runtime.Enviorment
                 throw new EntryPointNotFoundException();
         }
 
+        public static object CreateInstance2(ILContext ctx, object instance, object[] param, IType[] genericArguments)
+        {
+            var t = param[0] as Type;
+            if (t != null)
+            {
+                if (t is ILRuntimeType)
+                {
+                    return ((ILRuntimeType)t).ILType.Instantiate();
+                }
+                else
+                    return Activator.CreateInstance(t);
+            }
+            else
+                return null;
+        }
+
         public static object GetType(ILContext ctx, object instance, object[] param, IType[] genericArguments)
         {
             var t = ctx.AppDomain.GetType((string)param[0]);
