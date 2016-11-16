@@ -51,14 +51,15 @@ namespace ILRuntime.Reflection
 
         void InitializeFields()
         {
-            fields = new ILRuntimeFieldInfo[type.TotalFieldCount + type.StaticFieldTypes.Length];
+            int staticCnt = type.StaticFieldTypes != null ? type.StaticFieldTypes.Length : 0;
+            fields = new ILRuntimeFieldInfo[type.TotalFieldCount + staticCnt];
             for (int i = 0; i < type.TotalFieldCount; i++)
             {
                 Mono.Cecil.FieldDefinition fd;
                 var t = type.GetField(i, out fd);
                 fields[i] = new ILRuntimeFieldInfo(fd, this, i, t);
             }
-            for (int i = type.TotalFieldCount; i < type.TotalFieldCount + type.StaticFieldTypes.Length; i++)
+            for (int i = type.TotalFieldCount; i < type.TotalFieldCount + staticCnt; i++)
             {
                 fields[i] = new ILRuntimeFieldInfo(type.StaticFieldDefinitions[i - type.TotalFieldCount], this, true, i - type.TotalFieldCount);
             }
