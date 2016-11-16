@@ -67,7 +67,7 @@ namespace ILRuntime.Reflection
             for (int i = 0; i < definition.CustomAttributes.Count; i++)
             {
                 var attribute = definition.CustomAttributes[i];
-                var at = appdomain.GetType(attribute.AttributeType, null);
+                var at = appdomain.GetType(attribute.AttributeType, null, null);
                 try
                 {
                     object ins = attribute.CreateInstance(at, appdomain);

@@ -101,7 +101,7 @@ namespace ILRuntime.CLR.Method
                 ReturnType = FindGenericArgument(def.ReturnType.Name);
             }
             else
-                ReturnType = domain.GetType(def.ReturnType, type);
+                ReturnType = domain.GetType(def.ReturnType, type, this);
             if (type.IsDelegate && def.Name == "Invoke")
                 isDelegateInvoke = true;
             this.appdomain = domain;
@@ -231,7 +231,7 @@ namespace ILRuntime.CLR.Method
                     switch (eh.HandlerType)
                     {
                         case Mono.Cecil.Cil.ExceptionHandlerType.Catch:
-                            e.CatchType = appdomain.GetType(eh.CatchType, declaringType);
+                            e.CatchType = appdomain.GetType(eh.CatchType, declaringType, this);
                             e.HandlerType = ExceptionHandlerType.Catch;
                             break;
                         case Mono.Cecil.Cil.ExceptionHandlerType.Finally:
@@ -362,7 +362,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldfld:
                 case OpCodeEnum.Ldflda:
                     {
-                        code.TokenInteger = appdomain.GetFieldIndex(token, declaringType);   
+                        code.TokenInteger = appdomain.GetFieldIndex(token, declaringType, this);   
                     }
                     break;
 
@@ -370,7 +370,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldsfld:
                 case OpCodeEnum.Ldsflda:
                     {
-                        code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType);   
+                        code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType, this);   
                     }
                     break;
                 case OpCodeEnum.Ldstr:
@@ -385,7 +385,7 @@ namespace ILRuntime.CLR.Method
                         if (token is FieldReference)
                         {
                             code.TokenInteger = 0;
-                            code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType);
+                            code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType, this);
                         }
                         else if(token is TypeReference)
                         {
@@ -407,7 +407,7 @@ namespace ILRuntime.CLR.Method
 
         int GetTypeTokenHashCode(object token)
         {
-            var t = appdomain.GetType(token, declaringType);
+            var t = appdomain.GetType(token, declaringType, this);
             if (t == null && token is TypeReference && ((TypeReference)token).IsGenericParameter)
             {
                 t = FindGenericArgument(((TypeReference)token).Name);
@@ -489,7 +489,7 @@ namespace ILRuntime.CLR.Method
                         type = type.MakeArrayType();
                 }
                 else
-                    type = appdomain.GetType(i.ParameterType, declaringType);
+                    type = appdomain.GetType(i.ParameterType, declaringType, this);
                 parameters.Add(type);
             }
         }

@@ -30,7 +30,7 @@ namespace ILRuntime.Reflection
                     for (int j = 0; j < attribute.ConstructorArguments.Count; j++)
                     {
                         var ca = attribute.ConstructorArguments[j];
-                        param.Add(appdomain.GetType(ca.Type, null));
+                        param.Add(appdomain.GetType(ca.Type, null, null));
                         p[j] = ca.Value;
                     }
                     var ctor = it.GetConstructor(param);
@@ -58,7 +58,7 @@ namespace ILRuntime.Reflection
                     for (int j = 0; j < attribute.ConstructorArguments.Count; j++)
                     {
                         var ca = attribute.ConstructorArguments[j];
-                        param.Add(appdomain.GetType(ca.Type, null));
+                        param.Add(appdomain.GetType(ca.Type, null, null));
                         p[j] = ca.Value;
                     }
                 }

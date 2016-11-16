@@ -33,7 +33,7 @@ namespace ILRuntime.Reflection
             for (int i = 0; i < type.TypeDefinition.CustomAttributes.Count; i++)
             {
                 var attribute = type.TypeDefinition.CustomAttributes[i];
-                var at = appdomain.GetType(attribute.AttributeType, type);
+                var at = appdomain.GetType(attribute.AttributeType, type, null);
                 try
                 {
                     object ins = attribute.CreateInstance(at, appdomain);

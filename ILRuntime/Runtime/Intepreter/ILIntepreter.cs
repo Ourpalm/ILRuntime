@@ -119,7 +119,7 @@ namespace ILRuntime.Runtime.Intepreter
                 var v = method.Definition.Body.Variables[i];
                 if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
                 {
-                    var t = AppDomain.GetType(v.VariableType, method.DeclearingType);
+                    var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
                     if (t is ILType)
                     {
                         var obj = ((ILType)t).Instantiate(false);
@@ -141,7 +141,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     if (v.VariableType.IsPrimitive)
                     {
-                        var t = AppDomain.GetType(v.VariableType, method.DeclearingType);
+                        var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
                         var loc = Add(v1, i);
                         StackObject.Initialized(loc, t.TypeForCLR);
                     }
@@ -1826,6 +1826,18 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             default:
                                                 res = obj1->Value == obj2->Value && obj1->ValueLow == obj2->ValueLow;
+                                                break;
+                                        }
+                                    }
+                                    else 
+                                    {
+                                        switch (obj1->ObjectType)
+                                        {
+                                            case ObjectTypes.Object:
+                                                res = mStack[obj1->Value] == null && obj2->ObjectType == ObjectTypes.Null;
+                                                break;
+                                            case ObjectTypes.Null:
+                                                res = obj2->ObjectType == ObjectTypes.Object && mStack[obj2->Value] == null;
                                                 break;
                                         }
                                     }
