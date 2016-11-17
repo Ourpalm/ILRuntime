@@ -1643,7 +1643,32 @@ namespace ILRuntime.Runtime.Intepreter
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1);
                                     if (objRef->ObjectType == ObjectTypes.Null)
                                         throw new NullReferenceException();
-                                    var obj = mStack[objRef->Value];
+                                    object obj = null;
+                                    switch (objRef->ObjectType)
+                                    {
+                                        case ObjectTypes.Object:
+                                            obj = mStack[objRef->Value];
+                                            break;
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                obj = mStack[objRef->Value];
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    obj = ((ILTypeInstance)obj)[objRef->ValueLow];
+                                                }
+                                                else
+                                                    throw new NotSupportedException();
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(objRef->Value) as ILType;
+                                                obj = t.StaticInstance[objRef->ValueLow];
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
                                     Free(esp - 1);
                                     if (obj != null)
                                     {
