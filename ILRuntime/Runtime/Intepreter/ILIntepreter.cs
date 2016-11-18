@@ -1103,13 +1103,28 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Brfalse_S:
                                 {
                                     esp--;
-                                    if (esp->ObjectType == ObjectTypes.Null || (esp->ObjectType == ObjectTypes.Integer && esp->Value == 0))
+                                    bool res = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Null:
+                                            res = true;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            res = esp->Value == 0;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            res = mStack[esp->Value] == null;
+                                            Free(esp);
+                                            break;
+                                        default:
+                                            Free(esp);
+                                            break;
+                                    }
+                                    if(res)
                                     {
                                         ip = ptr + ip->TokenInteger;
                                         continue;
                                     }
-                                    else
-                                        Free(esp);
                                 }
                                 break;
                             case OpCodeEnum.Beq:
