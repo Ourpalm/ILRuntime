@@ -2414,14 +2414,14 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.Object)
                                     {
                                         object obj = mStack[objRef->Value];
-                                        Free(esp - 1);
+                                        Free(objRef);
                                         if (obj != null)
                                         {
                                             var t = domain.GetType(ip->TokenInteger);
                                             if (t != null)
                                             {
                                                 var type = t.TypeForCLR;
-                                                if (type.IsPrimitive)
+                                                if ((t is CLRType) && type.IsPrimitive)
                                                 {
                                                     if (type == typeof(int))
                                                     {
@@ -2497,12 +2497,19 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (obj is ILTypeInstance)
                                                     {
                                                         var res = ((ILTypeInstance)obj);
-                                                        if (res.Boxed)
+                                                        if (res is ILEnumTypeInstance)
                                                         {
-                                                            res = res.Clone();
-                                                            res.Boxed = false;
+                                                            res.PushToStack(0, objRef, AppDomain, mStack);
                                                         }
-                                                        PushObject(objRef, mStack, res);
+                                                        else
+                                                        {
+                                                            if (res.Boxed)
+                                                            {
+                                                                res = res.Clone();
+                                                                res.Boxed = false;
+                                                            }
+                                                            PushObject(objRef, mStack, res);
+                                                        }
                                                     }
                                                     else
                                                         PushObject(objRef, mStack, obj);

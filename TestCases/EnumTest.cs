@@ -95,5 +95,12 @@ namespace TestCases
                 return fs.ReadByte().ToString();
             }
         }
+
+        public static void Test08()
+        {
+            object o = TestEnum.Enum4;
+
+            Console.WriteLine((TestEnum)o == TestEnum.Enum4);
+        }
     }
 }
