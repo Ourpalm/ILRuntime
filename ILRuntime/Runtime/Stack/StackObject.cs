@@ -42,8 +42,7 @@ namespace ILRuntime.Runtime.Stack
                         ILTypeInstance instance = mStack[esp->Value] as ILTypeInstance;
                         if (instance != null)
                         {
-                            var tmp = instance.Fields[esp->ValueLow];
-                            return ToObject(&tmp, appdomain, instance.ManagedObjects);
+                            return instance[esp->ValueLow];
                         }
                         else
                         {
@@ -70,8 +69,7 @@ namespace ILRuntime.Runtime.Stack
                         if (t is CLR.TypeSystem.ILType)
                         {
                             CLR.TypeSystem.ILType type = (CLR.TypeSystem.ILType)t;
-                            var tmp = type.StaticInstance.Fields[esp->ValueLow];
-                            return ToObject(&tmp, appdomain, type.StaticInstance.ManagedObjects);
+                            return type.StaticInstance[esp->ValueLow];
                         }
                         else
                         {
