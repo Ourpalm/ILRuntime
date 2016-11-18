@@ -37,6 +37,7 @@ namespace ILRuntime.CLR.TypeSystem
         List<ILType> genericInstances;
         bool isDelegate;
         ILRuntimeType reflectionType;
+        IType firstCLRBaseType;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
         public TypeReference TypeReference
@@ -96,7 +97,7 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 if (fieldMapping == null)
-                    InitializeFields(); 
+                    InitializeFields();
                 return staticFieldTypes;
             }
         }
@@ -117,6 +118,16 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (fieldMapping == null)
                     InitializeFields(); return fieldMapping;
+            }
+        }
+
+        public IType FirstCLRBaseType
+        {
+            get
+            {
+                if (!baseTypeInitialized)
+                    InitializeBaseType();
+                return firstCLRBaseType;
             }
         }
 
@@ -252,9 +263,9 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     return enumType.TypeForCLR;
                 }
-                else if(baseType != null && baseType is CrossBindingAdaptor)
+                else if(FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
                 {
-                    return ((CrossBindingAdaptor)baseType).RuntimeType.TypeForCLR;
+                    return ((CrossBindingAdaptor)FirstCLRBaseType).RuntimeType.TypeForCLR;
                 }
                 else
                     return typeof(ILTypeInstance);
@@ -375,6 +386,12 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                 }
             }
+            var curBase = baseType;
+            while (curBase is ILType)
+            {
+                curBase = curBase.BaseType;
+            }
+            firstCLRBaseType = curBase;
         }
 
         public IMethod GetMethod(string name)

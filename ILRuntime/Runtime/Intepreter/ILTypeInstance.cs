@@ -150,9 +150,9 @@ namespace ILRuntime.Runtime.Intepreter
                 managedObjs.Add(null);
             }
             InitializeFields(type);
-            if (type.BaseType is Enviorment.CrossBindingAdaptor)
+            if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
             {
-                clrInstance = ((Enviorment.CrossBindingAdaptor)type.BaseType).CreateCLRInstance(type.AppDomain, this);
+                clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, this);
             }
             else
             {
