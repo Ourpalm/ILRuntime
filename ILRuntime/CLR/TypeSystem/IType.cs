@@ -14,6 +14,8 @@ namespace ILRuntime.CLR.TypeSystem
         Type TypeForCLR { get; }
         Type ReflectionType { get; }
 
+        IType BaseType { get; }
+
         IType ByRefType { get; }
 
         IType ArrayType { get; }

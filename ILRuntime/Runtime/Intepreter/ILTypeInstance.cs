@@ -193,7 +193,7 @@ namespace ILRuntime.Runtime.Intepreter
                     if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
                     {
                         CLRType clrType = type.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
-                        var field = clrType.Fields[index];
+                        var field = clrType.GetField(index);
                         var obj = field.GetValue(clrInstance);
                         return obj;
                     }
@@ -230,7 +230,7 @@ namespace ILRuntime.Runtime.Intepreter
                 if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
                 {
                     CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
-                    var field = clrType.Fields[fieldIdx];
+                    var field = clrType.GetField(fieldIdx);
                     var obj = field.GetValue(clrInstance);
                     ILIntepreter.PushObject(esp, managedStack, obj);
                 }
@@ -267,7 +267,7 @@ namespace ILRuntime.Runtime.Intepreter
                 if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
                 {
                     CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
-                    var field = clrType.Fields[fieldIdx];
+                    var field = clrType.GetField(fieldIdx);
                     field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, StackObject.ToObject(esp, appdomain, managedStack)));
                 }
                 else

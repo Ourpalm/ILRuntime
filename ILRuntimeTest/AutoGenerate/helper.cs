@@ -24,8 +24,9 @@ namespace ILRuntimeTest.TestFramework
 			app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Boolean>();
 			
 			app.DelegateManager.RegisterMethodDelegate<System.Int32>();
-			
-			app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Int32>();
+            app.DelegateManager.RegisterMethodDelegate<TestFramework.BaseClassTest>();
+
+            app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Int32>();
 
 
 			// delegate convertor

@@ -1639,7 +1639,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (type != null)
                                             {
                                                 var val = esp - 1;
-                                                var f = ((CLRType)type).Fields[ip->TokenInteger];
+                                                var f = ((CLRType)type).GetField(ip->TokenInteger);
                                                 f.SetValue(obj, f.FieldType.CheckCLRTypes(domain, StackObject.ToObject(val, domain, mStack)));
                                             }
                                             else
@@ -1698,7 +1698,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             var type = AppDomain.GetType(t);
                                             if (type != null)
                                             {
-                                                var val = ((CLRType)type).Fields[ip->TokenInteger].GetValue(obj);
+                                                var val = ((CLRType)type).GetField(ip->TokenInteger).GetValue(obj);
                                                 PushObject(esp - 1, mStack, val);
                                             }
                                             else
@@ -3338,7 +3338,7 @@ namespace ILRuntime.Runtime.Intepreter
             else
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
-                var fi = t.Fields[idx];
+                var fi = t.GetField(idx);
                 PushObject(dst, mStack, fi.GetValue(obj));
             }
         }
@@ -3352,7 +3352,7 @@ namespace ILRuntime.Runtime.Intepreter
             else
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
-                var fi = t.Fields[idx];
+                var fi = t.GetField(idx);
                 var v = obj.GetType().CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack));
                 fi.SetValue(obj, v);
             }

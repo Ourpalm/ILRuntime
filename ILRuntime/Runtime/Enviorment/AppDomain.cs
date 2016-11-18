@@ -543,7 +543,7 @@ namespace ILRuntime.Runtime.Enviorment
             if (clrTypeMapping.TryGetValue(t, out res))
                 return res;
             else
-                return null;
+                return GetType(t.AssemblyQualifiedName);
         }
 
         /// <summary>

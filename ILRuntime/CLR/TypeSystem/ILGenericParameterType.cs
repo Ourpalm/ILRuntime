@@ -135,6 +135,15 @@ namespace ILRuntime.CLR.TypeSystem
                 throw new NotImplementedException();
             }
         }
+
+        public IType BaseType
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public Method.IMethod GetVirtualMethod(Method.IMethod method)
         {
             return method;

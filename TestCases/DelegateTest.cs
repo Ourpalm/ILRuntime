@@ -118,6 +118,18 @@ namespace TestCases
             a(1, "2", "3");
         }
 
+        public static void DelegateTest11()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.GenericDelegateTest = CallBack;
+            ILRuntimeTest.TestFramework.BaseClassTest.DoTest();
+        }
+
+        static void CallBack(ILRuntimeTest.TestFramework.BaseClassTest a)
+        {
+            a.testField = true;
+            Console.WriteLine(a.testField);
+        }
+
         static void Test07Sub(ILRuntimeTest.TestFramework.IntDelegate action)
         {
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest = action;
