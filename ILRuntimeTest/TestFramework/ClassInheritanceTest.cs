@@ -144,7 +144,8 @@ namespace ILRuntimeTest.TestFramework
             ins.TestField();
         }
     }
-    
+
+    [NeedAdaptor]
     public interface InterfaceTest
     {
         void TestVirtual();

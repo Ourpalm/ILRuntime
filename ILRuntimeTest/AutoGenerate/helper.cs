@@ -16,6 +16,7 @@ namespace ILRuntimeTest.TestFramework
 			// adaptor register 
                         
 			app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
+			app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
 			app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
 			app.RegisterCrossBindingAdaptor(new TestClass3Adaptor());   
 

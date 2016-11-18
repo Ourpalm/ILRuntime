@@ -73,47 +73,52 @@ namespace CodeGenerationTools
                 sourcePath1.Text = targetPath = OD.FileName;
             }
 
-
-            var assembly = Assembly.LoadFrom(targetPath);
-            if (assembly == null) return;
-            //types
-            Type[] types;
             try
             {
-                types = assembly.GetTypes();
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-                types = ex.Types;
-            }
-            catch (IOException ioex)
-            {
-                Print(ioex.Message);
-                types = new Type[0];
-            }
-
-            foreach (var type in types)
-            {
-                if (type == null) continue;
-                //load ad
-                var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
-                if (attr != null)
+                var assembly = Assembly.LoadFrom(targetPath);
+                if (assembly == null) return;
+                //types
+                Type[] types;
+                try
                 {
-                    Print("[adaptor]" + type.FullName);
-                    LoadAdaptor(type);
-                    continue;
+                    types = assembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    types = ex.Types;
+                }
+                catch (IOException ioex)
+                {
+                    Print(ioex.Message);
+                    types = new Type[0];
                 }
 
-                //load delegate
-                var attr1 = type.GetCustomAttribute(typeof(DelegateExportAttribute), false);
-                if (attr1 != null)
+                foreach (var type in types)
                 {
-                    Print("[delegate convertor]" + type.FullName);
-                    LoadDelegateConvertor(type);
-                }
-            }
+                    if (type == null) continue;
+                    //load ad
+                    var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
+                    if (attr != null)
+                    {
+                        Print("[adaptor]" + type.FullName);
+                        LoadAdaptor(type);
+                        continue;
+                    }
 
-            Print("----------main assembly loaded");
+                    //load delegate
+                    var attr1 = type.GetCustomAttribute(typeof(DelegateExportAttribute), false);
+                    if (attr1 != null)
+                    {
+                        Print("[delegate convertor]" + type.FullName);
+                        LoadDelegateConvertor(type);
+                    }
+                }
+                Print("----------main assembly loaded");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void LoadILScriptAssemblyClick(object sender, EventArgs e)
@@ -129,31 +134,41 @@ namespace CodeGenerationTools
                 sourcePath2.Text = targetPath = OD.FileName;
             }
 
-            using (var testFs = File.Open(targetPath, FileMode.Open))
+            try
             {
-                var module = ModuleDefinition.ReadModule(testFs);
-                foreach (var typeDefinition in module.Types)
+                using (var fs = File.Open(targetPath, FileMode.Open))
                 {
-                    foreach (var methodDefinition in typeDefinition.Methods)
+                    var module = ModuleDefinition.ReadModule(fs);
+                    foreach (var typeDefinition in module.Types)
                     {
-                        foreach (var instruction in methodDefinition.Body.Instructions)
+                        foreach (var methodDefinition in typeDefinition.Methods)
                         {
-                            if (instruction.OpCode != OpCodes.Newobj || instruction.Previous == null ||
-                                instruction.Previous.OpCode != OpCodes.Ldftn) continue;
+                            if (methodDefinition?.Body?.Instructions == null)
+                                continue;
+                            foreach (var instruction in methodDefinition.Body.Instructions)
+                            {
+                                if (instruction.OpCode != OpCodes.Newobj || instruction.Previous == null ||
+                                    instruction.Previous.OpCode != OpCodes.Ldftn) continue;
 
-                            var type = instruction.Operand as MethodReference;
-                            if (type == null ||
-                                (!type.DeclaringType.Name.Contains("Action") &&
-                                 !type.DeclaringType.Name.Contains("Func"))) continue;
+                                var type = instruction.Operand as MethodReference;
+                                if (type == null ||
+                                    (!type.DeclaringType.Name.Contains("Action") &&
+                                     !type.DeclaringType.Name.Contains("Func"))) continue;
 
-                            Print("[delegate register]" + type.DeclaringType.FullName);
-                            LoadDelegateRegister(type.DeclaringType.FullName, type.DeclaringType);
+                                Print("[delegate register]" + type.DeclaringType.FullName);
+                                LoadDelegateRegister(type.DeclaringType.FullName, type.DeclaringType);
+                            }
                         }
                     }
                 }
+
+                Print("----------ilscript assembly loaded");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
-            Print("----------ilscript assembly loaded");
 
         }
 
@@ -257,11 +272,11 @@ namespace CodeGenerationTools
             _helpGenerator.LoadTemplateFromFile(tmpdPath + "helper.tmpd");
 
         }
-        
+
         private void CreateILRuntimeHelper()
         {
             Print($"==================Begin create helper:=====================");
-            
+
             _helpGenerator.LoadData(new Tuple<HashSet<Type>, HashSet<Type>, Dictionary<string, object>>(_adaptorSet, _delegateSet, _delegateRegDic));
             var helperStr = _helpGenerator.Generate();
 
@@ -286,7 +301,7 @@ namespace CodeGenerationTools
 
             using (var fs = File.Create(_outputPath + adaptorName + ".cs"))
             {
-              
+
                 _adGenerator.LoadData(type);
                 var classbody = _adGenerator.Generate();
 
@@ -298,7 +313,7 @@ namespace CodeGenerationTools
             Print($"================end create adaptor:{type.Name}=======================");
 
         }
-        
+
         #endregion
 
     }
