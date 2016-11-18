@@ -363,7 +363,7 @@ namespace ILRuntime.Runtime.Enviorment
             return scope is AssemblyNameReference ? ((AssemblyNameReference)scope).FullName : null;
         }
 
-        internal IType GetType(object token, IType contextType)
+        internal IType GetType(object token, IType contextType, IMethod contextMethod)
         {
             int hash = token.GetHashCode();
             IType res;
@@ -386,12 +386,20 @@ namespace ILRuntime.Runtime.Enviorment
                 Mono.Cecil.TypeReference _ref = (token as Mono.Cecil.TypeReference);
                 if (_ref.IsGenericParameter)
                 {
-                    var t = contextType.FindGenericArgument(_ref.Name);
+                    IType t = null;
+                    if (contextType != null)
+                    {
+                        t = contextType.FindGenericArgument(_ref.Name);
+                    }
+                    if (t == null && contextMethod != null && contextMethod is ILMethod)
+                    {
+                        t = ((ILMethod)contextMethod).FindGenericArgument(_ref.Name);
+                    }
                     return t;
                 }
                 if (_ref.IsByReference)
                 {
-                    var t = GetType(_ref.GetElementType(), contextType);
+                    var t = GetType(_ref.GetElementType(), contextType, contextMethod);
                     if (t != null)
                     {
                         res = t.MakeByRefType();
@@ -401,14 +409,15 @@ namespace ILRuntime.Runtime.Enviorment
                             ((ILType)res).TypeReference = _ref;
                         }
                         mapTypeToken[hash] = res;
-                        mapType[res.FullName] = res;
+                        if (!string.IsNullOrEmpty(res.FullName))
+                            mapType[res.FullName] = res;
                         return res;
                     }
                     return null;
                 }
                 if (_ref.IsArray)
                 {
-                    var t = GetType(_ref.GetElementType(), contextType);
+                    var t = GetType(_ref.GetElementType(), contextType, contextMethod);
                     if (t != null)
                     {
                         res = t.MakeArrayType();
@@ -418,7 +427,8 @@ namespace ILRuntime.Runtime.Enviorment
                             ((ILType)res).TypeReference = _ref;
                         }
                         mapTypeToken[hash] = res;
-                        mapType[res.FullName] = res;
+                        if (!string.IsNullOrEmpty(res.FullName))
+                            mapType[res.FullName] = res;
                         return res;
                     }
                     return t;
@@ -439,13 +449,18 @@ namespace ILRuntime.Runtime.Enviorment
                         {
                             val = contextType.FindGenericArgument(gType.GenericArguments[i].Name);
                             dummyGenericInstance = true;
-                            if(val ==null)
+                            if (val == null)
                             {
-                                return null;
+                                if (contextMethod != null && contextMethod is ILMethod)
+                                {
+                                    val = ((ILMethod)contextMethod).FindGenericArgument(gType.GenericArguments[i].Name);
+                                }
+                                else
+                                    return null;
                             }
                         }
                         else
-                            val = GetType(gType.GenericArguments[i], contextType);
+                            val = GetType(gType.GenericArguments[i], contextType, contextMethod);
                         genericArguments[i] = new KeyValuePair<string, IType>(key, val);
                     }
                 }
@@ -505,7 +520,8 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     ((ILType)res).TypeReference = (TypeReference)token;
                 }
-                mapType[res.FullName] = res;
+                if (!string.IsNullOrEmpty(res.FullName))
+                    mapType[res.FullName] = res;
             }
             if (!dummyGenericInstance)
                 mapTypeToken[hash] = res;
@@ -527,7 +543,7 @@ namespace ILRuntime.Runtime.Enviorment
             if (clrTypeMapping.TryGetValue(t, out res))
                 return res;
             else
-                return null;
+                return GetType(t.AssemblyQualifiedName);
         }
 
         /// <summary>
@@ -687,7 +703,6 @@ namespace ILRuntime.Runtime.Enviorment
         {
             string methodname = null;
             string typename = null;
-            TypeReference typeDef = null;
             List<IType> paramList = null;
             int hashCode = token.GetHashCode();
             IMethod method;
@@ -697,6 +712,7 @@ namespace ILRuntime.Runtime.Enviorment
             bool isConstructor = false;
             if (mapMethod.TryGetValue(hashCode, out method))
                 return method;
+            IType type = null;
             if (token is Mono.Cecil.MethodReference)
             {
                 Mono.Cecil.MethodReference _ref = (token as Mono.Cecil.MethodReference);
@@ -711,7 +727,11 @@ namespace ILRuntime.Runtime.Enviorment
                     return null;
                 }
                 methodname = _ref.Name;
-                typeDef = _ref.DeclaringType;
+                var typeDef = _ref.DeclaringType;
+                type = GetType(typeDef, contextType, contextMethod);
+                if (type == null)
+                    throw new KeyNotFoundException("Cannot find type:" + typename);
+
                 if (token is Mono.Cecil.MethodDefinition)
                 {
                     var def = _ref as MethodDefinition;
@@ -719,9 +739,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 else
                     isConstructor = methodname == ".ctor";
-
-                paramList = _ref.GetParamList(this, contextType);
-                returnType = GetType(_ref.ReturnType, contextType);
+                
                 if (_ref.IsGenericInstance)
                 {
                     GenericInstanceMethod gim = (GenericInstanceMethod)_ref;
@@ -730,7 +748,7 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (gim.GenericArguments[i].IsGenericParameter)
                             invalidToken = true;
-                        var gt = GetType(gim.GenericArguments[i], contextType);
+                        var gt = GetType(gim.GenericArguments[i], contextType, contextMethod);
                         if (gt == null)
                         {
                             gt = contextMethod.FindGenericArgument(gim.GenericArguments[i].Name);
@@ -746,6 +764,9 @@ namespace ILRuntime.Runtime.Enviorment
                             genericArguments[i] = gt;
                     }
                 }
+
+                paramList = _ref.GetParamList(this, contextType, contextMethod, genericArguments);
+                returnType = GetType(_ref.ReturnType, contextType, null);
             }
             else
             {
@@ -753,10 +774,6 @@ namespace ILRuntime.Runtime.Enviorment
                 //Mono.Cecil.GenericInstanceMethod gmethod = _def as Mono.Cecil.GenericInstanceMethod;
                 //genlist = new MethodParamList(environment, gmethod);
             }
-
-            var type = GetType(typeDef, contextType);
-            if (type == null)
-                throw new KeyNotFoundException("Cannot find type:" + typename);
 
             if (isConstructor)
                 method = type.GetConstructor(paramList);
@@ -794,10 +811,10 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        internal int GetFieldIndex(object token, IType contextType)
+        internal int GetFieldIndex(object token, IType contextType, IMethod contextMethod)
         {
             FieldReference f = token as FieldReference;
-            var type = GetType(f.DeclaringType, contextType);
+            var type = GetType(f.DeclaringType, contextType, contextMethod);
             if(type != null)
             {
                 return type.GetFieldIndex(token);
@@ -805,10 +822,10 @@ namespace ILRuntime.Runtime.Enviorment
             throw new KeyNotFoundException();
         }
 
-        internal long GetStaticFieldIndex(object token, IType contextType)
+        internal long GetStaticFieldIndex(object token, IType contextType, IMethod contextMethod)
         {
             FieldReference f = token as FieldReference;
-            var type = GetType(f.DeclaringType, contextType);
+            var type = GetType(f.DeclaringType, contextType, contextMethod);
 
             if (type is ILType)
             {

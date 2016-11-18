@@ -55,7 +55,7 @@ namespace ILRuntime.Runtime.Stack
                             }
                             else
                                 t = appdomain.GetType(obj.GetType());
-                            var fi = ((CLRType)t).Fields[esp->ValueLow];
+                            var fi = ((CLRType)t).GetField(esp->ValueLow);
                             return fi.GetValue(obj);
                         }
                     }

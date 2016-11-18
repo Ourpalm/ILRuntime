@@ -32,6 +32,16 @@ namespace TestCases
     }
     class Test05
     {
+        public static void TestArrayNull()
+        {
+            Console.WriteLine("TestArrayNull");
+            byte[] b = null;
+            if (b != null && b.Length > 0)
+            {
+            }
+            Console.WriteLine("TestArrayNullEnd ");
+        }
+
         public static void TestExplicit()
         {
             TestExplicit data = new TestCases.TestExplicit(true);

@@ -32,5 +32,22 @@ namespace ILRuntimeTest.TestFramework
         public static IntDelegate2 IntDelegateTestReturn;
         public static Int2Delegate2 IntDelegateTestReturn1;
         public static IntFloatDelegate2 IntDelegateTestReturn2;
+        public static Action<BaseClassTest> GenericDelegateTest;
+    }
+
+    public class GenericClassTest<T> : BaseClassTest
+    {
+
+    }
+    public class BaseClassTest
+    {
+        public bool testField;
+
+        public static void DoTest()
+        {
+            GenericClassTest<int> a = new GenericClassTest<int>();
+            if (DelegateTest.GenericDelegateTest != null)
+                DelegateTest.GenericDelegateTest(a);
+        }
     }
 }

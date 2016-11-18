@@ -77,6 +77,25 @@ namespace TestCases
             return dest;
         }
 
+        public static void UnitTest_GenericsRefOutList()
+        {
+            List<TestGenrRef> list = null;
+            ReadList<TestGenrRef>(ref list);
+            Console.WriteLine(list[0]);
+        }
+
+        static int ReadList<T>(ref List<T> dest) where T : TestGenrRefBase, new()
+        {
+            if (dest == null)
+                dest = new List<T>();
+
+            T obj = new T();
+
+            dest.Add(obj);
+            return 0;
+        }
+
+
         public static void UnitTest_RefTest()
         {
             TestCls r = null;

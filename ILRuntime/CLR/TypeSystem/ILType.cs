@@ -328,7 +328,7 @@ namespace ILRuntime.CLR.TypeSystem
                 interfaces = new IType[definition.Interfaces.Count];
                 for (int i = 0; i < interfaces.Length; i++)
                 {
-                    interfaces[i] = appdomain.GetType(definition.Interfaces[i], this);
+                    interfaces[i] = appdomain.GetType(definition.Interfaces[i], this, null);
                     if(interfaces[i] is CLRType)
                     {
                         CrossBindingAdaptor adaptor;
@@ -347,7 +347,7 @@ namespace ILRuntime.CLR.TypeSystem
             baseTypeInitialized = true;
             if (definition.BaseType != null)
             {
-                baseType = appdomain.GetType(definition.BaseType, this);
+                baseType = appdomain.GetType(definition.BaseType, this, null);
                 if (baseType is CLRType)
                 {
                     if (baseType.TypeForCLR == typeof(Enum) || baseType.TypeForCLR == typeof(object) || baseType.TypeForCLR == typeof(ValueType) || baseType.TypeForCLR == typeof(System.Enum))
@@ -642,7 +642,7 @@ namespace ILRuntime.CLR.TypeSystem
                         staticFieldTypes[idxStatic] = FindGenericArgument(field.FieldType.Name);
                     }
                     else
-                        staticFieldTypes[idxStatic] = appdomain.GetType(field.FieldType, this);
+                        staticFieldTypes[idxStatic] = appdomain.GetType(field.FieldType, this, null);
                     idxStatic++;
                 }
                 else
@@ -654,7 +654,7 @@ namespace ILRuntime.CLR.TypeSystem
                         fieldTypes[idx - FieldStartIndex] = FindGenericArgument(field.FieldType.Name);
                     }
                     else
-                        fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType, this);
+                        fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType, this, null);
                     if (IsEnum)
                     {
                         enumType = fieldTypes[idx - FieldStartIndex];

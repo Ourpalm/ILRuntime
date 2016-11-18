@@ -178,6 +178,14 @@ namespace ILRuntime.Runtime.Enviorment
                 return type.ReflectionType;
             }
         }
+
+        public IType BaseType
+        {
+            get
+            {
+                return type.BaseType;
+            }
+        }
         #endregion
     }
 }

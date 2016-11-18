@@ -21,6 +21,8 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, int> fieldTokenMapping;
         IType byRefType, arrayType;
         bool isDelegate;
+        IType baseType;
+        bool isBaseTypeInitialized = false;
 
         public Dictionary<int, FieldInfo> Fields
         {
@@ -118,6 +120,38 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 return clrType.Name;
             }
+        }
+
+        public IType BaseType
+        {
+            get
+            {
+                if (!isBaseTypeInitialized)
+                    InitializeBaseType();
+                return baseType;
+            }
+        }
+
+        void InitializeBaseType()
+        {
+            baseType = appdomain.GetType(clrType.BaseType);
+            if (baseType.TypeForCLR == typeof(Enum) || baseType.TypeForCLR == typeof(object) || baseType.TypeForCLR == typeof(ValueType) || baseType.TypeForCLR == typeof(System.Enum))
+            {//都是这样，无所谓
+                baseType = null;
+            }
+            isBaseTypeInitialized = true;
+        }
+
+        public FieldInfo GetField(int hash)
+        {
+            var dic = Fields;
+            FieldInfo res;
+            if (dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetField(hash);
+            else
+                return null;
         }
 
         void InitializeMethods()
@@ -281,7 +315,7 @@ namespace ILRuntime.CLR.TypeSystem
                             }
                             if (match)
                             {
-                                match = returnType == null || i.ReturnType == returnType;
+                                match = returnType == null || i.ReturnType.TypeForCLR == returnType.TypeForCLR;
                             }
                             if (match)
                             {

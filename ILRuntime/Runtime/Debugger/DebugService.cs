@@ -418,7 +418,7 @@ namespace ILRuntime.Runtime.Debugger
                     if (v == null)
                         v = "null";
                     else
-                        v = intp.AppDomain.GetType(lv.VariableType, m.DeclearingType).TypeForCLR.CheckCLRTypes(intp.AppDomain, v);
+                        v = intp.AppDomain.GetType(lv.VariableType, m.DeclearingType, m).TypeForCLR.CheckCLRTypes(intp.AppDomain, v);
                     string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
                     VariableInfo vinfo = new Debugger.VariableInfo();
                     vinfo.Address = (long)val;

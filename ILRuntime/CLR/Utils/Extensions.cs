@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.Method;
 using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter;
 namespace ILRuntime.CLR.Utils
@@ -13,27 +14,29 @@ namespace ILRuntime.CLR.Utils
     static class Extensions
     {
         public static List<IType> EmptyParamList = new List<IType>();
-        public static List<IType> GetParamList(this MethodReference def, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IType contextType)
+        public static List<IType> GetParamList(this MethodReference def, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IType contextType, IMethod contextMethod, IType[] genericArguments)
         {
             if (def.HasParameters)
             {
                 List<IType> param = new List<IType>();
-                var dt = appdomain.GetType(def.DeclaringType, contextType);
+                var dt = appdomain.GetType(def.DeclaringType, contextType, contextMethod);
                 foreach (var i in def.Parameters)
                 {
                     IType t = null;
-                    t = appdomain.GetType(i.ParameterType, dt);
+                    t = appdomain.GetType(i.ParameterType, dt, null);
                     if (t == null && def.IsGenericInstance)
                     {
                         GenericInstanceMethod gim = (GenericInstanceMethod)def;
-                        string name = i.ParameterType.FullName;
+                        string name = i.ParameterType.IsByReference ? i.ParameterType.GetElementType().FullName : i.ParameterType.FullName;
                         for (int j = 0; j < gim.GenericArguments.Count; j++)
                         {
                             var gp = gim.ElementMethod.GenericParameters[j];
                             var ga = gim.GenericArguments[j];
                             if (name == gp.Name)
                             {
-                                t = appdomain.GetType(ga, contextType);
+                                t = appdomain.GetType(ga, contextType, contextMethod);
+                                if (t == null && genericArguments != null)
+                                    t = genericArguments[j];
                                 break;
                             }
                             else if (name.Contains(gp.Name))
