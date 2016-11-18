@@ -719,8 +719,8 @@ namespace ILRuntime.Runtime.Intepreter
                         else
                         {
                             sb.Append(", ");
-                        }
-                        sb.Append(i.FullName);
+                        }                        
+                        sb.Append(i.TypeForCLR.FullName);
                     }
                     sb.AppendLine(">");
                 }
@@ -738,11 +738,11 @@ namespace ILRuntime.Runtime.Intepreter
                         {
                             sb.Append(", ");
                         }
-                        sb.Append(i.FullName);
+                        sb.Append(i.TypeForCLR.FullName);
                     }
                     if (!first)
                         sb.Append(", ");
-                    sb.Append(method.ReturnType.FullName);
+                    sb.Append(method.ReturnType.TypeForCLR.FullName);
                     sb.AppendLine(">");
                 }
             }
