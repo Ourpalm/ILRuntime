@@ -786,7 +786,7 @@ namespace ILRuntime.Runtime.Enviorment
 
             if (method == null)
             {
-                if (isConstructor && contextType.BaseType != null && contextType.BaseType is CrossBindingAdaptor && type.TypeForCLR == ((CrossBindingAdaptor)contextType.BaseType).BaseCLRType)
+                if (isConstructor && contextType.FirstCLRBaseType != null && contextType.FirstCLRBaseType is CrossBindingAdaptor && type.TypeForCLR == ((CrossBindingAdaptor)contextType.FirstCLRBaseType).BaseCLRType)
                 {
                     method = contextType.BaseType.GetConstructor(paramList);
                     if(method == null)

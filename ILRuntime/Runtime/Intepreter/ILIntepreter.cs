@@ -1569,6 +1569,8 @@ namespace ILRuntime.Runtime.Intepreter
 #if UNITY_EDITOR
                                                 UnityEngine.Profiler.EndSample();
 #endif
+                                                if (result is CrossBindingAdaptorType)
+                                                    result = ((CrossBindingAdaptorType)result).ILInstance;
                                                 int paramCount = cm.ParameterCount;
                                                 for (int i = 1; i <= paramCount; i++)
                                                 {
@@ -1699,6 +1701,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (type != null)
                                             {
                                                 var val = ((CLRType)type).GetField(ip->TokenInteger).GetValue(obj);
+                                                if (val is CrossBindingAdaptorType)
+                                                    val = ((CrossBindingAdaptorType)val).ILInstance;
                                                 PushObject(esp - 1, mStack, val);
                                             }
                                             else
@@ -1779,6 +1783,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             int idx = (int)ip->TokenLong;
                                             var f = t.Fields[idx];
                                             var val = f.GetValue(null);
+                                            if (val is CrossBindingAdaptorType)
+                                                val = ((CrossBindingAdaptorType)val).ILInstance;
                                             PushObject(esp, mStack, val);
                                         }
                                     }
@@ -2137,6 +2143,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else
                                             {
+                                                if (ins is ILTypeInstance)
+                                                    ins = ((ILTypeInstance)ins).CLRInstance;
                                                 dele = Delegate.CreateDelegate(cm.DeclearingType.TypeForCLR, ins, ((CLRMethod)mi).MethodInfo);
                                             }
                                             esp = PushObject(esp, mStack, dele);

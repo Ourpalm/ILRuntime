@@ -51,7 +51,7 @@ namespace ILRuntime.Runtime.Stack
                             IType t = null;
                             if (obj is CrossBindingAdaptorType)
                             {
-                                t = appdomain.GetType(((CrossBindingAdaptor)((CrossBindingAdaptorType)obj).ILInstance.Type.BaseType).BaseCLRType);
+                                t = appdomain.GetType(((CrossBindingAdaptor)((CrossBindingAdaptorType)obj).ILInstance.Type.FirstCLRBaseType).BaseCLRType);
                             }
                             else
                                 t = appdomain.GetType(obj.GetType());

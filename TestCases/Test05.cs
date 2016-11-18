@@ -40,6 +40,13 @@ namespace TestCases
             {
             }
             Console.WriteLine("TestArrayNullEnd ");
+
+            Dictionary<Type, int> dic = new Dictionary<Type, int>();
+            int a;
+            if(dic.TryGetValue(typeof(Test05), out a))
+            {
+                Console.WriteLine("Error!!!");
+            }
         }
 
         public static void TestExplicit()

@@ -190,9 +190,9 @@ namespace ILRuntime.Runtime.Intepreter
                 }
                 else
                 {
-                    if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
+                    if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                     {
-                        CLRType clrType = type.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
+                        CLRType clrType = type.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
                         var field = clrType.GetField(index);
                         var obj = field.GetValue(clrInstance);
                         return obj;
@@ -227,9 +227,9 @@ namespace ILRuntime.Runtime.Intepreter
                 PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
             else
             {
-                if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
+                if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
-                    CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
+                    CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
                     var field = clrType.GetField(fieldIdx);
                     var obj = field.GetValue(clrInstance);
                     ILIntepreter.PushObject(esp, managedStack, obj);
@@ -264,9 +264,9 @@ namespace ILRuntime.Runtime.Intepreter
                 AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
             else
             {
-                if (Type.BaseType != null && Type.BaseType is Enviorment.CrossBindingAdaptor)
+                if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
-                    CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.BaseType).BaseCLRType) as CLRType;
+                    CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
                     var field = clrType.GetField(fieldIdx);
                     field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, StackObject.ToObject(esp, appdomain, managedStack)));
                 }
