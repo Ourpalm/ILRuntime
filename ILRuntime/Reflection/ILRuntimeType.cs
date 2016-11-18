@@ -317,5 +317,9 @@ namespace ILRuntime.Reflection
         {
             return false;
         }
+        public override int GetHashCode()
+        {
+            return type.GetHashCode();
+        }
     }
 }

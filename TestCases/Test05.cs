@@ -40,11 +40,14 @@ namespace TestCases
             {
             }
             Console.WriteLine("TestArrayNullEnd ");
+        }
 
+        public static void TestTypeof()
+        {
             Dictionary<Type, int> dic = new Dictionary<Type, int>();
-            dic[typeof(string)] = 2;
+            dic[typeof(TestCls2)] = 2;
             int a;
-            if(dic.TryGetValue(typeof(Test05), out a))
+            if (dic.TryGetValue(typeof(TestCls), out a))
             {
                 Console.WriteLine("Error!!!");
             }
