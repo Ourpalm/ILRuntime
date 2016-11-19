@@ -24,6 +24,10 @@ namespace CodeGenerationTools
 
         private AdaptorGenerator _adGenerator;
         private HelperGenerator _helpGenerator;
+
+        private Type _adaptorAttr;
+        private Type _delegateAttr;
+
         #endregion
 
         #region WinForm Event
@@ -75,8 +79,24 @@ namespace CodeGenerationTools
 
             try
             {
+                //var module = ModuleDefinition.ReadModule(targetPath);
+                //if (module == null) return;
+                //var typeList = module.GetTypes();
+                //foreach (var t in typeList)
+                //{
+                //   t.CustomAttributes
+                //}
+
                 var assembly = Assembly.LoadFrom(targetPath);
                 if (assembly == null) return;
+
+                //如果自定义属性用自定义
+                _adaptorAttr = assembly.GetType("ILRuntime.Other.NeedAdaptorAttribute");
+                if (_adaptorAttr == null) _adaptorAttr = typeof(NeedAdaptorAttribute);
+
+                _delegateAttr = assembly.GetType("ILRuntime.Other.DelegateExportAttribute");
+                if (_delegateAttr == null) _delegateAttr = typeof(DelegateExportAttribute);
+
                 //types
                 Type[] types;
                 try
@@ -93,20 +113,30 @@ namespace CodeGenerationTools
                     types = new Type[0];
                 }
 
+
+
                 foreach (var type in types)
                 {
                     if (type == null) continue;
-                    //load ad
-                    var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
+                    //load adaptor
+                    if (type == _adaptorAttr)
+                        continue;
+
+                    //var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
+                    //if (attr.Length > 0)
+                    var attr = type.GetCustomAttribute(_adaptorAttr, false);
                     if (attr != null)
                     {
                         Print("[adaptor]" + type.FullName);
                         LoadAdaptor(type);
                         continue;
                     }
-
+                    if (type == _delegateAttr)
+                        continue;
                     //load delegate
-                    var attr1 = type.GetCustomAttribute(typeof(DelegateExportAttribute), false);
+                    //var attr1 = type.GetCustomAttributes(typeof(DelegateExportAttribute), false);
+                    //if (attr1.Length > 0)
+                    var attr1 = type.GetCustomAttribute(_delegateAttr, false);
                     if (attr1 != null)
                     {
                         Print("[delegate convertor]" + type.FullName);
