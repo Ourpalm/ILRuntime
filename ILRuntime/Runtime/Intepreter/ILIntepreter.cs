@@ -3062,6 +3062,12 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             val = (byte)obj->Value;
                                             break;
+                                        case ObjectTypes.Float:
+                                            val = (byte)*(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (byte)*(double*)&obj->Value;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -3081,6 +3087,12 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Long:
                                         case ObjectTypes.Integer:
                                             val = (sbyte)obj->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            val = (sbyte)*(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (sbyte)*(double*)&obj->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -3102,6 +3114,12 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             val = (ushort)obj->Value;
                                             break;
+                                        case ObjectTypes.Float:
+                                            val = (ushort)*(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (ushort)*(double*)&obj->Value;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -3121,6 +3139,12 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Long:
                                         case ObjectTypes.Integer:
                                             val = (short)(obj->Value);
+                                            break;
+                                        case ObjectTypes.Float:
+                                            val = (short)*(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (short)*(double*)&obj->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -3143,6 +3167,12 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Integer:
                                             val = (uint)obj->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            val = (uint)*(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (uint)*(double*)&obj->Value;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -3198,6 +3228,12 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Long:
                                             ip++;
                                             continue;
+                                        case ObjectTypes.Float:
+                                            val = (long)*(float*)&obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (long)*(double*)&obj->Value;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
