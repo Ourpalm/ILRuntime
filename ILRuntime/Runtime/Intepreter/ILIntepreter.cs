@@ -2025,7 +2025,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             res = *(double*)&obj1->Value > *(double*)&obj2->Value;
                                             break;
                                         case ObjectTypes.Object:
-                                            res = obj2->ObjectType == ObjectTypes.Null;
+                                            res = mStack[obj1->Value] != null && obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Null:
                                             res = false;

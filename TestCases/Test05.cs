@@ -36,8 +36,9 @@ namespace TestCases
         {
             Console.WriteLine("TestArrayNull");
             byte[] b = null;
-            if (b != null && b.Length > 0)
+            if (b != null)
             {
+                Console.WriteLine("Error");
             }
             Console.WriteLine("TestArrayNullEnd ");
         }
