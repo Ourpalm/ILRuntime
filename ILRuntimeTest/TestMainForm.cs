@@ -175,6 +175,9 @@ namespace ILRuntimeTest
 
         private void LoadTest()
         {
+            _testUnitList.Clear();
+            _resList.Clear();
+
             var types = _app.LoadedTypes.Values.ToList();
             foreach (var type in types)
             {
