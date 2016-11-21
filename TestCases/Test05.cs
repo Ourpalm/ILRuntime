@@ -43,6 +43,13 @@ namespace TestCases
             Console.WriteLine("TestArrayNullEnd ");
         }
 
+        public static void TestStringNull()
+        {
+            string str = null;
+            if (!string.IsNullOrEmpty(str))
+                Console.WriteLine("Error");
+        }
+
         public static void TestTypeof()
         {
             Dictionary<Type, int> dic = new Dictionary<Type, int>();

@@ -90,7 +90,6 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* arg = Minus(frame.LocalVarPointer, method.ParameterCount);
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
-            int locBase = mStackBase;
             int paramCnt = method.ParameterCount;
             if (method.HasThis)//this parameter is always object reference
             {
@@ -113,7 +112,9 @@ namespace ILRuntime.Runtime.Intepreter
                     mStack.Add(null);
                 }
             }
-                //Managed Stack reserved for local variable
+
+            int locBase = mStack.Count;
+            //Managed Stack reserved for local variable
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
                 var v = method.Definition.Body.Variables[i];
