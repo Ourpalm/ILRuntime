@@ -30,6 +30,10 @@ namespace ILRuntime.Runtime.Enviorment
         Assembly[] loadedAssemblies;
         Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
         DebugService debugService;
+
+#if UNITY_EDITOR
+        public int UnityMainThreadID { get; set; }
+#endif
         public AppDomain()
         {
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();

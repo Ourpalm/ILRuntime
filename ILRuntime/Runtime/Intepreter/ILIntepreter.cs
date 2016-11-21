@@ -77,7 +77,8 @@ namespace ILRuntime.Runtime.Intepreter
             if (method == null)
                 throw new NullReferenceException();
 #if UNITY_EDITOR
-            UnityEngine.Profiler.BeginSample(method.ToString());
+            if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
+                UnityEngine.Profiler.BeginSample(method.ToString());
 #endif
             OpCode[] body = method.Body;
             StackFrame frame = stack.PushFrame(method, esp);
@@ -1564,11 +1565,13 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (!processed)
                                             {
 #if UNITY_EDITOR
-                                                UnityEngine.Profiler.BeginSample(cm.ToString());
+                                                if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
+                                                    UnityEngine.Profiler.BeginSample(cm.ToString());
 #endif
                                                 object result = cm.Invoke(this, esp, mStack);
 #if UNITY_EDITOR
-                                                UnityEngine.Profiler.EndSample();
+                                                if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
+                                                    UnityEngine.Profiler.EndSample();
 #endif
                                                 if (result is CrossBindingAdaptorType)
                                                     result = ((CrossBindingAdaptorType)result).ILInstance;
@@ -3339,7 +3342,8 @@ namespace ILRuntime.Runtime.Intepreter
                 }
             }
 #if UNITY_EDITOR
-            UnityEngine.Profiler.EndSample();
+            if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
+                UnityEngine.Profiler.EndSample();
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
