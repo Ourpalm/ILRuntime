@@ -10,20 +10,20 @@ namespace ILRuntimeTest.TestBase
     {
         public override void Run()
         {
-            //Invoke(_typeName, _methodName);
-            var obj = _app.Instantiate(_typeName);
+            //Invoke(TypeName, MethodName);
+            var obj = App.Instantiate(TypeName);
             if (obj != null)
-                Invoke(obj, _typeName, _methodName);
+                Invoke(obj, TypeName, MethodName);
         }
 
         public override bool Check()
         {
-            return _pass;
+            return Pass;
         }
 
         public override TestResultInfo CheckResult()
         {
-            return new TestResultInfo(_typeName + "." + _methodName, _pass, message.ToString());
+            return new TestResultInfo(TypeName + "." + MethodName, Pass, Message.ToString());
         }
     }
 }

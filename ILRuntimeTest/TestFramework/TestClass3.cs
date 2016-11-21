@@ -11,4 +11,17 @@ namespace ILRuntimeTest.TestFramework
     {
 
     }
+
+    [NeedAdaptor]
+    public class TestClass4
+    {
+        protected int a;
+        protected int b;
+
+        public virtual void KKK()
+        {
+            a = 1;
+            b = 2;
+        }
+    }
 }

@@ -50,7 +50,7 @@ namespace ILRuntime.CLR.Method
             get
             {
                 if (body == null)
-                    InitCodeBody(); 
+                    InitCodeBody();
                 return exceptionHandler;
             }
         }
@@ -109,7 +109,7 @@ namespace ILRuntime.CLR.Method
             if (def.HasBody)
             {
                 var sp = DebugService.FindSequencePoint(def.Body.Instructions[0]);
-                if(sp != null)
+                if (sp != null)
                 {
                     StartLine = sp.StartLine;
                     sp = DebugService.FindSequencePoint(def.Body.Instructions[def.Body.Instructions.Count - 1]);
@@ -170,6 +170,11 @@ namespace ILRuntime.CLR.Method
             {
                 return isDelegateInvoke;
             }
+        }
+
+        public bool IsStatic
+        {
+            get { return def.IsStatic; }
         }
 
         public int ParameterCount
@@ -281,7 +286,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Blt_S:
                 case OpCodeEnum.Blt_Un:
                 case OpCodeEnum.Blt_Un_S:
-                    code.TokenInteger = addr[(Mono.Cecil.Cil.Instruction)token]; 
+                    code.TokenInteger = addr[(Mono.Cecil.Cil.Instruction)token];
                     break;
                 case OpCodeEnum.Ldc_I4:
                     code.TokenInteger = (int)token;
@@ -303,7 +308,7 @@ namespace ILRuntime.CLR.Method
                         double val = (double)token;
                         code.TokenLong = *(long*)&val;
                     }
-                    break;                    
+                    break;
                 case OpCodeEnum.Stloc:
                 case OpCodeEnum.Stloc_S:
                 case OpCodeEnum.Ldloc:
@@ -362,7 +367,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldfld:
                 case OpCodeEnum.Ldflda:
                     {
-                        code.TokenInteger = appdomain.GetFieldIndex(token, declaringType, this);   
+                        code.TokenInteger = appdomain.GetFieldIndex(token, declaringType, this);
                     }
                     break;
 
@@ -370,7 +375,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldsfld:
                 case OpCodeEnum.Ldsflda:
                     {
-                        code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType, this);   
+                        code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType, this);
                     }
                     break;
                 case OpCodeEnum.Ldstr:
@@ -387,7 +392,7 @@ namespace ILRuntime.CLR.Method
                             code.TokenInteger = 0;
                             code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType, this);
                         }
-                        else if(token is TypeReference)
+                        else if (token is TypeReference)
                         {
                             code.TokenInteger = 1;
                             code.TokenLong = GetTypeTokenHashCode(token);
@@ -424,7 +429,7 @@ namespace ILRuntime.CLR.Method
             return 0;
         }
 
-        void PrepareJumpTable(object token,Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
+        void PrepareJumpTable(object token, Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
         {
             int hashCode = token.GetHashCode();
 

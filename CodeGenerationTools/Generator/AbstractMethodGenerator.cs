@@ -1,11 +1,12 @@
 ﻿using System.Reflection;
 using CodeGenerationTools.Generator.Base;
+using Mono.Cecil;
 
 namespace CodeGenerationTools.Generator
 {
-    public class AbstractMethodGenerator : GeneratorBase<MethodInfo>
+    public class AbstractMethodGenerator : GeneratorBase<MethodDefinition>
     {
-        public override bool LoadData(MethodInfo methodInfo)
+        public override bool LoadData(MethodDefinition methodInfo)
         {
             if (methodInfo == null)
                 return false;
@@ -14,7 +15,7 @@ namespace CodeGenerationTools.Generator
             string argNoTypeStr = "";
 
             SetKeyValue("{$AMethodName}", methodInfo.Name);
-            foreach (var pInfo in methodInfo.GetParameters())
+            foreach (var pInfo in methodInfo.Parameters)//.GetParameters())
             {
                 argStr += pInfo.ParameterType.Name + " " + pInfo.Name + ",";
                 argNoTypeStr += pInfo.Name + ",";
@@ -25,15 +26,34 @@ namespace CodeGenerationTools.Generator
             SetKeyValue("{$args_no_type}", argNoTypeStr);
 
             SetKeyValue("{$comma}", argStr == "" ? "" : ",");
-            SetKeyValue("{$modifier}", methodInfo.Accessmodifier().ToString().ToLower());
+            SetKeyValue("{$modifier}", GetAccessmodifier(methodInfo));//.Accessmodifier().ToString().ToLower());
 
-            if (methodInfo.ReturnType == typeof(void)) return true;
+            if (methodInfo.ReturnType.FullName == "System.Void") return true;
 
             SetKeyValue("{$returnType}", methodInfo.ReturnType.Name);
             var returnStr = methodInfo.ReturnType.IsValueType ? "return 0;" : "return null;";
             SetKeyValue("{$returnDefault}", returnStr);
 
             return true;
+        }
+
+
+        public string GetAccessmodifier(MethodDefinition method)
+        {
+            if (method.IsPrivate)
+                return "private";
+            if (method.IsFamilyOrAssembly)
+                return "protected internal";//!--
+            if (method.IsAssembly)
+                return "internal";
+            if (method.IsFamily)
+                return "protected";
+            if (method.IsPublic)
+                return "public";
+            //dont know what the hell 
+            //if (method.IsFamilyAndAssembly)
+            //    return "public";
+            return "public";
         }
     }
 }

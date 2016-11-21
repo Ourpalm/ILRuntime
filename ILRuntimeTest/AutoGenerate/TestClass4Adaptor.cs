@@ -3,15 +3,15 @@ using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 
-namespace {$Namespace}
+namespace ILRuntimeTest.TestFramework
 {   
-    public class {$ClassName}Adaptor : CrossBindingAdaptor
+    public class TestClass4Adaptor : CrossBindingAdaptor
     {
         public override Type BaseCLRType
         {
             get
             {
-                return typeof({$ClassName});
+                return typeof(TestClass4);
             }
         }
 
@@ -28,7 +28,7 @@ namespace {$Namespace}
             return new Adaptor(appdomain, instance);
         }
 
-		internal class Adaptor : {$ClassName}, CrossBindingAdaptorType
+		internal class Adaptor : TestClass4, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -46,7 +46,26 @@ namespace {$Namespace}
 
             public ILTypeInstance ILInstance { get { return instance; } }
 
-            {$MethodArea}
+            
+            IMethod mKKK;
+            bool isKKKInvoking = false;
+
+            public override void KKK()
+            {
+                if (mKKK == null)
+                {
+                    mKKK = instance.Type.GetMethod("KKK", 0);
+                }
+                if (mKKK != null && !isKKKInvoking)
+                {
+                    isKKKInvoking = true;
+                    appdomain.Invoke(mKKK, instance );
+                    isKKKInvoking = false;
+                }
+                else
+                    base.KKK();
+            }
+
             
             
             public override string ToString()
@@ -63,5 +82,5 @@ namespace {$Namespace}
         }
     }
 
-	{$Interface}
+	
 }

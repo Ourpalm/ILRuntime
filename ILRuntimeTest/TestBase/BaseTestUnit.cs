@@ -10,27 +10,29 @@ namespace ILRuntimeTest.Test
 {
     abstract class BaseTestUnit : ITestable
     {
-        protected ILRuntime.Runtime.Enviorment.AppDomain _app;
-        protected string _assemblyName;
-        protected string _typeName;
-        protected string _methodName;
-        protected bool _pass;
-        protected StringBuilder message = new StringBuilder();
+        protected AppDomain App;
+        protected string AssemblyName;
+        protected string TypeName;
+        protected string MethodName;
+        protected bool Pass;
+        protected StringBuilder Message = new StringBuilder();
+
+        public string TestName { get { return TypeName + "." + MethodName; } }
 
         #region 接口方法
 
         public bool Init(string fileName)
         {
-            _assemblyName = fileName;
-            if (!File.Exists(_assemblyName))
+            AssemblyName = fileName;
+            if (!File.Exists(AssemblyName))
                 return false;
-            using (var fs = new System.IO.FileStream(_assemblyName, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+            using (var fs = new System.IO.FileStream(AssemblyName, System.IO.FileMode.Open, System.IO.FileAccess.Read))
             {
-                _app = new ILRuntime.Runtime.Enviorment.AppDomain();
-                var path = System.IO.Path.GetDirectoryName(_assemblyName);
-                var name = System.IO.Path.GetFileNameWithoutExtension(_assemblyName);
+                App = new ILRuntime.Runtime.Enviorment.AppDomain();
+                var path = System.IO.Path.GetDirectoryName(AssemblyName);
+                var name = System.IO.Path.GetFileNameWithoutExtension(AssemblyName);
                 using (var fs2 = new System.IO.FileStream(string.Format("{0}\\{1}.pdb", path, name), System.IO.FileMode.Open))
-                    _app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
+                    App.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
             }
 
             return true;
@@ -41,7 +43,7 @@ namespace ILRuntimeTest.Test
             if (app == null)
                 return false;
 
-            _app = app;
+            App = app;
             return true;
         }
 
@@ -50,10 +52,10 @@ namespace ILRuntimeTest.Test
             if (app == null)
                 return false;
 
-            _typeName = type;
-            _methodName = method;
+            TypeName = type;
+            MethodName = method;
 
-            _app = app;
+            App = app;
             return true;
         }
 
@@ -83,9 +85,9 @@ namespace ILRuntimeTest.Test
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            _app.Invoke(type, method, null); //InstanceTest
+            App.Invoke(type, method, null); //InstanceTest
             sw.Stop();
-            message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
+            Message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
         }
 
         public void Invoke(string type, string method)
@@ -95,32 +97,32 @@ namespace ILRuntimeTest.Test
                 var sw = new System.Diagnostics.Stopwatch();
                 Console.WriteLine("Invoking {0}.{1}", type, method);
                 sw.Start();
-                var res = _app.Invoke(type, method, null); //InstanceTest
+                var res = App.Invoke(type, method, null); //InstanceTest
                 sw.Stop();
                 if (res != null)
-                    message.AppendLine("Return:" + res);
-                message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
-                _pass = true;
+                    Message.AppendLine("Return:" + res);
+                Message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
+                Pass = true;
             }
             catch (ILRuntime.Runtime.Intepreter.ILRuntimeException e)
             {
-                message.AppendLine(e.Message);
+                Message.AppendLine(e.Message);
                 if (!string.IsNullOrEmpty(e.ThisInfo))
                 {
-                    message.AppendLine("this:");
-                    message.AppendLine(e.ThisInfo);
+                    Message.AppendLine("this:");
+                    Message.AppendLine(e.ThisInfo);
                 }
-                message.AppendLine("Local Variables:");
-                message.AppendLine(e.LocalInfo);
-                message.AppendLine(e.StackTrace);
+                Message.AppendLine("Local Variables:");
+                Message.AppendLine(e.LocalInfo);
+                Message.AppendLine(e.StackTrace);
                 if (e.InnerException != null)
-                    message.AppendLine(e.InnerException.ToString());
-                _pass = false;
+                    Message.AppendLine(e.InnerException.ToString());
+                Pass = false;
             }
             catch (Exception ex)
             {
-                message.AppendLine(ex.ToString());
-                _pass = false;
+                Message.AppendLine(ex.ToString());
+                Pass = false;
             }
         }
 

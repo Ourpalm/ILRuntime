@@ -9,7 +9,7 @@ using Mono.Cecil;
 
 namespace CodeGenerationTools.Generator
 {
-    public class HelperGenerator : GeneratorBase<Tuple<HashSet<Type>, HashSet<Type>, Dictionary<string, Object>>>
+    public class HelperGenerator : GeneratorBase<Tuple<Dictionary<string, TypeDefinition>, Dictionary<string, TypeDefinition>, Dictionary<string, TypeReference>>>
     {
         private string _filePath;
         private DelegateConveterGenerator _dcg;
@@ -26,7 +26,7 @@ namespace CodeGenerationTools.Generator
             return base.LoadTemplateFromFile(filePath);
         }
 
-        public override bool LoadData(Tuple<HashSet<Type>, HashSet<Type>, Dictionary<string, object>> data)
+        public override bool LoadData(Tuple<Dictionary<string, TypeDefinition>, Dictionary<string, TypeDefinition>, Dictionary<string, TypeReference>> data)
         {
             if (data?.Item1 == null)
                 return false;
@@ -35,16 +35,22 @@ namespace CodeGenerationTools.Generator
             if (data.Item3 == null)
                 return false;
 
+            string nsStr = null;
+
             var adptorStr = "";
-            foreach (var type in data.Item1)
+            foreach (var type in data.Item1.Values)
             {
+                if (nsStr == null)
+                    nsStr = type.Namespace;
                 adptorStr += CreateAdaptorInit(type);
             }
             SetKeyValue("{$AdaptorInit}", adptorStr);
 
             var delegateStr = "";
-            foreach (var type in data.Item2)
+            foreach (var type in data.Item2.Values)
             {
+                if (nsStr == null)
+                    nsStr = type.Namespace;
                 delegateStr += CreateDelegateConvertorInit(type);
             }
             SetKeyValue("{$DelegateInit}", delegateStr);
@@ -56,10 +62,12 @@ namespace CodeGenerationTools.Generator
             }
             SetKeyValue("{$DelegateRegInit}", delegateRegStr);
 
+            SetKeyValue("{$Namespace}", nsStr);
+
             return true;
         }
 
-        private string CreateAdaptorInit(Type type)
+        private string CreateAdaptorInit(TypeDefinition type)
         {
             _arg.InitFromFile(_filePath + "/adaptor_register.tmpd", type);
             return _arg.Generate();
@@ -86,12 +94,12 @@ namespace CodeGenerationTools.Generator
             return _drg.Generate();
         }
 
-        private string CreateDelegateConvertorInit(Type type)
+        private string CreateDelegateConvertorInit(TypeDefinition type)
         {
-            var method = type.GetMethod("Invoke");
+            var method = type.Methods.FirstOrDefault(m => m.Name == "Invoke");//GetMethod("Invoke");
             if (method == null)
                 return "";
-            var tmpd = method.ReturnType == typeof(void) ? "delegate_void.tmpd" : "delegate_return.tmpd";
+            var tmpd = method.ReturnType.FullName == "System.Void" ? "delegate_void.tmpd" : "delegate_return.tmpd";// == typeof(void) ? "delegate_void.tmpd" : "delegate_return.tmpd";
             _dcg.InitFromFile(_filePath + Path.AltDirectorySeparatorChar + tmpd, type);
             return _dcg.Generate();
         }

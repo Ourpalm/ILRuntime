@@ -18,15 +18,23 @@ namespace CodeGenerationTools
         #region Fields
         private string _outputPath;
 
-        private readonly HashSet<Type> _adaptorSet = new HashSet<Type>();
-        private readonly HashSet<Type> _delegateSet = new HashSet<Type>();
-        private readonly Dictionary<string, object> _delegateRegDic = new Dictionary<string, object>();
+        //private readonly HashSet<Type> _adaptorSet = new HashSet<Type>();
+        //private readonly HashSet<Type> _delegateSet = new HashSet<Type>();
+        //private readonly Dictionary<string, object> _delegateRegDic = new Dictionary<string, object>();
+
+        //private Type _adaptorAttr;
+        //private Type _delegateAttr;
+
+        private readonly Dictionary<string, TypeDefinition> _adaptorDic = new Dictionary<string, TypeDefinition>();
+        private readonly Dictionary<string, TypeDefinition> _delegateCovDic = new Dictionary<string, TypeDefinition>();
+        private readonly Dictionary<string, TypeReference> _delegateRegDic = new Dictionary<string, TypeReference>();
 
         private AdaptorGenerator _adGenerator;
         private HelperGenerator _helpGenerator;
 
-        private Type _adaptorAttr;
-        private Type _delegateAttr;
+
+        private string _adaptorAttrName = "ILRuntime.Other.NeedAdaptorAttribute";
+        private string _delegateAttrName = "ILRuntime.Other.DelegateExportAttribute";
 
         #endregion
 
@@ -49,8 +57,8 @@ namespace CodeGenerationTools
 
             outputText.Text = "";
 
-            _adaptorSet.Clear();
-            _delegateSet.Clear();
+            _adaptorDic.Clear();
+            _delegateCovDic.Clear();
             _delegateRegDic.Clear();
 
             LoadTemplates();
@@ -79,70 +87,90 @@ namespace CodeGenerationTools
 
             try
             {
-                //var module = ModuleDefinition.ReadModule(targetPath);
-                //if (module == null) return;
-                //var typeList = module.GetTypes();
-                //foreach (var t in typeList)
+                var module = ModuleDefinition.ReadModule(targetPath);
+                if (module == null) return;
+
+                _adaptorDic.Clear();
+                _delegateCovDic.Clear();
+
+                var typeList = module.GetTypes();
+                foreach (var t in typeList)
+                {
+                    foreach (var customAttribute in t.CustomAttributes)
+                    {
+                        if (customAttribute.AttributeType.FullName == _adaptorAttrName)
+                        {
+                            Print("[Need Adaptor]" + t.FullName);
+                            LoadAdaptor(t);
+                            continue;
+                        }
+
+                        if (customAttribute.AttributeType.FullName == _delegateAttrName)
+                        {
+                            //unity dll egg hurt name has '/'
+                            var typeName = t.FullName.Replace("/", ".");
+                            Print("[Delegate Export]" + typeName);
+                            LoadDelegateConvertor(t);
+                            continue;
+                        }
+                    }
+                }
+
+
+                //var assembly = Assembly.LoadFrom(targetPath);
+                //if (assembly == null) return;
+
+                ////如果自定义属性用自定义
+                //_adaptorAttr = assembly.GetType("ILRuntime.Other.NeedAdaptorAttribute");
+                //if (_adaptorAttr == null) _adaptorAttr = typeof(NeedAdaptorAttribute);
+
+                //_delegateAttr = assembly.GetType("ILRuntime.Other.DelegateExportAttribute");
+                //if (_delegateAttr == null) _delegateAttr = typeof(DelegateExportAttribute);
+
+                ////types
+                //Type[] types;
+                //try
                 //{
-                //   t.CustomAttributes
+                //    types = assembly.GetTypes();
+                //}
+                //catch (ReflectionTypeLoadException ex)
+                //{
+                //    types = ex.Types;
+                //}
+                //catch (IOException ioex)
+                //{
+                //    Print(ioex.Message);
+                //    types = new Type[0];
                 //}
 
-                var assembly = Assembly.LoadFrom(targetPath);
-                if (assembly == null) return;
+                //foreach (var type in types)
+                //{
+                //    if (type == null) continue;
+                //    //load adaptor
+                //    if (type == _adaptorAttr)
+                //        continue;
 
-                //如果自定义属性用自定义
-                _adaptorAttr = assembly.GetType("ILRuntime.Other.NeedAdaptorAttribute");
-                if (_adaptorAttr == null) _adaptorAttr = typeof(NeedAdaptorAttribute);
-
-                _delegateAttr = assembly.GetType("ILRuntime.Other.DelegateExportAttribute");
-                if (_delegateAttr == null) _delegateAttr = typeof(DelegateExportAttribute);
-
-                //types
-                Type[] types;
-                try
-                {
-                    types = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    types = ex.Types;
-                }
-                catch (IOException ioex)
-                {
-                    Print(ioex.Message);
-                    types = new Type[0];
-                }
-
-
-
-                foreach (var type in types)
-                {
-                    if (type == null) continue;
-                    //load adaptor
-                    if (type == _adaptorAttr)
-                        continue;
-
-                    //var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
-                    //if (attr.Length > 0)
-                    var attr = type.GetCustomAttribute(_adaptorAttr, false);
-                    if (attr != null)
-                    {
-                        Print("[adaptor]" + type.FullName);
-                        LoadAdaptor(type);
-                        continue;
-                    }
-                    if (type == _delegateAttr)
-                        continue;
-                    //load delegate
-                    //var attr1 = type.GetCustomAttributes(typeof(DelegateExportAttribute), false);
-                    //if (attr1.Length > 0)
-                    var attr1 = type.GetCustomAttribute(_delegateAttr, false);
-                    if (attr1 != null)
-                    {
-                        Print("[delegate convertor]" + type.FullName);
-                        LoadDelegateConvertor(type);
-                    }
-                }
+                //    //var attr = type.GetCustomAttribute(typeof(NeedAdaptorAttribute), false);
+                //    //if (attr.Length > 0)
+                //    var attr = type.GetCustomAttribute(_adaptorAttr, false);
+                //    if (attr != null)
+                //    {
+                //        Print("[adaptor]" + type.FullName);
+                //        LoadAdaptor(type);
+                //        continue;
+                //    }
+                //    if (type == _delegateAttr)
+                //        continue;
+                //    //load delegate
+                //    //var attr1 = type.GetCustomAttributes(typeof(DelegateExportAttribute), false);
+                //    //if (attr1.Length > 0)
+                //    var attr1 = type.GetCustomAttribute(_delegateAttr, false);
+                //    if (attr1 != null)
+                //    {
+                //        Print("[delegate convertor]" + type.FullName);
+                //        LoadDelegateConvertor(type);
+                //    }
+                //}
                 Print("----------main assembly loaded");
             }
             catch (Exception ex)
@@ -168,6 +196,7 @@ namespace CodeGenerationTools
             {
                 using (var fs = File.Open(targetPath, FileMode.Open))
                 {
+                    _delegateRegDic.Clear();
                     var module = ModuleDefinition.ReadModule(fs);
                     foreach (var typeDefinition in module.Types)
                     {
@@ -185,8 +214,9 @@ namespace CodeGenerationTools
                                     (!type.DeclaringType.Name.Contains("Action") &&
                                      !type.DeclaringType.Name.Contains("Func"))) continue;
 
-                                Print("[delegate register]" + type.DeclaringType.FullName);
-                                LoadDelegateRegister(type.DeclaringType.FullName, type.DeclaringType);
+                                var typeName = type.DeclaringType.FullName;//.Replace("/", ".");
+                                Print("[delegate register]" + typeName);
+                                LoadDelegateRegister(typeName, type.DeclaringType);
                             }
                         }
                     }
@@ -204,7 +234,7 @@ namespace CodeGenerationTools
 
         private void GenerateClick(object sender, EventArgs e)
         {
-            if (_adaptorSet.Count <= 0 && _delegateSet.Count <= 0 && _delegateRegDic.Count <= 0)
+            if (_adaptorDic.Count <= 0 && _delegateCovDic.Count <= 0 && _delegateRegDic.Count <= 0)
             {
                 Print("[Warnning] There is nothing to Generate");
                 return;
@@ -219,7 +249,7 @@ namespace CodeGenerationTools
 
             Print("[=============================Generate Begin==============================]");
 
-            foreach (var type in _adaptorSet)
+            foreach (var type in _adaptorDic.Values)
             {
                 CreateAdaptor(type);
             }
@@ -273,23 +303,65 @@ namespace CodeGenerationTools
 
         #region CodeGenerate Methods
 
-        private void LoadDelegateRegister(string key, object type)
-        {
-            if (!_delegateRegDic.ContainsKey(key))
-                _delegateRegDic.Add(key, type);
-        }
+        //private void LoadDelegateRegister(string key, object type)
+        //{
+        //    if (!_delegateRegDic.ContainsKey(key))
+        //        _delegateRegDic.Add(key, type);
+        //}
 
-        private void LoadDelegateConvertor(Type type)
-        {
-            if (!_delegateSet.Contains(type))
-                _delegateSet.Add(type);
-        }
+        //private void LoadDelegateConvertor(Type type)
+        //{
+        //    if (!_delegateSet.Contains(type))
+        //        _delegateSet.Add(type);
+        //}
 
-        private void LoadAdaptor(Type type)
-        {
-            if (!_adaptorSet.Contains(type))
-                _adaptorSet.Add(type);
-        }
+        //private void LoadAdaptor(Type type)
+        //{
+        //    if (!_adaptorSet.Contains(type))
+        //        _adaptorSet.Add(type);
+        //}
+
+
+        //private void CreateILRuntimeHelper()
+        //{
+        //    Print($"==================Begin create helper:=====================");
+
+        //    _helpGenerator.LoadData(new Tuple<HashSet<Type>, HashSet<Type>, Dictionary<string, object>>(_adaptorSet, _delegateSet, _delegateRegDic));
+        //    var helperStr = _helpGenerator.Generate();
+
+        //    using (var fs2 = File.Create(_outputPath + "helper.cs"))
+        //    {
+        //        var sw = new StreamWriter(fs2);
+        //        sw.Write(helperStr);
+        //        sw.Flush();
+        //    }
+
+        //    Print($"==============End create helper:===================");
+        //}
+
+        //private void CreateAdaptor(Type type)
+        //{
+        //    if (type.IsInterface)
+        //        return;
+
+        //    Print($"================begin create adaptor:{type.Name}=======================");
+
+        //    var adaptorName = type.Name + "Adaptor";
+
+        //    using (var fs = File.Create(_outputPath + adaptorName + ".cs"))
+        //    {
+
+        //        _adGenerator.LoadData(type);
+        //        var classbody = _adGenerator.Generate();
+
+        //        var sw = new StreamWriter(fs);
+        //        sw.Write(classbody);
+        //        sw.Flush();
+        //    }
+
+        //    Print($"================end create adaptor:{type.Name}=======================");
+
+        //}
 
         private void LoadTemplates()
         {
@@ -303,11 +375,12 @@ namespace CodeGenerationTools
 
         }
 
+
         private void CreateILRuntimeHelper()
         {
             Print($"==================Begin create helper:=====================");
 
-            _helpGenerator.LoadData(new Tuple<HashSet<Type>, HashSet<Type>, Dictionary<string, object>>(_adaptorSet, _delegateSet, _delegateRegDic));
+            _helpGenerator.LoadData(new Tuple<Dictionary<string, TypeDefinition>, Dictionary<string, TypeDefinition>, Dictionary<string, TypeReference>>(_adaptorDic, _delegateCovDic, _delegateRegDic));
             var helperStr = _helpGenerator.Generate();
 
             using (var fs2 = File.Create(_outputPath + "helper.cs"))
@@ -320,10 +393,11 @@ namespace CodeGenerationTools
             Print($"==============End create helper:===================");
         }
 
-        private void CreateAdaptor(Type type)
+        private void CreateAdaptor(TypeDefinition type)
         {
             if (type.IsInterface)
                 return;
+
 
             Print($"================begin create adaptor:{type.Name}=======================");
 
@@ -342,6 +416,33 @@ namespace CodeGenerationTools
 
             Print($"================end create adaptor:{type.Name}=======================");
 
+        }
+
+
+        private void LoadDelegateRegister(string key, TypeReference type)
+        {
+            if (!_delegateRegDic.ContainsKey(key))
+                _delegateRegDic.Add(key, type);
+            else
+                _delegateRegDic[key] = type;
+        }
+
+        private void LoadDelegateConvertor(TypeDefinition type)
+        {
+            var key = type.FullName.Replace("/", ".");
+            if (!_delegateCovDic.ContainsKey(key))
+                _delegateCovDic.Add(key, type);
+            else
+                _delegateCovDic[type.FullName] = type;
+        }
+
+        private void LoadAdaptor(TypeDefinition type)
+        {
+            //var key = type.FullName.Replace("/", ".");
+            if (!_adaptorDic.ContainsKey(type.FullName))
+                _adaptorDic.Add(type.FullName, type);
+            else
+                _adaptorDic[type.FullName] = type;
         }
 
         #endregion

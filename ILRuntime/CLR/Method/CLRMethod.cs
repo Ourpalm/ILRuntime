@@ -74,6 +74,11 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public bool IsStatic
+        {
+            get { return def.IsStatic; }
+        }
+
         public MethodInfo MethodInfo { get { return def; } }
 
         public ConstructorInfo ConstructorInfo { get { return cDef; } }
@@ -89,7 +94,7 @@ namespace ILRuntime.CLR.Method
             if (!def.ContainsGenericParameters)
             {
                 ReturnType = domain.GetType(def.ReturnType.FullName);
-                if(ReturnType == null)
+                if (ReturnType == null)
                 {
                     ReturnType = domain.GetType(def.ReturnType.AssemblyQualifiedName);
                 }
@@ -192,7 +197,7 @@ namespace ILRuntime.CLR.Method
             return (StackObject*)((long)a - sizeof(StackObject) * b);
         }
 
-        public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, List<object> mStack,bool isNewObj=false)
+        public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, List<object> mStack, bool isNewObj = false)
         {
             if (parameters == null)
             {
@@ -216,7 +221,7 @@ namespace ILRuntime.CLR.Method
                 {
                     if (!cDef.IsStatic)
                     {
-                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, StackObject.ToObject((Minus(esp, paramCount + 1)),appdomain, mStack));
+                        object instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, StackObject.ToObject((Minus(esp, paramCount + 1)), appdomain, mStack));
                         if (instance == null)
                             throw new NullReferenceException();
                         if (instance is CrossBindingAdaptorType)//It makes no sense to call the Adaptor's constructor
@@ -244,7 +249,7 @@ namespace ILRuntime.CLR.Method
 
                 if (!def.IsStatic)
                 {
-                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, StackObject.ToObject((Minus(esp, paramCount + 1)),appdomain, mStack));
+                    instance = declaringType.TypeForCLR.CheckCLRTypes(appdomain, StackObject.ToObject((Minus(esp, paramCount + 1)), appdomain, mStack));
                     if (instance == null)
                         throw new NullReferenceException();
                 }

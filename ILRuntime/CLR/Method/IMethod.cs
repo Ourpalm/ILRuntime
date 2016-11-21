@@ -26,6 +26,8 @@ namespace ILRuntime.CLR.Method
 
         bool IsDelegateInvoke { get; }
 
+        bool IsStatic { get; }
+
         IMethod MakeGenericMethod(IType[] genericArguments);
     }
 }

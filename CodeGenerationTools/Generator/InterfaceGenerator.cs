@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodeGenerationTools.Generator.Base;
+using Mono.Cecil;
 
 namespace CodeGenerationTools.Generator
 {
-    public class InterfaceGenerator : GeneratorBase<Tuple<Type, Type>>
+    public class InterfaceGenerator : GeneratorBase<Tuple<TypeDefinition, TypeDefinition>>
     {
-        public override bool LoadData(Tuple<Type, Type> data)
+        public override bool LoadData(Tuple<TypeDefinition, TypeDefinition> data)
         {
             if (data == null)
                 return false;

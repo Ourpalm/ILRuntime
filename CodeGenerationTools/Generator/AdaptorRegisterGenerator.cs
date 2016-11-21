@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodeGenerationTools.Generator.Base;
+using Mono.Cecil;
 
 namespace CodeGenerationTools.Generator
 {
-    public class AdaptorRegisterGenerator : GeneratorBase<Type>
+    public class AdaptorRegisterGenerator : GeneratorBase<TypeDefinition>
     {
-        public override bool LoadData(Type data)
+        public override bool LoadData(TypeDefinition data)
         {
             if (data == null)
                 return false;
