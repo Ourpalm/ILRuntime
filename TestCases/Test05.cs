@@ -45,6 +45,13 @@ namespace TestCases
     }
     class Test05
     {
+        public static void TestStringFormat()
+        {
+            Console.WriteLine("TestStringFormat");
+            var ts = string.Format("{0}{1}{2}{3}", 1, "gfgf", -3, 4);
+            Console.WriteLine(ts);
+            Console.WriteLine("TestStringFormat End");
+        }
         public static void ParseDB<T>(System.Action<int, T> cbk) where T : new()
         {
 

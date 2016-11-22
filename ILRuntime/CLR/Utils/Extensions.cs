@@ -46,6 +46,7 @@ namespace ILRuntime.CLR.Utils
                                 name = name.Replace("<" + gp.Name + ",", "<" + ga.FullName + ",");
                                 name = name.Replace("," + gp.Name + ">", "," + ga.FullName + ">");
                                 name = name.Replace("," + gp.Name + ",", "," + ga.FullName + ",");
+                                name = name.Replace(gp.Name + "[]", ga.FullName + "[]");
                             }
                         }
                         if (t == null)
