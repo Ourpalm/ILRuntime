@@ -21,6 +21,13 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get { return null; }
         }
+        public bool HasGenericParameter
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         public Type TypeForCLR
         {

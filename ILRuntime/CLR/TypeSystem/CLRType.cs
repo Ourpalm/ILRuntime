@@ -63,6 +63,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return genericArguments;
             }
         }
+        public bool HasGenericParameter
+        {
+            get
+            {
+                return clrType.ContainsGenericParameters;
+            }
+        }
 
         public Type TypeForCLR
         {

@@ -28,6 +28,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         bool IsDelegate { get; }
 
+        bool HasGenericParameter { get; }
+
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
 
         IMethod GetMethod(string name, int paramCount);
