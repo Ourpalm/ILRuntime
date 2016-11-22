@@ -465,7 +465,13 @@ namespace ILRuntime.Runtime.Enviorment
                         }
                         else
                             val = GetType(gType.GenericArguments[i], contextType, contextMethod);
-                        genericArguments[i] = new KeyValuePair<string, IType>(key, val);
+                        if (val != null)
+                            genericArguments[i] = new KeyValuePair<string, IType>(key, val);
+                        else
+                        {
+                            genericArguments = null;
+                            break;
+                        }
                     }
                 }
                 else

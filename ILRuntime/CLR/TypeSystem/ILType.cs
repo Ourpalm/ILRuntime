@@ -130,6 +130,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return firstCLRBaseType;
             }
         }
+        public bool HasGenericParameter
+        {
+            get
+            {
+                return definition.HasGenericParameters;
+            }
+        }
 
         public Dictionary<string,int> StaticFieldMapping { get { return staticFieldMapping; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
@@ -523,11 +530,12 @@ namespace ILRuntime.CLR.TypeSystem
             for (int j = 0; j < param.Count; j++)
             {
                 var p = i.Parameters[j];
-                if (p is CLR.TypeSystem.ILGenericParameterType)
+                if (p.HasGenericParameter)
                 {
                     //TODO should match the generic parameters;
                     continue;
                 }
+
                 if (param[j] != p)
                 {
                     match = false;

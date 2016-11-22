@@ -186,6 +186,14 @@ namespace ILRuntime.Runtime.Enviorment
                 return type.BaseType;
             }
         }
+
+        public bool HasGenericParameter
+        {
+            get
+            {
+                return type.HasGenericParameter;
+            }
+        }
         #endregion
     }
 }

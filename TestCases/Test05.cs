@@ -30,8 +30,29 @@ namespace TestCases
             return data.doubleVal;
         }
     }
+    public class B
+    {
+        public int aa = 2;
+        public virtual void Print()
+        {
+            Console.WriteLine("I am B"); ;
+        }
+    }
     class Test05
     {
+        public static void ParseDB<T>(System.Action<T> cbk) where T : B, new()
+        {
+
+        }
+        public static string Test()
+        {
+            ParseDB<B>((d) =>
+            {
+
+            });
+
+            return "xxxx1";
+        }
         public static void TestArrayNull()
         {
             Console.WriteLine("TestArrayNull");
