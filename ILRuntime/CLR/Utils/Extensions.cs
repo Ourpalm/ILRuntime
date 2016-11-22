@@ -42,11 +42,24 @@ namespace ILRuntime.CLR.Utils
                             }
                             else if (name.Contains(gp.Name))
                             {
-                                name = name.Replace("<" + gp.Name + ">", "<" + ga.FullName + ">");
-                                name = name.Replace("<" + gp.Name + ",", "<" + ga.FullName + ",");
-                                name = name.Replace("," + gp.Name + ">", "," + ga.FullName + ">");
-                                name = name.Replace("," + gp.Name + ",", "," + ga.FullName + ",");
-                                name = name.Replace(gp.Name + "[]", ga.FullName + "[]");
+                                if (name == gp.Name)
+                                {
+                                    name = ga.FullName;
+                                }
+                                else if (name == gp.Name + "[]")
+                                {
+                                    name = ga.FullName + "[]";
+                                }
+                                else
+                                {
+                                    name = name.Replace("<" + gp.Name + ">", "<" + ga.FullName + ">");
+                                    name = name.Replace("<" + gp.Name + "[", "<" + ga.FullName + "[");
+                                    name = name.Replace("<" + gp.Name + ",", "<" + ga.FullName + ",");
+                                    name = name.Replace("," + gp.Name + ">", "," + ga.FullName + ">");
+                                    name = name.Replace("," + gp.Name + "[", "," + ga.FullName + "[");
+                                    name = name.Replace("," + gp.Name + ",", "," + ga.FullName + ",");
+                                    name = name.Replace("," + gp.Name + "[", "," + ga.FullName + "[");
+                                }
                             }
                         }
                         if (t == null)
