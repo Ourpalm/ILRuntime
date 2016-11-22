@@ -134,7 +134,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.HasGenericParameters;
+                return definition.HasGenericParameters && genericArguments == null;
             }
         }
 
@@ -494,6 +494,8 @@ namespace ILRuntime.CLR.TypeSystem
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
                             genericMethod = CheckGenericParams(i, param, ref match);
+                            if (genericMethod != null)
+                                break;
                         }
                         else
                         {

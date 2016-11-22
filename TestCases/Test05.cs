@@ -10,6 +10,11 @@ namespace TestCases
         bool boolVal;
         double doubleVal;
 
+        public TestExplicit()
+        {
+
+        }
+
         public TestExplicit(bool boolVal)
         {
             this.boolVal = boolVal;
@@ -40,17 +45,20 @@ namespace TestCases
     }
     class Test05
     {
-        public static void ParseDB<T>(System.Action<T> cbk) where T : B, new()
+        public static void ParseDB<T>(System.Action<int, T> cbk) where T : new()
         {
 
         }
         public static string Test()
         {
-            ParseDB<B>((d) =>
+            ParseDB<B>((c, d) =>
             {
 
             });
+            ParseDB<TestExplicit>((c, d) =>
+            {
 
+            });
             return "xxxx1";
         }
         public static void TestArrayNull()

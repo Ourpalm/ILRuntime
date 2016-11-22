@@ -286,7 +286,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        static void ParseGenericType(string fullname, out string baseType, out List<string> genericParams, out bool isArray)
+        internal static void ParseGenericType(string fullname, out string baseType, out List<string> genericParams, out bool isArray)
         {
             StringBuilder sb = new StringBuilder();
             int depth = 0;

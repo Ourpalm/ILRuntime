@@ -28,6 +28,7 @@ namespace ILRuntime.CLR.Utils
                     {
                         GenericInstanceMethod gim = (GenericInstanceMethod)def;
                         string name = i.ParameterType.IsByReference ? i.ParameterType.GetElementType().FullName : i.ParameterType.FullName;
+                        
                         for (int j = 0; j < gim.GenericArguments.Count; j++)
                         {
                             var gp = gim.ElementMethod.GenericParameters[j];
@@ -41,7 +42,10 @@ namespace ILRuntime.CLR.Utils
                             }
                             else if (name.Contains(gp.Name))
                             {
-                                name = name.Replace(gp.Name, ga.FullName);
+                                name = name.Replace("<" + gp.Name + ">", "<" + ga.FullName + ">");
+                                name = name.Replace("<" + gp.Name + ",", "<" + ga.FullName + ",");
+                                name = name.Replace("," + gp.Name + ">", "," + ga.FullName + ">");
+                                name = name.Replace("," + gp.Name + ",", "," + ga.FullName + ",");
                             }
                         }
                         if (t == null)
