@@ -86,6 +86,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v2 = frame.LocalVarPointer + 1;
             StackObject* v3 = frame.LocalVarPointer + 1 + 1;
             StackObject* v4 = Add(frame.LocalVarPointer, 3);
+            bool fault = false;
 
             esp = frame.BasePointer;
             StackObject* arg = Minus(frame.LocalVarPointer, method.ParameterCount);
@@ -1496,15 +1497,20 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         int addr = (int)(ip - ptr);
                                         var sql = from e in method.ExceptionHandler
-                                                  where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally
+                                                  where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
                                                   select e;
                                         var eh = sql.FirstOrDefault();
                                         if (eh != null)
                                         {
-                                            ip = ptr + eh.HandlerStart;
-                                            continue;
+                                            if (eh.HandlerType == ExceptionHandlerType.Finally || fault)
+                                            {
+                                                fault = false;
+                                                ip = ptr + eh.HandlerStart;
+                                                continue;
+                                            }
                                         }
                                     }
+                                    fault = false;
                                     ip = ptr + ip->TokenInteger;
                                     continue;
                                 }
@@ -3362,6 +3368,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 ex.Data["StackTrace"] = debugger.GetStackTrance(this);
                                 ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
                                 esp = PushObject(esp, mStack, ex);
+                                fault = true;
                                 ip = ptr + eh.HandlerStart;
                                 continue;
                             }

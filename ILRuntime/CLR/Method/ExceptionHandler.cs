@@ -11,6 +11,7 @@ namespace ILRuntime.CLR.Method
     {
         Catch,
         Finally,
+        Fault,
     }
     class ExceptionHandler
     {

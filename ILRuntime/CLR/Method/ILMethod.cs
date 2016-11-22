@@ -242,6 +242,9 @@ namespace ILRuntime.CLR.Method
                         case Mono.Cecil.Cil.ExceptionHandlerType.Finally:
                             e.HandlerType = ExceptionHandlerType.Finally;
                             break;
+                        case Mono.Cecil.Cil.ExceptionHandlerType.Fault:
+                            e.HandlerType = ExceptionHandlerType.Fault;
+                            break;
                         default:
                             throw new NotImplementedException();
                     }
