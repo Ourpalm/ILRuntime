@@ -89,7 +89,7 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public unsafe static void Initialized(ref StackObject esp, Type t)
+        public unsafe static void Initialized(ref StackObject esp, int idx, Type t, IType fieldType, List<object> mStack)
         {
             if (t.IsPrimitive)
             {
@@ -122,7 +122,21 @@ namespace ILRuntime.Runtime.Stack
             }
             else
             {
-                esp = Null;
+                if (fieldType.IsValueType)
+                {
+                    esp.ObjectType = ObjectTypes.Object;
+                    esp.Value = idx;
+                    if (fieldType is CLRType)
+                    {
+                        mStack[idx] = Activator.CreateInstance(t);
+                    }
+                    else
+                    {
+                        mStack[idx] = ((ILType)fieldType).Instantiate();
+                    }
+                }
+                else
+                    esp = Null;
             }
         }
 

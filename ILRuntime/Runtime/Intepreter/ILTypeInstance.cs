@@ -18,9 +18,10 @@ namespace ILRuntime.Runtime.Intepreter
             managedObjs = new List<object>(fields.Length);
             for (int i = 0; i < fields.Length; i++)
             {
-                var t = type.StaticFieldTypes[i].TypeForCLR;
-                StackObject.Initialized(ref fields[i], t);
+                var ft = type.StaticFieldTypes[i];
+                var t = ft.TypeForCLR;
                 managedObjs.Add(null);
+                StackObject.Initialized(ref fields[i], i, t, ft, managedObjs);
             }
             int idx = 0;
             foreach (var i in type.TypeDefinition.Fields)
@@ -207,7 +208,8 @@ namespace ILRuntime.Runtime.Intepreter
         {
             for (int i = 0; i < type.FieldTypes.Length; i++)
             {
-                StackObject.Initialized(ref fields[type.FieldStartIndex + i], type.FieldTypes[i].TypeForCLR);
+                var ft = type.FieldTypes[i];
+                StackObject.Initialized(ref fields[type.FieldStartIndex + i], type.FieldStartIndex + i, ft.TypeForCLR, ft, managedObjs);
             }
             if (type.BaseType != null && type.BaseType is ILType)
                 InitializeFields((ILType)type.BaseType);
