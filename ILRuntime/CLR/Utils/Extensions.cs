@@ -52,13 +52,14 @@ namespace ILRuntime.CLR.Utils
                                 }
                                 else
                                 {
-                                    name = name.Replace("<" + gp.Name + ">", "<" + ga.FullName + ">");
+                                    /*name = name.Replace("<" + gp.Name + ">", "<" + ga.FullName + ">");
                                     name = name.Replace("<" + gp.Name + "[", "<" + ga.FullName + "[");
                                     name = name.Replace("<" + gp.Name + ",", "<" + ga.FullName + ",");
                                     name = name.Replace("," + gp.Name + ">", "," + ga.FullName + ">");
                                     name = name.Replace("," + gp.Name + "[", "," + ga.FullName + "[");
                                     name = name.Replace("," + gp.Name + ",", "," + ga.FullName + ",");
-                                    name = name.Replace("," + gp.Name + "[", "," + ga.FullName + "[");
+                                    name = name.Replace("," + gp.Name + "[", "," + ga.FullName + "[");*/
+                                    name = ReplaceGenericArgument(name, gp.Name, ga.FullName);
                                 }
                             }
                         }
@@ -72,6 +73,37 @@ namespace ILRuntime.CLR.Utils
             }
             else
                 return EmptyParamList;
+        }
+
+        static string ReplaceGenericArgument(string typename, string argumentName, string argumentType)
+        {
+            string baseType;
+            StringBuilder sb = new StringBuilder();
+            List<string> ga;
+            bool isArray;
+            Runtime.Enviorment.AppDomain.ParseGenericType(typename, out baseType, out ga, out isArray);
+            if (baseType == argumentName)
+                sb.Append(argumentType);
+            else
+                sb.Append(baseType);
+            if (ga != null && ga.Count > 0)
+            {
+                sb.Append("<");
+                bool isFirst = true;
+                foreach(var i in ga)
+                {
+                    if (isFirst)
+                        isFirst = false;
+                    else
+                        sb.Append(",");
+
+                    sb.Append(ReplaceGenericArgument(i, argumentName, argumentType));
+                }
+                sb.Append(">");
+            }
+            if (isArray)
+                sb.Append("[]");
+            return sb.ToString();
         }
 
         public static object CheckCLRTypes(this Type pt, Runtime.Enviorment.AppDomain domain, object obj)
