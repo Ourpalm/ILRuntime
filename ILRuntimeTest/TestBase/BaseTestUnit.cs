@@ -15,7 +15,7 @@ namespace ILRuntimeTest.Test
         protected string TypeName;
         protected string MethodName;
         protected bool Pass;
-        protected StringBuilder Message = new StringBuilder();
+        protected StringBuilder Message = null;//= new StringBuilder();
 
         public string TestName { get { return TypeName + "." + MethodName; } }
 
@@ -83,6 +83,7 @@ namespace ILRuntimeTest.Test
         /// <param name="method">MethodName</param>
         public void Invoke(Object Instance, string type, string method)
         {
+            Message = new StringBuilder();
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             App.Invoke(type, method, null); //InstanceTest
@@ -92,6 +93,7 @@ namespace ILRuntimeTest.Test
 
         public void Invoke(string type, string method)
         {
+            Message = new StringBuilder();
             try
             {
                 var sw = new System.Diagnostics.Stopwatch();

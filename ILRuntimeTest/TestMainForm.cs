@@ -150,6 +150,16 @@ namespace ILRuntimeTest
             var res = testUnit.CheckResult();
             _selectItemArgs.Item.SubItems[1].Text = res.Result.ToString();
             _selectItemArgs.Item.BackColor = res.Result ? Color.Green : Color.Red;
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Test:");
+            sb.AppendLine(res.TestName);
+            sb.Append("TestResult:");
+            sb.AppendLine(res.Result.ToString());
+            sb.AppendLine("Log:");
+            sb.AppendLine(res.Message);
+            sb.AppendLine("=======================");
+            tbLog.Text = sb.ToString();
         }
 
         private void OnFormLoaded(object sender, EventArgs e)
