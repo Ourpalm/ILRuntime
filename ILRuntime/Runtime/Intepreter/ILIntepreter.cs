@@ -14,13 +14,13 @@ using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Intepreter
 {
-    unsafe class ILIntepreter
+    public unsafe class ILIntepreter
     {
         Enviorment.AppDomain domain;
         RuntimeStack stack;
         object _lockObj;
 
-        public RuntimeStack Stack { get { return stack; } }
+        internal RuntimeStack Stack { get { return stack; } }
         public bool ShouldBreak { get; set; }
         public StepTypes CurrentStepType { get; set; }
         public StackObject* LastStepFrameBase { get; set; }
@@ -1606,31 +1606,37 @@ namespace ILRuntime.Runtime.Intepreter
 
                                             if (!processed)
                                             {
+                                                var redirect = cm.Redirection;
+                                                if (redirect != null)
+                                                    esp = redirect(this, esp, mStack, cm);
+                                                else
+                                                {
 #if UNITY_EDITOR
-                                                if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
-                                                    UnityEngine.Profiler.BeginSample(cm.ToString());
+                                                    if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
+                                                        UnityEngine.Profiler.BeginSample(cm.ToString());
 #endif
-                                                object result = cm.Invoke(this, esp, mStack);
+                                                    object result = cm.Invoke(this, esp, mStack);
 #if UNITY_EDITOR
-                                                if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
-                                                    UnityEngine.Profiler.EndSample();
+                                                    if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
+                                                        UnityEngine.Profiler.EndSample();
 #endif
-                                                if (result is CrossBindingAdaptorType)
-                                                    result = ((CrossBindingAdaptorType)result).ILInstance;
-                                                int paramCount = cm.ParameterCount;
-                                                for (int i = 1; i <= paramCount; i++)
-                                                {
-                                                    Free(Minus(esp, i));
-                                                }
-                                                esp = Minus(esp, paramCount);
-                                                if (cm.HasThis)
-                                                {
-                                                    Free(esp - 1);
-                                                    esp--;
-                                                }
-                                                if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
-                                                {
-                                                    esp = PushObject(esp, mStack, result, cm.ReturnType.TypeForCLR == typeof(object));
+                                                    if (result is CrossBindingAdaptorType)
+                                                        result = ((CrossBindingAdaptorType)result).ILInstance;
+                                                    int paramCount = cm.ParameterCount;
+                                                    for (int i = 1; i <= paramCount; i++)
+                                                    {
+                                                        Free(Minus(esp, i));
+                                                    }
+                                                    esp = Minus(esp, paramCount);
+                                                    if (cm.HasThis)
+                                                    {
+                                                        Free(esp - 1);
+                                                        esp--;
+                                                    }
+                                                    if (cm.ReturnType != AppDomain.VoidType && !cm.IsConstructor)
+                                                    {
+                                                        esp = PushObject(esp, mStack, result, cm.ReturnType.TypeForCLR == typeof(object));
+                                                    }
                                                 }
                                             }
                                         }
@@ -3660,14 +3666,14 @@ namespace ILRuntime.Runtime.Intepreter
                 mStack.Add(mStack[src->Value]);
             }
         }
-        StackObject* PushOne(StackObject* esp)
+        public static StackObject* PushOne(StackObject* esp)
         {
             esp->ObjectType = ObjectTypes.Integer;
             esp->Value = 1;
             return esp + 1;
         }
 
-        StackObject* PushZero(StackObject* esp)
+        public static StackObject* PushZero(StackObject* esp)
         {
             esp->ObjectType = ObjectTypes.Integer;
             esp->Value = 0;
@@ -3775,12 +3781,12 @@ namespace ILRuntime.Runtime.Intepreter
         }
 
         //Don't ask me why add this funky method for this, otherwise Unity won't calculate the right value
-        StackObject* Add(StackObject* a, int b)
+        public static StackObject* Add(StackObject* a, int b)
         {
             return (StackObject*)((long)a + sizeof(StackObject) * b);
         }
 
-        StackObject* Minus(StackObject* a, int b)
+        public static StackObject* Minus(StackObject* a, int b)
         {
             return (StackObject*)((long)a - sizeof(StackObject) * b);
         }

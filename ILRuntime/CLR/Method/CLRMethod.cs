@@ -12,7 +12,7 @@ using ILRuntime.Runtime.Stack;
 using ILRuntime.CLR.Utils;
 namespace ILRuntime.CLR.Method
 {
-    class CLRMethod : IMethod
+    public class CLRMethod : IMethod
     {
         MethodInfo def;
         ConstructorInfo cDef;
@@ -21,7 +21,7 @@ namespace ILRuntime.CLR.Method
         CLRType declaringType;
         ParameterInfo[] param;
         bool isConstructor;
-        Func<ILContext, object, object[], IType[], object> redirect;
+        CLRRedirectionDelegate redirect;
         IType[] genericArguments;
         object[] invocationParam;
         bool isDelegateInvoke;
@@ -79,13 +79,15 @@ namespace ILRuntime.CLR.Method
             get { return def.IsStatic; }
         }
 
+        public CLRRedirectionDelegate Redirection { get { return redirect; } }
+
         public MethodInfo MethodInfo { get { return def; } }
 
         public ConstructorInfo ConstructorInfo { get { return cDef; } }
 
         public IType[] GenericArguments { get { return genericArguments; } }
 
-        public CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
+        internal CLRMethod(MethodInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.def = def;
             declaringType = type;
@@ -103,7 +105,7 @@ namespace ILRuntime.CLR.Method
                 isDelegateInvoke = true;
             isConstructor = false;
         }
-        public CLRMethod(ConstructorInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
+        internal CLRMethod(ConstructorInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.cDef = def;
             declaringType = type;
@@ -254,9 +256,9 @@ namespace ILRuntime.CLR.Method
                         throw new NullReferenceException();
                 }
                 object res = null;
-                if (redirect != null)
+                /*if (redirect != null)
                     res = redirect(new ILContext(appdomain, intepreter, esp, mStack, this), instance, param, genericArguments);
-                else
+                else*/
                 {
                     res = def.Invoke(instance, param);
                 }

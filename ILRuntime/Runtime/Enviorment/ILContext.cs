@@ -14,7 +14,7 @@ namespace ILRuntime.Runtime.Enviorment
         public StackObject* ESP { get; private set; }
         public List<object> ManagedStack { get; private set; }
         public IMethod Method { get; private set; }
-        internal ILIntepreter Interpreter { get; private set; }
+        public ILIntepreter Interpreter { get; private set; }
 
         internal ILContext(AppDomain domain,ILIntepreter intpreter, StackObject* esp, List<object> mStack, IMethod method)
         {
