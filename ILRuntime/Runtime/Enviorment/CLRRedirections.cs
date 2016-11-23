@@ -726,18 +726,20 @@ namespace ILRuntime.Runtime.Enviorment
 
         public unsafe static StackObject* MethodInfoInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
+            AppDomain domain = intp.AppDomain;
             //Don't ask me why not esp - 3, unity won't return the right result
             var ret = ILIntepreter.Minus(esp, 3);
             var param = esp - 1;
-            var p = mStack[param->Value];
+            var p = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
             param = esp - 1 - 1;
-            var obj = mStack[param->Value];
+            var obj = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
             param = ILIntepreter.Minus(esp, 3);
-            object instance = mStack[param->Value];
+            object instance = StackObject.ToObject(param, domain, mStack);
+            intp.Free(param);
 
             if (instance is ILRuntimeMethodInfo)
             {
@@ -800,9 +802,10 @@ namespace ILRuntime.Runtime.Enviorment
 
         public unsafe static StackObject* ObjectGetType(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
+            AppDomain domain = intp.AppDomain;
             var ret = esp - 1;
             var param = esp - 1;
-            var instance = mStack[param->Value];
+            var instance = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
              
             var type = instance.GetType();

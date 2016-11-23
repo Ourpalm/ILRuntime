@@ -104,6 +104,16 @@ namespace ILRuntime.CLR.Method
             if (type.IsDelegate && def.Name == "Invoke")
                 isDelegateInvoke = true;
             isConstructor = false;
+
+            if (def != null)
+            {
+                if (def.IsGenericMethod && !def.IsGenericMethodDefinition)
+                {
+                    appdomain.RedirectMap.TryGetValue(def.GetGenericMethodDefinition(), out redirect);
+                }
+                else
+                    appdomain.RedirectMap.TryGetValue(def, out redirect);
+            }
         }
         internal CLRMethod(ConstructorInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
@@ -182,15 +192,6 @@ namespace ILRuntime.CLR.Method
                 if (type == null)
                     throw new TypeLoadException();
                 parameters.Add(type);
-            }
-            if (def != null)
-            {
-                if (def.IsGenericMethod && !def.IsGenericMethodDefinition)
-                {
-                    appdomain.RedirectMap.TryGetValue(def.GetGenericMethodDefinition(), out redirect);
-                }
-                else
-                    appdomain.RedirectMap.TryGetValue(def, out redirect);
             }
         }
 
