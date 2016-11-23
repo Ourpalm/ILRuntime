@@ -882,6 +882,14 @@ namespace ILRuntime.Runtime.Intepreter
                                             esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value % b->Value;
                                             break;
+                                        case ObjectTypes.Float:
+                                            esp->ObjectType = ObjectTypes.Float;
+                                            *(float*)&esp->Value = *(float*)&a->Value % *(float*)&b->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            esp->ObjectType = ObjectTypes.Float;
+                                            *(double*)&esp->Value = *(double*)&a->Value % *(double*)&b->Value;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
