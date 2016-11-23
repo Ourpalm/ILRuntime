@@ -1100,7 +1100,20 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Brtrue_S:
                                 {
                                     esp--;
-                                    if ((esp->ObjectType == ObjectTypes.Integer && esp->Value > 0) || (esp->ObjectType == ObjectTypes.Object && esp->Value >= 0))
+                                    bool res = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = esp->Value > 0;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&esp->Value > 0;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            res = mStack[esp->Value] != null;
+                                            break;
+                                    }
+                                    if (res)
                                     {
                                         ip = ptr + ip->TokenInteger;
                                         Free(esp);
@@ -1122,6 +1135,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Integer:
                                             res = esp->Value == 0;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&esp->Value == 0;
                                             break;
                                         case ObjectTypes.Object:
                                             res = mStack[esp->Value] == null;

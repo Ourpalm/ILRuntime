@@ -45,6 +45,29 @@ namespace TestCases
     }
     class Test05
     {
+        class t
+        {
+            public long a = 0;
+        }
+
+        class a
+        {
+            public long b = 1111;
+        }
+        public static void TestEqual()
+        {
+            Console.WriteLine("TestEqual");
+
+            var t = new t();
+            var a = new a();
+            
+            if (t.a == 0 || t.a == a.b)
+            {
+                Console.WriteLine("TestEqual true");//这行不执行
+            }
+
+            Console.WriteLine("TestEqual end ");
+        }
         public static void TestStringFormat()
         {
             Console.WriteLine("TestStringFormat");
