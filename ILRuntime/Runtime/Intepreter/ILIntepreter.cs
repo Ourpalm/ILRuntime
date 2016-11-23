@@ -1166,7 +1166,6 @@ namespace ILRuntime.Runtime.Intepreter
                                         switch (a->ObjectType)
                                         {
                                             case ObjectTypes.Integer:
-                                            case ObjectTypes.Object:
                                                 transfer = a->Value == b->Value;
                                                 break;
                                             case ObjectTypes.Long:
@@ -1177,6 +1176,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             case ObjectTypes.Double:
                                                 transfer = *(double*)&a->Value == *(double*)&b->Value;
+                                                break;
+                                            case ObjectTypes.Object:
+                                                transfer = mStack[a->Value] == mStack[b->Value];
                                                 break;
                                             default:
                                                 throw new NotImplementedException();
@@ -1204,7 +1206,6 @@ namespace ILRuntime.Runtime.Intepreter
                                         switch (a->ObjectType)
                                         {
                                             case ObjectTypes.Integer:
-                                            case ObjectTypes.Object:
                                                 transfer = (uint)a->Value != (uint)b->Value;
                                                 break;
                                             case ObjectTypes.Float:
@@ -1215,6 +1216,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             case ObjectTypes.Double:
                                                 transfer = *(double*)&a->Value != *(double*)&b->Value;
+                                                break;
+                                            case ObjectTypes.Object:
+                                                transfer = mStack[a->Value] != mStack[b->Value];
                                                 break;
                                             default:
                                                 throw new NotImplementedException();

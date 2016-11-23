@@ -51,6 +51,26 @@ namespace TestCases
             Console.WriteLine("I am B"); ;
         }
     }
+
+    class A
+    {
+        public int a = 1;
+        public A(int a)
+        {
+            this.a = a;
+        }
+
+        public void Check(A e)
+        {
+            Console.WriteLine("other != this = " + (e != this && e.Geta() == this.Geta()));
+        }
+
+        public int Geta()
+        {
+            return a;
+        }
+    }
+
     class Test05
     {
         static bool CheckValue(List<B> lst)
@@ -70,6 +90,12 @@ namespace TestCases
         public static void TestReturn()
         {
             CheckValue(new List<B>() { new B(1), new B(2) });
+        }
+
+        public static void TestThis()
+        {
+            A aa = new A(5);
+            aa.Check(aa);
         }
 
         class t
