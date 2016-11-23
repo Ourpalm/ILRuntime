@@ -87,6 +87,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v3 = frame.LocalVarPointer + 1 + 1;
             StackObject* v4 = Add(frame.LocalVarPointer, 3);
             bool fault = false;
+            int finallyEndAddress = 0;
 
             esp = frame.BasePointer;
             StackObject* arg = Minus(frame.LocalVarPointer, method.ParameterCount);
@@ -1529,6 +1530,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (eh.HandlerType == ExceptionHandlerType.Finally || fault)
                                             {
                                                 fault = false;
+                                                finallyEndAddress = ip->TokenInteger;
                                                 ip = ptr + eh.HandlerStart;
                                                 continue;
                                             }
@@ -1536,6 +1538,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     fault = false;
                                     ip = ptr + ip->TokenInteger;
+                                    continue;
+                                }
+                            case OpCodeEnum.Endfinally:
+                                {
+                                    ip = ptr + finallyEndAddress;
+                                    finallyEndAddress = 0;
                                     continue;
                                 }
                             case OpCodeEnum.Call:
@@ -3354,7 +3362,6 @@ namespace ILRuntime.Runtime.Intepreter
                                     throw ex;
                                 }
                             case OpCodeEnum.Nop:
-                            case OpCodeEnum.Endfinally:
                             case OpCodeEnum.Volatile:
                             case OpCodeEnum.Castclass:
                                 break;

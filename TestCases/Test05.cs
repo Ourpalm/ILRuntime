@@ -38,6 +38,14 @@ namespace TestCases
     public class B
     {
         public int aa = 2;
+        public B()
+        {
+
+        }
+        public B(int a)
+        {
+            aa = a;
+        }
         public virtual void Print()
         {
             Console.WriteLine("I am B"); ;
@@ -45,6 +53,25 @@ namespace TestCases
     }
     class Test05
     {
+        static bool CheckValue(List<B> lst)
+        {
+            foreach (B a in lst)
+            {
+                if (a.aa >= 1)
+                {
+                    Console.WriteLine("CheckValue 111111");
+                    return false;
+                }
+            }
+            Console.WriteLine("CheckValue 2222222");
+            return true;
+        }
+
+        public static void TestReturn()
+        {
+            CheckValue(new List<B>() { new B(1), new B(2) });
+        }
+
         class t
         {
             public long a = 0;
