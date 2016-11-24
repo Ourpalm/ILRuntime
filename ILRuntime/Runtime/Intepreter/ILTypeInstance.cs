@@ -209,16 +209,21 @@ namespace ILRuntime.Runtime.Intepreter
                     fixed (StackObject* ptr = fields)
                     {
                         StackObject* esp = &ptr[index];
-                        if (value.GetType().IsPrimitive)
+                        if (value != null)
                         {
-                            ILIntepreter.UnboxObject(esp, value);
+                            if (value.GetType().IsPrimitive)
+                            {
+                                ILIntepreter.UnboxObject(esp, value);
+                            }
+                            else
+                            {
+                                esp->ObjectType = ObjectTypes.Object;
+                                esp->Value = index;
+                                managedObjs[index] = value;
+                            }
                         }
                         else
-                        {
-                            esp->ObjectType = ObjectTypes.Object;
-                            esp->Value = index;
-                            managedObjs[index] = value;
-                        }
+                            *esp = StackObject.Null;
                     }
                 }
                 else
