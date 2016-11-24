@@ -27,6 +27,29 @@ namespace TestCases
 
         }
 
+        class StructTest
+        {
+            public Vector3 Vector;
+            public ILRuntimeTest.TestFramework.TestStruct Struct;
+        }
+
+        public static void UnitTest_Struct()
+        {
+            StructTest a = new TestCases.ExpTest_10.StructTest();
+
+            Vector3 vec = a.Vector;
+            vec.x += 10;
+            vec.y += 11;
+
+            Console.WriteLine(vec.x);
+            Console.WriteLine(a.Vector.x);
+
+            ILRuntimeTest.TestFramework.TestStruct b = a.Struct;
+            a.Struct.value += 100;
+            Console.WriteLine(b.value);
+            Console.WriteLine(a.Struct.value);
+        }
+
         public static object UnitTest_10022()
         {
             Vector3 pos = Vector3.Zero;

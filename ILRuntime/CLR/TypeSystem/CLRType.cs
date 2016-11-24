@@ -23,6 +23,7 @@ namespace ILRuntime.CLR.TypeSystem
         bool isDelegate;
         IType baseType;
         bool isBaseTypeInitialized = false;
+        MethodInfo memberwiseClone;
 
         public Dictionary<int, FieldInfo> Fields
         {
@@ -136,6 +137,18 @@ namespace ILRuntime.CLR.TypeSystem
                 if (!isBaseTypeInitialized)
                     InitializeBaseType();
                 return baseType;
+            }
+        }
+
+        public new MethodInfo MemberwiseClone
+        {
+            get
+            {
+                if(clrType.IsValueType && memberwiseClone == null)
+                {
+                    memberwiseClone = clrType.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                }
+                return memberwiseClone;
             }
         }
 

@@ -24,7 +24,6 @@ namespace ILRuntime.Reflection
         bool isStatic;
         int fieldIdx;
         string name;
-        List<object> mStack;
         FieldDefinition definition;
         Runtime.Enviorment.AppDomain appdomain;
         object[] customAttributes;
@@ -167,12 +166,7 @@ namespace ILRuntime.Reflection
                     else
                         ins = ((CrossBindingAdaptorType)obj).ILInstance;
                 }
-                if (mStack == null)
-                    mStack = new List<object>();
-                ins.PushToStack(fieldIdx, &esp, ilType.AppDomain, mStack);
-                var res = fieldType.TypeForCLR.CheckCLRTypes(ilType.AppDomain, StackObject.ToObject(&esp, ilType.AppDomain, mStack));
-                mStack.Clear();
-                return res;
+                return ins[fieldIdx];
             }
         }
 
@@ -186,11 +180,8 @@ namespace ILRuntime.Reflection
             unsafe
             {
                 StackObject esp;
-                if (mStack == null)
-                    mStack = new List<object>();
                 if (value is CrossBindingAdaptorType)
                     value = ((CrossBindingAdaptorType)value).ILInstance;
-                ILIntepreter.PushObject(&esp, mStack, value);
                 ILTypeInstance ins;
                 if (isStatic)
                 {
@@ -203,9 +194,7 @@ namespace ILRuntime.Reflection
                     else
                         ins = ((CrossBindingAdaptorType)obj).ILInstance;
                 }
-                
-                ins.AssignFromStack(fieldIdx, &esp, ilType.AppDomain, mStack);
-                mStack.Clear();
+                ins[fieldIdx] = value;
             }
         }
     }

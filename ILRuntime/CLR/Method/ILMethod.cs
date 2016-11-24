@@ -24,6 +24,7 @@ namespace ILRuntime.CLR.Method
         Dictionary<int, int[]> jumptables;
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
+        int paramCnt, localVarCnt;
 
         public MethodDefinition Definition { get { return def; } }
 
@@ -105,6 +106,8 @@ namespace ILRuntime.CLR.Method
             if (type.IsDelegate && def.Name == "Invoke")
                 isDelegateInvoke = true;
             this.appdomain = domain;
+            paramCnt = def.HasParameters ? def.Parameters.Count : 0;
+            localVarCnt = def.HasBody ? def.Body.Variables.Count : 0;
 #if DEBUG
             if (def.HasBody)
             {
@@ -152,7 +155,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                return def.HasBody ? def.Body.Variables.Count : 0;
+                return localVarCnt;
             }
         }
 
@@ -181,7 +184,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                return def.HasParameters ? def.Parameters.Count : 0;
+                return paramCnt;
             }
         }
 

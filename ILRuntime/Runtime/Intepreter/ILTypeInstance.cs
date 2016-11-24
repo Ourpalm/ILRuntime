@@ -254,10 +254,10 @@ namespace ILRuntime.Runtime.Intepreter
             esp->ValueLow = fieldIdx;
         }
 
-        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)
+        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack, bool checkValueType)
         {
             if (fieldIdx < fields.Length && fieldIdx >= 0)
-                PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
+                PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack, checkValueType);
             else
             {
                 if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
@@ -272,13 +272,16 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
+        unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack, bool checkValueType)
         {
             *esp = field;
             if (field.ObjectType >= ObjectTypes.Object)
             {
                 esp->Value = managedStack.Count;
-                managedStack.Add(managedObjs[fieldIdx]);
+                if (checkValueType)
+                    managedStack.Add(ILIntepreter.CheckAndCloneValueType(managedObjs[fieldIdx], type.AppDomain));
+                else
+                    managedStack.Add(managedObjs[fieldIdx]);
             }
         }
 
