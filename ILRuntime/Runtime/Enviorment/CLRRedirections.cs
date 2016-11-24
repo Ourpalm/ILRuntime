@@ -83,7 +83,8 @@ namespace ILRuntime.Runtime.Enviorment
         public static StackObject* GetType(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             var p = esp - 1;
-            string fullname = (string)mStack[p->Value];
+            AppDomain dommain = intp.AppDomain;
+            string fullname = (string)StackObject.ToObject(p, dommain, mStack); ;
             intp.Free(p);
             var t = intp.AppDomain.GetType(fullname);
             if (t != null)
@@ -104,11 +105,12 @@ namespace ILRuntime.Runtime.Enviorment
         public unsafe static StackObject* InitializeArray(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             var ret = esp - 1 - 1;
+            AppDomain domain = intp.AppDomain;
             var param = esp - 1;
-            byte[] data = mStack[param->Value] as byte[];
+            byte[] data = StackObject.ToObject(param, domain, mStack) as byte[];
             intp.Free(param);
             param = esp - 1 - 1;
-            object array = mStack[param->Value];
+            object array = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
             if (data == null)
@@ -359,16 +361,14 @@ namespace ILRuntime.Runtime.Enviorment
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
-
+            AppDomain domain = intp.AppDomain;
             var param = esp - 1;
-            object dele2 = mStack[param->Value];
+            object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
             param = esp - 1 - 1;
-            object dele1 = mStack[param->Value];
+            object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
-
-            Enviorment.AppDomain domain = intp.AppDomain;
             
             if (dele1 != null)
             {
@@ -460,16 +460,14 @@ namespace ILRuntime.Runtime.Enviorment
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
-
+            AppDomain domain = intp.AppDomain;
             var param = esp - 1;
-            object dele2 = mStack[param->Value];
+            object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
             param = esp - 1 - 1;
-            object dele1 = mStack[param->Value];
+            object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
-
-            Enviorment.AppDomain domain = intp.AppDomain;
 
             if (dele1 != null)
             {
@@ -548,16 +546,14 @@ namespace ILRuntime.Runtime.Enviorment
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
-
+            AppDomain domain = intp.AppDomain;
             var param = esp - 1;
-            object dele2 = mStack[param->Value];
+            object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
             param = esp - 1 - 1;
-            object dele1 = mStack[param->Value];
+            object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
-
-            Enviorment.AppDomain domain = intp.AppDomain;
 
             bool res = false;
             if (dele1 != null)
@@ -635,16 +631,14 @@ namespace ILRuntime.Runtime.Enviorment
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
-
+            AppDomain domain = intp.AppDomain;
             var param = esp - 1;
-            object dele2 = mStack[param->Value];
+            object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
             param = esp - 1 - 1;
-            object dele1 = mStack[param->Value];
+            object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
-
-            Enviorment.AppDomain domain = intp.AppDomain;
 
             bool res = false;
             if (dele1 != null)
