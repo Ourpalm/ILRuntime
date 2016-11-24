@@ -1166,10 +1166,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (esp->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
-                                            res = esp->Value > 0;
+                                            res = esp->Value != 0;
                                             break;
                                         case ObjectTypes.Long:
-                                            res = *(long*)&esp->Value > 0;
+                                            res = *(long*)&esp->Value != 0;
                                             break;
                                         case ObjectTypes.Object:
                                             res = mStack[esp->Value] != null;
