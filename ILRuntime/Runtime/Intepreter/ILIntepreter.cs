@@ -2203,14 +2203,20 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            object result = cm.Invoke(this, esp, mStack, true);
-                                            int paramCount = cm.ParameterCount;
-                                            for (int i = 1; i <= paramCount; i++)
+                                            var redirect = cm.Redirection;
+                                            if (redirect != null)
+                                                esp = redirect(this, esp, mStack, cm);
+                                            else
                                             {
-                                                Free(esp - i);
+                                                object result = cm.Invoke(this, esp, mStack, true);
+                                                int paramCount = cm.ParameterCount;
+                                                for (int i = 1; i <= paramCount; i++)
+                                                {
+                                                    Free(esp - i);
+                                                }
+                                                esp = Minus(esp, paramCount);
+                                                esp = PushObject(esp, mStack, result);//new constructedObj
                                             }
-                                            esp = Minus(esp, paramCount);
-                                            esp = PushObject(esp, mStack, result);//new constructedObj
                                         }
                                     }
                                 }

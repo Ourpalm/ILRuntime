@@ -26,6 +26,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
         Dictionary<System.Reflection.MethodInfo, CLRRedirectionDelegate> redirectMap = new Dictionary<System.Reflection.MethodInfo, CLRRedirectionDelegate>();
+        Dictionary<ConstructorInfo, CLRRedirectionDelegate> ctorRedirectMap = new Dictionary<ConstructorInfo, CLRRedirectionDelegate>();
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         DelegateManager dMgr;
         Assembly[] loadedAssemblies;
@@ -108,7 +109,8 @@ namespace ILRuntime.Runtime.Enviorment
         public IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
-        internal Dictionary<System.Reflection.MethodInfo, CLRRedirectionDelegate> RedirectMap { get { return redirectMap; } }
+        internal Dictionary<MethodInfo, CLRRedirectionDelegate> RedirectMap { get { return redirectMap; } }
+        internal Dictionary<ConstructorInfo, CLRRedirectionDelegate> ConstructorRedirectMap { get { return ctorRedirectMap; } }
         internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
         public DebugService DebugService { get { return debugService; } }
         internal Dictionary<int, ILIntepreter> Intepreters { get { return intepreters; } }
@@ -188,11 +190,16 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
-        public void RegisterCLRMethodRedirection(System.Reflection.MethodInfo mi, CLRRedirectionDelegate func)
+        public void RegisterCLRMethodRedirection(MethodInfo mi, CLRRedirectionDelegate func)
         {
             redirectMap[mi] = func;
         }
-        
+
+        public void RegisterCLRConstructorRedirection(ConstructorInfo mi, CLRRedirectionDelegate func)
+        {
+            ctorRedirectMap[mi] = func;
+        }
+
         public IType GetType(string fullname)
         {
             IType res;

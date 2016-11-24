@@ -126,6 +126,11 @@ namespace ILRuntime.CLR.Method
                 ReturnType = type;
             }
             isConstructor = true;
+
+            if (def != null)
+            {
+                appdomain.ConstructorRedirectMap.TryGetValue(cDef, out redirect);
+            }
         }
 
         public int ParameterCount
