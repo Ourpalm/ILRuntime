@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 
 using Mono.Cecil;
-using ILRuntime.Runtime.Intepreter.OpCodes;
+using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
@@ -279,16 +279,48 @@ namespace ILRuntime.CLR.Method
             for (int i = paramCount; i >= 1; i--)
             {
                 var p = Minus(esp, i);
-                if (p->ObjectType == ObjectTypes.StackObjectReference)
+                var val = param[paramCount - i];
+                switch (p->ObjectType)
                 {
-                    var dst = *(StackObject**)&p->Value;
-                    if (dst->ObjectType >= ObjectTypes.Object)
-                    {
-                        var obj = param[paramCount - i];
-                        if (obj is CrossBindingAdaptorType)
-                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
-                        mStack[dst->Value] = obj;
-                    }
+                    case ObjectTypes.StackObjectReference:
+                        {
+                            var dst = *(StackObject**)&p->Value;
+                            if (dst->ObjectType >= ObjectTypes.Object)
+                            {
+                                var obj = val;
+                                if (obj is CrossBindingAdaptorType)
+                                    obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                mStack[dst->Value] = obj;
+                            }
+                        }
+                        break;
+                    case ObjectTypes.FieldReference:
+                        {
+                            var obj = mStack[p->Value];
+                            if(obj is ILTypeInstance)
+                            {
+                                ((ILTypeInstance)obj)[p->ValueLow] = val;
+                            }
+                            else
+                            {
+                                var t = appdomain.GetType(obj.GetType()) as CLRType;
+                                t.Fields[p->ValueLow].SetValue(obj, val);
+                            }
+                        }
+                        break;
+                    case ObjectTypes.StaticFieldReference:
+                        {
+                            var t = appdomain.GetType(p->Value);
+                            if(t is ILType)
+                            {
+                                ((ILType)t).StaticInstance[p->ValueLow] = val;
+                            }
+                            else
+                            {
+                                ((CLRType)t).Fields[p->ValueLow].SetValue(null, val);
+                            }
+                        }
+                        break;
                 }
             }
         }

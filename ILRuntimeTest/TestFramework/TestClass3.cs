@@ -24,4 +24,18 @@ namespace ILRuntimeTest.TestFramework
             b = 2;
         }
     }
+
+    public struct TestStruct
+    {
+        public int value;
+        public static void DoTest(ref TestStruct a)
+        {
+            a.value = 11111;
+        }
+
+        public static void DoTest(ref int a)
+        {
+            a = 22222;
+        }
+    }
 }

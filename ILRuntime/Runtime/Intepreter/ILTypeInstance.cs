@@ -202,6 +202,37 @@ namespace ILRuntime.Runtime.Intepreter
                         throw new TypeLoadException();
                 }
             }
+            set
+            {
+                if (index < fields.Length && index >= 0)
+                {
+                    fixed (StackObject* ptr = fields)
+                    {
+                        StackObject* esp = &ptr[index];
+                        if (value.GetType().IsPrimitive)
+                        {
+                            ILIntepreter.UnboxObject(esp, value);
+                        }
+                        else
+                        {
+                            esp->ObjectType = ObjectTypes.Object;
+                            esp->Value = index;
+                            managedObjs[index] = value;
+                        }
+                    }
+                }
+                else
+                {
+                    if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
+                    {
+                        CLRType clrType = type.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
+                        var field = clrType.GetField(index);
+                        field.SetValue(clrInstance, index);
+                    }
+                    else
+                        throw new TypeLoadException();
+                }
+            }
         }
 
         void InitializeFields(ILType type)

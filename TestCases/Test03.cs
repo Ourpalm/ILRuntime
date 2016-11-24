@@ -11,7 +11,9 @@ namespace TestCases
         public class TestGenrRefBase
         {
             public int v;
-
+            TestGenrRefBase t;
+            ILRuntimeTest.TestFramework.TestStruct str;
+            static ILRuntimeTest.TestFramework.TestStruct str2;
             public TestGenrRefBase()
             {
                 v = 1;
@@ -22,9 +24,51 @@ namespace TestCases
                 v = val;
             }
 
+            void TestRef(ref int a)
+            {
+                a = 123;
+            }
+
+            public void DoTestRef()
+            {
+                TestRef(ref v);
+            }
+
+            public void DoTestRef2()
+            {
+                t = new TestGenrRef();
+                t.v = 2;
+                TestGenrRefBase t2 = ReadData(ref t);
+
+                Console.WriteLine("new val:" + t2.v);
+                Console.WriteLine("new val:" + t.v);
+            }
+
+            public void DoTestRef3()
+            {
+                ILRuntimeTest.TestFramework.TestStruct.DoTest(ref str);
+
+                Console.WriteLine("new val:" + str.value);
+
+                ILRuntimeTest.TestFramework.TestStruct.DoTest(ref str2);
+
+                Console.WriteLine("new val:" + str2.value);
+
+                ILRuntimeTest.TestFramework.TestStruct.DoTest(ref v);
+
+                Console.WriteLine("new val:" + v);
+            }
+
             public string GetString()
             {
                 return "1";
+            }
+
+            public T ReadData<T>(ref T obj) where T : TestGenrRefBase, new()
+            {
+                obj = new T();
+                obj.v = 8;
+                return obj;
             }
         }
 
@@ -36,13 +80,22 @@ namespace TestCases
             }
         }
 
+        static TestGenrRef ttt;
         public static void UnitTest_GenericsRefOut()
         {
-            TestGenrRef t1 = new TestGenrRef();
-            t1.v = 2;
-            TestGenrRef t2 = ReadData<TestGenrRef>(ref t1);
+            ttt = new TestGenrRef();
+            ttt.v = 2;
+            TestGenrRef t2 = ReadData<TestGenrRef>(ref ttt);
 
             Console.WriteLine("new val:" + t2.v);
+            Console.WriteLine("new val:" + ttt.v);
+
+            t2.DoTestRef();
+            Console.WriteLine("new val:" + t2.v);
+            Console.WriteLine("new val:" + ttt.v);
+
+            t2.DoTestRef2();
+            t2.DoTestRef3();
         }
 
 

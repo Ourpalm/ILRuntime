@@ -422,6 +422,39 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                             }
                                             break;
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var obj = mStack[objRef->Value];
+                                                int idx = objRef->ValueLow;
+                                                Free(objRef);
+                                                if(obj is ILTypeInstance)
+                                                {
+                                                    ((ILTypeInstance)obj).PushToStack(idx, objRef, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var t = AppDomain.GetType(ip->TokenInteger);
+                                                    obj = ((CLRType)t).Fields[idx].GetValue(obj);
+                                                    PushObject(objRef, mStack, obj);
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(objRef->Value);
+                                                int idx = objRef->ValueLow;
+                                                Free(objRef);
+                                                if (t is ILType)
+                                                {
+                                                    ((ILType)t).StaticInstance.PushToStack(idx, objRef, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var obj = ((CLRType)t).Fields[idx].GetValue(null);
+                                                    PushObject(objRef, mStack, obj);
+                                                }
+                                            }
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -450,6 +483,34 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                 {
                                                     *objRef = *val;
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var obj = mStack[objRef->Value];
+                                                int idx = objRef->ValueLow;
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    ((ILTypeInstance)obj).AssignFromStack(idx, val, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var t = AppDomain.GetType(ip->TokenInteger);
+                                                    ((CLRType)t).Fields[idx].SetValue(obj, t.TypeForCLR.CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack)));
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(objRef->Value);
+                                                if(t is ILType)
+                                                {
+                                                    ((ILType)t).StaticInstance.AssignFromStack(objRef->ValueLow, val, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    ((CLRType)t).Fields[objRef->ValueLow].SetValue(null, t.TypeForCLR.CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack)));
                                                 }
                                             }
                                             break;
@@ -3694,6 +3755,67 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
+        public static void UnboxObject(StackObject* esp, object obj)
+        {
+            if (obj is int)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (int)obj;
+            }
+            else if (obj is bool)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (bool)(obj) ? 1 : 0;
+            }
+            else if (obj is short)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (short)obj;
+            }
+            else if (obj is long)
+            {
+                esp->ObjectType = ObjectTypes.Long;
+                *(long*)(&esp->Value) = (long)obj;
+            }
+            else if (obj is float)
+            {
+                esp->ObjectType = ObjectTypes.Float;
+                *(float*)(&esp->Value) = (float)obj;
+            }
+            else if (obj is byte)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (byte)obj;
+            }
+            else if (obj is uint)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (int)(uint)obj;
+            }
+            else if (obj is char)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (int)(char)obj;
+            }
+            else if (obj is double)
+            {
+                esp->ObjectType = ObjectTypes.Double;
+                *(double*)(&esp->Value) = (double)obj;
+            }
+            else if (obj is ulong)
+            {
+                esp->ObjectType = ObjectTypes.Long;
+                *(ulong*)(&esp->Value) = (ulong)obj;
+            }
+            else if (obj is sbyte)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (sbyte)obj;
+            }
+            else
+                throw new NotImplementedException();
+        }
+
         public static StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
         {
             if (obj != null)
@@ -3702,63 +3824,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     if (obj.GetType().IsPrimitive)
                     {
-                        if (obj is int)
-                        {
-                            esp->ObjectType = ObjectTypes.Integer;
-                            esp->Value = (int)obj;
-                        }
-                        else if (obj is bool)
-                        {
-                            esp->ObjectType = ObjectTypes.Integer;
-                            esp->Value = (bool)(obj) ? 1 : 0;
-                        }
-                        else if (obj is short)
-                        {
-                            esp->ObjectType = ObjectTypes.Integer;
-                            esp->Value = (short)obj;
-                        }
-                        else if (obj is long)
-                        {
-                            esp->ObjectType = ObjectTypes.Long;
-                            *(long*)(&esp->Value) = (long)obj;
-                        }
-                        else if (obj is float)
-                        {
-                            esp->ObjectType = ObjectTypes.Float;
-                            *(float*)(&esp->Value) = (float)obj;
-                        }
-                        else if (obj is byte)
-                        {
-                            esp->ObjectType = ObjectTypes.Integer;
-                            esp->Value = (byte)obj;
-                        }
-                        else if (obj is uint)
-                        {
-                            esp->ObjectType = ObjectTypes.Integer;
-                            esp->Value = (int)(uint)obj;
-                        }
-                        else if(obj is char)
-                        {
-                            esp->ObjectType = ObjectTypes.Integer;
-                            esp->Value = (int)(char)obj;
-                        }
-                        else if (obj is double)
-                        {
-                            esp->ObjectType = ObjectTypes.Double;
-                            *(double*)(&esp->Value) = (double)obj;
-                        }
-                        else if (obj is ulong)
-                        {
-                            esp->ObjectType = ObjectTypes.Long;
-                            *(ulong*)(&esp->Value) = (ulong)obj;
-                        }
-                        else if (obj is sbyte)
-                        {
-                            esp->ObjectType = ObjectTypes.Integer;
-                            esp->Value = (sbyte)obj;
-                        }
-                        else
-                            throw new NotImplementedException();
+                        UnboxObject(esp, obj);
                     }
                     else if (obj.GetType().IsEnum)
                     {
