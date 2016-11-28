@@ -204,6 +204,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             set
             {
+                value = ILIntepreter.CheckAndCloneValueType(value, type.AppDomain);
                 if (index < fields.Length && index >= 0)
                 {
                     fixed (StackObject* ptr = fields)
@@ -232,7 +233,7 @@ namespace ILRuntime.Runtime.Intepreter
                     {
                         CLRType clrType = type.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
                         var field = clrType.GetField(index);
-                        field.SetValue(clrInstance, index);
+                        field.SetValue(clrInstance, value);
                     }
                     else
                         throw new TypeLoadException();
@@ -259,10 +260,10 @@ namespace ILRuntime.Runtime.Intepreter
             esp->ValueLow = fieldIdx;
         }
 
-        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack, bool checkValueType)
+        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)
         {
             if (fieldIdx < fields.Length && fieldIdx >= 0)
-                PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack, checkValueType);
+                PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
             else
             {
                 if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
@@ -277,16 +278,13 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack, bool checkValueType)
+        unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
         {
             *esp = field;
             if (field.ObjectType >= ObjectTypes.Object)
             {
                 esp->Value = managedStack.Count;
-                if (checkValueType)
-                    managedStack.Add(ILIntepreter.CheckAndCloneValueType(managedObjs[fieldIdx], type.AppDomain));
-                else
-                    managedStack.Add(managedObjs[fieldIdx]);
+                managedStack.Add(managedObjs[fieldIdx]);
             }
         }
 
@@ -309,7 +307,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
                     var field = clrType.GetField(fieldIdx);
-                    field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, StackObject.ToObject(esp, appdomain, managedStack)));
+                    field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, ILIntepreter.CheckAndCloneValueType(StackObject.ToObject(esp, appdomain, managedStack), appdomain)));
                 }
                 else
                     throw new TypeLoadException();
@@ -322,7 +320,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (field.ObjectType >= ObjectTypes.Object)
             {
                 field.Value = fieldIdx;
-                managedObjs[fieldIdx] = managedStack[esp->Value];
+                managedObjs[fieldIdx] = ILIntepreter.CheckAndCloneValueType(managedStack[esp->Value], Type.AppDomain);
             }
         }
 

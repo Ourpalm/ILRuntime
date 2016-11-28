@@ -219,7 +219,7 @@ namespace ILRuntime.CLR.Method
             {
                 var p = Minus(esp, i);
                 var obj = this.param[paramCount - i].ParameterType.CheckCLRTypes(appdomain, StackObject.ToObject(p, appdomain, mStack));
-
+                obj = ILIntepreter.CheckAndCloneValueType(obj, appdomain);
                 param[paramCount - i] = obj;
             }
 
