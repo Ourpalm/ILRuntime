@@ -98,8 +98,6 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 arg--;
                 paramCnt++;
-                if (arg->ObjectType != ObjectTypes.StackObjectReference)
-                    mStackBase--;
             }
             unhandledException = false;
 
@@ -107,12 +105,19 @@ namespace ILRuntime.Runtime.Intepreter
             for (int i = 0; i < paramCnt; i++)
             {
                 var a = Add(arg, i);
-                if (a->ObjectType == ObjectTypes.Null)
+                switch (a->ObjectType)
                 {
-                    //Need to reserve place for null, in case of starg
-                    a->ObjectType = ObjectTypes.Object;
-                    a->Value = mStack.Count;
-                    mStack.Add(null);
+                    case ObjectTypes.Null:
+                        //Need to reserve place for null, in case of starg
+                        a->ObjectType = ObjectTypes.Object;
+                        a->Value = mStack.Count;
+                        mStack.Add(null);
+                        break;
+                    case ObjectTypes.Object:
+                    case ObjectTypes.FieldReference:
+                    case ObjectTypes.ArrayReference:
+                        mStackBase--;
+                        break;
                 }
             }
 
@@ -2235,13 +2240,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp++;
                                             }
                                             esp = Execute((ILMethod)m, esp, out unhandledException);
-                                            for (int i = m.ParameterCount - 1; i >= 0; i--)
-                                            {
-                                                Free(a + i);
-                                            }
-                                            Free(objRef - 1);
-                                            esp = a;
-                                            esp = PushObject(esp, mStack, obj);//new constructedObj
+                                            esp = PushObject(a, mStack, obj);//new constructedObj
                                         }
                                         if (unhandledException)
                                             returned = true;
