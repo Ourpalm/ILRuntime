@@ -292,6 +292,10 @@ namespace ILRuntime.CLR.Method
                                     obj = ((CrossBindingAdaptorType)obj).ILInstance;
                                 mStack[dst->Value] = obj;
                             }
+                            else
+                            {
+                                ILIntepreter.UnboxObject(dst, val);
+                            }
                         }
                         break;
                     case ObjectTypes.FieldReference:
