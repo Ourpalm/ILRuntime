@@ -3831,6 +3831,11 @@ namespace ILRuntime.Runtime.Intepreter
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (int)(uint)obj;
             }
+            else if (obj is ushort)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = (int)(ushort)obj;
+            }
             else if (obj is char)
             {
                 esp->ObjectType = ObjectTypes.Integer;
