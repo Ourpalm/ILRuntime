@@ -2193,7 +2193,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ILType type = m.DeclearingType as ILType;
                                         if (type.IsDelegate)
                                         {
-                                            var objRef = esp - 1 - 1;
+                                            var objRef = GetObjectAndResolveReference(esp - 1 - 1);
                                             var mi = (IMethod)mStack[(esp - 1)->Value];
                                             object ins;
                                             if (objRef->ObjectType == ObjectTypes.Null)
@@ -2250,7 +2250,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         CLRMethod cm = (CLRMethod)m;
                                         if (cm.DeclearingType.IsDelegate)
                                         {
-                                            var objRef = esp - 1 - 1;
+                                            var objRef = GetObjectAndResolveReference(esp - 1 - 1);
                                             var mi = (IMethod)mStack[(esp - 1)->Value];
                                             object ins;
                                             if (objRef->ObjectType == ObjectTypes.Null)
