@@ -2782,7 +2782,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
                                                     {
-                                                        esp = PushObject(objRef, mStack, obj);
+                                                        esp = PushObject(objRef, mStack, obj, true);
                                                     }
                                                     else
                                                     {

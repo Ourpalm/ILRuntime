@@ -8,6 +8,24 @@ namespace TestCases
 
     class Test03
     {
+        public static void UnitTest_Typeof()
+        {
+            object obj = 1;
+            if(obj.GetType() == typeof(int))
+            {
+                Console.WriteLine("ok");
+            }
+            else
+                Console.WriteLine("error");
+
+            if (obj is int)
+            {
+                Console.WriteLine("ok");
+            }
+            else
+                Console.WriteLine("error");
+
+        }
         public class TestGenrRefBase
         {
             public int v;
