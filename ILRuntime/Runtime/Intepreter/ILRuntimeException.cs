@@ -34,8 +34,6 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        internal unsafe StackObject* ReturnESP { get; set; }
-
         public override string StackTrace
         {
             get

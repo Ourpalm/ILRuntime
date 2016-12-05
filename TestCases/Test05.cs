@@ -99,10 +99,10 @@ namespace TestCases
             }
         }
 
-        static void ParseOne(string line)
+        static string ParseOne(string line)
         {
-            Console.WriteLine(line.ToString());
-            throw new NotSupportedException("test error");
+            Console.WriteLine(line.ToString());            
+            throw new NotSupportedException("error");            
         }
 
         static bool CheckValue(List<B> lst)

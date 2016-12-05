@@ -57,6 +57,17 @@ namespace ILRuntime.Runtime.Debugger
         }
 
         /// <summary>
+        /// Stop Debugger Server
+        /// </summary>
+        public void StopDebugService()
+        {
+#if DEBUG
+            server.Stop();
+            server = null;
+#endif
+        }
+
+        /// <summary>
         /// 中断运行
         /// </summary>
         /// <param name="intpreter"></param>
