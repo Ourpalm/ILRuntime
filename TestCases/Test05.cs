@@ -73,6 +73,38 @@ namespace TestCases
 
     class Test05
     {
+        public static void TestForEach()
+        {
+            List<string> a = new List<string>() { "1", "2", "3" };
+            foreach (var i in a)
+            {
+                ParseOne(i);
+            }
+        }
+
+
+        public static void TestForEachTry()
+        {
+            List<string> a = new List<string>() { "1", "2", "3" };
+            foreach(var i in a)
+            {
+                try
+                {
+                    ParseOne(i);   
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+        }
+
+        static void ParseOne(string line)
+        {
+            Console.WriteLine(line.ToString());
+            throw new NotSupportedException("test error");
+        }
+
         static bool CheckValue(List<B> lst)
         {
             foreach (B a in lst)
@@ -202,6 +234,14 @@ namespace TestCases
         {
             try
             {
+                try
+                {
+                    c5.bar();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(string.Format("{0}\n{1}\n{2}", ex.Message, ex.Data["StackTrace"], ex.StackTrace));
+                }
                 c5.bar();
                 throw new NotImplementedException("new exception");
             }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using ILRuntime.Runtime.Stack;
+
 namespace ILRuntime.Runtime.Intepreter
 {
     public class ILRuntimeException : Exception
@@ -31,6 +33,8 @@ namespace ILRuntime.Runtime.Intepreter
                 localInfo = ds.GetLocalVariableInfo(intepreter);
             }
         }
+
+        internal unsafe StackObject* ReturnESP { get; set; }
 
         public override string StackTrace
         {

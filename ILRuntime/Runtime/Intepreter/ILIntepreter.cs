@@ -87,6 +87,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v3 = frame.LocalVarPointer + 1 + 1;
             StackObject* v4 = Add(frame.LocalVarPointer, 3);
             bool fault = false;
+            ExceptionHandler lastFault = null;
             int finallyEndAddress = 0;
 
             esp = frame.BasePointer;
@@ -1590,20 +1591,29 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     if (method.ExceptionHandler != null)
                                     {
-                                        int addr = (int)(ip - ptr);
-                                        var sql = from e in method.ExceptionHandler
-                                                  where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
-                                                  select e;
-                                        var eh = sql.FirstOrDefault();
+                                        ExceptionHandler eh = null;
+                                        if (fault && lastFault != null)
+                                        {
+                                            var sql = from e in method.ExceptionHandler
+                                                      where lastFault.TryStart == e.TryStart && lastFault.TryEnd == e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                      select e;
+                                            eh = sql.FirstOrDefault();
+                                        }
+                                        else
+                                        {
+                                            int addr = (int)(ip - ptr);
+                                            var sql = from e in method.ExceptionHandler
+                                                      where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                      select e;
+                                            eh = sql.FirstOrDefault();
+                                        }
+                                        lastFault = null;
                                         if (eh != null)
                                         {
-                                            if (eh.HandlerType == ExceptionHandlerType.Finally || fault)
-                                            {
-                                                fault = false;
-                                                finallyEndAddress = ip->TokenInteger;
-                                                ip = ptr + eh.HandlerStart;
-                                                continue;
-                                            }
+                                            fault = false;
+                                            finallyEndAddress = ip->TokenInteger;
+                                            ip = ptr + eh.HandlerStart;
+                                            continue;
                                         }
                                     }
                                     fault = false;
@@ -3473,22 +3483,18 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
-                        if (unhandledException)
-                            throw ex;
+                        if(ex is ILRuntimeException)
+                        {
+                            esp = ((ILRuntimeException)ex).ReturnESP;
+                        }
                         if (method.ExceptionHandler != null)
                         {
                             int addr =(int)(ip - ptr);
-                            var sql = from e in method.ExceptionHandler
-                                      where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Catch && CheckExceptionType(e.CatchType, ex, true)
-                                      select e;
-                            var eh = sql.FirstOrDefault();
-                            
+                            var eh = GetCorrespondingExceptionHandler(method, ex, addr, ExceptionHandlerType.Catch, true);
+
                             if (eh == null)
                             {
-                                var sql2 = from e in method.ExceptionHandler
-                                          where addr >= e.TryStart && addr <= e.TryEnd && e.HandlerType == ExceptionHandlerType.Catch && CheckExceptionType(e.CatchType, ex, false)
-                                          select e;
-                                eh = sql2.FirstOrDefault();
+                                eh = GetCorrespondingExceptionHandler(method, ex, addr, ExceptionHandlerType.Catch, false);
                             }
                             if (eh != null)
                             {
@@ -3500,18 +3506,37 @@ namespace ILRuntime.Runtime.Intepreter
                                 ex.Data["StackTrace"] = debugger.GetStackTrance(this);
                                 ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
                                 esp = PushObject(esp, mStack, ex);
+                                unhandledException = false;
+                                lastFault = eh;
                                 fault = true;
                                 ip = ptr + eh.HandlerStart;
                                 continue;
                             }
                         }
+                        if (unhandledException)
+                        {
+                            var ret = stack.PopFrame(ref frame, esp, mStack, mStackBase);
+                            if (ex is ILRuntimeException)
+                            {
+                                ((ILRuntimeException)ex).ReturnESP = ret;
+                            }
+                            throw ex;
+                        }
+
                         unhandledException = true;
                         returned = true;
 #if DEBUG
                         if (!AppDomain.DebugService.Break(this, ex))
 #endif
                         {
-                            throw new ILRuntimeException(ex.Message, this, method, ex);
+                            if(method.ReturnType != AppDomain.VoidType)
+                            {
+                                StackObject.Initialized(esp, method.ReturnType.TypeForCLR);
+                                esp++;
+                            }
+                            var newEx = new ILRuntimeException(ex.Message, this, method, ex);
+                            newEx.ReturnESP = stack.PopFrame(ref frame, esp, mStack, mStackBase);
+                            throw newEx;
                         }
                     }
                 }
@@ -3522,6 +3547,31 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack, mStackBase);
+        }
+
+        ExceptionHandler GetCorrespondingExceptionHandler(ILMethod method,object ex, int addr, ExceptionHandlerType type, bool explicitMatch)
+        {
+            ExceptionHandler res = null;
+            int distance = int.MaxValue;
+            foreach(var i in method.ExceptionHandler)
+            {
+                if(i.HandlerType == type)
+                {
+                    if (addr >= i.TryStart && addr <= i.TryEnd)
+                    {
+                        if (CheckExceptionType(i.CatchType, ex, explicitMatch))
+                        {
+                            int d = addr - i.TryStart;
+                            if (d < distance)
+                            {
+                                distance = d;
+                                res = i;
+                            }
+                        }
+                    }
+                }
+            }
+            return res;
         }
 
         void LoadFromFieldReference(object obj, int idx, StackObject* dst, List<object> mStack)
