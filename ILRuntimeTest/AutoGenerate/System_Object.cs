@@ -76,10 +76,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object objA = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object objB = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object objB = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object objA = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Object.Equals(objA, objB);
@@ -94,10 +94,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object objA = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object objB = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object objB = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object objA = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Object.ReferenceEquals(objA, objB);

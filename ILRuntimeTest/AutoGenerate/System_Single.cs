@@ -268,10 +268,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Single.Parse(s, style);
@@ -286,10 +286,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Single.Parse(s, provider);
@@ -304,13 +304,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Single.Parse(s, style, provider);
@@ -325,11 +325,11 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.GetObjectAndResolveReference(p);
             System.Single result = *(float*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             var result_of_this_method = System.Single.TryParse(s, out result);
             ret->ObjectType = ObjectTypes.Integer;
@@ -343,17 +343,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.GetObjectAndResolveReference(p);
             System.Single result = *(float*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 3);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 4);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             var result_of_this_method = System.Single.TryParse(s, style, provider, out result);
             ret->ObjectType = ObjectTypes.Integer;
@@ -391,10 +391,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
             System.Single instance = *(float*)&p->Value;

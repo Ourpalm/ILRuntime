@@ -219,10 +219,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int32 length = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
             System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 length = p->Value;
 
             var result_of_this_method = System.Array.CreateInstance(elementType, length);
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
@@ -234,12 +234,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length2 = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 length1 = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length2 = p->Value;
+            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             var result_of_this_method = System.Array.CreateInstance(elementType, length1, length2);
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
@@ -251,14 +251,14 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int32 length3 = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Int32 length2 = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.Int32 length1 = p->Value;
+            p = ILIntepreter.Minus(esp, 4);
             System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 length1 = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length2 = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int32 length3 = p->Value;
 
             var result_of_this_method = System.Array.CreateInstance(elementType, length1, length2, length3);
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
@@ -270,10 +270,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
+            System.Int32[] lengths = (System.Int32[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int32[] lengths = (System.Int32[])StackObject.ToObject(p, domain, mStack);
+            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.CreateInstance(elementType, lengths);
@@ -286,10 +286,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
+            System.Int64[] lengths = (System.Int64[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64[] lengths = (System.Int64[])StackObject.ToObject(p, domain, mStack);
+            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.CreateInstance(elementType, lengths);
@@ -302,13 +302,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
+            System.Int32[] lowerBounds = (System.Int32[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32[] lengths = (System.Int32[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32[] lowerBounds = (System.Int32[])StackObject.ToObject(p, domain, mStack);
+            System.Type elementType = (System.Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.CreateInstance(elementType, lengths, lowerBounds);
@@ -321,13 +321,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Array destinationArray = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length = p->Value;
+            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Copy(sourceArray, destinationArray, length);
             return ret;
@@ -339,17 +339,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Int32 sourceIndex = p->Value;
+            System.Int32 destinationIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array destinationArray = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.Int32 destinationIndex = p->Value;
+            System.Int32 sourceIndex = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.Int32 length = p->Value;
+            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length);
             return ret;
@@ -361,17 +361,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Int32 sourceIndex = p->Value;
+            System.Int32 destinationIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array destinationArray = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.Int32 destinationIndex = p->Value;
+            System.Int32 sourceIndex = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.Int32 length = p->Value;
+            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.ConstrainedCopy(sourceArray, sourceIndex, destinationArray, destinationIndex, length);
             return ret;
@@ -383,13 +383,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int64 length = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Array destinationArray = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Int64 length = *(long*)&p->Value;
+            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Copy(sourceArray, destinationArray, length);
             return ret;
@@ -401,17 +401,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int64 length = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 sourceIndex = *(long*)&p->Value;
+            System.Int64 destinationIndex = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array destinationArray = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.Int64 destinationIndex = *(long*)&p->Value;
+            System.Int64 sourceIndex = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.Int64 length = *(long*)&p->Value;
+            System.Array sourceArray = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length);
             return ret;
@@ -423,12 +423,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length = p->Value;
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Clear(array, index, length);
             return ret;
@@ -471,9 +471,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int32 index1 = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
             System.Int32 index2 = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Int32 index1 = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -488,11 +488,11 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int32 index1 = p->Value;
+            System.Int32 index3 = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 index2 = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 index3 = p->Value;
+            System.Int32 index1 = p->Value;
             p = ILIntepreter.Minus(esp, 4);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -522,9 +522,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 index1 = *(long*)&p->Value;
-            p = ILIntepreter.Minus(esp, 2);
             System.Int64 index2 = *(long*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Int64 index1 = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -539,11 +539,11 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 index1 = *(long*)&p->Value;
+            System.Int64 index3 = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int64 index2 = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int64 index3 = *(long*)&p->Value;
+            System.Int64 index1 = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 4);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -574,10 +574,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int32 index = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -592,12 +592,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 index2 = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 index1 = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 index2 = p->Value;
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -612,14 +612,14 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int32 index3 = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Int32 index2 = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.Int32 index1 = p->Value;
+            p = ILIntepreter.Minus(esp, 4);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 index1 = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 index2 = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int32 index3 = p->Value;
             p = ILIntepreter.Minus(esp, 5);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -634,10 +634,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Int32[] indices = (System.Int32[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int32[] indices = (System.Int32[])StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
@@ -653,10 +653,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int64 index = *(long*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int64 index = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -671,12 +671,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int64 index2 = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int64 index1 = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int64 index2 = *(long*)&p->Value;
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -691,14 +691,14 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int64 index3 = *(long*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Int64 index2 = *(long*)&p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.Int64 index1 = *(long*)&p->Value;
+            p = ILIntepreter.Minus(esp, 4);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int64 index1 = *(long*)&p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int64 index2 = *(long*)&p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int64 index3 = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 5);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -713,10 +713,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Int64[] indices = (System.Int64[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64[] indices = (System.Int64[])StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
@@ -916,10 +916,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.BinarySearch(array, value);
@@ -934,14 +934,14 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int32 index = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
             System.Int32 length = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.BinarySearch(array, index, length, value);
@@ -956,13 +956,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.BinarySearch(array, value, comparer);
@@ -977,17 +977,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int32 index = p->Value;
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.BinarySearch(array, index, length, value, comparer);
@@ -1002,10 +1002,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int32 index = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
             System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -1020,10 +1020,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
+            System.Int64 index = *(long*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
             System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int64 index = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
@@ -1051,10 +1051,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.IndexOf(array, value);
@@ -1069,13 +1069,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 startIndex = p->Value;
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             var result_of_this_method = System.Array.IndexOf(array, value, startIndex);
             ret->ObjectType = ObjectTypes.Integer;
@@ -1089,15 +1089,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 count = p->Value;
             p = ILIntepreter.Minus(esp, 2);
+            System.Int32 startIndex = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.Int32 count = p->Value;
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             var result_of_this_method = System.Array.IndexOf(array, value, startIndex, count);
             ret->ObjectType = ObjectTypes.Integer;
@@ -1111,10 +1111,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             var result_of_this_method = System.Array.LastIndexOf(array, value);
@@ -1129,13 +1129,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 startIndex = p->Value;
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             var result_of_this_method = System.Array.LastIndexOf(array, value, startIndex);
             ret->ObjectType = ObjectTypes.Integer;
@@ -1149,15 +1149,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 count = p->Value;
             p = ILIntepreter.Minus(esp, 2);
+            System.Int32 startIndex = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.Int32 count = p->Value;
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             var result_of_this_method = System.Array.LastIndexOf(array, value, startIndex, count);
             ret->ObjectType = ObjectTypes.Integer;
@@ -1184,12 +1184,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length = p->Value;
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Reverse(array, index, length);
             return ret;
@@ -1214,10 +1214,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Array items = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Array items = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             System.Array.Sort(keys, items);
@@ -1230,12 +1230,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length = p->Value;
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Sort(array, index, length);
             return ret;
@@ -1247,15 +1247,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 2);
+            System.Int32 index = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
             System.Array items = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.Int32 length = p->Value;
+            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
 
             System.Array.Sort(keys, items, index, length);
             return ret;
@@ -1267,10 +1267,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             System.Array.Sort(array, comparer);
@@ -1283,13 +1283,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Array items = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
+            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             System.Array.Sort(keys, items, comparer);
@@ -1302,14 +1302,14 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int32 index = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
             System.Int32 length = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
+            System.Array array = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             System.Array.Sort(array, index, length, comparer);
@@ -1322,17 +1322,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
-            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
+            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Array items = (System.Array)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
+            System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.Int32 length = p->Value;
+            System.Array items = (System.Array)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
             p = ILIntepreter.Minus(esp, 5);
-            System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
+            System.Array keys = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             System.Array.Sort(keys, items, index, length, comparer);

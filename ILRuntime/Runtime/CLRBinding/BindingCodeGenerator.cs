@@ -123,10 +123,10 @@ namespace ILRuntime.Runtime.Generated
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;");
                 sb.AppendLine("            StackObject* p;");
                 sb.AppendLine(string.Format("            StackObject* ret = ILIntepreter.Minus(esp, {0});", paramCnt));
-                for(int j = 1; j <= param.Length; j++)
+                for (int j = param.Length; j > 0; j--)
                 {
                     var p = param[j - 1];
-                    sb.AppendLine(string.Format("            p = ILIntepreter.Minus(esp, {0});", j));
+                    sb.AppendLine(string.Format("            p = ILIntepreter.Minus(esp, {0});", param.Length - j + 1));
                     string tmp, clsName;
                     bool isByRef;
                     GetClassName(p.ParameterType, out tmp, out clsName, out isByRef);
