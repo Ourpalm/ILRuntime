@@ -151,7 +151,7 @@ namespace ILRuntime.Runtime.Generated
                 sb.AppendLine();
                 if (i.ReturnType != typeof(void))
                 {
-                    sb.Append("            var result = ");
+                    sb.Append("            var result_of_this_method = ");
                 }
                 else
                     sb.Append("            ");
@@ -267,62 +267,62 @@ namespace ILRuntime.Runtime.Generated
                 if (type == typeof(int))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            ret->Value = result;");
+                    sb.AppendLine("            ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(long))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Long;");
-                    sb.AppendLine("            *(long*)&ret->Value = result;");
+                    sb.AppendLine("            *(long*)&ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(short))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            ret->Value = result;");
+                    sb.AppendLine("            ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(bool))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            ret->Value = result ? 1 : 0;");
+                    sb.AppendLine("            ret->Value = result_of_this_method ? 1 : 0;");
                 }
                 else if (type == typeof(ushort))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            ret->Value = result;");
+                    sb.AppendLine("            ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(float))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Float;");
-                    sb.AppendLine("            *(float*)&ret->Value = result;");
+                    sb.AppendLine("            *(float*)&ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(double))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Double;");
-                    sb.AppendLine("            *(double*)&ret->Value = result;");
+                    sb.AppendLine("            *(double*)&ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(byte))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            (byte)ret->Value = result;");
+                    sb.AppendLine("            (byte)ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(sbyte))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            (sbyte)ret->Value = result;");
+                    sb.AppendLine("            (sbyte)ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(uint))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            ret->Value = (int)result;");
+                    sb.AppendLine("            ret->Value = (int)result_of_this_method;");
                 }
                 else if (type == typeof(char))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            ret->Value = (int)result;");
+                    sb.AppendLine("            ret->Value = (int)result_of_this_method;");
                 }
                 else if (type == typeof(ulong))
                 {
                     sb.AppendLine("            ret->ObjectType = ObjectTypes.Long;");
-                    sb.AppendLine("            *(ulong*)&ret->Value = result;");
+                    sb.AppendLine("            *(ulong*)&ret->Value = result_of_this_method;");
                 }
                 else
                     throw new NotImplementedException();
@@ -331,7 +331,7 @@ namespace ILRuntime.Runtime.Generated
             }
             else
             {
-                sb.AppendLine("            return ILIntepreter.PushObject(ret, mStack, result);");
+                sb.AppendLine("            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);");
             }
         }
 

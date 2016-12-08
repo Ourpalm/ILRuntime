@@ -1,0 +1,408 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Stack;
+using ILRuntime.Reflection;
+
+namespace ILRuntime.Runtime.Generated
+{
+    unsafe class System_Single
+    {
+        public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
+        {
+            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+            MethodInfo method;
+            Type[] args;
+            Type type = typeof(System.Single);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("IsInfinity", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IsInfinity_0);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("IsPositiveInfinity", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IsPositiveInfinity_1);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("IsNegativeInfinity", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IsNegativeInfinity_2);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("IsNaN", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IsNaN_3);
+            args = new Type[]{typeof(System.Object)};
+            method = type.GetMethod("CompareTo", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, CompareTo_4);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("CompareTo", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, CompareTo_5);
+            args = new Type[]{typeof(System.Object)};
+            method = type.GetMethod("Equals", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Equals_6);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("Equals", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Equals_7);
+            args = new Type[]{};
+            method = type.GetMethod("GetHashCode", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, GetHashCode_8);
+            args = new Type[]{typeof(System.IFormatProvider)};
+            method = type.GetMethod("ToString", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToString_9);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("ToString", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToString_10);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("Parse", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Parse_11);
+            args = new Type[]{typeof(System.String), typeof(System.Globalization.NumberStyles)};
+            method = type.GetMethod("Parse", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Parse_12);
+            args = new Type[]{typeof(System.String), typeof(System.IFormatProvider)};
+            method = type.GetMethod("Parse", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Parse_13);
+            args = new Type[]{typeof(System.String), typeof(System.Globalization.NumberStyles), typeof(System.IFormatProvider)};
+            method = type.GetMethod("Parse", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Parse_14);
+            args = new Type[]{typeof(System.String), typeof(System.Single).MakeByRefType()};
+            method = type.GetMethod("TryParse", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TryParse_15);
+            args = new Type[]{typeof(System.String), typeof(System.Globalization.NumberStyles), typeof(System.IFormatProvider), typeof(System.Single).MakeByRefType()};
+            method = type.GetMethod("TryParse", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TryParse_16);
+            args = new Type[]{};
+            method = type.GetMethod("GetTypeCode", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, GetTypeCode_17);
+            args = new Type[]{};
+            method = type.GetMethod("ToString", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToString_18);
+            args = new Type[]{typeof(System.String), typeof(System.IFormatProvider)};
+            method = type.GetMethod("ToString", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToString_19);
+
+        }
+
+        static StackObject* IsInfinity_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single f = *(float*)&p->Value;
+
+            var result_of_this_method = System.Single.IsInfinity(f);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* IsPositiveInfinity_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single f = *(float*)&p->Value;
+
+            var result_of_this_method = System.Single.IsPositiveInfinity(f);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* IsNegativeInfinity_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single f = *(float*)&p->Value;
+
+            var result_of_this_method = System.Single.IsNegativeInfinity(f);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* IsNaN_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single f = *(float*)&p->Value;
+
+            var result_of_this_method = System.Single.IsNaN(f);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* CompareTo_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.CompareTo(value);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* CompareTo_5(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single value = *(float*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.CompareTo(value);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* Equals_6(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Object obj = (System.Object)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.Equals(obj);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* Equals_7(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single obj = *(float*)&p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.Equals(obj);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* GetHashCode_8(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.GetHashCode();
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* ToString_9(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.ToString(provider);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+        }
+
+        static StackObject* ToString_10(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.ToString(format);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+        }
+
+        static StackObject* Parse_11(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = System.Single.Parse(s);
+            ret->ObjectType = ObjectTypes.Float;
+            *(float*)&ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* Parse_12(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = System.Single.Parse(s, style);
+            ret->ObjectType = ObjectTypes.Float;
+            *(float*)&ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* Parse_13(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = System.Single.Parse(s, provider);
+            ret->ObjectType = ObjectTypes.Float;
+            *(float*)&ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* Parse_14(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 3);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 3);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = System.Single.Parse(s, style, provider);
+            ret->ObjectType = ObjectTypes.Float;
+            *(float*)&ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* TryParse_15(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Single result = *(float*)&p->Value;
+
+            var result_of_this_method = System.Single.TryParse(s, out result);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* TryParse_16(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 4);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 3);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 4);
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Single result = *(float*)&p->Value;
+
+            var result_of_this_method = System.Single.TryParse(s, style, provider, out result);
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method ? 1 : 0;
+            return ret + 1;
+        }
+
+        static StackObject* GetTypeCode_17(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.GetTypeCode();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+        }
+
+        static StackObject* ToString_18(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.ToString();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+        }
+
+        static StackObject* ToString_19(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 3);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 3);
+            System.Single instance = *(float*)&p->Value;
+
+            var result_of_this_method = instance.ToString(format, provider);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+        }
+
+
+    }
+}

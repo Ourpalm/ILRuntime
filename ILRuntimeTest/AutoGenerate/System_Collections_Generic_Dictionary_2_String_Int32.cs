@@ -75,8 +75,8 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Comparer;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.Comparer;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_Count_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -88,9 +88,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Count;
+            var result_of_this_method = instance.Count;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -103,8 +103,8 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Keys;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.Keys;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_Values_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -116,8 +116,8 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Values;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.Values;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_Item_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -132,9 +132,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance[key];
+            var result_of_this_method = instance[key];
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -199,9 +199,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.ContainsKey(key);
+            var result_of_this_method = instance.ContainsKey(key);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -216,9 +216,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.ContainsValue(value);
+            var result_of_this_method = instance.ContainsValue(value);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -231,8 +231,8 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetEnumerator();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetEnumerator();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetObjectData_11(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -282,9 +282,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Remove(key);
+            var result_of_this_method = instance.Remove(key);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -303,9 +303,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.TryGetValue(key, out value);
+            var result_of_this_method = instance.TryGetValue(key, out value);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 

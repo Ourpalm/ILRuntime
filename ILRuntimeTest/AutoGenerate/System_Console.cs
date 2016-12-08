@@ -327,8 +327,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.Error;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.Error;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_In_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -337,8 +337,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.In;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.In;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_Out_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -347,8 +347,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.Out;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.Out;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_InputEncoding_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -357,8 +357,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.InputEncoding;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.InputEncoding;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* set_InputEncoding_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -380,8 +380,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.OutputEncoding;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.OutputEncoding;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* set_OutputEncoding_6(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -437,8 +437,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.BackgroundColor;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.BackgroundColor;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* set_BackgroundColor_11(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -460,8 +460,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.ForegroundColor;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.ForegroundColor;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* set_ForegroundColor_13(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -545,9 +545,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.BufferHeight;
+            var result_of_this_method = System.Console.BufferHeight;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -569,9 +569,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.BufferWidth;
+            var result_of_this_method = System.Console.BufferWidth;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -607,9 +607,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.WindowHeight;
+            var result_of_this_method = System.Console.WindowHeight;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -631,9 +631,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.WindowWidth;
+            var result_of_this_method = System.Console.WindowWidth;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -669,9 +669,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.LargestWindowWidth;
+            var result_of_this_method = System.Console.LargestWindowWidth;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -681,9 +681,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.LargestWindowHeight;
+            var result_of_this_method = System.Console.LargestWindowHeight;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -693,9 +693,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.WindowLeft;
+            var result_of_this_method = System.Console.WindowLeft;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -717,9 +717,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.WindowTop;
+            var result_of_this_method = System.Console.WindowTop;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -755,9 +755,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.CursorLeft;
+            var result_of_this_method = System.Console.CursorLeft;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -779,9 +779,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.CursorTop;
+            var result_of_this_method = System.Console.CursorTop;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -817,9 +817,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.CursorSize;
+            var result_of_this_method = System.Console.CursorSize;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -841,9 +841,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.CursorVisible;
+            var result_of_this_method = System.Console.CursorVisible;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -865,8 +865,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.Title;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.Title;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* set_Title_44(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -888,8 +888,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.ReadKey();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.ReadKey();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* ReadKey_46(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -900,8 +900,8 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Boolean intercept = p->Value == 1;
 
-            var result = System.Console.ReadKey(intercept);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.ReadKey(intercept);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_KeyAvailable_47(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -910,9 +910,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.KeyAvailable;
+            var result_of_this_method = System.Console.KeyAvailable;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -922,9 +922,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.NumberLock;
+            var result_of_this_method = System.Console.NumberLock;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -934,9 +934,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.CapsLock;
+            var result_of_this_method = System.Console.CapsLock;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -946,9 +946,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.TreatControlCAsInput;
+            var result_of_this_method = System.Console.TreatControlCAsInput;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -970,8 +970,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.OpenStandardError();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.OpenStandardError();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* OpenStandardError_53(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -982,8 +982,8 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 bufferSize = p->Value;
 
-            var result = System.Console.OpenStandardError(bufferSize);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.OpenStandardError(bufferSize);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* OpenStandardInput_54(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -992,8 +992,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.OpenStandardInput();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.OpenStandardInput();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* OpenStandardInput_55(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -1004,8 +1004,8 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 bufferSize = p->Value;
 
-            var result = System.Console.OpenStandardInput(bufferSize);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.OpenStandardInput(bufferSize);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* OpenStandardOutput_56(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -1014,8 +1014,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.OpenStandardOutput();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.OpenStandardOutput();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* OpenStandardOutput_57(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -1026,8 +1026,8 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 bufferSize = p->Value;
 
-            var result = System.Console.OpenStandardOutput(bufferSize);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.OpenStandardOutput(bufferSize);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* SetIn_58(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -1075,9 +1075,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.Read();
+            var result_of_this_method = System.Console.Read();
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -1087,8 +1087,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
-            var result = System.Console.ReadLine();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Console.ReadLine();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* WriteLine_63(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)

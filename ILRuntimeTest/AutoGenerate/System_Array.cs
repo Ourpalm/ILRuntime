@@ -224,8 +224,8 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 length = p->Value;
 
-            var result = System.Array.CreateInstance(elementType, length);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Array.CreateInstance(elementType, length);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* CreateInstance_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -241,8 +241,8 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 length2 = p->Value;
 
-            var result = System.Array.CreateInstance(elementType, length1, length2);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Array.CreateInstance(elementType, length1, length2);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* CreateInstance_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -260,8 +260,8 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 length3 = p->Value;
 
-            var result = System.Array.CreateInstance(elementType, length1, length2, length3);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Array.CreateInstance(elementType, length1, length2, length3);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* CreateInstance_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -276,8 +276,8 @@ namespace ILRuntime.Runtime.Generated
             System.Int32[] lengths = (System.Int32[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.CreateInstance(elementType, lengths);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Array.CreateInstance(elementType, lengths);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* CreateInstance_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -292,8 +292,8 @@ namespace ILRuntime.Runtime.Generated
             System.Int64[] lengths = (System.Int64[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.CreateInstance(elementType, lengths);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Array.CreateInstance(elementType, lengths);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* CreateInstance_5(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -311,8 +311,8 @@ namespace ILRuntime.Runtime.Generated
             System.Int32[] lowerBounds = (System.Int32[])StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.CreateInstance(elementType, lengths, lowerBounds);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = System.Array.CreateInstance(elementType, lengths, lowerBounds);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* Copy_6(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -446,8 +446,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(indices);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(indices);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetValue_13(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -461,8 +461,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(index);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(index);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetValue_14(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -478,8 +478,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(index1, index2);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(index1, index2);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetValue_15(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -497,8 +497,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(index1, index2, index3);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(index1, index2, index3);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetValue_16(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -512,8 +512,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(index);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(index);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetValue_17(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -529,8 +529,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(index1, index2);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(index1, index2);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetValue_18(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -548,8 +548,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(index1, index2, index3);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(index1, index2, index3);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* GetValue_19(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -564,8 +564,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetValue(indices);
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetValue(indices);
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* SetValue_20(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -735,9 +735,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Length;
+            var result_of_this_method = instance.Length;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -750,9 +750,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.LongLength;
+            var result_of_this_method = instance.LongLength;
             ret->ObjectType = ObjectTypes.Long;
-            *(long*)&ret->Value = result;
+            *(long*)&ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -767,9 +767,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetLength(dimension);
+            var result_of_this_method = instance.GetLength(dimension);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -784,9 +784,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetLongLength(dimension);
+            var result_of_this_method = instance.GetLongLength(dimension);
             ret->ObjectType = ObjectTypes.Long;
-            *(long*)&ret->Value = result;
+            *(long*)&ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -799,9 +799,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Rank;
+            var result_of_this_method = instance.Rank;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -816,9 +816,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetUpperBound(dimension);
+            var result_of_this_method = instance.GetUpperBound(dimension);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -833,9 +833,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetLowerBound(dimension);
+            var result_of_this_method = instance.GetLowerBound(dimension);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -848,8 +848,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.SyncRoot;
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.SyncRoot;
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* get_IsReadOnly_36(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -861,9 +861,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.IsReadOnly;
+            var result_of_this_method = instance.IsReadOnly;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -876,9 +876,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.IsFixedSize;
+            var result_of_this_method = instance.IsFixedSize;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -891,9 +891,9 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.IsSynchronized;
+            var result_of_this_method = instance.IsSynchronized;
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result ? 1 : 0;
+            ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
@@ -906,8 +906,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.Clone();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.Clone();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* BinarySearch_40(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -922,9 +922,9 @@ namespace ILRuntime.Runtime.Generated
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.BinarySearch(array, value);
+            var result_of_this_method = System.Array.BinarySearch(array, value);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -944,9 +944,9 @@ namespace ILRuntime.Runtime.Generated
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.BinarySearch(array, index, length, value);
+            var result_of_this_method = System.Array.BinarySearch(array, index, length, value);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -965,9 +965,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.BinarySearch(array, value, comparer);
+            var result_of_this_method = System.Array.BinarySearch(array, value, comparer);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -990,9 +990,9 @@ namespace ILRuntime.Runtime.Generated
             System.Collections.IComparer comparer = (System.Collections.IComparer)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.BinarySearch(array, index, length, value, comparer);
+            var result_of_this_method = System.Array.BinarySearch(array, index, length, value, comparer);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -1041,8 +1041,8 @@ namespace ILRuntime.Runtime.Generated
             System.Array instance = (System.Array)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = instance.GetEnumerator();
-            return ILIntepreter.PushObject(ret, mStack, result);
+            var result_of_this_method = instance.GetEnumerator();
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
         static StackObject* IndexOf_47(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
@@ -1057,9 +1057,9 @@ namespace ILRuntime.Runtime.Generated
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.IndexOf(array, value);
+            var result_of_this_method = System.Array.IndexOf(array, value);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -1077,9 +1077,9 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 startIndex = p->Value;
 
-            var result = System.Array.IndexOf(array, value, startIndex);
+            var result_of_this_method = System.Array.IndexOf(array, value, startIndex);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -1099,9 +1099,9 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 count = p->Value;
 
-            var result = System.Array.IndexOf(array, value, startIndex, count);
+            var result_of_this_method = System.Array.IndexOf(array, value, startIndex, count);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -1117,9 +1117,9 @@ namespace ILRuntime.Runtime.Generated
             System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result = System.Array.LastIndexOf(array, value);
+            var result_of_this_method = System.Array.LastIndexOf(array, value);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -1137,9 +1137,9 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 startIndex = p->Value;
 
-            var result = System.Array.LastIndexOf(array, value, startIndex);
+            var result_of_this_method = System.Array.LastIndexOf(array, value, startIndex);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -1159,9 +1159,9 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 count = p->Value;
 
-            var result = System.Array.LastIndexOf(array, value, startIndex, count);
+            var result_of_this_method = System.Array.LastIndexOf(array, value, startIndex, count);
             ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 

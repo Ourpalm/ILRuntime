@@ -228,6 +228,11 @@ namespace ILRuntimeTest
         private void btnGenerateBinding_Click(object sender, EventArgs e)
         {
             List<Type> types = new List<Type>();
+            types.Add(typeof(int));
+            types.Add(typeof(float));
+            types.Add(typeof(long));
+            types.Add(typeof(object));
+            types.Add(typeof(ValueType));
             types.Add(typeof(Console));
             types.Add(typeof(Array));
             types.Add(typeof(Dictionary<string, int>));
