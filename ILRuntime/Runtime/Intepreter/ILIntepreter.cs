@@ -3752,7 +3752,7 @@ namespace ILRuntime.Runtime.Intepreter
                 throw new NotImplementedException();
         }
 
-        StackObject* GetObjectAndResolveReference(StackObject* esp)
+        public static StackObject* GetObjectAndResolveReference(StackObject* esp)
         {
             if (esp->ObjectType == ObjectTypes.StackObjectReference)
             {

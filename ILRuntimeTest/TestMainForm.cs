@@ -232,6 +232,7 @@ namespace ILRuntimeTest
             types.Add(typeof(Array));
             types.Add(typeof(Dictionary<string, int>));
             types.Add(typeof(Dictionary<ILRuntime.Runtime.Intepreter.ILTypeInstance, int>));
+            types.Add(typeof(TestFramework.TestStruct));
             ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(types, "..\\..\\AutoGenerate");
         }
     }

@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -52,6 +54,11 @@
   <ItemGroup>
     <Compile Include="AutoGenerate\ClassInheritanceTestAdaptor.cs" />
     <Compile Include="AutoGenerate\helper.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestStruct.cs" />
+    <Compile Include="AutoGenerate\System_Array.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_ILTypeInstance_Int32.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Int32.cs" />
+    <Compile Include="AutoGenerate\System_Console.cs" />
     <Compile Include="AutoGenerate\TestClass2Adaptor.cs" />
     <Compile Include="AutoGenerate\TestClass3Adaptor.cs" />
     <Compile Include="AutoGenerate\TestClass4Adaptor.cs" />
