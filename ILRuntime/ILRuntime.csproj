@@ -57,6 +57,7 @@
     <Compile Include="Reflection\ILRuntimeMethodInfo.cs" />
     <Compile Include="Reflection\ILRuntimeType.cs" />
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
+    <Compile Include="Runtime\CLRBinding\BindingCodeGenerator.cs" />
     <Compile Include="Runtime\Debugger\BreakpointInfo.cs" />
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />

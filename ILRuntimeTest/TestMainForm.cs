@@ -224,5 +224,15 @@ namespace ILRuntimeTest
             btnRun.Enabled = _isLoadAssembly;
             btnRunSelect.Enabled = _selectItemArgs != null;
         }
+
+        private void btnGenerateBinding_Click(object sender, EventArgs e)
+        {
+            List<Type> types = new List<Type>();
+            types.Add(typeof(Console));
+            types.Add(typeof(Array));
+            types.Add(typeof(Dictionary<string, int>));
+            types.Add(typeof(Dictionary<ILRuntime.Runtime.Intepreter.ILTypeInstance, int>));
+            ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(types, "..\\..\\AutoGenerate");
+        }
     }
 }

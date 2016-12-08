@@ -35,6 +35,7 @@
             this.btnLoad = new System.Windows.Forms.Button();
             this.txtPath = new System.Windows.Forms.TextBox();
             this.btnRunSelect = new System.Windows.Forms.Button();
+            this.btnGenerateBinding = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // OD
@@ -44,10 +45,10 @@
             // btnRun
             // 
             this.btnRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRun.Location = new System.Drawing.Point(581, 380);
+            this.btnRun.Location = new System.Drawing.Point(514, 380);
             this.btnRun.Margin = new System.Windows.Forms.Padding(2);
             this.btnRun.Name = "btnRun";
-            this.btnRun.Size = new System.Drawing.Size(95, 29);
+            this.btnRun.Size = new System.Drawing.Size(62, 29);
             this.btnRun.TabIndex = 0;
             this.btnRun.Text = "RunAll";
             this.btnRun.UseVisualStyleBackColor = true;
@@ -78,7 +79,7 @@
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(378, 380);
+            this.btnLoad.Location = new System.Drawing.Point(332, 380);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(100, 29);
             this.btnLoad.TabIndex = 3;
@@ -92,25 +93,36 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPath.Location = new System.Drawing.Point(12, 385);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(349, 21);
+            this.txtPath.Size = new System.Drawing.Size(314, 21);
             this.txtPath.TabIndex = 4;
             // 
-            // BtnRunSelect
+            // btnRunSelect
             // 
             this.btnRunSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRunSelect.Location = new System.Drawing.Point(484, 380);
+            this.btnRunSelect.Location = new System.Drawing.Point(438, 380);
             this.btnRunSelect.Name = "btnRunSelect";
-            this.btnRunSelect.Size = new System.Drawing.Size(92, 29);
+            this.btnRunSelect.Size = new System.Drawing.Size(71, 29);
             this.btnRunSelect.TabIndex = 5;
             this.btnRunSelect.Text = "RunSelect";
             this.btnRunSelect.UseVisualStyleBackColor = true;
             this.btnRunSelect.Click += new System.EventHandler(this.OnBtnRunSelect);
             // 
-            // MainForm
+            // btnGenerateBinding
+            // 
+            this.btnGenerateBinding.Location = new System.Drawing.Point(581, 380);
+            this.btnGenerateBinding.Name = "btnGenerateBinding";
+            this.btnGenerateBinding.Size = new System.Drawing.Size(84, 29);
+            this.btnGenerateBinding.TabIndex = 6;
+            this.btnGenerateBinding.Text = "Binding";
+            this.btnGenerateBinding.UseVisualStyleBackColor = true;
+            this.btnGenerateBinding.Click += new System.EventHandler(this.btnGenerateBinding_Click);
+            // 
+            // TestMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 420);
+            this.Controls.Add(this.btnGenerateBinding);
             this.Controls.Add(this.btnRunSelect);
             this.Controls.Add(this.txtPath);
             this.Controls.Add(this.btnLoad);
@@ -118,7 +130,7 @@
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.btnRun);
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "MainForm";
+            this.Name = "TestMainForm";
             this.Text = "TestAll";
             this.Load += new System.EventHandler(this.OnFormLoaded);
             this.ResumeLayout(false);
@@ -135,6 +147,7 @@
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.TextBox txtPath;
         private System.Windows.Forms.Button btnRunSelect;
+        private System.Windows.Forms.Button btnGenerateBinding;
     }
 }
 
