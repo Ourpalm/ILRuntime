@@ -6,6 +6,10 @@ namespace ILRuntime.Runtime.Generated
 {
     class CLRBindings
     {
+        /// <summary>
+        /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
+        /// </summary>
+        /// <param name="app"></param>
         public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             System_Int32.Register(app);
