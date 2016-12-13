@@ -34,6 +34,7 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
@@ -624,7 +625,7 @@ namespace ILRuntime.Runtime.Generated
             }
             else
             {
-                return string.Format("({0})StackObject.ToObject(p, domain, mStack)", realClsName);
+                return string.Format("({0})typeof({0}).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack))", realClsName);
             }
         }
 
