@@ -4,6 +4,7 @@ using System.Reflection;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
@@ -90,6 +91,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single f = *(float*)&p->Value;
 
             var result_of_this_method = System.Single.IsInfinity(f);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -104,6 +106,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single f = *(float*)&p->Value;
 
             var result_of_this_method = System.Single.IsPositiveInfinity(f);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -118,6 +121,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single f = *(float*)&p->Value;
 
             var result_of_this_method = System.Single.IsNegativeInfinity(f);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -132,6 +136,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single f = *(float*)&p->Value;
 
             var result_of_this_method = System.Single.IsNaN(f);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -149,6 +154,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.CompareTo(value);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -165,6 +171,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.CompareTo(value);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -182,6 +189,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.Equals(obj);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -198,6 +206,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.Equals(obj);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -212,6 +221,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.GetHashCode();
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -229,6 +239,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.ToString(provider);
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -244,6 +255,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.ToString(format);
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -257,6 +269,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Single.Parse(s);
+
             ret->ObjectType = ObjectTypes.Float;
             *(float*)&ret->Value = result_of_this_method;
             return ret + 1;
@@ -275,6 +288,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Single.Parse(s, style);
+
             ret->ObjectType = ObjectTypes.Float;
             *(float*)&ret->Value = result_of_this_method;
             return ret + 1;
@@ -293,6 +307,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Single.Parse(s, provider);
+
             ret->ObjectType = ObjectTypes.Float;
             *(float*)&ret->Value = result_of_this_method;
             return ret + 1;
@@ -314,6 +329,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Single.Parse(s, style, provider);
+
             ret->ObjectType = ObjectTypes.Float;
             *(float*)&ret->Value = result_of_this_method;
             return ret + 1;
@@ -332,6 +348,46 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Single.TryParse(s, out result);
+
+            p = ILIntepreter.Minus(esp, 1);
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var dst = *(StackObject**)&p->Value;
+                        dst->ObjectType = ObjectTypes.Float;
+                        *(float*)&dst->Value = result;
+                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var obj = mStack[p->Value];
+                        if(obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)obj)[p->ValueLow] = result;
+                        }
+                        else
+                        {
+                            var t = domain.GetType(obj.GetType()) as CLRType;
+                            t.Fields[p->ValueLow].SetValue(obj, result);
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(p->Value);
+                        if(t is ILType)
+                        {
+                            ((ILType)t).StaticInstance[p->ValueLow] = result;
+                        }
+                        else
+                        {
+                            ((CLRType)t).Fields[p->ValueLow].SetValue(null, result);
+                        }
+                    }
+                    break;
+            }
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -356,6 +412,46 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Single.TryParse(s, style, provider, out result);
+
+            p = ILIntepreter.Minus(esp, 1);
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var dst = *(StackObject**)&p->Value;
+                        dst->ObjectType = ObjectTypes.Float;
+                        *(float*)&dst->Value = result;
+                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var obj = mStack[p->Value];
+                        if(obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)obj)[p->ValueLow] = result;
+                        }
+                        else
+                        {
+                            var t = domain.GetType(obj.GetType()) as CLRType;
+                            t.Fields[p->ValueLow].SetValue(obj, result);
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(p->Value);
+                        if(t is ILType)
+                        {
+                            ((ILType)t).StaticInstance[p->ValueLow] = result;
+                        }
+                        else
+                        {
+                            ((CLRType)t).Fields[p->ValueLow].SetValue(null, result);
+                        }
+                    }
+                    break;
+            }
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -370,6 +466,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.GetTypeCode();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -382,6 +479,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.ToString();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -400,6 +498,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single instance = *(float*)&p->Value;
 
             var result_of_this_method = instance.ToString(format, provider);
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 

@@ -4,6 +4,7 @@ using System.Reflection;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
@@ -49,6 +50,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.ToString();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -65,6 +67,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.Equals(obj);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -83,6 +86,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Object.Equals(objA, objB);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -101,6 +105,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = System.Object.ReferenceEquals(objA, objB);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -116,6 +121,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.GetHashCode();
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -131,6 +137,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.GetType();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 

@@ -19,6 +19,7 @@ namespace ILRuntime.Runtime.Intepreter
         Enviorment.AppDomain domain;
         RuntimeStack stack;
         object _lockObj;
+        bool allowUnboundCLRMethod;
 
         internal RuntimeStack Stack { get { return stack; } }
         public bool ShouldBreak { get; set; }
@@ -29,6 +30,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             this.domain = domain;
             stack = new RuntimeStack(this);
+            allowUnboundCLRMethod = domain.AllowUnboundCLRMethod;
 #if DEBUG
             _lockObj = new object();
 #endif
@@ -1675,6 +1677,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     esp = redirect(this, esp, mStack, cm);
                                                 else
                                                 {
+#if DEBUG
+                                                    if (!allowUnboundCLRMethod)
+                                                        throw new NotSupportedException(cm.ToString() + " is not bound!");
+#endif
 #if UNITY_EDITOR
                                                     if(System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
                                                         UnityEngine.Profiler.BeginSample(cm.ToString());

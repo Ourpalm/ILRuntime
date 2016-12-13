@@ -8,7 +8,7 @@ using Mono.Cecil;
 using ILRuntime.CLR.Method;
 namespace ILRuntime.CLR.TypeSystem
 {
-    class CLRType : IType
+    public class CLRType : IType
     {
         Type clrType;
         Dictionary<string, List<CLRMethod>> methods;

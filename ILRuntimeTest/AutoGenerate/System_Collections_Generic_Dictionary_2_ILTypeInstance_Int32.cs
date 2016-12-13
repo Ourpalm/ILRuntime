@@ -4,6 +4,7 @@ using System.Reflection;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
@@ -76,6 +77,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.Comparer;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -89,6 +91,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.Count;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -104,6 +107,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.Keys;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -117,6 +121,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.Values;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -133,6 +138,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance[key];
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -153,6 +159,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             instance[key] = value;
+
             return ret;
         }
 
@@ -171,6 +178,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             instance.Add(key, value);
+
             return ret;
         }
 
@@ -184,6 +192,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             instance.Clear();
+
             return ret;
         }
 
@@ -200,6 +209,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.ContainsKey(key);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -217,6 +227,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.ContainsValue(value);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -232,6 +243,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.GetEnumerator();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -251,6 +263,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             instance.GetObjectData(info, context);
+
             return ret;
         }
 
@@ -267,6 +280,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             instance.OnDeserialization(sender);
+
             return ret;
         }
 
@@ -283,6 +297,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.Remove(key);
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -304,6 +319,46 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.TryGetValue(key, out value);
+
+            p = ILIntepreter.Minus(esp, 1);
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var dst = *(StackObject**)&p->Value;
+                        dst->ObjectType = ObjectTypes.Integer;
+                        dst->Value = value;
+                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var obj = mStack[p->Value];
+                        if(obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)obj)[p->ValueLow] = value;
+                        }
+                        else
+                        {
+                            var t = domain.GetType(obj.GetType()) as CLRType;
+                            t.Fields[p->ValueLow].SetValue(obj, value);
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(p->Value);
+                        if(t is ILType)
+                        {
+                            ((ILType)t).StaticInstance[p->ValueLow] = value;
+                        }
+                        else
+                        {
+                            ((CLRType)t).Fields[p->ValueLow].SetValue(null, value);
+                        }
+                    }
+                    break;
+            }
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;

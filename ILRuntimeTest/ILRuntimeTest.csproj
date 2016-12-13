@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoGenerate\ClassInheritanceTestAdaptor.cs" />
+    <Compile Include="AutoGenerate\CLRBindings.cs" />
     <Compile Include="AutoGenerate\helper.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestStruct.cs" />
     <Compile Include="AutoGenerate\System_Array.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="AutoGenerate\System_Int64.cs" />
     <Compile Include="AutoGenerate\System_Object.cs" />
     <Compile Include="AutoGenerate\System_Single.cs" />
+    <Compile Include="AutoGenerate\System_String.cs" />
     <Compile Include="AutoGenerate\System_ValueType.cs" />
     <Compile Include="AutoGenerate\TestClass2Adaptor.cs" />
     <Compile Include="AutoGenerate\TestClass3Adaptor.cs" />

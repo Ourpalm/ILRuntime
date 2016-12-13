@@ -4,6 +4,7 @@ using System.Reflection;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
@@ -328,6 +329,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.Error;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -338,6 +340,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.In;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -348,6 +351,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.Out;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -358,6 +362,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.InputEncoding;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -371,6 +376,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.InputEncoding = value;
+
             return ret;
         }
 
@@ -381,6 +387,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.OutputEncoding;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -394,6 +401,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.OutputEncoding = value;
+
             return ret;
         }
 
@@ -404,6 +412,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             System.Console.Beep();
+
             return ret;
         }
 
@@ -418,6 +427,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 frequency = p->Value;
 
             System.Console.Beep(frequency, duration);
+
             return ret;
         }
 
@@ -428,6 +438,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             System.Console.Clear();
+
             return ret;
         }
 
@@ -438,6 +449,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.BackgroundColor;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -451,6 +463,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.BackgroundColor = value;
+
             return ret;
         }
 
@@ -461,6 +474,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.ForegroundColor;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -474,6 +488,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.ForegroundColor = value;
+
             return ret;
         }
 
@@ -484,6 +499,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             System.Console.ResetColor();
+
             return ret;
         }
 
@@ -506,6 +522,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 sourceLeft = p->Value;
 
             System.Console.MoveBufferArea(sourceLeft, sourceTop, sourceWidth, sourceHeight, targetLeft, targetTop);
+
             return ret;
         }
 
@@ -536,6 +553,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 sourceLeft = p->Value;
 
             System.Console.MoveBufferArea(sourceLeft, sourceTop, sourceWidth, sourceHeight, targetLeft, targetTop, sourceChar, sourceForeColor, sourceBackColor);
+
             return ret;
         }
 
@@ -546,6 +564,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.BufferHeight;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -560,6 +579,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.BufferHeight = value;
+
             return ret;
         }
 
@@ -570,6 +590,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.BufferWidth;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -584,6 +605,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.BufferWidth = value;
+
             return ret;
         }
 
@@ -598,6 +620,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 width = p->Value;
 
             System.Console.SetBufferSize(width, height);
+
             return ret;
         }
 
@@ -608,6 +631,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.WindowHeight;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -622,6 +646,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.WindowHeight = value;
+
             return ret;
         }
 
@@ -632,6 +657,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.WindowWidth;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -646,6 +672,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.WindowWidth = value;
+
             return ret;
         }
 
@@ -660,6 +687,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 width = p->Value;
 
             System.Console.SetWindowSize(width, height);
+
             return ret;
         }
 
@@ -670,6 +698,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.LargestWindowWidth;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -682,6 +711,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.LargestWindowHeight;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -694,6 +724,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.WindowLeft;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -708,6 +739,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.WindowLeft = value;
+
             return ret;
         }
 
@@ -718,6 +750,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.WindowTop;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -732,6 +765,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.WindowTop = value;
+
             return ret;
         }
 
@@ -746,6 +780,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 left = p->Value;
 
             System.Console.SetWindowPosition(left, top);
+
             return ret;
         }
 
@@ -756,6 +791,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.CursorLeft;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -770,6 +806,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.CursorLeft = value;
+
             return ret;
         }
 
@@ -780,6 +817,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.CursorTop;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -794,6 +832,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.CursorTop = value;
+
             return ret;
         }
 
@@ -808,6 +847,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 left = p->Value;
 
             System.Console.SetCursorPosition(left, top);
+
             return ret;
         }
 
@@ -818,6 +858,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.CursorSize;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -832,6 +873,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.CursorSize = value;
+
             return ret;
         }
 
@@ -842,6 +884,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.CursorVisible;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -856,6 +899,7 @@ namespace ILRuntime.Runtime.Generated
             System.Boolean value = p->Value == 1;
 
             System.Console.CursorVisible = value;
+
             return ret;
         }
 
@@ -866,6 +910,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.Title;
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -879,6 +924,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Title = value;
+
             return ret;
         }
 
@@ -889,6 +935,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.ReadKey();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -901,6 +948,7 @@ namespace ILRuntime.Runtime.Generated
             System.Boolean intercept = p->Value == 1;
 
             var result_of_this_method = System.Console.ReadKey(intercept);
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -911,6 +959,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.KeyAvailable;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -923,6 +972,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.NumberLock;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -935,6 +985,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.CapsLock;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -947,6 +998,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.TreatControlCAsInput;
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
@@ -961,6 +1013,7 @@ namespace ILRuntime.Runtime.Generated
             System.Boolean value = p->Value == 1;
 
             System.Console.TreatControlCAsInput = value;
+
             return ret;
         }
 
@@ -971,6 +1024,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.OpenStandardError();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -983,6 +1037,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 bufferSize = p->Value;
 
             var result_of_this_method = System.Console.OpenStandardError(bufferSize);
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -993,6 +1048,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.OpenStandardInput();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1005,6 +1061,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 bufferSize = p->Value;
 
             var result_of_this_method = System.Console.OpenStandardInput(bufferSize);
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1015,6 +1072,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.OpenStandardOutput();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1027,6 +1085,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 bufferSize = p->Value;
 
             var result_of_this_method = System.Console.OpenStandardOutput(bufferSize);
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1040,6 +1099,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.SetIn(newIn);
+
             return ret;
         }
 
@@ -1053,6 +1113,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.SetOut(newOut);
+
             return ret;
         }
 
@@ -1066,6 +1127,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.SetError(newError);
+
             return ret;
         }
 
@@ -1076,6 +1138,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.Read();
+
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
@@ -1088,6 +1151,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             var result_of_this_method = System.Console.ReadLine();
+
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1098,6 +1162,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 0);
 
             System.Console.WriteLine();
+
             return ret;
         }
 
@@ -1110,6 +1175,7 @@ namespace ILRuntime.Runtime.Generated
             System.Boolean value = p->Value == 1;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1122,6 +1188,7 @@ namespace ILRuntime.Runtime.Generated
             System.Char value = (char)p->Value;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1135,6 +1202,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(buffer);
+
             return ret;
         }
 
@@ -1152,6 +1220,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(buffer, index, count);
+
             return ret;
         }
 
@@ -1165,6 +1234,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1177,6 +1247,7 @@ namespace ILRuntime.Runtime.Generated
             System.Double value = *(double*)&p->Value;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1189,6 +1260,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single value = *(float*)&p->Value;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1201,6 +1273,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1213,6 +1286,7 @@ namespace ILRuntime.Runtime.Generated
             System.UInt32 value = (uint)p->Value;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1225,6 +1299,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int64 value = *(long*)&p->Value;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1237,6 +1312,7 @@ namespace ILRuntime.Runtime.Generated
             System.UInt64 value = *(ulong*)&p->Value;
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1250,6 +1326,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1263,6 +1340,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(value);
+
             return ret;
         }
 
@@ -1279,6 +1357,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(format, arg0);
+
             return ret;
         }
 
@@ -1298,6 +1377,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(format, arg0, arg1);
+
             return ret;
         }
 
@@ -1320,6 +1400,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(format, arg0, arg1, arg2);
+
             return ret;
         }
 
@@ -1345,6 +1426,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(format, arg0, arg1, arg2, arg3);
+
             return ret;
         }
 
@@ -1361,6 +1443,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.WriteLine(format, arg);
+
             return ret;
         }
 
@@ -1377,6 +1460,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(format, arg0);
+
             return ret;
         }
 
@@ -1396,6 +1480,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(format, arg0, arg1);
+
             return ret;
         }
 
@@ -1418,6 +1503,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(format, arg0, arg1, arg2);
+
             return ret;
         }
 
@@ -1443,6 +1529,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(format, arg0, arg1, arg2, arg3);
+
             return ret;
         }
 
@@ -1459,6 +1546,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(format, arg);
+
             return ret;
         }
 
@@ -1471,6 +1559,7 @@ namespace ILRuntime.Runtime.Generated
             System.Boolean value = p->Value == 1;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1483,6 +1572,7 @@ namespace ILRuntime.Runtime.Generated
             System.Char value = (char)p->Value;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1496,6 +1586,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(buffer);
+
             return ret;
         }
 
@@ -1513,6 +1604,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(buffer, index, count);
+
             return ret;
         }
 
@@ -1525,6 +1617,7 @@ namespace ILRuntime.Runtime.Generated
             System.Double value = *(double*)&p->Value;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1538,6 +1631,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1550,6 +1644,7 @@ namespace ILRuntime.Runtime.Generated
             System.Single value = *(float*)&p->Value;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1562,6 +1657,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 value = p->Value;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1574,6 +1670,7 @@ namespace ILRuntime.Runtime.Generated
             System.UInt32 value = (uint)p->Value;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1586,6 +1683,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int64 value = *(long*)&p->Value;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1598,6 +1696,7 @@ namespace ILRuntime.Runtime.Generated
             System.UInt64 value = *(ulong*)&p->Value;
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1611,6 +1710,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(value);
+
             return ret;
         }
 
@@ -1624,6 +1724,7 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             System.Console.Write(value);
+
             return ret;
         }
 

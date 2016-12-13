@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.Text;
+using ILRuntime.Runtime.Enviorment;
 
 namespace ILRuntime.Runtime.CLRBinding
 {
@@ -12,11 +13,13 @@ namespace ILRuntime.Runtime.CLRBinding
         {
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
+            List<string> clsNames = new List<string>();
             foreach (var i in types)
             {
                 string clsName, realClsName;
                 bool isByRef;
                 GetClassName(i, out clsName, out realClsName, out isByRef);
+                clsNames.Add(clsName);
                 using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/" + clsName + ".cs", false, Encoding.UTF8))
                 {
                     sw.Write(@"using System;
@@ -25,6 +28,7 @@ using System.Reflection;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
@@ -53,6 +57,30 @@ namespace ILRuntime.Runtime.Generated
                     sw.WriteLine("}");
                     sw.Flush();
                 }
+            }
+
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, Encoding.UTF8))
+            {
+                sw.WriteLine(@"using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+namespace ILRuntime.Runtime.Generated
+{
+    class CLRBindings
+    {
+        public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
+        {");
+                foreach (var i in clsNames)
+                {
+                    sw.Write("            ");
+                    sw.Write(i);
+                    sw.WriteLine(".Register(app);");
+                }
+
+                sw.WriteLine(@"        }
+    }
+}");
             }
         }
 
@@ -182,6 +210,20 @@ namespace ILRuntime.Runtime.Generated
                             else
                                 sb.AppendLine(string.Format("{2}.{0} = {1};", t[1], param[0].Name, typeClsName));
                         }
+                        else if(propType == "op")
+                        {
+                            switch (t[1])
+                            {
+                                case "Equality":
+                                    sb.AppendLine(string.Format("{0} == {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "Inequality":
+                                    sb.AppendLine(string.Format("{0} != {1};", param[0].Name, param[1].Name));
+                                    break;
+                                default:
+                                    throw new NotImplementedException();
+                            }
+                        }
                         else
                             throw new NotImplementedException();
                     }
@@ -229,6 +271,60 @@ namespace ILRuntime.Runtime.Generated
                         sb.AppendLine(");");
                     }
                 }
+                sb.AppendLine();
+                //Ref/Out
+                for (int j = param.Length; j > 0; j--)
+                {
+                    var p = param[j - 1];
+                    if (!p.ParameterType.IsByRef)
+                        continue;
+                    sb.AppendLine(string.Format("            p = ILIntepreter.Minus(esp, {0});", param.Length - j + 1));
+                    sb.AppendLine(@"            switch(p->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var dst = *(StackObject**)&p->Value;");
+                    GetRefWriteBackValueCode(p.ParameterType.GetElementType(), sb, p.Name);
+                    sb.Append(@"                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var obj = mStack[p->Value];
+                        if(obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)obj)[p->ValueLow] = ");
+                    sb.Append(p.Name);
+                    sb.Append(@";
+                        }
+                        else
+                        {
+                            var t = domain.GetType(obj.GetType()) as CLRType;
+                            t.Fields[p->ValueLow].SetValue(obj, ");
+                    sb.Append(p.Name);
+                    sb.Append(@");
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(p->Value);
+                        if(t is ILType)
+                        {
+                            ((ILType)t).StaticInstance[p->ValueLow] = ");
+                    sb.Append(p.Name);
+                    sb.Append(@";
+                        }
+                        else
+                        {
+                            ((CLRType)t).Fields[p->ValueLow].SetValue(null, ");
+                    sb.Append(p.Name);
+                    sb.AppendLine(@");
+                        }
+                    }
+                    break;
+            }");
+                    sb.AppendLine();
+                }
                 if (i.ReturnType != typeof(void))
                 {
                     GetReturnValueCode(i.ReturnType, sb);
@@ -257,6 +353,106 @@ namespace ILRuntime.Runtime.Generated
                 else if (j.ParameterType.IsByRef)
                     sb.Append("ref ");
                 sb.Append(j.Name);
+            }
+        }
+
+        static void GetRefWriteBackValueCode(Type type, StringBuilder sb, string paramName)
+        {
+            if (type.IsPrimitive)
+            {
+                if (type == typeof(int))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(long))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Long;");
+                    sb.Append("                        *(long*)&dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(short))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(bool))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        dst->Value = " + paramName + " ? 1 : 0;");
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(ushort))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(float))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Float;");
+                    sb.Append("                        *(float*)&dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(double))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Double;");
+                    sb.Append("                        *(double*)&dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(byte))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        (byte)dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(sbyte))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        (sbyte)dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(uint))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        dst->Value = (int)" + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(char))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        dst->Value = (int)" + paramName);
+                    sb.AppendLine(";");
+                }
+                else if (type == typeof(ulong))
+                {
+                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Long;");
+                    sb.Append("                        *(ulong*)&dst->Value = " + paramName);
+                    sb.AppendLine(";");
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else
+            {
+                if (!type.IsValueType)
+                {
+                    sb.Append(@"                        var obj = ");
+                    sb.Append(paramName);
+                    sb.AppendLine(";");
+
+                    sb.AppendLine(@"                        if (obj is CrossBindingAdaptorType)
+                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                        mStack[dst->Value] = obj; ");
+                }
+               else
+                {
+                    sb.Append("                        mStack[dst->Value] = ");
+                    sb.Append(paramName);
+                    sb.AppendLine(";");
+                }
             }
         }
 

@@ -33,11 +33,17 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
         DebugService debugService;
 
+        /// <summary>
+        /// Determine if invoking unbinded CLR method(using reflection) is allowed
+        /// </summary>
+        public bool AllowUnboundCLRMethod { get; set; }
+
 #if UNITY_EDITOR
         public int UnityMainThreadID { get; set; }
 #endif
         public unsafe AppDomain()
         {
+            AllowUnboundCLRMethod = true;
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
@@ -192,7 +198,8 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void RegisterCLRMethodRedirection(MethodInfo mi, CLRRedirectionDelegate func)
         {
-            redirectMap[mi] = func;
+            if (!redirectMap.ContainsKey(mi))
+                redirectMap[mi] = func;
         }
 
         public void RegisterCLRConstructorRedirection(ConstructorInfo mi, CLRRedirectionDelegate func)
@@ -546,7 +553,7 @@ namespace ILRuntime.Runtime.Enviorment
             return res;
         }
 
-        internal IType GetType(int hash)
+        public IType GetType(int hash)
         {
             IType res;
             if (mapTypeToken.TryGetValue(hash, out res))
@@ -555,7 +562,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
-        internal IType GetType(Type t)
+        public IType GetType(Type t)
         {
             IType res;
             if (clrTypeMapping.TryGetValue(t, out res))

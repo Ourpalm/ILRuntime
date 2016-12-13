@@ -40,6 +40,7 @@ namespace ILRuntimeTest
             listView1.View = View.Details;
             _app = new ILRuntime.Runtime.Enviorment.AppDomain();
             _app.DebugService.StartDebugService(56000);
+            ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
         }
 
         private void OnBtnRun(object sender, EventArgs e)
@@ -232,6 +233,7 @@ namespace ILRuntimeTest
             types.Add(typeof(float));
             types.Add(typeof(long));
             types.Add(typeof(object));
+            types.Add(typeof(string));
             types.Add(typeof(ValueType));
             types.Add(typeof(Console));
             types.Add(typeof(Array));
