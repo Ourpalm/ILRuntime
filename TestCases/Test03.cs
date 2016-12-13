@@ -75,6 +75,11 @@ namespace TestCases
                 ILRuntimeTest.TestFramework.TestStruct.DoTest(ref v);
 
                 Console.WriteLine("new val:" + v);
+
+                var b = str;
+                b.value = 1233333;
+                ILRuntimeTest.TestFramework.TestStruct.DoTest2(str);
+                Console.WriteLine("new val:" + str.value);
             }
 
             public string GetString()

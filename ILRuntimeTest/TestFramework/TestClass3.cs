@@ -37,5 +37,11 @@ namespace ILRuntimeTest.TestFramework
         {
             a = 22222;
         }
+
+        public static void DoTest2(TestStruct aaa)
+        {
+            aaa.value = 232425235;
+        }
+
     }
 }

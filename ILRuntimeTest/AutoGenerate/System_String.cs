@@ -94,201 +94,201 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.Char[])};
             method = type.GetMethod("Trim", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Trim_24);
-            args = new Type[]{typeof(System.Char[])};
-            method = type.GetMethod("TrimStart", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, TrimStart_25);
-            args = new Type[]{typeof(System.Char[])};
-            method = type.GetMethod("TrimEnd", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, TrimEnd_26);
-            args = new Type[]{};
-            method = type.GetMethod("IsNormalized", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IsNormalized_27);
-            args = new Type[]{typeof(System.Text.NormalizationForm)};
-            method = type.GetMethod("IsNormalized", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IsNormalized_28);
-            args = new Type[]{};
-            method = type.GetMethod("Normalize", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Normalize_29);
-            args = new Type[]{typeof(System.Text.NormalizationForm)};
-            method = type.GetMethod("Normalize", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Normalize_30);
-            args = new Type[]{typeof(System.String), typeof(System.String)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_31);
-            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.Boolean)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_32);
-            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.Globalization.CultureInfo), typeof(System.Globalization.CompareOptions)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_33);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.Globalization.CultureInfo), typeof(System.Globalization.CompareOptions)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_34);
-            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.StringComparison)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_35);
-            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_36);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_37);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.Boolean)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_38);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_39);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.StringComparison)};
-            method = type.GetMethod("Compare", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Compare_40);
-            args = new Type[]{typeof(System.Object)};
-            method = type.GetMethod("CompareTo", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, CompareTo_41);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("CompareTo", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, CompareTo_42);
-            args = new Type[]{typeof(System.String), typeof(System.String)};
-            method = type.GetMethod("CompareOrdinal", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, CompareOrdinal_43);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("CompareOrdinal", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, CompareOrdinal_44);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("Contains", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Contains_45);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("EndsWith", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, EndsWith_46);
-            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
-            method = type.GetMethod("EndsWith", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, EndsWith_47);
-            args = new Type[]{typeof(System.String), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
-            method = type.GetMethod("EndsWith", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, EndsWith_48);
-            args = new Type[]{typeof(System.Char)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_49);
-            args = new Type[]{typeof(System.Char), typeof(System.Int32)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_50);
-            args = new Type[]{typeof(System.Char), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_51);
-            args = new Type[]{typeof(System.Char[])};
-            method = type.GetMethod("IndexOfAny", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOfAny_52);
-            args = new Type[]{typeof(System.Char[]), typeof(System.Int32)};
-            method = type.GetMethod("IndexOfAny", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOfAny_53);
-            args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("IndexOfAny", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOfAny_54);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_55);
-            args = new Type[]{typeof(System.String), typeof(System.Int32)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_56);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_57);
-            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_58);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.StringComparison)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_59);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.StringComparison)};
-            method = type.GetMethod("IndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, IndexOf_60);
-            args = new Type[]{typeof(System.Char)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_61);
-            args = new Type[]{typeof(System.Char), typeof(System.Int32)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_62);
-            args = new Type[]{typeof(System.Char), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_63);
-            args = new Type[]{typeof(System.Char[])};
-            method = type.GetMethod("LastIndexOfAny", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOfAny_64);
-            args = new Type[]{typeof(System.Char[]), typeof(System.Int32)};
-            method = type.GetMethod("LastIndexOfAny", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOfAny_65);
-            args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("LastIndexOfAny", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOfAny_66);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_67);
-            args = new Type[]{typeof(System.String), typeof(System.Int32)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_68);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_69);
-            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_70);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.StringComparison)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_71);
-            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.StringComparison)};
-            method = type.GetMethod("LastIndexOf", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, LastIndexOf_72);
-            args = new Type[]{typeof(System.Int32)};
-            method = type.GetMethod("PadLeft", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, PadLeft_73);
-            args = new Type[]{typeof(System.Int32), typeof(System.Char)};
-            method = type.GetMethod("PadLeft", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, PadLeft_74);
-            args = new Type[]{typeof(System.Int32)};
-            method = type.GetMethod("PadRight", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, PadRight_75);
-            args = new Type[]{typeof(System.Int32), typeof(System.Char)};
-            method = type.GetMethod("PadRight", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, PadRight_76);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("StartsWith", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, StartsWith_77);
-            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
-            method = type.GetMethod("StartsWith", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, StartsWith_78);
-            args = new Type[]{typeof(System.String), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
-            method = type.GetMethod("StartsWith", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, StartsWith_79);
-            args = new Type[]{};
-            method = type.GetMethod("ToLower", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToLower_80);
-            args = new Type[]{typeof(System.Globalization.CultureInfo)};
-            method = type.GetMethod("ToLower", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToLower_81);
-            args = new Type[]{};
-            method = type.GetMethod("ToLowerInvariant", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToLowerInvariant_82);
-            args = new Type[]{};
-            method = type.GetMethod("ToUpper", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToUpper_83);
-            args = new Type[]{typeof(System.Globalization.CultureInfo)};
-            method = type.GetMethod("ToUpper", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToUpper_84);
-            args = new Type[]{};
-            method = type.GetMethod("ToUpperInvariant", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToUpperInvariant_85);
-            args = new Type[]{};
-            method = type.GetMethod("ToString", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToString_86);
-            args = new Type[]{typeof(System.IFormatProvider)};
-            method = type.GetMethod("ToString", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ToString_87);
-            args = new Type[]{};
-            method = type.GetMethod("Clone", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Clone_88);
             args = new Type[]{};
             method = type.GetMethod("Trim", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Trim_89);
+            app.RegisterCLRMethodRedirection(method, Trim_25);
+            args = new Type[]{typeof(System.Char[])};
+            method = type.GetMethod("TrimStart", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TrimStart_26);
+            args = new Type[]{typeof(System.Char[])};
+            method = type.GetMethod("TrimEnd", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TrimEnd_27);
+            args = new Type[]{};
+            method = type.GetMethod("IsNormalized", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IsNormalized_28);
+            args = new Type[]{typeof(System.Text.NormalizationForm)};
+            method = type.GetMethod("IsNormalized", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IsNormalized_29);
+            args = new Type[]{};
+            method = type.GetMethod("Normalize", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Normalize_30);
+            args = new Type[]{typeof(System.Text.NormalizationForm)};
+            method = type.GetMethod("Normalize", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Normalize_31);
+            args = new Type[]{typeof(System.String), typeof(System.String)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_32);
+            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.Boolean)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_33);
+            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.Globalization.CultureInfo), typeof(System.Globalization.CompareOptions)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_34);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.Globalization.CultureInfo), typeof(System.Globalization.CompareOptions)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_35);
+            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.StringComparison)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_36);
+            args = new Type[]{typeof(System.String), typeof(System.String), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_37);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_38);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.Boolean)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_39);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_40);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.StringComparison)};
+            method = type.GetMethod("Compare", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Compare_41);
+            args = new Type[]{typeof(System.Object)};
+            method = type.GetMethod("CompareTo", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, CompareTo_42);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("CompareTo", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, CompareTo_43);
+            args = new Type[]{typeof(System.String), typeof(System.String)};
+            method = type.GetMethod("CompareOrdinal", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, CompareOrdinal_44);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("CompareOrdinal", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, CompareOrdinal_45);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("Contains", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Contains_46);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("EndsWith", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, EndsWith_47);
+            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
+            method = type.GetMethod("EndsWith", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, EndsWith_48);
+            args = new Type[]{typeof(System.String), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
+            method = type.GetMethod("EndsWith", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, EndsWith_49);
+            args = new Type[]{typeof(System.Char)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_50);
+            args = new Type[]{typeof(System.Char), typeof(System.Int32)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_51);
+            args = new Type[]{typeof(System.Char), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_52);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_53);
+            args = new Type[]{typeof(System.String), typeof(System.Int32)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_54);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_55);
+            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_56);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.StringComparison)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_57);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.StringComparison)};
+            method = type.GetMethod("IndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOf_58);
+            args = new Type[]{typeof(System.Char[])};
+            method = type.GetMethod("IndexOfAny", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOfAny_59);
+            args = new Type[]{typeof(System.Char[]), typeof(System.Int32)};
+            method = type.GetMethod("IndexOfAny", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOfAny_60);
+            args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("IndexOfAny", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IndexOfAny_61);
+            args = new Type[]{typeof(System.Char)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_62);
+            args = new Type[]{typeof(System.Char), typeof(System.Int32)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_63);
+            args = new Type[]{typeof(System.Char), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_64);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_65);
+            args = new Type[]{typeof(System.String), typeof(System.Int32)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_66);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_67);
+            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_68);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.StringComparison)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_69);
+            args = new Type[]{typeof(System.String), typeof(System.Int32), typeof(System.Int32), typeof(System.StringComparison)};
+            method = type.GetMethod("LastIndexOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOf_70);
+            args = new Type[]{typeof(System.Char[])};
+            method = type.GetMethod("LastIndexOfAny", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOfAny_71);
+            args = new Type[]{typeof(System.Char[]), typeof(System.Int32)};
+            method = type.GetMethod("LastIndexOfAny", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOfAny_72);
+            args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("LastIndexOfAny", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, LastIndexOfAny_73);
+            args = new Type[]{typeof(System.Int32)};
+            method = type.GetMethod("PadLeft", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, PadLeft_74);
+            args = new Type[]{typeof(System.Int32), typeof(System.Char)};
+            method = type.GetMethod("PadLeft", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, PadLeft_75);
+            args = new Type[]{typeof(System.Int32)};
+            method = type.GetMethod("PadRight", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, PadRight_76);
+            args = new Type[]{typeof(System.Int32), typeof(System.Char)};
+            method = type.GetMethod("PadRight", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, PadRight_77);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("StartsWith", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, StartsWith_78);
+            args = new Type[]{typeof(System.String), typeof(System.StringComparison)};
+            method = type.GetMethod("StartsWith", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, StartsWith_79);
+            args = new Type[]{typeof(System.String), typeof(System.Boolean), typeof(System.Globalization.CultureInfo)};
+            method = type.GetMethod("StartsWith", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, StartsWith_80);
+            args = new Type[]{};
+            method = type.GetMethod("ToLower", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToLower_81);
+            args = new Type[]{typeof(System.Globalization.CultureInfo)};
+            method = type.GetMethod("ToLower", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToLower_82);
+            args = new Type[]{};
+            method = type.GetMethod("ToLowerInvariant", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToLowerInvariant_83);
+            args = new Type[]{};
+            method = type.GetMethod("ToUpper", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToUpper_84);
+            args = new Type[]{typeof(System.Globalization.CultureInfo)};
+            method = type.GetMethod("ToUpper", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToUpper_85);
+            args = new Type[]{};
+            method = type.GetMethod("ToUpperInvariant", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToUpperInvariant_86);
+            args = new Type[]{};
+            method = type.GetMethod("ToString", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToString_87);
+            args = new Type[]{typeof(System.IFormatProvider)};
+            method = type.GetMethod("ToString", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ToString_88);
+            args = new Type[]{};
+            method = type.GetMethod("Clone", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Clone_89);
             args = new Type[]{typeof(System.Int32), typeof(System.String)};
             method = type.GetMethod("Insert", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Insert_90);
@@ -833,7 +833,21 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* TrimStart_25(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Trim_25(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.Trim();
+
+            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+        }
+
+        static StackObject* TrimStart_26(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -850,7 +864,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* TrimEnd_26(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* TrimEnd_27(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -867,7 +881,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* IsNormalized_27(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IsNormalized_28(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -883,7 +897,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IsNormalized_28(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IsNormalized_29(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -902,7 +916,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Normalize_29(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Normalize_30(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -916,7 +930,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* Normalize_30(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Normalize_31(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -933,7 +947,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* Compare_31(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_32(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -952,7 +966,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_32(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_33(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -973,7 +987,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_33(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_34(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -998,7 +1012,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_34(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_35(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1029,7 +1043,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_35(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_36(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1051,7 +1065,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_36(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_37(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1075,7 +1089,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_37(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_38(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1100,7 +1114,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_38(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_39(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1127,7 +1141,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_39(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_40(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1157,7 +1171,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Compare_40(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Compare_41(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1185,7 +1199,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* CompareTo_41(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* CompareTo_42(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1204,7 +1218,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* CompareTo_42(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* CompareTo_43(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1223,7 +1237,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* CompareOrdinal_43(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* CompareOrdinal_44(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1242,7 +1256,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* CompareOrdinal_44(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* CompareOrdinal_45(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1267,7 +1281,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Contains_45(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Contains_46(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1286,7 +1300,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* EndsWith_46(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* EndsWith_47(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1305,7 +1319,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* EndsWith_47(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* EndsWith_48(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1327,7 +1341,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* EndsWith_48(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* EndsWith_49(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1351,7 +1365,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IndexOf_49(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOf_50(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1363,26 +1377,6 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value);
-
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
-        }
-
-        static StackObject* IndexOf_50(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char value = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.IndexOf(value, startIndex);
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
@@ -1393,6 +1387,26 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 3);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Int32 startIndex = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Char value = (char)p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.IndexOf(value, startIndex);
+
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* IndexOf_52(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 count = p->Value;
@@ -1411,70 +1425,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IndexOfAny_52(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.IndexOfAny(anyOf);
-
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
-        }
-
-        static StackObject* IndexOfAny_53(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.IndexOfAny(anyOf, startIndex);
-
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
-        }
-
-        static StackObject* IndexOfAny_54(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.IndexOfAny(anyOf, startIndex, count);
-
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
-        }
-
-        static StackObject* IndexOf_55(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOf_53(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1493,7 +1444,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IndexOf_56(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOf_54(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1514,7 +1465,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IndexOf_57(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOf_55(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1537,7 +1488,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IndexOf_58(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOf_56(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1559,7 +1510,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IndexOf_59(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOf_57(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1583,7 +1534,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* IndexOf_60(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOf_58(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1609,18 +1560,63 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOf_61(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* IndexOfAny_59(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Char value = (char)p->Value;
+            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            var result_of_this_method = instance.LastIndexOf(value);
+            var result_of_this_method = instance.IndexOfAny(anyOf);
+
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* IndexOfAny_60(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 3);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Int32 startIndex = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 3);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.IndexOfAny(anyOf, startIndex);
+
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* IndexOfAny_61(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 4);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Int32 count = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Int32 startIndex = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 4);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.IndexOfAny(anyOf, startIndex, count);
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
@@ -1631,6 +1627,24 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Char value = (char)p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.LastIndexOf(value);
+
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* LastIndexOf_63(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 startIndex = p->Value;
@@ -1647,7 +1661,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOf_63(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOf_64(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1669,70 +1683,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOfAny_64(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.LastIndexOfAny(anyOf);
-
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
-        }
-
-        static StackObject* LastIndexOfAny_65(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.LastIndexOfAny(anyOf, startIndex);
-
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
-        }
-
-        static StackObject* LastIndexOfAny_66(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.LastIndexOfAny(anyOf, startIndex, count);
-
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
-        }
-
-        static StackObject* LastIndexOf_67(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOf_65(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1751,7 +1702,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOf_68(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOf_66(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1772,7 +1723,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOf_69(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOf_67(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1795,7 +1746,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOf_70(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOf_68(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1817,7 +1768,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOf_71(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOf_69(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1841,7 +1792,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* LastIndexOf_72(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOf_70(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1867,7 +1818,70 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* PadLeft_73(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* LastIndexOfAny_71(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 2);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.LastIndexOfAny(anyOf);
+
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* LastIndexOfAny_72(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 3);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Int32 startIndex = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 3);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.LastIndexOfAny(anyOf, startIndex);
+
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* LastIndexOfAny_73(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 4);
+            p = ILIntepreter.Minus(esp, 1);
+            System.Int32 count = p->Value;
+            p = ILIntepreter.Minus(esp, 2);
+            System.Int32 startIndex = p->Value;
+            p = ILIntepreter.Minus(esp, 3);
+            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 4);
+            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            var result_of_this_method = instance.LastIndexOfAny(anyOf, startIndex, count);
+
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
+            return ret + 1;
+        }
+
+        static StackObject* PadLeft_74(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1883,7 +1897,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* PadLeft_74(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* PadLeft_75(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1901,7 +1915,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* PadRight_75(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* PadRight_76(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1917,7 +1931,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* PadRight_76(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* PadRight_77(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1935,7 +1949,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* StartsWith_77(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* StartsWith_78(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1954,7 +1968,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* StartsWith_78(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* StartsWith_79(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -1976,7 +1990,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* StartsWith_79(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* StartsWith_80(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2000,7 +2014,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* ToLower_80(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToLower_81(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2014,7 +2028,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToLower_81(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToLower_82(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2031,7 +2045,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToLowerInvariant_82(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToLowerInvariant_83(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2045,7 +2059,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToUpper_83(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToUpper_84(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2059,7 +2073,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToUpper_84(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToUpper_85(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2076,7 +2090,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToUpperInvariant_85(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToUpperInvariant_86(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2090,7 +2104,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToString_86(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToString_87(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2104,7 +2118,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToString_87(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToString_88(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2121,7 +2135,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* Clone_88(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Clone_89(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -2131,20 +2145,6 @@ namespace ILRuntime.Runtime.Generated
             intp.Free(p);
 
             var result_of_this_method = instance.Clone();
-
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
-        }
-
-        static StackObject* Trim_89(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
-            intp.Free(p);
-
-            var result_of_this_method = instance.Trim();
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }

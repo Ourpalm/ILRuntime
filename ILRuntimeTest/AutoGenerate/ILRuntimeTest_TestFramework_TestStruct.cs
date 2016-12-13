@@ -25,6 +25,9 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.Int32).MakeByRefType()};
             method = type.GetMethod("DoTest", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, DoTest_1);
+            args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct)};
+            method = type.GetMethod("DoTest2", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, DoTest2_2);
 
         }
 
@@ -129,6 +132,20 @@ namespace ILRuntime.Runtime.Generated
                     }
                     break;
             }
+
+            return ret;
+        }
+
+        static StackObject* DoTest2_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
+            StackObject* p;
+            StackObject* ret = ILIntepreter.Minus(esp, 1);
+            p = ILIntepreter.Minus(esp, 1);
+            ILRuntimeTest.TestFramework.TestStruct aaa = (ILRuntimeTest.TestFramework.TestStruct)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            ILRuntimeTest.TestFramework.TestStruct.DoTest2(aaa);
 
             return ret;
         }
