@@ -18,6 +18,8 @@ namespace ILRuntime.Runtime.CLRBinding
             {
                 string clsName, realClsName;
                 bool isByRef;
+                if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                    continue;
                 GetClassName(i, out clsName, out realClsName, out isByRef);
                 clsNames.Add(clsName);
                 using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/" + clsName + ".cs", false, Encoding.UTF8))
@@ -87,25 +89,44 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+        static bool ShouldSkipMethod(Type type, MethodInfo i)
+        {
+            if (i.IsPrivate)
+                return true;
+            if (i.IsGenericMethod)
+                return true;
+            //EventHandler is currently not supported
+            if (i.IsSpecialName)
+            {
+                string[] t = i.Name.Split('_');
+                if (t[0] == "add" || t[0] == "remove")
+                    return true;
+                if (t[0] == "get" || t[0] == "set")
+                {
+                    var prop = type.GetProperty(t[1]);
+                    if (prop.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                        return true;
+                }
+            }
+            if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                return true;
+            return false;
+        }
+
         static string GenerateRegisterCode(Type type, MethodInfo[] methods)
         {
             StringBuilder sb = new StringBuilder();
             int idx = 0;
             foreach (var i in methods)
             {
-                if (i.IsPrivate)
-                    continue;
-                if (i.IsGenericMethod)
-                    continue;
-                //EventHandler is currently not supported
-                if (i.IsSpecialName && (i.Name.StartsWith("add") || i.Name.StartsWith("remove")))
+                if (ShouldSkipMethod(type, i))
                     continue;
                 bool isProperty = i.IsSpecialName;
                 var param = i.GetParameters();
                 StringBuilder sb2 = new StringBuilder();
                 sb2.Append("{");
                 bool first = true;
-                foreach(var j in param)
+                foreach (var j in param)
                 {
                     if (first)
                         first = false;
@@ -115,7 +136,7 @@ namespace ILRuntime.Runtime.Generated
                     string tmp, clsName;
                     bool isByRef;
                     GetClassName(j.ParameterType, out tmp, out clsName, out isByRef);
-                    sb2.Append(clsName);                    
+                    sb2.Append(clsName);
                     sb2.Append(")");
                     if (isByRef)
                         sb2.Append(".MakeByRefType()");
@@ -137,12 +158,7 @@ namespace ILRuntime.Runtime.Generated
             int idx = 0;
             foreach (var i in methods)
             {
-                if (i.IsPrivate)
-                    continue;
-                if (i.IsGenericMethod)
-                    continue;
-                //EventHandler is currently not supported
-                if (i.IsSpecialName && (i.Name.StartsWith("add") || i.Name.StartsWith("remove")))
+                if (ShouldSkipMethod(type, i))
                     continue;
                 bool isProperty = i.IsSpecialName;
                 var param = i.GetParameters();
@@ -213,7 +229,7 @@ namespace ILRuntime.Runtime.Generated
                             else
                                 sb.AppendLine(string.Format("{2}.{0} = {1};", t[1], param[0].Name, typeClsName));
                         }
-                        else if(propType == "op")
+                        else if (propType == "op")
                         {
                             switch (t[1])
                             {
@@ -258,7 +274,7 @@ namespace ILRuntime.Runtime.Generated
                     {
                         string[] t = i.Name.Split('_');
                         string propType = t[0];
-                        
+
                         if (propType == "get")
                         {
                             bool isIndexer = param.Length > 0;
@@ -465,7 +481,7 @@ namespace ILRuntime.Runtime.Generated
                             obj = ((CrossBindingAdaptorType)obj).ILInstance;
                         mStack[dst->Value] = obj; ");
                 }
-               else
+                else
                 {
                     sb.Append("                        mStack[dst->Value] = ");
                     sb.Append(paramName);
@@ -617,7 +633,21 @@ namespace ILRuntime.Runtime.Generated
             isByRef = type.IsByRef;
             if (isByRef)
                 type = type.GetElementType();
-            clsName = type.Namespace.Replace(".", "_") + "_" + type.Name.Replace(".", "_").Replace("`", "_").Replace("<", "_").Replace(">", "_");
+            string realNamespace = null;
+            if (type.IsNested)
+            {
+                string bClsName, bRealClsName;
+                bool tmp;
+                GetClassName(type.ReflectedType, out bClsName, out bRealClsName, out tmp);
+                clsName = bClsName + "_";
+                realNamespace = bRealClsName + ".";
+            }
+            else
+            {
+                clsName = !string.IsNullOrEmpty(type.Namespace) ? type.Namespace.Replace(".", "_") + "_" : "";
+                realNamespace = !string.IsNullOrEmpty(type.Namespace) ? type.Namespace + "." : null;
+            }
+            clsName = clsName + type.Name.Replace(".", "_").Replace("`", "_").Replace("<", "_").Replace(">", "_");
             bool isGeneric = false;
             string ga = null;
             if (type.IsGenericType)
@@ -644,8 +674,9 @@ namespace ILRuntime.Runtime.Generated
                 }
                 ga += ">";
             }
+            clsName += "_Binding";
 
-            realClsName = type.Namespace + ".";
+            realClsName = realNamespace;
             if (isGeneric)
             {
                 int idx = type.Name.IndexOf("`");
