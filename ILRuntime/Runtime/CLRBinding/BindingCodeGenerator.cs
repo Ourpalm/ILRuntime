@@ -223,8 +223,23 @@ namespace ILRuntime.Runtime.Generated
                                 case "Inequality":
                                     sb.AppendLine(string.Format("{0} != {1};", param[0].Name, param[1].Name));
                                     break;
+                                case "Addition":
+                                    sb.AppendLine(string.Format("{0} + {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "Subtraction":
+                                    sb.AppendLine(string.Format("{0} - {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "Multipy":
+                                    sb.AppendLine(string.Format("{0} * {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "Division":
+                                    sb.AppendLine(string.Format("{0} / {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "UnaryNegation":
+                                    sb.AppendLine(string.Format("-{0};", param[0].Name));
+                                    break;
                                 default:
-                                    throw new NotImplementedException();
+                                    throw new NotImplementedException(i.Name);
                             }
                         }
                         else
