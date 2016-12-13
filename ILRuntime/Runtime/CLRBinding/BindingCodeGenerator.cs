@@ -229,7 +229,7 @@ namespace ILRuntime.Runtime.Generated
                                 case "Subtraction":
                                     sb.AppendLine(string.Format("{0} - {1};", param[0].Name, param[1].Name));
                                     break;
-                                case "Multipy":
+                                case "Multiply":
                                     sb.AppendLine(string.Format("{0} * {1};", param[0].Name, param[1].Name));
                                     break;
                                 case "Division":
