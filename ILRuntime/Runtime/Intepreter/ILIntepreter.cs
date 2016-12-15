@@ -2680,9 +2680,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         else
                                             throw new NullReferenceException();
                                     }
-                                    else if (objRef->ObjectType == ObjectTypes.Null)
+                                    else if (objRef->ObjectType < ObjectTypes.StackObjectReference)
                                     {
-                                        //Nothing to do if unboxing a null reference
+                                        //Nothing to do with primitive types
                                     }
                                     else
                                         throw new InvalidCastException();
