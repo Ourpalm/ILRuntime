@@ -166,7 +166,7 @@ namespace ILRuntime.Runtime.Generated
                 int paramCnt = param.Length;
                 if (!i.IsStatic)
                     paramCnt++;
-                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)", i.Name, idx));
+                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)", i.Name, idx));
                 sb.AppendLine("        {");
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;");
                 sb.AppendLine("            StackObject* p;");
