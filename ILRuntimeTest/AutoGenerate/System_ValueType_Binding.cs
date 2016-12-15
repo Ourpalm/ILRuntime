@@ -8,10 +8,11 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class System_ValueType
+    unsafe class System_ValueType_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
@@ -37,10 +38,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object obj = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.ValueType instance = (System.ValueType)StackObject.ToObject(p, domain, mStack);
+            System.ValueType instance = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Equals(obj);
@@ -56,7 +57,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.ValueType instance = (System.ValueType)StackObject.ToObject(p, domain, mStack);
+            System.ValueType instance = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.GetHashCode();
@@ -72,7 +73,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.ValueType instance = (System.ValueType)StackObject.ToObject(p, domain, mStack);
+            System.ValueType instance = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToString();

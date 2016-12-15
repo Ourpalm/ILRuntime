@@ -8,10 +8,11 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class System_String
+    unsafe class System_String_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
@@ -370,10 +371,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String[] value = (System.String[])StackObject.ToObject(p, domain, mStack);
+            System.String[] value = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String separator = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String separator = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Join(separator, value);
@@ -391,10 +392,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String[] value = (System.String[])StackObject.ToObject(p, domain, mStack);
+            System.String[] value = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String separator = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String separator = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Join(separator, value, startIndex, count);
@@ -408,10 +409,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object obj = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Equals(obj);
@@ -427,10 +428,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Equals(value);
@@ -446,13 +447,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Equals(value, comparisonType);
@@ -468,10 +469,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String b = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String a = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Equals(a, b);
@@ -487,13 +488,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String b = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String a = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Equals(a, b, comparisonType);
@@ -509,10 +510,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String b = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String a = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = a == b;
@@ -528,10 +529,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String b = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String a = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = a != b;
@@ -549,7 +550,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 index = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance[index];
@@ -569,12 +570,12 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 destinationIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Char[] destination = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] destination = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 sourceIndex = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             instance.CopyTo(sourceIndex, destination, destinationIndex, count);
@@ -588,7 +589,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToCharArray();
@@ -606,7 +607,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToCharArray(startIndex, length);
@@ -620,7 +621,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.IsNullOrEmpty(value);
@@ -636,7 +637,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.GetHashCode();
@@ -652,7 +653,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Length;
@@ -668,10 +669,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Char[] separator = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Split(separator);
@@ -687,10 +688,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 count = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Char[] separator = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Split(separator, count);
@@ -704,13 +705,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)StackObject.ToObject(p, domain, mStack);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Char[] separator = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Split(separator, options);
@@ -724,15 +725,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)StackObject.ToObject(p, domain, mStack);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 count = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Char[] separator = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Split(separator, count, options);
@@ -746,13 +747,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)StackObject.ToObject(p, domain, mStack);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String[] separator = (System.String[])StackObject.ToObject(p, domain, mStack);
+            System.String[] separator = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Split(separator, options);
@@ -766,15 +767,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)StackObject.ToObject(p, domain, mStack);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 count = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String[] separator = (System.String[])StackObject.ToObject(p, domain, mStack);
+            System.String[] separator = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Split(separator, count, options);
@@ -790,7 +791,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Substring(startIndex);
@@ -808,7 +809,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Substring(startIndex, length);
@@ -822,10 +823,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Char[] trimChars = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Trim(trimChars);
@@ -839,7 +840,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Trim();
@@ -853,10 +854,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Char[] trimChars = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.TrimStart(trimChars);
@@ -870,10 +871,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Char[] trimChars = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.TrimEnd(trimChars);
@@ -887,7 +888,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IsNormalized();
@@ -903,10 +904,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)StackObject.ToObject(p, domain, mStack);
+            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)typeof(System.Text.NormalizationForm).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IsNormalized(normalizationForm);
@@ -922,7 +923,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Normalize();
@@ -936,10 +937,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)StackObject.ToObject(p, domain, mStack);
+            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)typeof(System.Text.NormalizationForm).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Normalize(normalizationForm);
@@ -953,10 +954,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, strB);
@@ -974,10 +975,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Boolean ignoreCase = p->Value == 1;
             p = ILIntepreter.Minus(esp, 2);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, strB, ignoreCase);
@@ -993,16 +994,16 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)typeof(System.Globalization.CompareOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, strB, culture, options);
@@ -1018,22 +1019,22 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 7);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)typeof(System.Globalization.CompareOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 indexB = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 6);
             System.Int32 indexA = p->Value;
             p = ILIntepreter.Minus(esp, 7);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, culture, options);
@@ -1049,13 +1050,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, strB, comparisonType);
@@ -1071,15 +1072,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Boolean ignoreCase = p->Value == 1;
             p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, strB, ignoreCase, culture);
@@ -1099,12 +1100,12 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 indexB = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 indexA = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length);
@@ -1126,12 +1127,12 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 indexB = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 5);
             System.Int32 indexA = p->Value;
             p = ILIntepreter.Minus(esp, 6);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, ignoreCase);
@@ -1147,7 +1148,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 7);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Boolean ignoreCase = p->Value == 1;
@@ -1156,12 +1157,12 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 indexB = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 6);
             System.Int32 indexA = p->Value;
             p = ILIntepreter.Minus(esp, 7);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, ignoreCase, culture);
@@ -1177,19 +1178,19 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 6);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 length = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 indexB = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 5);
             System.Int32 indexA = p->Value;
             p = ILIntepreter.Minus(esp, 6);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, comparisonType);
@@ -1205,10 +1206,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.CompareTo(value);
@@ -1224,10 +1225,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.CompareTo(strB);
@@ -1243,10 +1244,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.CompareOrdinal(strA, strB);
@@ -1266,12 +1267,12 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 indexB = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
             System.Int32 indexA = p->Value;
             p = ILIntepreter.Minus(esp, 5);
-            System.String strA = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.CompareOrdinal(strA, indexA, strB, indexB, length);
@@ -1287,10 +1288,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Contains(value);
@@ -1306,10 +1307,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.EndsWith(value);
@@ -1325,13 +1326,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.EndsWith(value, comparisonType);
@@ -1347,15 +1348,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Boolean ignoreCase = p->Value == 1;
             p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.EndsWith(value, ignoreCase, culture);
@@ -1373,7 +1374,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Char value = (char)p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value);
@@ -1393,7 +1394,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Char value = (char)p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value, startIndex);
@@ -1415,7 +1416,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 3);
             System.Char value = (char)p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value, startIndex, count);
@@ -1431,10 +1432,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value);
@@ -1452,10 +1453,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value, startIndex);
@@ -1475,10 +1476,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value, startIndex, count);
@@ -1494,13 +1495,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value, comparisonType);
@@ -1516,15 +1517,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value, startIndex, comparisonType);
@@ -1540,17 +1541,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 count = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 5);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOf(value, startIndex, count, comparisonType);
@@ -1566,10 +1567,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOfAny(anyOf);
@@ -1587,10 +1588,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOfAny(anyOf, startIndex);
@@ -1610,10 +1611,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.IndexOfAny(anyOf, startIndex, count);
@@ -1631,7 +1632,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Char value = (char)p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value);
@@ -1651,7 +1652,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Char value = (char)p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value, startIndex);
@@ -1673,7 +1674,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 3);
             System.Char value = (char)p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value, startIndex, count);
@@ -1689,10 +1690,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value);
@@ -1710,10 +1711,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value, startIndex);
@@ -1733,10 +1734,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value, startIndex, count);
@@ -1752,13 +1753,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value, comparisonType);
@@ -1774,15 +1775,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value, startIndex, comparisonType);
@@ -1798,17 +1799,17 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 5);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 count = p->Value;
             p = ILIntepreter.Minus(esp, 3);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 4);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 5);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOf(value, startIndex, count, comparisonType);
@@ -1824,10 +1825,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOfAny(anyOf);
@@ -1845,10 +1846,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOfAny(anyOf, startIndex);
@@ -1868,10 +1869,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.Char[] anyOf = (System.Char[])StackObject.ToObject(p, domain, mStack);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.LastIndexOfAny(anyOf, startIndex, count);
@@ -1889,7 +1890,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 totalWidth = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.PadLeft(totalWidth);
@@ -1907,7 +1908,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 totalWidth = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.PadLeft(totalWidth, paddingChar);
@@ -1923,7 +1924,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 totalWidth = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.PadRight(totalWidth);
@@ -1941,7 +1942,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 totalWidth = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.PadRight(totalWidth, paddingChar);
@@ -1955,10 +1956,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.StartsWith(value);
@@ -1974,13 +1975,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)StackObject.ToObject(p, domain, mStack);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.StartsWith(value, comparisonType);
@@ -1996,15 +1997,15 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Boolean ignoreCase = p->Value == 1;
             p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.StartsWith(value, ignoreCase, culture);
@@ -2020,7 +2021,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToLower();
@@ -2034,10 +2035,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToLower(culture);
@@ -2051,7 +2052,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToLowerInvariant();
@@ -2065,7 +2066,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToUpper();
@@ -2079,10 +2080,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToUpper(culture);
@@ -2096,7 +2097,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToUpperInvariant();
@@ -2110,7 +2111,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToString();
@@ -2124,10 +2125,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ToString(provider);
@@ -2141,7 +2142,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Clone();
@@ -2155,12 +2156,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Insert(startIndex, value);
@@ -2178,7 +2179,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Char oldChar = (char)p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Replace(oldChar, newChar);
@@ -2192,13 +2193,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.String newValue = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String newValue = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String oldValue = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String oldValue = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Replace(oldValue, newValue);
@@ -2216,7 +2217,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 2);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 3);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Remove(startIndex, count);
@@ -2232,7 +2233,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 startIndex = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Remove(startIndex);
@@ -2246,10 +2247,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object arg0 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Format(format, arg0);
@@ -2263,13 +2264,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object arg1 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object arg0 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Format(format, arg0, arg1);
@@ -2283,16 +2284,16 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object arg2 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object arg1 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Object arg0 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Format(format, arg0, arg1, arg2);
@@ -2306,10 +2307,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object[] args = (System.Object[])StackObject.ToObject(p, domain, mStack);
+            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Format(format, args);
@@ -2323,13 +2324,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object[] args = (System.Object[])StackObject.ToObject(p, domain, mStack);
+            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Format(provider, format, args);
@@ -2343,7 +2344,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String str = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Copy(str);
@@ -2357,7 +2358,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object arg0 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(arg0);
@@ -2371,10 +2372,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object arg1 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object arg0 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(arg0, arg1);
@@ -2388,13 +2389,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object arg2 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object arg1 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Object arg0 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(arg0, arg1, arg2);
@@ -2408,16 +2409,16 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object arg3 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg3 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object arg2 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Object arg1 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.Object arg0 = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(arg0, arg1, arg2, arg3);
@@ -2431,7 +2432,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object[] args = (System.Object[])StackObject.ToObject(p, domain, mStack);
+            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(args);
@@ -2445,10 +2446,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String str1 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String str0 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(str0, str1);
@@ -2462,13 +2463,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.String str2 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str2 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String str1 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String str0 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(str0, str1, str2);
@@ -2482,16 +2483,16 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
-            System.String str3 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str3 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String str2 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str2 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String str1 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String str0 = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(str0, str1, str2, str3);
@@ -2505,7 +2506,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String[] values = (System.String[])StackObject.ToObject(p, domain, mStack);
+            System.String[] values = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Concat(values);
@@ -2519,7 +2520,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String str = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.Intern(str);
@@ -2533,7 +2534,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String str = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = System.String.IsInterned(str);
@@ -2547,7 +2548,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.GetTypeCode();
@@ -2561,7 +2562,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String instance = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String instance = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.GetEnumerator();

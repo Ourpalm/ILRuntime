@@ -8,10 +8,11 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class ILRuntimeTest_TestFramework_TestStruct
+    unsafe class ILRuntimeTest_TestFramework_TestStruct_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
@@ -38,7 +39,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.GetObjectAndResolveReference(p);
-            ILRuntimeTest.TestFramework.TestStruct a = (ILRuntimeTest.TestFramework.TestStruct)StackObject.ToObject(p, domain, mStack);
+            ILRuntimeTest.TestFramework.TestStruct a = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest(ref a);
 
@@ -142,7 +143,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            ILRuntimeTest.TestFramework.TestStruct aaa = (ILRuntimeTest.TestFramework.TestStruct)StackObject.ToObject(p, domain, mStack);
+            ILRuntimeTest.TestFramework.TestStruct aaa = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest2(aaa);

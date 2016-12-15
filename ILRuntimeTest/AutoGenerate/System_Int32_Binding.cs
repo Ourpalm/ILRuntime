@@ -8,27 +8,28 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class System_Int64
+    unsafe class System_Int32_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodInfo method;
             Type[] args;
-            Type type = typeof(System.Int64);
+            Type type = typeof(System.Int32);
             args = new Type[]{typeof(System.Object)};
             method = type.GetMethod("CompareTo", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, CompareTo_0);
-            args = new Type[]{typeof(System.Int64)};
+            args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("CompareTo", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, CompareTo_1);
             args = new Type[]{typeof(System.Object)};
             method = type.GetMethod("Equals", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Equals_2);
-            args = new Type[]{typeof(System.Int64)};
+            args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("Equals", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Equals_3);
             args = new Type[]{};
@@ -37,10 +38,10 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("ToString", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, ToString_5);
-            args = new Type[]{typeof(System.IFormatProvider)};
+            args = new Type[]{typeof(System.String)};
             method = type.GetMethod("ToString", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, ToString_6);
-            args = new Type[]{typeof(System.String)};
+            args = new Type[]{typeof(System.IFormatProvider)};
             method = type.GetMethod("ToString", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, ToString_7);
             args = new Type[]{typeof(System.String), typeof(System.IFormatProvider)};
@@ -58,10 +59,10 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.String), typeof(System.Globalization.NumberStyles), typeof(System.IFormatProvider)};
             method = type.GetMethod("Parse", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Parse_12);
-            args = new Type[]{typeof(System.String), typeof(System.Int64).MakeByRefType()};
+            args = new Type[]{typeof(System.String), typeof(System.Int32).MakeByRefType()};
             method = type.GetMethod("TryParse", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, TryParse_13);
-            args = new Type[]{typeof(System.String), typeof(System.Globalization.NumberStyles), typeof(System.IFormatProvider), typeof(System.Int64).MakeByRefType()};
+            args = new Type[]{typeof(System.String), typeof(System.Globalization.NumberStyles), typeof(System.IFormatProvider), typeof(System.Int32).MakeByRefType()};
             method = type.GetMethod("TryParse", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, TryParse_14);
             args = new Type[]{};
@@ -76,10 +77,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object value = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.CompareTo(value);
 
@@ -94,9 +95,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 value = *(long*)&p->Value;
+            System.Int32 value = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.CompareTo(value);
 
@@ -111,10 +112,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object obj = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.Equals(obj);
 
@@ -129,9 +130,9 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 obj = *(long*)&p->Value;
+            System.Int32 obj = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.Equals(obj);
 
@@ -146,7 +147,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.GetHashCode();
 
@@ -161,7 +162,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.ToString();
 
@@ -174,12 +175,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
-            var result_of_this_method = instance.ToString(provider);
+            var result_of_this_method = instance.ToString(format);
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
@@ -190,12 +191,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
-            var result_of_this_method = instance.ToString(format);
+            var result_of_this_method = instance.ToString(provider);
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
@@ -206,13 +207,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String format = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.ToString(format, provider);
 
@@ -225,13 +226,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = System.Int64.Parse(s);
+            var result_of_this_method = System.Int32.Parse(s);
 
-            ret->ObjectType = ObjectTypes.Long;
-            *(long*)&ret->Value = result_of_this_method;
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -241,16 +242,16 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = System.Int64.Parse(s, style);
+            var result_of_this_method = System.Int32.Parse(s, style);
 
-            ret->ObjectType = ObjectTypes.Long;
-            *(long*)&ret->Value = result_of_this_method;
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -260,16 +261,16 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = System.Int64.Parse(s, provider);
+            var result_of_this_method = System.Int32.Parse(s, provider);
 
-            ret->ObjectType = ObjectTypes.Long;
-            *(long*)&ret->Value = result_of_this_method;
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -279,19 +280,19 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = System.Int64.Parse(s, style, provider);
+            var result_of_this_method = System.Int32.Parse(s, style, provider);
 
-            ret->ObjectType = ObjectTypes.Long;
-            *(long*)&ret->Value = result_of_this_method;
+            ret->ObjectType = ObjectTypes.Integer;
+            ret->Value = result_of_this_method;
             return ret + 1;
         }
 
@@ -302,12 +303,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.GetObjectAndResolveReference(p);
-            System.Int64 result = *(long*)&p->Value;
+            System.Int32 result = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = System.Int64.TryParse(s, out result);
+            var result_of_this_method = System.Int32.TryParse(s, out result);
 
             p = ILIntepreter.Minus(esp, 1);
             switch(p->ObjectType)
@@ -315,8 +316,8 @@ namespace ILRuntime.Runtime.Generated
                 case ObjectTypes.StackObjectReference:
                     {
                         var dst = *(StackObject**)&p->Value;
-                        dst->ObjectType = ObjectTypes.Long;
-                        *(long*)&dst->Value = result;
+                        dst->ObjectType = ObjectTypes.Integer;
+                        dst->Value = result;
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -360,18 +361,18 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ret = ILIntepreter.Minus(esp, 4);
             p = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.GetObjectAndResolveReference(p);
-            System.Int64 result = *(long*)&p->Value;
+            System.Int32 result = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.IFormatProvider provider = (System.IFormatProvider)StackObject.ToObject(p, domain, mStack);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)StackObject.ToObject(p, domain, mStack);
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 4);
-            System.String s = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = System.Int64.TryParse(s, style, provider, out result);
+            var result_of_this_method = System.Int32.TryParse(s, style, provider, out result);
 
             p = ILIntepreter.Minus(esp, 1);
             switch(p->ObjectType)
@@ -379,8 +380,8 @@ namespace ILRuntime.Runtime.Generated
                 case ObjectTypes.StackObjectReference:
                     {
                         var dst = *(StackObject**)&p->Value;
-                        dst->ObjectType = ObjectTypes.Long;
-                        *(long*)&dst->Value = result;
+                        dst->ObjectType = ObjectTypes.Integer;
+                        dst->Value = result;
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -423,7 +424,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 instance = *(long*)&p->Value;
+            System.Int32 instance = p->Value;
 
             var result_of_this_method = instance.GetTypeCode();
 

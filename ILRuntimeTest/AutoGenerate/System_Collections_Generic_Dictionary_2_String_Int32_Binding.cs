@@ -8,10 +8,11 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class System_Collections_Generic_Dictionary_2_String_Int32
+    unsafe class System_Collections_Generic_Dictionary_2_String_Int32_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
@@ -73,7 +74,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Comparer;
@@ -87,7 +88,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Count;
@@ -103,7 +104,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Keys;
@@ -117,7 +118,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Values;
@@ -131,10 +132,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String key = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String key = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance[key];
@@ -152,10 +153,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 value = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String key = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String key = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             instance[key] = value;
@@ -171,10 +172,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 value = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String key = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String key = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             instance.Add(key, value);
@@ -188,7 +189,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             instance.Clear();
@@ -202,10 +203,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String key = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String key = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ContainsKey(key);
@@ -223,7 +224,7 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int32 value = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.ContainsValue(value);
@@ -239,7 +240,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.GetEnumerator();
@@ -253,13 +254,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 3);
             p = ILIntepreter.Minus(esp, 1);
-            System.Runtime.Serialization.StreamingContext context = (System.Runtime.Serialization.StreamingContext)StackObject.ToObject(p, domain, mStack);
+            System.Runtime.Serialization.StreamingContext context = (System.Runtime.Serialization.StreamingContext)typeof(System.Runtime.Serialization.StreamingContext).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Runtime.Serialization.SerializationInfo info = (System.Runtime.Serialization.SerializationInfo)StackObject.ToObject(p, domain, mStack);
+            System.Runtime.Serialization.SerializationInfo info = (System.Runtime.Serialization.SerializationInfo)typeof(System.Runtime.Serialization.SerializationInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             instance.GetObjectData(info, context);
@@ -273,10 +274,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object sender = (System.Object)StackObject.ToObject(p, domain, mStack);
+            System.Object sender = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             instance.OnDeserialization(sender);
@@ -290,10 +291,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 2);
             p = ILIntepreter.Minus(esp, 1);
-            System.String key = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String key = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.Remove(key);
@@ -312,10 +313,10 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.GetObjectAndResolveReference(p);
             System.Int32 value = p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.String key = (System.String)StackObject.ToObject(p, domain, mStack);
+            System.String key = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)StackObject.ToObject(p, domain, mStack);
+            System.Collections.Generic.Dictionary<System.String, System.Int32> instance = (System.Collections.Generic.Dictionary<System.String, System.Int32>)typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
             var result_of_this_method = instance.TryGetValue(key, out value);
