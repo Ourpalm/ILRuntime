@@ -474,7 +474,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 if (!type.IsValueType)
                 {
-                    sb.Append(@"                        var obj = ");
+                    sb.Append(@"                        object obj = ");
                     sb.Append(paramName);
                     sb.AppendLine(";");
 
