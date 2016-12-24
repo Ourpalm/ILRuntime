@@ -23,6 +23,8 @@ namespace ILRuntime.Runtime
                 return (int)(double)obj;
             if (obj is byte)
                 return (int)(byte)obj;
+            if (obj is Intepreter.ILEnumTypeInstance)
+                return (int)((Intepreter.ILEnumTypeInstance)obj)[0];
             if (obj is uint)
                 return (int)(uint)obj;
             if (obj is ushort)
