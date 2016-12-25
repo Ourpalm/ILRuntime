@@ -71,7 +71,7 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
-        static StackObject* CompareTo_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* CompareTo_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -80,16 +80,37 @@ namespace ILRuntime.Runtime.Generated
             System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.CompareTo(value);
+            var result_of_this_method = instance_of_this_method.CompareTo(value);
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
         }
 
-        static StackObject* CompareTo_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* CompareTo_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -97,16 +118,37 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int64 value = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.CompareTo(value);
+            var result_of_this_method = instance_of_this_method.CompareTo(value);
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
         }
 
-        static StackObject* Equals_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Equals_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -115,16 +157,37 @@ namespace ILRuntime.Runtime.Generated
             System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.Equals(obj);
+            var result_of_this_method = instance_of_this_method.Equals(obj);
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
-        static StackObject* Equals_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Equals_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -132,44 +195,107 @@ namespace ILRuntime.Runtime.Generated
             p = ILIntepreter.Minus(esp, 1);
             System.Int64 obj = *(long*)&p->Value;
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.Equals(obj);
+            var result_of_this_method = instance_of_this_method.Equals(obj);
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
-        static StackObject* GetHashCode_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* GetHashCode_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.GetHashCode();
+            var result_of_this_method = instance_of_this_method.GetHashCode();
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
         }
 
-        static StackObject* ToString_5(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToString_5(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.ToString();
+            var result_of_this_method = instance_of_this_method.ToString();
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToString_6(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToString_6(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -178,14 +304,35 @@ namespace ILRuntime.Runtime.Generated
             System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.ToString(provider);
+            var result_of_this_method = instance_of_this_method.ToString(provider);
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToString_7(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToString_7(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -194,14 +341,35 @@ namespace ILRuntime.Runtime.Generated
             System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.ToString(format);
+            var result_of_this_method = instance_of_this_method.ToString(format);
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* ToString_8(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToString_8(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -213,14 +381,35 @@ namespace ILRuntime.Runtime.Generated
             System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 3);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.ToString(format, provider);
+            var result_of_this_method = instance_of_this_method.ToString(format, provider);
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* Parse_9(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Parse_9(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -236,7 +425,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Parse_10(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Parse_10(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -255,7 +444,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Parse_11(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Parse_11(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -274,7 +463,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* Parse_12(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Parse_12(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -296,7 +485,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* TryParse_13(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* TryParse_13(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -354,7 +543,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* TryParse_14(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* TryParse_14(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -418,15 +607,36 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* GetTypeCode_15(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* GetTypeCode_15(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Int64 instance = *(long*)&p->Value;
+            p = ILIntepreter.GetObjectAndResolveReference(p);
+            System.Int64 instance_of_this_method;
+            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Int64)((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Int64)t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(long*)&p->Value;
+                    break;
+            }
 
-            var result_of_this_method = instance.GetTypeCode();
+            var result_of_this_method = instance_of_this_method.GetTypeCode();
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }

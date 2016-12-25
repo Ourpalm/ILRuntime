@@ -289,12 +289,8 @@ namespace ILRuntime.Runtime.Intepreter
         }
 
         internal void Clear()
-        {
-            for (int i = 0; i < fields.Length; i++)
-            {
-                fields[i] = StackObject.Null;
-                managedObjs[i] = null;
-            }
+        {   
+            InitializeFields(type);
         }
 
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)

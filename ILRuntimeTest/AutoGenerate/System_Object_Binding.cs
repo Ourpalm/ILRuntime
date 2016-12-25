@@ -41,21 +41,22 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
-        static StackObject* ToString_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ToString_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object instance = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
+            System.Object instance_of_this_method;
+            instance_of_this_method = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = instance.ToString();
+            var result_of_this_method = instance_of_this_method.ToString();
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
-        static StackObject* Equals_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Equals_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -64,17 +65,18 @@ namespace ILRuntime.Runtime.Generated
             System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
             p = ILIntepreter.Minus(esp, 2);
-            System.Object instance = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
+            System.Object instance_of_this_method;
+            instance_of_this_method = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = instance.Equals(obj);
+            var result_of_this_method = instance_of_this_method.Equals(obj);
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method ? 1 : 0;
             return ret + 1;
         }
 
-        static StackObject* Equals_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* Equals_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -93,7 +95,7 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* ReferenceEquals_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* ReferenceEquals_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -112,32 +114,34 @@ namespace ILRuntime.Runtime.Generated
             return ret + 1;
         }
 
-        static StackObject* GetHashCode_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* GetHashCode_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object instance = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
+            System.Object instance_of_this_method;
+            instance_of_this_method = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = instance.GetHashCode();
+            var result_of_this_method = instance_of_this_method.GetHashCode();
 
             ret->ObjectType = ObjectTypes.Integer;
             ret->Value = result_of_this_method;
             return ret + 1;
         }
 
-        static StackObject* GetType_5(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* GetType_5(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
             StackObject* ret = ILIntepreter.Minus(esp, 1);
             p = ILIntepreter.Minus(esp, 1);
-            System.Object instance = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
+            System.Object instance_of_this_method;
+            instance_of_this_method = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
             intp.Free(p);
 
-            var result_of_this_method = instance.GetType();
+            var result_of_this_method = instance_of_this_method.GetType();
 
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }

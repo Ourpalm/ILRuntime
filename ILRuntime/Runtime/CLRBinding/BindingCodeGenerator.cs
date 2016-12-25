@@ -190,9 +190,40 @@ namespace ILRuntime.Runtime.Generated
                     string tmp, clsName;
                     bool isByRef;
                     GetClassName(type, out tmp, out clsName, out isByRef);
-                    if (isByRef)
+                    if (type.IsPrimitive || type.IsValueType)
                         sb.AppendLine("            p = ILIntepreter.GetObjectAndResolveReference(p);");
-                    sb.AppendLine(string.Format("            {0} instance = {1};", clsName, GetRetrieveValueCode(type, clsName)));
+                    sb.AppendLine(string.Format("            {0} instance_of_this_method;", clsName));
+                    if (type.IsPrimitive)
+                    {
+                        sb.Append(@"            switch(p->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = mStack[p->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (");
+                        sb.Append(clsName);
+                        sb.Append(")((ILTypeInstance)instance_of_fieldReference)[p->ValueLow];");
+                        sb.Append(@"
+                        }
+                        else
+                        {
+                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (");
+                        sb.Append(clsName);
+                        sb.Append(")t.Fields[p->ValueLow].GetValue(instance_of_fieldReference);");
+                        sb.AppendLine(@"
+                        }
+                    }
+                    break;
+                default:");
+                        sb.AppendLine(string.Format("                    instance_of_this_method = {0};", GetRetrieveValueCode(type, clsName)));
+                        sb.AppendLine(@"                    break;
+            }");
+                    }
+                    else
+                        sb.AppendLine(string.Format("            instance_of_this_method = {0};", GetRetrieveValueCode(type, clsName)));
                     if (!isByRef && !type.IsPrimitive)
                         sb.AppendLine("            intp.Free(p);");
                 }
@@ -281,27 +312,27 @@ namespace ILRuntime.Runtime.Generated
                             bool isIndexer = param.Length > 0;
                             if (isIndexer)
                             {
-                                sb.AppendLine(string.Format("instance[{0}];", param[0].Name));
+                                sb.AppendLine(string.Format("instance_of_this_method[{0}];", param[0].Name));
                             }
                             else
-                                sb.AppendLine(string.Format("instance.{0};", t[1]));
+                                sb.AppendLine(string.Format("instance_of_this_method.{0};", t[1]));
                         }
                         else if (propType == "set")
                         {
                             bool isIndexer = param.Length > 1;
                             if (isIndexer)
                             {
-                                sb.AppendLine(string.Format("instance[{0}] = {1};", param[0].Name, param[1].Name));
+                                sb.AppendLine(string.Format("instance_of_this_method[{0}] = {1};", param[0].Name, param[1].Name));
                             }
                             else
-                                sb.AppendLine(string.Format("instance.{0} = {1};", t[1], param[0].Name));
+                                sb.AppendLine(string.Format("instance_of_this_method.{0} = {1};", t[1], param[0].Name));
                         }
                         else
                             throw new NotImplementedException();
                     }
                     else
                     {
-                        sb.Append(string.Format("instance.{0}(", i.Name));
+                        sb.Append(string.Format("instance_of_this_method.{0}(", i.Name));
                         AppendParameters(param, sb);
                         sb.AppendLine(");");
                     }

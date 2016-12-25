@@ -32,7 +32,7 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
-        static StackObject* DoTest_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* DoTest_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -84,7 +84,7 @@ namespace ILRuntime.Runtime.Generated
             return ret;
         }
 
-        static StackObject* DoTest_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* DoTest_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;
@@ -137,7 +137,7 @@ namespace ILRuntime.Runtime.Generated
             return ret;
         }
 
-        static StackObject* DoTest2_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        static StackObject* DoTest2_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
             StackObject* p;

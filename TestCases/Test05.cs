@@ -73,6 +73,26 @@ namespace TestCases
 
     class Test05
     {
+        public struct TestStruct
+        {
+            public int id;
+
+            public override string ToString()
+            {
+                return id.ToString();
+            }
+        }
+
+        public static void TestMethodDefaultStructValue()
+        {
+            PrintValue(100);
+        }
+
+        public static void PrintValue(int a, TestStruct b = default(TestStruct))
+        {
+            Console.WriteLine("a = " + a + ", b = " + b.ToString());
+        }
+
         public static void TestForEach()
         {
             List<string> a = new List<string>() { "1", "2", "3" };
