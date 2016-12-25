@@ -351,7 +351,14 @@ namespace ILRuntime.Runtime.Intepreter
                 ins.fields[i] = fields[i];
                 ins.managedObjs[i] = managedObjs[i];
             }
-            ins.clrInstance = clrInstance;
+            if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
+            {
+                ins.clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, ins);
+            }
+            else
+            {
+                ins.clrInstance = ins;
+            }
             return ins;
         }
 

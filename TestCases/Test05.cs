@@ -76,10 +76,36 @@ namespace TestCases
         public struct TestStruct
         {
             public int id;
+            public string address;
 
             public override string ToString()
             {
                 return id.ToString();
+            }
+        }
+
+        public static void TestStructDictionary()
+        {
+            Dictionary<int, TestStruct> dicts = new Dictionary<int, TestStruct>();
+            for(int i = 0; i < 2; i++)
+            {
+                var def = new TestStruct();
+                def.id = i;
+                def.address = "address " + i;
+
+                dicts.Add(i, def);
+            }
+
+            List<TestStruct> lists = new List<TestStruct>();
+            foreach(var i in dicts.Values)
+            {
+                lists.Add(i);
+            }
+
+            for(int i = 0; i < lists.Count; i++)
+            {
+                var item = lists[i];
+                Console.WriteLine(string.Format("id:{0} address:{1}", item.id, item.address));
             }
         }
 
