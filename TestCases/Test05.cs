@@ -73,6 +73,20 @@ namespace TestCases
 
     class Test05
     {
+        class MGenericTest
+        {
+            public TestStruct TestGeneric<T>(string a, string b)
+            {
+                return TestGenericSub<T>(a, b);
+            }
+
+            TestStruct TestGenericSub<T>(string a, string b)
+            {
+                TestStruct res = new TestStruct();
+                res.address = a + b;
+                return res;
+            }
+        } 
         public struct TestStruct
         {
             public int id;
@@ -82,6 +96,18 @@ namespace TestCases
             {
                 return id.ToString();
             }
+        }
+
+        public static void TestGenericMethod()
+        {
+            var test = TestGenericMethodSub();
+            var r = test.TestGeneric<ILRuntimeTest.TestFramework.TestClass3>("123", "456");
+            Console.WriteLine("address " + r.address);
+        }
+
+        static MGenericTest TestGenericMethodSub()
+        {
+            return new MGenericTest();
         }
 
         public static void TestStructDictionary()

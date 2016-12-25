@@ -473,8 +473,10 @@ namespace ILRuntime.CLR.TypeSystem
                 else
                     return null;//BaseType == null means base type is Object or Enum
             }
-            else
+            else if (m.IsGenericInstance == method.IsGenericInstance)
                 return m;
+            else
+                return method;
         }
 
         public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null)

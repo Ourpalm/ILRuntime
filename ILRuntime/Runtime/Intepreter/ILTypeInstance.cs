@@ -312,6 +312,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
         {
+            esp = ILIntepreter.GetObjectAndResolveReference(esp);
             field = *esp;
             if (field.ObjectType >= ObjectTypes.Object)
             {
