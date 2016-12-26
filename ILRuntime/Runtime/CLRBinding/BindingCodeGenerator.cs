@@ -593,6 +593,14 @@ namespace ILRuntime.Runtime.Generated
             }
             else
             {
+                if (!type.IsSealed)
+                {
+                    sb.AppendLine(@"            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }");
+                }
                 sb.AppendLine("            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);");
             }
         }

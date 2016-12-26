@@ -331,6 +331,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.Error;
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -342,6 +347,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.In;
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -353,6 +363,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.Out;
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -364,6 +379,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.InputEncoding;
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -389,6 +409,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.OutputEncoding;
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1026,6 +1051,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.OpenStandardError();
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1039,6 +1069,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.OpenStandardError(bufferSize);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1050,6 +1085,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.OpenStandardInput();
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1063,6 +1103,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.OpenStandardInput(bufferSize);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1074,6 +1119,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.OpenStandardOutput();
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
@@ -1087,6 +1137,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Console.OpenStandardOutput(bufferSize);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
         }
 
