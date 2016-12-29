@@ -74,6 +74,7 @@ namespace Mono.Cecil
 
         string @namespace;
         bool value_type;
+        int hashCode = -1;
         internal IMetadataScope scope;
         internal ModuleDefinition module;
 
@@ -249,6 +250,13 @@ namespace Mono.Cecil
             get { return false; }
         }
 
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = FullName.GetHashCode();
+
+            return hashCode;
+        }
         public virtual bool IsPrimitive
         {
             get { return Mixin.IsPrimitive(etype); }

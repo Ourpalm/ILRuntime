@@ -36,7 +36,7 @@ namespace Mono.Cecil
 
     public class MethodReference : MemberReference, IMethodSignature, IGenericParameterProvider, IGenericContext
     {
-
+        int hashCode = -1;
         internal ParameterDefinitionCollection parameters;
         MethodReturnType return_type;
 
@@ -150,6 +150,14 @@ namespace Mono.Cecil
                 Mixin.MethodSignatureFullName(this, builder);
                 return builder.ToString();
             }
+        }
+
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = FullName.GetHashCode();
+
+            return hashCode;
         }
 
         public virtual bool IsGenericInstance
