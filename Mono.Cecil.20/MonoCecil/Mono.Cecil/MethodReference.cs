@@ -155,7 +155,9 @@ namespace Mono.Cecil
         public override int GetHashCode()
         {
             if (hashCode == -1)
-                hashCode = FullName.GetHashCode();
+            {
+                hashCode = (int)(((uint)FullName.GetHashCode() << 16 & 0xFFFF0000) | ((uint)base.GetHashCode() & 0xFFFF));
+            }
 
             return hashCode;
         }
