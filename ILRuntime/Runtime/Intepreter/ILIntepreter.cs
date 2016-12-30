@@ -804,8 +804,17 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         default:
                                             {
-                                                mStack[dst->Value] = mStack[val->Value];
-
+                                                switch (val->ObjectType)
+                                                {
+                                                    case ObjectTypes.Object:
+                                                        mStack[dst->Value] = mStack[val->Value];
+                                                        break;
+                                                    case ObjectTypes.Null:
+                                                        mStack[dst->Value] = null;
+                                                        break;
+                                                    default:
+                                                        throw new NotImplementedException();
+                                                }
                                             }
                                             break;
                                     }

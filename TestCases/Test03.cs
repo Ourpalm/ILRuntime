@@ -8,6 +8,17 @@ namespace TestCases
 
     class Test03
     {
+        static bool TryGet(out A a)
+        {
+            a = null;
+            return true;
+        }
+
+        public static void UnitTest_RefOutNull()
+        {
+            A aaa;
+            TryGet(out aaa);
+        }
         public static void UnitTest_Typeof()
         {
             object obj = 1;
