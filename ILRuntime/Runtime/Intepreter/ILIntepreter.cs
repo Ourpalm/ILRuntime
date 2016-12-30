@@ -2854,13 +2854,85 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Stelem_Ref:
-                            case OpCodeEnum.Stelem_Any:
                                 {
                                     var val = esp - 1;
                                     var idx = esp - 1 - 1;
                                     var arrRef = esp - 1 - 1 - 1;
                                     Array arr = mStack[arrRef->Value] as Array;
                                     arr.SetValue(mStack[val->Value], idx->Value);
+                                    Free(esp - 1);
+                                    Free(esp - 1 - 1);
+                                    Free(esp - 1 - 1 - 1);
+                                    esp = esp - 1 - 1 - 1;
+                                }
+                                break;
+                            case OpCodeEnum.Stelem_Any:
+                                {
+                                    var val = esp - 1;
+                                    var idx = esp - 1 - 1;
+                                    var arrRef = esp - 1 - 1 - 1;
+                                    Array arr = mStack[arrRef->Value] as Array;
+                                    if (arr is object[])
+                                    {
+                                        switch (val->ObjectType)
+                                        {
+                                            case ObjectTypes.Object:
+                                                arr.SetValue(mStack[val->Value], idx->Value);
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                arr.SetValue(val->Value, idx->Value);
+                                                break;
+                                            case ObjectTypes.Long:
+                                                arr.SetValue(*(long*)&val->Value, idx->Value);
+                                                break;
+                                            case ObjectTypes.Float:
+                                                arr.SetValue(*(float*)&val->Value, idx->Value);
+                                                break;
+                                            case ObjectTypes.Double:
+                                                arr.SetValue(*(double*)&val->Value, idx->Value);
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        switch (val->ObjectType)
+                                        {
+                                            case ObjectTypes.Object:
+                                                arr.SetValue(mStack[val->Value], idx->Value);
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                {
+                                                    StoreIntValueToArray(arr, val, idx);
+                                                }
+                                                break;
+                                            case ObjectTypes.Long:
+                                                {
+                                                    if(arr is long[])
+                                                    {
+                                                        ((long[])arr)[idx->Value] = *(long*)&val->Value;
+                                                    }
+                                                    else
+                                                    {
+                                                        ((ulong[])arr)[idx->Value] = *(ulong*)&val->Value;
+                                                    }
+                                                }
+                                                break;
+                                            case ObjectTypes.Float:
+                                                {
+                                                    ((float[])arr)[idx->Value] = *(float*)&val->Value;
+                                                }
+                                                break;
+                                            case ObjectTypes.Double:
+                                                {
+                                                    ((double[])arr)[idx->Value] = *(double*)&val->Value;
+                                                }
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
                                     Free(esp - 1 - 1 - 1);
@@ -3556,6 +3628,75 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack);
+        }
+
+        void StoreIntValueToArray(Array arr, StackObject* val, StackObject* idx)
+        {
+            {
+                int[] tmp = arr as int[];
+                if (tmp != null)
+                {
+                    tmp[idx->Value] = val->Value;
+                    return;
+                }
+            }
+            {
+                short[] tmp = arr as short[];
+                if(tmp != null)
+                {
+                    tmp[idx->Value] = (short)val->Value;
+                    return;
+                }
+            }
+            {
+                byte[] tmp = arr as byte[];
+                if (tmp != null)
+                {
+                    tmp[idx->Value] = (byte)val->Value;
+                    return;
+                }
+            }
+            {
+                bool[] tmp = arr as bool[];
+                if (tmp != null)
+                {
+                    tmp[idx->Value] = val->Value == 1;
+                    return;
+                }
+            }
+            {
+                uint[] tmp = arr as uint[];
+                if (tmp != null)
+                {
+                    tmp[idx->Value] = (uint)val->Value;
+                    return;
+                }
+            }
+            {
+                ushort[] tmp = arr as ushort[];
+                if (tmp != null)
+                {
+                    tmp[idx->Value] = (ushort)val->Value;
+                    return;
+                }
+            }
+            {
+                char[] tmp = arr as char[];
+                if (tmp != null)
+                {
+                    tmp[idx->Value] = (char)val->Value;
+                    return;
+                }
+            }
+            {
+                sbyte[] tmp = arr as sbyte[];
+                if (tmp != null)
+                {
+                    tmp[idx->Value] = (sbyte)val->Value;
+                    return;
+                }
+            }
+            throw new NotImplementedException();
         }
 
         ExceptionHandler GetCorrespondingExceptionHandler(ILMethod method, object obj, int addr, ExceptionHandlerType type, bool explicitMatch)

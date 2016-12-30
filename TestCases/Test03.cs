@@ -8,6 +8,21 @@ namespace TestCases
 
     class Test03
     {
+        static void Swap<T>(T[] arr, int idx1, int idx2)
+        {
+            if (idx1 >= arr.Length || idx2 >= arr.Length) return;
+            T temp = arr[idx1];
+            arr[idx1] = arr[idx2];
+            arr[idx2] = temp;
+        }
+
+        public static void UnitTest_Swap()
+        {
+            int[] arr = new int[] { 1, 2 };
+            Swap(arr, 0, 1);
+
+            Console.WriteLine(arr[0]);
+        }
         static bool TryGet(out A a)
         {
             a = null;
