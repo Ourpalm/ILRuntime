@@ -573,12 +573,12 @@ namespace ILRuntime.Runtime.Generated
                 else if (type == typeof(byte))
                 {
                     sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            (byte)__ret->Value = result_of_this_method;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(sbyte))
                 {
                     sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
-                    sb.AppendLine("            (sbyte)__ret->Value = result_of_this_method;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method;");
                 }
                 else if (type == typeof(uint))
                 {
