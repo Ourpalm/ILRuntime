@@ -680,7 +680,10 @@ namespace ILRuntime.Runtime.Generated
         static void GetClassName(Type type, out string clsName, out string realClsName, out bool isByRef, bool simpleClassName = false)
         {
             isByRef = type.IsByRef;
+            bool isArray = type.IsArray;
             if (isByRef)
+                type = type.GetElementType();
+            if (isArray)
                 type = type.GetElementType();
             string realNamespace = null;
             if (type.IsNested)
@@ -725,6 +728,8 @@ namespace ILRuntime.Runtime.Generated
             }
             if (!simpleClassName)
                 clsName += "_Binding";
+            if (!simpleClassName && isArray)
+                clsName += "_Array";
 
             realClsName = realNamespace;
             if (isGeneric)
@@ -735,6 +740,10 @@ namespace ILRuntime.Runtime.Generated
             }
             else
                 realClsName += type.Name;
+
+            if (isArray)
+                realClsName += "[]";
+
         }
 
     }

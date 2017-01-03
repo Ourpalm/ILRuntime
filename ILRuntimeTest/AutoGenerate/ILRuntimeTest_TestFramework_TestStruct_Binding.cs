@@ -32,123 +32,123 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
-        static StackObject* DoTest_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* DoTest_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.GetObjectAndResolveReference(p);
-            ILRuntimeTest.TestFramework.TestStruct a = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            ILRuntimeTest.TestFramework.TestStruct a = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest(ref a);
 
-            p = ILIntepreter.Minus(esp, 1);
-            switch(p->ObjectType)
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&p->Value;
-                        mStack[dst->Value] = a;
+                        var dst = *(StackObject**)&ptr_of_this_method->Value;
+                        __mStack[dst->Value] = a;
                     }
                     break;
                 case ObjectTypes.FieldReference:
                     {
-                        var obj = mStack[p->Value];
+                        var obj = __mStack[ptr_of_this_method->Value];
                         if(obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)obj)[p->ValueLow] = a;
+                            ((ILTypeInstance)obj)[ptr_of_this_method->ValueLow] = a;
                         }
                         else
                         {
                             var t = domain.GetType(obj.GetType()) as CLRType;
-                            t.Fields[p->ValueLow].SetValue(obj, a);
+                            t.Fields[ptr_of_this_method->ValueLow].SetValue(obj, a);
                         }
                     }
                     break;
                 case ObjectTypes.StaticFieldReference:
                     {
-                        var t = domain.GetType(p->Value);
+                        var t = domain.GetType(ptr_of_this_method->Value);
                         if(t is ILType)
                         {
-                            ((ILType)t).StaticInstance[p->ValueLow] = a;
+                            ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = a;
                         }
                         else
                         {
-                            ((CLRType)t).Fields[p->ValueLow].SetValue(null, a);
+                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, a);
                         }
                     }
                     break;
             }
 
-            return ret;
+            return __ret;
         }
 
-        static StackObject* DoTest_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* DoTest_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.GetObjectAndResolveReference(p);
-            System.Int32 a = p->Value;
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Int32 a = ptr_of_this_method->Value;
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest(ref a);
 
-            p = ILIntepreter.Minus(esp, 1);
-            switch(p->ObjectType)
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&p->Value;
+                        var dst = *(StackObject**)&ptr_of_this_method->Value;
                         dst->ObjectType = ObjectTypes.Integer;
                         dst->Value = a;
                     }
                     break;
                 case ObjectTypes.FieldReference:
                     {
-                        var obj = mStack[p->Value];
+                        var obj = __mStack[ptr_of_this_method->Value];
                         if(obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)obj)[p->ValueLow] = a;
+                            ((ILTypeInstance)obj)[ptr_of_this_method->ValueLow] = a;
                         }
                         else
                         {
                             var t = domain.GetType(obj.GetType()) as CLRType;
-                            t.Fields[p->ValueLow].SetValue(obj, a);
+                            t.Fields[ptr_of_this_method->ValueLow].SetValue(obj, a);
                         }
                     }
                     break;
                 case ObjectTypes.StaticFieldReference:
                     {
-                        var t = domain.GetType(p->Value);
+                        var t = domain.GetType(ptr_of_this_method->Value);
                         if(t is ILType)
                         {
-                            ((ILType)t).StaticInstance[p->ValueLow] = a;
+                            ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = a;
                         }
                         else
                         {
-                            ((CLRType)t).Fields[p->ValueLow].SetValue(null, a);
+                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, a);
                         }
                     }
                     break;
             }
 
-            return ret;
+            return __ret;
         }
 
-        static StackObject* DoTest2_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* DoTest2_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            ILRuntimeTest.TestFramework.TestStruct aaa = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ILRuntimeTest.TestFramework.TestStruct aaa = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest2(aaa);
 
-            return ret;
+            return __ret;
         }
 
 

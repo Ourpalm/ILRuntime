@@ -365,2292 +365,2292 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
-        static StackObject* Join_0(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Join_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String[] value = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String separator = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String[] value = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String separator = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Join(separator, value);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Join_1(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Join_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String[] value = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.String separator = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String[] value = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String separator = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Join(separator, value, startIndex, count);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Equals_2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Equals_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Equals(obj);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* Equals_3(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Equals_3(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Equals(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* Equals_4(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Equals_4(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Equals(value, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* Equals_5(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Equals_5(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Equals(a, b);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* Equals_6(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Equals_6(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Equals(a, b, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* op_Equality_7(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* op_Equality_7(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = a == b;
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* op_Inequality_8(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* op_Inequality_8(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String b = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String a = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = a != b;
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* get_Chars_9(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* get_Chars_9(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 index = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 index = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method[index];
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = (int)result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = (int)result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* CopyTo_10(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* CopyTo_10(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 5);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 destinationIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char[] destination = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int32 sourceIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 5);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 destinationIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char[] destination = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Int32 sourceIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.CopyTo(sourceIndex, destination, destinationIndex, count);
 
-            return ret;
+            return __ret;
         }
 
-        static StackObject* ToCharArray_11(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToCharArray_11(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToCharArray();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToCharArray_12(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToCharArray_12(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToCharArray(startIndex, length);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* IsNullOrEmpty_13(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IsNullOrEmpty_13(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.IsNullOrEmpty(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* GetHashCode_14(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* GetHashCode_14(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetHashCode();
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* get_Length_15(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* get_Length_15(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Length;
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Split_16(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Split_16(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Split(separator);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Split_17(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Split_17(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Split(separator, count);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Split_18(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Split_18(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Split(separator, options);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Split_19(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Split_19(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char[] separator = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Split(separator, count, options);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Split_20(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Split_20(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String[] separator = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String[] separator = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Split(separator, options);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Split_21(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Split_21(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String[] separator = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringSplitOptions options = (System.StringSplitOptions)typeof(System.StringSplitOptions).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String[] separator = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Split(separator, count, options);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Substring_22(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Substring_22(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Substring(startIndex);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Substring_23(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Substring_23(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Substring(startIndex, length);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Trim_24(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Trim_24(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Trim(trimChars);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Trim_25(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Trim_25(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Trim();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* TrimStart_26(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* TrimStart_26(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.TrimStart(trimChars);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* TrimEnd_27(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* TrimEnd_27(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.TrimEnd(trimChars);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* IsNormalized_28(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IsNormalized_28(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IsNormalized();
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* IsNormalized_29(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IsNormalized_29(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)typeof(System.Text.NormalizationForm).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)typeof(System.Text.NormalizationForm).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IsNormalized(normalizationForm);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* Normalize_30(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Normalize_30(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Normalize();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Normalize_31(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Normalize_31(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)typeof(System.Text.NormalizationForm).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Text.NormalizationForm normalizationForm = (System.Text.NormalizationForm)typeof(System.Text.NormalizationForm).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Normalize(normalizationForm);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Compare_32(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_32(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, strB);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_33(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_33(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Boolean ignoreCase = p->Value == 1;
-            p = ILIntepreter.Minus(esp, 2);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Boolean ignoreCase = ptr_of_this_method->Value == 1;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, strB, ignoreCase);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_34(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_34(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)typeof(System.Globalization.CompareOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)typeof(System.Globalization.CompareOptions).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, strB, culture, options);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_35(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_35(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 7);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)typeof(System.Globalization.CompareOptions).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int32 indexB = p->Value;
-            p = ILIntepreter.Minus(esp, 5);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 6);
-            System.Int32 indexA = p->Value;
-            p = ILIntepreter.Minus(esp, 7);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 7);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CompareOptions options = (System.Globalization.CompareOptions)typeof(System.Globalization.CompareOptions).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Int32 indexB = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 6);
+            System.Int32 indexA = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 7);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, culture, options);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_36(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_36(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, strB, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_37(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_37(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Boolean ignoreCase = p->Value == 1;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Boolean ignoreCase = ptr_of_this_method->Value == 1;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, strB, ignoreCase, culture);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_38(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_38(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 5);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 indexB = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int32 indexA = p->Value;
-            p = ILIntepreter.Minus(esp, 5);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 indexB = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Int32 indexA = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_39(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_39(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 6);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Boolean ignoreCase = p->Value == 1;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 indexB = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 5);
-            System.Int32 indexA = p->Value;
-            p = ILIntepreter.Minus(esp, 6);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 6);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Boolean ignoreCase = ptr_of_this_method->Value == 1;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Int32 indexB = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.Int32 indexA = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 6);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, ignoreCase);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_40(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_40(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 7);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Boolean ignoreCase = p->Value == 1;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int32 indexB = p->Value;
-            p = ILIntepreter.Minus(esp, 5);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 6);
-            System.Int32 indexA = p->Value;
-            p = ILIntepreter.Minus(esp, 7);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 7);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Boolean ignoreCase = ptr_of_this_method->Value == 1;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Int32 indexB = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 6);
+            System.Int32 indexA = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 7);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, ignoreCase, culture);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Compare_41(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Compare_41(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 6);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 indexB = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 5);
-            System.Int32 indexA = p->Value;
-            p = ILIntepreter.Minus(esp, 6);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 6);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Int32 indexB = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.Int32 indexA = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 6);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Compare(strA, indexA, strB, indexB, length, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* CompareTo_42(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* CompareTo_42(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.CompareTo(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* CompareTo_43(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* CompareTo_43(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.CompareTo(strB);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* CompareOrdinal_44(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* CompareOrdinal_44(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.CompareOrdinal(strA, strB);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* CompareOrdinal_45(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* CompareOrdinal_45(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 5);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 length = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 indexB = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.Int32 indexA = p->Value;
-            p = ILIntepreter.Minus(esp, 5);
-            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 indexB = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String strB = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Int32 indexA = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.String strA = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.CompareOrdinal(strA, indexA, strB, indexB, length);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* Contains_46(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Contains_46(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Contains(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* EndsWith_47(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* EndsWith_47(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.EndsWith(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* EndsWith_48(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* EndsWith_48(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.EndsWith(value, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* EndsWith_49(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* EndsWith_49(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Boolean ignoreCase = p->Value == 1;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Boolean ignoreCase = ptr_of_this_method->Value == 1;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.EndsWith(value, ignoreCase, culture);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_50(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_50(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char value = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char value = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_51(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_51(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char value = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char value = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value, startIndex);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_52(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_52(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char value = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char value = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value, startIndex, count);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_53(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_53(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_54(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_54(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value, startIndex);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_55(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_55(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value, startIndex, count);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_56(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_56(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_57(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_57(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value, startIndex, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOf_58(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOf_58(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 5);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 5);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOf(value, startIndex, count, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOfAny_59(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOfAny_59(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOfAny(anyOf);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOfAny_60(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOfAny_60(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOfAny(anyOf, startIndex);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* IndexOfAny_61(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IndexOfAny_61(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IndexOfAny(anyOf, startIndex, count);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_62(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_62(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char value = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char value = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_63(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_63(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char value = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char value = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value, startIndex);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_64(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_64(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char value = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char value = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value, startIndex, count);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_65(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_65(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_66(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_66(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value, startIndex);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_67(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_67(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value, startIndex, count);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_68(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_68(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_69(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_69(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value, startIndex, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_70(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_70(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 5);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 4);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 5);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOf(value, startIndex, count, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOfAny_71(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOfAny_71(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOfAny(anyOf);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOfAny_72(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOfAny_72(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOfAny(anyOf, startIndex);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* LastIndexOfAny_73(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* LastIndexOfAny_73(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
-            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char[] anyOf = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.LastIndexOfAny(anyOf, startIndex, count);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
-        static StackObject* PadLeft_74(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* PadLeft_74(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 totalWidth = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 totalWidth = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.PadLeft(totalWidth);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* PadLeft_75(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* PadLeft_75(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char paddingChar = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 totalWidth = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char paddingChar = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 totalWidth = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.PadLeft(totalWidth, paddingChar);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* PadRight_76(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* PadRight_76(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 totalWidth = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 totalWidth = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.PadRight(totalWidth);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* PadRight_77(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* PadRight_77(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char paddingChar = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 totalWidth = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char paddingChar = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 totalWidth = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.PadRight(totalWidth, paddingChar);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* StartsWith_78(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* StartsWith_78(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.StartsWith(value);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* StartsWith_79(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* StartsWith_79(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.StringComparison comparisonType = (System.StringComparison)typeof(System.StringComparison).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.StartsWith(value, comparisonType);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* StartsWith_80(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* StartsWith_80(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Boolean ignoreCase = p->Value == 1;
-            p = ILIntepreter.Minus(esp, 3);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Boolean ignoreCase = ptr_of_this_method->Value == 1;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.StartsWith(value, ignoreCase, culture);
 
-            ret->ObjectType = ObjectTypes.Integer;
-            ret->Value = result_of_this_method ? 1 : 0;
-            return ret + 1;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
-        static StackObject* ToLower_81(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToLower_81(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToLower();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToLower_82(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToLower_82(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToLower(culture);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToLowerInvariant_83(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToLowerInvariant_83(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToLowerInvariant();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToUpper_84(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToUpper_84(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToUpper();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToUpper_85(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToUpper_85(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Globalization.CultureInfo culture = (System.Globalization.CultureInfo)typeof(System.Globalization.CultureInfo).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToUpper(culture);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToUpperInvariant_86(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToUpperInvariant_86(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToUpperInvariant();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToString_87(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToString_87(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToString();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ToString_88(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* ToString_88(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToString(provider);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Clone_89(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Clone_89(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Clone();
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
             {    
-                return ILIntepreter.PushObject(ret, mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
             }
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Insert_90(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Insert_90(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Insert(startIndex, value);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Replace_91(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Replace_91(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Char newChar = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Char oldChar = (char)p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char newChar = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char oldChar = (char)ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Replace(oldChar, newChar);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Replace_92(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Replace_92(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String newValue = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String oldValue = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String newValue = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String oldValue = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Replace(oldValue, newValue);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Remove_93(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Remove_93(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 count = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 3);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Remove(startIndex, count);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Remove_94(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Remove_94(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Int32 startIndex = p->Value;
-            p = ILIntepreter.Minus(esp, 2);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Remove(startIndex);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Format_95(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Format_95(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Format(format, arg0);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Format_96(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Format_96(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Format(format, arg0, arg1);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Format_97(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Format_97(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Format(format, arg0, arg1, arg2);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Format_98(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Format_98(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Format(format, args);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Format_99(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Format_99(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Format(provider, format, args);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Copy_100(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Copy_100(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Copy(str);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_101(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_101(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(arg0);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_102(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_102(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(arg0, arg1);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_103(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_103(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(arg0, arg1, arg2);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_104(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_104(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object arg3 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg3 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(arg0, arg1, arg2, arg3);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_105(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_105(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object[] args = (System.Object[])typeof(System.Object[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(args);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_106(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_106(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 2);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(str0, str1);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_107(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_107(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 3);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String str2 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String str2 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(str0, str1, str2);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_108(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_108(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 4);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String str3 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 2);
-            System.String str2 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 3);
-            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
-            p = ILIntepreter.Minus(esp, 4);
-            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String str3 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String str2 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String str1 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String str0 = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(str0, str1, str2, str3);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Concat_109(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Concat_109(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String[] values = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String[] values = (System.String[])typeof(System.String[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Concat(values);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Intern_110(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* Intern_110(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.Intern(str);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* IsInterned_111(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* IsInterned_111(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
-            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String str = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.String.IsInterned(str);
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetTypeCode_112(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* GetTypeCode_112(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetTypeCode();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetEnumerator_113(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod __method)
+        static StackObject* GetEnumerator_113(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = intp.AppDomain;
-            StackObject* p;
-            StackObject* ret = ILIntepreter.Minus(esp, 1);
-            p = ILIntepreter.Minus(esp, 1);
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(p, domain, mStack));
-            intp.Free(p);
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetEnumerator();
 
-            return ILIntepreter.PushObject(ret, mStack, result_of_this_method);
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
 
