@@ -286,6 +286,15 @@ namespace ILRuntime.Runtime.Generated
                                 case "UnaryNegation":
                                     sb.AppendLine(string.Format("-{0};", param[0].Name));
                                     break;
+                                case "Implicit":
+                                case "Explicit":
+                                    {
+                                        string tmp, clsName;
+                                        bool isByRef;
+                                        GetClassName(i.ReturnType, out tmp, out clsName, out isByRef);
+                                        sb.AppendLine(string.Format("({1}){0};", param[0].Name, clsName));
+                                    }
+                                    break;
                                 default:
                                     throw new NotImplementedException(i.Name);
                             }
@@ -471,13 +480,13 @@ namespace ILRuntime.Runtime.Generated
                 else if (type == typeof(byte))
                 {
                     sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        (byte)dst->Value = " + paramName);
+                    sb.Append("                        dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(sbyte))
                 {
                     sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        (sbyte)dst->Value = " + paramName);
+                    sb.Append("                        dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(uint))
@@ -668,7 +677,7 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
-        static void GetClassName(Type type, out string clsName, out string realClsName, out bool isByRef)
+        static void GetClassName(Type type, out string clsName, out string realClsName, out bool isByRef, bool simpleClassName = false)
         {
             isByRef = type.IsByRef;
             if (isByRef)
@@ -679,12 +688,12 @@ namespace ILRuntime.Runtime.Generated
                 string bClsName, bRealClsName;
                 bool tmp;
                 GetClassName(type.ReflectedType, out bClsName, out bRealClsName, out tmp);
-                clsName = bClsName + "_";
+                clsName = simpleClassName ? "" : bClsName + "_";
                 realNamespace = bRealClsName + ".";
             }
             else
             {
-                clsName = !string.IsNullOrEmpty(type.Namespace) ? type.Namespace.Replace(".", "_") + "_" : "";
+                clsName = simpleClassName ? "" : (!string.IsNullOrEmpty(type.Namespace) ? type.Namespace.Replace(".", "_") + "_" : "");
                 realNamespace = !string.IsNullOrEmpty(type.Namespace) ? type.Namespace + "." : null;
             }
             clsName = clsName + type.Name.Replace(".", "_").Replace("`", "_").Replace("<", "_").Replace(">", "_");
@@ -706,15 +715,16 @@ namespace ILRuntime.Runtime.Generated
                         clsName += "_";
                         ga += ", ";
                     }
-                    clsName += j.Name;
                     string a, b;
                     bool tmp;
-                    GetClassName(j, out a, out b, out tmp);
+                    GetClassName(j, out a, out b, out tmp, true);
+                    clsName += a;
                     ga += b;
                 }
                 ga += ">";
             }
-            clsName += "_Binding";
+            if (!simpleClassName)
+                clsName += "_Binding";
 
             realClsName = realNamespace;
             if (isGeneric)
