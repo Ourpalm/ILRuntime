@@ -162,6 +162,12 @@ namespace ILRuntime.CLR.TypeSystem
             isBaseTypeInitialized = true;
         }
 
+
+        /// <summary>
+        /// 根据索引从字段表中获取指定的字段信息
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         public FieldInfo GetField(int hash)
         {
             var dic = Fields;

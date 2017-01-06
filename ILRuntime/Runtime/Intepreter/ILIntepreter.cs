@@ -21,6 +21,9 @@ namespace ILRuntime.Runtime.Intepreter
         object _lockObj;
         bool allowUnboundCLRMethod;
 
+        /// <summary>
+        /// 运行栈
+        /// </summary>
         internal RuntimeStack Stack { get { return stack; } }
         public bool ShouldBreak { get; set; }
         public StepTypes CurrentStepType { get; set; }
@@ -52,6 +55,9 @@ namespace ILRuntime.Runtime.Intepreter
                 Monitor.Pulse(_lockObj);
         }
 
+        /// <summary>
+        /// 重置DEBUG状态
+        /// </summary>
         public void ClearDebugState()
         {
             ShouldBreak = false;
@@ -59,16 +65,24 @@ namespace ILRuntime.Runtime.Intepreter
             LastStepFrameBase = (StackObject*)0;
             LastStepInstructionIndex = 0;
         }
+        /// <summary>
+        /// 运行函数体
+        /// </summary>
+        /// <param name="method">函数体</param>
+        /// <param name="instance">对象</param>
+        /// <param name="p">参数</param>
+        /// <returns></returns>
         public object Run(ILMethod method, object instance, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
-            StackObject* esp = stack.StackBase;
-            if (method.HasThis)
+            StackObject* esp = stack.StackBase;//返回栈指针
+            if (method.HasThis) //如果此函数不是静态函数，包含 this，那么将instance压入对象栈中
                 esp = PushObject(esp, mStack, instance);
-            esp = PushParameters(method, esp, p);
+            esp = PushParameters(method, esp, p); //压入传入的参数
             bool unhandledException;
             esp = Execute(method, esp, out unhandledException);
+
             object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(domain, StackObject.ToObject((esp - 1), domain, mStack)) : null;
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
@@ -3918,20 +3932,30 @@ namespace ILRuntime.Runtime.Intepreter
                 return esp;
         }
 
+        /// <summary>
+        /// 压入参数
+        /// </summary>
+        /// <param name="method">函数体</param>
+        /// <param name="esp">ESP</param>
+        /// <param name="p">参数</param>
+        /// <returns></returns>
         StackObject* PushParameters(IMethod method, StackObject* esp, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
             if (p != null && p.Length > 0)
             {
                 var plist = method.Parameters;
-                int pCnt = plist != null ? plist.Count : 0;
-                if (pCnt != p.Length)
+                int pCnt = plist != null ? plist.Count : 0; //获取参数数量
+                if (pCnt != p.Length) //检查参数数量和传入值数量是否相等
                     throw new ArgumentOutOfRangeException();
-                for (int i = 0; i < p.Length; i++)
+
+                for (int i = 0; i < p.Length; i++) //逐个压入参数到对象栈
                 {
                     bool isBox = false;
+
                     if (plist != null && i < plist.Count)
-                        isBox = plist[i] == AppDomain.ObjectType;
+                        isBox = plist[i] == AppDomain.ObjectType; //检查类型是否正确，如果不正确需要拆箱
+
                     esp = PushObject(esp, mStack, p[i], isBox);
                 }
             }
@@ -3987,6 +4011,11 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
+        /// <summary>
+        /// 压入一个空值
+        /// </summary>
+        /// <param name="esp"></param>
+        /// <returns></returns>
         public static StackObject* PushNull(StackObject* esp)
         {
             esp->ObjectType = ObjectTypes.Null;
@@ -3995,6 +4024,11 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
+        /// <summary>
+        /// 将对象拆箱存入esp指定的栈中
+        /// </summary>
+        /// <param name="esp">ESP指针</param>
+        /// <param name="obj">对象</param>
         public static void UnboxObject(StackObject* esp, object obj)
         {
             if (obj is int)
@@ -4061,29 +4095,37 @@ namespace ILRuntime.Runtime.Intepreter
                 throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 将对象压入对象栈
+        /// </summary>
+        /// <param name="esp">栈指针</param>
+        /// <param name="mStack">对象栈</param>
+        /// <param name="obj">对象</param>
+        /// <param name="isBox">是否拆装箱</param>
+        /// <returns></returns>
         public static StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
         {
             if (obj != null)
             {
-                if (!isBox)
+                if (!isBox) //需要拆箱情况下
                 {
-                    if (obj.GetType().IsPrimitive)
+                    if (obj.GetType().IsPrimitive) //如果此对象是基本类型 那么将此对象拆箱，并将结果放入ESP
                     {
                         UnboxObject(esp, obj);
                     }
-                    else if (obj.GetType().IsEnum)
+                    else if (obj.GetType().IsEnum) //如果此对象是枚举，将枚举表示的int32值放入ESP中
                     {
                         esp->ObjectType = ObjectTypes.Integer;
                         esp->Value = Convert.ToInt32(obj);
                     }
-                    else
+                    else  //如果此对象是一个类对象，将此对象放入对象栈，并且更新 esp到对象栈索引
                     {
                         esp->ObjectType = ObjectTypes.Object;
                         esp->Value = mStack.Count;
                         mStack.Add(obj);
                     }
                 }
-                else
+                else //直接将此对象放入对象栈中
                 {
                     esp->ObjectType = ObjectTypes.Object;
                     esp->Value = mStack.Count;
@@ -4092,9 +4134,10 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
             {
+                //压入空值 ESP++;
                 return PushNull(esp);
             }
-            return esp + 1;
+            return esp + 1; //ESP++ 始终将ESP指向最上一层供其他地方使用
         }
 
         //Don't ask me why add this funky method for this, otherwise Unity won't calculate the right value

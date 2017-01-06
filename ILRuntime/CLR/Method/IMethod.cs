@@ -16,6 +16,9 @@ namespace ILRuntime.CLR.Method
         IType DeclearingType { get; }
 
         IType ReturnType { get; }
+        /// <summary>
+        /// 此方法的参数类型
+        /// </summary>
         List<IType> Parameters { get; }
 
         int GenericParameterCount { get; }

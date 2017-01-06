@@ -106,6 +106,13 @@ namespace ILRuntime.CLR.Utils
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 扩展CLR TYPE 方法，根据此当前类型，进行类型转换
+        /// </summary>
+        /// <param name="pt">CLR类型</param>
+        /// <param name="domain">ILAPPdomain</param>
+        /// <param name="obj">对象</param>
+        /// <returns></returns>
         public static object CheckCLRTypes(this Type pt, Runtime.Enviorment.AppDomain domain, object obj)
         {
             if (obj == null)

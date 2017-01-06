@@ -18,11 +18,17 @@ namespace ILRuntime.Runtime.Enviorment
     public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method);
     public class AppDomain
     {
+        /// <summary>
+        /// 解释器队列
+        /// </summary>
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<int, ILIntepreter> intepreters = new Dictionary<int, ILIntepreter>();
         Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>();
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
+        /// <summary>
+        /// 此域Hash索引对象类型表
+        /// </summary>
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<int, string> mapString = new Dictionary<int, string>();
@@ -121,11 +127,16 @@ namespace ILRuntime.Runtime.Enviorment
         internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
         public DebugService DebugService { get { return debugService; } }
         internal Dictionary<int, ILIntepreter> Intepreters { get { return intepreters; } }
+
+        /// <summary> 
+        /// 获取当前解释器队列
+        /// </summary>
         internal Queue<ILIntepreter> FreeIntepreters { get { return freeIntepreters; } }
 
         public DelegateManager DelegateManager { get { return dMgr; } }
 
-        
+
+
         /// <summary>
         /// 加载Assembly 文件，从指定的路径
         /// </summary>
@@ -148,6 +159,10 @@ namespace ILRuntime.Runtime.Enviorment
                 }
             }
         }
+
+#if LOAD_ASSEMBLY_FILE
+
+
 
         /// <summary>
         /// 加载Assembly 文件和PDB文件或MDB文件，从指定的路径（PDB和MDB文件按默认命名方式，并且和Assembly文件处于同一目录中
@@ -267,15 +282,6 @@ namespace ILRuntime.Runtime.Enviorment
         }
 
         /// <summary>
-        /// 从流加载Assembly 不加载symbol符号文件
-        /// </summary>
-        /// <param name="stream">Dll数据流</param>
-        public void LoadAssembly(System.IO.Stream stream)
-        {
-            LoadAssembly(stream, null, null);
-        }        
-
-        /// <summary>
         ///  从流加载Assembly,以及symbol符号文件(pdb)
         /// </summary>
         /// <param name="stream">Assembly Stream</param>
@@ -291,12 +297,27 @@ namespace ILRuntime.Runtime.Enviorment
         ///  从流加载Assembly,以及symbol符号文件(Mdb)
         /// </summary>
         /// <param name="stream">Assembly Stream</param>
-        /// <param name="symbol">PDB Stream</param>
+        /// <param name="symbol">MDB Stream</param>
 
         public void LoadAssemblyMDB(System.IO.Stream stream, System.IO.Stream symbol)
         {
             LoadAssembly(stream, symbol, new Mono.Cecil.Mdb.MdbReaderProvider());
         }
+
+
+#endif
+
+
+        /// <summary>
+        /// 从流加载Assembly 不加载symbol符号文件
+        /// </summary>
+        /// <param name="stream">Dll数据流</param>
+        public void LoadAssembly(System.IO.Stream stream)
+        {
+            LoadAssembly(stream, null, null);
+        }        
+
+
 
         /// <summary>
         /// 从流加载Assembly,以及symbol符号文件(pdb)
@@ -348,9 +369,9 @@ namespace ILRuntime.Runtime.Enviorment
                 doubleType = GetType("System.Double");
                 objectType = GetType("System.Object");
             }
-            module.AssemblyResolver.ResolveFailure += AssemblyResolver_ResolveFailure;
+            module.AssemblyResolver.ResolveFailure += AssemblyResolver_ResolveFailure; //如果无法解析依赖的类型
 #if DEBUG
-            debugService.NotifyModuleLoaded(module.Name);
+            debugService.NotifyModuleLoaded(module.Name); //加载调试服务器
 #endif
         }
 
@@ -367,6 +388,12 @@ namespace ILRuntime.Runtime.Enviorment
             references[name] = content;
         }
 
+        /// <summary>
+        /// 如果无法解析依赖的类型
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="reference"></param>
+        /// <returns></returns>
         private AssemblyDefinition AssemblyResolver_ResolveFailure(object sender, AssemblyNameReference reference)
         {
             byte[] content;
@@ -578,6 +605,13 @@ namespace ILRuntime.Runtime.Enviorment
             return scope is AssemblyNameReference ? ((AssemblyNameReference)scope).FullName : null;
         }
 
+        /// <summary>
+        /// 从此域中获取此对象的IL类型
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="contextType"></param>
+        /// <param name="contextMethod"></param>
+        /// <returns></returns>
         internal IType GetType(object token, IType contextType, IMethod contextMethod)
         {
             int hash = token.GetHashCode();
@@ -749,6 +783,11 @@ namespace ILRuntime.Runtime.Enviorment
             return res;
         }
 
+        /// <summary>
+        /// 在IL应用域中获取类型
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         public IType GetType(int hash)
         {
             IType res;
@@ -825,6 +864,7 @@ namespace ILRuntime.Runtime.Enviorment
             IType t = GetType(type);
             if (t == null)
                 return null;
+            
             var m = t.GetMethod(method, p != null ? p.Length : 0);
 
             if (m != null)
@@ -873,36 +913,41 @@ namespace ILRuntime.Runtime.Enviorment
                 ILIntepreter inteptreter = null;
                 lock (freeIntepreters)
                 {
-                    if (freeIntepreters.Count > 0)
+                    if (freeIntepreters.Count > 0) //如果解释器队列里面有解释器弹一个出来 否则就新建一个 解释器
                     {
                         inteptreter = freeIntepreters.Dequeue();
                         //Clear debug state, because it may be in ShouldBreak State
-                        inteptreter.ClearDebugState();
+                        inteptreter.ClearDebugState(); //重置上一次的DEBUG 状态
                     }
                     else
                     {
                         inteptreter = new ILIntepreter(this);
 #if DEBUG
-                        intepreters[inteptreter.GetHashCode()] = inteptreter;
+                        intepreters[inteptreter.GetHashCode()] = inteptreter; //设置到当前调试MAP中
+
                         debugService.ThreadStarted(inteptreter);
 #endif
                     }
                 }
+
                 try
                 {
-                    res = inteptreter.Run((ILMethod)m, instance, p);
+                    res = inteptreter.Run((ILMethod)m, instance, p); //让解释器去运行函数体
                 }
                 finally
                 {
+
+                          
                     lock (freeIntepreters)
                     {
 #if DEBUG
-                        if(inteptreter.CurrentStepType!= StepTypes.None)
+                        //运行完毕后 检查如果当前调试步运行结束的话，恢复所有解释器状态和线程！           
+                        if (inteptreter.CurrentStepType != StepTypes.None)
                         {
                             //We should resume all other threads if we are currently doing stepping operation
-                            foreach(var i in intepreters)
+                            foreach (var i in intepreters)
                             {
-                                if(i.Value != inteptreter)
+                                if (i.Value != inteptreter)
                                 {
                                     i.Value.ClearDebugState();
                                     i.Value.Resume();
@@ -911,9 +956,9 @@ namespace ILRuntime.Runtime.Enviorment
                             inteptreter.ClearDebugState();
                         }
 #endif
-                        inteptreter.Stack.ManagedStack.Clear();
+                        inteptreter.Stack.ManagedStack.Clear(); 
                         inteptreter.Stack.Frames.Clear();
-                        freeIntepreters.Enqueue(inteptreter);
+                        freeIntepreters.Enqueue(inteptreter); //压入解释器供下次使用
 #if DEBUG
                         //debugService.ThreadEnded(inteptreter);
 #endif
@@ -924,6 +969,8 @@ namespace ILRuntime.Runtime.Enviorment
 
             return res;
         }
+
+
 
         internal IMethod GetMethod(object token, ILType contextType,ILMethod contextMethod, out bool invalidToken)
         {

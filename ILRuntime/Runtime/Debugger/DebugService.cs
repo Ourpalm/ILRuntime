@@ -11,6 +11,9 @@ using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Debugger
 {
+    /// <summary>
+    /// 调试服务器
+    /// </summary>
     public class DebugService
     {
         BreakPointContext curBreakpoint;
@@ -468,6 +471,10 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
+        /// <summary>
+        /// 启动DEBUG
+        /// </summary>
+        /// <param name="intp"></param>
         internal void ThreadStarted(ILIntepreter intp)
         {
             if (server != null && server.IsAttached)

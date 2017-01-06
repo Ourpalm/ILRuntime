@@ -201,6 +201,9 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        /// <summary>
+        /// 函数返回类型
+        /// </summary>
         public IType ReturnType
         {
             get;

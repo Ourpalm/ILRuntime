@@ -14,6 +14,9 @@ namespace ILRuntime.Runtime.Stack
         StackObject* pointer;
         StackObject* endOfMemory;
         IntPtr nativePointer;
+        /// <summary>
+        /// 对象栈，所有运行时对象保存在此
+        /// </summary>
         List<object> managedStack = new List<object>(32);
         Stack<StackFrame> frames = new Stack<StackFrame>();
         const int MAXIMAL_STACK_OBJECTS = 1024 * 128;
@@ -41,6 +44,9 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
+        /// <summary>
+        /// 返回对象栈，所有运行时对象保存在此
+        /// </summary>
         public List<object> ManagedStack { get { return managedStack; } }
 
         public void InitializeFrame(ILMethod method, StackObject* esp, out StackFrame res)
