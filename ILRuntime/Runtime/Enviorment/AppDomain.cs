@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using Mono.Cecil;
 using System.Reflection;
 using Mono.Cecil.Cil;
@@ -123,10 +124,122 @@ namespace ILRuntime.Runtime.Enviorment
         internal Queue<ILIntepreter> FreeIntepreters { get { return freeIntepreters; } }
 
         public DelegateManager DelegateManager { get { return dMgr; } }
+
+        
+        /// <summary>
+        /// 加载Assembly 文件，从指定的路径
+        /// </summary>
+        /// <param name="path">路径</param>
+        public void LoadAssemblyFile(string path)
+        {
+            FileInfo file = new FileInfo(path);
+
+            if (!file.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", path));
+            }
+            else
+            {
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    LoadAssembly(fs);
+
+                    fs.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 加载Assembly 文件和PDB文件，从指定的路径（PDB文件按默认命名方式，并且和Assembly文件处于同一目录中
+        /// </summary>
+        /// <param name="path">路径</param>
+        public void LoadAssemblyFileAndPDB(string path)
+        {
+            FileInfo file = new FileInfo(path);
+
+            if (!file.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", path));
+            }
+            else
+            {
+                var dlldir = file.DirectoryName;
+                var assname = Path.GetFileNameWithoutExtension(file.Name);
+                var pdbpath = $"{dlldir}\\{assname}.pdb";
+
+                if(!File.Exists(pdbpath))
+                {
+                    throw new FileNotFoundException(string.Format("PDB file not find!:\r\n{0}", pdbpath));
+                }
+
+                using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
+                {                  
+                    
+                    using (var pdbfs = new System.IO.FileStream(pdbpath, FileMode.Open))
+                    {
+                        LoadAssembly(fs, pdbfs);
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 加载Assembly 文件和PDB文件，两者都从指定的路径
+        /// </summary>
+        /// <param name="assemblyFilePath">Assembly 文件路径</param>
+        /// <param name="pdbFilePath">PDB文件路径</param>
+        public void LoadAssemblyFileAndPDB(string assemblyFilePath,string pdbFilePath)
+        {
+            FileInfo assfile = new FileInfo(assemblyFilePath);
+            FileInfo pdbfile = new FileInfo(pdbFilePath);
+            if (!assfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", assemblyFilePath));
+            }
+
+            if (!pdbfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("PDB file not find!:\r\n{0}", pdbFilePath));
+            }
+
+            using (FileStream fs = new FileStream(assfile.FullName, FileMode.Open, FileAccess.Read))
+            {
+
+                using (var pdbfs = new System.IO.FileStream(pdbfile.FullName, FileMode.Open))
+                {
+                    LoadAssembly(fs, pdbfs);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 从流加载Assembly 不加载symbol符号文件
+        /// </summary>
+        /// <param name="stream">Dll数据流</param>
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);
+        }        
+
+        /// <summary>
+        ///  从流加载Assembly,以及symbol符号文件(pdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">PDB Stream</param>
+
+        public void LoadAssembly(System.IO.Stream stream, System.IO.Stream symbol)
+        {
+            LoadAssembly(stream, symbol, new Mono.Cecil.Pdb.PdbReaderProvider());
         }
+
+        /// <summary>
+        /// 从流加载Assembly,以及symbol符号文件(pdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">PDB Stream</param>
+        /// <param name="symbolReader">PDB 读取器</param>
         public void LoadAssembly(System.IO.Stream stream, System.IO.Stream symbol, ISymbolReaderProvider symbolReader)
         {
             var module = ModuleDefinition.ReadModule(stream);
@@ -171,6 +284,9 @@ namespace ILRuntime.Runtime.Enviorment
             debugService.NotifyModuleLoaded(module.Name);
 #endif
         }
+
+
+
 
         /// <summary>
         /// External reference should be added to the AppDomain by the method
