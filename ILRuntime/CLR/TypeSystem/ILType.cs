@@ -193,6 +193,11 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        /// <summary>
+        /// 初始化IL类型
+        /// </summary>
+        /// <param name="def">MONO返回的类型定义</param>
+        /// <param name="domain">ILdomain</param>
         public ILType(TypeReference def, Runtime.Enviorment.AppDomain domain)
         {
             this.typeRef = def;
@@ -200,11 +205,17 @@ namespace ILRuntime.CLR.TypeSystem
             appdomain = domain;
         }
 
+        /// <summary>
+        /// 加载类型
+        /// </summary>
+        /// <param name="def"></param>
         void RetriveDefinitino(TypeReference def)
         {
             TypeReference res;
             if (def is GenericInstanceType)
+            {
                 res = ((GenericInstanceType)def).ElementType;
+            }
             else if (def is ByReferenceType)
             {
                 res = ((ByReferenceType)def).ElementType;
@@ -215,10 +226,13 @@ namespace ILRuntime.CLR.TypeSystem
             }
             else
                 res = (TypeDefinition)def;
+
+
             if (!res.IsGenericParameter)
             {
                 definition = res as TypeDefinition;
             }
+
         }
 
         public bool IsGenericInstance

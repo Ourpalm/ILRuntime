@@ -165,17 +165,27 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 var dlldir = file.DirectoryName;
                 var assname = Path.GetFileNameWithoutExtension(file.Name);
-                var pdbpath = $"{dlldir}\\{assname}.pdb";
+                var pdbpath = string.Format("{0}/{1}.pdb",dlldir,assname);
+                var mdbpath = string.Format("{0}/{1}.mdb", dlldir, assname);
 
-                if(!File.Exists(pdbpath))
+                string symbolPath = "";
+
+
+                if (File.Exists(pdbpath))
+                    symbolPath = pdbpath;
+                else if (File.Exists(mdbpath))
+                    symbolPath = mdbpath;
+
+
+                if (string.IsNullOrEmpty(symbolPath))
                 {
-                    throw new FileNotFoundException(string.Format("PDB file not find!:\r\n{0}", pdbpath));
+                    throw new FileNotFoundException(string.Format("symbol file not find!:\r\ncheck:\r\n{0}\r\n{1}\r\n", pdbpath,mdbpath));
                 }
 
                 using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
                 {                  
                     
-                    using (var pdbfs = new System.IO.FileStream(pdbpath, FileMode.Open))
+                    using (var pdbfs = new System.IO.FileStream(symbolPath, FileMode.Open))
                     {
                         LoadAssembly(fs, pdbfs);
                     }
@@ -188,11 +198,11 @@ namespace ILRuntime.Runtime.Enviorment
         /// 加载Assembly 文件和PDB文件，两者都从指定的路径
         /// </summary>
         /// <param name="assemblyFilePath">Assembly 文件路径</param>
-        /// <param name="pdbFilePath">PDB文件路径</param>
-        public void LoadAssemblyFileAndPDB(string assemblyFilePath,string pdbFilePath)
+        /// <param name="symbolFilePath">symbol文件路径</param>
+        public void LoadAssemblyFileAndPDB(string assemblyFilePath,string symbolFilePath)
         {
             FileInfo assfile = new FileInfo(assemblyFilePath);
-            FileInfo pdbfile = new FileInfo(pdbFilePath);
+            FileInfo pdbfile = new FileInfo(symbolFilePath);
             if (!assfile.Exists)
             {
                 throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", assemblyFilePath));
@@ -200,7 +210,7 @@ namespace ILRuntime.Runtime.Enviorment
 
             if (!pdbfile.Exists)
             {
-                throw new FileNotFoundException(string.Format("PDB file not find!:\r\n{0}", pdbFilePath));
+                throw new FileNotFoundException(string.Format("symbol file not find!:\r\n{0}", symbolFilePath));
             }
 
             using (FileStream fs = new FileStream(assfile.FullName, FileMode.Open, FileAccess.Read))
@@ -242,13 +252,14 @@ namespace ILRuntime.Runtime.Enviorment
         /// <param name="symbolReader">PDB 读取器</param>
         public void LoadAssembly(System.IO.Stream stream, System.IO.Stream symbol, ISymbolReaderProvider symbolReader)
         {
-            var module = ModuleDefinition.ReadModule(stream);
+            var module = ModuleDefinition.ReadModule(stream); //从MONO中加载模块
 
-            if (symbolReader != null && symbol != null)
+            if (symbolReader != null && symbol != null) 
             {
-                module.ReadSymbols(symbolReader.GetSymbolReader(module, symbol));
+                module.ReadSymbols(symbolReader.GetSymbolReader(module, symbol)); //加载符号表
             }
-            if (module.HasAssemblyReferences)
+
+            if (module.HasAssemblyReferences) //如果此模块引用了其他模块
             {
                 foreach (var ar in module.AssemblyReferences)
                 {
@@ -258,14 +269,18 @@ namespace ILRuntime.Runtime.Enviorment
                         moduleref.Add(ar.FullName);*/
                 }
             }
+
             if (module.HasTypes)
             {
                 List<ILType> types = new List<ILType>();
-                foreach (var t in module.GetTypes())
+
+                foreach (var t in module.GetTypes()) //获取所有此模块定义的类型
                 {
                     ILType type = new ILType(t, this);
+
                     mapType[t.FullName] = type;
                     types.Add(type);
+
                 }
             }
 
@@ -323,6 +338,11 @@ namespace ILRuntime.Runtime.Enviorment
             ctorRedirectMap[mi] = func;
         }
 
+        /// <summary>
+        /// 更近类型名称返回类型
+        /// </summary>
+        /// <param name="fullname">类型全名 命名空间.类型名</param>
+        /// <returns></returns>
         public IType GetType(string fullname)
         {
             IType res;
@@ -330,12 +350,18 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 return null;
             }
+
             if (mapType.TryGetValue(fullname, out res))
                 return res;
+
+
             string baseType;
             List<string> genericParams;
             bool isArray;
+
             ParseGenericType(fullname, out baseType, out genericParams, out isArray);
+
+
             bool isByRef = baseType.EndsWith("&");
             if (isByRef)
                 baseType = baseType.Substring(0, baseType.Length - 1);
@@ -678,6 +704,11 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
+        /// <summary>
+        /// 根据CLR类型获取 IL类型
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public IType GetType(Type t)
         {
             IType res;
