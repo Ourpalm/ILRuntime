@@ -150,10 +150,10 @@ namespace ILRuntime.Runtime.Enviorment
         }
 
         /// <summary>
-        /// 加载Assembly 文件和PDB文件，从指定的路径（PDB文件按默认命名方式，并且和Assembly文件处于同一目录中
+        /// 加载Assembly 文件和PDB文件或MDB文件，从指定的路径（PDB和MDB文件按默认命名方式，并且和Assembly文件处于同一目录中
         /// </summary>
         /// <param name="path">路径</param>
-        public void LoadAssemblyFileAndPDB(string path)
+        public void LoadAssemblyFileAndSymbol(string path)
         {
             FileInfo file = new FileInfo(path);
 
@@ -170,11 +170,16 @@ namespace ILRuntime.Runtime.Enviorment
 
                 string symbolPath = "";
 
-
+                bool isPDB = true;
                 if (File.Exists(pdbpath))
+                {
                     symbolPath = pdbpath;
+                }
                 else if (File.Exists(mdbpath))
+                {
                     symbolPath = mdbpath;
+                    isPDB = false;
+                }
 
 
                 if (string.IsNullOrEmpty(symbolPath))
@@ -187,7 +192,14 @@ namespace ILRuntime.Runtime.Enviorment
                     
                     using (var pdbfs = new System.IO.FileStream(symbolPath, FileMode.Open))
                     {
-                        LoadAssembly(fs, pdbfs);
+                        if (isPDB)
+                        {
+                            LoadAssemblyPDB(fs, pdbfs);
+                        }
+                        else
+                        {
+                            LoadAssemblyMDB(fs, pdbfs);
+                        }
                     }
                 }
             }
@@ -218,7 +230,37 @@ namespace ILRuntime.Runtime.Enviorment
 
                 using (var pdbfs = new System.IO.FileStream(pdbfile.FullName, FileMode.Open))
                 {
-                    LoadAssembly(fs, pdbfs);
+                    LoadAssemblyPDB(fs, pdbfs);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 加载Assembly 文件和MDB文件，两者都从指定的路径
+        /// </summary>
+        /// <param name="assemblyFilePath">Assembly 文件路径</param>
+        /// <param name="symbolFilePath">symbol文件路径</param>
+        public void LoadAssemblyFileAndMDB(string assemblyFilePath, string symbolFilePath)
+        {
+            FileInfo assfile = new FileInfo(assemblyFilePath);
+            FileInfo pdbfile = new FileInfo(symbolFilePath);
+            if (!assfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", assemblyFilePath));
+            }
+
+            if (!pdbfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("symbol file not find!:\r\n{0}", symbolFilePath));
+            }
+
+            using (FileStream fs = new FileStream(assfile.FullName, FileMode.Open, FileAccess.Read))
+            {
+
+                using (var pdbfs = new System.IO.FileStream(pdbfile.FullName, FileMode.Open))
+                {
+                    LoadAssemblyMDB(fs, pdbfs);
                 }
             }
 
@@ -239,17 +281,29 @@ namespace ILRuntime.Runtime.Enviorment
         /// <param name="stream">Assembly Stream</param>
         /// <param name="symbol">PDB Stream</param>
 
-        public void LoadAssembly(System.IO.Stream stream, System.IO.Stream symbol)
+        public void LoadAssemblyPDB(System.IO.Stream stream, System.IO.Stream symbol)
         {
             LoadAssembly(stream, symbol, new Mono.Cecil.Pdb.PdbReaderProvider());
+        }
+
+
+        /// <summary>
+        ///  从流加载Assembly,以及symbol符号文件(Mdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">PDB Stream</param>
+
+        public void LoadAssemblyMDB(System.IO.Stream stream, System.IO.Stream symbol)
+        {
+            LoadAssembly(stream, symbol, new Mono.Cecil.Mdb.MdbReaderProvider());
         }
 
         /// <summary>
         /// 从流加载Assembly,以及symbol符号文件(pdb)
         /// </summary>
         /// <param name="stream">Assembly Stream</param>
-        /// <param name="symbol">PDB Stream</param>
-        /// <param name="symbolReader">PDB 读取器</param>
+        /// <param name="symbol">symbol Stream</param>
+        /// <param name="symbolReader">symbol 读取器</param>
         public void LoadAssembly(System.IO.Stream stream, System.IO.Stream symbol, ISymbolReaderProvider symbolReader)
         {
             var module = ModuleDefinition.ReadModule(stream); //从MONO中加载模块
