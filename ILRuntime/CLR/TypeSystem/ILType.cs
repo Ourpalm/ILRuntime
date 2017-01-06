@@ -501,6 +501,7 @@ namespace ILRuntime.CLR.TypeSystem
                         }
                         else
                         {
+                            match = genericArguments == null;
                             for (int j = 0; j < pCnt; j++)
                             {
                                 if (param[j] != i.Parameters[j])

@@ -322,6 +322,7 @@ namespace ILRuntime.CLR.TypeSystem
                         }
                         else
                         {
+                            match = genericArguments == null;
                             for (int j = 0; j < param.Count; j++)
                             {
                                 var typeA = param[j].TypeForCLR.IsByRef ? param[j].TypeForCLR.GetElementType() : param[j].TypeForCLR;

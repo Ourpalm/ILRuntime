@@ -128,7 +128,7 @@ namespace ILRuntime.Runtime.Debugger
                 arg--;
             if (arg->ObjectType == ObjectTypes.StackObjectReference)
                 arg = *(StackObject**)&arg->Value;
-            ILTypeInstance instance = intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance;
+            ILTypeInstance instance = arg->ObjectType != ObjectTypes.Null ? intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance : null;
             if (instance == null)
                 return "null";
             var fields = instance.Type.TypeDefinition.Fields;
