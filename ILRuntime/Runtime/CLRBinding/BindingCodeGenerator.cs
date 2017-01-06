@@ -347,6 +347,51 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
                 sb.AppendLine();
+
+
+                if (!i.IsStatic && type.IsValueType && !type.IsPrimitive)//need to write back value type instance
+                {
+                    sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.Object:
+                    {
+                        __mStack[ptr_of_this_method->Value] = instance_of_this_method;");
+                    sb.Append(@"                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = instance_of_this_method");
+                    sb.Append(@";
+                        }
+                        else
+                        {
+                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, instance_of_this_method");
+                    sb.Append(@");
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = instance_of_this_method");
+                    sb.Append(@";
+                        }
+                        else
+                        {
+                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, instance_of_this_method");
+                    sb.AppendLine(@");
+                        }
+                    }
+                    break;
+            }");
+                    sb.AppendLine();
+                }
                 //Ref/Out
                 for (int j = param.Length; j > 0; j--)
                 {
@@ -364,17 +409,17 @@ namespace ILRuntime.Runtime.Generated
                     break;
                 case ObjectTypes.FieldReference:
                     {
-                        var obj = __mStack[ptr_of_this_method->Value];
-                        if(obj is ILTypeInstance)
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)obj)[ptr_of_this_method->ValueLow] = ");
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = ");
                     sb.Append(p.Name);
                     sb.Append(@";
                         }
                         else
                         {
-                            var t = domain.GetType(obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(obj, ");
+                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -514,13 +559,13 @@ namespace ILRuntime.Runtime.Generated
             {
                 if (!type.IsValueType)
                 {
-                    sb.Append(@"                        object obj = ");
+                    sb.Append(@"                        object ___obj = ");
                     sb.Append(paramName);
                     sb.AppendLine(";");
 
-                    sb.AppendLine(@"                        if (obj is CrossBindingAdaptorType)
-                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
-                        __mStack[dst->Value] = obj; ");
+                    sb.AppendLine(@"                        if (___obj is CrossBindingAdaptorType)
+                            ___obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                        __mStack[dst->Value] = ___obj; ");
                 }
                 else
                 {
@@ -602,7 +647,7 @@ namespace ILRuntime.Runtime.Generated
             }
             else
             {
-                if (!type.IsSealed)
+                if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
                 {
                     sb.AppendLine(@"            object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
@@ -735,8 +780,13 @@ namespace ILRuntime.Runtime.Generated
             if (isGeneric)
             {
                 int idx = type.Name.IndexOf("`");
-                realClsName += type.Name.Substring(0, idx);
-                realClsName += ga;
+                if (idx > 0)
+                {
+                    realClsName += type.Name.Substring(0, idx);
+                    realClsName += ga;
+                }
+                else
+                    realClsName += type.Name;
             }
             else
                 realClsName += type.Name;
