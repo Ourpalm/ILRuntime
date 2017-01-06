@@ -9,10 +9,15 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     public class BindingCodeGenerator
     {
-        public static void GenerateBindingCode(List<Type> types, string outputPath)
+        public static void GenerateBindingCode(List<Type> types, string outputPath, HashSet<MethodInfo> excludes = null)
         {
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
+            string[] oldFiles = System.IO.Directory.GetFiles(outputPath, "*.*");
+            foreach (var i in oldFiles)
+            {
+                System.IO.File.Delete(i);
+            }
             List<string> clsNames = new List<string>();
             foreach (var i in types)
             {
@@ -50,8 +55,8 @@ namespace ILRuntime.Runtime.Generated
                     sw.Write(realClsName);
                     sw.WriteLine(");");
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                    string registerCode = GenerateRegisterCode(i, methods);
-                    string wraperCode = GenerateWraperCode(i, methods, realClsName);
+                    string registerCode = GenerateRegisterCode(i, methods, excludes);
+                    string wraperCode = GenerateWraperCode(i, methods, realClsName, excludes);
                     sw.WriteLine(registerCode);
                     sw.WriteLine("        }");
                     sw.WriteLine();
@@ -105,6 +110,8 @@ namespace ILRuntime.Runtime.Generated
                 if (t[0] == "get" || t[0] == "set")
                 {
                     var prop = type.GetProperty(t[1]);
+                    if (prop == null)
+                        return true;
                     if (prop.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
                         return true;
                 }
@@ -114,12 +121,14 @@ namespace ILRuntime.Runtime.Generated
             return false;
         }
 
-        static string GenerateRegisterCode(Type type, MethodInfo[] methods)
+        static string GenerateRegisterCode(Type type, MethodInfo[] methods, HashSet<MethodInfo> excludes)
         {
             StringBuilder sb = new StringBuilder();
             int idx = 0;
             foreach (var i in methods)
             {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
                 if (ShouldSkipMethod(type, i))
                     continue;
                 bool isProperty = i.IsSpecialName;
@@ -152,13 +161,15 @@ namespace ILRuntime.Runtime.Generated
             return sb.ToString();
         }
 
-        static string GenerateWraperCode(Type type, MethodInfo[] methods, string typeClsName)
+        static string GenerateWraperCode(Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodInfo> excludes)
         {
             StringBuilder sb = new StringBuilder();
 
             int idx = 0;
             foreach (var i in methods)
             {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
                 if (ShouldSkipMethod(type, i))
                     continue;
                 bool isProperty = i.IsSpecialName;
