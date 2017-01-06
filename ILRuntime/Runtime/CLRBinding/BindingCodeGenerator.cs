@@ -575,7 +575,7 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine(";");
 
                     sb.AppendLine(@"                        if (___obj is CrossBindingAdaptorType)
-                            ___obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                            ___obj = ((CrossBindingAdaptorType)___obj).ILInstance;
                         __mStack[dst->Value] = ___obj; ");
                 }
                 else
