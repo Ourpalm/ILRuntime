@@ -74,7 +74,7 @@ namespace Mono.Cecil
 
         string @namespace;
         bool value_type;
-        int hashCode = -1;
+        static int instance_id;
         internal IMetadataScope scope;
         internal ModuleDefinition module;
 
@@ -252,12 +252,7 @@ namespace Mono.Cecil
 
         public override int GetHashCode()
         {
-            if (hashCode == -1)
-            {
-                hashCode = (int)(((uint)FullName.GetHashCode() << 16 & 0xFFFF0000) | ((uint)base.GetHashCode() & 0xFFFF));
-            }
-
-            return hashCode;
+            return System.Threading.Interlocked.Add(ref instance_id, 1);
         }
         public virtual bool IsPrimitive
         {

@@ -36,7 +36,7 @@ namespace Mono.Cecil
 
     public class MethodReference : MemberReference, IMethodSignature, IGenericParameterProvider, IGenericContext
     {
-        int hashCode = -1;
+        static int instance_id;
         internal ParameterDefinitionCollection parameters;
         MethodReturnType return_type;
 
@@ -154,12 +154,7 @@ namespace Mono.Cecil
 
         public override int GetHashCode()
         {
-            if (hashCode == -1)
-            {
-                hashCode = (int)(((uint)FullName.GetHashCode() << 16 & 0xFFFF0000) | ((uint)base.GetHashCode() & 0xFFFF));
-            }
-
-            return hashCode;
+            return System.Threading.Interlocked.Add(ref instance_id, 1);
         }
 
         public virtual bool IsGenericInstance
