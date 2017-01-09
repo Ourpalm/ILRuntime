@@ -2859,7 +2859,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     var idx = esp - 1 - 1;
                                     var arrRef = esp - 1 - 1 - 1;
                                     Array arr = mStack[arrRef->Value] as Array;
-                                    arr.SetValue(mStack[val->Value], idx->Value);
+                                    ArraySetValue(arr, mStack[val->Value], idx->Value);
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
                                     Free(esp - 1 - 1 - 1);
@@ -2877,7 +2877,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         switch (val->ObjectType)
                                         {
                                             case ObjectTypes.Object:
-                                                arr.SetValue(mStack[val->Value], idx->Value);
+                                                ArraySetValue(arr, mStack[val->Value], idx->Value);
                                                 break;
                                             case ObjectTypes.Integer:
                                                 arr.SetValue(val->Value, idx->Value);
@@ -2900,7 +2900,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         switch (val->ObjectType)
                                         {
                                             case ObjectTypes.Object:
-                                                arr.SetValue(mStack[val->Value], idx->Value);
+                                                ArraySetValue(arr, mStack[val->Value], idx->Value);
                                                 break;
                                             case ObjectTypes.Integer:
                                                 {
@@ -3628,6 +3628,11 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack);
+        }
+
+        void ArraySetValue(Array arr, object obj, int idx)
+        {
+            arr.SetValue(obj.GetType().CheckCLRTypes(AppDomain, obj), idx);
         }
 
         void StoreIntValueToArray(Array arr, StackObject* val, StackObject* idx)
