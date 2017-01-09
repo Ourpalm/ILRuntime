@@ -149,6 +149,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
+#if USE_MDB || USE_PDB
         /// <summary>
         /// 加载Assembly 文件和PDB文件或MDB文件，从指定的路径（PDB和MDB文件按默认命名方式，并且和Assembly文件处于同一目录中
         /// </summary>
@@ -204,8 +205,9 @@ namespace ILRuntime.Runtime.Enviorment
                 }
             }
         }
+#endif
 
-
+#if USE_PDB
         /// <summary>
         /// 加载Assembly 文件和PDB文件，两者都从指定的路径
         /// </summary>
@@ -237,6 +239,19 @@ namespace ILRuntime.Runtime.Enviorment
         }
 
         /// <summary>
+        ///  从流加载Assembly,以及symbol符号文件(pdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">PDB Stream</param>
+        public void LoadAssemblyPDB(System.IO.Stream stream, System.IO.Stream symbol)
+        {
+            LoadAssembly(stream, symbol, new Mono.Cecil.Pdb.PdbReaderProvider());
+        }
+
+#endif
+
+#if USE_MDB
+        /// <summary>
         /// 加载Assembly 文件和MDB文件，两者都从指定的路径
         /// </summary>
         /// <param name="assemblyFilePath">Assembly 文件路径</param>
@@ -263,9 +278,18 @@ namespace ILRuntime.Runtime.Enviorment
                     LoadAssemblyMDB(fs, pdbfs);
                 }
             }
-
         }
 
+        /// <summary>
+        ///  从流加载Assembly,以及symbol符号文件(Mdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">PDB Stream</param>
+        public void LoadAssemblyMDB(System.IO.Stream stream, System.IO.Stream symbol)
+        {
+            LoadAssembly(stream, symbol, new Mono.Cecil.Mdb.MdbReaderProvider());
+        }
+#endif
         /// <summary>
         /// 从流加载Assembly 不加载symbol符号文件
         /// </summary>
@@ -274,29 +298,6 @@ namespace ILRuntime.Runtime.Enviorment
         {
             LoadAssembly(stream, null, null);
         }        
-
-        /// <summary>
-        ///  从流加载Assembly,以及symbol符号文件(pdb)
-        /// </summary>
-        /// <param name="stream">Assembly Stream</param>
-        /// <param name="symbol">PDB Stream</param>
-
-        public void LoadAssemblyPDB(System.IO.Stream stream, System.IO.Stream symbol)
-        {
-            LoadAssembly(stream, symbol, new Mono.Cecil.Pdb.PdbReaderProvider());
-        }
-
-
-        /// <summary>
-        ///  从流加载Assembly,以及symbol符号文件(Mdb)
-        /// </summary>
-        /// <param name="stream">Assembly Stream</param>
-        /// <param name="symbol">PDB Stream</param>
-
-        public void LoadAssemblyMDB(System.IO.Stream stream, System.IO.Stream symbol)
-        {
-            LoadAssembly(stream, symbol, new Mono.Cecil.Mdb.MdbReaderProvider());
-        }
 
         /// <summary>
         /// 从流加载Assembly,以及symbol符号文件(pdb)
@@ -353,9 +354,6 @@ namespace ILRuntime.Runtime.Enviorment
             debugService.NotifyModuleLoaded(module.Name);
 #endif
         }
-
-
-
 
         /// <summary>
         /// External reference should be added to the AppDomain by the method
