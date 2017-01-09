@@ -13,7 +13,7 @@ namespace ILRuntime.Runtime.CLRBinding
         {
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
-            string[] oldFiles = System.IO.Directory.GetFiles(outputPath, "*.*");
+            string[] oldFiles = System.IO.Directory.GetFiles(outputPath, "*.cs");
             foreach (var i in oldFiles)
             {
                 System.IO.File.Delete(i);
