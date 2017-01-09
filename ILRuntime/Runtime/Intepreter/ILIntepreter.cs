@@ -2947,6 +2947,8 @@ namespace ILRuntime.Runtime.Intepreter
                                     var arrRef = esp - 1 - 1;
                                     Array arr = mStack[arrRef->Value] as Array;
                                     object val = arr.GetValue(idx->Value);
+                                    if (val is CrossBindingAdaptorType)
+                                        val = ((CrossBindingAdaptorType)val).ILInstance;
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
 
