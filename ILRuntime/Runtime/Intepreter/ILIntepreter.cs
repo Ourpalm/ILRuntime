@@ -834,23 +834,19 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) + *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value + b->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            esp->ObjectType = ObjectTypes.Float;
                                             *((float*)&esp->Value) = *((float*)&a->Value) + *((float*)&b->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            esp->ObjectType = ObjectTypes.Double;
                                             *((double*)&esp->Value) = *((double*)&a->Value) + *((double*)&b->Value);
                                             break;
                                         default:
@@ -863,23 +859,19 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) - *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value - b->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            esp->ObjectType = ObjectTypes.Float;
                                             *((float*)&esp->Value) = *((float*)&a->Value) - *((float*)&b->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            esp->ObjectType = ObjectTypes.Double;
                                             *((double*)&esp->Value) = *((double*)&a->Value) - *((double*)&b->Value);
                                             break;
                                         default:
@@ -892,23 +884,19 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) * *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value * b->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            esp->ObjectType = ObjectTypes.Float;
                                             *((float*)&esp->Value) = *((float*)&a->Value) * *((float*)&b->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            esp->ObjectType = ObjectTypes.Double;
                                             *((double*)&esp->Value) = *((double*)&a->Value) * *((double*)&b->Value);
                                             break;
                                         default:
@@ -921,23 +909,19 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) / *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value / b->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            esp->ObjectType = ObjectTypes.Float;
                                             *((float*)&esp->Value) = *((float*)&a->Value) / *((float*)&b->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            esp->ObjectType = ObjectTypes.Double;
                                             *((double*)&esp->Value) = *((double*)&a->Value) / *((double*)&b->Value);
                                             break;
                                         default:
@@ -950,23 +934,19 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) % *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value % b->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            esp->ObjectType = ObjectTypes.Float;
                                             *(float*)&esp->Value = *(float*)&a->Value % *(float*)&b->Value;
                                             break;
                                         case ObjectTypes.Double:
-                                            esp->ObjectType = ObjectTypes.Float;
                                             *(double*)&esp->Value = *(double*)&a->Value % *(double*)&b->Value;
                                             break;
                                         default:
@@ -979,15 +959,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((ulong*)&esp->Value) = *((ulong*)&a->Value) % *((ulong*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = (int)((uint)a->Value % (uint)b->Value);
                                             break;
                                         default:
@@ -1000,15 +978,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) ^ *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value ^ b->Value;
                                             break;
                                         default:
@@ -1021,15 +997,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) & *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value & b->Value;
                                             break;
                                         default:
@@ -1042,15 +1016,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) | *((long*)&b->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value | b->Value;
                                             break;
                                         default:
@@ -1063,16 +1035,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     int bits = b->Value;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) << bits;
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value << bits;
                                             break;
                                         default:
@@ -1085,16 +1055,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     int bits = b->Value;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((long*)&esp->Value) = *((long*)&a->Value) >> bits;
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             esp->Value = a->Value >> bits;
                                             break;
                                         default:
@@ -1107,16 +1075,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     StackObject* b = esp - 1;
                                     StackObject* a = esp - 1 - 1;
-                                    esp = esp - 1 - 1;
+                                    esp = a;
                                     int bits = b->Value;
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            esp->ObjectType = ObjectTypes.Long;
                                             *((ulong*)&esp->Value) = *((ulong*)&a->Value) >> bits;
                                             break;
                                         case ObjectTypes.Integer:
-                                            esp->ObjectType = ObjectTypes.Integer;
                                             *(uint*)&esp->Value = (uint)a->Value >> bits;
                                             break;
                                         default:
@@ -1131,11 +1097,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            a->ObjectType = ObjectTypes.Long;
                                             *((long*)&a->Value) = ~*((long*)&a->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            a->ObjectType = ObjectTypes.Integer;
                                             a->Value = ~a->Value;
                                             break;
                                         default:
@@ -1149,19 +1113,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (a->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            a->ObjectType = ObjectTypes.Long;
                                             *((long*)&a->Value) = -*((long*)&a->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            a->ObjectType = ObjectTypes.Integer;
                                             a->Value = -a->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            a->ObjectType = ObjectTypes.Float;
                                             *((float*)&a->Value) = -*((float*)&a->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            a->ObjectType = ObjectTypes.Double;
                                             *((double*)&a->Value) = -*((double*)&a->Value);
                                             break;
                                         default:
