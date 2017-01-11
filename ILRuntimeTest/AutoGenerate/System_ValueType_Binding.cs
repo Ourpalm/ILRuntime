@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.Generated
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodInfo method;
+            MethodBase method;
             Type[] args;
             Type type = typeof(System.ValueType);
             args = new Type[]{typeof(System.Object)};
@@ -29,6 +29,7 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("ToString", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, ToString_2);
+
 
         }
 
@@ -83,6 +84,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+
 
 
     }

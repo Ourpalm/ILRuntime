@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.Generated
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodInfo method;
+            MethodBase method;
             Type[] args;
             Type type = typeof(System.String);
             args = new Type[]{typeof(System.String), typeof(System.String[])};
@@ -362,6 +362,16 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("GetEnumerator", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, GetEnumerator_113);
+
+            args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetConstructor(flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Ctor_0);
+            args = new Type[]{typeof(System.Char[])};
+            method = type.GetConstructor(flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Ctor_1);
+            args = new Type[]{typeof(System.Char), typeof(System.Int32)};
+            method = type.GetConstructor(flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Ctor_2);
 
         }
 
@@ -2649,6 +2659,54 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetEnumerator();
+
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+
+        static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 length = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 startIndex = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char[] value = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = new System.String(value, startIndex, length);
+
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static StackObject* Ctor_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] value = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = new System.String(value);
+
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static StackObject* Ctor_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Char c = (char)ptr_of_this_method->Value;
+
+            var result_of_this_method = new System.String(c, count);
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }

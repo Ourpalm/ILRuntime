@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.Generated
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodInfo method;
+            MethodBase method;
             Type[] args;
             Type type = typeof(System.Console);
             args = new Type[]{};
@@ -320,6 +320,7 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.String)};
             method = type.GetMethod("Write", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Write_99);
+
 
         }
 
@@ -1783,6 +1784,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+
 
 
     }

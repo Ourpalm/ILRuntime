@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.Generated
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodInfo method;
+            MethodBase method;
             Type[] args;
             Type type = typeof(ILRuntimeTest.TestFramework.TestStruct);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct).MakeByRefType()};
@@ -29,6 +29,7 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct)};
             method = type.GetMethod("DoTest2", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, DoTest2_2);
+
 
         }
 
@@ -54,15 +55,15 @@ namespace ILRuntime.Runtime.Generated
                     break;
                 case ObjectTypes.FieldReference:
                     {
-                        var obj = __mStack[ptr_of_this_method->Value];
-                        if(obj is ILTypeInstance)
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)obj)[ptr_of_this_method->ValueLow] = a;
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = a;
                         }
                         else
                         {
-                            var t = domain.GetType(obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(obj, a);
+                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, a);
                         }
                     }
                     break;
@@ -107,15 +108,15 @@ namespace ILRuntime.Runtime.Generated
                     break;
                 case ObjectTypes.FieldReference:
                     {
-                        var obj = __mStack[ptr_of_this_method->Value];
-                        if(obj is ILTypeInstance)
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)obj)[ptr_of_this_method->ValueLow] = a;
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = a;
                         }
                         else
                         {
-                            var t = domain.GetType(obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(obj, a);
+                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, a);
                         }
                     }
                     break;
@@ -150,6 +151,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+
 
 
     }

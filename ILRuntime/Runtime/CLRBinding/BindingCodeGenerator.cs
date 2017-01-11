@@ -9,7 +9,7 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     public class BindingCodeGenerator
     {
-        public static void GenerateBindingCode(List<Type> types, string outputPath, HashSet<MethodInfo> excludes = null)
+        public static void GenerateBindingCode(List<Type> types, string outputPath, HashSet<MethodBase> excludes = null)
         {
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
@@ -49,18 +49,23 @@ namespace ILRuntime.Runtime.Generated
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodInfo method;
+            MethodBase method;
             Type[] args;
             Type type = typeof(");
                     sw.Write(realClsName);
                     sw.WriteLine(");");
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string registerCode = GenerateRegisterCode(i, methods, excludes);
+                    ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                    string ctorRegisterCode = GenerateConstructorRegisterCode(i, ctors, excludes);
                     string wraperCode = GenerateWraperCode(i, methods, realClsName, excludes);
+                    string ctorWraperCode = GenerateConstructorWraperCode(i, ctors, realClsName, excludes);
                     sw.WriteLine(registerCode);
+                    sw.WriteLine(ctorRegisterCode);
                     sw.WriteLine("        }");
                     sw.WriteLine();
                     sw.WriteLine(wraperCode);
+                    sw.WriteLine(ctorWraperCode);
                     sw.WriteLine("    }");
                     sw.WriteLine("}");
                     sw.Flush();
@@ -95,7 +100,7 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
-        static bool ShouldSkipMethod(Type type, MethodInfo i)
+        static bool ShouldSkipMethod(Type type, MethodBase i)
         {
             if (i.IsPrivate)
                 return true;
@@ -118,10 +123,16 @@ namespace ILRuntime.Runtime.Generated
             }
             if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
                 return true;
+            var param = i.GetParameters();
+            foreach(var j in param)
+            {
+                if (j.ParameterType.IsPointer)
+                    return true;
+            }
             return false;
         }
 
-        static string GenerateRegisterCode(Type type, MethodInfo[] methods, HashSet<MethodInfo> excludes)
+        static string GenerateRegisterCode(Type type, MethodInfo[] methods, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
             int idx = 0;
@@ -161,7 +172,153 @@ namespace ILRuntime.Runtime.Generated
             return sb.ToString();
         }
 
-        static string GenerateWraperCode(Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodInfo> excludes)
+        static string GenerateConstructorRegisterCode(Type type, ConstructorInfo[] methods, HashSet<MethodBase> excludes)
+        {
+            StringBuilder sb = new StringBuilder();
+            int idx = 0;
+            foreach (var i in methods)
+            {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
+                if (ShouldSkipMethod(type, i))
+                    continue;
+                var param = i.GetParameters();
+                StringBuilder sb2 = new StringBuilder();
+                sb2.Append("{");
+                bool first = true;
+                foreach (var j in param)
+                {
+                    if (first)
+                        first = false;
+                    else
+                        sb2.Append(", ");
+                    sb2.Append("typeof(");
+                    string tmp, clsName;
+                    bool isByRef;
+                    GetClassName(j.ParameterType, out tmp, out clsName, out isByRef);
+                    sb2.Append(clsName);
+                    sb2.Append(")");
+                    if (isByRef)
+                        sb2.Append(".MakeByRefType()");
+                }
+                sb2.Append("}");
+                sb.AppendLine(string.Format("            args = new Type[]{0};", sb2));
+                sb.AppendLine("            method = type.GetConstructor(flag, null, args, null);");
+                sb.AppendLine(string.Format("            app.RegisterCLRMethodRedirection(method, Ctor_{0});",idx));
+
+                idx++;
+            }
+            return sb.ToString();
+        }
+
+        static string GenerateConstructorWraperCode(Type type, ConstructorInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            int idx = 0;
+            foreach (var i in methods)
+            {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
+                if (ShouldSkipMethod(type, i) || i.IsStatic)
+                    continue;
+                var param = i.GetParameters();
+                int paramCnt = param.Length;
+                sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)", idx));
+                sb.AppendLine("        {");
+                sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;");
+                sb.AppendLine("            StackObject* ptr_of_this_method;");
+                sb.AppendLine(string.Format("            StackObject* __ret = ILIntepreter.Minus(__esp, {0});", paramCnt));
+                for (int j = param.Length; j > 0; j--)
+                {
+                    var p = param[j - 1];
+                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
+                    string tmp, clsName;
+                    bool isByRef;
+                    GetClassName(p.ParameterType, out tmp, out clsName, out isByRef);
+                    if (isByRef)
+                        sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
+                    sb.AppendLine(string.Format("            {0} {1} = {2};", clsName, p.Name, GetRetrieveValueCode(p.ParameterType, clsName)));
+                    if (!isByRef && !p.ParameterType.IsPrimitive)
+                        sb.AppendLine("            __intp.Free(ptr_of_this_method);");
+                }
+                sb.AppendLine();
+                sb.Append("            var result_of_this_method = ");
+                {
+                    string tmp, clsName;
+                    bool isByRef;
+                    GetClassName(type, out tmp, out clsName, out isByRef);
+                    sb.Append(string.Format("new {0}(", clsName));
+                    AppendParameters(param, sb);
+                    sb.AppendLine(");");
+
+                }
+                sb.AppendLine();
+
+                //Ref/Out
+                for (int j = param.Length; j > 0; j--)
+                {
+                    var p = param[j - 1];
+                    if (!p.ParameterType.IsByRef)
+                        continue;
+                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
+                    sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var dst = *(StackObject**)&ptr_of_this_method->Value;");
+                    GetRefWriteBackValueCode(p.ParameterType.GetElementType(), sb, p.Name);
+                    sb.Append(@"                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = ");
+                    sb.Append(p.Name);
+                    sb.Append(@";
+                        }
+                        else
+                        {
+                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, ");
+                    sb.Append(p.Name);
+                    sb.Append(@");
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = ");
+                    sb.Append(p.Name);
+                    sb.Append(@";
+                        }
+                        else
+                        {
+                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, ");
+                    sb.Append(p.Name);
+                    sb.AppendLine(@");
+                        }
+                    }
+                    break;
+            }");
+                    sb.AppendLine();
+                }
+                sb.AppendLine("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);");
+
+                sb.AppendLine("        }");
+                sb.AppendLine();
+                idx++;
+            }
+
+            return sb.ToString();
+        }
+
+        static string GenerateWraperCode(Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
 

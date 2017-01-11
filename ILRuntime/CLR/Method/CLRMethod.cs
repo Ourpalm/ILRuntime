@@ -129,7 +129,7 @@ namespace ILRuntime.CLR.Method
 
             if (def != null)
             {
-                appdomain.ConstructorRedirectMap.TryGetValue(cDef, out redirect);
+                appdomain.RedirectMap.TryGetValue(cDef, out redirect);
             }
         }
 

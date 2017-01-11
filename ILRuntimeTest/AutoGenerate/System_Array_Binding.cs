@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.Generated
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodInfo method;
+            MethodBase method;
             Type[] args;
             Type type = typeof(System.Array);
             args = new Type[]{typeof(System.Type), typeof(System.Int32)};
@@ -212,6 +212,7 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("Initialize", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Initialize_63);
+
 
         }
 
@@ -1534,6 +1535,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+
 
 
     }
