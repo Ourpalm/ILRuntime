@@ -224,7 +224,7 @@ namespace ILRuntime.Runtime.Generated
                     continue;
                 var param = i.GetParameters();
                 int paramCnt = param.Length;
-                sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)", idx));
+                sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", idx));
                 sb.AppendLine("        {");
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");
@@ -254,6 +254,50 @@ namespace ILRuntime.Runtime.Generated
 
                 }
                 sb.AppendLine();
+                if (type.IsValueType)
+                {
+                    sb.AppendLine(@"            if(!isNewObj)
+            {
+                __ret--;
+                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(__ret);
+                switch(ptr_of_this_method->ObjectType)
+                {
+                    case ObjectTypes.Object:
+                        {
+                            __mStack[ptr_of_this_method->Value] = result_of_this_method;
+                        }
+                        break;
+                    case ObjectTypes.FieldReference:
+                        {
+                            var ___obj = __mStack[ptr_of_this_method->Value];
+                            if(___obj is ILTypeInstance)
+                            {
+                                ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = result_of_this_method;
+                            }
+                            else
+                            {
+                                var t = domain.GetType(___obj.GetType()) as CLRType;
+                                t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, result_of_this_method);
+                            }
+                        }
+                        break;
+                    case ObjectTypes.StaticFieldReference:
+                        {
+                            var t = domain.GetType(ptr_of_this_method->Value);
+                            if(t is ILType)
+                            {
+                                ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = result_of_this_method;                    
+                            }
+                            else
+                            {
+                                ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, result_of_this_method);
+                            }
+                        }
+                        break;
+                }
+                return __ret;
+            }"); 
+                }
 
                 //Ref/Out
                 for (int j = param.Length; j > 0; j--)
@@ -334,7 +378,7 @@ namespace ILRuntime.Runtime.Generated
                 int paramCnt = param.Length;
                 if (!i.IsStatic)
                     paramCnt++;
-                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)", i.Name, idx));
+                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", i.Name, idx));
                 sb.AppendLine("        {");
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");

@@ -15,7 +15,7 @@ using ILRuntime.Runtime.Debugger;
 using ILRuntime.Runtime.Stack;
 namespace ILRuntime.Runtime.Enviorment
 {
-    public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method);
+    public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj);
     public class AppDomain
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();

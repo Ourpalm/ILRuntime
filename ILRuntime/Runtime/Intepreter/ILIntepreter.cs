@@ -1643,7 +1643,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 var redirect = cm.Redirection;
                                                 if (redirect != null)
-                                                    esp = redirect(this, esp, mStack, cm);
+                                                    esp = redirect(this, esp, mStack, cm, false);
                                                 else
                                                 {
 #if DEBUG
@@ -2263,7 +2263,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             var redirect = cm.Redirection;
                                             if (redirect != null)
-                                                esp = redirect(this, esp, mStack, cm);
+                                                esp = redirect(this, esp, mStack, cm, true);
                                             else
                                             {
                                                 object result = cm.Invoke(this, esp, mStack, true);

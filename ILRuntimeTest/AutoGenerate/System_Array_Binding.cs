@@ -216,7 +216,7 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
-        static StackObject* CreateInstance_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CreateInstance_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -237,7 +237,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* CreateInstance_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CreateInstance_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -260,7 +260,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* CreateInstance_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CreateInstance_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -285,7 +285,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* CreateInstance_3(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CreateInstance_3(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -307,7 +307,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* CreateInstance_4(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CreateInstance_4(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -329,7 +329,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* CreateInstance_5(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CreateInstance_5(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -354,7 +354,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Copy_6(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Copy_6(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -373,7 +373,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Copy_7(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Copy_7(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -396,7 +396,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* ConstrainedCopy_8(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* ConstrainedCopy_8(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -419,7 +419,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Copy_9(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Copy_9(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -438,7 +438,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Copy_10(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Copy_10(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -461,7 +461,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Clear_11(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Clear_11(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -479,7 +479,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* GetValue_12(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_12(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -502,7 +502,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetValue_13(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_13(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -524,7 +524,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetValue_14(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_14(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -548,7 +548,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetValue_15(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_15(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -574,7 +574,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetValue_16(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_16(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -596,7 +596,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetValue_17(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_17(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -620,7 +620,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetValue_18(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_18(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -646,7 +646,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* GetValue_19(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetValue_19(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -669,7 +669,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* SetValue_20(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_20(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -689,7 +689,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetValue_21(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_21(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -711,7 +711,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetValue_22(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_22(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -735,7 +735,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetValue_23(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_23(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -756,7 +756,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetValue_24(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_24(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -776,7 +776,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetValue_25(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_25(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -798,7 +798,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetValue_26(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_26(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -822,7 +822,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetValue_27(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* SetValue_27(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -843,7 +843,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_Length_28(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* get_Length_28(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -860,7 +860,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_LongLength_29(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* get_LongLength_29(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -877,7 +877,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* GetLength_30(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetLength_30(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -896,7 +896,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* GetLongLength_31(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetLongLength_31(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -915,7 +915,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_Rank_32(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* get_Rank_32(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -932,7 +932,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* GetUpperBound_33(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetUpperBound_33(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -951,7 +951,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* GetLowerBound_34(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetLowerBound_34(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -970,7 +970,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_SyncRoot_35(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* get_SyncRoot_35(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -990,7 +990,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* get_IsReadOnly_36(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* get_IsReadOnly_36(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1007,7 +1007,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_IsFixedSize_37(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* get_IsFixedSize_37(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1024,7 +1024,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_IsSynchronized_38(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* get_IsSynchronized_38(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1041,7 +1041,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* Clone_39(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Clone_39(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1061,7 +1061,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* BinarySearch_40(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* BinarySearch_40(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1080,7 +1080,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* BinarySearch_41(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* BinarySearch_41(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1103,7 +1103,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* BinarySearch_42(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* BinarySearch_42(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1125,7 +1125,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* BinarySearch_43(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* BinarySearch_43(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1151,7 +1151,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* CopyTo_44(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CopyTo_44(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1171,7 +1171,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* CopyTo_45(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* CopyTo_45(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1191,7 +1191,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* GetEnumerator_46(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* GetEnumerator_46(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1211,7 +1211,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* IndexOf_47(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* IndexOf_47(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1230,7 +1230,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* IndexOf_48(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* IndexOf_48(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1251,7 +1251,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* IndexOf_49(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* IndexOf_49(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1274,7 +1274,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_50(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_50(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1293,7 +1293,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_51(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_51(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1314,7 +1314,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* LastIndexOf_52(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* LastIndexOf_52(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1337,7 +1337,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* Reverse_53(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Reverse_53(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1351,7 +1351,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Reverse_54(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Reverse_54(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1369,7 +1369,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_55(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_55(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1383,7 +1383,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_56(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_56(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1400,7 +1400,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_57(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_57(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1418,7 +1418,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_58(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_58(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1439,7 +1439,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_59(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_59(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1456,7 +1456,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_60(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_60(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1476,7 +1476,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_61(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_61(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1497,7 +1497,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Sort_62(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Sort_62(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1521,7 +1521,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Initialize_63(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method)
+        static StackObject* Initialize_63(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
