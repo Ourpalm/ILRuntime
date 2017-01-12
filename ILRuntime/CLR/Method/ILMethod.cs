@@ -386,9 +386,8 @@ namespace ILRuntime.CLR.Method
                     break;
                 case OpCodeEnum.Ldstr:
                     {
-                        int hashCode = token.GetHashCode();
-                        appdomain.CacheString(token);
-                        code.TokenInteger = hashCode;
+                        long hashCode = appdomain.CacheString(token);
+                        code.TokenLong = hashCode;
                     }
                     break;
                 case OpCodeEnum.Ldtoken:

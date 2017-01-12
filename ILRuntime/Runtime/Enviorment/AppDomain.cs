@@ -25,7 +25,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
-        Dictionary<int, string> mapString = new Dictionary<int, string>();
+        Dictionary<long, string> mapString = new Dictionary<long, string>();
         Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate> redirectMap = new Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate>();
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         DelegateManager dMgr;
@@ -1061,13 +1061,35 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
-        internal void CacheString(object token)
+        internal long CacheString(object token)
         {
-            int hashCode = token.GetHashCode();
-            mapString[hashCode] = (string)token;
+            long oriHash = token.GetHashCode();
+            long hashCode = oriHash;
+            string str = (string)token;
+            lock (mapString)
+            {
+                bool isCollision = CheckStringCollision(hashCode, str);
+                long cnt = 0;
+                while (isCollision)
+                {
+                    cnt++;
+                    hashCode = cnt << 32 | oriHash;
+                    isCollision = CheckStringCollision(hashCode, str);
+                }
+                mapString[hashCode] = (string)token;
+            }
+            return hashCode;
         }
 
-        internal string GetString(int hashCode)
+        bool CheckStringCollision(long hashCode, string newStr)
+        {
+            string oldVal;
+            if (mapString.TryGetValue(hashCode, out oldVal))
+                return oldVal != newStr;
+            return false;
+        }
+
+        internal string GetString(long hashCode)
         {
             string res = null;
             if (mapString.TryGetValue(hashCode, out res))

@@ -825,7 +825,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Ldstr:
-                                esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenInteger));
+                                esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenLong));
                                 break;
                             #endregion
 
