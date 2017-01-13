@@ -3899,7 +3899,10 @@ namespace ILRuntime.Runtime.Intepreter
                     bool isBox = false;
                     if (plist != null && i < plist.Count)
                         isBox = plist[i] == AppDomain.ObjectType;
-                    esp = PushObject(esp, mStack, p[i], isBox);
+                    object obj = p[i];
+                    if (obj is CrossBindingAdaptorType)
+                        obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                    esp = PushObject(esp, mStack, obj, isBox);
                 }
             }
             return esp;
