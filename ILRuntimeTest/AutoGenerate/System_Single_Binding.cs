@@ -167,7 +167,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -205,7 +205,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -244,7 +244,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -282,7 +282,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -318,7 +318,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -357,7 +357,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -394,7 +394,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -518,7 +518,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(___obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, result);
+                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, result);
                         }
                     }
                     break;
@@ -531,7 +531,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, result);
+                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, result);
                         }
                     }
                     break;
@@ -582,7 +582,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(___obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, result);
+                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, result);
                         }
                     }
                     break;
@@ -595,7 +595,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, result);
+                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, result);
                         }
                     }
                     break;
@@ -626,7 +626,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -660,7 +660,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;
@@ -700,7 +700,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
                     }
                     break;

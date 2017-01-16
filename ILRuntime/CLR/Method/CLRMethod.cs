@@ -308,7 +308,7 @@ namespace ILRuntime.CLR.Method
                             else
                             {
                                 var t = appdomain.GetType(obj.GetType()) as CLRType;
-                                t.Fields[p->ValueLow].SetValue(obj, val);
+                                t.GetField(p->ValueLow).SetValue(obj, val);
                             }
                         }
                         break;
@@ -321,7 +321,7 @@ namespace ILRuntime.CLR.Method
                             }
                             else
                             {
-                                ((CLRType)t).Fields[p->ValueLow].SetValue(null, val);
+                                ((CLRType)t).GetField(p->ValueLow).SetValue(null, val);
                             }
                         }
                         break;

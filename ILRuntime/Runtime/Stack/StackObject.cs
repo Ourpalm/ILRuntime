@@ -74,7 +74,7 @@ namespace ILRuntime.Runtime.Stack
                         else
                         {
                             CLR.TypeSystem.CLRType type = (CLR.TypeSystem.CLRType)t;
-                            var fi = type.Fields[esp->ValueLow];
+                            var fi = type.GetField(esp->ValueLow);
                             return fi.GetValue(null);
                         }
                     }

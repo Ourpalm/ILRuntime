@@ -277,7 +277,7 @@ namespace ILRuntime.Runtime.Generated
                             else
                             {
                                 var t = domain.GetType(___obj.GetType()) as CLRType;
-                                t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, result_of_this_method);
+                                t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, result_of_this_method);
                             }
                         }
                         break;
@@ -290,7 +290,7 @@ namespace ILRuntime.Runtime.Generated
                             }
                             else
                             {
-                                ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, result_of_this_method);
+                                ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, result_of_this_method);
                             }
                         }
                         break;
@@ -326,7 +326,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(___obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, ");
+                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -343,7 +343,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, ");
+                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
                     sb.Append(p.Name);
                     sb.AppendLine(@");
                         }
@@ -424,7 +424,7 @@ namespace ILRuntime.Runtime.Generated
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (");
                         sb.Append(clsName);
-                        sb.Append(")t.Fields[ptr_of_this_method->ValueLow].GetValue(instance_of_fieldReference);");
+                        sb.Append(")t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);");
                         sb.AppendLine(@"
                         }
                     }
@@ -581,7 +581,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(___obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, instance_of_this_method");
+                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, instance_of_this_method");
                     sb.Append(@");
                         }
                     }
@@ -596,7 +596,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, instance_of_this_method");
+                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method");
                     sb.AppendLine(@");
                         }
                     }
@@ -631,7 +631,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = domain.GetType(___obj.GetType()) as CLRType;
-                            t.Fields[ptr_of_this_method->ValueLow].SetValue(___obj, ");
+                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -648,7 +648,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).Fields[ptr_of_this_method->ValueLow].SetValue(null, ");
+                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
                     sb.Append(p.Name);
                     sb.AppendLine(@");
                         }

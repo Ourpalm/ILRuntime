@@ -442,7 +442,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                 {
                                                     var t = AppDomain.GetType(ip->TokenInteger);
-                                                    obj = ((CLRType)t).Fields[idx].GetValue(obj);
+                                                    obj = ((CLRType)t).GetField(idx).GetValue(obj);
                                                     PushObject(objRef, mStack, obj);
                                                 }
                                             }
@@ -458,7 +458,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                                 else
                                                 {
-                                                    var obj = ((CLRType)t).Fields[idx].GetValue(null);
+                                                    var obj = ((CLRType)t).GetField(idx).GetValue(null);
                                                     PushObject(objRef, mStack, obj);
                                                 }
                                             }
@@ -505,7 +505,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                 {
                                                     var t = AppDomain.GetType(ip->TokenInteger);
-                                                    ((CLRType)t).Fields[idx].SetValue(obj, t.TypeForCLR.CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack)));
+                                                    ((CLRType)t).GetField(idx).SetValue(obj, t.TypeForCLR.CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack)));
                                                 }
                                             }
                                             break;
@@ -518,7 +518,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                                 else
                                                 {
-                                                    ((CLRType)t).Fields[objRef->ValueLow].SetValue(null, t.TypeForCLR.CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack)));
+                                                    ((CLRType)t).GetField(objRef->ValueLow).SetValue(null, t.TypeForCLR.CheckCLRTypes(AppDomain, StackObject.ToObject(val, AppDomain, mStack)));
                                                 }
                                             }
                                             break;
@@ -1872,7 +1872,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             CLRType t = type as CLRType;
                                             int idx = (int)ip->TokenLong;
-                                            var f = t.Fields[idx];
+                                            var f = t.GetField(idx);
                                             StackObject* val = esp - 1;
                                             f.SetValue(null, f.FieldType.CheckCLRTypes(domain, CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
                                         }
@@ -1897,7 +1897,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             CLRType t = type as CLRType;
                                             int idx = (int)ip->TokenLong;
-                                            var f = t.Fields[idx];
+                                            var f = t.GetField(idx);
                                             var val = f.GetValue(null);
                                             if (val is CrossBindingAdaptorType)
                                                 val = ((CrossBindingAdaptorType)val).ILInstance;
