@@ -56,6 +56,7 @@ namespace ILRuntime.Runtime.Generated
                     sw.WriteLine(");");
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string registerCode = GenerateRegisterCode(i, methods, excludes);
+                    string commonCode = GenerateCommonCode(i, realClsName);
                     ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string ctorRegisterCode = GenerateConstructorRegisterCode(i, ctors, excludes);
                     string wraperCode = GenerateWraperCode(i, methods, realClsName, excludes);
@@ -64,6 +65,7 @@ namespace ILRuntime.Runtime.Generated
                     sw.WriteLine(ctorRegisterCode);
                     sw.WriteLine("        }");
                     sw.WriteLine();
+                    sw.WriteLine(commonCode);
                     sw.WriteLine(wraperCode);
                     sw.WriteLine(ctorWraperCode);
                     sw.WriteLine("    }");
@@ -211,6 +213,126 @@ namespace ILRuntime.Runtime.Generated
             return sb.ToString();
         }
 
+        static string GenerateCommonCode(Type type, string typeClsName)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (type.IsPrimitive)
+            {
+                sb.AppendLine(string.Format("        static {0} GetInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack)", typeClsName));
+                sb.AppendLine("        {");
+                if (type.IsPrimitive || type.IsValueType)
+                    sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
+                sb.AppendLine(string.Format("            {0} instance_of_this_method;", typeClsName));
+                sb.Append(@"            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (");
+                sb.Append(typeClsName);
+                sb.Append(")((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];");
+                sb.Append(@"
+                        }
+                        else
+                        {
+                            var t = __domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (");
+                sb.Append(typeClsName);
+                sb.Append(")t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);");
+                sb.Append(@"
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = __domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (");
+                sb.Append(typeClsName);
+                sb.Append(@")((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (");
+                sb.Append(typeClsName);
+                sb.Append(@")((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
+                sb.Append(typeClsName);
+                sb.AppendLine(@"[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
+                    }
+                    break;
+                default:");
+                sb.AppendLine(string.Format("                    instance_of_this_method = {0};", GetRetrieveValueCode(type, typeClsName)));
+                sb.AppendLine(@"                    break;
+            }
+            return instance_of_this_method;");
+                sb.AppendLine("        }");
+            }
+            if (!type.IsPrimitive && !type.IsAbstract)
+            {
+                sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, {0} instance_of_this_method)", typeClsName));
+                sb.AppendLine("        {");
+                sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.Object:
+                    {
+                        __mStack[ptr_of_this_method->Value] = instance_of_this_method;");
+                sb.Append(@"                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = instance_of_this_method");
+                sb.Append(@";
+                        }
+                        else
+                        {
+                            var t = __domain.GetType(___obj.GetType()) as CLRType;
+                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, instance_of_this_method");
+                sb.Append(@");
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = __domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = instance_of_this_method");
+                sb.Append(@";
+                        }
+                        else
+                        {
+                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method");
+                sb.Append(@");
+                        }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
+                sb.Append(typeClsName);
+                sb.AppendLine(@"[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = instance_of_this_method;
+                    }
+                    break;
+            }");
+                sb.AppendLine(@"        }");
+            }
+            return sb.ToString();
+        }
+
         static string GenerateConstructorWraperCode(Type type, ConstructorInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
@@ -226,7 +348,7 @@ namespace ILRuntime.Runtime.Generated
                 int paramCnt = param.Length;
                 sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", idx));
                 sb.AppendLine("        {");
-                sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;");
+                sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");
                 sb.AppendLine(string.Format("            StackObject* __ret = ILIntepreter.Minus(__esp, {0});", paramCnt));
                 for (int j = param.Length; j > 0; j--)
@@ -259,42 +381,7 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine(@"            if(!isNewObj)
             {
                 __ret--;
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(__ret);
-                switch(ptr_of_this_method->ObjectType)
-                {
-                    case ObjectTypes.Object:
-                        {
-                            __mStack[ptr_of_this_method->Value] = result_of_this_method;
-                        }
-                        break;
-                    case ObjectTypes.FieldReference:
-                        {
-                            var ___obj = __mStack[ptr_of_this_method->Value];
-                            if(___obj is ILTypeInstance)
-                            {
-                                ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = result_of_this_method;
-                            }
-                            else
-                            {
-                                var t = domain.GetType(___obj.GetType()) as CLRType;
-                                t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, result_of_this_method);
-                            }
-                        }
-                        break;
-                    case ObjectTypes.StaticFieldReference:
-                        {
-                            var t = domain.GetType(ptr_of_this_method->Value);
-                            if(t is ILType)
-                            {
-                                ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = result_of_this_method;                    
-                            }
-                            else
-                            {
-                                ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, result_of_this_method);
-                            }
-                        }
-                        break;
-                }
+                WriteBackInstance(__domain, __ret, __mStack, result_of_this_method);
                 return __ret;
             }"); 
                 }
@@ -328,7 +415,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            var t = __domain.GetType(___obj.GetType()) as CLRType;
                             t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
@@ -337,7 +424,7 @@ namespace ILRuntime.Runtime.Generated
                     break;
                 case ObjectTypes.StaticFieldReference:
                     {
-                        var t = domain.GetType(ptr_of_this_method->Value);
+                        var t = __domain.GetType(ptr_of_this_method->Value);
                         if(t is ILType)
                         {
                             ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = ");
@@ -393,7 +480,7 @@ namespace ILRuntime.Runtime.Generated
                     paramCnt++;
                 sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", i.Name, idx));
                 sb.AppendLine("        {");
-                sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;");
+                sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");
                 sb.AppendLine(string.Format("            StackObject* __ret = ILIntepreter.Minus(__esp, {0});", paramCnt));
                 for (int j = param.Length; j > 0; j--)
@@ -412,70 +499,17 @@ namespace ILRuntime.Runtime.Generated
                 if (!i.IsStatic)
                 {
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
-                    string tmp, clsName;
-                    bool isByRef;
-                    GetClassName(type, out tmp, out clsName, out isByRef);
-                    if (type.IsPrimitive || type.IsValueType)
-                        sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
-                    sb.AppendLine(string.Format("            {0} instance_of_this_method;", clsName));
                     if (type.IsPrimitive)
-                    {
-                        sb.Append(@"            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (");
-                        sb.Append(clsName);
-                        sb.Append(")((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];");
-                        sb.Append(@"
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (");
-                        sb.Append(clsName);
-                        sb.Append(")t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);");
-                        sb.Append(@"
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (");
-                        sb.Append(clsName);
-                        sb.Append(@")((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (");
-                        sb.Append(clsName);
-                        sb.Append(@")((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
-                        sb.Append(clsName);
-                        sb.AppendLine(@"[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:");
-                        sb.AppendLine(string.Format("                    instance_of_this_method = {0};", GetRetrieveValueCode(type, clsName)));
-                        sb.AppendLine(@"                    break;
-            }");
-                    }
+                        sb.AppendLine(string.Format("            {0} instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);", typeClsName));
                     else
-                        sb.AppendLine(string.Format("            instance_of_this_method = {0};", GetRetrieveValueCode(type, clsName)));
-                    if (!type.IsValueType && !type.IsPrimitive)
-                        sb.AppendLine("            __intp.Free(ptr_of_this_method);");
+                    {
+                        if (type.IsValueType)
+                            sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
+                        sb.AppendLine(string.Format("            {0} instance_of_this_method;", typeClsName));
+                        sb.AppendLine(string.Format("            instance_of_this_method = {0};", GetRetrieveValueCode(type, typeClsName)));
+                        if (!type.IsValueType)
+                            sb.AppendLine("            __intp.Free(ptr_of_this_method);");
+                    }
                 }
                 sb.AppendLine();
                 if (i.ReturnType != typeof(void))
@@ -601,56 +635,7 @@ namespace ILRuntime.Runtime.Generated
 
                 if (!i.IsStatic && type.IsValueType && !type.IsPrimitive)//need to write back value type instance
                 {
-                    string tmp, clsName;
-                    bool isByRef;
-                    GetClassName(type, out tmp, out clsName, out isByRef);
-                    sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.Object:
-                    {
-                        __mStack[ptr_of_this_method->Value] = instance_of_this_method;");
-                    sb.Append(@"                    }
-                    break;
-                case ObjectTypes.FieldReference:
-                    {
-                        var ___obj = __mStack[ptr_of_this_method->Value];
-                        if(___obj is ILTypeInstance)
-                        {
-                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = instance_of_this_method");
-                    sb.Append(@";
-                        }
-                        else
-                        {
-                            var t = domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, instance_of_this_method");
-                    sb.Append(@");
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = instance_of_this_method");
-                    sb.Append(@";
-                        }
-                        else
-                        {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method");
-                    sb.Append(@");
-                        }
-                    }
-                    break;
-                 case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
-                    sb.Append(clsName);
-                    sb.AppendLine(@"[];
-                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = instance_of_this_method;
-                    }
-                    break;
-            }");
+                    sb.AppendLine("            WriteBackInstance(__domain, ptr_of_this_method, __mStack, instance_of_this_method);");
                     sb.AppendLine();
                 }
                 //Ref/Out
@@ -682,7 +667,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            var t = __domain.GetType(___obj.GetType()) as CLRType;
                             t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
@@ -691,7 +676,7 @@ namespace ILRuntime.Runtime.Generated
                     break;
                 case ObjectTypes.StaticFieldReference:
                     {
-                        var t = domain.GetType(ptr_of_this_method->Value);
+                        var t = __domain.GetType(ptr_of_this_method->Value);
                         if(t is ILType)
                         {
                             ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = ");
@@ -992,7 +977,7 @@ namespace ILRuntime.Runtime.Generated
             }
             else
             {
-                return string.Format("({0})typeof({0}).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack))", realClsName);
+                return string.Format("({0})typeof({0}).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack))", realClsName);
             }
         }
 

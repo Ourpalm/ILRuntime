@@ -84,9 +84,55 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
+        static System.Single GetInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack)
+        {
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Single instance_of_this_method;
+            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.FieldReference:
+                    {
+                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
+                        if(instance_of_fieldReference is ILTypeInstance)
+                        {
+                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            var t = __domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
+                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = __domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
+                    }
+                    break;
+                default:
+                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
+                    break;
+            }
+            return instance_of_this_method;
+        }
+
         static StackObject* IsInfinity_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
@@ -101,7 +147,7 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* IsPositiveInfinity_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
@@ -116,7 +162,7 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* IsNegativeInfinity_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
@@ -131,7 +177,7 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* IsNaN_3(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
@@ -146,54 +192,14 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* CompareTo_4(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.CompareTo(value);
 
@@ -204,53 +210,13 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* CompareTo_5(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.Single value = *(float*)&ptr_of_this_method->Value;
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.CompareTo(value);
 
@@ -261,54 +227,14 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* Equals_6(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.Equals(obj);
 
@@ -319,53 +245,13 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* Equals_7(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.Single obj = *(float*)&ptr_of_this_method->Value;
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.Equals(obj);
 
@@ -376,51 +262,11 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* GetHashCode_8(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.GetHashCode();
 
@@ -431,51 +277,11 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* ToString_9(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.ToString();
 
@@ -484,54 +290,14 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* ToString_10(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.ToString(provider);
 
@@ -540,54 +306,14 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* ToString_11(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.ToString(format);
 
@@ -596,57 +322,17 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* ToString_12(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.ToString(format, provider);
 
@@ -655,11 +341,11 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* Parse_13(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Single.Parse(s);
@@ -671,14 +357,14 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* Parse_14(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Single.Parse(s, style);
@@ -690,14 +376,14 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* Parse_15(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Single.Parse(s, provider);
@@ -709,17 +395,17 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* Parse_16(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Single.Parse(s, style, provider);
@@ -731,14 +417,14 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* TryParse_17(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             System.Single result = *(float*)&ptr_of_this_method->Value;
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Single.TryParse(s, out result);
@@ -762,14 +448,14 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            var t = __domain.GetType(___obj.GetType()) as CLRType;
                             t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, result);
                         }
                     }
                     break;
                 case ObjectTypes.StaticFieldReference:
                     {
-                        var t = domain.GetType(ptr_of_this_method->Value);
+                        var t = __domain.GetType(ptr_of_this_method->Value);
                         if(t is ILType)
                         {
                             ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = result;
@@ -795,20 +481,20 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* TryParse_18(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 4);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             System.Single result = *(float*)&ptr_of_this_method->Value;
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Single.TryParse(s, style, provider, out result);
@@ -832,14 +518,14 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            var t = domain.GetType(___obj.GetType()) as CLRType;
+                            var t = __domain.GetType(___obj.GetType()) as CLRType;
                             t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, result);
                         }
                     }
                     break;
                 case ObjectTypes.StaticFieldReference:
                     {
-                        var t = domain.GetType(ptr_of_this_method->Value);
+                        var t = __domain.GetType(ptr_of_this_method->Value);
                         if(t is ILType)
                         {
                             ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = result;
@@ -865,51 +551,11 @@ namespace ILRuntime.Runtime.Generated
 
         static StackObject* GetTypeCode_19(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single instance_of_this_method;
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.FieldReference:
-                    {
-                        var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
-                        if(instance_of_fieldReference is ILTypeInstance)
-                        {
-                            instance_of_this_method = (System.Single)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
-                            instance_of_this_method = (System.Single)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            instance_of_this_method = (System.Single)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
-                        }
-                        else
-                        {
-                            instance_of_this_method = (System.Single)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
-                        }
-                    }
-                    break;
-                case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
-                    }
-                    break;
-                default:
-                    instance_of_this_method = *(float*)&ptr_of_this_method->Value;
-                    break;
-            }
+            System.Single instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
 
             var result_of_this_method = instance_of_this_method.GetTypeCode();
 
