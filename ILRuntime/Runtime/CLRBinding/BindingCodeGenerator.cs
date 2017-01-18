@@ -281,7 +281,7 @@ namespace ILRuntime.Runtime.Generated
             }
             if (!type.IsPrimitive && !type.IsAbstract)
             {
-                sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, {0} instance_of_this_method)", typeClsName));
+                sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, ref {0} instance_of_this_method)", typeClsName));
                 sb.AppendLine("        {");
                 sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
             {
@@ -637,7 +637,7 @@ namespace ILRuntime.Runtime.Generated
 
                 if (!i.IsStatic && type.IsValueType && !type.IsPrimitive)//need to write back value type instance
                 {
-                    sb.AppendLine("            WriteBackInstance(__domain, ptr_of_this_method, __mStack, instance_of_this_method);");
+                    sb.AppendLine("            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);");
                     sb.AppendLine();
                 }
                 //Ref/Out
