@@ -383,7 +383,7 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine(@"            if(!isNewObj)
             {
                 __ret--;
-                WriteBackInstance(__domain, __ret, __mStack, result_of_this_method);
+                WriteBackInstance(__domain, __ret, __mStack, ref result_of_this_method);
                 return __ret;
             }"); 
                 }
