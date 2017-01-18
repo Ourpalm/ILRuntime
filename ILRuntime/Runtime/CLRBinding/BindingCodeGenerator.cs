@@ -215,6 +215,8 @@ namespace ILRuntime.Runtime.Generated
 
         static string GenerateCommonCode(Type type, string typeClsName)
         {
+            if (!type.IsValueType)
+                return "";
             StringBuilder sb = new StringBuilder();
             if (type.IsPrimitive)
             {
