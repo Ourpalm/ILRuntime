@@ -92,10 +92,10 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("Substring", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Substring_23);
-            args = new Type[]{typeof(System.Char[])};
+            args = new Type[]{};
             method = type.GetMethod("Trim", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Trim_24);
-            args = new Type[]{};
+            args = new Type[]{typeof(System.Char[])};
             method = type.GetMethod("Trim", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Trim_25);
             args = new Type[]{typeof(System.Char[])};
@@ -848,6 +848,21 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String instance_of_this_method;
+            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = instance_of_this_method.Trim();
+
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static StackObject* Trim_25(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.Char[] trimChars = (System.Char[])typeof(System.Char[]).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
@@ -858,21 +873,6 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Trim(trimChars);
-
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
-        }
-
-        static StackObject* Trim_25(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String instance_of_this_method;
-            instance_of_this_method = (System.String)typeof(System.String).CheckCLRTypes(domain, StackObject.ToObject(ptr_of_this_method, domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            var result_of_this_method = instance_of_this_method.Trim();
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }

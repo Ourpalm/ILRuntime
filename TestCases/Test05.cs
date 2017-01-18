@@ -98,6 +98,16 @@ namespace TestCases
             }
         }
 
+        public static void TestArrayValueType()
+        {
+            int[] arr = new int[4] { 1, 2, 3, 4 };
+            for(int i = 0; i < arr.Length; i++)
+            {
+                string str = arr[i].ToString();
+                Console.WriteLine("!!! new str = " + str);
+            }
+        }
+
         public static void TestGenericMethod()
         {
             var test = TestGenericMethodSub();

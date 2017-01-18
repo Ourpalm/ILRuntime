@@ -99,6 +99,25 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
+                    }
+                    break;
                 default:
                     instance_of_this_method = *(long*)&ptr_of_this_method->Value;
                     break;
@@ -135,6 +154,25 @@ namespace ILRuntime.Runtime.Generated
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (System.Int64)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
                     }
                     break;
                 default:
@@ -176,6 +214,25 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
+                    }
+                    break;
                 default:
                     instance_of_this_method = *(long*)&ptr_of_this_method->Value;
                     break;
@@ -214,6 +271,25 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
+                    }
+                    break;
                 default:
                     instance_of_this_method = *(long*)&ptr_of_this_method->Value;
                     break;
@@ -250,6 +326,25 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
+                    }
+                    break;
                 default:
                     instance_of_this_method = *(long*)&ptr_of_this_method->Value;
                     break;
@@ -284,6 +379,25 @@ namespace ILRuntime.Runtime.Generated
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (System.Int64)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
                     }
                     break;
                 default:
@@ -323,6 +437,25 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
+                    }
+                    break;
                 default:
                     instance_of_this_method = *(long*)&ptr_of_this_method->Value;
                     break;
@@ -358,6 +491,25 @@ namespace ILRuntime.Runtime.Generated
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (System.Int64)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
                     }
                     break;
                 default:
@@ -398,6 +550,25 @@ namespace ILRuntime.Runtime.Generated
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (System.Int64)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
                     }
                     break;
                 default:
@@ -537,6 +708,12 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = result;
+                    }
+                    break;
             }
 
             __ret->ObjectType = ObjectTypes.Integer;
@@ -601,6 +778,12 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = result;
+                    }
+                    break;
             }
 
             __ret->ObjectType = ObjectTypes.Integer;
@@ -630,6 +813,25 @@ namespace ILRuntime.Runtime.Generated
                             var t = domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (System.Int64)t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);
                         }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (System.Int64)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (System.Int64)((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
                     }
                     break;
                 default:

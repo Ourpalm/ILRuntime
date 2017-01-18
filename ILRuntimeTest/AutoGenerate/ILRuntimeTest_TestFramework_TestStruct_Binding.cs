@@ -80,6 +80,12 @@ namespace ILRuntime.Runtime.Generated
                         }
                     }
                     break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ILRuntimeTest.TestFramework.TestStruct[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = a;
+                    }
+                    break;
             }
 
             return __ret;
@@ -131,6 +137,12 @@ namespace ILRuntime.Runtime.Generated
                         {
                             ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, a);
                         }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int32[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = a;
                     }
                     break;
             }

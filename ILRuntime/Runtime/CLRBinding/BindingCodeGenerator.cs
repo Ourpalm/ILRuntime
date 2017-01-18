@@ -305,6 +305,9 @@ namespace ILRuntime.Runtime.Generated
                     var p = param[j - 1];
                     if (!p.ParameterType.IsByRef)
                         continue;
+                    string tmp, clsName;
+                    bool isByRef;
+                    GetClassName(p.ParameterType.GetElementType(), out tmp, out clsName, out isByRef);
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
                     sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
             {
@@ -345,8 +348,18 @@ namespace ILRuntime.Runtime.Generated
                         {
                             ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
                     sb.Append(p.Name);
-                    sb.AppendLine(@");
+                    sb.Append(@");
                         }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
+                    sb.Append(clsName);
+                    sb.Append(@"[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = ");
+                    sb.Append(p.Name);
+                    sb.AppendLine(@";
                     }
                     break;
             }");
@@ -425,8 +438,33 @@ namespace ILRuntime.Runtime.Generated
                             instance_of_this_method = (");
                         sb.Append(clsName);
                         sb.Append(")t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);");
-                        sb.AppendLine(@"
+                        sb.Append(@"
                         }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var t = domain.GetType(ptr_of_this_method->Value);
+                        if(t is ILType)
+                        {
+                            instance_of_this_method = (");
+                        sb.Append(clsName);
+                        sb.Append(@")((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                        }
+                        else
+                        {
+                            instance_of_this_method = (");
+                        sb.Append(clsName);
+                        sb.Append(@")((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                        }
+                    }
+                    break;
+                case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
+                        sb.Append(clsName);
+                        sb.AppendLine(@"[];
+                        instance_of_this_method = instance_of_arrayReference[ptr_of_this_method->ValueLow];                        
                     }
                     break;
                 default:");
@@ -563,6 +601,9 @@ namespace ILRuntime.Runtime.Generated
 
                 if (!i.IsStatic && type.IsValueType && !type.IsPrimitive)//need to write back value type instance
                 {
+                    string tmp, clsName;
+                    bool isByRef;
+                    GetClassName(type, out tmp, out clsName, out isByRef);
                     sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.Object:
@@ -597,8 +638,16 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method");
-                    sb.AppendLine(@");
+                    sb.Append(@");
                         }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
+                    sb.Append(clsName);
+                    sb.AppendLine(@"[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = instance_of_this_method;
                     }
                     break;
             }");
@@ -610,6 +659,9 @@ namespace ILRuntime.Runtime.Generated
                     var p = param[j - 1];
                     if (!p.ParameterType.IsByRef)
                         continue;
+                    string tmp, clsName;
+                    bool isByRef;
+                    GetClassName(p.ParameterType.GetElementType(), out tmp, out clsName, out isByRef);
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
                     sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
             {
@@ -650,8 +702,18 @@ namespace ILRuntime.Runtime.Generated
                         {
                             ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
                     sb.Append(p.Name);
-                    sb.AppendLine(@");
+                    sb.Append(@");
                         }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ");
+                    sb.Append(clsName);
+                    sb.Append(@"[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = ");
+                    sb.Append(p.Name);
+                    sb.AppendLine(@";
                     }
                     break;
             }");
