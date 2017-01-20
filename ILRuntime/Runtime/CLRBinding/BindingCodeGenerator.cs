@@ -283,7 +283,8 @@ namespace ILRuntime.Runtime.Generated
             {
                 sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, ref {0} instance_of_this_method)", typeClsName));
                 sb.AppendLine("        {");
-                sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
+                sb.AppendLine(@"            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.Object:
                     {
