@@ -570,6 +570,18 @@ namespace ILRuntime.Runtime.Generated
                                 case "Division":
                                     sb.AppendLine(string.Format("{0} / {1};", param[0].Name, param[1].Name));
                                     break;
+                                case "GreaterThan":
+                                    sb.AppendLine(string.Format("{0} > {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "GreaterThanOrEqual":
+                                    sb.AppendLine(string.Format("{0} >= {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "LessThan":
+                                    sb.AppendLine(string.Format("{0} < {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "LessThanOrEqual":
+                                    sb.AppendLine(string.Format("{0} <= {1};", param[0].Name, param[1].Name));
+                                    break;
                                 case "UnaryNegation":
                                     sb.AppendLine(string.Format("-{0};", param[0].Name));
                                     break;
