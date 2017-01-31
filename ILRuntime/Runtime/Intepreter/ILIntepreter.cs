@@ -2851,6 +2851,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             case ObjectTypes.Double:
                                                 arr.SetValue(*(double*)&val->Value, idx->Value);
                                                 break;
+                                            case ObjectTypes.Null:
+                                                arr.SetValue(null, idx->Value);
+                                                break;
                                             default:
                                                 throw new NotImplementedException();
                                         }
@@ -2888,6 +2891,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     ((double[])arr)[idx->Value] = *(double*)&val->Value;
                                                 }
+                                                break;
+                                            case ObjectTypes.Null:
+                                                arr.SetValue(null, idx->Value);
                                                 break;
                                             default:
                                                 throw new NotImplementedException();
@@ -3594,7 +3600,12 @@ namespace ILRuntime.Runtime.Intepreter
 
         void ArraySetValue(Array arr, object obj, int idx)
         {
-            arr.SetValue(obj.GetType().CheckCLRTypes(AppDomain, obj), idx);
+            if (obj != null)
+            {
+                arr.SetValue(obj.GetType().CheckCLRTypes(AppDomain, obj), idx);
+            }
+            else
+                arr.SetValue(null, idx);
         }
 
         void StoreIntValueToArray(Array arr, StackObject* val, StackObject* idx)
