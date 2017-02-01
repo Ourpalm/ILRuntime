@@ -477,7 +477,7 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (dele2 is IDelegateAdapter)
                         {
-                            if (dele1 == dele2)
+                            if (((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2))
                                 return ILIntepreter.PushObject(ret, mStack, ((IDelegateAdapter)dele1).Next);
                             else
                                 ((IDelegateAdapter)dele1).Remove((IDelegateAdapter)dele2);

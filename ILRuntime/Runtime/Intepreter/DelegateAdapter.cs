@@ -662,7 +662,10 @@ namespace ILRuntime.Runtime.Intepreter
             if (adapter is DelegateAdapter)
             {
                 DelegateAdapter b = (DelegateAdapter)adapter;
-                return instance == b.instance && next == b.next && method == b.method && Delegate == b.Delegate;
+                if (adapter is DummyDelegateAdapter)
+                    return instance == b.instance && next == b.next && method == b.method;
+                else
+                    return instance == b.instance && next == b.next && method == b.method && Delegate == b.Delegate;
             }
             else
                 return false;

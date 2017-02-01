@@ -635,6 +635,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 LoadFromFieldReference(instance, idx, dst, mStack);
                                             }
                                             break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                            }
+                                            break;
                                         default:
                                             {
                                                 dst->ObjectType = ObjectTypes.Integer;
@@ -657,6 +665,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var idx = val->ValueLow;
                                                 Free(dst);
                                                 LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
                                             }
                                             break;
                                         default:
@@ -683,6 +699,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 LoadFromFieldReference(instance, idx, dst, mStack);
                                             }
                                             break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                            }
+                                            break;
                                         default:
                                             {
                                                 dst->ObjectType = ObjectTypes.Float;
@@ -705,6 +729,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var idx = val->ValueLow;
                                                 Free(dst);
                                                 LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
                                             }
                                             break;
                                         default:
@@ -730,6 +762,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 LoadFromFieldReference(instance, idx, dst, mStack);
                                             }
                                             break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                            }
+                                            break;
                                         default:
                                             {
                                                 dst->ObjectType = ObjectTypes.Object;
@@ -753,6 +793,11 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.FieldReference:
                                             {
                                                 StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, mStack[dst->Value].GetType().GetElementType(), mStack);
                                             }
                                             break;
                                         default:
@@ -2851,9 +2896,6 @@ namespace ILRuntime.Runtime.Intepreter
                                             case ObjectTypes.Double:
                                                 arr.SetValue(*(double*)&val->Value, idx->Value);
                                                 break;
-                                            case ObjectTypes.Null:
-                                                arr.SetValue(null, idx->Value);
-                                                break;
                                             default:
                                                 throw new NotImplementedException();
                                         }
@@ -2891,9 +2933,6 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     ((double[])arr)[idx->Value] = *(double*)&val->Value;
                                                 }
-                                                break;
-                                            case ObjectTypes.Null:
-                                                arr.SetValue(null, idx->Value);
                                                 break;
                                             default:
                                                 throw new NotImplementedException();
@@ -3600,12 +3639,10 @@ namespace ILRuntime.Runtime.Intepreter
 
         void ArraySetValue(Array arr, object obj, int idx)
         {
-            if (obj != null)
-            {
-                arr.SetValue(obj.GetType().CheckCLRTypes(AppDomain, obj), idx);
-            }
-            else
+            if (obj == null)
                 arr.SetValue(null, idx);
+            else
+                arr.SetValue(obj.GetType().CheckCLRTypes(AppDomain, obj), idx);
         }
 
         void StoreIntValueToArray(Array arr, StackObject* val, StackObject* idx)
@@ -3735,6 +3772,11 @@ namespace ILRuntime.Runtime.Intepreter
         void LoadFromArrayReference(object obj,int idx, StackObject* objRef, IType t, List<object> mStack)
         {
             var nT = t.TypeForCLR;
+            LoadFromArrayReference(obj, idx, objRef, nT, mStack);
+        }
+
+        void LoadFromArrayReference(object obj, int idx, StackObject* objRef, Type nT, List<object> mStack)
+        {
             if (nT.IsPrimitive)
             {
                 if (nT == typeof(int))
@@ -3816,6 +3858,11 @@ namespace ILRuntime.Runtime.Intepreter
         void StoreValueToArrayReference(StackObject* objRef, StackObject* val, IType t, List<object> mStack)
         {
             var nT = t.TypeForCLR;
+            StoreValueToArrayReference(objRef, val, nT, mStack);
+        }
+        
+        void StoreValueToArrayReference(StackObject* objRef, StackObject* val, Type nT, List<object> mStack)
+        {
             if (nT.IsPrimitive)
             {
                 if (nT == typeof(int))
