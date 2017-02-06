@@ -79,7 +79,7 @@ namespace Mono.Cecil {
 
 		public override TypeReference GetElementType ()
 		{
-			return element_type.GetElementType ();
+			return element_type;
 		}
 	}
 
