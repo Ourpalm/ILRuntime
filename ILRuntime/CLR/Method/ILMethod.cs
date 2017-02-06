@@ -418,7 +418,8 @@ namespace ILRuntime.CLR.Method
         int GetTypeTokenHashCode(object token)
         {
             var t = appdomain.GetType(token, declaringType, this);
-            if (t == null && token is TypeReference && ((TypeReference)token).IsGenericParameter)
+            bool isGenericParameter = token is TypeReference && ((TypeReference)token).IsGenericParameter;
+            if (t == null && isGenericParameter)
             {
                 t = FindGenericArgument(((TypeReference)token).Name);
             }
@@ -427,6 +428,10 @@ namespace ILRuntime.CLR.Method
                 if (t is ILType)
                 {
                     return ((ILType)t).TypeReference.GetHashCode();
+                }
+                else if (isGenericParameter)
+                {
+                    return t.TypeForCLR.GetHashCode();
                 }
                 else
                     return token.GetHashCode();

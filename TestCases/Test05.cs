@@ -5,6 +5,15 @@ using System.Collections.Generic;
 using System.Text;
 namespace TestCases
 {
+    class Student<T>
+    {
+        public T name;
+        public Student(T name)
+        {
+            this.name = name;
+            Console.WriteLine(name);
+        }
+    }
     class TestExplicit
     {
         bool boolVal;
@@ -96,6 +105,12 @@ namespace TestCases
             {
                 return id.ToString();
             }
+        }
+
+        public static void TestStudent()
+        {
+            Student<string> a = new TestCases.Student<string>("aaaaaa");
+            Console.WriteLine(a.name);
         }
 
         public static void TestArrayValueType()

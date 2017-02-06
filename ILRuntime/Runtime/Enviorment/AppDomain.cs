@@ -482,6 +482,7 @@ namespace ILRuntime.Runtime.Enviorment
                     mapType[res.FullName] = res;
                     mapType[t.AssemblyQualifiedName] = res;
                     clrTypeMapping[t] = res;
+                    mapTypeToken[t.GetHashCode()] = res;
                     return res;
                 }
             }
