@@ -37,7 +37,7 @@ namespace ILRuntime.CLR.TypeSystem
         List<ILType> genericInstances;
         bool isDelegate;
         ILRuntimeType reflectionType;
-        IType firstCLRBaseType;
+        IType firstCLRBaseType, firstCLRInterface;
         public TypeDefinition TypeDefinition { get { return definition; } }
 
         public TypeReference TypeReference
@@ -137,15 +137,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (!interfaceInitialized)
                     InitializeInterfaces();
-                if (interfaces != null)
-                {
-                    for (int i = 0; i < interfaces.Length; i++)
-                    {
-                        if (interfaces[i] is CrossBindingAdaptor)
-                            return interfaces[i];
-                    }
-                }
-                return null;
+                return firstCLRInterface;
             }
         }
         public bool HasGenericParameter
@@ -389,6 +381,7 @@ namespace ILRuntime.CLR.TypeSystem
                         if (appdomain.CrossBindingAdaptors.TryGetValue(interfaces[i].TypeForCLR, out adaptor))
                         {
                             interfaces[i] = adaptor;
+                            firstCLRInterface = adaptor;
                         }
                         else
                             throw new TypeLoadException("Cannot find Adaptor for:" + interfaces[i].TypeForCLR.ToString());
