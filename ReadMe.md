@@ -1,6 +1,6 @@
 ILRuntime
 ==========
-[English Document]https://github.com/Ourpalm/ILRuntime/ReadMe-EN.md "Click here for English documents"
+[English Document](https://github.com/Ourpalm/ILRuntime/ReadMe-EN.md "Click here for English documents")
 
 ILRuntime项目为基于C#的平台（例如Unity）提供了一个纯C#实现的，快速、方便并且可靠的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新
 
@@ -15,9 +15,9 @@ ILRuntime项目为基于C#的平台（例如Unity）提供了一个纯C#实现�
 
 C# vs Lua
 ========
-目前市面上主流的热更方案，主要分为Lua的实现和用C#的实现，两种实现方式各有各的优缺点。Lua是一个已经非常成熟的解决方案，但是对于Unity项目而言，也有非常明显的缺点。就是如果使用Lua来进行逻辑开发，就势必要求团队当中的人员需要同时对Lua和C#都特别熟悉，或者将团队中的人员分成C#小组和Lua小组。不管哪一种方案，对于中小型团队都是非常痛苦的一件事情。用C#来作为热更语言最大的优势就是项目可以用同一个语言来进行开发，对Unity项目而言，这种方式肯定是开发效率的。
+目前市面上主流的热更方案，主要分为Lua的实现和用C#的实现，两种实现方式各有各的优缺点。Lua是一个已经非常成熟的解决方案，但是对于Unity项目而言，也有非常明显的缺点。就是如果使用Lua来进行逻辑开发，就势必要求团队当中的人员需要同时对Lua和C#都特别熟悉，或者将团队中的人员分成C#小组和Lua小组。不管哪一种方案，对于中小型团队都是非常痛苦的一件事情。用C#来作为热更语言最大的优势就是项目可以用同一个语言来进行开发，对Unity项目而言，这种方式肯定是开发效率最高的。
 
-Lua的优势在于解决方案足够成熟，借助luajit，在某些情况下的执行效率会非常不错，但是luajit现在维护情况也不容乐观，官方还是推荐使用公版Lua来开发。
+Lua的优势在于解决方案足够成熟，之前的C++团队可能比起C#，更加习惯使用Lua来进行逻辑开发。此外借助luajit，在某些情况下的执行效率会非常不错，但是luajit现在维护情况也不容乐观，官方还是推荐使用公版Lua来开发。
 
 快速入门
 ========
@@ -35,6 +35,8 @@ Unity
 nable it like this:
 * 在Assets目录里建立一个名为smcs.rsp的文本文件
 * 在smcs.rsp文件中加入"-unsafe"
+
+你可以在[这里](Releases/xxxxxx)下载到Unity的示例工程
 
 Visual Studio
 ----------
@@ -102,5 +104,6 @@ ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRu
 * [ILRuntime中跨域继承](Documents/Inheritance/)
 * [CLR重定向机制](Documents/CLRRedirection/)
 * [CLR绑定](Documents/CLRBinding/)
+* [ILRuntime的实现原理](Documents/ILIntepreter/)
 
 
