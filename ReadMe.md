@@ -1,6 +1,7 @@
 ILRuntime
 ==========
 [English Document](ReadMe-EN.md "Click here for English documents")
+
 ![license](https://img.shields.io/badge/license-MIT-blue.png)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.png)](https://github.com/Ourpalm/ILRuntime/pulls)
 
@@ -99,6 +100,23 @@ Visual Studio
 测试用例
 ----------
 ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRuntime的正常运行，在运行测试用例前，需要手动生成一下TestCases里面的工程，生成DLL文件。
+
+调试插件
+----------
+ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试你的热更脚本。
+你可以在[这里](Releases/xxxxxx)下载到最新的VS2015调试插件。
+使用方法如下：
+*安装ILRuntime调试插件，并重新启动VS2015
+*运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
+*用VS2015打开热更DLL项目
+*点击菜单中的Debug->Attach to ILRuntime按钮
+*在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口
+*点击Attach按钮后，即可像UnityVS一样下断点调试
+
+注意事项：
+*调试插件需要Visual Studio 2015 Update3以上版本
+*调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值
+
 
 文档
 ==========
