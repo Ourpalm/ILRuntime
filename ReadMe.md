@@ -1,327 +1,106 @@
 ILRuntime
 ==========
+[English Document]https://github.com/Ourpalm/ILRuntime/ReadMe-EN.md "Click here for English documents"
 
-This project is inpired by L# intepreter([LSharp Project](https://github.com/lightszero/LSharp "A Pure C# IL Runner,Run DLL as a Script" )), which is designed for the same purpose as we do, which is to provide a IL runtime to run c# code on enviorments without JIT. For example on iOS.
+ILRuntime项目为基于C#的平台（例如Unity）提供了一个纯C#实现的，快速、方便并且可靠的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新
 
-L# is a great project which created a good code base to accomplish the task, but it also has some limitations.
-* L# doesn't support Generic types inside the runtime
-* L# doesn't support inheritance of types outside the runtime
-* The arthmetic operation on L# has relative poor performance compared to highly optimized runtime like luajit
+同市面上的其他热更方案相比，ILRuntime主要有以下优点：
+* 无缝访问C#工程的现成代码，无需额外抽象脚本API
+* 直接使用VS2015进行开发，ILRuntime的解译引擎支持.Net 4.6编译的DLL
+* 执行效率是L#的10-20倍
+* 选择性的CLR绑定使跨域调用更快速，跨域调用的性能是slua的2倍左右（从脚本调用GameObject之类的接口）
+* 支持跨域继承
+* 完整的泛型支持
+* 拥有Visual Studio 2015的调试插件，可以实现真机源码级调试(WIP)
 
-So this project aims to develop a solid IL runtime to support as many features of IL as possible, and with highly optimized performance which is  as competitive as luajit.
-
-Our Vision
+C# vs Lua
 ========
-Our vision is to create a reliable high performance IL runtime which is also as productive as possible. The entire runtime will include the following features
+目前市面上主流的热更方案，主要分为Lua的实现和用C#的实现，两种实现方式各有各的优缺点。Lua是一个已经非常成熟的解决方案，但是对于Unity项目而言，也有非常明显的缺点。就是如果使用Lua来进行逻辑开发，就势必要求团队当中的人员需要同时对Lua和C#都特别熟悉，或者将团队中的人员分成C#小组和Lua小组。不管哪一种方案，对于中小型团队都是非常痛苦的一件事情。用C#来作为热更语言最大的优势就是项目可以用同一个语言来进行开发，对Unity项目而言，这种方式肯定是开发效率的。
 
-* Full support for Generics, both for types inside and outside the ILRuntime
-* Full support for type Inheritance from ILRuntime to CLR
-* Complete framework for Debugging, which supports break points, and common debugger actions like Step in, Step out, Step through.
-* Framework for inspecting stack and object information
-* Either Visual Studio integration or Standalone Debugger with GUI.
+Lua的优势在于解决方案足够成熟，借助luajit，在某些情况下的执行效率会非常不错，但是luajit现在维护情况也不容乐观，官方还是推荐使用公版Lua来开发。
 
-WARNING!
-========
-Please mainly use this library for bug fixing!! ADDING/HIDING/CHANING features in your APP may violate some platform's guideline(for example iOS), your APP may get REJECTED or even BANNED if you do so.
-
-This libray should not be used for evading Apple's review system, if you do this, it will be on your own risk!
-
-Get Started
+快速入门
 ========
 Unity
 ----------
-If you want to use ILRuntime in Unity, you need to copy the following source code into your project's Assets folder:
+如果你希望在Unity中使用ILRuntime，推荐的方式是直接使用ILRuntime的源代码，这样ILRuntime可以根据你的发布设置自动进行优化。
+你需要将下列源码目录复制Unity工程的Assets目录：
 * Mono.Cecil.20
-* Mono.Cecil.Pdb for VS compiled assembly or Mono.Cecil.Mdb for mono compiled assembly
+* Mono.Cecil.Pdb
 * ILRuntime
 
-The bin, obj, Properties sub folder should not be copied into unity folder, otherwise it may cause problem. The project files(.csproj) are not needed either, but it shoudn't cause any problem either.
+需要注意的是，需要删除这些目录里面的bin、obj、Properties子目录，以及.csproj文件。
 
-ILRuntime uses unsafe code, so you must enable unsafe mode to use ILRuntime, you can enable it like this:
-* Create a file named:smcs.rsp in Assets folder
-* Open smcs.rsp with text editor and add "-unsafe" to it.
+此外，由于ILRuntime使用了unsafe代码来优化执行效率，所以你需要在Unity中开启unsafe模式：
+nable it like this:
+* 在Assets目录里建立一个名为smcs.rsp的文本文件
+* 在smcs.rsp文件中加入"-unsafe"
 
 Visual Studio
 ----------
-For Visual Studio you only need to reference Mono.Cecil.20,ILRuntime,Mono.Cecil.Pdb or Mono.Cecil.Mdb's assembly.
+如果你希望在VisualStudio的C#项目中使用ILRuntime， 你只需要引用编译好的ILRuntime.dll，Mono.Cecil.20.dll以及Mono.Cecil.Pdb即可。
 
-Usage
+用法
 ----------
-For start using ILRuntime, you may follow these instructions:
-* Reference or copy the needed dependencies like described above
-* Make a instance of ILRuntime.Runtime.Enviorment.AppDomain, this class is the entry point of ILRuntime
-* Use appDomain.LoadAssembly to load a dll file, and the corresponding symbol file. You should specify the symbol reader if you want to use symbol file(for example, Mono.Cecil.Pdb.PdbReaderProvider for .pdb symbol)
-* Use appDomain.Invoke to run a static method of specified type
-* You can get all loaded types via appDomain.LoadedTypes property. All types in ILRuntime are represented with IType interface. You can instantiate a ILRuntime type by using: ((ILType)type).Instantiate()
+使用ILRuntime非常简单，只需要以下这些代码即可运行一个完整的例子：
+```C#
+    ILRuntime.Runtime.Enviorment.AppDomain appdomain;
+    void Start()
+	{
+	    StartCoroutine(EngineReadyCorroutine());
+	}
+	
+	IEnumerator EngineReadyCorroutine()
+    {
+        appdomain = new ILRuntime.Runtime.Enviorment.AppDomain();
+#if UNITY_ANDROID
+        WWW www = new WWW(Application.streamingAssetsPath + "/Hotfix.dll");
+#else
+        WWW www = new WWW("file:///" + Application.streamingAssetsPath + "/Hotfix.dll");
+#endif
+        while (!www.isDone)
+            yield return null;
+        if (!string.IsNullOrEmpty(www.error))
+            D.error(www.error);
+        byte[] dll = www.bytes;
+        www.Dispose();
+#if UNITY_ANDROID
+        www = new WWW(Application.streamingAssetsPath + "/Hotfix.pdb");
+#else
+        www = new WWW("file:///" + Application.streamingAssetsPath + "/Hotfix.pdb");
+#endif
+        while (!www.isDone)
+            yield return null;
+        if (!string.IsNullOrEmpty(www.error))
+            D.error(www.error);
+        byte[] pdb = www.bytes;
+        using (System.IO.MemoryStream fs = new MemoryStream(dll))
+        {
+            using (System.IO.MemoryStream p = new MemoryStream(pdb))
+            {
+                appdomain.LoadAssembly(fs, p, new Mono.Cecil.Pdb.PdbReaderProvider());
+            }
+        }
+        OnILRuntimeInitialized();
+    }
+	
+	void OnILRuntimeInitialized()
+	{
+	    appdomain.Invoke("Hotfix.Game", "Initialize", null, null);
+	}
+```
 
-Delegates
+这个例子为了演示方便，直接从StreamingAssets目录里读取了脚本DLL文件以及调试符号PDB文件， 实际发布的时候，如果要热更，肯定是将DLL和PDB文件打包到Assetbundle中进行动态加载的，这个不是ILRuntime的范畴，故不具体演示了。
+
+测试用例
 ----------
-In order to support platforms, where JIT are not allowed, we can't use reflection to create delegate types. So you need to register the delegate type, before you can use it.
+ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRuntime的正常运行，在运行测试用例前，需要手动生成一下TestCases里面的工程，生成DLL文件。
 
-You only need to register delegate types with different method signature, different delegate types with the same parameters and return value are only needed to register once.
+文档
+==========
+* [ILRuntime中使用委托](Documents/Delagates/)
+* [ILRuntime中跨域继承](Documents/Inheritance/)
+* [CLR重定向机制](Documents/CLRRedirection/)
+* [CLR绑定](Documents/CLRBinding/)
 
-To register a delegate type, you need to call appDomain.DelegateManager.RegisterMethodDelegate<ParamType1,ParamType2...>() for methods, appDomain.DelegateManager.RegisterFunctionDelegate<ParamType1, ParamType2, ..., ReturnType>() for functions
 
-If you want to use an delegate instance created in ILRuntime outside ILRuntime, then you need to make a Delegate Converter for it. ILRuntime uses Action<T> and Func<T> internal for delegates, so such delegate types have builtin converter, and you don't need to write converter for such types.
-
-A typical Delegate Converter should look like this:
-```C#
-app.DelegateManager.RegisterDelegateConvertor<DelegateType>((action) =>
-{
-    return new DelegateType((a) =>
-    {
-       ((Action<ParamType1>)action)(a);
-    });
-});
-```
-
-Inheritance
-----------
-Before you can inherit a type declared outside ILRuntime, you need to define a Adaptor for it.  A typical Adaptor should look like this:
-```C#
-    //All adaptors should inherit CrossBindingAdaptor
-    public class ClassInheritanceAdaptor : CrossBindingAdaptor
-    {
-        public override Type BaseCLRType
-        {
-            get
-            {
-                return typeof(ClassInheritanceTest);//This is the type to be inherited
-            }
-        }
-
-        public override Type AdaptorType
-        {
-            get
-            {
-                return typeof(Adaptor);//This is the actual Adaptor class for it
-            }
-        }
-
-        public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
-        {
-            return new Adaptor(appdomain, instance);//Creating a new instance
-        }
-
-		//The Adaptor class should inherit the type you want to inherit from ILRuntime, and implement the CrossBindingAdaptorType interface
-        class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
-        {
-            ILTypeInstance instance;
-            ILRuntime.Runtime.Enviorment.AppDomain appdomain;
-            IMethod mTestAbstract;
-            IMethod mTestVirtual;
-            bool isTestVirtualInvoking = false;
-
-            public Adaptor()
-            {
-
-            }
-
-            public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
-            {
-                this.appdomain = appdomain;
-                this.instance = instance;
-            }
-
-            public ILTypeInstance ILInstance { get { return instance; } }
-            
-			//The adaptor class should override all virtual and abstract methods declared in the base type, and redirect the call to the ILRuntime instance
-            public override void TestAbstract()
-            {
-                if(mTestAbstract == null)
-                {
-                    mTestAbstract = instance.Type.GetMethod("TestAbstract", 0);
-                }
-                if (mTestAbstract != null)
-                    appdomain.Invoke(mTestAbstract, instance);
-            }
-
-            public override void TestVirtual()
-            {
-                if (mTestVirtual == null)
-                {
-                    mTestVirtual = instance.Type.GetMethod("TestVirtual", 0);
-                }
-				//For virtual method, you must add a bool variable to determine if it's already invoking, otherwise it will cause stackoverflow if you call base.TestVirtual() inside ILRuntime
-                if (mTestVirtual != null && !isTestVirtualInvoking)
-                {
-                    isTestVirtualInvoking = true;
-                    appdomain.Invoke(mTestVirtual, instance);
-                    isTestVirtualInvoking = false;
-                }
-                else
-                    base.TestVirtual();
-            }
-
-            public override string ToString()
-            {
-                IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
-                m = instance.Type.GetVirtualMethod(m);
-                if (m == null || m is ILMethod)
-                {
-                    return instance.ToString();
-                }
-                else
-                    return instance.Type.FullName;
-            }
-        }
-```
-
-Running Test Project
------------
-Running the test project is quite simple. 
-* Compile the whole solution
-* Run the ILRuntimeTest project
-* Select the TestCases.dll
-* The tests are run automatically and output the results in Console and Window
-
-Apporach
-========
-The basic part of the runtime, like resolving PE header, gathering meta information of types, and disassembling of IL instructions, we will take the same solution as L#, to use the Mono.Cecil library. 
-
-The intepreter part, we will try to take elimminate the memory allcation for arthmetic operations and method invokation as much as possible. Also we want to make use of the advantage of unsafe code to boost the arthmetic operations and stack operation.
-
-A very simple test case shows drastical performance improvement compared to LSharp:
-```C#
-        public static int foo(int init)
-        {
-            int b = init;
-            for (int i = 0; i < 10000; i++)
-            {
-                b += i;
-            }
-
-            return b;
-        }
-        public static int foo()
-        {
-            int b = 0;
-            for (int i = 0; i < 50; i++)
-            {
-                b += foo(b);
-            }
-
-            return b;
-        }
-```
-
-Invokation of foo() takes about 1300ms in LSharp, but only takes about 40ms in ILRuntime.
-
-StackFrame and Managed Object Stack
----------------------
-In order to make the arthmetic operation fast enough, we must use unsafe code and manage the stack ourselfs. To accomplish this task, we've designed a ValueType to represent every slot in managed Stack.
-```C#
-    struct StackObject
-    {
-        public ObjectTypes ObjectType;
-        public int Value;
-        public int ValueLow;
-    }
-    enum ObjectTypes
-    {
-        Null,
-        Integer,
-        Long,
-        Float,
-        Double,
-        StackObjectReference,//Value = pointer, 
-        StaticFieldReference,
-        Object,
-        FieldReference,//Value = objIdx, ValueLow = fieldIdx
-        ArrayReference,//Value = objIdx, ValueLow = elemIdx
-    }
-```
-With this structure we can represent all kinds of objects on a managed Stack. It has a field indicates, which type of object it is. And it has 2 32bits Value fields, which can represent values from byte to long, it is also capable to represent a field reference.
-
-This structure is not sufficient for storing a reference type value. Therefore we have to instantiate a List<object> to store object references. In such case, the Value field stores the index of the object reference in the List.
-
-Managed Call Stack
------------------------------
-In order to make function call, we need to push all parameters onto the stack, and we need to allocate memory for all local variables, and we need to pass the return value to the caller. The Stack manipulation of entering and leaving the method body is illustrated like below:
-
-```
-EnterFrame:                            LeaveFrame:
-|---------------|                     |---------------|
-|   Argument1   |     |-------------->|  [ReturnVal]  |
-|---------------|     |               |---------------|
-|      ...      |     |               |     NULL      |
-|---------------|     |               |---------------|
-|   ArgumentN   |     |               |      ...      |
-|---------------|     |
-|   LocalVar1   |     |
-|---------------|     |
-|      ...      |     |
-|---------------|     |
-|   LocalVarN   |     |
-|---------------|     |
-|   FrameBase   |     |
-|---------------|     |
-|  [ReturnVal]  |------
-|---------------|
-```
-After entering the Call stack frame, the stack pointer(to simplify the whole thing we just call it 'esp') to the FrameBase in the illustration. The local variables are stored in esp - n to esp -1. And the arguments are stored before local varialbes, which are pushed onto stack by the caller.
-
-After executing the ret instruction, we copy the return value onto the position, where the first argument was, and zero out all the memories behind it, the esp is then pointed to the return value.
-
-Roadmaps
-==============================================
-
-##Implemented
-* Basic Stack operations
-* Majorities of IL instructions
-* Type Systems
-* Value types and Reference Types
-* Enums
-* Virtual Methods
-* Inheritance of classes inside the Runtime
-* Implementation of interfaces insided the Runtime
-* Generics for both inside the Runtime and for CLR types
-* Exception handling
-* CLR Method redirections
-* Call stack and local variable dumper
-* Delegates
-* Inheritance of classes outside ILRuntime
-
-##Planned
-* Multi-dimensional Arrays
-* Reflection support
-* All IL instructions
-* Implementation of interfaces outside ILRuntime
-
-##Experimental, timeline uncertain
-* Debugger support
-* Visual Studio integration
-* Debugging in Visual Studio
-* Remote debugging on other device
-
-Known Issues and Limitations
-==============================
-* ILRuntime is still been develeoped, you should not use it in production enviorment yet!
-* Code like below is not supported
-```C#
-//The following code is decleared in ILRuntime:
-class SubType : BaseType
-{
-
-}
-
-class Test
-{
-    void foo()
-    {
-        SubType instance = BaseType.Make<SubType>();
-        //This instance is invalid, because it is not able to create ILRuntime instance in CLR like this
-    }
-}
-
-//=====================================
-//This type is decleared in native CLR
-class BaseType
-{
-    public static T Make<T>()
-        where T:new()
-    {
-        return new T();
-    }
-}
-```
