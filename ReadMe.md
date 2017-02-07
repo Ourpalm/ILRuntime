@@ -11,7 +11,7 @@ ILRuntime项目为基于C#的平台（例如Unity）提供了一个纯C#实现�
 * 无缝访问C#工程的现成代码，无需额外抽象脚本API
 * 直接使用VS2015进行开发，ILRuntime的解译引擎支持.Net 4.6编译的DLL
 * 执行效率是L#的10-20倍
-* 选择性的CLR绑定使跨域调用更快速，跨域调用的性能是slua的2倍左右（从脚本调用GameObject之类的接口）
+* 选择性的CLR绑定使跨域调用更快速，绑定后跨域调用的性能能达到slua的2倍左右（从脚本调用GameObject之类的接口）
 * 支持跨域继承
 * 完整的泛型支持
 * 拥有Visual Studio 2015的调试插件，可以实现真机源码级调试(WIP)
@@ -35,7 +35,6 @@ Unity
 需要注意的是，需要删除这些目录里面的bin、obj、Properties子目录，以及.csproj文件。
 
 此外，由于ILRuntime使用了unsafe代码来优化执行效率，所以你需要在Unity中开启unsafe模式：
-nable it like this:
 * 在Assets目录里建立一个名为smcs.rsp的文本文件
 * 在smcs.rsp文件中加入"-unsafe"
 
@@ -52,10 +51,10 @@ Visual Studio
     ILRuntime.Runtime.Enviorment.AppDomain appdomain;
     void Start()
 	{
-	    StartCoroutine(EngineReadyCorroutine());
+	    StartCoroutine(LoadILRuntime());
 	}
 	
-	IEnumerator EngineReadyCorroutine()
+	IEnumerator LoadILRuntime()
     {
         appdomain = new ILRuntime.Runtime.Enviorment.AppDomain();
 #if UNITY_ANDROID
@@ -104,8 +103,11 @@ ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRu
 调试插件
 ----------
 ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试你的热更脚本。
+
 你可以在[这里](Releases/xxxxxx)下载到最新的VS2015调试插件。
+
 使用方法如下：
+
 *安装ILRuntime调试插件，并重新启动VS2015
 *运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
 *用VS2015打开热更DLL项目
@@ -114,6 +116,7 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 *点击Attach按钮后，即可像UnityVS一样下断点调试
 
 注意事项：
+
 *调试插件需要Visual Studio 2015 Update3以上版本
 *调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值
 
@@ -122,9 +125,13 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 ==========
 * [ILRuntime中使用委托](Documents/Delegates/)
 * [ILRuntime中跨域继承](Documents/Inheritance/)
+* [ILRuntime中的反射](Documents/Reflections/)
 * [CLR重定向机制](Documents/CLRRedirection/)
 * [CLR绑定](Documents/CLRBinding/)
 * [iOS IL2CPP打包注意事项](Documents/IL2CPP/)
 * [ILRuntime的实现原理](Documents/ILIntepreter/)
 
+技术支持
+==========
 
+QQ群：512079820
