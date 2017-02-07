@@ -8,14 +8,14 @@
 
 通过反射获取Type
 ----------------
-在*热更DLL*当中，直接调用Type.GetType("TypeName")或者typeof(TypeName)均可以得到有效System.Type类型实例
+在**热更DLL**当中，直接调用Type.GetType("TypeName")或者typeof(TypeName)均可以得到有效System.Type类型实例
 ```C#
 //在热更DLL中，以下两种方式均可以
 Type t = typeof(TypeName);
 Type t2 = Type.GetType("TypeName");
 ```
 
-在*Unity主工程中*，无法通过Type.GetType来取得热更DLL内部定义的类，而只能通过以下方式得到System.Type实例：
+在**Unity主工程中**，无法通过Type.GetType来取得热更DLL内部定义的类，而只能通过以下方式得到System.Type实例：
 
 ```C#
 IType type = appdomain.LoadedTypes["TypeName"];
@@ -24,23 +24,23 @@ Type t = type.ReflectedType;
 
 通过反射创建实例
 ---------------
-在*热更DLL*当中，可以直接通过Activator来创建实例：
+在**热更DLL**当中，可以直接通过Activator来创建实例：
 
 ```C#
 Type t = Type.GetType("TypeName");//或者typeof(TypeName)
 //以下两种方式均可以
 object instance = Activator.CreateInstance(t);
-object instance = Activator<TypeName>();
+object instance = Activator.CreateInstance<TypeName>();
 ```
 
-在*Unity主工程中*，无法通过Activator来创建热更DLL内类型的实例，必须通过AppDomain来创建实例：
+在**Unity主工程中**，无法通过Activator来创建热更DLL内类型的实例，必须通过AppDomain来创建实例：
 ```C#
 object instance = appdomain.Instantiate("TypeName");
 ```
 
 通过反射调用方法
 ---------------
-在*热更DLL*当中，通过反射调用方法跟通常C#用法没有任何区别
+在**热更DLL**当中，通过反射调用方法跟通常C#用法没有任何区别
 
 ```C#
 Type type = typeof(TypeName);
@@ -49,7 +49,7 @@ MethodInfo mi = type.GetMethod("foo");
 mi.Invoke(instance, null);
 ```
 
-在*Unity主工程中*，可以通过C#通常用法来调用，也可以通过ILRuntime自己的接口来调用，两个方式是等效的：
+在**Unity主工程中**，可以通过C#通常用法来调用，也可以通过ILRuntime自己的接口来调用，两个方式是等效的：
 ```C#
 IType t = appdomain.LoadedTypes["TypeName"];
 Type type = t.ReflectedType;
