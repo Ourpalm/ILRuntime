@@ -1,6 +1,8 @@
 ILRuntime
 ==========
-[English Document](https://github.com/Ourpalm/ILRuntime/ReadMe-EN.md "Click here for English documents")
+[English Document](ReadMe-EN.md "Click here for English documents")
+![license](https://img.shields.io/badge/license-MIT-blue.png)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.png)](https://github.com/Ourpalm/ILRuntime/pulls)
 
 ILRuntime项目为基于C#的平台（例如Unity）提供了一个纯C#实现的，快速、方便并且可靠的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新
 
@@ -100,10 +102,11 @@ ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRu
 
 文档
 ==========
-* [ILRuntime中使用委托](Documents/Delagates/)
+* [ILRuntime中使用委托](Documents/Delegates/)
 * [ILRuntime中跨域继承](Documents/Inheritance/)
 * [CLR重定向机制](Documents/CLRRedirection/)
 * [CLR绑定](Documents/CLRBinding/)
+* [iOS IL2CPP打包注意事项](Documents/IL2CPP/)
 * [ILRuntime的实现原理](Documents/ILIntepreter/)
 
 
