@@ -108,17 +108,17 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 
 使用方法如下：
 
-*安装ILRuntime调试插件，并重新启动VS2015
-*运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
-*用VS2015打开热更DLL项目
-*点击菜单中的Debug->Attach to ILRuntime按钮
-*在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口
-*点击Attach按钮后，即可像UnityVS一样下断点调试
+* 安装ILRuntime调试插件，并重新启动VS2015
+* 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
+* 用VS2015打开热更DLL项目
+* 点击菜单中的Debug->Attach to ILRuntime按钮
+* 在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口
+* 点击Attach按钮后，即可像UnityVS一样下断点调试
 
 注意事项：
 
-*调试插件需要Visual Studio 2015 Update3以上版本
-*调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值
+* 调试插件需要Visual Studio 2015 Update3以上版本
+* 调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值
 
 
 文档
