@@ -130,6 +130,24 @@ namespace ILRuntime.CLR.TypeSystem
                 return firstCLRBaseType;
             }
         }
+
+        IType FirstCLRInterface
+        {
+            get
+            {
+                if (!interfaceInitialized)
+                    InitializeInterfaces();
+                if (interfaces != null)
+                {
+                    for (int i = 0; i < interfaces.Length; i++)
+                    {
+                        if (interfaces[i] is CrossBindingAdaptor)
+                            return interfaces[i];
+                    }
+                }
+                return null;
+            }
+        }
         public bool HasGenericParameter
         {
             get
@@ -138,7 +156,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public Dictionary<string,int> StaticFieldMapping { get { return staticFieldMapping; } }
+        public Dictionary<string, int> StaticFieldMapping { get { return staticFieldMapping; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
@@ -284,9 +302,13 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     return enumType.TypeForCLR;
                 }
-                else if(FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
+                else if (FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
                 {
                     return ((CrossBindingAdaptor)FirstCLRBaseType).RuntimeType.TypeForCLR;
+                }
+                else if (FirstCLRInterface != null && FirstCLRInterface is CrossBindingAdaptor)
+                {
+                    return ((CrossBindingAdaptor)FirstCLRInterface).RuntimeType.TypeForCLR;
                 }
                 else
                     return typeof(ILTypeInstance);
@@ -361,7 +383,7 @@ namespace ILRuntime.CLR.TypeSystem
                 for (int i = 0; i < interfaces.Length; i++)
                 {
                     interfaces[i] = appdomain.GetType(definition.Interfaces[i], this, null);
-                    if(interfaces[i] is CLRType)
+                    if (interfaces[i] is CLRType)
                     {
                         CrossBindingAdaptor adaptor;
                         if (appdomain.CrossBindingAdaptors.TryGetValue(interfaces[i].TypeForCLR, out adaptor))
@@ -386,7 +408,7 @@ namespace ILRuntime.CLR.TypeSystem
                     {//都是这样，无所谓
                         baseType = null;
                     }
-                    else if(baseType.TypeForCLR == typeof(MulticastDelegate))
+                    else if (baseType.TypeForCLR == typeof(MulticastDelegate))
                     {
                         baseType = null;
                         isDelegate = true;
@@ -434,7 +456,7 @@ namespace ILRuntime.CLR.TypeSystem
             List<ILMethod> lst;
             if (methods.TryGetValue(name, out lst))
             {
-                foreach(var i in lst)
+                foreach (var i in lst)
                 {
                     if (i.ParameterCount == paramCount)
                         return i;
@@ -447,7 +469,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             methods = new Dictionary<string, List<ILMethod>>();
             constructors = new List<ILMethod>();
-            foreach(var i in definition.Methods)
+            foreach (var i in definition.Methods)
             {
                 if (i.IsConstructor)
                 {
@@ -586,7 +608,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             if (constructors == null)
                 InitializeMethods();
-            foreach(var i in constructors)
+            foreach (var i in constructors)
             {
                 if (i.ParameterCount == param.Count)
                 {
@@ -773,7 +795,7 @@ namespace ILRuntime.CLR.TypeSystem
                 bool match = true;
                 for (int j = 0; j < genericArguments.Length; j++)
                 {
-                    if(i.genericArguments[j].Value != genericArguments[j].Value)
+                    if (i.genericArguments[j].Value != genericArguments[j].Value)
                     {
                         match = false;
                         break;
@@ -829,7 +851,7 @@ namespace ILRuntime.CLR.TypeSystem
 
             foreach (var i in genericInstances)
             {
-                bool match=true;
+                bool match = true;
                 for (int j = 0; j < kv.Length; j++)
                 {
                     if (i.genericArguments[j].Value != kv[j])
