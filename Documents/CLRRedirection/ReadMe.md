@@ -1,7 +1,7 @@
 ﻿CLR重定向
 ===============
 在开发中，如ILRuntime的反射那篇文档中说的，一些依赖反射的接口是没有办法直接运行的，最典型的就是在Unity主工程中通过new T()创建热更DLL内类型的实例。
-细心的朋友一定会好奇，为什么Activator.CreateInstance<Type>();这个明显内部是new T();的接口为什么可以直接调用呢？
+细心的朋友一定会好奇，为什么Activator.CreateInstance<Type>();这个明显内部是new T();的接口可以直接调用呢？
 
 ILRuntime为了解决这类问题，引入了CLR重定向机制。 原理就是当IL解译器发现需要调用某个指定CLR方法时，将实际调用重定向到另外一个方法进行挟持，再在这个方法中对ILRuntime的反射的用法进行处理
 

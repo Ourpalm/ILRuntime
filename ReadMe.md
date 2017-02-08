@@ -7,6 +7,8 @@ ILRuntime
 
 ILRuntime项目为基于C#的平台（例如Unity）提供了一个纯C#实现的，快速、方便并且可靠的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新
 
+ILRuntime的优势
+----------
 同市面上的其他热更方案相比，ILRuntime主要有以下优点：
 * 无缝访问C#工程的现成代码，无需额外抽象脚本API
 * 直接使用VS2015进行开发，ILRuntime的解译引擎支持.Net 4.6编译的DLL
@@ -129,6 +131,7 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 * [CLR重定向机制](Documents/CLRRedirection/)
 * [CLR绑定](Documents/CLRBinding/)
 * [iOS IL2CPP打包注意事项](Documents/IL2CPP/)
+* [ILRuntime的性能优化建议](Documents/Optimization/)
 * [ILRuntime的实现原理](Documents/ILIntepreter/)
 
 技术支持
