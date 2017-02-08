@@ -47,7 +47,19 @@ namespace TestCases
             ILRuntimeTest.TestFramework.TestStruct b = a.Struct;
             a.Struct.value += 100;
             Console.WriteLine(b.value);
-            Console.WriteLine(a.Struct.value);
+            Console.WriteLine(a.Struct.value);            
+        }
+
+        public static void UnitTest_Struct2()
+        {
+            ILRuntimeTest.TestFramework.TestClass3 obj = new ILRuntimeTest.TestFramework.TestClass3();
+            obj.Struct.value = 111;
+            obj.Struct.value += 111;
+            Console.WriteLine(obj.Struct.value);
+
+            ILRuntimeTest.TestFramework.TestStruct.instance.value = 222;
+            ILRuntimeTest.TestFramework.TestStruct.instance.value += 111;
+            Console.WriteLine(ILRuntimeTest.TestFramework.TestStruct.instance.value);
         }
 
         public static object UnitTest_10022()

@@ -1745,18 +1745,30 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.FieldReference:
                                             {
                                                 obj = mStack[objRef->Value];
+                                                int idx = objRef->ValueLow;
                                                 if (obj is ILTypeInstance)
                                                 {
-                                                    obj = ((ILTypeInstance)obj)[objRef->ValueLow];
+                                                    obj = ((ILTypeInstance)obj)[idx];
                                                 }
                                                 else
-                                                    throw new NotSupportedException();
+                                                {
+                                                    var t = AppDomain.GetType(obj.GetType());
+                                                    obj = ((CLRType)t).GetField(idx).GetValue(obj);
+                                                }
                                             }
                                             break;
                                         case ObjectTypes.StaticFieldReference:
                                             {
-                                                var t = AppDomain.GetType(objRef->Value) as ILType;
-                                                obj = t.StaticInstance[objRef->ValueLow];
+                                                var t = AppDomain.GetType(objRef->Value);
+                                                int idx = objRef->ValueLow;
+                                                if (t is ILType)
+                                                {
+                                                    obj = ((ILType)t).StaticInstance[idx];
+                                                }
+                                                else
+                                                {
+                                                    obj = ((CLRType)t).GetField(idx).GetValue(null);
+                                                }
                                             }
                                             break;
                                         default:
@@ -1779,6 +1791,46 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var val = esp - 1;
                                                 var f = ((CLRType)type).GetField(ip->TokenInteger);
                                                 f.SetValue(obj, f.FieldType.CheckCLRTypes(domain, CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
+                                                //Writeback
+                                                if (t.IsValueType)
+                                                {
+                                                    switch (objRef->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Object:
+                                                            break;
+                                                        case ObjectTypes.FieldReference:
+                                                            {
+                                                                var oldObj = mStack[objRef->Value];
+                                                                int idx = objRef->ValueLow;
+                                                                if (oldObj is ILTypeInstance)
+                                                                {
+                                                                    oldObj = ((ILTypeInstance)oldObj)[idx];
+                                                                }
+                                                                else
+                                                                {
+                                                                    var it = AppDomain.GetType(oldObj.GetType());
+                                                                    ((CLRType)it).GetField(idx).SetValue(oldObj, obj);
+                                                                }
+                                                            }
+                                                            break;
+                                                        case ObjectTypes.StaticFieldReference:
+                                                            {
+                                                                var it = AppDomain.GetType(objRef->Value);
+                                                                int idx = objRef->ValueLow;
+                                                                if (it is ILType)
+                                                                {
+                                                                    ((ILType)it).StaticInstance[idx] = obj;
+                                                                }
+                                                                else
+                                                                {
+                                                                    ((CLRType)it).GetField(idx).SetValue(null, obj);
+                                                                }
+                                                            }
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
                                             }
                                             else
                                                 throw new TypeLoadException();
@@ -1805,18 +1857,30 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.FieldReference:
                                             {
                                                 obj = mStack[objRef->Value];
+                                                int idx = objRef->ValueLow;
                                                 if (obj is ILTypeInstance)
                                                 {
-                                                    obj = ((ILTypeInstance)obj)[objRef->ValueLow];
+                                                    obj = ((ILTypeInstance)obj)[idx];
                                                 }
                                                 else
-                                                    throw new NotSupportedException();
+                                                {
+                                                    var t = AppDomain.GetType(obj.GetType());
+                                                    obj = ((CLRType)t).GetField(idx).GetValue(obj);
+                                                }
                                             }
                                             break;
                                         case ObjectTypes.StaticFieldReference:
                                             {
-                                                var t = AppDomain.GetType(objRef->Value) as ILType;
-                                                obj = t.StaticInstance[objRef->ValueLow];
+                                                var t = AppDomain.GetType(objRef->Value);
+                                                int idx = objRef->ValueLow;
+                                                if (t is ILType)
+                                                {
+                                                    obj = ((ILType)t).StaticInstance[idx];
+                                                }
+                                                else
+                                                {
+                                                    obj = ((CLRType)t).GetField(idx).GetValue(null);
+                                                }
                                             }
                                             break;
                                         default:
@@ -1864,18 +1928,30 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.FieldReference:
                                             {
                                                 obj = mStack[objRef->Value];
+                                                int idx = objRef->ValueLow;
                                                 if (obj is ILTypeInstance)
                                                 {
-                                                    obj = ((ILTypeInstance)obj)[objRef->ValueLow];
+                                                    obj = ((ILTypeInstance)obj)[idx];
                                                 }
                                                 else
-                                                    throw new NotSupportedException();
+                                                {
+                                                    var t = AppDomain.GetType(obj.GetType());
+                                                    obj = ((CLRType)t).GetField(idx).GetValue(obj);
+                                                }
                                             }
                                             break;
                                         case ObjectTypes.StaticFieldReference:
                                             {
-                                                var t = AppDomain.GetType(objRef->Value) as ILType;
-                                                obj = t.StaticInstance[objRef->ValueLow];
+                                                var t = AppDomain.GetType(objRef->Value);
+                                                int idx = objRef->ValueLow;
+                                                if (t is ILType)
+                                                {
+                                                    obj = ((ILType)t).StaticInstance[idx];
+                                                }
+                                                else
+                                                {
+                                                    obj = ((CLRType)t).GetField(idx).GetValue(null);
+                                                }
                                             }
                                             break;
                                         default:
