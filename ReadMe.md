@@ -106,7 +106,7 @@ ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRu
 ----------
 ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试你的热更脚本。
 
-你可以在[这里](Releases/xxxxxx)下载到最新的VS2015调试插件。
+你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的VS2015调试插件。
 
 使用方法如下：
 
