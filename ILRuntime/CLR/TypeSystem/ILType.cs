@@ -46,7 +46,7 @@ namespace ILRuntime.CLR.TypeSystem
             set
             {
                 typeRef = value;
-                RetriveDefinitino(value);
+                RetriveDefinitino(value);                
             }
         }
 
@@ -221,28 +221,13 @@ namespace ILRuntime.CLR.TypeSystem
         /// <param name="def"></param>
         void RetriveDefinitino(TypeReference def)
         {
-            TypeReference res;
-            if (def is GenericInstanceType)
+            if (!def.IsGenericParameter)
             {
-                res = ((GenericInstanceType)def).ElementType;
+                if (def is TypeSpecification)
+                    RetriveDefinitino(def.GetElementType());
+                else
+                    definition = def as TypeDefinition;
             }
-            else if (def is ByReferenceType)
-            {
-                res = ((ByReferenceType)def).ElementType;
-            }
-            else if (def.IsArray)
-            {
-                res = (TypeDefinition)def.GetElementType();
-            }
-            else
-                res = (TypeDefinition)def;
-
-
-            if (!res.IsGenericParameter)
-            {
-                definition = res as TypeDefinition;
-            }
-
         }
 
         public bool IsGenericInstance

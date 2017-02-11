@@ -403,7 +403,8 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&ptr_of_this_method->Value;");
+                        var ___ptr = &ptr_of_this_method->Value;
+                        var ___dst = *(StackObject**)___ptr;");
                     GetRefWriteBackValueCode(p.ParameterType.GetElementType(), sb, p.Name);
                     sb.Append(@"                    }
                     break;
@@ -667,7 +668,8 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&ptr_of_this_method->Value;");
+                        var ___ptr = &ptr_of_this_method->Value;
+                        var ___dst = *(StackObject**)___ptr;");
                     GetRefWriteBackValueCode(p.ParameterType.GetElementType(), sb, p.Name);
                     sb.Append(@"                    }
                     break;
@@ -756,74 +758,74 @@ namespace ILRuntime.Runtime.Generated
             {
                 if (type == typeof(int))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(long))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Long;");
-                    sb.Append("                        *(long*)&dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Long;");
+                    sb.Append("                        *(long*)&___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(short))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(bool))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = " + paramName + " ? 1 : 0;");
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = " + paramName + " ? 1 : 0;");
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(ushort))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(float))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Float;");
-                    sb.Append("                        *(float*)&dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Float;");
+                    sb.Append("                        *(float*)&___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(double))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Double;");
-                    sb.Append("                        *(double*)&dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Double;");
+                    sb.Append("                        *(double*)&___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(byte))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(sbyte))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(uint))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = (int)" + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = (int)" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(char))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        dst->Value = (int)" + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                    sb.Append("                        ___dst->Value = (int)" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(ulong))
                 {
-                    sb.AppendLine("                        dst->ObjectType = ObjectTypes.Long;");
-                    sb.Append("                        *(ulong*)&dst->Value = " + paramName);
+                    sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Long;");
+                    sb.Append("                        *(ulong*)&___dst->Value = " + paramName);
                     sb.AppendLine(";");
                 }
                 else
@@ -839,11 +841,11 @@ namespace ILRuntime.Runtime.Generated
 
                     sb.AppendLine(@"                        if (___obj is CrossBindingAdaptorType)
                             ___obj = ((CrossBindingAdaptorType)___obj).ILInstance;
-                        __mStack[dst->Value] = ___obj; ");
+                        __mStack[___dst->Value] = ___obj; ");
                 }
                 else
                 {
-                    sb.Append("                        __mStack[dst->Value] = ");
+                    sb.Append("                        __mStack[___dst->Value] = ");
                     sb.Append(paramName);
                     sb.AppendLine(";");
                 }

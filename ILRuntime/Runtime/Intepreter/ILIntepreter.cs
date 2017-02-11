@@ -212,7 +212,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var a = Add(arg, ip->TokenInteger);
                                     esp->ObjectType = ObjectTypes.StackObjectReference;
-                                    *(StackObject**)&esp->Value = a;
+                                    var ppp = &esp->Value;
+                                    * (StackObject**)ppp = a;
                                     esp++;
                                 }
                                 break;
@@ -401,7 +402,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var v = Add(frame.LocalVarPointer, ip->TokenInteger);
                                     esp->ObjectType = ObjectTypes.StackObjectReference;
-                                    *(StackObject**)&esp->Value = v;
+                                    var ppp = &esp->Value;
+                                    * (StackObject**)ppp = v;
                                     esp++;
                                 }
                                 break;
@@ -1757,6 +1759,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                             }
                                             break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                Array arr = mStack[objRef->Value] as Array;
+                                                int idx = objRef->ValueLow;
+                                                obj = arr.GetValue(idx);
+                                                obj = obj.GetType().CheckCLRTypes(AppDomain, obj);
+                                            }
+                                            break;
                                         case ObjectTypes.StaticFieldReference:
                                             {
                                                 var t = AppDomain.GetType(objRef->Value);
@@ -1883,8 +1893,18 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                             }
                                             break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                Array arr = mStack[objRef->Value] as Array;
+                                                int idx = objRef->ValueLow;
+                                                obj = arr.GetValue(idx);
+                                                obj = obj.GetType().CheckCLRTypes(AppDomain, obj);
+                                            }
+                                            break;
                                         default:
-                                            throw new NotImplementedException();
+                                            {
+                                                throw new NotImplementedException();
+                                            }
                                     }
                                     Free(esp - 1);
                                     if (obj != null)
@@ -1938,6 +1958,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                     var t = AppDomain.GetType(obj.GetType());
                                                     obj = ((CLRType)t).GetField(idx).GetValue(obj);
                                                 }
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                Array arr = mStack[objRef->Value] as Array;
+                                                int idx = objRef->ValueLow;
+                                                obj = arr.GetValue(idx);
+                                                obj = obj.GetType().CheckCLRTypes(AppDomain, obj);
                                             }
                                             break;
                                         case ObjectTypes.StaticFieldReference:
@@ -4013,7 +4041,8 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (esp->ObjectType == ObjectTypes.StackObjectReference)
             {
-                return *(StackObject**)&esp->Value;
+                var ptr = &esp->Value;
+                return *(StackObject**)ptr;
             }
             else
                 return esp;
