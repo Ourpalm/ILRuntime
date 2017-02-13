@@ -4051,12 +4051,13 @@ namespace ILRuntime.Runtime.Intepreter
         StackObject* PushParameters(IMethod method, StackObject* esp, object[] p)
         {
             List<object> mStack = stack.ManagedStack;
-            if (p != null && p.Length > 0)
+            var plist = method.Parameters;
+            int pCnt = plist != null ? plist.Count : 0;
+            int pCnt2 = p != null ? p.Length : 0;
+            if (pCnt != pCnt2)
+                throw new ArgumentOutOfRangeException("Parameter mismatch");
+            if (pCnt2 > 0)
             {
-                var plist = method.Parameters;
-                int pCnt = plist != null ? plist.Count : 0;
-                if (pCnt != p.Length)
-                    throw new ArgumentOutOfRangeException();
                 for (int i = 0; i < p.Length; i++)
                 {
                     bool isBox = false;
