@@ -360,7 +360,8 @@ namespace ILRuntime.CLR.TypeSystem
                 for (int i = 0; i < interfaces.Length; i++)
                 {
                     interfaces[i] = appdomain.GetType(definition.Interfaces[i], this, null);
-                    if (interfaces[i] is CLRType)
+                    //only one clrInterface is valid
+                    if (interfaces[i] is CLRType && firstCLRInterface == null)
                     {
                         CrossBindingAdaptor adaptor;
                         if (appdomain.CrossBindingAdaptors.TryGetValue(interfaces[i].TypeForCLR, out adaptor))
