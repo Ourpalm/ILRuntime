@@ -50,12 +50,23 @@ namespace TestCases
             Console.WriteLine(a.Struct.value);            
         }
 
+        class StructTest2
+        {
+            public ILRuntimeTest.TestFramework.TestStruct Struct;
+        }
+
         public static void UnitTest_Struct2()
         {
             ILRuntimeTest.TestFramework.TestClass3 obj = new ILRuntimeTest.TestFramework.TestClass3();
             obj.Struct.value = 111;
             obj.Struct.value += 111;
             Console.WriteLine(obj.Struct.value);
+
+            StructTest2 obj2 = new TestCases.ExpTest_10.StructTest2();
+            obj2.Struct.value = 111;
+            obj2.Struct.value += 111;
+            Console.WriteLine(obj2.Struct.value);
+
 
             ILRuntimeTest.TestFramework.TestStruct.instance.value = 222;
             ILRuntimeTest.TestFramework.TestStruct.instance.value += 111;

@@ -376,7 +376,6 @@ namespace ILRuntime.CLR.TypeSystem
         }
         void InitializeBaseType()
         {
-            baseTypeInitialized = true;
             if (definition.BaseType != null)
             {
                 baseType = appdomain.GetType(definition.BaseType, this, null);
@@ -413,6 +412,7 @@ namespace ILRuntime.CLR.TypeSystem
                 curBase = curBase.BaseType;
             }
             firstCLRBaseType = curBase;
+            baseTypeInitialized = true;
         }
 
         public IMethod GetMethod(string name)
