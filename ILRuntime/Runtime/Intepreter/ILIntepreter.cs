@@ -3750,7 +3750,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (obj == null)
                 arr.SetValue(null, idx);
             else
-                arr.SetValue(obj.GetType().CheckCLRTypes(AppDomain, obj), idx);
+                arr.SetValue(arr.GetType().GetElementType().CheckCLRTypes(AppDomain, obj), idx);
         }
 
         void StoreIntValueToArray(Array arr, StackObject* val, StackObject* idx)

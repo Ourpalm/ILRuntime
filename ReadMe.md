@@ -125,7 +125,7 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 Unity3D的示例工程
 你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的Unity实例工程。
 
-里面有2个工程，其中ILRuntimeDemo是Unity的主工程。实例都在这个工程当中的各个示例场景中。
+里面有2个工程，其中ILRuntimeDemo是Unity的主工程。实例都在这个工程当中的各个示例场景中，这个工程是在Unity5.4下完成的，如果你使用的是其他版本的Unity，可能需要自己做一些修改。
 
 HotFix_Project是热更DLL工程，请用VS2015之类的C# IDE打开和进行编译，在编译前请确保至少打开过一次Unity的主工程，如果编译依然说说找不到UnityEngine等dll，请手动重新指认一下
 
