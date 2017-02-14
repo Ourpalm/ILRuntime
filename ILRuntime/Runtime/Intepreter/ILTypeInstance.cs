@@ -135,13 +135,13 @@ namespace ILRuntime.Runtime.Intepreter
 
         public List<object> ManagedObjects { get { return managedObjs; } }
 
-        public object CLRInstance { get { return clrInstance; } }
+        public object CLRInstance { get { return clrInstance; } set { clrInstance = value; } }
 
         protected ILTypeInstance()
         {
 
         }
-        public ILTypeInstance(ILType type)
+        public ILTypeInstance(ILType type, bool initializeCLRInstance = true)
         {
             this.type = type;
             fields = new StackObject[type.TotalFieldCount];
@@ -151,30 +151,35 @@ namespace ILRuntime.Runtime.Intepreter
                 managedObjs.Add(null);
             }
             InitializeFields(type);
-            if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
+            if (initializeCLRInstance)
             {
-                clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, this);
-            }
-            else
-            {
-                clrInstance = this;
-            }
-
-            if (type.Implements != null)
-            {
-                foreach (var i in type.Implements)
+                if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
-                    if (i is Enviorment.CrossBindingAdaptor)
+                    clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, this);
+                }
+                else
+                {
+                    clrInstance = this;
+                }
+
+                if (type.Implements != null)
+                {
+                    foreach (var i in type.Implements)
                     {
-                        if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
+                        if (i is Enviorment.CrossBindingAdaptor)
                         {
-                            throw new NotSupportedException("Inheriting and implementing interface at the same time is not supported yet");
+                            if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
+                            {
+                                throw new NotSupportedException("Inheriting and implementing interface at the same time is not supported yet");
+                            }
+                            clrInstance = ((Enviorment.CrossBindingAdaptor)i).CreateCLRInstance(type.AppDomain, this);
+                            break;
                         }
-                        clrInstance = ((Enviorment.CrossBindingAdaptor)i).CreateCLRInstance(type.AppDomain, this);
-                        break;
                     }
                 }
             }
+            else
+                clrInstance = this;
         }
 
         public unsafe object this[int index]

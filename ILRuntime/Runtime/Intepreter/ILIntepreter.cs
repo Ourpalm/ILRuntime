@@ -65,7 +65,11 @@ namespace ILRuntime.Runtime.Intepreter
             int mStackBase = mStack.Count;
             StackObject* esp = stack.StackBase;
             if (method.HasThis)
+            {
+                if (instance is CrossBindingAdaptorType)
+                    instance = ((CrossBindingAdaptorType)instance).ILInstance;
                 esp = PushObject(esp, mStack, instance);
+            }
             esp = PushParameters(method, esp, p);
             bool unhandledException;
             esp = Execute(method, esp, out unhandledException);

@@ -314,15 +314,14 @@ namespace ILRuntime.CLR.TypeSystem
                                     break;
                                 }
                             }
-                            if (match)
+                            if (match && genericMethod == null)
                             {
                                 genericMethod = i;
-                                break;
-                            }                            
+                            }
                         }
                         else
                         {
-                            match = genericArguments == null;
+                            match = genericArguments == null || i.GenericArguments.Length == genericArguments.Length;
                             for (int j = 0; j < param.Count; j++)
                             {
                                 var typeA = param[j].TypeForCLR.IsByRef ? param[j].TypeForCLR.GetElementType() : param[j].TypeForCLR;
