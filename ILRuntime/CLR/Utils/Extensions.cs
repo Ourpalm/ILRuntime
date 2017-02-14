@@ -151,6 +151,10 @@ namespace ILRuntime.CLR.Utils
             }
             else if (obj is ILTypeInstance)
             {
+                if (obj is IDelegateAdapter)
+                {
+                    return ((IDelegateAdapter)obj).Delegate;
+                }
                 if (!(obj is ILEnumTypeInstance))
                 {
                     var ins = (ILTypeInstance)obj;
