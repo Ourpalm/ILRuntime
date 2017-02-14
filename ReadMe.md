@@ -40,7 +40,7 @@ Unity
 * 在Assets目录里建立一个名为smcs.rsp的文本文件
 * 在smcs.rsp文件中加入"-unsafe"
 
-你可以在[这里](Releases/xxxxxx)下载到Unity的示例工程
+你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到Unity的示例工程
 
 Visual Studio
 ----------
@@ -122,6 +122,12 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 * 调试插件需要Visual Studio 2015 Update3以上版本
 * 调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值
 
+Unity3D的示例工程
+你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的Unity实例工程。
+
+里面有2个工程，其中ILRuntimeDemo是Unity的主工程。实例都在这个工程当中的各个示例场景中。
+
+HotFix_Project是热更DLL工程，请用VS2015之类的C# IDE打开和进行编译，在编译前请确保至少打开过一次Unity的主工程，如果编译依然说说找不到UnityEngine等dll，请手动重新指认一下
 
 文档
 ==========
