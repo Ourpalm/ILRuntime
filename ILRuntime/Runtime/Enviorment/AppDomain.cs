@@ -817,10 +817,16 @@ namespace ILRuntime.Runtime.Enviorment
             IType t = GetType(type);
             if (t == null)
                 return null;
-            var m = t.GetMethod(method, p != null ? p.Length : 0);
-
+            var m = t.GetMethod(method, p != null ? p.Length : 0);            
             if (m != null)
             {
+                for(int i = 0; i < m.ParameterCount; i++)
+                {
+                    if (!m.Parameters[i].TypeForCLR.IsAssignableFrom(p[i].GetType()))
+                    {
+                        throw new ArgumentException("Parameter type mismatch");
+                    }
+                }
                 return Invoke(m, instance, p);
             }
             return null;
