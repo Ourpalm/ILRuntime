@@ -46,7 +46,7 @@ namespace ILRuntime.CLR.TypeSystem
             set
             {
                 typeRef = value;
-                RetriveDefinitino(value);                
+                RetriveDefinitino(value);
             }
         }
 

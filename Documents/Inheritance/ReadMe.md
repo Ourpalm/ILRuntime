@@ -20,7 +20,21 @@
         {
             get
             {
+			    //如果你是想一个类实现多个Unity主工程的接口，这里需要return null;
                 return typeof(ClassInheritanceTest);//这是你想继承的那个类
+            }
+        }
+		
+		public override Type[] BaseCLRTypes
+        {
+            get
+            {
+                //跨域继承只能有1个Adapter，因此应该尽量避免一个类同时实现多个外部接口，
+                //ILRuntime虽然支持同时实现多个接口，但是一定要小心这种用法，使用不当很容易造成不可预期的问题
+                //日常开发如果需要实现多个DLL外部接口，请在Unity这边先做一个基类实现那些个接口，然后继承那个基类
+				//如需一个Adapter实现多个接口，请用下面这行
+                //return new Type[] { typeof(IEnumerator<object>), typeof(IEnumerator), typeof(IDisposable) };
+				return null;
             }
         }
 

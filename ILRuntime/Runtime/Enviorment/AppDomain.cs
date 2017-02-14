@@ -1100,8 +1100,29 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void RegisterCrossBindingAdaptor(CrossBindingAdaptor adaptor)
         {
-            if (!crossAdaptors.ContainsKey(adaptor.BaseCLRType))
+            var bType = adaptor.BaseCLRType;
+            if (bType != null)
             {
+                if (!crossAdaptors.ContainsKey(bType))
+                {
+                    var t = adaptor.AdaptorType;
+                    var res = GetType(t);
+                    if (res == null)
+                    {
+                        res = new CLRType(t, this);
+                        mapType[res.FullName] = res;
+                        mapType[t.AssemblyQualifiedName] = res;
+                        clrTypeMapping[t] = res;
+                    }
+                    adaptor.RuntimeType = res;
+                    crossAdaptors[bType] = adaptor;
+                }
+                else
+                    throw new Exception("Crossbinding Adapter for " + bType.FullName + " is already added.");
+            }
+            else
+            {
+                var bTypes = adaptor.BaseCLRTypes;
                 var t = adaptor.AdaptorType;
                 var res = GetType(t);
                 if (res == null)
@@ -1112,8 +1133,17 @@ namespace ILRuntime.Runtime.Enviorment
                     clrTypeMapping[t] = res;
                 }
                 adaptor.RuntimeType = res;
-                crossAdaptors[adaptor.BaseCLRType] = adaptor;
-            }
+
+                foreach (var i in bTypes)
+                {
+                    if (!crossAdaptors.ContainsKey(i))
+                    {
+                        crossAdaptors[i] = adaptor;
+                    }
+                    else
+                        throw new Exception("Crossbinding Adapter for " + i.FullName + " is already added.");
+                }
+            } 
         }
     }
 }
