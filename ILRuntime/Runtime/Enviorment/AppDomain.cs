@@ -952,6 +952,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 methodname = _ref.Name;
                 var typeDef = _ref.DeclaringType;
+                
                 type = GetType(typeDef, contextType, contextMethod);
                 if (type == null)
                     throw new KeyNotFoundException("Cannot find type:" + typename);
@@ -988,7 +989,18 @@ namespace ILRuntime.Runtime.Enviorment
                             genericArguments[i] = gt;
                     }
                 }
-
+                if (!invalidToken && typeDef.IsGenericInstance)
+                {
+                    GenericInstanceType gim = (GenericInstanceType)typeDef;
+                    for(int i = 0; i < gim.GenericArguments.Count; i++)
+                    {
+                        if(gim.GenericArguments[0].IsGenericParameter)
+                        {
+                            invalidToken = true;
+                            break;
+                        }
+                    }
+                }
                 paramList = _ref.GetParamList(this, contextType, contextMethod, genericArguments);
                 returnType = GetType(_ref.ReturnType, contextType, null);
             }
@@ -1004,8 +1016,6 @@ namespace ILRuntime.Runtime.Enviorment
             else
             {
                 method = type.GetMethod(methodname, paramList, genericArguments, returnType);
-                if (method != null && method.IsGenericInstance)
-                    mapMethod[method.GetHashCode()] = method;
             }
 
             if (method == null)
@@ -1023,6 +1033,8 @@ namespace ILRuntime.Runtime.Enviorment
             }
             if (!invalidToken)
                 mapMethod[hashCode] = method;
+            else
+                mapMethod[method.GetHashCode()] = method;
             return method;
         }
 

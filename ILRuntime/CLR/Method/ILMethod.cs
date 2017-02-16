@@ -25,6 +25,8 @@ namespace ILRuntime.CLR.Method
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
         int paramCnt, localVarCnt;
+        int hashCode = -1;
+        static int instance_id = 0x10000000;
 
         public MethodDefinition Definition { get { return def; } }
 
@@ -83,6 +85,8 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
+                if (IsGenericInstance)
+                    return 0;
                 return def.GenericParameters.Count;
             }
         }
@@ -93,6 +97,8 @@ namespace ILRuntime.CLR.Method
                 return genericParameters != null;
             }
         }
+
+        public KeyValuePair<string, IType>[] GenericArguments { get { return genericParameters; } }
         public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.def = def;
@@ -550,6 +556,13 @@ namespace ILRuntime.CLR.Method
             }
             sb.Append(')');
             return sb.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+            return hashCode;
         }
     }
 }

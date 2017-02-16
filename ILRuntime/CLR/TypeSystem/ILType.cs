@@ -510,13 +510,13 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            genericMethod = CheckGenericParams(i, param, ref match);
-                            if (genericMethod != null)
-                                break;
+                            genericMethod = CheckGenericParams(i, param, ref match);                            
                         }
                         else
                         {
-                            match = genericArguments == null;
+                            match = CheckGenericArguments(i, genericArguments);
+                            if (!match)
+                                continue;
                             for (int j = 0; j < pCnt; j++)
                             {
                                 if (param[j] != i.Parameters[j])
@@ -542,6 +542,28 @@ namespace ILRuntime.CLR.TypeSystem
                 return m;
             }
             return null;
+        }
+
+        bool CheckGenericArguments(ILMethod i, IType[] genericArguments)
+        {
+            if (genericArguments == null || i.GenericArguments == null)
+            {
+                return true;
+            }
+            else
+            {
+                if (i.GenericArguments.Length == genericArguments.Length)
+                {
+                    for(int j = 0; j < genericArguments.Length; j++)
+                    {
+                        if (i.GenericArguments[j].Value != genericArguments[j])
+                            return false;                        
+                    }
+                    return true;
+                }
+                else
+                    return false;
+            }
         }
 
         ILMethod CheckGenericParams(ILMethod i, List<IType> param, ref bool match)

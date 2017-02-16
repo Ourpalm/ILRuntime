@@ -80,6 +80,12 @@ namespace TestCases
         }
     }
 
+    class NRow<A, B>
+    {
+        public A K { get; set; }
+        public B V { get; set; }
+    }
+
     class Test05
     {
         class MGenericTest
@@ -128,6 +134,29 @@ namespace TestCases
             var test = TestGenericMethodSub();
             var r = test.TestGeneric<ILRuntimeTest.TestFramework.TestClass3>("123", "456");
             Console.WriteLine("address " + r.address);
+        }
+
+        public static void TestGenericMethod2()
+        {
+            var res = GetRows<int, int>("123", "345");
+            Console.WriteLine(string.Format("res[0], K={0} V={1}", res[0].K, res[0].V));
+            var res2 = GetRows<int, double>("789", "345.678");
+            Console.WriteLine(string.Format("res2[0], K={0} V={1}", res2[0].K, res2[0].V));
+
+        }
+
+        static List<NRow<A, B>> GetRows<A, B>(string a, string b)
+        {
+            List<NRow<A, B>> res = new List<TestCases.NRow<A, B>>();
+            NRow<A, B> row;
+            for (int i = 0; i < 1; i++)
+            {
+                row = new TestCases.NRow<A, B>();
+                row.K = (A)Convert.ChangeType(a, typeof(A));
+                row.V = (B)Convert.ChangeType(b, typeof(B));
+                res.Add(row);
+            }
+            return res;
         }
 
         static MGenericTest TestGenericMethodSub()

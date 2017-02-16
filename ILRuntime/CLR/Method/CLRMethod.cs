@@ -25,6 +25,8 @@ namespace ILRuntime.CLR.Method
         IType[] genericArguments;
         object[] invocationParam;
         bool isDelegateInvoke;
+        int hashCode = -1;
+        static int instance_id = 0x10000000;
 
         public IType DeclearingType
         {
@@ -350,6 +352,13 @@ namespace ILRuntime.CLR.Method
                 return def.ToString();
             else
                 return cDef.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+            return hashCode;
         }
     }
 }
