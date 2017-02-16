@@ -26,7 +26,7 @@ namespace ILRuntime.CLR.Method
         object[] invocationParam;
         bool isDelegateInvoke;
         int hashCode = -1;
-        static int instance_id = 0x10000000;
+        static int instance_id = 0x20000000;
 
         public IType DeclearingType
         {
