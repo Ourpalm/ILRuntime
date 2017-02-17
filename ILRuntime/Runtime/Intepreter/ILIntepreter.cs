@@ -132,7 +132,7 @@ namespace ILRuntime.Runtime.Intepreter
             //Managed Stack reserved for local variable
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
-                var v = method.Definition.Body.Variables[i];
+                var v = method.Variables[i];
                 if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
                 {
                     var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);

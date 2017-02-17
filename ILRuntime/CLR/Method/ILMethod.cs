@@ -25,6 +25,7 @@ namespace ILRuntime.CLR.Method
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
         int paramCnt, localVarCnt;
+        Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> variables;
         int hashCode = -1;
         static int instance_id = 0x10000000;
 
@@ -97,6 +98,13 @@ namespace ILRuntime.CLR.Method
                 return genericParameters != null;
             }
         }
+        public Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> Variables
+        {
+            get
+            {
+                return variables;
+            }
+        }
 
         public KeyValuePair<string, IType>[] GenericArguments { get { return genericParameters; } }
         public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
@@ -113,7 +121,6 @@ namespace ILRuntime.CLR.Method
                 isDelegateInvoke = true;
             this.appdomain = domain;
             paramCnt = def.HasParameters ? def.Parameters.Count : 0;
-            localVarCnt = def.HasBody ? def.Body.Variables.Count : 0;
 #if DEBUG
             if (def.HasBody)
             {
@@ -216,6 +223,7 @@ namespace ILRuntime.CLR.Method
         {
             if (def.HasBody)
             {
+                localVarCnt = def.Body.Variables.Count;
                 body = new OpCode[def.Body.Instructions.Count];
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
                 for (int i = 0; i < body.Length; i++)
@@ -260,6 +268,9 @@ namespace ILRuntime.CLR.Method
                     exceptionHandler[i] = e;
                     //Mono.Cecil.Cil.ExceptionHandlerType.
                 }
+                //Release Method body to save memory
+                variables = def.Body.Variables;
+                def.Body = null;
             }
             else
                 body = new OpCode[0];
