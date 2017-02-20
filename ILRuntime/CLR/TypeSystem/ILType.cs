@@ -379,31 +379,87 @@ namespace ILRuntime.CLR.TypeSystem
         {
             if (definition.BaseType != null)
             {
-                baseType = appdomain.GetType(definition.BaseType, this, null);
-                if (baseType is CLRType)
+                bool specialProcess = false;
+                List<int> spIdx = null;
+                if (definition.BaseType.IsGenericInstance)
                 {
-                    if (baseType.TypeForCLR == typeof(Enum) || baseType.TypeForCLR == typeof(object) || baseType.TypeForCLR == typeof(ValueType) || baseType.TypeForCLR == typeof(System.Enum))
-                    {//都是这样，无所谓
-                        baseType = null;
-                    }
-                    else if (baseType.TypeForCLR == typeof(MulticastDelegate))
+                    GenericInstanceType git = definition.BaseType as GenericInstanceType;
+                    var elementType = appdomain.GetType(definition.BaseType.GetElementType(), this, null);
+                    if (elementType is CLRType)
                     {
-                        baseType = null;
-                        isDelegate = true;
-                    }
-                    else
-                    {
-                        CrossBindingAdaptor adaptor;
-                        if (appdomain.CrossBindingAdaptors.TryGetValue(baseType.TypeForCLR, out adaptor))
+                        for (int i = 0; i < git.GenericArguments.Count; i++)
                         {
-                            baseType = adaptor;
+                            var ga = git.GenericArguments[i];
+                            if (ga == typeRef)
+                            {
+                                specialProcess = true;
+                                if (spIdx == null)
+                                    spIdx = new List<int>();
+                                spIdx.Add(i);
+                            }
+                        }
+                    }
+                }
+                if (specialProcess)
+                {
+                    //如果泛型参数是自身，则必须要特殊处理，否则会StackOverflow
+                    var elementType = appdomain.GetType(definition.BaseType.GetElementType(), this, null);
+                    foreach (var i in appdomain.CrossBindingAdaptors)
+                    {
+                        if (i.Key.IsGenericType && !i.Key.IsGenericTypeDefinition)
+                        {
+                            var gd = i.Key.GetGenericTypeDefinition();
+                            if (gd == elementType.TypeForCLR)
+                            {
+                                var ga = i.Key.GetGenericArguments();
+                                bool match = true;
+                                foreach(var j in spIdx)
+                                {
+                                    if(ga[j] != i.Value.AdaptorType)
+                                    {
+                                        match = false;
+                                        break;
+                                    }
+                                }
+                                if (match)
+                                {
+                                    baseType = i.Value;
+                                    break;
+                                }
+                            }
+                        }                        
+                    }
+                    if(baseType == null)
+                        throw new TypeLoadException("Cannot find Adaptor for:" + definition.BaseType.FullName);
+                }
+                else
+                {
+                    baseType = appdomain.GetType(definition.BaseType, this, null);
+                    if (baseType is CLRType)
+                    {
+                        if (baseType.TypeForCLR == typeof(Enum) || baseType.TypeForCLR == typeof(object) || baseType.TypeForCLR == typeof(ValueType) || baseType.TypeForCLR == typeof(System.Enum))
+                        {//都是这样，无所谓
+                            baseType = null;
+                        }
+                        else if (baseType.TypeForCLR == typeof(MulticastDelegate))
+                        {
+                            baseType = null;
+                            isDelegate = true;
                         }
                         else
-                            throw new TypeLoadException("Cannot find Adaptor for:" + baseType.TypeForCLR.ToString());
-                        //继承了其他系统类型
-                        //env.logger.Log_Error("ScriptType:" + Name + " Based On a SystemType:" + BaseType.Name);
-                        //HasSysBase = true;
-                        //throw new Exception("不得继承系统类型，脚本类型系统和脚本类型系统是隔离的");
+                        {
+                            CrossBindingAdaptor adaptor;
+                            if (appdomain.CrossBindingAdaptors.TryGetValue(baseType.TypeForCLR, out adaptor))
+                            {
+                                baseType = adaptor;
+                            }
+                            else
+                                throw new TypeLoadException("Cannot find Adaptor for:" + baseType.TypeForCLR.ToString());
+                            //继承了其他系统类型
+                            //env.logger.Log_Error("ScriptType:" + Name + " Based On a SystemType:" + BaseType.Name);
+                            //HasSysBase = true;
+                            //throw new Exception("不得继承系统类型，脚本类型系统和脚本类型系统是隔离的");
+                        }
                     }
                 }
             }

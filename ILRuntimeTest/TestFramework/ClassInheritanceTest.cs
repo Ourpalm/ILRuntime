@@ -116,7 +116,13 @@ namespace ILRuntimeTest.TestFramework
     //        return new ClassInheritanceAdaptor.Adaptor(appdomain, instance);
     //    }        
     //}
-
+    public abstract class ClassInheritanceTest2<T>
+    {
+        public virtual void TestVirtual()
+        {
+            Console.WriteLine("This is from Base Class");
+        }
+    }
     [NeedAdaptor]
     public abstract class ClassInheritanceTest: InterfaceTest
     {
