@@ -166,7 +166,7 @@ namespace ILRuntime.Reflection
                     else
                         ins = ((CrossBindingAdaptorType)obj).ILInstance;
                 }
-                return ins[fieldIdx];
+                return FieldType.CheckCLRTypes(appdomain, ins[fieldIdx]);
             }
         }
 
