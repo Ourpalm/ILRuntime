@@ -14,7 +14,7 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
-        KeyValuePair<string,IType>[] genericArguments;
+        KeyValuePair<string, IType>[] genericArguments;
         List<CLRType> genericInstances;
         Dictionary<string, int> fieldMapping;
         Dictionary<int, FieldInfo> fieldInfoCache;
@@ -48,7 +48,7 @@ namespace ILRuntime.CLR.TypeSystem
             this.appdomain = appdomain;
             isDelegate = clrType.BaseType == typeof(MulticastDelegate);
         }
-        
+
         public bool IsGenericInstance
         {
             get
@@ -144,7 +144,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                if(clrType.IsValueType && memberwiseClone == null)
+                if (clrType.IsValueType && memberwiseClone == null)
                 {
                     memberwiseClone = clrType.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                 }
@@ -321,7 +321,15 @@ namespace ILRuntime.CLR.TypeSystem
                         }
                         else
                         {
-                            match = genericArguments == null || i.GenericArguments == null || i.GenericArguments.Length == genericArguments.Length;
+                            if (genericArguments == null)
+                                match = i.GenericArguments == null;
+                            else
+                            {
+                                if (i.GenericArguments == null)
+                                    match = false;
+                                else
+                                    match = i.GenericArguments.Length == genericArguments.Length;
+                            }
                             for (int j = 0; j < param.Count; j++)
                             {
                                 var typeA = param[j].TypeForCLR.IsByRef ? param[j].TypeForCLR.GetElementType() : param[j].TypeForCLR;
@@ -339,14 +347,14 @@ namespace ILRuntime.CLR.TypeSystem
                             }
                             if (match)
                             {
-                                
+
                                 if (i.IsGenericInstance)
                                 {
                                     if (i.GenericArguments.Length == genericArguments.Length)
                                     {
                                         for (int j = 0; j < genericArguments.Length; j++)
                                         {
-                                            if(i.GenericArguments[j] != genericArguments[j])
+                                            if (i.GenericArguments[j] != genericArguments[j])
                                             {
                                                 match = false;
                                                 break;
@@ -405,7 +413,7 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                 }
             }
-            
+
             return null;
         }
 

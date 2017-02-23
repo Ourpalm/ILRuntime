@@ -981,6 +981,25 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeEnum.Div_Un:
+                                {
+                                    StackObject* b = esp - 1;
+                                    StackObject* a = esp - 1 - 1;
+                                    esp = a;
+                                    switch (a->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            *((ulong*)&esp->Value) = *((ulong*)&a->Value) / *((ulong*)&b->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            esp->Value = (int)((uint)a->Value / (uint)b->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    esp++;
+                                }
+                                break;
                             case OpCodeEnum.Rem:
                                 {
                                     StackObject* b = esp - 1;
@@ -3630,7 +3649,42 @@ namespace ILRuntime.Runtime.Intepreter
                                     *(double*)&obj->Value = val;
                                 }
                                 break;
-
+                            case OpCodeEnum.Conv_R_Un:
+                                {
+                                    var obj = esp - 1;
+                                    bool isDouble = false;
+                                    float val = 0;
+                                    double val2 = 0;
+                                    switch (obj->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val2 = (double)*(ulong*)&obj->Value;
+                                            isDouble = true;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            ip++;
+                                            continue;
+                                        case ObjectTypes.Integer:
+                                            val = (uint)obj->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            ip++;
+                                            continue;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (isDouble)
+                                    {
+                                        obj->ObjectType = ObjectTypes.Double;
+                                        *(double*)&obj->Value = val2;
+                                    }
+                                    else
+                                    {
+                                        obj->ObjectType = ObjectTypes.Float;
+                                        *(float*)&obj->Value = val;
+                                    }
+                                }
+                                break;
                             #endregion
 
                             #region Stack operation

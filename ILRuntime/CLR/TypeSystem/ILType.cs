@@ -413,9 +413,9 @@ namespace ILRuntime.CLR.TypeSystem
                             {
                                 var ga = i.Key.GetGenericArguments();
                                 bool match = true;
-                                foreach(var j in spIdx)
+                                foreach (var j in spIdx)
                                 {
-                                    if(ga[j] != i.Value.AdaptorType)
+                                    if (ga[j] != i.Value.AdaptorType)
                                     {
                                         match = false;
                                         break;
@@ -427,9 +427,9 @@ namespace ILRuntime.CLR.TypeSystem
                                     break;
                                 }
                             }
-                        }                        
+                        }
                     }
-                    if(baseType == null)
+                    if (baseType == null)
                         throw new TypeLoadException("Cannot find Adaptor for:" + definition.BaseType.FullName);
                 }
                 else
@@ -566,7 +566,7 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
                         {
-                            genericMethod = CheckGenericParams(i, param, ref match);                            
+                            genericMethod = CheckGenericParams(i, param, ref match);
                         }
                         else
                         {
@@ -602,18 +602,22 @@ namespace ILRuntime.CLR.TypeSystem
 
         bool CheckGenericArguments(ILMethod i, IType[] genericArguments)
         {
-            if (genericArguments == null || i.GenericArguments == null)
+            if (genericArguments == null)
             {
-                return true;
+                return i.GenericArguments == null;
             }
             else
             {
+                if (i.GenericArguments == null)
+                    return false;
+                else if (i.GenericArguments.Length != genericArguments.Length)
+                    return false;
                 if (i.GenericArguments.Length == genericArguments.Length)
                 {
-                    for(int j = 0; j < genericArguments.Length; j++)
+                    for (int j = 0; j < genericArguments.Length; j++)
                     {
                         if (i.GenericArguments[j].Value != genericArguments[j])
-                            return false;                        
+                            return false;
                     }
                     return true;
                 }

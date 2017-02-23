@@ -230,5 +230,28 @@ namespace TestCases
             }
             return test3.B;
         }
+
+        public static void UnitTest_1010()
+        {
+            uint a = 100;
+            TestUInt(a);
+            TestUInt((ulong)a);
+        }
+
+        static void TestUInt(uint a)
+        {
+            float speedUp = (1 - (float)a / 1000f);
+            uint speedUp2 = 1000 / a;
+            Console.WriteLine(speedUp);
+            Console.WriteLine(speedUp2);
+        }
+
+        static void TestUInt(ulong a)
+        {
+            float speedUp = (1 - (float)a / 1000f);
+            ulong speedUp2 = 1000 / a;
+            Console.WriteLine(speedUp);
+            Console.WriteLine(speedUp2);
+        }
     }
 }
