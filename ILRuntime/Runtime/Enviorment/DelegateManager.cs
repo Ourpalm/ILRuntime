@@ -202,7 +202,7 @@ namespace ILRuntime.Runtime.Enviorment
                 sb.AppendLine(");");
                 sb.AppendLine("    });");
                 sb.AppendLine("});");
-                throw new KeyNotFoundException("Cannot find convertor for " + clrDelegateType);
+                throw new KeyNotFoundException(sb.ToString());
             }
         }
 
