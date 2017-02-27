@@ -25,7 +25,7 @@ namespace ILRuntime.Runtime.CLRBinding
                 bool isByRef;
                 if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
                     continue;
-                GetClassName(i, out clsName, out realClsName, out isByRef);
+                i.GetClassName(out clsName, out realClsName, out isByRef);
                 clsNames.Add(clsName);
                 using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/" + clsName + ".cs", false, Encoding.UTF8))
                 {
@@ -158,7 +158,7 @@ namespace ILRuntime.Runtime.Generated
                     sb2.Append("typeof(");
                     string tmp, clsName;
                     bool isByRef;
-                    GetClassName(j.ParameterType, out tmp, out clsName, out isByRef);
+                    j.ParameterType.GetClassName(out tmp, out clsName, out isByRef);
                     sb2.Append(clsName);
                     sb2.Append(")");
                     if (isByRef)
@@ -197,7 +197,7 @@ namespace ILRuntime.Runtime.Generated
                     sb2.Append("typeof(");
                     string tmp, clsName;
                     bool isByRef;
-                    GetClassName(j.ParameterType, out tmp, out clsName, out isByRef);
+                    j.ParameterType.GetClassName(out tmp, out clsName, out isByRef);
                     sb2.Append(clsName);
                     sb2.Append(")");
                     if (isByRef)
@@ -360,7 +360,7 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
                     string tmp, clsName;
                     bool isByRef;
-                    GetClassName(p.ParameterType, out tmp, out clsName, out isByRef);
+                    p.ParameterType.GetClassName(out tmp, out clsName, out isByRef);
                     if (isByRef)
                         sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
                     sb.AppendLine(string.Format("            {0} {1} = {2};", clsName, p.Name, GetRetrieveValueCode(p.ParameterType, clsName)));
@@ -372,7 +372,7 @@ namespace ILRuntime.Runtime.Generated
                 {
                     string tmp, clsName;
                     bool isByRef;
-                    GetClassName(type, out tmp, out clsName, out isByRef);
+                    type.GetClassName(out tmp, out clsName, out isByRef);
                     sb.Append(string.Format("new {0}(", clsName));
                     AppendParameters(param, sb);
                     sb.AppendLine(");");
@@ -397,7 +397,7 @@ namespace ILRuntime.Runtime.Generated
                         continue;
                     string tmp, clsName;
                     bool isByRef;
-                    GetClassName(p.ParameterType.GetElementType(), out tmp, out clsName, out isByRef);
+                    p.ParameterType.GetElementType().GetClassName(out tmp, out clsName, out isByRef);
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
                     sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
             {
@@ -493,7 +493,7 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
                     string tmp, clsName;
                     bool isByRef;
-                    GetClassName(p.ParameterType, out tmp, out clsName, out isByRef);
+                    p.ParameterType.GetClassName(out tmp, out clsName, out isByRef);
                     if (isByRef)
                         sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
                     sb.AppendLine(string.Format("            {0} {1} = {2};", clsName, p.Name, GetRetrieveValueCode(p.ParameterType, clsName)));
@@ -591,7 +591,7 @@ namespace ILRuntime.Runtime.Generated
                                     {
                                         string tmp, clsName;
                                         bool isByRef;
-                                        GetClassName(i.ReturnType, out tmp, out clsName, out isByRef);
+                                        i.ReturnType.GetClassName(out tmp, out clsName, out isByRef);
                                         sb.AppendLine(string.Format("({1}){0};", param[0].Name, clsName));
                                     }
                                     break;
@@ -662,7 +662,7 @@ namespace ILRuntime.Runtime.Generated
                         continue;
                     string tmp, clsName;
                     bool isByRef;
-                    GetClassName(p.ParameterType.GetElementType(), out tmp, out clsName, out isByRef);
+                    p.ParameterType.GetElementType().GetClassName(out tmp, out clsName, out isByRef);
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
                     sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
             {
@@ -997,80 +997,5 @@ namespace ILRuntime.Runtime.Generated
                 return string.Format("({0})typeof({0}).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack))", realClsName);
             }
         }
-
-        static void GetClassName(Type type, out string clsName, out string realClsName, out bool isByRef, bool simpleClassName = false)
-        {
-            isByRef = type.IsByRef;
-            bool isArray = type.IsArray;
-            if (isByRef)
-                type = type.GetElementType();
-            if (isArray)
-                type = type.GetElementType();
-            string realNamespace = null;
-            if (type.IsNested)
-            {
-                string bClsName, bRealClsName;
-                bool tmp;
-                GetClassName(type.ReflectedType, out bClsName, out bRealClsName, out tmp);
-                clsName = simpleClassName ? "" : bClsName + "_";
-                realNamespace = bRealClsName + ".";
-            }
-            else
-            {
-                clsName = simpleClassName ? "" : (!string.IsNullOrEmpty(type.Namespace) ? type.Namespace.Replace(".", "_") + "_" : "");
-                realNamespace = !string.IsNullOrEmpty(type.Namespace) ? type.Namespace + "." : null;
-            }
-            clsName = clsName + type.Name.Replace(".", "_").Replace("`", "_").Replace("<", "_").Replace(">", "_");
-            bool isGeneric = false;
-            string ga = null;
-            if (type.IsGenericType)
-            {
-                isGeneric = true;
-                clsName += "_";
-                ga = "<";
-                var args = type.GetGenericArguments();
-                bool first = true;
-                foreach (var j in args)
-                {
-                    if (first)
-                        first = false;
-                    else
-                    {
-                        clsName += "_";
-                        ga += ", ";
-                    }
-                    string a, b;
-                    bool tmp;
-                    GetClassName(j, out a, out b, out tmp, true);
-                    clsName += a;
-                    ga += b;
-                }
-                ga += ">";
-            }
-            if (!simpleClassName)
-                clsName += "_Binding";
-            if (!simpleClassName && isArray)
-                clsName += "_Array";
-
-            realClsName = realNamespace;
-            if (isGeneric)
-            {
-                int idx = type.Name.IndexOf("`");
-                if (idx > 0)
-                {
-                    realClsName += type.Name.Substring(0, idx);
-                    realClsName += ga;
-                }
-                else
-                    realClsName += type.Name;
-            }
-            else
-                realClsName += type.Name;
-
-            if (isArray)
-                realClsName += "[]";
-
-        }
-
     }
 }
