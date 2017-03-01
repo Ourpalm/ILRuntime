@@ -2985,7 +2985,6 @@ namespace ILRuntime.Runtime.Intepreter
                                     mStack.Add(arr);
                                 }
                                 break;
-                            case OpCodeEnum.Stelem_Ref:
                                 {
                                     var val = esp - 1;
                                     var idx = esp - 1 - 1;
@@ -2998,9 +2997,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = esp - 1 - 1 - 1;
                                 }
                                 break;
+                            case OpCodeEnum.Stelem_Ref:
                             case OpCodeEnum.Stelem_Any:
                                 {
-                                    var val = esp - 1;
+                                    var val = GetObjectAndResolveReference(esp - 1);
                                     var idx = esp - 1 - 1;
                                     var arrRef = esp - 1 - 1 - 1;
                                     Array arr = mStack[arrRef->Value] as Array;
@@ -3008,6 +3008,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         switch (val->ObjectType)
                                         {
+                                            case ObjectTypes.Null:
+                                                arr.SetValue(null, idx->Value);
+                                                break;
                                             case ObjectTypes.Object:
                                                 ArraySetValue(arr, mStack[val->Value], idx->Value);
                                                 break;
