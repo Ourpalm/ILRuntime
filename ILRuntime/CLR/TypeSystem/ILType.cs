@@ -537,15 +537,7 @@ namespace ILRuntime.CLR.TypeSystem
             IType[] genericArguments = null;
             if (method is ILMethod)
             {
-                var ga = ((ILMethod)method).GenericArguments;
-                if (ga != null)
-                {
-                    genericArguments = new IType[ga.Length];
-                    for (int i = 0; i < ga.Length; i++)
-                    {
-                        genericArguments[i] = ga[i].Value;
-                    }
-                }
+                genericArguments = ((ILMethod)method).GenericArugmentsArray;
             }
             else
             {

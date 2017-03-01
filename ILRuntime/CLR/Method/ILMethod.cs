@@ -21,6 +21,7 @@ namespace ILRuntime.CLR.Method
         ILType declaringType;
         ExceptionHandler[] exceptionHandler;
         KeyValuePair<string, IType>[] genericParameters;
+        IType[] genericArguments;
         Dictionary<int, int[]> jumptables;
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
@@ -107,6 +108,8 @@ namespace ILRuntime.CLR.Method
         }
 
         public KeyValuePair<string, IType>[] GenericArguments { get { return genericParameters; } }
+
+        public IType[] GenericArugmentsArray { get { return genericArguments; } }
         public ILMethod(MethodDefinition def, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             this.def = def;
@@ -538,6 +541,7 @@ namespace ILRuntime.CLR.Method
 
             ILMethod m = new ILMethod(def, declaringType, appdomain);
             m.genericParameters = genericParameters;
+            m.genericArguments = genericArguments;
             if (m.def.ReturnType.IsGenericParameter)
             {
                 m.ReturnType = m.FindGenericArgument(m.def.ReturnType.Name);
