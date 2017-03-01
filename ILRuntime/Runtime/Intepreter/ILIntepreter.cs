@@ -2985,18 +2985,6 @@ namespace ILRuntime.Runtime.Intepreter
                                     mStack.Add(arr);
                                 }
                                 break;
-                                {
-                                    var val = esp - 1;
-                                    var idx = esp - 1 - 1;
-                                    var arrRef = esp - 1 - 1 - 1;
-                                    Array arr = mStack[arrRef->Value] as Array;
-                                    ArraySetValue(arr, mStack[val->Value], idx->Value);
-                                    Free(esp - 1);
-                                    Free(esp - 1 - 1);
-                                    Free(esp - 1 - 1 - 1);
-                                    esp = esp - 1 - 1 - 1;
-                                }
-                                break;
                             case OpCodeEnum.Stelem_Ref:
                             case OpCodeEnum.Stelem_Any:
                                 {
