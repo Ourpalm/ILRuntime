@@ -534,7 +534,24 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IMethod GetVirtualMethod(IMethod method)
         {
-            var m = GetMethod(method.Name, method.Parameters, null, method.ReturnType);
+            IType[] genericArguments = null;
+            if (method is ILMethod)
+            {
+                var ga = ((ILMethod)method).GenericArguments;
+                if (ga != null)
+                {
+                    genericArguments = new IType[ga.Length];
+                    for (int i = 0; i < ga.Length; i++)
+                    {
+                        genericArguments[i] = ga[i].Value;
+                    }
+                }
+            }
+            else
+            {
+                genericArguments = ((CLRMethod)method).GenericArguments;
+            }
+            var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType);
             if (m == null)
             {
                 if (BaseType != null)
