@@ -638,19 +638,22 @@ namespace ILRuntime.CLR.TypeSystem
         ILMethod CheckGenericParams(ILMethod i, List<IType> param, ref bool match)
         {
             ILMethod genericMethod = null;
-            for (int j = 0; j < param.Count; j++)
+            if (param != null)
             {
-                var p = i.Parameters[j];
-                if (p.HasGenericParameter)
+                for (int j = 0; j < param.Count; j++)
                 {
-                    //TODO should match the generic parameters;
-                    continue;
-                }
+                    var p = i.Parameters[j];
+                    if (p.HasGenericParameter)
+                    {
+                        //TODO should match the generic parameters;
+                        continue;
+                    }
 
-                if (param[j] != p)
-                {
-                    match = false;
-                    break;
+                    if (param[j] != p)
+                    {
+                        match = false;
+                        break;
+                    }
                 }
             }
             if (match)
