@@ -403,8 +403,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___ptr = &ptr_of_this_method->Value;
-                        var ___dst = *(StackObject**)___ptr;");
+                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;");
                     GetRefWriteBackValueCode(p.ParameterType.GetElementType(), sb, p.Name);
                     sb.Append(@"                    }
                     break;
@@ -668,8 +667,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___ptr = &ptr_of_this_method->Value;
-                        var ___dst = *(StackObject**)___ptr;");
+                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;");
                     GetRefWriteBackValueCode(p.ParameterType.GetElementType(), sb, p.Name);
                     sb.Append(@"                    }
                     break;

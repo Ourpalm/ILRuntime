@@ -286,9 +286,7 @@ namespace ILRuntime.CLR.Method
                 {
                     case ObjectTypes.StackObjectReference:
                         {
-                            var ptr = &p->Value;
-                            //IL2CPP fix
-                            var dst = *(StackObject**)ptr;
+                            var dst = *(StackObject**)&p->Value;
                             if (dst->ObjectType >= ObjectTypes.Object)
                             {
                                 var obj = val;
