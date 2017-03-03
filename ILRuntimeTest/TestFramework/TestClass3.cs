@@ -44,5 +44,9 @@ namespace ILRuntimeTest.TestFramework
             aaa.value = 232425235;
         }
 
+        public static int Add(int a, int b)
+        {
+            return a + b;
+        }
     }
 }

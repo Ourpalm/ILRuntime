@@ -128,8 +128,7 @@ namespace ILRuntime.Runtime.Debugger
                 arg--;
             if (arg->ObjectType == ObjectTypes.StackObjectReference)
             {
-                var ptr = &arg->Value;
-                arg = *(StackObject**)ptr;
+                arg = *(StackObject**)&arg->Value;
             }
             ILTypeInstance instance = arg->ObjectType != ObjectTypes.Null ? intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance : null;
             if (instance == null)

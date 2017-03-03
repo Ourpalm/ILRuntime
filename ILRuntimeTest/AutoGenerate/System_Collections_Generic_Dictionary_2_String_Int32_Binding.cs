@@ -87,50 +87,6 @@ namespace ILRuntime.Runtime.Generated
 
         }
 
-        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, System.Collections.Generic.Dictionary<System.String, System.Int32> instance_of_this_method)
-        {
-            switch(ptr_of_this_method->ObjectType)
-            {
-                case ObjectTypes.Object:
-                    {
-                        __mStack[ptr_of_this_method->Value] = instance_of_this_method;
-                    }
-                    break;
-                case ObjectTypes.FieldReference:
-                    {
-                        var ___obj = __mStack[ptr_of_this_method->Value];
-                        if(___obj is ILTypeInstance)
-                        {
-                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = instance_of_this_method;
-                        }
-                        else
-                        {
-                            var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, instance_of_this_method);
-                        }
-                    }
-                    break;
-                case ObjectTypes.StaticFieldReference:
-                    {
-                        var t = __domain.GetType(ptr_of_this_method->Value);
-                        if(t is ILType)
-                        {
-                            ((ILType)t).StaticInstance[ptr_of_this_method->ValueLow] = instance_of_this_method;
-                        }
-                        else
-                        {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method);
-                        }
-                    }
-                    break;
-                 case ObjectTypes.ArrayReference:
-                    {
-                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Collections.Generic.Dictionary<System.String, System.Int32>[];
-                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = instance_of_this_method;
-                    }
-                    break;
-            }
-        }
 
         static StackObject* get_Comparer_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
@@ -410,9 +366,10 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&ptr_of_this_method->Value;
-                        dst->ObjectType = ObjectTypes.Integer;
-                        dst->Value = value;
+                        var ___ptr = &ptr_of_this_method->Value;
+                        var ___dst = *(StackObject**)___ptr;
+                        ___dst->ObjectType = ObjectTypes.Integer;
+                        ___dst->Value = value;
                     }
                     break;
                 case ObjectTypes.FieldReference:

@@ -216,8 +216,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var a = Add(arg, ip->TokenInteger);
                                     esp->ObjectType = ObjectTypes.StackObjectReference;
-                                    var ppp = &esp->Value;
-                                    * (StackObject**)ppp = a;
+                                    *(StackObject**)&esp->Value = a;
                                     esp++;
                                 }
                                 break;
@@ -406,8 +405,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     var v = Add(frame.LocalVarPointer, ip->TokenInteger);
                                     esp->ObjectType = ObjectTypes.StackObjectReference;
-                                    var ppp = &esp->Value;
-                                    * (StackObject**)ppp = v;
+                                    *(StackObject**)&esp->Value = v;
                                     esp++;
                                 }
                                 break;
@@ -4090,8 +4088,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (esp->ObjectType == ObjectTypes.StackObjectReference)
             {
-                var ptr = &esp->Value;
-                return *(StackObject**)ptr;
+                return *(StackObject**)&esp->Value;
             }
             else
                 return esp;

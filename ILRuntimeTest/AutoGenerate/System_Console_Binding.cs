@@ -20,789 +20,312 @@ namespace ILRuntime.Runtime.Generated
             MethodBase method;
             Type[] args;
             Type type = typeof(System.Console);
-            args = new Type[]{typeof(System.Single)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_0);
-            args = new Type[]{typeof(System.Int32)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_1);
-            args = new Type[]{typeof(System.UInt32)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_2);
-            args = new Type[]{typeof(System.Int64)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_3);
-            args = new Type[]{typeof(System.UInt64)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_4);
-            args = new Type[]{typeof(System.Object)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_5);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_6);
-            args = new Type[]{typeof(System.String), typeof(System.Object)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_7);
-            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_8);
-            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_9);
-            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_10);
-            args = new Type[]{typeof(System.String), typeof(System.Object[])};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_11);
-            args = new Type[]{typeof(System.String), typeof(System.Object)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_12);
-            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_13);
-            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_14);
-            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_15);
-            args = new Type[]{typeof(System.String), typeof(System.Object[])};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_16);
-            args = new Type[]{typeof(System.Boolean)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_17);
-            args = new Type[]{typeof(System.Char)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_18);
-            args = new Type[]{typeof(System.Char[])};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_19);
-            args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_20);
-            args = new Type[]{typeof(System.Double)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_21);
-            args = new Type[]{typeof(System.Decimal)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_22);
-            args = new Type[]{typeof(System.Single)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_23);
-            args = new Type[]{typeof(System.Int32)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_24);
-            args = new Type[]{typeof(System.UInt32)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_25);
-            args = new Type[]{typeof(System.Int64)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_26);
-            args = new Type[]{typeof(System.UInt64)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_27);
-            args = new Type[]{typeof(System.Object)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_28);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_29);
             args = new Type[]{};
             method = type.GetMethod("get_Error", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_Error_30);
+            app.RegisterCLRMethodRedirection(method, get_Error_0);
             args = new Type[]{};
             method = type.GetMethod("get_In", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_In_31);
+            app.RegisterCLRMethodRedirection(method, get_In_1);
             args = new Type[]{};
             method = type.GetMethod("get_Out", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_Out_32);
+            app.RegisterCLRMethodRedirection(method, get_Out_2);
             args = new Type[]{};
             method = type.GetMethod("get_InputEncoding", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_InputEncoding_33);
+            app.RegisterCLRMethodRedirection(method, get_InputEncoding_3);
             args = new Type[]{typeof(System.Text.Encoding)};
             method = type.GetMethod("set_InputEncoding", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_InputEncoding_34);
+            app.RegisterCLRMethodRedirection(method, set_InputEncoding_4);
             args = new Type[]{};
             method = type.GetMethod("get_OutputEncoding", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_OutputEncoding_35);
+            app.RegisterCLRMethodRedirection(method, get_OutputEncoding_5);
             args = new Type[]{typeof(System.Text.Encoding)};
             method = type.GetMethod("set_OutputEncoding", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_OutputEncoding_36);
+            app.RegisterCLRMethodRedirection(method, set_OutputEncoding_6);
             args = new Type[]{};
             method = type.GetMethod("Beep", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Beep_37);
+            app.RegisterCLRMethodRedirection(method, Beep_7);
             args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("Beep", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Beep_38);
+            app.RegisterCLRMethodRedirection(method, Beep_8);
             args = new Type[]{};
             method = type.GetMethod("Clear", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Clear_39);
+            app.RegisterCLRMethodRedirection(method, Clear_9);
             args = new Type[]{};
             method = type.GetMethod("get_BackgroundColor", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_BackgroundColor_40);
+            app.RegisterCLRMethodRedirection(method, get_BackgroundColor_10);
             args = new Type[]{typeof(System.ConsoleColor)};
             method = type.GetMethod("set_BackgroundColor", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_BackgroundColor_41);
+            app.RegisterCLRMethodRedirection(method, set_BackgroundColor_11);
             args = new Type[]{};
             method = type.GetMethod("get_ForegroundColor", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_ForegroundColor_42);
+            app.RegisterCLRMethodRedirection(method, get_ForegroundColor_12);
             args = new Type[]{typeof(System.ConsoleColor)};
             method = type.GetMethod("set_ForegroundColor", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_ForegroundColor_43);
+            app.RegisterCLRMethodRedirection(method, set_ForegroundColor_13);
             args = new Type[]{};
             method = type.GetMethod("ResetColor", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ResetColor_44);
+            app.RegisterCLRMethodRedirection(method, ResetColor_14);
             args = new Type[]{typeof(System.Int32), typeof(System.Int32), typeof(System.Int32), typeof(System.Int32), typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("MoveBufferArea", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, MoveBufferArea_45);
+            app.RegisterCLRMethodRedirection(method, MoveBufferArea_15);
             args = new Type[]{typeof(System.Int32), typeof(System.Int32), typeof(System.Int32), typeof(System.Int32), typeof(System.Int32), typeof(System.Int32), typeof(System.Char), typeof(System.ConsoleColor), typeof(System.ConsoleColor)};
             method = type.GetMethod("MoveBufferArea", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, MoveBufferArea_46);
+            app.RegisterCLRMethodRedirection(method, MoveBufferArea_16);
             args = new Type[]{};
             method = type.GetMethod("get_BufferHeight", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_BufferHeight_47);
+            app.RegisterCLRMethodRedirection(method, get_BufferHeight_17);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_BufferHeight", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_BufferHeight_48);
+            app.RegisterCLRMethodRedirection(method, set_BufferHeight_18);
             args = new Type[]{};
             method = type.GetMethod("get_BufferWidth", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_BufferWidth_49);
+            app.RegisterCLRMethodRedirection(method, get_BufferWidth_19);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_BufferWidth", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_BufferWidth_50);
+            app.RegisterCLRMethodRedirection(method, set_BufferWidth_20);
             args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("SetBufferSize", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetBufferSize_51);
+            app.RegisterCLRMethodRedirection(method, SetBufferSize_21);
             args = new Type[]{};
             method = type.GetMethod("get_WindowHeight", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_WindowHeight_52);
+            app.RegisterCLRMethodRedirection(method, get_WindowHeight_22);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_WindowHeight", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_WindowHeight_53);
+            app.RegisterCLRMethodRedirection(method, set_WindowHeight_23);
             args = new Type[]{};
             method = type.GetMethod("get_WindowWidth", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_WindowWidth_54);
+            app.RegisterCLRMethodRedirection(method, get_WindowWidth_24);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_WindowWidth", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_WindowWidth_55);
+            app.RegisterCLRMethodRedirection(method, set_WindowWidth_25);
             args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("SetWindowSize", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetWindowSize_56);
+            app.RegisterCLRMethodRedirection(method, SetWindowSize_26);
             args = new Type[]{};
             method = type.GetMethod("get_LargestWindowWidth", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_LargestWindowWidth_57);
+            app.RegisterCLRMethodRedirection(method, get_LargestWindowWidth_27);
             args = new Type[]{};
             method = type.GetMethod("get_LargestWindowHeight", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_LargestWindowHeight_58);
+            app.RegisterCLRMethodRedirection(method, get_LargestWindowHeight_28);
             args = new Type[]{};
             method = type.GetMethod("get_WindowLeft", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_WindowLeft_59);
+            app.RegisterCLRMethodRedirection(method, get_WindowLeft_29);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_WindowLeft", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_WindowLeft_60);
+            app.RegisterCLRMethodRedirection(method, set_WindowLeft_30);
             args = new Type[]{};
             method = type.GetMethod("get_WindowTop", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_WindowTop_61);
+            app.RegisterCLRMethodRedirection(method, get_WindowTop_31);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_WindowTop", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_WindowTop_62);
+            app.RegisterCLRMethodRedirection(method, set_WindowTop_32);
             args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("SetWindowPosition", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetWindowPosition_63);
+            app.RegisterCLRMethodRedirection(method, SetWindowPosition_33);
             args = new Type[]{};
             method = type.GetMethod("get_CursorLeft", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_CursorLeft_64);
+            app.RegisterCLRMethodRedirection(method, get_CursorLeft_34);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_CursorLeft", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_CursorLeft_65);
+            app.RegisterCLRMethodRedirection(method, set_CursorLeft_35);
             args = new Type[]{};
             method = type.GetMethod("get_CursorTop", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_CursorTop_66);
+            app.RegisterCLRMethodRedirection(method, get_CursorTop_36);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_CursorTop", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_CursorTop_67);
+            app.RegisterCLRMethodRedirection(method, set_CursorTop_37);
             args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("SetCursorPosition", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetCursorPosition_68);
+            app.RegisterCLRMethodRedirection(method, SetCursorPosition_38);
             args = new Type[]{};
             method = type.GetMethod("get_CursorSize", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_CursorSize_69);
+            app.RegisterCLRMethodRedirection(method, get_CursorSize_39);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("set_CursorSize", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_CursorSize_70);
+            app.RegisterCLRMethodRedirection(method, set_CursorSize_40);
             args = new Type[]{};
             method = type.GetMethod("get_CursorVisible", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_CursorVisible_71);
+            app.RegisterCLRMethodRedirection(method, get_CursorVisible_41);
             args = new Type[]{typeof(System.Boolean)};
             method = type.GetMethod("set_CursorVisible", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_CursorVisible_72);
+            app.RegisterCLRMethodRedirection(method, set_CursorVisible_42);
             args = new Type[]{};
             method = type.GetMethod("get_Title", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_Title_73);
+            app.RegisterCLRMethodRedirection(method, get_Title_43);
             args = new Type[]{typeof(System.String)};
             method = type.GetMethod("set_Title", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_Title_74);
+            app.RegisterCLRMethodRedirection(method, set_Title_44);
             args = new Type[]{};
             method = type.GetMethod("ReadKey", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ReadKey_75);
+            app.RegisterCLRMethodRedirection(method, ReadKey_45);
             args = new Type[]{typeof(System.Boolean)};
             method = type.GetMethod("ReadKey", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ReadKey_76);
+            app.RegisterCLRMethodRedirection(method, ReadKey_46);
             args = new Type[]{};
             method = type.GetMethod("get_KeyAvailable", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_KeyAvailable_77);
+            app.RegisterCLRMethodRedirection(method, get_KeyAvailable_47);
             args = new Type[]{};
             method = type.GetMethod("get_NumberLock", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_NumberLock_78);
+            app.RegisterCLRMethodRedirection(method, get_NumberLock_48);
             args = new Type[]{};
             method = type.GetMethod("get_CapsLock", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_CapsLock_79);
+            app.RegisterCLRMethodRedirection(method, get_CapsLock_49);
             args = new Type[]{};
             method = type.GetMethod("get_TreatControlCAsInput", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_TreatControlCAsInput_80);
+            app.RegisterCLRMethodRedirection(method, get_TreatControlCAsInput_50);
             args = new Type[]{typeof(System.Boolean)};
             method = type.GetMethod("set_TreatControlCAsInput", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_TreatControlCAsInput_81);
+            app.RegisterCLRMethodRedirection(method, set_TreatControlCAsInput_51);
             args = new Type[]{};
             method = type.GetMethod("OpenStandardError", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, OpenStandardError_82);
+            app.RegisterCLRMethodRedirection(method, OpenStandardError_52);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("OpenStandardError", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, OpenStandardError_83);
+            app.RegisterCLRMethodRedirection(method, OpenStandardError_53);
             args = new Type[]{};
             method = type.GetMethod("OpenStandardInput", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, OpenStandardInput_84);
+            app.RegisterCLRMethodRedirection(method, OpenStandardInput_54);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("OpenStandardInput", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, OpenStandardInput_85);
+            app.RegisterCLRMethodRedirection(method, OpenStandardInput_55);
             args = new Type[]{};
             method = type.GetMethod("OpenStandardOutput", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, OpenStandardOutput_86);
+            app.RegisterCLRMethodRedirection(method, OpenStandardOutput_56);
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("OpenStandardOutput", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, OpenStandardOutput_87);
+            app.RegisterCLRMethodRedirection(method, OpenStandardOutput_57);
             args = new Type[]{typeof(System.IO.TextReader)};
             method = type.GetMethod("SetIn", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetIn_88);
+            app.RegisterCLRMethodRedirection(method, SetIn_58);
             args = new Type[]{typeof(System.IO.TextWriter)};
             method = type.GetMethod("SetOut", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetOut_89);
+            app.RegisterCLRMethodRedirection(method, SetOut_59);
             args = new Type[]{typeof(System.IO.TextWriter)};
             method = type.GetMethod("SetError", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetError_90);
+            app.RegisterCLRMethodRedirection(method, SetError_60);
             args = new Type[]{};
             method = type.GetMethod("Read", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Read_91);
+            app.RegisterCLRMethodRedirection(method, Read_61);
             args = new Type[]{};
             method = type.GetMethod("ReadLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ReadLine_92);
+            app.RegisterCLRMethodRedirection(method, ReadLine_62);
             args = new Type[]{};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_93);
+            app.RegisterCLRMethodRedirection(method, WriteLine_63);
             args = new Type[]{typeof(System.Boolean)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_94);
+            app.RegisterCLRMethodRedirection(method, WriteLine_64);
             args = new Type[]{typeof(System.Char)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_95);
+            app.RegisterCLRMethodRedirection(method, WriteLine_65);
             args = new Type[]{typeof(System.Char[])};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_96);
+            app.RegisterCLRMethodRedirection(method, WriteLine_66);
             args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_97);
+            app.RegisterCLRMethodRedirection(method, WriteLine_67);
             args = new Type[]{typeof(System.Decimal)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_98);
+            app.RegisterCLRMethodRedirection(method, WriteLine_68);
             args = new Type[]{typeof(System.Double)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_99);
+            app.RegisterCLRMethodRedirection(method, WriteLine_69);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_70);
+            args = new Type[]{typeof(System.Int32)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_71);
+            args = new Type[]{typeof(System.UInt32)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_72);
+            args = new Type[]{typeof(System.Int64)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_73);
+            args = new Type[]{typeof(System.UInt64)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_74);
+            args = new Type[]{typeof(System.Object)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_75);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_76);
+            args = new Type[]{typeof(System.String), typeof(System.Object)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_77);
+            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_78);
+            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_79);
+            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_80);
+            args = new Type[]{typeof(System.String), typeof(System.Object[])};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_81);
+            args = new Type[]{typeof(System.String), typeof(System.Object)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_82);
+            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_83);
+            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_84);
+            args = new Type[]{typeof(System.String), typeof(System.Object), typeof(System.Object), typeof(System.Object), typeof(System.Object)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_85);
+            args = new Type[]{typeof(System.String), typeof(System.Object[])};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_86);
+            args = new Type[]{typeof(System.Boolean)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_87);
+            args = new Type[]{typeof(System.Char)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_88);
+            args = new Type[]{typeof(System.Char[])};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_89);
+            args = new Type[]{typeof(System.Char[]), typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_90);
+            args = new Type[]{typeof(System.Double)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_91);
+            args = new Type[]{typeof(System.Decimal)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_92);
+            args = new Type[]{typeof(System.Single)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_93);
+            args = new Type[]{typeof(System.Int32)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_94);
+            args = new Type[]{typeof(System.UInt32)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_95);
+            args = new Type[]{typeof(System.Int64)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_96);
+            args = new Type[]{typeof(System.UInt64)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_97);
+            args = new Type[]{typeof(System.Object)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_98);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_99);
 
 
         }
 
 
-        static StackObject* WriteLine_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Single value = *(float*)&ptr_of_this_method->Value;
-
-            System.Console.WriteLine(value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int32 value = ptr_of_this_method->Value;
-
-            System.Console.WriteLine(value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.UInt32 value = (uint)ptr_of_this_method->Value;
-
-            System.Console.WriteLine(value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_3(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int64 value = *(long*)&ptr_of_this_method->Value;
-
-            System.Console.WriteLine(value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_4(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.UInt64 value = *(ulong*)&ptr_of_this_method->Value;
-
-            System.Console.WriteLine(value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_5(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_6(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_7(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(format, arg0);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_8(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(format, arg0, arg1);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_9(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(format, arg0, arg1, arg2);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_10(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg3 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(format, arg0, arg1, arg2, arg3);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_11(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object[] arg = (System.Object[])typeof(System.Object[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(format, arg);
-
-            return __ret;
-        }
-
-        static StackObject* Write_12(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(format, arg0);
-
-            return __ret;
-        }
-
-        static StackObject* Write_13(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(format, arg0, arg1);
-
-            return __ret;
-        }
-
-        static StackObject* Write_14(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(format, arg0, arg1, arg2);
-
-            return __ret;
-        }
-
-        static StackObject* Write_15(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object arg3 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
-            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(format, arg0, arg1, arg2, arg3);
-
-            return __ret;
-        }
-
-        static StackObject* Write_16(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object[] arg = (System.Object[])typeof(System.Object[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(format, arg);
-
-            return __ret;
-        }
-
-        static StackObject* Write_17(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Boolean value = ptr_of_this_method->Value == 1;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_18(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Char value = (char)ptr_of_this_method->Value;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_19(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Char[] buffer = (System.Char[])typeof(System.Char[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(buffer);
-
-            return __ret;
-        }
-
-        static StackObject* Write_20(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int32 count = ptr_of_this_method->Value;
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Int32 index = ptr_of_this_method->Value;
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.Char[] buffer = (System.Char[])typeof(System.Char[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(buffer, index, count);
-
-            return __ret;
-        }
-
-        static StackObject* Write_21(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Double value = *(double*)&ptr_of_this_method->Value;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_22(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Decimal value = (System.Decimal)typeof(System.Decimal).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_23(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Single value = *(float*)&ptr_of_this_method->Value;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_24(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int32 value = ptr_of_this_method->Value;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_25(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.UInt32 value = (uint)ptr_of_this_method->Value;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_26(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int64 value = *(long*)&ptr_of_this_method->Value;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_27(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.UInt64 value = *(ulong*)&ptr_of_this_method->Value;
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_28(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* Write_29(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.Write(value);
-
-            return __ret;
-        }
-
-        static StackObject* get_Error_30(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_Error_0(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -818,7 +341,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* get_In_31(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_In_1(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -834,7 +357,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* get_Out_32(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_Out_2(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -850,7 +373,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* get_InputEncoding_33(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_InputEncoding_3(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -866,7 +389,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* set_InputEncoding_34(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_InputEncoding_4(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -880,7 +403,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_OutputEncoding_35(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_OutputEncoding_5(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -896,7 +419,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* set_OutputEncoding_36(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_OutputEncoding_6(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -910,7 +433,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Beep_37(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Beep_7(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -921,7 +444,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Beep_38(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Beep_8(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -936,7 +459,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Clear_39(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Clear_9(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -947,7 +470,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_BackgroundColor_40(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_BackgroundColor_10(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -958,7 +481,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* set_BackgroundColor_41(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_BackgroundColor_11(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -972,7 +495,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_ForegroundColor_42(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_ForegroundColor_12(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -983,7 +506,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* set_ForegroundColor_43(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_ForegroundColor_13(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -997,7 +520,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* ResetColor_44(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* ResetColor_14(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1008,7 +531,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* MoveBufferArea_45(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* MoveBufferArea_15(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1031,7 +554,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* MoveBufferArea_46(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* MoveBufferArea_16(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1062,7 +585,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_BufferHeight_47(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_BufferHeight_17(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1075,7 +598,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_BufferHeight_48(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_BufferHeight_18(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1088,7 +611,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_BufferWidth_49(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_BufferWidth_19(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1101,7 +624,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_BufferWidth_50(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_BufferWidth_20(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1114,7 +637,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetBufferSize_51(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetBufferSize_21(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1129,7 +652,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_WindowHeight_52(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_WindowHeight_22(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1142,7 +665,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_WindowHeight_53(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_WindowHeight_23(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1155,7 +678,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_WindowWidth_54(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_WindowWidth_24(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1168,7 +691,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_WindowWidth_55(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_WindowWidth_25(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1181,7 +704,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetWindowSize_56(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetWindowSize_26(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1196,7 +719,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_LargestWindowWidth_57(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_LargestWindowWidth_27(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1209,7 +732,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_LargestWindowHeight_58(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_LargestWindowHeight_28(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1222,7 +745,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_WindowLeft_59(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_WindowLeft_29(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1235,7 +758,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_WindowLeft_60(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_WindowLeft_30(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1248,7 +771,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_WindowTop_61(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_WindowTop_31(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1261,7 +784,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_WindowTop_62(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_WindowTop_32(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1274,7 +797,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetWindowPosition_63(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetWindowPosition_33(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1289,7 +812,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_CursorLeft_64(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_CursorLeft_34(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1302,7 +825,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_CursorLeft_65(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_CursorLeft_35(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1315,7 +838,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_CursorTop_66(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_CursorTop_36(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1328,7 +851,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_CursorTop_67(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_CursorTop_37(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1341,7 +864,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetCursorPosition_68(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetCursorPosition_38(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1356,7 +879,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_CursorSize_69(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_CursorSize_39(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1369,7 +892,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_CursorSize_70(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_CursorSize_40(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1382,7 +905,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_CursorVisible_71(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_CursorVisible_41(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1395,7 +918,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_CursorVisible_72(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_CursorVisible_42(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1408,7 +931,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_Title_73(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_Title_43(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1419,7 +942,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* set_Title_74(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_Title_44(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1433,7 +956,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* ReadKey_75(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* ReadKey_45(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1444,7 +967,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ReadKey_76(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* ReadKey_46(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1457,7 +980,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* get_KeyAvailable_77(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_KeyAvailable_47(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1470,7 +993,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_NumberLock_78(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_NumberLock_48(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1483,7 +1006,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_CapsLock_79(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_CapsLock_49(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1496,7 +1019,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* get_TreatControlCAsInput_80(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_TreatControlCAsInput_50(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1509,7 +1032,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* set_TreatControlCAsInput_81(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_TreatControlCAsInput_51(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1522,7 +1045,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* OpenStandardError_82(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* OpenStandardError_52(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1538,7 +1061,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* OpenStandardError_83(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* OpenStandardError_53(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1556,7 +1079,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* OpenStandardInput_84(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* OpenStandardInput_54(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1572,7 +1095,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* OpenStandardInput_85(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* OpenStandardInput_55(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1590,7 +1113,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* OpenStandardOutput_86(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* OpenStandardOutput_56(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1606,7 +1129,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* OpenStandardOutput_87(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* OpenStandardOutput_57(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1624,7 +1147,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* SetIn_88(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetIn_58(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1638,7 +1161,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetOut_89(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetOut_59(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1652,7 +1175,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* SetError_90(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetError_60(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1666,7 +1189,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Read_91(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Read_61(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1679,7 +1202,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static StackObject* ReadLine_92(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* ReadLine_62(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1690,7 +1213,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* WriteLine_93(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* WriteLine_63(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1701,7 +1224,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* WriteLine_94(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* WriteLine_64(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1714,7 +1237,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* WriteLine_95(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* WriteLine_65(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1727,7 +1250,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* WriteLine_96(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* WriteLine_66(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1741,7 +1264,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* WriteLine_97(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* WriteLine_67(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1759,7 +1282,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* WriteLine_98(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* WriteLine_68(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1773,7 +1296,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* WriteLine_99(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* WriteLine_69(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -1782,6 +1305,483 @@ namespace ILRuntime.Runtime.Generated
             System.Double value = *(double*)&ptr_of_this_method->Value;
 
             System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_70(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Single value = *(float*)&ptr_of_this_method->Value;
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_71(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 value = ptr_of_this_method->Value;
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_72(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.UInt32 value = (uint)ptr_of_this_method->Value;
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_73(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int64 value = *(long*)&ptr_of_this_method->Value;
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_74(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.UInt64 value = *(ulong*)&ptr_of_this_method->Value;
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_75(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_76(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_77(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(format, arg0);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_78(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(format, arg0, arg1);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_79(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(format, arg0, arg1, arg2);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_80(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg3 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(format, arg0, arg1, arg2, arg3);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_81(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object[] arg = (System.Object[])typeof(System.Object[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(format, arg);
+
+            return __ret;
+        }
+
+        static StackObject* Write_82(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(format, arg0);
+
+            return __ret;
+        }
+
+        static StackObject* Write_83(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(format, arg0, arg1);
+
+            return __ret;
+        }
+
+        static StackObject* Write_84(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(format, arg0, arg1, arg2);
+
+            return __ret;
+        }
+
+        static StackObject* Write_85(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 5);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object arg3 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Object arg2 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Object arg1 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            System.Object arg0 = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 5);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(format, arg0, arg1, arg2, arg3);
+
+            return __ret;
+        }
+
+        static StackObject* Write_86(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object[] arg = (System.Object[])typeof(System.Object[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(format, arg);
+
+            return __ret;
+        }
+
+        static StackObject* Write_87(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Boolean value = ptr_of_this_method->Value == 1;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_88(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char value = (char)ptr_of_this_method->Value;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_89(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Char[] buffer = (System.Char[])typeof(System.Char[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(buffer);
+
+            return __ret;
+        }
+
+        static StackObject* Write_90(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 count = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 index = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Char[] buffer = (System.Char[])typeof(System.Char[]).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(buffer, index, count);
+
+            return __ret;
+        }
+
+        static StackObject* Write_91(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Double value = *(double*)&ptr_of_this_method->Value;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_92(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Decimal value = (System.Decimal)typeof(System.Decimal).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_93(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Single value = *(float*)&ptr_of_this_method->Value;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_94(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 value = ptr_of_this_method->Value;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_95(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.UInt32 value = (uint)ptr_of_this_method->Value;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_96(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int64 value = *(long*)&ptr_of_this_method->Value;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_97(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.UInt64 value = *(ulong*)&ptr_of_this_method->Value;
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_98(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(value);
+
+            return __ret;
+        }
+
+        static StackObject* Write_99(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.Write(value);
 
             return __ret;
         }

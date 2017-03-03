@@ -362,9 +362,10 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&ptr_of_this_method->Value;
-                        dst->ObjectType = ObjectTypes.Integer;
-                        dst->Value = result;
+                        var ___ptr = &ptr_of_this_method->Value;
+                        var ___dst = *(StackObject**)___ptr;
+                        ___dst->ObjectType = ObjectTypes.Integer;
+                        ___dst->Value = result;
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -432,9 +433,10 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&ptr_of_this_method->Value;
-                        dst->ObjectType = ObjectTypes.Integer;
-                        dst->Value = result;
+                        var ___ptr = &ptr_of_this_method->Value;
+                        var ___dst = *(StackObject**)___ptr;
+                        ___dst->ObjectType = ObjectTypes.Integer;
+                        ___dst->Value = result;
                     }
                     break;
                 case ObjectTypes.FieldReference:

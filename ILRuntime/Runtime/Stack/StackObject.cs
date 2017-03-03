@@ -80,8 +80,7 @@ namespace ILRuntime.Runtime.Stack
                     }
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ptr = &esp->Value;
-                        return ToObject((*(StackObject**)ptr), appdomain, mStack);
+                        return ToObject((*(StackObject**)&esp->Value), appdomain, mStack);
                     }
                 case ObjectTypes.Null:
                     return null;

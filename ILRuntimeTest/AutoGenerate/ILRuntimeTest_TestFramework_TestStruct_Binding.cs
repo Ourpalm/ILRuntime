@@ -29,12 +29,16 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct)};
             method = type.GetMethod("DoTest2", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, DoTest2_2);
+            args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
+            method = type.GetMethod("Add", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Add_3);
 
 
         }
 
-        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, ILRuntimeTest.TestFramework.TestStruct instance_of_this_method)
+        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, ref ILRuntimeTest.TestFramework.TestStruct instance_of_this_method)
         {
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.Object:
@@ -94,8 +98,9 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&ptr_of_this_method->Value;
-                        __mStack[dst->Value] = a;
+                        var ___ptr = &ptr_of_this_method->Value;
+                        var ___dst = *(StackObject**)___ptr;
+                        __mStack[___dst->Value] = a;
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -152,9 +157,10 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var dst = *(StackObject**)&ptr_of_this_method->Value;
-                        dst->ObjectType = ObjectTypes.Integer;
-                        dst->Value = a;
+                        var ___ptr = &ptr_of_this_method->Value;
+                        var ___dst = *(StackObject**)___ptr;
+                        ___dst->ObjectType = ObjectTypes.Integer;
+                        ___dst->Value = a;
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -207,6 +213,23 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.TestStruct.DoTest2(aaa);
 
             return __ret;
+        }
+
+        static StackObject* Add_3(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 b = ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 a = ptr_of_this_method->Value;
+
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestStruct.Add(a, b);
+
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 
 
