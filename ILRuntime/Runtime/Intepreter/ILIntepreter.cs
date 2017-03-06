@@ -2391,59 +2391,67 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         CLRMethod cm = (CLRMethod)m;
-                                        if (cm.DeclearingType.IsDelegate)
+                                        //Means new object();
+                                        if (cm == null)
                                         {
-                                            var objRef = GetObjectAndResolveReference(esp - 1 - 1);
-                                            var mi = (IMethod)mStack[(esp - 1)->Value];
-                                            object ins;
-                                            if (objRef->ObjectType == ObjectTypes.Null)
-                                                ins = null;
-                                            else
-                                                ins = mStack[objRef->Value];
-                                            Free(esp - 1);
-                                            Free(esp - 1 - 1);
-                                            esp = esp - 1 - 1;
-                                            object dele;
-                                            if (mi is ILMethod)
-                                            {
-                                                if (ins != null)
-                                                {
-                                                    dele = ((ILTypeInstance)ins).GetDelegateAdapter((ILMethod)mi);
-                                                    if (dele == null)
-                                                        dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
-                                                }
-                                                else
-                                                {
-                                                    if (((ILMethod)mi).DelegateAdapter == null)
-                                                    {
-                                                        ((ILMethod)mi).DelegateAdapter = domain.DelegateManager.FindDelegateAdapter(null, (ILMethod)mi);
-                                                    }
-                                                    dele = ((ILMethod)mi).DelegateAdapter;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (ins is ILTypeInstance)
-                                                    ins = ((ILTypeInstance)ins).CLRInstance;
-                                                dele = Delegate.CreateDelegate(cm.DeclearingType.TypeForCLR, ins, ((CLRMethod)mi).MethodInfo);
-                                            }
-                                            esp = PushObject(esp, mStack, dele);
+                                            esp = PushObject(esp, mStack, new object());
                                         }
                                         else
                                         {
-                                            var redirect = cm.Redirection;
-                                            if (redirect != null)
-                                                esp = redirect(this, esp, mStack, cm, true);
+                                            if (cm.DeclearingType.IsDelegate)
+                                            {
+                                                var objRef = GetObjectAndResolveReference(esp - 1 - 1);
+                                                var mi = (IMethod)mStack[(esp - 1)->Value];
+                                                object ins;
+                                                if (objRef->ObjectType == ObjectTypes.Null)
+                                                    ins = null;
+                                                else
+                                                    ins = mStack[objRef->Value];
+                                                Free(esp - 1);
+                                                Free(esp - 1 - 1);
+                                                esp = esp - 1 - 1;
+                                                object dele;
+                                                if (mi is ILMethod)
+                                                {
+                                                    if (ins != null)
+                                                    {
+                                                        dele = ((ILTypeInstance)ins).GetDelegateAdapter((ILMethod)mi);
+                                                        if (dele == null)
+                                                            dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                                    }
+                                                    else
+                                                    {
+                                                        if (((ILMethod)mi).DelegateAdapter == null)
+                                                        {
+                                                            ((ILMethod)mi).DelegateAdapter = domain.DelegateManager.FindDelegateAdapter(null, (ILMethod)mi);
+                                                        }
+                                                        dele = ((ILMethod)mi).DelegateAdapter;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (ins is ILTypeInstance)
+                                                        ins = ((ILTypeInstance)ins).CLRInstance;
+                                                    dele = Delegate.CreateDelegate(cm.DeclearingType.TypeForCLR, ins, ((CLRMethod)mi).MethodInfo);
+                                                }
+                                                esp = PushObject(esp, mStack, dele);
+                                            }
                                             else
                                             {
-                                                object result = cm.Invoke(this, esp, mStack, true);
-                                                int paramCount = cm.ParameterCount;
-                                                for (int i = 1; i <= paramCount; i++)
+                                                var redirect = cm.Redirection;
+                                                if (redirect != null)
+                                                    esp = redirect(this, esp, mStack, cm, true);
+                                                else
                                                 {
-                                                    Free(esp - i);
+                                                    object result = cm.Invoke(this, esp, mStack, true);
+                                                    int paramCount = cm.ParameterCount;
+                                                    for (int i = 1; i <= paramCount; i++)
+                                                    {
+                                                        Free(esp - i);
+                                                    }
+                                                    esp = Minus(esp, paramCount);
+                                                    esp = PushObject(esp, mStack, result);//new constructedObj
                                                 }
-                                                esp = Minus(esp, paramCount);
-                                                esp = PushObject(esp, mStack, result);//new constructedObj
                                             }
                                         }
                                     }

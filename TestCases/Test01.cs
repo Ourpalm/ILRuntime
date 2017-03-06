@@ -87,6 +87,7 @@ namespace TestCases
 
         public static void UnitTest_Cls()
         {
+            object obj = new object();
             Console.WriteLine("UnitTest_Cls"); 
             Test1098Cls cls = new Test1098Cls();
             Test1098Sub(cls);
