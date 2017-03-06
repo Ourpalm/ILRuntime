@@ -87,5 +87,4 @@ object[] attributeArr = fi.GetCustomAttributes(typeof(SomeAttribute), false);
 限制和注意事项
 ============
 
-* ILRuntime的反射不支持Property
 * 在Unity主工程中不能通过new T()的方式来创建热更工程中的类型实例
