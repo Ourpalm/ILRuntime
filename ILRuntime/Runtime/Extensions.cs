@@ -195,5 +195,15 @@ namespace ILRuntime.Runtime
                 return (double)(sbyte)obj;
             throw new InvalidCastException();
         }
+
+        public static Type GetActualType(this object value)
+        {
+            if (value is ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)
+                return ((ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)value).ILInstance.Type.ReflectionType;
+            if (value is ILRuntime.Runtime.Intepreter.ILTypeInstance)
+                return ((ILRuntime.Runtime.Intepreter.ILTypeInstance)value).Type.ReflectionType;
+            else
+                return value.GetType();
+        }
     }
 }

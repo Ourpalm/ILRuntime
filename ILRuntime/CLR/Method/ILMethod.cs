@@ -25,6 +25,7 @@ namespace ILRuntime.CLR.Method
         Dictionary<int, int[]> jumptables;
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
+        ILRuntimeConstructorInfo reflectionCtorInfo;
         int paramCnt, localVarCnt;
         Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> variables;
         int hashCode = -1;
@@ -44,9 +45,23 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
+                if (IsConstructor)
+                    throw new NotSupportedException();
                 if (refletionMethodInfo == null)
                     refletionMethodInfo = new ILRuntimeMethodInfo(this);
                 return refletionMethodInfo;
+            }
+        }
+
+        public ConstructorInfo ReflectionConstructorInfo
+        {
+            get
+            {
+                if (!IsConstructor)
+                    throw new NotSupportedException();
+                if (reflectionCtorInfo == null)
+                    reflectionCtorInfo = new ILRuntimeConstructorInfo(this);
+                return reflectionCtorInfo;
             }
         }
 

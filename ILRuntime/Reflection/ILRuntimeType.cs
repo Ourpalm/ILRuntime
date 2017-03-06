@@ -17,6 +17,8 @@ namespace ILRuntime.Reflection
         object[] customAttributes;
         Type[] attributeTypes;
         ILRuntimeFieldInfo[] fields;
+        ILRuntimePropertyInfo[] properties;
+        ILRuntimeMethodInfo[] methods;
 
         public ILType ILType { get { return type; } }
         
@@ -47,6 +49,32 @@ namespace ILRuntime.Reflection
                 }               
             }
 
+        }
+
+        void InitializeProperties()
+        {
+            int cnt = type.TypeDefinition.HasProperties ? type.TypeDefinition.Properties.Count : 0;
+            properties = new ILRuntimePropertyInfo[cnt];
+            for (int i = 0; i < cnt; i++)
+            {
+                Mono.Cecil.PropertyDefinition pd = type.TypeDefinition.Properties[i];
+                ILRuntimePropertyInfo pi = new ILRuntimePropertyInfo(pd, type);
+                properties[i] = pi;
+                if (pd.GetMethod != null)
+                    pi.Getter = type.GetMethod(pd.GetMethod.Name, 0) as ILMethod;
+                if (pd.SetMethod != null)
+                    pi.Setter = type.GetMethod(pd.SetMethod.Name, 1) as ILMethod;
+            }
+        }
+
+        void InitializeMethods()
+        {
+            var methods = type.GetMethods();
+            this.methods = new ILRuntimeMethodInfo[methods.Count];
+            for(int i = 0; i < methods.Count; i++)
+            {
+                this.methods[i] = (ILRuntimeMethodInfo)((ILMethod)methods[i]).ReflectionMethodInfo;
+            }
         }
 
         void InitializeFields()
@@ -139,7 +167,13 @@ namespace ILRuntime.Reflection
 
         public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
         {
-            throw new NotImplementedException();
+            var ctors = type.GetConstructors();
+            ConstructorInfo[] res = new ConstructorInfo[ctors.Count];
+            for(int i = 0; i < res.Length; i++)
+            {
+                res[i] = ctors[i].ReflectionConstructorInfo;
+            }
+            return res;
         }
 
         public override object[] GetCustomAttributes(bool inherit)
@@ -199,22 +233,55 @@ namespace ILRuntime.Reflection
 
         public override Type GetInterface(string name, bool ignoreCase)
         {
-            throw new NotImplementedException();
+            if (type.FirstCLRInterface != null)
+            {
+                if (type.FirstCLRInterface.Name == name)
+                    return type.FirstCLRInterface.TypeForCLR;
+                else
+                    return null;
+            }
+            else
+                return null;
         }
 
         public override Type[] GetInterfaces()
         {
-            throw new NotImplementedException();
+            if (type.FirstCLRInterface != null)
+                return new Type[] { type.FirstCLRInterface.TypeForCLR };
+            else
+                return new Type[0];
         }
 
         public override MemberInfo[] GetMembers(BindingFlags bindingAttr)
         {
-            throw new NotImplementedException();
+            if (methods == null)
+                InitializeMethods();
+            if (fields == null)
+                InitializeFields();
+            if (properties == null)
+                InitializeProperties();
+            MemberInfo[] res = new MemberInfo[methods.Length + fields.Length + properties.Length];
+            for (int i = 0; i < methods.Length; i++)
+            {
+                res[i] = methods[i];
+            }
+            for (int i = methods.Length; i < methods.Length + fields.Length; i++)
+            {
+                res[i] = fields[i - methods.Length];
+            }
+            for (int i = methods.Length + fields.Length; i < res.Length; i++)
+            {
+                res[i] = properties[i- methods.Length - fields.Length];
+            }
+
+            return res;
         }
 
         public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
         {
-            throw new NotImplementedException();
+            if (methods == null)
+                InitializeMethods();
+            return methods;
         }
 
         public override Type GetNestedType(string name, BindingFlags bindingAttr)
@@ -229,7 +296,9 @@ namespace ILRuntime.Reflection
 
         public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
         {
-            throw new NotImplementedException();
+            if (properties == null)
+                InitializeProperties();
+            return properties;
         }
 
         public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
@@ -239,17 +308,52 @@ namespace ILRuntime.Reflection
 
         public override bool IsDefined(Type attributeType, bool inherit)
         {
-            throw new NotImplementedException();
+            if (customAttributes == null)
+                InitializeCustomAttribute();
+            for (int i = 0; i < customAttributes.Length; i++)
+            {
+                if (attributeTypes[i] == attributeType)
+                    return true;
+            }
+            return false;
         }
 
         protected override TypeAttributes GetAttributeFlagsImpl()
         {
-            throw new NotImplementedException();
+            TypeAttributes res = TypeAttributes.Public;
+            if (type.TypeDefinition.IsAbstract)
+                res |= TypeAttributes.Abstract;
+            if (!type.IsValueType)
+                res |= TypeAttributes.Class;
+            if (type.TypeDefinition.IsSealed)
+                res |= TypeAttributes.Sealed;
+            return res;
         }
 
         protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
         {
-            throw new NotImplementedException();
+            List<IType> param = new List<IType>();
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (types[i] is ILRuntimeType)
+                    param.Add(((ILRuntimeType)types[i]).type);
+                else
+                {
+                    var t = appdomain.GetType(types[i]);
+                    if (t == null)
+                        t = appdomain.GetType(types[i].AssemblyQualifiedName);
+                    if (t == null)
+                        throw new TypeLoadException();
+                    param.Add(t);
+                }
+            }
+
+            var res = type.GetConstructor(param);
+
+            if (res != null)
+                return ((ILMethod)res).ReflectionConstructorInfo;
+            else
+                return null;
         }
 
         protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
@@ -285,7 +389,15 @@ namespace ILRuntime.Reflection
 
         protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
         {
-            throw new NotImplementedException();
+            if (properties == null)
+                InitializeProperties();
+
+            foreach(var i in properties)
+            {
+                if (i.Name == name)
+                    return i;
+            }
+            return null;
         }
 
         protected override bool HasElementTypeImpl()

@@ -131,7 +131,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        IType FirstCLRInterface
+        public IType FirstCLRInterface
         {
             get
             {
@@ -661,6 +661,13 @@ namespace ILRuntime.CLR.TypeSystem
                 genericMethod = i;
             }
             return genericMethod;
+        }
+
+        public List<ILMethod> GetConstructors()
+        {
+            if (constructors == null)
+                InitializeMethods();
+            return constructors;
         }
 
         public IMethod GetConstructor(int paramCnt)
