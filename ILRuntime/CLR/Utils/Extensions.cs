@@ -151,7 +151,7 @@ namespace ILRuntime.CLR.Utils
             }
             else if (obj is ILTypeInstance)
             {
-                if (obj is IDelegateAdapter)
+                if (obj is IDelegateAdapter && pt != typeof(ILTypeInstance))
                 {
                     return ((IDelegateAdapter)obj).Delegate;
                 }

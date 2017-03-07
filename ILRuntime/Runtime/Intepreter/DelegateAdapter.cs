@@ -552,6 +552,7 @@ namespace ILRuntime.Runtime.Intepreter
             this.appdomain = appdomain;
             this.instance = instance;
             this.method = method;
+            CLRInstance = this;
         }
 
         public override bool IsValueType
