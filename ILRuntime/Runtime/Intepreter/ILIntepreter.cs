@@ -2459,7 +2459,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Constrained:
                                 {
-                                    var obj = GetObjectAndResolveReference(esp - 1);
+                                    var objRef = esp - 1;
+                                    var obj = GetObjectAndResolveReference(objRef);
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type != null)
                                     {
@@ -2469,8 +2470,43 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (t.IsEnum)
                                             {
                                                 ILEnumTypeInstance ins = new ILEnumTypeInstance(t);
-                                                ins.AssignFromStack(0, obj, AppDomain, mStack);
-                                                ins.Boxed = true;
+                                                switch (obj->ObjectType)
+                                                {
+                                                    case ObjectTypes.FieldReference:
+                                                        {
+                                                            var owner = mStack[obj->Value] as ILTypeInstance;
+                                                            int idx = obj->ValueLow;
+                                                            Free(objRef);
+                                                            owner.PushToStack(idx, objRef, AppDomain, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    case ObjectTypes.StaticFieldReference:
+                                                        {
+                                                            var st = AppDomain.GetType(obj->Value) as ILType;
+                                                            int idx = obj->ValueLow;
+                                                            Free(objRef);
+                                                            st.StaticInstance.PushToStack(idx, objRef, AppDomain, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    case ObjectTypes.ArrayReference:
+                                                        {
+                                                            var arr = mStack[obj->Value];
+                                                            var idx = obj->ValueLow;
+                                                            Free(objRef);
+                                                            LoadFromArrayReference(arr, idx, objRef, t, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    default:
+                                                        ins.AssignFromStack(0, obj, AppDomain, mStack);
+                                                        ins.Boxed = true;
+                                                        break;
+                                                }
                                                 esp = PushObject(esp - 1, mStack, ins);
                                             }
                                             else
