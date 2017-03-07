@@ -273,10 +273,6 @@ namespace ILRuntime.CLR.TypeSystem
                 {
                     if (enumType == null)
                         InitializeFields();
-                    if (enumType == null)
-                    {
-
-                    }
                     return enumType.TypeForCLR;
                 }
                 else if (FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
