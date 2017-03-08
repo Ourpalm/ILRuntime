@@ -1686,6 +1686,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (objRef->ObjectType == ObjectTypes.Null)
                                                         throw new NullReferenceException();
                                                     var obj = mStack[objRef->Value];
+                                                    if (obj == null)
+                                                        throw new NullReferenceException();
                                                     ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                                 }
                                                 esp = Execute(ilm, esp, out unhandledException);

@@ -135,6 +135,18 @@ namespace TestCases
 
         }
 
+        public static void DelegateTest13()
+        {
+            Action<int> a = null;
+            a += IntTest;
+            a += IntTest2;
+
+            a -= IntTest;
+            a -= IntTest2;
+
+            Console.WriteLine(a == null);
+        }
+
         static void CallBack(ILRuntimeTest.TestFramework.BaseClassTest a)
         {
             a.testField = true;

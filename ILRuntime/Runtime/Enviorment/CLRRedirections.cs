@@ -379,16 +379,24 @@ namespace ILRuntime.Runtime.Enviorment
                         if (dele2 is IDelegateAdapter)
                         {
                             var dele = ((IDelegateAdapter)dele1);
-                            //This means it's the default delegate which should be singleton to support == operator
-                            if (dele.Next == null)
+                            //This means it's the original delegate which should be untouch
+                            if (!dele.IsClone)
                             {
-                                dele = dele.Instantiate(domain, dele.Instance, dele.Method);
+                                dele = dele.Clone();
+                            }
+                            if(!((IDelegateAdapter)dele2).IsClone)
+                            {
+                                dele2 = ((IDelegateAdapter)dele2).Clone();
                             }
                             dele.Combine((IDelegateAdapter)dele2);
                             return ILIntepreter.PushObject(ret, mStack, dele);
                         }
                         else
                         {
+                            if (!((IDelegateAdapter)dele1).IsClone)
+                            {
+                                dele1 = ((IDelegateAdapter)dele1).Clone();
+                            }
                             ((IDelegateAdapter)dele1).Combine((Delegate)dele2);
                             return ILIntepreter.PushObject(ret, mStack, dele1);
                         }
