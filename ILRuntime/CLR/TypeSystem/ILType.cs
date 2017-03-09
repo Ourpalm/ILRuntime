@@ -524,7 +524,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
-            if (staticConstructor != null && !TypeReference.HasGenericParameters)
+            if (staticConstructor != null && (!TypeReference.HasGenericParameters || IsGenericInstance))
             {
                 appdomain.Invoke(staticConstructor, null, null);
             }

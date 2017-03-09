@@ -480,11 +480,14 @@ namespace ILRuntime.Runtime.Enviorment
                 Type t = Type.GetType(fullname);
                 if (t != null)
                 {
-                    res = new CLRType(t, this);
+                    if (!clrTypeMapping.TryGetValue(t, out res))
+                    {
+                        res = new CLRType(t, this);
+                        clrTypeMapping[t] = res;
+                    }
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
                     mapType[t.AssemblyQualifiedName] = res;
-                    clrTypeMapping[t] = res;
                     mapTypeToken[res.GetHashCode()] = res;
                     return res;
                 }
@@ -737,7 +740,10 @@ namespace ILRuntime.Runtime.Enviorment
                     ((ILType)res).TypeReference = (TypeReference)token;
                 }
                 if (!string.IsNullOrEmpty(res.FullName))
-                    mapType[res.FullName] = res;
+                {
+                    if (res is CLRType || !((ILType)res).TypeReference.HasGenericParameters)
+                        mapType[res.FullName] = res;
+                }
             }
             mapTypeToken[res.GetHashCode()] = res;
             if (!dummyGenericInstance)
