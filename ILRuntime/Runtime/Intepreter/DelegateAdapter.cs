@@ -589,7 +589,9 @@ namespace ILRuntime.Runtime.Intepreter
 
         public override IDelegateAdapter Clone()
         {
-            return new DummyDelegateAdapter(appdomain, instance, method);
+            var res = new DummyDelegateAdapter(appdomain, instance, method);
+            res.isClone = true;
+            return res;
         }
 
         public override void Combine(Delegate dele)
