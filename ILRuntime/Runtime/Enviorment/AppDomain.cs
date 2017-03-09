@@ -1033,13 +1033,13 @@ namespace ILRuntime.Runtime.Enviorment
                 if (isConstructor && contextType.FirstCLRBaseType != null && contextType.FirstCLRBaseType is CrossBindingAdaptor && type.TypeForCLR == ((CrossBindingAdaptor)contextType.FirstCLRBaseType).BaseCLRType)
                 {
                     method = contextType.BaseType.GetConstructor(paramList);
-                    if(method == null)
-                        throw new KeyNotFoundException("Cannot find method:" + methodname);
+                    if (method == null)
+                        throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}" + methodname, typename, token));
                     invalidToken = true;
                     mapMethod[method.GetHashCode()] = method;
                 }
                 else
-                    throw new KeyNotFoundException("Cannot find method:" + methodname);
+                    throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}" + methodname, typename, token));
             }
             if (!invalidToken)
                 mapMethod[hashCode] = method;
