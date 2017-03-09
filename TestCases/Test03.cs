@@ -8,6 +8,32 @@ namespace TestCases
 
     class Test03
     {
+        static class Check
+        {
+            public static void Test<T>(T value)
+            {
+                if (value == null)
+                    Console.WriteLine("null");
+            }
+
+            public static void Test2<T>(T obj)
+            {
+                Action<T> action = (value) => { Console.WriteLine(value); };
+                action(obj);
+            }
+        }
+
+
+        public static void UnitTest_NullCheck()
+        {
+            Check.Test(new byte[] { 1, 2 });
+        }
+
+        public static void UnitTest_GenericDelegate()
+        {
+            Check.Test2(1);
+        }
+
         static void Swap<T>(T[] arr, int idx1, int idx2)
         {
             if (idx1 >= arr.Length || idx2 >= arr.Length) return;

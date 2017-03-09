@@ -25,6 +25,9 @@ namespace ILRuntime.CLR.TypeSystem
         bool isBaseTypeInitialized = false;
         MethodInfo memberwiseClone;
 
+        int hashCode = -1;
+        static int instance_id = 0x20000000;
+
         public Dictionary<int, FieldInfo> Fields
         {
             get
@@ -470,6 +473,13 @@ namespace ILRuntime.CLR.TypeSystem
         public IType ResolveGenericType(IType contextType)
         {
             throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+            return hashCode;
         }
     }
 }

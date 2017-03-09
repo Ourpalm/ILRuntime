@@ -433,6 +433,7 @@ namespace ILRuntime.Runtime.Enviorment
                     }
                     bt = bt.MakeGenericInstance(genericArguments);
                     mapType[bt.FullName] = bt;
+                    mapTypeToken[bt.GetHashCode()] = bt;
                     StringBuilder sb = new StringBuilder();
                     sb.Append(baseType);
                     sb.Append('<');
@@ -455,6 +456,7 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     bt = bt.MakeByRefType();
                     mapType[bt.FullName] = bt;
+                    mapTypeToken[bt.GetHashCode()] = bt;
                     if (!isArray)
                     {
                         mapType[fullname] = bt;
@@ -467,6 +469,7 @@ namespace ILRuntime.Runtime.Enviorment
                     res = bt.MakeArrayType();
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
+                    mapTypeToken[res.GetHashCode()] = res;
                     return res;
                 }
                 else
@@ -482,7 +485,7 @@ namespace ILRuntime.Runtime.Enviorment
                     mapType[res.FullName] = res;
                     mapType[t.AssemblyQualifiedName] = res;
                     clrTypeMapping[t] = res;
-                    mapTypeToken[t.GetHashCode()] = res;
+                    mapTypeToken[res.GetHashCode()] = res;
                     return res;
                 }
             }
@@ -736,6 +739,7 @@ namespace ILRuntime.Runtime.Enviorment
                 if (!string.IsNullOrEmpty(res.FullName))
                     mapType[res.FullName] = res;
             }
+            mapTypeToken[res.GetHashCode()] = res;
             if (!dummyGenericInstance)
                 mapTypeToken[hash] = res;
             return res;
@@ -1067,14 +1071,23 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 var it = type as ILType;
                 int idx = it.GetFieldIndex(token);
-                long res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
+                long res = 0;
+                if (it.TypeReference.HasGenericParameters)
+                {
+                    mapTypeToken[type.GetHashCode()] = it;
+                    res = ((long)type.GetHashCode() << 32) | (uint)idx;
+                }
+                else
+                {
+                    res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
+                }
 
                 return res;
             }
             else
             {
                 int idx = type.GetFieldIndex(token);
-                long res = ((long)f.DeclaringType.GetHashCode() << 32) | (uint)idx;
+                long res = ((long)type.GetHashCode() << 32) | (uint)idx;
 
                 return res;
             }

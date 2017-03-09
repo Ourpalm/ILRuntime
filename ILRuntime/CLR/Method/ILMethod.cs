@@ -462,11 +462,14 @@ namespace ILRuntime.CLR.Method
             {
                 if (t is ILType)
                 {
-                    return ((ILType)t).TypeReference.GetHashCode();
+                    if (((ILType)t).TypeReference.HasGenericParameters)
+                        return t.GetHashCode();
+                    else
+                        return ((ILType)t).TypeReference.GetHashCode();
                 }
                 else if (isGenericParameter)
                 {
-                    return t.TypeForCLR.GetHashCode();
+                    return t.GetHashCode();
                 }
                 else
                     return token.GetHashCode();

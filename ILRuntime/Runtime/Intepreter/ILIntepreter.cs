@@ -3018,6 +3018,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (type.TypeForCLR != typeof(ILTypeInstance))
                                         {
                                             arr = Array.CreateInstance(type.TypeForCLR, cnt->Value);
+                                            //Register Type
+                                            AppDomain.GetType(arr.GetType());
                                         }
                                         else
                                         {
