@@ -68,6 +68,8 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 if (instance is CrossBindingAdaptorType)
                     instance = ((CrossBindingAdaptorType)instance).ILInstance;
+                if (instance == null)
+                    throw new NullReferenceException("instance should not be null!");
                 esp = PushObject(esp, mStack, instance);
             }
             esp = PushParameters(method, esp, p);
