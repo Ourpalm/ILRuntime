@@ -1850,10 +1850,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             var type = AppDomain.GetType(t);
                                             if (type != null)
                                             {
-                                                var val = ((CLRType)type).GetField(ip->TokenInteger).GetValue(obj);
+                                                var ft = ((CLRType)type).GetField(ip->TokenInteger);
+                                                var val = ft.GetValue(obj);
                                                 if (val is CrossBindingAdaptorType)
                                                     val = ((CrossBindingAdaptorType)val).ILInstance;
-                                                PushObject(esp - 1, mStack, val);
+                                                PushObject(esp - 1, mStack, val, ft.FieldType == typeof(object));
                                             }
                                             else
                                                 throw new TypeLoadException();
@@ -1934,7 +1935,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             var val = f.GetValue(null);
                                             if (val is CrossBindingAdaptorType)
                                                 val = ((CrossBindingAdaptorType)val).ILInstance;
-                                            PushObject(esp, mStack, val);
+                                            PushObject(esp, mStack, val, f.FieldType == typeof(object));
                                         }
                                     }
                                     else
