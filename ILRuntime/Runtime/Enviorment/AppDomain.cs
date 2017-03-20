@@ -1034,12 +1034,12 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     method = contextType.BaseType.GetConstructor(paramList);
                     if (method == null)
-                        throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}", methodname, type, token));
+                        throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}", methodname, type.FullName, token));
                     invalidToken = true;
                     mapMethod[method.GetHashCode()] = method;
                 }
                 else
-                    throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}", methodname, type, token));
+                    throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}", methodname, type.FullName, token));
             }
             if (!invalidToken)
                 mapMethod[hashCode] = method;
