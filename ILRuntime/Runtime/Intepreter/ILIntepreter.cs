@@ -1793,7 +1793,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                                 int idx = objRef->ValueLow;
                                                                 if (oldObj is ILTypeInstance)
                                                                 {
-                                                                    oldObj = ((ILTypeInstance)oldObj)[idx];
+                                                                    ((ILTypeInstance)oldObj)[idx] = oldObj;
                                                                 }
                                                                 else
                                                                 {
