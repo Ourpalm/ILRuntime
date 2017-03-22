@@ -32,6 +32,23 @@ namespace TestCases
             string a = 11.ToString();
 
         }
+
+        static int Add(int a, int b)
+        {
+            return a + b;
+        }
+
+        public static void UnitTest_Performance2()
+        {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1000000; i++)
+            {
+                Add(1, 2);
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
         /// <summary>
         /// 性能测试
         /// </summary>
@@ -70,6 +87,7 @@ namespace TestCases
 
         public static void UnitTest_Cls()
         {
+            object obj = new object();
             Console.WriteLine("UnitTest_Cls"); 
             Test1098Cls cls = new Test1098Cls();
             Test1098Sub(cls);

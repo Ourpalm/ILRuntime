@@ -166,13 +166,20 @@ namespace ILRuntime.Reflection
                     else
                         ins = ((CrossBindingAdaptorType)obj).ILInstance;
                 }
-                return ins[fieldIdx];
+                return FieldType.CheckCLRTypes(appdomain, ins[fieldIdx]);
             }
         }
 
         public override bool IsDefined(Type attributeType, bool inherit)
         {
-            throw new NotImplementedException();
+            if (customAttributes == null)
+                InitializeCustomAttribute();
+            for (int i = 0; i < customAttributes.Length; i++)
+            {
+                if (attributeTypes[i] == attributeType)
+                    return true;
+            }
+            return false;
         }
 
         public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder, CultureInfo culture)

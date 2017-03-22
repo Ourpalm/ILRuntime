@@ -77,6 +77,12 @@ namespace TestCases
             list[0].DoTest();
         }
 
+        public static void InheritanceTest05()
+        {
+            TestCls4 cls = new TestCases.TestCls4();
+            cls.TestVirtual();
+        }
+
         class GenericTestCls<T>
             where T : ClassInheritanceTest, new()
         {
@@ -153,6 +159,14 @@ namespace TestCases
         public void TestVirtual()
         {
             Console.WriteLine("This is TestCls3.TestVirtual");
+        }
+    }
+
+    class TestCls4 : ClassInheritanceTest2<TestCls4>
+    {
+        public override void TestVirtual()
+        {
+            base.TestVirtual();
         }
     }
 }

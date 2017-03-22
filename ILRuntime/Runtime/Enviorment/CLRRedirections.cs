@@ -14,7 +14,7 @@ namespace ILRuntime.Runtime.Enviorment
 {
     unsafe static class CLRRedirections
     {
-        public static StackObject* CreateInstance(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public static StackObject* CreateInstance(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             IType[] genericArguments = method.GenericArguments;
             if (genericArguments != null && genericArguments.Length == 1)
@@ -46,7 +46,7 @@ namespace ILRuntime.Runtime.Enviorment
                 throw new EntryPointNotFoundException();
         }*/
 
-        public static StackObject* CreateInstance2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public static StackObject* CreateInstance2(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             var p = esp - 1;
             var t = mStack[p->Value] as Type;
@@ -80,7 +80,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }*/
 
-        public static StackObject* GetType(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public static StackObject* GetType(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             var p = esp - 1;
             AppDomain dommain = intp.AppDomain;
@@ -102,7 +102,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }*/
 
-        public unsafe static StackObject* InitializeArray(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public unsafe static StackObject* InitializeArray(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
@@ -357,7 +357,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }*/
 
-        public unsafe static StackObject* DelegateCombine(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public unsafe static StackObject* DelegateCombine(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -379,16 +379,24 @@ namespace ILRuntime.Runtime.Enviorment
                         if (dele2 is IDelegateAdapter)
                         {
                             var dele = ((IDelegateAdapter)dele1);
-                            //This means it's the default delegate which should be singleton to support == operator
-                            if (dele.Next == null)
+                            //This means it's the original delegate which should be untouch
+                            if (!dele.IsClone)
                             {
-                                dele = dele.Instantiate(domain, dele.Instance, dele.Method);
+                                dele = dele.Clone();
+                            }
+                            if(!((IDelegateAdapter)dele2).IsClone)
+                            {
+                                dele2 = ((IDelegateAdapter)dele2).Clone();
                             }
                             dele.Combine((IDelegateAdapter)dele2);
                             return ILIntepreter.PushObject(ret, mStack, dele);
                         }
                         else
                         {
+                            if (!((IDelegateAdapter)dele1).IsClone)
+                            {
+                                dele1 = ((IDelegateAdapter)dele1).Clone();
+                            }
                             ((IDelegateAdapter)dele1).Combine((Delegate)dele2);
                             return ILIntepreter.PushObject(ret, mStack, dele1);
                         }
@@ -456,7 +464,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2;
         }*/
 
-        public unsafe static StackObject* DelegateRemove(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public unsafe static StackObject* DelegateRemove(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -477,7 +485,7 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (dele2 is IDelegateAdapter)
                         {
-                            if (dele1 == dele2)
+                            if (((IDelegateAdapter)dele1).Equals((IDelegateAdapter)dele2))
                                 return ILIntepreter.PushObject(ret, mStack, ((IDelegateAdapter)dele1).Next);
                             else
                                 ((IDelegateAdapter)dele1).Remove((IDelegateAdapter)dele2);
@@ -542,7 +550,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }*/
 
-        public unsafe static StackObject* DelegateEqulity(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public unsafe static StackObject* DelegateEqulity(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -627,7 +635,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2 == null;
         }*/
 
-        public unsafe static StackObject* DelegateInequlity(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public unsafe static StackObject* DelegateInequlity(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -707,7 +715,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2 != null;
         }*/
 
-        public static StackObject* GetTypeFromHandle(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public static StackObject* GetTypeFromHandle(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             //Nothing to do
             return esp;
@@ -718,7 +726,7 @@ namespace ILRuntime.Runtime.Enviorment
             return param[0];
         }*/
 
-        public unsafe static StackObject* MethodInfoInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public unsafe static StackObject* MethodInfoInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             AppDomain domain = intp.AppDomain;
             //Don't ask me why not esp - 3, unity won't return the right result
@@ -794,7 +802,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ((MethodInfo)instance).Invoke(obj, (object[])p);
         }*/
 
-        public unsafe static StackObject* ObjectGetType(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method)
+        public unsafe static StackObject* ObjectGetType(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
         {
             AppDomain domain = intp.AppDomain;
             var ret = esp - 1;

@@ -135,13 +135,13 @@ namespace ILRuntime.Runtime.Intepreter
 
         public List<object> ManagedObjects { get { return managedObjs; } }
 
-        public object CLRInstance { get { return clrInstance; } }
+        public object CLRInstance { get { return clrInstance; } set { clrInstance = value; } }
 
         protected ILTypeInstance()
         {
 
         }
-        public ILTypeInstance(ILType type)
+        public ILTypeInstance(ILType type, bool initializeCLRInstance = true)
         {
             this.type = type;
             fields = new StackObject[type.TotalFieldCount];
@@ -151,30 +151,35 @@ namespace ILRuntime.Runtime.Intepreter
                 managedObjs.Add(null);
             }
             InitializeFields(type);
-            if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
+            if (initializeCLRInstance)
             {
-                clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, this);
-            }
-            else
-            {
-                clrInstance = this;
-            }
-
-            if (type.Implements != null)
-            {
-                foreach (var i in type.Implements)
+                if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
-                    if (i is Enviorment.CrossBindingAdaptor)
+                    clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, this);
+                }
+                else
+                {
+                    clrInstance = this;
+                }
+
+                if (type.Implements != null)
+                {
+                    foreach (var i in type.Implements)
                     {
-                        if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
+                        if (i is Enviorment.CrossBindingAdaptor)
                         {
-                            throw new NotSupportedException("Inheriting and implementing interface at the same time is not supported yet");
+                            if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
+                            {
+                                throw new NotSupportedException("Inheriting and implementing interface at the same time is not supported yet");
+                            }
+                            clrInstance = ((Enviorment.CrossBindingAdaptor)i).CreateCLRInstance(type.AppDomain, this);
+                            break;
                         }
-                        clrInstance = ((Enviorment.CrossBindingAdaptor)i).CreateCLRInstance(type.AppDomain, this);
-                        break;
                     }
                 }
             }
+            else
+                clrInstance = this;
         }
 
         public unsafe object this[int index]
@@ -289,12 +294,8 @@ namespace ILRuntime.Runtime.Intepreter
         }
 
         internal void Clear()
-        {
-            for (int i = 0; i < fields.Length; i++)
-            {
-                fields[i] = StackObject.Null;
-                managedObjs[i] = null;
-            }
+        {   
+            InitializeFields(type);
         }
 
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, List<object> managedStack)
@@ -316,6 +317,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject* esp, List<object> managedStack)
         {
+            esp = ILIntepreter.GetObjectAndResolveReference(esp);
             field = *esp;
             if (field.ObjectType >= ObjectTypes.Object)
             {
@@ -355,7 +357,14 @@ namespace ILRuntime.Runtime.Intepreter
                 ins.fields[i] = fields[i];
                 ins.managedObjs[i] = managedObjs[i];
             }
-            ins.clrInstance = clrInstance;
+            if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
+            {
+                ins.clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, ins);
+            }
+            else
+            {
+                ins.clrInstance = ins;
+            }
             return ins;
         }
 

@@ -11,7 +11,7 @@ namespace ILRuntime.CLR.Utils
 {
     public delegate TResult Func<T1, T2, T3, T4, T5, TResult>(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5);
 
-    static class Extensions
+    public static class Extensions
     {
         public static List<IType> EmptyParamList = new List<IType>();
         public static List<IType> GetParamList(this MethodReference def, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IType contextType, IMethod contextMethod, IType[] genericArguments)
@@ -151,8 +151,17 @@ namespace ILRuntime.CLR.Utils
             }
             else if (obj is ILTypeInstance)
             {
+                if (obj is IDelegateAdapter && pt != typeof(ILTypeInstance))
+                {
+                    return ((IDelegateAdapter)obj).Delegate;
+                }
                 if (!(obj is ILEnumTypeInstance))
-                    return ((ILTypeInstance)obj).CLRInstance;
+                {
+                    var ins = (ILTypeInstance)obj;
+                    if (ins.IsValueType)
+                        ins = ins.Clone();
+                    return ins.CLRInstance;
+                }
             }
             return obj;
         }

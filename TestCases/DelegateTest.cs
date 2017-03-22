@@ -124,6 +124,60 @@ namespace TestCases
             ILRuntimeTest.TestFramework.BaseClassTest.DoTest();
         }
 
+        public static void DelegateTest12()
+        {
+            testDele += IntTest3;
+            Dictionary<int, TestDelegate> dic = new Dictionary<int, TestDelegate>();
+            dic[0] = testDele;
+            dic[1] = IntTest3;
+            Console.WriteLine(dic[0](1000));
+            Console.WriteLine(dic[1](1000));
+
+        }
+
+        public static void DelegateTest13()
+        {
+            Action<int> a = null;
+            a += IntTest;
+            a += IntTest2;
+
+            a -= IntTest;
+            a -= IntTest2;
+
+            Console.WriteLine(a == null);
+        }
+
+        public static void DelegateTest14()
+        {
+            Action<string> a = null;
+            a += TestString;
+            a += TestString2;
+            a += TestString3;
+            a += TestString4;
+
+            a("ffff");
+        }
+
+        static void TestString(string a)
+        {
+            Console.WriteLine("test1:" + a);
+        }
+
+        static void TestString2(string a)
+        {
+            Console.WriteLine("test2:" + a);
+        }
+
+        static void TestString3(string a)
+        {
+            Console.WriteLine("test3:" + a);
+        }
+
+        static void TestString4(string a)
+        {
+            Console.WriteLine("test4:" + a);
+        }
+
         static void CallBack(ILRuntimeTest.TestFramework.BaseClassTest a)
         {
             a.testField = true;

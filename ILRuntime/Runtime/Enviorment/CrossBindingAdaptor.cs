@@ -23,6 +23,17 @@ namespace ILRuntime.Runtime.Enviorment
         /// </summary>
         public abstract Type BaseCLRType { get; }
 
+        /// <summary>
+        /// If this Adaptor is capable to impelement multuple interfaces, use this Property, AND BaseCLRType should return null
+        /// </summary>
+        public virtual Type[] BaseCLRTypes
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public abstract Type AdaptorType { get; }
 
         public abstract object CreateCLRInstance(Enviorment.AppDomain appdomain, ILTypeInstance instance);

@@ -127,7 +127,83 @@ namespace ILRuntime.Runtime.Enviorment
                 return func(adapter.Delegate);
             }
             else
-                throw new KeyNotFoundException("Cannot find convertor for " + clrDelegateType);
+            {
+                StringBuilder sb = new StringBuilder();
+                string clsName, rName;
+                bool isByRef;
+                clrDelegateType.GetClassName(out clsName, out rName, out isByRef);
+                sb.AppendLine("Cannot find convertor for " + rName);
+                sb.AppendLine("Please add following code:");
+                sb.Append("appdomain.DelegateManager.RegisterDelegateConvertor<");
+                sb.Append(rName);
+                sb.AppendLine(">((act) =>");
+                sb.AppendLine("{");
+                sb.Append("    return new ");
+                sb.Append(rName);
+                sb.Append("((");
+                var mi = clrDelegateType.GetMethod("Invoke");
+                bool first = true;
+                foreach(var i in mi.GetParameters())
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                        sb.Append(", ");
+                    sb.Append(i.Name);
+                }
+                sb.AppendLine(") =>");
+                sb.AppendLine("    {");
+                if(mi.ReturnType != appdomain.VoidType.TypeForCLR)
+                {
+                    sb.Append("        return ((Func<");
+                    first = true;
+                    foreach (var i in mi.GetParameters())
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                            sb.Append(", ");
+                        i.ParameterType.GetClassName(out clsName, out rName, out isByRef);
+                        sb.Append(rName);
+                    }
+                }
+                else
+                {
+                    sb.Append("        ((Action<");
+                    first = true;
+                    foreach (var i in mi.GetParameters())
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                            sb.Append(", ");
+                        i.ParameterType.GetClassName(out clsName, out rName, out isByRef);
+                        sb.Append(rName);
+                    }
+                }
+                sb.Append(">)act)(");
+                first = true;
+                foreach (var i in mi.GetParameters())
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                        sb.Append(", ");
+                    sb.Append(i.Name);
+                }
+                sb.AppendLine(");");
+                sb.AppendLine("    });");
+                sb.AppendLine("});");
+                throw new KeyNotFoundException(sb.ToString());
+            }
         }
 
         internal IDelegateAdapter FindDelegateAdapter(ILTypeInstance instance, ILMethod method)

@@ -17,5 +17,6 @@ namespace ILRuntime.Runtime.Stack
         public StackObject* LocalVarPointer;
         public StackObject* BasePointer;
         public IntegerReference Address;
+        public int ManagedStackBase;
     }
 }

@@ -25,6 +25,8 @@ namespace ILRuntime.CLR.Method
         IType[] genericArguments;
         object[] invocationParam;
         bool isDelegateInvoke;
+        int hashCode = -1;
+        static int instance_id = 0x20000000;
 
         public IType DeclearingType
         {
@@ -129,7 +131,7 @@ namespace ILRuntime.CLR.Method
 
             if (def != null)
             {
-                appdomain.ConstructorRedirectMap.TryGetValue(cDef, out redirect);
+                appdomain.RedirectMap.TryGetValue(cDef, out redirect);
             }
         }
 
@@ -308,7 +310,7 @@ namespace ILRuntime.CLR.Method
                             else
                             {
                                 var t = appdomain.GetType(obj.GetType()) as CLRType;
-                                t.Fields[p->ValueLow].SetValue(obj, val);
+                                t.GetField(p->ValueLow).SetValue(obj, val);
                             }
                         }
                         break;
@@ -321,7 +323,7 @@ namespace ILRuntime.CLR.Method
                             }
                             else
                             {
-                                ((CLRType)t).Fields[p->ValueLow].SetValue(null, val);
+                                ((CLRType)t).GetField(p->ValueLow).SetValue(null, val);
                             }
                         }
                         break;
@@ -348,6 +350,13 @@ namespace ILRuntime.CLR.Method
                 return def.ToString();
             else
                 return cDef.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+            return hashCode;
         }
     }
 }

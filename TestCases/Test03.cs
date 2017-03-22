@@ -8,6 +8,76 @@ namespace TestCases
 
     class Test03
     {
+        static class Check
+        {
+            public static void Test<T>(T value)
+            {
+                if (value == null)
+                    Console.WriteLine("null");
+            }
+
+            public static void Test2<T>(T obj)
+            {
+                Action<T> action = (value) => { Console.WriteLine(value); };
+                action(obj);
+            }
+        }
+
+
+        public static void UnitTest_NullCheck()
+        {
+            Check.Test(new byte[] { 1, 2 });
+        }
+
+        public static void UnitTest_GenericDelegate()
+        {
+            Check.Test2(1);
+        }
+
+        static void Swap<T>(T[] arr, int idx1, int idx2)
+        {
+            if (idx1 >= arr.Length || idx2 >= arr.Length) return;
+            T temp = arr[idx1];
+            arr[idx1] = arr[idx2];
+            arr[idx2] = temp;
+        }
+
+        public static void UnitTest_Swap()
+        {
+            int[] arr = new int[] { 1, 2 };
+            Swap(arr, 0, 1);
+
+            Console.WriteLine(arr[0]);
+        }
+        static bool TryGet(out A a)
+        {
+            a = null;
+            return true;
+        }
+
+        public static void UnitTest_RefOutNull()
+        {
+            A aaa;
+            TryGet(out aaa);
+        }
+        public static void UnitTest_Typeof()
+        {
+            object obj = 1;
+            if(obj.GetType() == typeof(int))
+            {
+                Console.WriteLine("ok");
+            }
+            else
+                Console.WriteLine("error");
+
+            if (obj is int)
+            {
+                Console.WriteLine("ok");
+            }
+            else
+                Console.WriteLine("error");
+
+        }
         public class TestGenrRefBase
         {
             public int v;
@@ -57,6 +127,11 @@ namespace TestCases
                 ILRuntimeTest.TestFramework.TestStruct.DoTest(ref v);
 
                 Console.WriteLine("new val:" + v);
+
+                var b = str;
+                b.value = 1233333;
+                ILRuntimeTest.TestFramework.TestStruct.DoTest2(str);
+                Console.WriteLine("new val:" + str.value);
             }
 
             public string GetString()

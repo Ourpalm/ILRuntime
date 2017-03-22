@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using Mono.Cecil;
 using System.Reflection;
 using Mono.Cecil.Cil;
@@ -14,7 +15,7 @@ using ILRuntime.Runtime.Debugger;
 using ILRuntime.Runtime.Stack;
 namespace ILRuntime.Runtime.Enviorment
 {
-    public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method);
+    public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj);
     public class AppDomain
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
@@ -24,20 +25,25 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
-        Dictionary<int, string> mapString = new Dictionary<int, string>();
-        Dictionary<System.Reflection.MethodInfo, CLRRedirectionDelegate> redirectMap = new Dictionary<System.Reflection.MethodInfo, CLRRedirectionDelegate>();
-        Dictionary<ConstructorInfo, CLRRedirectionDelegate> ctorRedirectMap = new Dictionary<ConstructorInfo, CLRRedirectionDelegate>();
+        Dictionary<long, string> mapString = new Dictionary<long, string>();
+        Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate> redirectMap = new Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate>();
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         DelegateManager dMgr;
         Assembly[] loadedAssemblies;
         Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
         DebugService debugService;
 
+        /// <summary>
+        /// Determine if invoking unbinded CLR method(using reflection) is allowed
+        /// </summary>
+        public bool AllowUnboundCLRMethod { get; set; }
+
 #if UNITY_EDITOR
         public int UnityMainThreadID { get; set; }
 #endif
         public unsafe AppDomain()
         {
+            AllowUnboundCLRMethod = true;
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
@@ -109,27 +115,204 @@ namespace ILRuntime.Runtime.Enviorment
         public IType ObjectType { get { return objectType; } }
 
         public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
-        internal Dictionary<MethodInfo, CLRRedirectionDelegate> RedirectMap { get { return redirectMap; } }
-        internal Dictionary<ConstructorInfo, CLRRedirectionDelegate> ConstructorRedirectMap { get { return ctorRedirectMap; } }
+        internal Dictionary<MethodBase, CLRRedirectionDelegate> RedirectMap { get { return redirectMap; } }
         internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
         public DebugService DebugService { get { return debugService; } }
         internal Dictionary<int, ILIntepreter> Intepreters { get { return intepreters; } }
         internal Queue<ILIntepreter> FreeIntepreters { get { return freeIntepreters; } }
 
         public DelegateManager DelegateManager { get { return dMgr; } }
+
+        
+        /// <summary>
+        /// 加载Assembly 文件，从指定的路径
+        /// </summary>
+        /// <param name="path">路径</param>
+        public void LoadAssemblyFile(string path)
+        {
+            FileInfo file = new FileInfo(path);
+
+            if (!file.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", path));
+            }
+            else
+            {
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    LoadAssembly(fs);
+
+                    fs.Dispose();
+                }
+            }
+        }
+
+#if USE_MDB || USE_PDB
+        /// <summary>
+        /// 加载Assembly 文件和PDB文件或MDB文件，从指定的路径（PDB和MDB文件按默认命名方式，并且和Assembly文件处于同一目录中
+        /// </summary>
+        /// <param name="path">路径</param>
+        public void LoadAssemblyFileAndSymbol(string path)
+        {
+            FileInfo file = new FileInfo(path);
+
+            if (!file.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", path));
+            }
+            else
+            {
+                var dlldir = file.DirectoryName;
+                var assname = Path.GetFileNameWithoutExtension(file.Name);
+                var pdbpath = string.Format("{0}/{1}.pdb",dlldir,assname);
+                var mdbpath = string.Format("{0}/{1}.mdb", dlldir, assname);
+
+                string symbolPath = "";
+
+                bool isPDB = true;
+                if (File.Exists(pdbpath))
+                {
+                    symbolPath = pdbpath;
+                }
+                else if (File.Exists(mdbpath))
+                {
+                    symbolPath = mdbpath;
+                    isPDB = false;
+                }
+
+
+                if (string.IsNullOrEmpty(symbolPath))
+                {
+                    throw new FileNotFoundException(string.Format("symbol file not find!:\r\ncheck:\r\n{0}\r\n{1}\r\n", pdbpath,mdbpath));
+                }
+
+                using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
+                {                  
+                    
+                    using (var pdbfs = new System.IO.FileStream(symbolPath, FileMode.Open))
+                    {
+                        if (isPDB)
+                        {
+                            LoadAssemblyPDB(fs, pdbfs);
+                        }
+                        else
+                        {
+                            LoadAssemblyMDB(fs, pdbfs);
+                        }
+                    }
+                }
+            }
+        }
+#endif
+
+#if USE_PDB
+        /// <summary>
+        /// 加载Assembly 文件和PDB文件，两者都从指定的路径
+        /// </summary>
+        /// <param name="assemblyFilePath">Assembly 文件路径</param>
+        /// <param name="symbolFilePath">symbol文件路径</param>
+        public void LoadAssemblyFileAndPDB(string assemblyFilePath,string symbolFilePath)
+        {
+            FileInfo assfile = new FileInfo(assemblyFilePath);
+            FileInfo pdbfile = new FileInfo(symbolFilePath);
+            if (!assfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", assemblyFilePath));
+            }
+
+            if (!pdbfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("symbol file not find!:\r\n{0}", symbolFilePath));
+            }
+
+            using (FileStream fs = new FileStream(assfile.FullName, FileMode.Open, FileAccess.Read))
+            {
+
+                using (var pdbfs = new System.IO.FileStream(pdbfile.FullName, FileMode.Open))
+                {
+                    LoadAssemblyPDB(fs, pdbfs);
+                }
+            }
+
+        }
+
+        /// <summary>
+        ///  从流加载Assembly,以及symbol符号文件(pdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">PDB Stream</param>
+        public void LoadAssemblyPDB(System.IO.Stream stream, System.IO.Stream symbol)
+        {
+            LoadAssembly(stream, symbol, new Mono.Cecil.Pdb.PdbReaderProvider());
+        }
+
+#endif
+
+#if USE_MDB
+        /// <summary>
+        /// 加载Assembly 文件和MDB文件，两者都从指定的路径
+        /// </summary>
+        /// <param name="assemblyFilePath">Assembly 文件路径</param>
+        /// <param name="symbolFilePath">symbol文件路径</param>
+        public void LoadAssemblyFileAndMDB(string assemblyFilePath, string symbolFilePath)
+        {
+            FileInfo assfile = new FileInfo(assemblyFilePath);
+            FileInfo pdbfile = new FileInfo(symbolFilePath);
+            if (!assfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("Assembly File not find!:\r\n{0}", assemblyFilePath));
+            }
+
+            if (!pdbfile.Exists)
+            {
+                throw new FileNotFoundException(string.Format("symbol file not find!:\r\n{0}", symbolFilePath));
+            }
+
+            using (FileStream fs = new FileStream(assfile.FullName, FileMode.Open, FileAccess.Read))
+            {
+
+                using (var pdbfs = new System.IO.FileStream(pdbfile.FullName, FileMode.Open))
+                {
+                    LoadAssemblyMDB(fs, pdbfs);
+                }
+            }
+        }
+
+        /// <summary>
+        ///  从流加载Assembly,以及symbol符号文件(Mdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">PDB Stream</param>
+        public void LoadAssemblyMDB(System.IO.Stream stream, System.IO.Stream symbol)
+        {
+            LoadAssembly(stream, symbol, new Mono.Cecil.Mdb.MdbReaderProvider());
+        }
+#endif
+        /// <summary>
+        /// 从流加载Assembly 不加载symbol符号文件
+        /// </summary>
+        /// <param name="stream">Dll数据流</param>
         public void LoadAssembly(System.IO.Stream stream)
         {
             LoadAssembly(stream, null, null);
-        }
+        }        
+
+        /// <summary>
+        /// 从流加载Assembly,以及symbol符号文件(pdb)
+        /// </summary>
+        /// <param name="stream">Assembly Stream</param>
+        /// <param name="symbol">symbol Stream</param>
+        /// <param name="symbolReader">symbol 读取器</param>
         public void LoadAssembly(System.IO.Stream stream, System.IO.Stream symbol, ISymbolReaderProvider symbolReader)
         {
-            var module = ModuleDefinition.ReadModule(stream);
+            var module = ModuleDefinition.ReadModule(stream); //从MONO中加载模块
 
-            if (symbolReader != null && symbol != null)
+            if (symbolReader != null && symbol != null) 
             {
-                module.ReadSymbols(symbolReader.GetSymbolReader(module, symbol));
+                module.ReadSymbols(symbolReader.GetSymbolReader(module, symbol)); //加载符号表
             }
-            if (module.HasAssemblyReferences)
+
+            if (module.HasAssemblyReferences) //如果此模块引用了其他模块
             {
                 foreach (var ar in module.AssemblyReferences)
                 {
@@ -139,14 +322,18 @@ namespace ILRuntime.Runtime.Enviorment
                         moduleref.Add(ar.FullName);*/
                 }
             }
+
             if (module.HasTypes)
             {
                 List<ILType> types = new List<ILType>();
-                foreach (var t in module.GetTypes())
+
+                foreach (var t in module.GetTypes()) //获取所有此模块定义的类型
                 {
                     ILType type = new ILType(t, this);
+
                     mapType[t.FullName] = type;
                     types.Add(type);
+
                 }
             }
 
@@ -190,16 +377,17 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
-        public void RegisterCLRMethodRedirection(MethodInfo mi, CLRRedirectionDelegate func)
+        public void RegisterCLRMethodRedirection(MethodBase mi, CLRRedirectionDelegate func)
         {
-            redirectMap[mi] = func;
+            if (!redirectMap.ContainsKey(mi))
+                redirectMap[mi] = func;
         }
 
-        public void RegisterCLRConstructorRedirection(ConstructorInfo mi, CLRRedirectionDelegate func)
-        {
-            ctorRedirectMap[mi] = func;
-        }
-
+        /// <summary>
+        /// 更近类型名称返回类型
+        /// </summary>
+        /// <param name="fullname">类型全名 命名空间.类型名</param>
+        /// <returns></returns>
         public IType GetType(string fullname)
         {
             IType res;
@@ -207,12 +395,18 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 return null;
             }
+
             if (mapType.TryGetValue(fullname, out res))
                 return res;
+
+
             string baseType;
             List<string> genericParams;
             bool isArray;
+
             ParseGenericType(fullname, out baseType, out genericParams, out isArray);
+
+
             bool isByRef = baseType.EndsWith("&");
             if (isByRef)
                 baseType = baseType.Substring(0, baseType.Length - 1);
@@ -239,6 +433,7 @@ namespace ILRuntime.Runtime.Enviorment
                     }
                     bt = bt.MakeGenericInstance(genericArguments);
                     mapType[bt.FullName] = bt;
+                    mapTypeToken[bt.GetHashCode()] = bt;
                     StringBuilder sb = new StringBuilder();
                     sb.Append(baseType);
                     sb.Append('<');
@@ -261,6 +456,7 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     bt = bt.MakeByRefType();
                     mapType[bt.FullName] = bt;
+                    mapTypeToken[bt.GetHashCode()] = bt;
                     if (!isArray)
                     {
                         mapType[fullname] = bt;
@@ -273,6 +469,7 @@ namespace ILRuntime.Runtime.Enviorment
                     res = bt.MakeArrayType();
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
+                    mapTypeToken[res.GetHashCode()] = res;
                     return res;
                 }
                 else
@@ -283,11 +480,15 @@ namespace ILRuntime.Runtime.Enviorment
                 Type t = Type.GetType(fullname);
                 if (t != null)
                 {
-                    res = new CLRType(t, this);
+                    if (!clrTypeMapping.TryGetValue(t, out res))
+                    {
+                        res = new CLRType(t, this);
+                        clrTypeMapping[t] = res;
+                    }
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
                     mapType[t.AssemblyQualifiedName] = res;
-                    clrTypeMapping[t] = res;
+                    mapTypeToken[res.GetHashCode()] = res;
                     return res;
                 }
             }
@@ -539,14 +740,18 @@ namespace ILRuntime.Runtime.Enviorment
                     ((ILType)res).TypeReference = (TypeReference)token;
                 }
                 if (!string.IsNullOrEmpty(res.FullName))
-                    mapType[res.FullName] = res;
+                {
+                    if (res is CLRType || !((ILType)res).TypeReference.HasGenericParameters)
+                        mapType[res.FullName] = res;
+                }
             }
+            mapTypeToken[res.GetHashCode()] = res;
             if (!dummyGenericInstance)
                 mapTypeToken[hash] = res;
             return res;
         }
 
-        internal IType GetType(int hash)
+        public IType GetType(int hash)
         {
             IType res;
             if (mapTypeToken.TryGetValue(hash, out res))
@@ -555,7 +760,12 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }
 
-        internal IType GetType(Type t)
+        /// <summary>
+        /// 根据CLR类型获取 IL类型
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public IType GetType(Type t)
         {
             IType res;
             if (clrTypeMapping.TryGetValue(t, out res))
@@ -617,10 +827,16 @@ namespace ILRuntime.Runtime.Enviorment
             IType t = GetType(type);
             if (t == null)
                 return null;
-            var m = t.GetMethod(method, p != null ? p.Length : 0);
-
+            var m = t.GetMethod(method, p != null ? p.Length : 0);            
             if (m != null)
             {
+                for(int i = 0; i < m.ParameterCount; i++)
+                {
+                    if (!m.Parameters[i].TypeForCLR.IsAssignableFrom(p[i].GetType()))
+                    {
+                        throw new ArgumentException("Parameter type mismatch");
+                    }
+                }
                 return Invoke(m, instance, p);
             }
             return null;
@@ -746,6 +962,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 methodname = _ref.Name;
                 var typeDef = _ref.DeclaringType;
+                
                 type = GetType(typeDef, contextType, contextMethod);
                 if (type == null)
                     throw new KeyNotFoundException("Cannot find type:" + typename);
@@ -782,7 +999,18 @@ namespace ILRuntime.Runtime.Enviorment
                             genericArguments[i] = gt;
                     }
                 }
-
+                if (!invalidToken && typeDef.IsGenericInstance)
+                {
+                    GenericInstanceType gim = (GenericInstanceType)typeDef;
+                    for(int i = 0; i < gim.GenericArguments.Count; i++)
+                    {
+                        if(gim.GenericArguments[0].IsGenericParameter)
+                        {
+                            invalidToken = true;
+                            break;
+                        }
+                    }
+                }
                 paramList = _ref.GetParamList(this, contextType, contextMethod, genericArguments);
                 returnType = GetType(_ref.ReturnType, contextType, null);
             }
@@ -798,8 +1026,6 @@ namespace ILRuntime.Runtime.Enviorment
             else
             {
                 method = type.GetMethod(methodname, paramList, genericArguments, returnType);
-                if (method != null && method.IsGenericInstance)
-                    mapMethod[method.GetHashCode()] = method;
             }
 
             if (method == null)
@@ -807,16 +1033,18 @@ namespace ILRuntime.Runtime.Enviorment
                 if (isConstructor && contextType.FirstCLRBaseType != null && contextType.FirstCLRBaseType is CrossBindingAdaptor && type.TypeForCLR == ((CrossBindingAdaptor)contextType.FirstCLRBaseType).BaseCLRType)
                 {
                     method = contextType.BaseType.GetConstructor(paramList);
-                    if(method == null)
-                        throw new KeyNotFoundException("Cannot find method:" + methodname);
+                    if (method == null)
+                        throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}", methodname, type.FullName, token));
                     invalidToken = true;
                     mapMethod[method.GetHashCode()] = method;
                 }
                 else
-                    throw new KeyNotFoundException("Cannot find method:" + methodname);
+                    throw new KeyNotFoundException(string.Format("Cannot find method:{0} in type:{1}, token={2}", methodname, type.FullName, token));
             }
             if (!invalidToken)
                 mapMethod[hashCode] = method;
+            else
+                mapMethod[method.GetHashCode()] = method;
             return method;
         }
 
@@ -849,26 +1077,57 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 var it = type as ILType;
                 int idx = it.GetFieldIndex(token);
-                long res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
+                long res = 0;
+                if (it.TypeReference.HasGenericParameters)
+                {
+                    mapTypeToken[type.GetHashCode()] = it;
+                    res = ((long)type.GetHashCode() << 32) | (uint)idx;
+                }
+                else
+                {
+                    res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
+                }
 
                 return res;
             }
             else
             {
                 int idx = type.GetFieldIndex(token);
-                long res = ((long)f.DeclaringType.GetHashCode() << 32) | (uint)idx;
+                long res = ((long)type.GetHashCode() << 32) | (uint)idx;
 
                 return res;
             }
         }
 
-        internal void CacheString(object token)
+        internal long CacheString(object token)
         {
-            int hashCode = token.GetHashCode();
-            mapString[hashCode] = (string)token;
+            long oriHash = token.GetHashCode();
+            long hashCode = oriHash;
+            string str = (string)token;
+            lock (mapString)
+            {
+                bool isCollision = CheckStringCollision(hashCode, str);
+                long cnt = 0;
+                while (isCollision)
+                {
+                    cnt++;
+                    hashCode = cnt << 32 | oriHash;
+                    isCollision = CheckStringCollision(hashCode, str);
+                }
+                mapString[hashCode] = (string)token;
+            }
+            return hashCode;
         }
 
-        internal string GetString(int hashCode)
+        bool CheckStringCollision(long hashCode, string newStr)
+        {
+            string oldVal;
+            if (mapString.TryGetValue(hashCode, out oldVal))
+                return oldVal != newStr;
+            return false;
+        }
+
+        internal string GetString(long hashCode)
         {
             string res = null;
             if (mapString.TryGetValue(hashCode, out res))
@@ -878,8 +1137,29 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void RegisterCrossBindingAdaptor(CrossBindingAdaptor adaptor)
         {
-            if (!crossAdaptors.ContainsKey(adaptor.BaseCLRType))
+            var bType = adaptor.BaseCLRType;
+            if (bType != null)
             {
+                if (!crossAdaptors.ContainsKey(bType))
+                {
+                    var t = adaptor.AdaptorType;
+                    var res = GetType(t);
+                    if (res == null)
+                    {
+                        res = new CLRType(t, this);
+                        mapType[res.FullName] = res;
+                        mapType[t.AssemblyQualifiedName] = res;
+                        clrTypeMapping[t] = res;
+                    }
+                    adaptor.RuntimeType = res;
+                    crossAdaptors[bType] = adaptor;
+                }
+                else
+                    throw new Exception("Crossbinding Adapter for " + bType.FullName + " is already added.");
+            }
+            else
+            {
+                var bTypes = adaptor.BaseCLRTypes;
                 var t = adaptor.AdaptorType;
                 var res = GetType(t);
                 if (res == null)
@@ -890,8 +1170,17 @@ namespace ILRuntime.Runtime.Enviorment
                     clrTypeMapping[t] = res;
                 }
                 adaptor.RuntimeType = res;
-                crossAdaptors[adaptor.BaseCLRType] = adaptor;
-            }
+
+                foreach (var i in bTypes)
+                {
+                    if (!crossAdaptors.ContainsKey(i))
+                    {
+                        crossAdaptors[i] = adaptor;
+                    }
+                    else
+                        throw new Exception("Crossbinding Adapter for " + i.FullName + " is already added.");
+                }
+            } 
         }
     }
 }

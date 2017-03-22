@@ -5,6 +5,15 @@ using System.Collections.Generic;
 using System.Text;
 namespace TestCases
 {
+    class Student<T>
+    {
+        public T name;
+        public Student(T name)
+        {
+            this.name = name;
+            Console.WriteLine(name);
+        }
+    }
     class TestExplicit
     {
         bool boolVal;
@@ -71,8 +80,157 @@ namespace TestCases
         }
     }
 
+    class NRow<A, B>
+    {
+        public A K { get; set; }
+        public B V { get; set; }
+    }
+
     class Test05
     {
+        class MGenericTest
+        {
+            public TestStruct TestGeneric<T>(string a, string b)
+            {
+                return TestGenericSub<T>(a, b);
+            }
+
+            TestStruct TestGenericSub<T>(string a, string b)
+            {
+                TestStruct res = new TestStruct();
+                res.address = a + b;
+                return res;
+            }
+        } 
+        public struct TestStruct
+        {
+            public int id;
+            public string address;
+
+            public override string ToString()
+            {
+                return id.ToString();
+            }
+        }
+
+        public static void TestStudent()
+        {
+            Student<string> a = new TestCases.Student<string>("aaaaaa");
+            Console.WriteLine(a.name);
+        }
+
+        public static void TestArrayValueType()
+        {
+            int[] arr = new int[4] { 1, 2, 3, 4 };
+            for(int i = 0; i < arr.Length; i++)
+            {
+                string str = arr[i].ToString();
+                Console.WriteLine("!!! new str = " + str);
+            }
+        }
+
+        public static void TestGenericMethod()
+        {
+            var test = TestGenericMethodSub();
+            var r = test.TestGeneric<ILRuntimeTest.TestFramework.TestClass3>("123", "456");
+            Console.WriteLine("address " + r.address);
+        }
+
+        public static void TestGenericMethod2()
+        {
+            var res = GetRows<int, int>("123", "345");
+            Console.WriteLine(string.Format("res[0], K={0} V={1}", res[0].K, res[0].V));
+            var res2 = GetRows<int, double>("789", "345.678");
+            Console.WriteLine(string.Format("res2[0], K={0} V={1}", res2[0].K, res2[0].V));
+
+        }
+
+        static List<NRow<A, B>> GetRows<A, B>(string a, string b)
+        {
+            List<NRow<A, B>> res = new List<TestCases.NRow<A, B>>();
+            NRow<A, B> row;
+            for (int i = 0; i < 1; i++)
+            {
+                row = new TestCases.NRow<A, B>();
+                row.K = (A)Convert.ChangeType(a, typeof(A));
+                row.V = (B)Convert.ChangeType(b, typeof(B));
+                res.Add(row);
+            }
+            return res;
+        }
+
+        static MGenericTest TestGenericMethodSub()
+        {
+            return new MGenericTest();
+        }
+
+        public static void TestStructDictionary()
+        {
+            Dictionary<int, TestStruct> dicts = new Dictionary<int, TestStruct>();
+            for(int i = 0; i < 2; i++)
+            {
+                var def = new TestStruct();
+                def.id = i;
+                def.address = "address " + i;
+
+                dicts.Add(i, def);
+            }
+
+            List<TestStruct> lists = new List<TestStruct>();
+            foreach(var i in dicts.Values)
+            {
+                lists.Add(i);
+            }
+
+            for(int i = 0; i < lists.Count; i++)
+            {
+                var item = lists[i];
+                Console.WriteLine(string.Format("id:{0} address:{1}", item.id, item.address));
+            }
+        }
+
+        public static void TestMethodDefaultStructValue()
+        {
+            PrintValue(100);
+        }
+
+        public static void PrintValue(int a, TestStruct b = default(TestStruct))
+        {
+            Console.WriteLine("a = " + a + ", b = " + b.ToString());
+        }
+
+        public static void TestForEach()
+        {
+            List<string> a = new List<string>() { "1", "2", "3" };
+            foreach (var i in a)
+            {
+                ParseOne(i);
+            }
+        }
+
+
+        public static void TestForEachTry()
+        {
+            List<string> a = new List<string>() { "1", "2", "3" };
+            foreach(var i in a)
+            {
+                try
+                {
+                    ParseOne(i);   
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+        }
+
+        static string ParseOne(string line)
+        {
+            Console.WriteLine(line.ToString());            
+            throw new NotSupportedException("error");            
+        }
+
         static bool CheckValue(List<B> lst)
         {
             foreach (B a in lst)
@@ -202,6 +360,14 @@ namespace TestCases
         {
             try
             {
+                try
+                {
+                    c5.bar();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(string.Format("{0}\n{1}\n{2}", ex.Message, ex.Data["StackTrace"], ex.StackTrace));
+                }
                 c5.bar();
                 throw new NotImplementedException("new exception");
             }

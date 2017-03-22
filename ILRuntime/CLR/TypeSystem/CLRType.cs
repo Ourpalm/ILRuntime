@@ -8,13 +8,13 @@ using Mono.Cecil;
 using ILRuntime.CLR.Method;
 namespace ILRuntime.CLR.TypeSystem
 {
-    class CLRType : IType
+    public class CLRType : IType
     {
         Type clrType;
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
-        KeyValuePair<string,IType>[] genericArguments;
+        KeyValuePair<string, IType>[] genericArguments;
         List<CLRType> genericInstances;
         Dictionary<string, int> fieldMapping;
         Dictionary<int, FieldInfo> fieldInfoCache;
@@ -24,6 +24,9 @@ namespace ILRuntime.CLR.TypeSystem
         IType baseType;
         bool isBaseTypeInitialized = false;
         MethodInfo memberwiseClone;
+
+        int hashCode = -1;
+        static int instance_id = 0x20000000;
 
         public Dictionary<int, FieldInfo> Fields
         {
@@ -48,7 +51,7 @@ namespace ILRuntime.CLR.TypeSystem
             this.appdomain = appdomain;
             isDelegate = clrType.BaseType == typeof(MulticastDelegate);
         }
-        
+
         public bool IsGenericInstance
         {
             get
@@ -144,7 +147,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                if(clrType.IsValueType && memberwiseClone == null)
+                if (clrType.IsValueType && memberwiseClone == null)
                 {
                     memberwiseClone = clrType.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                 }
@@ -314,14 +317,22 @@ namespace ILRuntime.CLR.TypeSystem
                                     break;
                                 }
                             }
-                            if (match)
+                            if (match && genericMethod == null)
                             {
                                 genericMethod = i;
-                                break;
-                            }                            
+                            }
                         }
                         else
                         {
+                            if (genericArguments == null)
+                                match = i.GenericArguments == null;
+                            else
+                            {
+                                if (i.GenericArguments == null)
+                                    match = false;
+                                else
+                                    match = i.GenericArguments.Length == genericArguments.Length;
+                            }
                             for (int j = 0; j < param.Count; j++)
                             {
                                 var typeA = param[j].TypeForCLR.IsByRef ? param[j].TypeForCLR.GetElementType() : param[j].TypeForCLR;
@@ -339,14 +350,14 @@ namespace ILRuntime.CLR.TypeSystem
                             }
                             if (match)
                             {
-                                
+
                                 if (i.IsGenericInstance)
                                 {
                                     if (i.GenericArguments.Length == genericArguments.Length)
                                     {
                                         for (int j = 0; j < genericArguments.Length; j++)
                                         {
-                                            if(i.GenericArguments[j] != genericArguments[j])
+                                            if (i.GenericArguments[j] != genericArguments[j])
                                             {
                                                 match = false;
                                                 break;
@@ -405,7 +416,7 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                 }
             }
-            
+
             return null;
         }
 
@@ -462,6 +473,13 @@ namespace ILRuntime.CLR.TypeSystem
         public IType ResolveGenericType(IType contextType)
         {
             throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+            return hashCode;
         }
     }
 }

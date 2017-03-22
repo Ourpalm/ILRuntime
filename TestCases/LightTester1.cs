@@ -47,7 +47,30 @@ namespace TestCases
             ILRuntimeTest.TestFramework.TestStruct b = a.Struct;
             a.Struct.value += 100;
             Console.WriteLine(b.value);
-            Console.WriteLine(a.Struct.value);
+            Console.WriteLine(a.Struct.value);            
+        }
+
+        class StructTest2
+        {
+            public ILRuntimeTest.TestFramework.TestStruct Struct;
+        }
+
+        public static void UnitTest_Struct2()
+        {
+            ILRuntimeTest.TestFramework.TestClass3 obj = new ILRuntimeTest.TestFramework.TestClass3();
+            obj.Struct.value = 111;
+            obj.Struct.value += 111;
+            Console.WriteLine(obj.Struct.value);
+
+            StructTest2 obj2 = new TestCases.ExpTest_10.StructTest2();
+            obj2.Struct.value = 111;
+            obj2.Struct.value += 111;
+            Console.WriteLine(obj2.Struct.value);
+
+
+            ILRuntimeTest.TestFramework.TestStruct.instance.value = 222;
+            ILRuntimeTest.TestFramework.TestStruct.instance.value += 111;
+            Console.WriteLine(ILRuntimeTest.TestFramework.TestStruct.instance.value);
         }
 
         public static object UnitTest_10022()
@@ -206,6 +229,29 @@ namespace TestCases
                 Console.WriteLine(string.Format("A={0},B={1}", test.A, test.B));            
             }
             return test3.B;
+        }
+
+        public static void UnitTest_1010()
+        {
+            uint a = 100;
+            TestUInt(a);
+            TestUInt((ulong)a);
+        }
+
+        static void TestUInt(uint a)
+        {
+            float speedUp = (1 - (float)a / 1000f);
+            uint speedUp2 = 1000 / a;
+            Console.WriteLine(speedUp);
+            Console.WriteLine(speedUp2);
+        }
+
+        static void TestUInt(ulong a)
+        {
+            float speedUp = (1 - (float)a / 1000f);
+            ulong speedUp2 = 1000 / a;
+            Console.WriteLine(speedUp);
+            Console.WriteLine(speedUp2);
         }
     }
 }

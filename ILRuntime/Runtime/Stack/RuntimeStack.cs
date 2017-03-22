@@ -16,7 +16,7 @@ namespace ILRuntime.Runtime.Stack
         IntPtr nativePointer;
         List<object> managedStack = new List<object>(32);
         Stack<StackFrame> frames = new Stack<StackFrame>();
-        const int MAXIMAL_STACK_OBJECTS = 1024 * 128;
+        const int MAXIMAL_STACK_OBJECTS = 1024 * 16;
 
         public Stack<StackFrame> Frames { get { return frames; } }
         public RuntimeStack(ILIntepreter intepreter)
@@ -43,13 +43,13 @@ namespace ILRuntime.Runtime.Stack
 
         public List<object> ManagedStack { get { return managedStack; } }
 
-        public StackFrame PushFrame(ILMethod method, StackObject* esp)
+        public void InitializeFrame(ILMethod method, StackObject* esp, out StackFrame res)
         {
             if (esp < pointer || esp >= endOfMemory)
                 throw new StackOverflowException();
             if (frames.Count > 0 && frames.Peek().BasePointer > esp)
                 throw new StackOverflowException();
-            StackFrame res = new StackFrame();
+            res = new StackFrame();
             res.LocalVarPointer = esp;
             res.Method = method;
 #if DEBUG
@@ -61,11 +61,15 @@ namespace ILRuntime.Runtime.Stack
             }
 #endif
             res.BasePointer = method.LocalVariableCount > 0 ? Add(esp, method.LocalVariableCount + 1) : esp;
-            frames.Push(res);
-            return res;
+            res.ManagedStackBase = managedStack.Count;
+            //frames.Push(res);
+        }
+        public void PushFrame(ref StackFrame frame)
+        {
+            frames.Push(frame);
         }
 
-        public StackObject* PopFrame(ref StackFrame frame, StackObject* esp, List<object> mStack, int mStackBase)
+        public StackObject* PopFrame(ref StackFrame frame, StackObject* esp, List<object> mStack)
         {
             if (frames.Count > 0 && frames.Peek().BasePointer == frame.BasePointer)
                 frames.Pop();
@@ -73,6 +77,7 @@ namespace ILRuntime.Runtime.Stack
                 throw new NotSupportedException();
             StackObject* returnVal = esp - 1;
             StackObject* ret = frame.LocalVarPointer - frame.Method.ParameterCount;
+            int mStackBase = frame.ManagedStackBase;
             if (frame.Method.HasThis)
                 ret--;
             if(frame.Method.ReturnType != intepreter.AppDomain.VoidType)

@@ -9,7 +9,7 @@ namespace ILRuntimeTest.TestFramework
     [NeedAdaptor]
     public class TestClass3
     {
-
+        public TestStruct Struct;
     }
 
     [NeedAdaptor]
@@ -27,6 +27,7 @@ namespace ILRuntimeTest.TestFramework
 
     public struct TestStruct
     {
+        public static TestStruct instance;
         public int value;
         public static void DoTest(ref TestStruct a)
         {
@@ -36,6 +37,16 @@ namespace ILRuntimeTest.TestFramework
         public static void DoTest(ref int a)
         {
             a = 22222;
+        }
+
+        public static void DoTest2(TestStruct aaa)
+        {
+            aaa.value = 232425235;
+        }
+
+        public static int Add(int a, int b)
+        {
+            return a + b;
         }
     }
 }

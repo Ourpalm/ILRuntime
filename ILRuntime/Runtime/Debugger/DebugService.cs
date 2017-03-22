@@ -57,6 +57,17 @@ namespace ILRuntime.Runtime.Debugger
         }
 
         /// <summary>
+        /// Stop Debugger Server
+        /// </summary>
+        public void StopDebugService()
+        {
+#if DEBUG
+            server.Stop();
+            server = null;
+#endif
+        }
+
+        /// <summary>
         /// 中断运行
         /// </summary>
         /// <param name="intpreter"></param>
@@ -116,8 +127,10 @@ namespace ILRuntime.Runtime.Debugger
             if (topFrame.Method.HasThis)
                 arg--;
             if (arg->ObjectType == ObjectTypes.StackObjectReference)
+            {
                 arg = *(StackObject**)&arg->Value;
-            ILTypeInstance instance = intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance;
+            }
+            ILTypeInstance instance = arg->ObjectType != ObjectTypes.Null ? intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance : null;
             if (instance == null)
                 return "null";
             var fields = instance.Type.TypeDefinition.Fields;

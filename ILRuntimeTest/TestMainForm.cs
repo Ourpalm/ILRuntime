@@ -40,6 +40,7 @@ namespace ILRuntimeTest
             listView1.View = View.Details;
             _app = new ILRuntime.Runtime.Enviorment.AppDomain();
             _app.DebugService.StartDebugService(56000);
+            ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
         }
 
         private void OnBtnRun(object sender, EventArgs e)
@@ -135,7 +136,7 @@ namespace ILRuntimeTest
             }
             catch (Exception ex)
             {
-                MessageBox.Show("[Error:]" + ex.Message);
+                MessageBox.Show("[Error:]" + ex);
             }
 
         }
@@ -223,6 +224,23 @@ namespace ILRuntimeTest
         {
             btnRun.Enabled = _isLoadAssembly;
             btnRunSelect.Enabled = _selectItemArgs != null;
+        }
+
+        private void btnGenerateBinding_Click(object sender, EventArgs e)
+        {
+            List<Type> types = new List<Type>();
+            types.Add(typeof(int));
+            types.Add(typeof(float));
+            types.Add(typeof(long));
+            types.Add(typeof(object));
+            types.Add(typeof(string));
+            types.Add(typeof(ValueType));
+            types.Add(typeof(Console));
+            types.Add(typeof(Array));
+            types.Add(typeof(Dictionary<string, int>));
+            types.Add(typeof(Dictionary<ILRuntime.Runtime.Intepreter.ILTypeInstance, int>));
+            types.Add(typeof(TestFramework.TestStruct));
+            ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(types, "..\\..\\AutoGenerate");
         }
     }
 }

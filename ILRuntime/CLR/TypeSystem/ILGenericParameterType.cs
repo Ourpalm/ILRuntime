@@ -8,6 +8,7 @@ namespace ILRuntime.CLR.TypeSystem
     class ILGenericParameterType : IType
     {
         string name;
+        ILGenericParameterType arrayType;
         public ILGenericParameterType(string name)
         {
             this.name = name;
@@ -105,12 +106,14 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IType ArrayType
         {
-            get { throw new NotImplementedException(); }
+            get { return arrayType; }
         }
 
         public IType MakeArrayType()
         {
-            throw new NotImplementedException();
+            if (arrayType == null)
+                arrayType = new ILGenericParameterType(name + "[]");
+            return arrayType;
         }
 
 

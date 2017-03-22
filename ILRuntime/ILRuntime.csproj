@@ -53,10 +53,14 @@
     <Compile Include="Other\DelegateExportAttribute.cs" />
     <Compile Include="Other\NeedAdaptorAttribute.cs" />
     <Compile Include="Reflection\Extensions.cs" />
+    <Compile Include="Reflection\ILRuntimeConstructorInfo.cs" />
     <Compile Include="Reflection\ILRuntimeFieldInfo.cs" />
     <Compile Include="Reflection\ILRuntimeMethodInfo.cs" />
+    <Compile Include="Reflection\ILRuntimeParameterInfo.cs" />
+    <Compile Include="Reflection\ILRuntimePropertyInfo.cs" />
     <Compile Include="Reflection\ILRuntimeType.cs" />
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
+    <Compile Include="Runtime\CLRBinding\BindingCodeGenerator.cs" />
     <Compile Include="Runtime\Debugger\BreakpointInfo.cs" />
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />

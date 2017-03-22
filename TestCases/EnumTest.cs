@@ -102,5 +102,17 @@ namespace TestCases
 
             Console.WriteLine((TestEnum)o == TestEnum.Enum4);
         }
+
+        public static void Test09()
+        {
+            Dictionary<TestEnum, int> dic = new Dictionary<TestEnum, int>();
+            dic[TestEnum.Enum2] = 123;
+
+            int res;
+            if(dic.TryGetValue(TestEnum.Enum2, out res))
+            {
+                Console.WriteLine(res);
+            }
+        }
     }
 }
