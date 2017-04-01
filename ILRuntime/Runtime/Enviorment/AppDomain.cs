@@ -674,6 +674,8 @@ namespace ILRuntime.Runtime.Enviorment
                         }
                         else
                             val = GetType(gType.GenericArguments[i], contextType, contextMethod);
+                        if (val != null && val.HasGenericParameter)
+                            dummyGenericInstance = true;
                         if (val != null)
                             genericArguments[i] = new KeyValuePair<string, IType>(key, val);
                         else
@@ -962,7 +964,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 methodname = _ref.Name;
                 var typeDef = _ref.DeclaringType;
-                
+
                 type = GetType(typeDef, contextType, contextMethod);
                 if (type == null)
                     throw new KeyNotFoundException("Cannot find type:" + typename);
@@ -974,7 +976,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 else
                     isConstructor = methodname == ".ctor";
-                
+
                 if (_ref.IsGenericInstance)
                 {
                     GenericInstanceMethod gim = (GenericInstanceMethod)_ref;
@@ -1002,9 +1004,9 @@ namespace ILRuntime.Runtime.Enviorment
                 if (!invalidToken && typeDef.IsGenericInstance)
                 {
                     GenericInstanceType gim = (GenericInstanceType)typeDef;
-                    for(int i = 0; i < gim.GenericArguments.Count; i++)
+                    for (int i = 0; i < gim.GenericArguments.Count; i++)
                     {
-                        if(gim.GenericArguments[0].IsGenericParameter)
+                        if (gim.GenericArguments[0].IsGenericParameter)
                         {
                             invalidToken = true;
                             break;
@@ -1012,7 +1014,9 @@ namespace ILRuntime.Runtime.Enviorment
                     }
                 }
                 paramList = _ref.GetParamList(this, contextType, contextMethod, genericArguments);
-                returnType = GetType(_ref.ReturnType, contextType, null);
+                returnType = GetType(_ref.ReturnType, type, null);
+                if (returnType == null)
+                    returnType = GetType(_ref.ReturnType, contextType, null);
             }
             else
             {
