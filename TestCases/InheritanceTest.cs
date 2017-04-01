@@ -124,6 +124,7 @@ namespace TestCases
     class TestCls2 : ClassInheritanceTest
     {
         public TestCls2()
+            : base(4, 5)
         {
             testVal = 2;
         }
