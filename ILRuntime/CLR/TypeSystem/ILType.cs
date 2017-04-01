@@ -31,6 +31,7 @@ namespace ILRuntime.CLR.TypeSystem
         int totalFieldCnt = -1;
         KeyValuePair<string, IType>[] genericArguments;
         IType baseType, byRefType, arrayType, enumType;
+        Type arrayCLRType;
         IType[] interfaces;
         bool baseTypeInitialized = false;
         bool interfaceInitialized = false;
@@ -276,6 +277,10 @@ namespace ILRuntime.CLR.TypeSystem
                     if (enumType == null)
                         InitializeFields();
                     return enumType.TypeForCLR;
+                }
+                else if (typeRef is ArrayType)
+                {
+                    return arrayCLRType;
                 }
                 else if (FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
                 {
@@ -909,6 +914,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 var def = new ArrayType(typeRef);
                 arrayType = new ILType(def, appdomain);
+                ((ILType)arrayType).arrayCLRType = this.TypeForCLR.MakeArrayType();
             }
             return arrayType;
         }

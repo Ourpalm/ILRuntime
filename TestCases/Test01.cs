@@ -259,6 +259,14 @@ namespace TestCases
 
     public class MyTest
     {
+        public static Dictionary<string, MyTest[]> data = new Dictionary<string, MyTest[]>();
+
+        public static void UnitTest_Test1()
+        {
+            var arr = new MyTest[] { new MyTest(), null, null };
+            data["test"] = arr;
+            Console.WriteLine(data["test"][0]);
+        }
         public static void Test()
         {
             DictionaryEnumeratorTest<int, int> t = new DictionaryEnumeratorTest<int, int>();

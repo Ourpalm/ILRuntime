@@ -433,5 +433,20 @@ namespace ILRuntime.Reflection
         {
             return type.GetHashCode();
         }
+        public override bool IsGenericType
+        {
+            get
+            {
+                return type.HasGenericParameter;
+            }
+        }
+
+        public override bool IsGenericTypeDefinition
+        {
+            get
+            {
+                return type.HasGenericParameter;
+            }
+        }
     }
 }
