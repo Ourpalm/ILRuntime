@@ -30,7 +30,7 @@ namespace ILRuntime.CLR.TypeSystem
         int fieldStartIdx = -1;
         int totalFieldCnt = -1;
         KeyValuePair<string, IType>[] genericArguments;
-        IType baseType, byRefType, arrayType, enumType;
+        IType baseType, byRefType, arrayType, enumType, elementType;
         Type arrayCLRType;
         IType[] interfaces;
         bool baseTypeInitialized = false;
@@ -246,6 +246,13 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 return genericArguments;
             }
+        }
+
+        public IType ElementType { get { return elementType; } }
+
+        public bool IsArray
+        {
+            get; private set;
         }
 
         public bool IsValueType
@@ -914,6 +921,8 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 var def = new ArrayType(typeRef);
                 arrayType = new ILType(def, appdomain);
+                ((ILType)arrayType).IsArray = true;
+                ((ILType)arrayType).elementType = this;
                 ((ILType)arrayType).arrayCLRType = this.TypeForCLR.MakeArrayType();
             }
             return arrayType;

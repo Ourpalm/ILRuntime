@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DelegateInnerTest.cs" />
+    <Compile Include="JsonTest.cs" />
     <Compile Include="ReflectionTest.cs" />
     <Compile Include="InheritanceTest.cs" />
     <Compile Include="DelegateTest.cs" />
@@ -59,6 +60,10 @@
     <ProjectReference Include="..\ILRuntimeTest\ILRuntimeTest.csproj">
       <Project>{e6dd179d-fa31-4425-bde1-9dd0be0a9be1}</Project>
       <Name>ILRuntimeTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LitJson\LitJson.csproj">
+      <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
+      <Name>LitJson</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

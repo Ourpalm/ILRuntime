@@ -117,6 +117,10 @@
       <Project>{79ef2f29-89d1-4097-986c-5e4eefe0fa33}</Project>
       <Name>ILRuntime</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LitJson\LitJson.csproj">
+      <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
+      <Name>LitJson</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mono.Cecil.20\Mono.Cecil.20.csproj">
       <Project>{d3785d8b-4d85-4546-8763-47fc848c13e0}</Project>
       <Name>Mono.Cecil.20</Name>
