@@ -234,13 +234,14 @@ namespace ILRuntime.Reflection
             if (fields == null)
                 InitializeFields();
             bool isPublic = (bindingAttr & BindingFlags.Public) == BindingFlags.Public;
-            bool isStatic = (bindingAttr & BindingFlags.Instance) != BindingFlags.Instance;
+            bool isStatic = (bindingAttr & BindingFlags.Static) == BindingFlags.Static;
+            bool isInstance = (bindingAttr & BindingFlags.Instance) == BindingFlags.Instance;
             List<FieldInfo> res = new List<FieldInfo>();
             foreach(var i in fields)
             {
                 if (isPublic != i.IsPublic)
                     continue;
-                if (isStatic != i.IsStatic)
+                if ((isStatic != i.IsStatic) && (isInstance != !i.IsStatic))
                     continue;
                 res.Add(i);
             }
@@ -315,13 +316,14 @@ namespace ILRuntime.Reflection
             if (properties == null)
                 InitializeProperties();
             bool isPublic = (bindingAttr & BindingFlags.Public) == BindingFlags.Public;
-            bool isStatic = (bindingAttr & BindingFlags.Instance) != BindingFlags.Instance;
+            bool isStatic = (bindingAttr & BindingFlags.Static) == BindingFlags.Static;
+            bool isInstance = (bindingAttr & BindingFlags.Instance) == BindingFlags.Instance;
             List<PropertyInfo> res = new List<PropertyInfo>();
             foreach (var i in properties)
             {
                 if (isPublic != i.IsPublic)
                     continue;
-                if (isStatic != i.IsStatic)
+                if ((isStatic != i.IsStatic) && (isInstance != !i.IsStatic))
                     continue;
                 res.Add(i);
             }
