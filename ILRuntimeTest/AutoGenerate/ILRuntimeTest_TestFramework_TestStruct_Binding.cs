@@ -89,7 +89,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            ILRuntimeTest.TestFramework.TestStruct a = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestStruct a = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest(ref a);
 
@@ -98,8 +98,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___ptr = &ptr_of_this_method->Value;
-                        var ___dst = *(StackObject**)___ptr;
+                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
                         __mStack[___dst->Value] = a;
                     }
                     break;
@@ -157,8 +156,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___ptr = &ptr_of_this_method->Value;
-                        var ___dst = *(StackObject**)___ptr;
+                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
                         ___dst->ObjectType = ObjectTypes.Integer;
                         ___dst->Value = a;
                     }
@@ -207,7 +205,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestStruct aaa = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestStruct aaa = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest2(aaa);

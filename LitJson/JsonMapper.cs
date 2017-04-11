@@ -429,7 +429,8 @@ namespace LitJson
                     object item = ReadValue (elem_type, reader);
                     if (item == null && reader.Token == JsonToken.ArrayEnd)
                         break;
-
+                    var rt = elem_type is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)elem_type).RealType : elem_type;
+                    item = rt.CheckCLRTypes(item);
                     list.Add (item);
                 }
 
@@ -1000,7 +1001,7 @@ namespace LitJson
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(esp, 1);
-            System.String json = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, mStack));
+            System.String json = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, mStack));
             intp.Free(ptr_of_this_method);
             var type = method.GenericArguments[0].ReflectionType;
             var result_of_this_method = ReadValue(type, new JsonReader(json));
@@ -1014,7 +1015,7 @@ namespace LitJson
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(esp, 1);
-            JsonReader json = (JsonReader)typeof(JsonReader).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, mStack));
+            JsonReader json = (JsonReader)typeof(JsonReader).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, mStack));
             intp.Free(ptr_of_this_method);
             var type = method.GenericArguments[0].ReflectionType;
             var result_of_this_method = ReadValue(type, json);
@@ -1028,7 +1029,7 @@ namespace LitJson
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(esp, 1);
-            TextReader json = (TextReader)typeof(TextReader).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, mStack));
+            TextReader json = (TextReader)typeof(TextReader).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, mStack));
             intp.Free(ptr_of_this_method);
             var type = method.GenericArguments[0].ReflectionType;
             var result_of_this_method = ReadValue(type, new JsonReader(json));

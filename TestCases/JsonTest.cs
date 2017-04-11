@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using LitJson;
+using ILRuntimeTest.TestFramework;
 
 namespace TestCases
 {
@@ -29,6 +30,11 @@ namespace TestCases
             public long LongProp { get; set; }
             public List<JsonTestSubClass> SubClassList { get; set; }
             public JsonTestSubClass[] ArrayProp { get; set; }
+        }
+
+        class MyTestDataA : TestClass3
+        {
+            public string Name;
         }
 
         public static void JsonTest1()
@@ -69,5 +75,13 @@ namespace TestCases
             Console.WriteLine(cls2.DicTest2["111222"]);
 
         }
+
+        public static void JsonTest2()
+        {
+            string json = "[{\"Name\":\"MyName\"}]";
+            List<MyTestDataA> data = JsonMapper.ToObject<List<MyTestDataA>>(json);
+            Console.WriteLine("Name : " + data[0].Name);
+        }
+
     }
 }

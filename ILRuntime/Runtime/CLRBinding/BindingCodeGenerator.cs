@@ -992,7 +992,7 @@ namespace ILRuntime.Runtime.Generated
             }
             else
             {
-                return string.Format("({0})typeof({0}).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack))", realClsName);
+                return string.Format("({0})typeof({0}).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack))", realClsName);
             }
         }
     }

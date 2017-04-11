@@ -17,6 +17,8 @@ namespace ILRuntime.Reflection
 
         public CLRType CLRType { get { return type; } }
 
+        public Type RealType { get { return et; } }
+
         public override Guid GUID
         {
             get
