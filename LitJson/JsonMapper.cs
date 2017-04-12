@@ -334,8 +334,9 @@ namespace LitJson
             if (reader.Token == JsonToken.ArrayEnd)
                 return null;
 
-            Type underlying_type = Nullable.GetUnderlyingType(inst_type);
-            Type value_type = underlying_type ?? inst_type;
+            //ILRuntime doesn't support nullable valuetype
+            Type underlying_type = inst_type;//Nullable.GetUnderlyingType(inst_type);
+            Type value_type = inst_type;
 
             if (reader.Token == JsonToken.Null) {
                 if (inst_type.IsClass || underlying_type != null) {
@@ -493,9 +494,10 @@ namespace LitJson
                             }
                         }
 
+                        var rt = t_data.ElementType is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)t_data.ElementType).RealType : t_data.ElementType;
                         ((IDictionary) instance).Add (
-                            property, ReadValue (
-                                t_data.ElementType, reader));
+                            property, rt.CheckCLRTypes(ReadValue (
+                                t_data.ElementType, reader)));
                     }
 
                 }

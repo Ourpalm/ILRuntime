@@ -167,6 +167,11 @@ namespace ILRuntime.Reflection
             return et.GetNestedTypes(bindingAttr);
         }
 
+        public override int GetHashCode()
+        {
+            return type.GetHashCode();
+        }
+
         public override Type GetNestedType(string name, BindingFlags bindingAttr)
         {
             return et.GetNestedType(name, bindingAttr);

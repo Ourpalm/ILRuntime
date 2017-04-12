@@ -32,9 +32,25 @@ namespace TestCases
             public JsonTestSubClass[] ArrayProp { get; set; }
         }
 
-        class MyTestDataA : TestClass3
+        class MyTestDataItem : TestClass3
         {
-            public string Name;
+            public string Type;
+        }
+
+        class MyTestDataItem1 // : TestClass3
+        {
+            public int Type;
+        }
+
+        class MyTestDataItem2 // : TestClass3
+        {
+            public string Type;
+        }
+
+        class MyTestDataMap //: TestClass3
+        {
+            public Dictionary<string, MyTestDataItem1> Items1;
+            public Dictionary<string, MyTestDataItem2> Items2;
         }
 
         public static void JsonTest1()
@@ -78,9 +94,18 @@ namespace TestCases
 
         public static void JsonTest2()
         {
-            string json = "[{\"Name\":\"MyName\"}]";
-            List<MyTestDataA> data = JsonMapper.ToObject<List<MyTestDataA>>(json);
-            Console.WriteLine("Name : " + data[0].Name);
+            string json = "[{\"Type\":\"MyName\"}]";
+            List<MyTestDataItem> data = JsonMapper.ToObject<List<MyTestDataItem>>(json);
+            Console.WriteLine("Name : " + data[0].Type);
+        }
+
+        public static void JsonTest3()
+        {
+            string json = "{\"Items1\":{\"one\":{\"Type\":1},\"two\":{\"Type\":2}},\"Items2\":{\"one\":{\"Type\":\"OneType\"},\"two\":{\"Type\":\"TwoType\"}}}";
+            MyTestDataMap data = JsonMapper.ToObject<MyTestDataMap>(json);
+            Console.WriteLine("Type : " + data.Items1["one"].Type);
+            Console.WriteLine("Type : " + data.Items2["one"].Type);
+
         }
 
     }
