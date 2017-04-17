@@ -89,7 +89,7 @@ namespace ILRuntime.Runtime.Debugger
             return false;
         }
 
-        internal string GetStackTrance(ILIntepreter intepreper)
+        public string GetStackTrance(ILIntepreter intepreper)
         {
             StringBuilder sb = new StringBuilder();
             ILRuntime.CLR.Method.ILMethod m;
@@ -120,7 +120,7 @@ namespace ILRuntime.Runtime.Debugger
             return sb.ToString();
         }
 
-        internal unsafe string GetThisInfo(ILIntepreter intepreter)
+        public unsafe string GetThisInfo(ILIntepreter intepreter)
         {
             var topFrame = intepreter.Stack.Frames.Peek();
             var arg = Minus(topFrame.LocalVarPointer, topFrame.Method.ParameterCount);
@@ -156,7 +156,7 @@ namespace ILRuntime.Runtime.Debugger
             return sb.ToString();
         }
 
-        internal unsafe string GetLocalVariableInfo(ILIntepreter intepreter)
+        public unsafe string GetLocalVariableInfo(ILIntepreter intepreter)
         {
             StackFrame topFrame = intepreter.Stack.Frames.Peek();
             var m = topFrame.Method;
