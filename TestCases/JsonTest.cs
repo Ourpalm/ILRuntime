@@ -47,6 +47,11 @@ namespace TestCases
             public string Type;
         }
 
+        class MyTestDataItem3 // : TestClass3
+        {
+            public bool B = true;
+        }
+
         class MyTestDataMap //: TestClass3
         {
             public Dictionary<string, MyTestDataItem1> Items1;
@@ -106,6 +111,15 @@ namespace TestCases
             Console.WriteLine("Type : " + data.Items1["one"].Type);
             Console.WriteLine("Type : " + data.Items2["one"].Type);
 
+        }
+        public static void JsonTest4()
+        {
+            var tj = new MyTestDataItem3();
+            var json = JsonMapper.ToJson(tj);
+            Console.WriteLine(json); //output: {"b":1} Error
+
+            var outTj = JsonMapper.ToObject<MyTestDataItem3>(json); //Error Point!
+            Console.WriteLine(outTj.B);
         }
 
     }
