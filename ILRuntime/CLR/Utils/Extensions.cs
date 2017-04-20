@@ -133,6 +133,10 @@ namespace ILRuntime.CLR.Utils
                     obj = (ulong)(long)obj;
                 }
             }
+            else if (obj is ILRuntime.Reflection.ILRuntimeWrapperType)
+            {
+                obj = ((ILRuntime.Reflection.ILRuntimeWrapperType)obj).RealType;
+            }
             else if (pt == typeof(Delegate) || pt.IsSubclassOf(typeof(Delegate)))
             {
                 if (obj is Delegate)
