@@ -18,11 +18,21 @@ namespace ILRuntime.Runtime
             if (isArray)
                 type = type.GetElementType();
             string realNamespace = null;
+            bool isNestedGeneric = false;
             if (type.IsNested)
             {
                 string bClsName, bRealClsName;
                 bool tmp;
-                GetClassName(type.ReflectedType, out bClsName, out bRealClsName, out tmp);
+                var rt = type.ReflectedType;
+                if(rt.IsGenericType && rt.IsGenericTypeDefinition)
+                {
+                    if (type.IsGenericType)
+                    {
+                        rt = rt.MakeGenericType(type.GetGenericArguments());
+                        isNestedGeneric = true;
+                    }
+                }
+                GetClassName(rt, out bClsName, out bRealClsName, out tmp);
                 clsName = simpleClassName ? "" : bClsName + "_";
                 realNamespace = bRealClsName + ".";
             }
@@ -34,7 +44,7 @@ namespace ILRuntime.Runtime
             clsName = clsName + type.Name.Replace(".", "_").Replace("`", "_").Replace("<", "_").Replace(">", "_");
             bool isGeneric = false;
             string ga = null;
-            if (type.IsGenericType)
+            if (type.IsGenericType && !isNestedGeneric)
             {
                 isGeneric = true;
                 clsName += "_";
