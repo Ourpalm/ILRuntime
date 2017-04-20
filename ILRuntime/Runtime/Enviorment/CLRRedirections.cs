@@ -6,6 +6,7 @@ using System.Reflection;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Utils;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
@@ -91,6 +92,37 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(p, mStack, t.ReflectionType);
             else
                 return ILIntepreter.PushNull(p);
+        }
+
+        public static StackObject* TypeEquals(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = ILIntepreter.Minus(esp, 2);
+            var p = esp - 1;
+            AppDomain dommain = intp.AppDomain;
+            var other = StackObject.ToObject(p, dommain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            var instance = StackObject.ToObject(p, dommain, mStack);
+            intp.Free(p);
+            if(instance is ILRuntimeType)
+            {
+                if (other is ILRuntimeType)
+                {
+                    if(((ILRuntimeType)instance).ILType == ((ILRuntimeType)other).ILType)
+                        return ILIntepreter.PushOne(ret);
+                    else
+                        return ILIntepreter.PushZero(ret);
+                }
+                else
+                    return ILIntepreter.PushZero(ret);
+            }
+            else
+            {
+                if(((Type)typeof(Type).CheckCLRTypes(instance)).Equals(((Type)typeof(Type).CheckCLRTypes(other))))
+                    return ILIntepreter.PushOne(ret);
+                else
+                    return ILIntepreter.PushZero(ret);
+            }
         }
 
         /*public static object GetType(ILContext ctx, object instance, object[] param, IType[] genericArguments)

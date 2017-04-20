@@ -122,5 +122,25 @@ namespace TestCases
             Console.WriteLine(outTj.B);
         }
 
+        public static void JsonTest5()
+        {
+            if (typeof(MyTestDataItem1).Equals(typeof(MyTestDataItem2)))
+            {
+                Console.WriteLine("MyTestDataItem1 == MyTestDataItem2");
+            }
+            else
+            {
+                Console.WriteLine("MyTestDataItem1 != MyTestDataItem2");
+            }
+            if (typeof(MyTestDataItem1).Equals(typeof(MyTestDataItem1)))
+            {
+                Console.WriteLine("MyTestDataItem1 == MyTestDataItem1");
+            }
+            else
+            {
+                Console.WriteLine("MyTestDataItem1 != MyTestDataItem1");
+            }
+        }
+
     }
 }
