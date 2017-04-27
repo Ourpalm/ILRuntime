@@ -70,7 +70,7 @@ namespace ILRuntime.Runtime
             }
             if (!simpleClassName)
                 clsName += "_Binding";
-            if (!simpleClassName && isArray)
+            if (isArray)
                 clsName += "_Array";
 
             realClsName = realNamespace;
