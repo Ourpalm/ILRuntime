@@ -2488,7 +2488,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             esp = PushObject(obj, mStack, (short)obj->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            esp = PushObject(obj, mStack, (short)0, true);
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2536,6 +2536,17 @@ namespace ILRuntime.Runtime.Intepreter
                                                             throw new NotImplementedException();
                                                     }
                                                 }
+                                                else if (t == typeof(char))
+                                                {
+                                                    switch (obj->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Integer:
+                                                            esp = PushObject(obj, mStack, (char)obj->Value, true);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
                                                 else if (t == typeof(uint))
                                                 {
                                                     switch (obj->ObjectType)
@@ -2544,7 +2555,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             esp = PushObject(obj, mStack, (uint)obj->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            esp = PushObject(obj, mStack, (uint)0, true);
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2558,7 +2569,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             esp = PushObject(obj, mStack, (ushort)obj->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            esp = PushObject(obj, mStack, (ushort)0, true);
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2572,7 +2583,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             esp = PushObject(obj, mStack, *(ulong*)&obj->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            esp = PushObject(obj, mStack, (ulong)0, true);
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2586,7 +2597,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             esp = PushObject(obj, mStack, (sbyte)obj->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(obj, mStack, 0L, true);
+                                                            esp = PushObject(obj, mStack, (sbyte)0, true);
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2666,6 +2677,12 @@ namespace ILRuntime.Runtime.Intepreter
                                                         double val = obj.ToDouble();
                                                         objRef->ObjectType = ObjectTypes.Double;
                                                         *(double*)&objRef->Value = val;
+                                                    }
+                                                    else if (type == typeof(char))
+                                                    {
+                                                        char val = (char)obj;
+                                                        objRef->ObjectType = ObjectTypes.Integer;
+                                                        *(char*)&objRef->Value = val;
                                                     }
                                                     else if (type == typeof(uint))
                                                     {
