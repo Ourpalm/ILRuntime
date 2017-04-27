@@ -2380,9 +2380,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            if (type.TypeForCLR.IsEnum)
+                                            var tt = type.TypeForCLR;
+                                            if (tt.IsEnum)
                                             {
-                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(type.TypeForCLR, StackObject.ToObject(obj, AppDomain, mStack)));
+                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)));
+                                            }
+                                            else if(tt.IsPrimitive)
+                                            {
+                                                esp = PushObject(esp - 1, mStack, tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack)));
                                             }
                                             else
                                             {
