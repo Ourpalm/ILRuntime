@@ -456,21 +456,20 @@ namespace ILRuntime.Runtime.Enviorment
                         mapType[asmName] = bt;
                 }
 
-                if (isByRef)
+                if (isArray)
                 {
-                    bt = bt.MakeByRefType();
+                    bt = bt.MakeArrayType();
                     mapType[bt.FullName] = bt;
                     mapTypeToken[bt.GetHashCode()] = bt;
-                    if (!isArray)
+                    if (!isByRef)
                     {
-                        mapType[fullname] = bt;
                         return bt;
                     }
                 }
 
-                if (isArray)
+                if (isByRef)
                 {
-                    res = bt.MakeArrayType();
+                    res = bt.MakeByRefType();
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
                     mapTypeToken[res.GetHashCode()] = res;
@@ -616,16 +615,19 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 if (_ref.IsByReference)
                 {
-                    var t = GetType(_ref.GetElementType(), contextType, contextMethod);
+                    var et = _ref.GetElementType();
+                    bool valid = !et.IsGenericParameter;
+                    var t = GetType(et, contextType, contextMethod);
                     if (t != null)
                     {
                         res = t.MakeByRefType();
-                        if (res is ILType)
+                        if (res is ILType && valid)
                         {
                             ///Unify the TypeReference
                             ((ILType)res).TypeReference = _ref;
                         }
-                        mapTypeToken[hash] = res;
+                        if (valid)
+                            mapTypeToken[hash] = res;
                         if (!string.IsNullOrEmpty(res.FullName))
                             mapType[res.FullName] = res;
                         return res;
