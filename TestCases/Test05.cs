@@ -118,7 +118,18 @@ namespace TestCases
             Student<string> a = new TestCases.Student<string>("aaaaaa");
             Console.WriteLine(a.name);
         }
+        public static void UnitTest_Out2()
+        {
+            Dictionary<string, TestClassC[]> data = new Dictionary<string, TestClassC[]>();
+            data["key"] = new TestClassC[1] { new TestClassC() };
+            TestClassC[] item;
+            data.TryGetValue("key", out item);
+            Console.WriteLine("value : " + item[0]);
+        }
 
+        class TestClassC
+        {
+        }
         public static void TestArrayValueType()
         {
             int[] arr = new int[4] { 1, 2, 3, 4 };

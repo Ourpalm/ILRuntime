@@ -161,21 +161,13 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     clrInstance = this;
                 }
-
-                if (type.Implements != null)
+                if(type.FirstCLRInterface is Enviorment.CrossBindingAdaptor)
                 {
-                    foreach (var i in type.Implements)
+                    if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
                     {
-                        if (i is Enviorment.CrossBindingAdaptor)
-                        {
-                            if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
-                            {
-                                throw new NotSupportedException("Inheriting and implementing interface at the same time is not supported yet");
-                            }
-                            clrInstance = ((Enviorment.CrossBindingAdaptor)i).CreateCLRInstance(type.AppDomain, this);
-                            break;
-                        }
+                        throw new NotSupportedException("Inheriting and implementing interface at the same time is not supported yet");
                     }
+                    clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRInterface).CreateCLRInstance(type.AppDomain, this);
                 }
             }
             else
@@ -308,7 +300,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
                     var field = clrType.GetField(fieldIdx);
-                    field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(appdomain, ILIntepreter.CheckAndCloneValueType(StackObject.ToObject(esp, appdomain, managedStack), appdomain)));
+                    field.SetValue(clrInstance, field.FieldType.CheckCLRTypes(ILIntepreter.CheckAndCloneValueType(StackObject.ToObject(esp, appdomain, managedStack), appdomain)));
                 }
                 else
                     throw new TypeLoadException();

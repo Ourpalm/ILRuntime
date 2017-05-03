@@ -30,7 +30,8 @@ namespace ILRuntime.CLR.TypeSystem
         int fieldStartIdx = -1;
         int totalFieldCnt = -1;
         KeyValuePair<string, IType>[] genericArguments;
-        IType baseType, byRefType, arrayType, enumType;
+        IType baseType, byRefType, arrayType, enumType, elementType;
+        Type arrayCLRType, byRefCLRType;
         IType[] interfaces;
         bool baseTypeInitialized = false;
         bool interfaceInitialized = false;
@@ -247,6 +248,13 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public IType ElementType { get { return elementType; } }
+
+        public bool IsArray
+        {
+            get; private set;
+        }
+
         public bool IsValueType
         {
             get
@@ -276,6 +284,14 @@ namespace ILRuntime.CLR.TypeSystem
                     if (enumType == null)
                         InitializeFields();
                     return enumType.TypeForCLR;
+                }
+                else if (typeRef is ArrayType)
+                {
+                    return arrayCLRType;
+                }
+                else if (typeRef is ByReferenceType)
+                {
+                    return byRefCLRType;
                 }
                 else if (FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
                 {
@@ -899,6 +915,8 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 var def = new ByReferenceType(typeRef);
                 byRefType = new ILType(def, appdomain);
+                ((ILType)byRefType).elementType = this;
+                ((ILType)byRefType).byRefCLRType = this.TypeForCLR.MakeByRefType();
             }
             return byRefType;
         }
@@ -909,6 +927,9 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 var def = new ArrayType(typeRef);
                 arrayType = new ILType(def, appdomain);
+                ((ILType)arrayType).IsArray = true;
+                ((ILType)arrayType).elementType = this;
+                ((ILType)arrayType).arrayCLRType = this.TypeForCLR.MakeArrayType();
             }
             return arrayType;
         }

@@ -225,4 +225,59 @@ namespace TestCases
             return _inst == inst;
         }
     }
+
+    public class DictionaryEnumeratorTest<TKey, TValue>
+    {
+        Dictionary<TKey, TValue> dic = new Dictionary<TKey, TValue>();
+        public void Add(TKey key, TValue value)
+        {
+            dic.Add(key, value);
+        }
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return dic.GetEnumerator();    //报错
+        }
+
+        public void GetEnumeratorTest()
+        {
+            var e = dic.GetEnumerator();   //正常
+            while (e.MoveNext())
+            {
+                Console.WriteLine(e.Current.Key + "  " + e.Current.Value);
+            }
+        }
+
+        public void GetEnumeratorTest2()
+        {
+            IEnumerator<KeyValuePair<TKey, TValue>> e = dic.GetEnumerator();   //报错
+            while (e.MoveNext())
+            {
+                Console.WriteLine(e.Current.Key + "  " + e.Current.Value);
+            }
+        }
+    }
+
+    public class MyTest
+    {
+        public static Dictionary<string, MyTest[]> data = new Dictionary<string, MyTest[]>();
+
+        public static void UnitTest_Test1()
+        {
+            var arr = new MyTest[] { new MyTest(), null, null };
+            data["test"] = arr;
+            Console.WriteLine(data["test"][0]);
+        }
+        public static void Test()
+        {
+            DictionaryEnumeratorTest<int, int> t = new DictionaryEnumeratorTest<int, int>();
+            t.Add(1, 1);
+            t.GetEnumeratorTest();
+            t.GetEnumeratorTest2();
+            var e = t.GetEnumerator();
+            while (e.MoveNext())
+            {
+                Console.WriteLine(e.Current.Key + "  " + e.Current.Value);
+            }
+        }
+    }
 }

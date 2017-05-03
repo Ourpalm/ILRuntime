@@ -6,6 +6,7 @@ using System.Reflection;
 
 using Mono.Cecil;
 using ILRuntime.CLR.Method;
+using ILRuntime.Reflection;
 namespace ILRuntime.CLR.TypeSystem
 {
     public class CLRType : IType
@@ -19,11 +20,12 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<string, int> fieldMapping;
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, int> fieldTokenMapping;
-        IType byRefType, arrayType;
+        IType byRefType, arrayType, elementType;
         bool isDelegate;
         IType baseType;
         bool isBaseTypeInitialized = false;
         MethodInfo memberwiseClone;
+        ILRuntimeWrapperType wraperType;
 
         int hashCode = -1;
         static int instance_id = 0x20000000;
@@ -67,6 +69,9 @@ namespace ILRuntime.CLR.TypeSystem
                 return genericArguments;
             }
         }
+
+        public IType ElementType { get { return elementType; } }
+
         public bool HasGenericParameter
         {
             get
@@ -87,7 +92,9 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return clrType;
+                if (wraperType == null)
+                    wraperType = new ILRuntimeWrapperType(this);
+                return wraperType;
             }
         }
         public IType ByRefType
@@ -104,6 +111,12 @@ namespace ILRuntime.CLR.TypeSystem
                 return arrayType;
             }
         }
+
+        public bool IsArray
+        {
+            get;private set;
+        }
+
         public bool IsValueType
         {
             get
@@ -466,6 +479,8 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 Type t = clrType.MakeArrayType();
                 arrayType = new CLRType(t, appdomain);
+                ((CLRType)arrayType).elementType = this;
+                ((CLRType)arrayType).IsArray = true;
             }
             return arrayType;
         }

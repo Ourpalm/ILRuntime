@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRuntimeDebuggerLauncher",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRuntimeDebugEngine", "Debugging\ILRuntimeDebugEngine\ILRuntimeDebugEngine.csproj", "{217AE15B-840C-4F8F-93CD-9D331AA4C81A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitJson", "LitJson\LitJson.csproj", "{BEC78343-4BA2-4757-807F-7CDBF1F70C83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{217AE15B-840C-4F8F-93CD-9D331AA4C81A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{217AE15B-840C-4F8F-93CD-9D331AA4C81A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{217AE15B-840C-4F8F-93CD-9D331AA4C81A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEC78343-4BA2-4757-807F-7CDBF1F70C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEC78343-4BA2-4757-807F-7CDBF1F70C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEC78343-4BA2-4757-807F-7CDBF1F70C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEC78343-4BA2-4757-807F-7CDBF1F70C83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

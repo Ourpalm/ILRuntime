@@ -38,6 +38,28 @@ namespace ILRuntime.Reflection
                 setter = value;
             }
         }
+
+        public bool IsPublic
+        {
+            get
+            {
+                if (getter != null)
+                    return getter.Definition.IsPublic;
+                else
+                    return setter.Definition.IsPublic;
+            }
+        }
+
+        public bool IsStatic
+        {
+            get
+            {
+                if (getter != null)
+                    return getter.IsStatic;
+                else
+                    return setter.IsStatic;
+            }
+        }
         public ILRuntimePropertyInfo(Mono.Cecil.PropertyDefinition definition, ILType dType)
         {
             this.definition = definition;

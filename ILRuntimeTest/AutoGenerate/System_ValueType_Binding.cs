@@ -40,11 +40,11 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.ValueType instance_of_this_method;
-            instance_of_this_method = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            instance_of_this_method = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Equals(obj);
@@ -61,7 +61,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.ValueType instance_of_this_method;
-            instance_of_this_method = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            instance_of_this_method = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetHashCode();
@@ -78,7 +78,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.ValueType instance_of_this_method;
-            instance_of_this_method = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            instance_of_this_method = (System.ValueType)typeof(System.ValueType).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.ToString();

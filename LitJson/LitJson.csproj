@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55}</ProjectGuid>
+    <ProjectGuid>{BEC78343-4BA2-4757-807F-7CDBF1F70C83}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestCases</RootNamespace>
-    <AssemblyName>TestCases</AssemblyName>
+    <RootNamespace>LitJson</RootNamespace>
+    <AssemblyName>LitJson</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -41,29 +41,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DelegateInnerTest.cs" />
-    <Compile Include="JsonTest.cs" />
-    <Compile Include="ReflectionTest.cs" />
-    <Compile Include="InheritanceTest.cs" />
-    <Compile Include="DelegateTest.cs" />
-    <Compile Include="LightTester2.cs" />
-    <Compile Include="LightTester1.cs" />
-    <Compile Include="EnumTest.cs" />
-    <Compile Include="SimpleTest.cs" />
+    <Compile Include="IJsonWrapper.cs" />
+    <Compile Include="JsonData.cs" />
+    <Compile Include="JsonException.cs" />
+    <Compile Include="JsonMapper.cs" />
+    <Compile Include="JsonMockWrapper.cs" />
+    <Compile Include="JsonReader.cs" />
+    <Compile Include="JsonWriter.cs" />
+    <Compile Include="Lexer.cs" />
+    <Compile Include="ParserToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Structs.cs" />
-    <Compile Include="Test01.cs" />
-    <Compile Include="Test03.cs" />
-    <Compile Include="Test05.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ILRuntimeTest\ILRuntimeTest.csproj">
-      <Project>{e6dd179d-fa31-4425-bde1-9dd0be0a9be1}</Project>
-      <Name>ILRuntimeTest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LitJson\LitJson.csproj">
-      <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
-      <Name>LitJson</Name>
+    <ProjectReference Include="..\ILRuntime\ILRuntime.csproj">
+      <Project>{79ef2f29-89d1-4097-986c-5e4eefe0fa33}</Project>
+      <Name>ILRuntime</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

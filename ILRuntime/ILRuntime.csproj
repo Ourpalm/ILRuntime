@@ -58,6 +58,7 @@
     <Compile Include="Reflection\ILRuntimeMethodInfo.cs" />
     <Compile Include="Reflection\ILRuntimeParameterInfo.cs" />
     <Compile Include="Reflection\ILRuntimePropertyInfo.cs" />
+    <Compile Include="Reflection\ILRuntimeWrapperType.cs" />
     <Compile Include="Reflection\ILRuntimeType.cs" />
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
     <Compile Include="Runtime\CLRBinding\BindingCodeGenerator.cs" />

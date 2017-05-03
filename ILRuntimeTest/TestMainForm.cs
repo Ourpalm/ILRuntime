@@ -40,6 +40,7 @@ namespace ILRuntimeTest
             listView1.View = View.Details;
             _app = new ILRuntime.Runtime.Enviorment.AppDomain();
             _app.DebugService.StartDebugService(56000);
+            LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(_app);
             ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
         }
 

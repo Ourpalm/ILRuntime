@@ -124,7 +124,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Object value = (System.Object)typeof(System.Object).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.Int32 instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
@@ -159,7 +159,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Object obj = (System.Object)typeof(System.Object).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.Int32 instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
@@ -222,7 +222,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.Int32 instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
@@ -238,7 +238,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.Int32 instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
@@ -254,10 +254,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String format = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             System.Int32 instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);
@@ -273,7 +273,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Int32.Parse(s);
@@ -289,10 +289,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Int32.Parse(s, style);
@@ -308,10 +308,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Int32.Parse(s, provider);
@@ -327,13 +327,13 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Int32.Parse(s, style, provider);
@@ -352,7 +352,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             System.Int32 result = ptr_of_this_method->Value;
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Int32.TryParse(s, out result);
@@ -362,8 +362,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___ptr = &ptr_of_this_method->Value;
-                        var ___dst = *(StackObject**)___ptr;
+                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
                         ___dst->ObjectType = ObjectTypes.Integer;
                         ___dst->Value = result;
                     }
@@ -417,13 +416,13 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             System.Int32 result = ptr_of_this_method->Value;
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.IFormatProvider provider = (System.IFormatProvider)typeof(System.IFormatProvider).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Globalization.NumberStyles style = (System.Globalization.NumberStyles)typeof(System.Globalization.NumberStyles).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
-            System.String s = (System.String)typeof(System.String).CheckCLRTypes(__domain, StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String s = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = System.Int32.TryParse(s, style, provider, out result);
@@ -433,8 +432,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___ptr = &ptr_of_this_method->Value;
-                        var ___dst = *(StackObject**)___ptr;
+                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
                         ___dst->ObjectType = ObjectTypes.Integer;
                         ___dst->Value = result;
                     }
