@@ -170,4 +170,54 @@ namespace TestCases
             base.TestVirtual();
         }
     }
+
+    interface IAs1
+    {
+        void AA1();
+    }
+
+    class AABase : IDisposable
+    {
+        public void AA1()
+        {
+            Console.WriteLine("AABase");
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    class AA : AABase
+    {
+        public void AA1()
+        {
+            Console.WriteLine("AA1");
+        }
+    }
+
+    class TestAs
+    {
+        public static bool TestAs01()
+        {
+            AA aa = new AA();
+            if (aa is IAs1)
+            {
+                throw new Exception("error");
+            }
+            return true;
+        }
+
+        public static bool TestAs02()
+        {
+            AA aa = new AA();
+            IAs1 ias = aa as IAs1;
+            if (ias != null)
+            {
+                throw new Exception("error");
+            }
+            return true;
+        }
+    }
+
 }
