@@ -51,6 +51,7 @@
     <Compile Include="EnumTest.cs" />
     <Compile Include="SimpleTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GCTest.cs" />
     <Compile Include="Structs.cs" />
     <Compile Include="Test01.cs" />
     <Compile Include="Test03.cs" />

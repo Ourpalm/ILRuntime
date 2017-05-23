@@ -69,7 +69,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public bool CanAssignTo(IType type)
         {
-            return type.CanAssignTo(type);
+            return this.type.CanAssignTo(type);
         }
 
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
