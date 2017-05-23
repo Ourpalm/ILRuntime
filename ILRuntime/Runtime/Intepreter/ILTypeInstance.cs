@@ -316,6 +316,8 @@ namespace ILRuntime.Runtime.Intepreter
                 field.Value = fieldIdx;
                 managedObjs[fieldIdx] = ILIntepreter.CheckAndCloneValueType(managedStack[esp->Value], Type.AppDomain);
             }
+            else if (managedObjs != null)
+                managedObjs[fieldIdx] = null;
         }
 
         public override string ToString()
