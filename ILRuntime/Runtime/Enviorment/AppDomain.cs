@@ -840,7 +840,7 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 for(int i = 0; i < m.ParameterCount; i++)
                 {
-                    if (p[0] == null)
+                    if (p[i] == null)
                         continue;
                     if (!m.Parameters[i].TypeForCLR.IsAssignableFrom(p[i].GetType()))
                     {
