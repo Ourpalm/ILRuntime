@@ -40,7 +40,7 @@ namespace ILRuntime.Reflection
                 {
                     object ins = attribute.CreateInstance(at, appdomain);
 
-                    attributeTypes[i] = at.ReflectionType;
+                    attributeTypes[i] = at.ReflectionType is ILRuntimeWrapperType ? at.TypeForCLR : at.ReflectionType;
                     customAttributes[i] = ins;
                 }
                 catch
@@ -234,12 +234,13 @@ namespace ILRuntime.Reflection
             if (fields == null)
                 InitializeFields();
             bool isPublic = (bindingAttr & BindingFlags.Public) == BindingFlags.Public;
+            bool isPrivate = (bindingAttr & BindingFlags.NonPublic) == BindingFlags.NonPublic;
             bool isStatic = (bindingAttr & BindingFlags.Static) == BindingFlags.Static;
             bool isInstance = (bindingAttr & BindingFlags.Instance) == BindingFlags.Instance;
             List<FieldInfo> res = new List<FieldInfo>();
             foreach(var i in fields)
             {
-                if (isPublic != i.IsPublic)
+                if (isPublic != i.IsPublic && isPrivate != !i.IsPublic)
                     continue;
                 if ((isStatic != i.IsStatic) && (isInstance != !i.IsStatic))
                     continue;
@@ -316,12 +317,13 @@ namespace ILRuntime.Reflection
             if (properties == null)
                 InitializeProperties();
             bool isPublic = (bindingAttr & BindingFlags.Public) == BindingFlags.Public;
+            bool isPrivate = (bindingAttr & BindingFlags.NonPublic) == BindingFlags.NonPublic;
             bool isStatic = (bindingAttr & BindingFlags.Static) == BindingFlags.Static;
             bool isInstance = (bindingAttr & BindingFlags.Instance) == BindingFlags.Instance;
             List<PropertyInfo> res = new List<PropertyInfo>();
             foreach (var i in properties)
             {
-                if (isPublic != i.IsPublic)
+                if (isPublic != i.IsPublic && isPrivate != !i.IsPublic)
                     continue;
                 if ((isStatic != i.IsStatic) && (isInstance != !i.IsStatic))
                     continue;
