@@ -76,11 +76,12 @@ namespace ILRuntime.Runtime.Stack
             else
                 throw new NotSupportedException();
             StackObject* returnVal = esp - 1;
-            StackObject* ret = frame.LocalVarPointer - frame.Method.ParameterCount;
+            var method = frame.Method;
+            StackObject* ret = frame.LocalVarPointer - method.ParameterCount;
             int mStackBase = frame.ManagedStackBase;
-            if (frame.Method.HasThis)
+            if (method.HasThis)
                 ret--;
-            if(frame.Method.ReturnType != intepreter.AppDomain.VoidType)
+            if(method.ReturnType != intepreter.AppDomain.VoidType)
             {
                 *ret = *returnVal;
                 if(ret->ObjectType == ObjectTypes.Object)
