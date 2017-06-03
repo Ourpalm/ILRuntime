@@ -4140,7 +4140,12 @@ namespace ILRuntime.Runtime.Intepreter
                 else
                 {
                     var type = obj.GetType();
-                    if (!type.IsPrimitive && type.IsValueType)
+                    var typeFlags = type.GetTypeFlags();
+
+                    var isPrimitive = (typeFlags & CLR.Utils.Extensions.TypeFlags.IsPrimitive) != 0;
+                    var isValueType = (typeFlags & CLR.Utils.Extensions.TypeFlags.IsValueType) != 0;
+
+                    if (!isPrimitive && isValueType)
                     {
                         var t = domain.GetType(type);
                         return ((CLRType)t).MemberwiseClone.Invoke(obj, null);
@@ -4243,11 +4248,13 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 if (!isBox)
                 {
-                    if (obj.GetType().IsPrimitive)
+                    var typeFlags = obj.GetType().GetTypeFlags();
+
+                    if ((typeFlags & CLR.Utils.Extensions.TypeFlags.IsPrimitive) != 0)
                     {
                         UnboxObject(esp, obj);
                     }
-                    else if (obj.GetType().IsEnum)
+                    else if ((typeFlags & CLR.Utils.Extensions.TypeFlags.IsEnum) != 0)
                     {
                         esp->ObjectType = ObjectTypes.Integer;
                         esp->Value = Convert.ToInt32(obj);

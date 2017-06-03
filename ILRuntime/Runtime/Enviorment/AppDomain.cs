@@ -16,13 +16,14 @@ using ILRuntime.Runtime.Stack;
 namespace ILRuntime.Runtime.Enviorment
 {
     public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, List<object> mStack, CLRMethod method, bool isNewObj);
+
     public class AppDomain
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<int, ILIntepreter> intepreters = new Dictionary<int, ILIntepreter>();
-        Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>();
+        Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>(new DictionaryTypeKeyComparer());
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
-        Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
+        Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>(new DictionaryTypeKeyComparer());
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<long, string> mapString = new Dictionary<long, string>();

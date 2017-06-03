@@ -769,7 +769,7 @@ namespace ILRuntime.Runtime.Intepreter
         public Delegate GetConvertor(Type type)
         {
             if (converters == null)
-                converters = new Dictionary<System.Type, Delegate>();
+                converters = new Dictionary<System.Type, Delegate>(new DictionaryTypeKeyComparer());
             Delegate res;
             if (converters.TryGetValue(type, out res))
                 return res;
