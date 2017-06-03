@@ -549,14 +549,18 @@ namespace ILRuntime.CLR.TypeSystem
         public IMethod GetVirtualMethod(IMethod method)
         {
             IType[] genericArguments = null;
-            if (method is ILMethod)
+            if (method.IsGenericInstance)
             {
-                genericArguments = ((ILMethod)method).GenericArugmentsArray;
+                if (method is ILMethod)
+                {
+                    genericArguments = ((ILMethod)method).GenericArugmentsArray;
+                }
+                else
+                {
+                    genericArguments = ((CLRMethod)method).GenericArguments;
+                }
             }
-            else
-            {
-                genericArguments = ((CLRMethod)method).GenericArguments;
-            }
+
             var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType);
             if (m == null)
             {
@@ -581,8 +585,9 @@ namespace ILRuntime.CLR.TypeSystem
             IMethod genericMethod = null;
             if (methods.TryGetValue(name, out lst))
             {
-                foreach (var i in lst)
+                for (var idx = 0; idx < lst.Count; idx++)
                 {
+                    var i = lst[idx];
                     int pCnt = param != null ? param.Count : 0;
                     if (i.ParameterCount == pCnt)
                     {
