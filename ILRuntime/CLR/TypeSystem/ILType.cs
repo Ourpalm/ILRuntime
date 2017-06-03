@@ -852,18 +852,19 @@ namespace ILRuntime.CLR.TypeSystem
 
         public bool CanAssignTo(IType type)
         {
+            bool res = false;
             if (this == type)
             {
                 return true;
             }
             else if (BaseType != null)
-                return BaseType.CanAssignTo(type);
-            else if (Implements != null)
+                res = BaseType.CanAssignTo(type);
+            if (!res && Implements != null)
             {
                 for (int i = 0; i < interfaces.Length; i++)
                 {
                     var im = interfaces[i];
-                    bool res = im.CanAssignTo(type);
+                    res = im.CanAssignTo(type);
                     if (res)
                         return true;
                 }

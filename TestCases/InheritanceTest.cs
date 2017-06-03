@@ -196,6 +196,36 @@ namespace TestCases
         }
     }
 
+    class BB : ILRuntimeTest.TestFramework.ClassInheritanceTest, IAs1
+    {
+        public void AA1()
+        {
+            Console.WriteLine("AA1");
+        }
+
+        public override void TestAbstract()
+        {
+            Console.WriteLine("BB");
+        }
+    }
+
+    public class Parent
+    {
+
+    }
+
+    public interface IAwake
+    {
+        void Awake();
+    }
+
+    public class Child : Parent, IAwake
+    {
+        public void Awake()
+        {
+        }
+    }
+
     class TestAs
     {
         public static bool TestAs01()
@@ -214,6 +244,39 @@ namespace TestCases
             IAs1 ias = aa as IAs1;
             if (ias != null)
             {
+                throw new Exception("error");
+            }
+            return true;
+        }
+
+        public static bool TestAs03()
+        {
+            BB aa = new BB();
+            Dictionary<int, BB> dic = new Dictionary<int, BB>();
+            dic[0] = aa;
+            IAs1 ias = dic[0] as IAs1;
+            if (ias == null)
+            {
+                throw new Exception("error");
+            }
+            else
+                ias.AA1();
+            ClassInheritanceTest id = dic[0] as ClassInheritanceTest;
+            if (id == null)
+            {
+                throw new Exception("error2");
+            }
+            else
+                id.TestAbstract();
+            return true;
+        }
+        public static bool TestAs04()
+        {
+            object child = new Child();
+            IAwake awake = child as IAwake;
+            if (awake == null)
+            {
+                Console.WriteLine("as fail!");
                 throw new Exception("error");
             }
             return true;

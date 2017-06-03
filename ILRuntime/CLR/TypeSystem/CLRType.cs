@@ -21,9 +21,10 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, int> fieldTokenMapping;
         IType byRefType, arrayType, elementType;
+        IType[] interfaces;
         bool isDelegate;
         IType baseType;
-        bool isBaseTypeInitialized = false;
+        bool isBaseTypeInitialized = false, interfaceInitialized = false;
         MethodInfo memberwiseClone;
         ILRuntimeWrapperType wraperType;
 
@@ -156,6 +157,16 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public IType[] Implements
+        {
+            get
+            {
+                if (!interfaceInitialized)
+                    InitializeInterfaces();
+                return interfaces;
+            }
+        }
+
         public new MethodInfo MemberwiseClone
         {
             get
@@ -176,6 +187,20 @@ namespace ILRuntime.CLR.TypeSystem
                 baseType = null;
             }
             isBaseTypeInitialized = true;
+        }
+
+        void InitializeInterfaces()
+        {
+            interfaceInitialized = true;
+            var arr = clrType.GetInterfaces();
+            if (arr.Length >0)
+            {
+                interfaces = new IType[arr.Length];
+                for (int i = 0; i < interfaces.Length; i++)
+                {
+                    interfaces[i] = appdomain.GetType(arr[i]);
+                }
+            }
         }
 
         public FieldInfo GetField(int hash)
