@@ -220,7 +220,7 @@ namespace ILRuntime.CLR.Utils
             }
             else if ((typeFlags & TypeFlags.IsByRef) != 0)
             {
-                return CheckCLRTypes(pt.GetElementType(), ref obj);
+                return CheckCLRTypes(pt.GetElementType(), obj);
             }
             else if ((typeFlags & TypeFlags.IsEnum) != 0)
             {
