@@ -31,7 +31,7 @@ namespace ILRuntime.Runtime.Intepreter
             this.domain = domain;
             stack = new RuntimeStack(this);
             allowUnboundCLRMethod = domain.AllowUnboundCLRMethod;
-#if DEBUG
+#if ILRUNTIME_DEBUG
             _lockObj = new object();
 #endif
         }
@@ -187,7 +187,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     try
                     {
-#if DEBUG
+#if ILRUNTIME_DEBUG
                         if (ShouldBreak)
                             Break();
                         var insOffset = (int)(ip - ptr);
@@ -1724,7 +1724,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     esp = redirect(this, esp, mStack, cm, false);
                                                 else
                                                 {
-#if DEBUG
+#if ILRUNTIME_DEBUG
                                                     if (!allowUnboundCLRMethod)
                                                         throw new NotSupportedException(cm.ToString() + " is not bound!");
 #endif
@@ -3676,6 +3676,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 else
                                 {
+#if ILRUNTIME_DEBUG
                                     var debugger = AppDomain.DebugService;
                                     if (method.HasThis)
                                         ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
@@ -3683,6 +3684,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ex.Data["ThisInfo"] = "";
                                     ex.Data["StackTrace"] = debugger.GetStackTrance(this);
                                     ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
+#endif
                                 }
                                 //Clear call stack
                                 while (stack.Frames.Peek().BasePointer != frame.BasePointer)
@@ -3708,7 +3710,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                         unhandledException = true;
                         returned = true;
-#if DEBUG
+#if ILRUNTIME_DEBUG
                         if (!AppDomain.DebugService.Break(this, ex))
 #endif
                         {

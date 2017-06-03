@@ -52,7 +52,7 @@ namespace ILRuntime.Runtime.Stack
             res = new StackFrame();
             res.LocalVarPointer = esp;
             res.Method = method;
-#if DEBUG
+#if ILRUNTIME_DEBUG
             res.Address = new IntegerReference();
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
