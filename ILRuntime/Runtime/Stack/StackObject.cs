@@ -127,7 +127,7 @@ namespace ILRuntime.Runtime.Stack
                     esp.Value = idx;
                     if (fieldType is CLRType)
                     {
-                        mStack[idx] = Activator.CreateInstance(t);
+                        mStack[idx] = ((CLRType)fieldType).CreateDefaultInstance();
                     }
                     else
                     {

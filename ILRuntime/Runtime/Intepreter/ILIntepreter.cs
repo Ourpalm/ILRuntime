@@ -154,7 +154,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                     {
-                        var obj = Activator.CreateInstance(t.TypeForCLR);
+                        var obj = ((CLRType) t).CreateDefaultInstance();
                         var loc = Add(v1, i);
                         loc->ObjectType = ObjectTypes.Object;
                         loc->Value = mStack.Count;
@@ -2909,7 +2909,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         if (type.TypeForCLR != typeof(ILTypeInstance))
                                         {
-                                            arr = Array.CreateInstance(type.TypeForCLR, cnt->Value);
+                                            if (type is CLRType)
+                                            {
+                                                arr = ((CLRType)type).CreateArrayInstance(cnt->Value);
+                                            }
+                                            else
+                                            {
+                                                arr = Array.CreateInstance(type.TypeForCLR, cnt->Value);
+                                            }
+
                                             //Register Type
                                             AppDomain.GetType(arr.GetType());
                                         }

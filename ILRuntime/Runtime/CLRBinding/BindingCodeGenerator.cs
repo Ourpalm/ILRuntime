@@ -60,7 +60,7 @@ namespace ILRuntime.Runtime.Generated
                     FieldInfo[] fields = i.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string registerMethodCode = GenerateMethodRegisterCode(i, methods, excludeMethods);
                     string registerFieldCode = GenerateFieldRegisterCode(i, fields, excludeFields);
-                    string registerMiscCode = GenerateMiscRegisterCode(i);
+                    string registerMiscCode = GenerateMiscRegisterCode(i, realClsName);
                     string commonCode = GenerateCommonCode(i, realClsName);
                     ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string ctorRegisterCode = GenerateConstructorRegisterCode(i, ctors, excludeMethods);
@@ -264,13 +264,29 @@ namespace ILRuntime.Runtime.Generated
             return sb.ToString();
         }
 
-        private static string GenerateMiscRegisterCode(Type type)
+        private static string GenerateMiscRegisterCode(Type type, string typeClsName)
         {
             StringBuilder sb = new StringBuilder();
 
             if (type.IsValueType && !type.IsPrimitive && !type.IsEnum)
             {
                 sb.AppendLine("            app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);");
+            }
+
+            if (!type.IsPrimitive && !type.IsAbstract)
+            {
+                var constructorFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+                var hasDefaultConstructor = type.GetConstructor(constructorFlags, null, new Type[0], null) != null;
+
+                if (hasDefaultConstructor || type.IsValueType)
+                {
+                    sb.AppendLine(string.Format("            app.RegisterCLRCreateDefaultInstance(type, () => new {0}());", typeClsName));
+                }
+            }
+
+            if (!type.IsAbstract || !type.IsSealed)
+            {
+                sb.AppendLine(string.Format("            app.RegisterCLRCreateArrayInstance(type, s => new {0}[s]);", typeClsName));
             }
 
             return sb.ToString();
@@ -829,10 +845,17 @@ namespace ILRuntime.Runtime.Generated
                     }
                     else
                     {
-                        sb.AppendLine("            var h = GCHandle.Alloc(o, GCHandleType.Pinned);");
-                        sb.AppendLine(string.Format("            {0}* p = ({0} *)(void *)h.AddrOfPinnedObject();", typeClsName));
-                        sb.AppendLine(string.Format("            p->{0} = ({1})v;", i.Name, i.FieldType.FullName));
-                        sb.AppendLine("            h.Free();");
+                        if (type.IsValueType)
+                        {
+                            sb.AppendLine("            var h = GCHandle.Alloc(o, GCHandleType.Pinned);");
+                            sb.AppendLine(string.Format("            {0}* p = ({0} *)(void *)h.AddrOfPinnedObject();", typeClsName));
+                            sb.AppendLine(string.Format("            p->{0} = ({1})v;", i.Name, i.FieldType.FullName));
+                            sb.AppendLine("            h.Free();");
+                        }
+                        else
+                        {
+                            sb.AppendLine(string.Format("            (({0})o).{1} = ({2})v;", typeClsName, i.Name, i.FieldType.FullName));
+                        }
                     }
                     sb.AppendLine("        }");
                 }

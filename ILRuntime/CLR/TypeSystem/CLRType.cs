@@ -24,7 +24,8 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
         Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
         CLRMemberwiseCloneDelegate memberwiseCloneDelegate;
-        private bool checkedForMemberwiseClone;
+        CLRCreateDefaultInstanceDelegate createDefaultInstanceDelegate;
+        CLRCreateArrayInstanceDelegate createArrayInstanceDelegate;
         Dictionary<int, int> fieldTokenMapping;
         IType byRefType, arrayType, elementType;
         IType[] interfaces;
@@ -592,6 +593,32 @@ namespace ILRuntime.CLR.TypeSystem
 
             genericInstances.Add(res);
             return res;
+        }
+
+        public object CreateDefaultInstance()
+        {
+            if (createDefaultInstanceDelegate == null)
+            {
+                if (!AppDomain.CreateDefaultInstanceMap.TryGetValue(clrType, out createDefaultInstanceDelegate))
+                {
+                    createDefaultInstanceDelegate = () => Activator.CreateInstance(TypeForCLR);
+                }
+            }
+
+            return createDefaultInstanceDelegate();
+        }
+
+        public object CreateArrayInstance(int size)
+        {
+            if (createArrayInstanceDelegate == null)
+            {
+                if (!AppDomain.CreateArrayInstanceMap.TryGetValue(clrType, out createArrayInstanceDelegate))
+                {
+                    createArrayInstanceDelegate = s => Array.CreateInstance(TypeForCLR, s);
+                }
+            }
+
+            return createArrayInstanceDelegate(size);
         }
 
         public IType MakeByRefType()

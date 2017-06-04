@@ -19,6 +19,8 @@ namespace ILRuntime.Runtime.Enviorment
     public delegate object CLRFieldGetterDelegate(ref object target);
     public delegate void CLRFieldSetterDelegate(ref object target, object value);
     public delegate object CLRMemberwiseCloneDelegate(ref object target);
+    public delegate object CLRCreateDefaultInstanceDelegate();
+    public delegate object CLRCreateArrayInstanceDelegate(int size);
 
     public class AppDomain
     {
@@ -34,6 +36,8 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate> fieldGetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate>();
         Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate> fieldSetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate>();
         Dictionary<Type, CLRMemberwiseCloneDelegate> memberwiseCloneMap = new Dictionary<Type, CLRMemberwiseCloneDelegate>(new DictionaryTypeKeyComparer());
+        Dictionary<Type, CLRCreateDefaultInstanceDelegate> createDefaultInstanceMap = new Dictionary<Type, CLRCreateDefaultInstanceDelegate>(new DictionaryTypeKeyComparer());
+        Dictionary<Type, CLRCreateArrayInstanceDelegate> createArrayInstanceMap = new Dictionary<Type, CLRCreateArrayInstanceDelegate>(new DictionaryTypeKeyComparer());
         IType voidType, intType, longType, boolType, floatType, doubleType, objectType;
         DelegateManager dMgr;
         Assembly[] loadedAssemblies;
@@ -130,6 +134,8 @@ namespace ILRuntime.Runtime.Enviorment
         internal Dictionary<FieldInfo, CLRFieldGetterDelegate> FieldGetterMap { get { return fieldGetterMap; } }
         internal Dictionary<FieldInfo, CLRFieldSetterDelegate> FieldSetterMap { get { return fieldSetterMap; } }
         internal Dictionary<Type, CLRMemberwiseCloneDelegate> MemberwiseCloneMap { get { return memberwiseCloneMap; } }
+        internal Dictionary<Type, CLRCreateDefaultInstanceDelegate> CreateDefaultInstanceMap { get { return createDefaultInstanceMap; } }
+        internal Dictionary<Type, CLRCreateArrayInstanceDelegate> CreateArrayInstanceMap { get { return createArrayInstanceMap; } }
         internal Dictionary<Type, CrossBindingAdaptor> CrossBindingAdaptors { get { return crossAdaptors; } }
         public DebugService DebugService { get { return debugService; } }
         internal Dictionary<int, ILIntepreter> Intepreters { get { return intepreters; } }
@@ -413,6 +419,18 @@ namespace ILRuntime.Runtime.Enviorment
         {
             if (!memberwiseCloneMap.ContainsKey(t))
                 memberwiseCloneMap[t] = memberwiseClone;
+        }
+
+        public void RegisterCLRCreateDefaultInstance(Type t, CLRCreateDefaultInstanceDelegate createDefaultInstance)
+        {
+            if (!createDefaultInstanceMap.ContainsKey(t))
+                createDefaultInstanceMap[t] = createDefaultInstance;
+        }
+
+        public void RegisterCLRCreateArrayInstance(Type t, CLRCreateArrayInstanceDelegate createArray)
+        {
+            if (!createArrayInstanceMap.ContainsKey(t))
+                createArrayInstanceMap[t] = createArray;
         }
 
         /// <summary>

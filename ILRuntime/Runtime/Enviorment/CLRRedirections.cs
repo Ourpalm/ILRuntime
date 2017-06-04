@@ -26,7 +26,7 @@ namespace ILRuntime.Runtime.Enviorment
                     return ILIntepreter.PushObject(esp, mStack, ((ILType)t).Instantiate());
                 }
                 else
-                    return ILIntepreter.PushObject(esp, mStack, Activator.CreateInstance(t.TypeForCLR));
+                    return ILIntepreter.PushObject(esp, mStack, ((CLRType)t).CreateDefaultInstance());
             }
             else
                 throw new EntryPointNotFoundException();
