@@ -23,13 +23,14 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
         Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
+        CLRMemberwiseCloneDelegate memberwiseCloneDelegate;
+        private bool checkedForMemberwiseClone;
         Dictionary<int, int> fieldTokenMapping;
         IType byRefType, arrayType, elementType;
         IType[] interfaces;
         bool isDelegate;
         IType baseType;
         bool isBaseTypeInitialized = false, interfaceInitialized = false;
-        MethodInfo memberwiseClone;
         ILRuntimeWrapperType wraperType;
 
         int hashCode = -1;
@@ -171,16 +172,26 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public new MethodInfo MemberwiseClone
+        public object PerformMemberwiseClone(object target)
         {
-            get
+            if (memberwiseCloneDelegate == null)
             {
-                if (clrType.IsValueType && memberwiseClone == null)
+                if (!AppDomain.MemberwiseCloneMap.TryGetValue(this.clrType, out memberwiseCloneDelegate))
                 {
-                    memberwiseClone = clrType.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    var memberwiseClone = clrType.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+                    if (memberwiseClone != null)
+                    {
+                        memberwiseCloneDelegate = (ref object t) => memberwiseClone.Invoke(t, null);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Memberwise clone method not found for " + clrType.FullName);
+                    }
                 }
-                return memberwiseClone;
             }
+
+            return memberwiseCloneDelegate(ref target);
         }
 
         void InitializeBaseType()
@@ -209,23 +220,41 @@ namespace ILRuntime.CLR.TypeSystem
 
         public object GetFieldValue(int hash, object target)
         {
+            if (fieldMapping == null)
+                InitializeFields();
+
             var getter = GetFieldGetter(hash);
             if (getter != null)
             {
                 return getter(ref target);
             }
 
-            var fieldInfo = GetField(hash);
-            if (fieldInfo != null)
+            var fieldinfo = GetField(hash);
+            if (fieldinfo != null)
             {
-                return fieldInfo.GetValue(target);
+                return fieldinfo.GetValue(target);
             }
 
             return null;
         }
 
-        public void SetFieldValue(int hash, object target, object value)
+        public void SetStaticFieldValue(int hash, object value)
         {
+            if (fieldMapping == null)
+                InitializeFields();
+
+            var fieldInfo = GetField(hash);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(null, value);
+            }
+        }
+
+        public unsafe void SetFieldValue(int hash, ref object target, object value)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+
             var setter = GetFieldSetter(hash);
             if (setter != null)
             {
