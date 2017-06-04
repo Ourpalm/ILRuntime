@@ -255,11 +255,16 @@ namespace ILRuntime.CLR.TypeSystem
             get; private set;
         }
 
+        private bool? isValueType;
+
         public bool IsValueType
         {
             get
             {
-                return definition.IsValueType;
+                if (isValueType == null)
+                    isValueType = definition.IsValueType;
+
+                return isValueType.Value;
             }
         }
 
