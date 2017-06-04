@@ -7,6 +7,8 @@ using System.Reflection;
 using Mono.Cecil;
 using ILRuntime.CLR.Method;
 using ILRuntime.Reflection;
+using ILRuntime.Runtime.Enviorment;
+
 namespace ILRuntime.CLR.TypeSystem
 {
     public class CLRType : IType
@@ -19,6 +21,8 @@ namespace ILRuntime.CLR.TypeSystem
         List<CLRType> genericInstances;
         Dictionary<string, int> fieldMapping;
         Dictionary<int, FieldInfo> fieldInfoCache;
+        Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
+        Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
         Dictionary<int, int> fieldTokenMapping;
         IType byRefType, arrayType, elementType;
         IType[] interfaces;
@@ -203,6 +207,63 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public object GetFieldValue(int hash, object target)
+        {
+            var getter = GetFieldGetter(hash);
+            if (getter != null)
+            {
+                return getter(ref target);
+            }
+
+            var fieldInfo = GetField(hash);
+            if (fieldInfo != null)
+            {
+                return fieldInfo.GetValue(target);
+            }
+
+            return null;
+        }
+
+        public void SetFieldValue(int hash, object target, object value)
+        {
+            var setter = GetFieldSetter(hash);
+            if (setter != null)
+            {
+                setter(ref target, value);
+                return;
+            }
+
+            var fieldInfo = GetField(hash);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(target, value);
+            }
+        }
+
+        private CLRFieldGetterDelegate GetFieldGetter(int hash)
+        {
+            var dic = fieldGetterCache;
+            CLRFieldGetterDelegate res;
+            if (dic != null && dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetFieldGetter(hash);
+            else
+                return null;
+        }
+
+        private CLRFieldSetterDelegate GetFieldSetter(int hash)
+        {
+            var dic = fieldSetterCache;
+            CLRFieldSetterDelegate res;
+            if (dic != null && dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetFieldSetter(hash);
+            else
+                return null;
+        }
+
         public FieldInfo GetField(int hash)
         {
             var dic = Fields;
@@ -269,11 +330,26 @@ namespace ILRuntime.CLR.TypeSystem
             var fields = clrType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
             foreach (var i in fields)
             {
+                int hashCode = i.GetHashCode();
+
                 if (i.IsPublic || i.IsFamily)
                 {
-                    int hashCode = i.GetHashCode();
                     fieldMapping[i.Name] = hashCode;
                     fieldInfoCache[hashCode] = i;
+                }
+
+                CLRFieldGetterDelegate getter;
+                if (AppDomain.FieldGetterMap.TryGetValue(i, out getter))
+                {
+                    if (fieldGetterCache == null) fieldGetterCache = new Dictionary<int, CLRFieldGetterDelegate>();
+                    fieldGetterCache[hashCode] = getter;
+                }
+
+                CLRFieldSetterDelegate setter;
+                if (AppDomain.FieldSetterMap.TryGetValue(i, out setter))
+                {
+                    if (fieldSetterCache == null) fieldSetterCache = new Dictionary<int, CLRFieldSetterDelegate>();
+                    fieldSetterCache[hashCode] = setter;
                 }
             }
         }

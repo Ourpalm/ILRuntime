@@ -323,7 +323,7 @@ namespace ILRuntime.CLR.Method
                             }
                             else
                             {
-                                ((CLRType)t).GetField(p->ValueLow).SetValue(null, val);
+                                ((CLRType)t).SetFieldValue(p->ValueLow, null, val);
                             }
                         }
                         break;

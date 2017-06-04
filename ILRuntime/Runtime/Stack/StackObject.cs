@@ -54,8 +54,8 @@ namespace ILRuntime.Runtime.Stack
                             }
                             else
                                 t = appdomain.GetType(obj.GetType());
-                            var fi = ((CLRType)t).GetField(esp->ValueLow);
-                            return fi.GetValue(obj);
+
+                            return ((CLRType)t).GetFieldValue(esp->ValueLow, obj);
                         }
                     }
                 case ObjectTypes.ArrayReference:
@@ -74,8 +74,7 @@ namespace ILRuntime.Runtime.Stack
                         else
                         {
                             CLR.TypeSystem.CLRType type = (CLR.TypeSystem.CLRType)t;
-                            var fi = type.GetField(esp->ValueLow);
-                            return fi.GetValue(null);
+                            return type.GetFieldValue(esp->ValueLow, null);
                         }
                     }
                 case ObjectTypes.StackObjectReference:

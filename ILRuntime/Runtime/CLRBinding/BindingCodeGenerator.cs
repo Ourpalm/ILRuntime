@@ -9,7 +9,7 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     public class BindingCodeGenerator
     {
-        public static void GenerateBindingCode(List<Type> types, string outputPath, HashSet<MethodBase> excludes = null)
+        public static void GenerateBindingCode(List<Type> types, string outputPath, HashSet<MethodBase> excludeMethods = null, HashSet<FieldInfo> excludeFields = null)
         {
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
@@ -50,23 +50,29 @@ namespace ILRuntime.Runtime.Generated
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
+            FieldInfo field;
             Type[] args;
             Type type = typeof(");
                     sw.Write(realClsName);
                     sw.WriteLine(");");
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                    string registerCode = GenerateRegisterCode(i, methods, excludes);
+                    FieldInfo[] fields = i.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                    string registerMethodCode = GenerateMethodRegisterCode(i, methods, excludeMethods);
+                    string registerFieldCode = GenerateFieldRegisterCode(i, fields, excludeFields);
                     string commonCode = GenerateCommonCode(i, realClsName);
                     ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                    string ctorRegisterCode = GenerateConstructorRegisterCode(i, ctors, excludes);
-                    string wraperCode = GenerateWraperCode(i, methods, realClsName, excludes);
-                    string ctorWraperCode = GenerateConstructorWraperCode(i, ctors, realClsName, excludes);
-                    sw.WriteLine(registerCode);
+                    string ctorRegisterCode = GenerateConstructorRegisterCode(i, ctors, excludeMethods);
+                    string methodWraperCode = GenerateMethodWraperCode(i, methods, realClsName, excludeMethods);
+                    string fieldWraperCode = GenerateFieldWraperCode(i, fields, realClsName, excludeFields);
+                    string ctorWraperCode = GenerateConstructorWraperCode(i, ctors, realClsName, excludeMethods);
+                    sw.WriteLine(registerMethodCode);
+                    sw.WriteLine(registerFieldCode);
                     sw.WriteLine(ctorRegisterCode);
                     sw.WriteLine("        }");
                     sw.WriteLine();
                     sw.WriteLine(commonCode);
-                    sw.WriteLine(wraperCode);
+                    sw.WriteLine(methodWraperCode);
+                    sw.WriteLine(fieldWraperCode);
                     sw.WriteLine(ctorWraperCode);
                     sw.WriteLine("    }");
                     sw.WriteLine("}");
@@ -134,7 +140,22 @@ namespace ILRuntime.Runtime.Generated
             return false;
         }
 
-        static string GenerateRegisterCode(Type type, MethodInfo[] methods, HashSet<MethodBase> excludes)
+        static bool ShouldSkipField(Type type, FieldInfo i)
+        {
+            if (i.IsPrivate)
+                return true;
+            //EventHandler is currently not supported
+            if (i.IsSpecialName)
+            {
+                return true;
+            }
+            if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                return true;
+            return false;
+        }
+
+
+        static string GenerateMethodRegisterCode(Type type, MethodInfo[] methods, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
             int idx = 0;
@@ -168,6 +189,31 @@ namespace ILRuntime.Runtime.Generated
                 sb.AppendLine(string.Format("            args = new Type[]{0};", sb2));
                 sb.AppendLine(string.Format("            method = type.GetMethod(\"{0}\", flag, null, args, null);", i.Name));
                 sb.AppendLine(string.Format("            app.RegisterCLRMethodRedirection(method, {0}_{1});", i.Name, idx));
+
+                idx++;
+            }
+            return sb.ToString();
+        }
+
+        static string GenerateFieldRegisterCode(Type type, FieldInfo[] fields, HashSet<FieldInfo> excludes)
+        {
+            StringBuilder sb = new StringBuilder();
+            int idx = 0;
+            foreach (var i in fields)
+            {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
+                if (ShouldSkipField(type, i))
+                    continue;
+                if (i.IsSpecialName)
+                    continue;
+
+                sb.AppendLine(string.Format("            field = type.GetField(\"{0}\", flag);", i.Name));
+                sb.AppendLine(string.Format("            app.RegisterCLRFieldGetter(field, get_{0}_{1});", i.Name, idx));
+                if (!i.IsInitOnly && !i.IsLiteral)
+                {
+                    sb.AppendLine(string.Format("            app.RegisterCLRFieldSetter(field, set_{0}_{1});", i.Name, idx));
+                }
 
                 idx++;
             }
@@ -242,7 +288,7 @@ namespace ILRuntime.Runtime.Generated
                             var t = __domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (");
                 sb.Append(typeClsName);
-                sb.Append(")t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);");
+                sb.Append(")t.GetFieldValue(ptr_of_this_method->ValueLow, instance_of_fieldReference);");
                 sb.Append(@"
                         }
                     }
@@ -260,7 +306,7 @@ namespace ILRuntime.Runtime.Generated
                         {
                             instance_of_this_method = (");
                 sb.Append(typeClsName);
-                sb.Append(@")((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                sb.Append(@")((CLRType)t).GetFieldValue(ptr_of_this_method->ValueLow, null);
                         }
                     }
                     break;
@@ -302,7 +348,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, instance_of_this_method");
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ___obj, instance_of_this_method");
                 sb.Append(@");
                         }
                     }
@@ -317,7 +363,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method");
+                            ((CLRType)t).SetFieldValue(ptr_of_this_method->ValueLow, null, instance_of_this_method");
                 sb.Append(@");
                         }
                     }
@@ -419,7 +465,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -436,7 +482,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
+                            ((CLRType)t).SetFieldValue(ptr_of_this_method->ValueLow, null, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -465,7 +511,7 @@ namespace ILRuntime.Runtime.Generated
             return sb.ToString();
         }
 
-        static string GenerateWraperCode(Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
+        static string GenerateMethodWraperCode(Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -683,7 +729,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -700,7 +746,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
+                            ((CLRType)t).SetFieldValue(ptr_of_this_method->ValueLow, null, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -727,6 +773,50 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine("            return __ret;");
                 sb.AppendLine("        }");
                 sb.AppendLine();
+                idx++;
+            }
+
+            return sb.ToString();
+        }
+
+        static string GenerateFieldWraperCode(Type type, FieldInfo[] fields, string typeClsName, HashSet<FieldInfo> excludes)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            int idx = 0;
+            foreach (var i in fields)
+            {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
+                if (ShouldSkipField(type, i))
+                    continue;
+                sb.AppendLine(string.Format("        static object get_{0}_{1}(ref object o)", i.Name, idx));
+                sb.AppendLine("        {");
+                if (i.IsStatic)
+                {
+                    sb.AppendLine(string.Format("            return {0}.{1};", typeClsName, i.Name));
+                }
+                else
+                {
+                    sb.AppendLine(string.Format("            return (({0})o).{1};", typeClsName, i.Name));
+                }
+                sb.AppendLine("        }");
+
+                if (!i.IsInitOnly && !i.IsLiteral)
+                {
+                    sb.AppendLine(string.Format("        static void set_{0}_{1}(ref object o, object v)", i.Name, idx));
+                    sb.AppendLine("        {");
+                    sb.AppendLine(string.Format("            var obj = ({0})o;", typeClsName));
+                    if (i.IsStatic)
+                    {
+                        sb.AppendLine(string.Format("            {0}.{1} = ({2})v;", typeClsName, i.Name, i.FieldType.FullName));
+                    }
+                    else
+                    {
+                        sb.AppendLine(string.Format("            obj.{0} = ({1})v;", i.Name, i.FieldType.FullName));
+                    }
+                    sb.AppendLine("        }");
+                }
                 idx++;
             }
 
