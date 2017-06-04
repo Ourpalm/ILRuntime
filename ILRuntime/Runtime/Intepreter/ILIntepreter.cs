@@ -4151,7 +4151,7 @@ namespace ILRuntime.Runtime.Intepreter
                     if (!type.IsPrimitive && type.IsValueType)
                     {
                         var t = domain.GetType(type);
-                        return ((CLRType)t).MemberwiseClone.Invoke(obj, null);
+                        return ((CLRType)t).PerformMemberwiseClone(obj);
                     }
                 }
             }
