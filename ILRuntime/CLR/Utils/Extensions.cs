@@ -117,7 +117,7 @@ namespace ILRuntime.CLR.Utils
             IsValueType = 0x10,
         }
 
-        private static readonly Dictionary<Type, TypeFlags> typeFlags = new Dictionary<Type, TypeFlags>(new DictionaryTypeKeyComparer());
+        private static readonly Dictionary<Type, TypeFlags> typeFlags = new Dictionary<Type, TypeFlags>(new ByReferenceKeyComparer<Type>());
 
         public static bool FastIsEnum(this Type pt)
         {
