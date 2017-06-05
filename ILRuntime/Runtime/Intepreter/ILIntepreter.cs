@@ -154,7 +154,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                     {
-                        var obj = Activator.CreateInstance(t.TypeForCLR);
+                        var obj = ((CLRType) t).CreateDefaultInstance();
                         var loc = Add(v1, i);
                         loc->ObjectType = ObjectTypes.Object;
                         loc->Value = mStack.Count;
@@ -454,7 +454,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                 {
                                                     var t = AppDomain.GetType(ip->TokenInteger);
-                                                    obj = ((CLRType)t).GetField(idx).GetValue(obj);
+                                                    obj = ((CLRType) t).GetFieldValue(idx, obj);
                                                     PushObject(objRef, mStack, obj);
                                                 }
                                             }
@@ -470,7 +470,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                                 else
                                                 {
-                                                    var obj = ((CLRType)t).GetField(idx).GetValue(null);
+                                                    var obj = ((CLRType)t).GetFieldValue(idx, null);
                                                     PushObject(objRef, mStack, obj);
                                                 }
                                             }
@@ -517,7 +517,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                 {
                                                     var t = AppDomain.GetType(ip->TokenInteger);
-                                                    ((CLRType)t).GetField(idx).SetValue(obj, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(val, AppDomain, mStack)));
+                                                    ((CLRType)t).SetFieldValue(idx, ref obj, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(val, AppDomain, mStack)));
                                                 }
                                             }
                                             break;
@@ -530,7 +530,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 }
                                                 else
                                                 {
-                                                    ((CLRType)t).GetField(objRef->ValueLow).SetValue(null, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(val, AppDomain, mStack)));
+                                                    ((CLRType)t).SetStaticFieldValue(objRef->ValueLow, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(val, AppDomain, mStack)));
                                                 }
                                             }
                                             break;
@@ -1794,8 +1794,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (type != null)
                                             {
                                                 var val = esp - 1;
-                                                var f = ((CLRType)type).GetField(ip->TokenInteger);
-                                                f.SetValue(obj, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
+                                                var fieldToken = ip->TokenInteger;
+                                                var f = ((CLRType)type).GetField(fieldToken);
+                                                ((CLRType)type).SetFieldValue(fieldToken, ref obj, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
                                                 //Writeback
                                                 if (t.IsValueType)
                                                 {
@@ -1814,7 +1815,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                                 else
                                                                 {
                                                                     var it = AppDomain.GetType(oldObj.GetType());
-                                                                    ((CLRType)it).GetField(idx).SetValue(oldObj, obj);
+                                                                    ((CLRType)it).SetFieldValue(idx, ref oldObj, obj);
                                                                 }
                                                             }
                                                             break;
@@ -1828,7 +1829,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                                 }
                                                                 else
                                                                 {
-                                                                    ((CLRType)it).GetField(idx).SetValue(null, obj);
+                                                                    ((CLRType)it).SetStaticFieldValue(idx, obj);
                                                                 }
                                                             }
                                                             break;
@@ -1866,8 +1867,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             var type = AppDomain.GetType(t);
                                             if (type != null)
                                             {
-                                                var ft = ((CLRType)type).GetField(ip->TokenInteger);
-                                                var val = ft.GetValue(obj);
+                                                var token = ip->TokenInteger;
+                                                var ft = ((CLRType)type).GetField(token);
+                                                var val = ((CLRType)type).GetFieldValue(token, obj);
                                                 if (val is CrossBindingAdaptorType)
                                                     val = ((CrossBindingAdaptorType)val).ILInstance;
                                                 PushObject(esp - 1, mStack, val, ft.FieldType == typeof(object));
@@ -1924,7 +1926,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             int idx = (int)ip->TokenLong;
                                             var f = t.GetField(idx);
                                             StackObject* val = esp - 1;
-                                            f.SetValue(null, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
+                                            t.SetStaticFieldValue(idx, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
                                         }
                                     }
                                     else
@@ -1948,7 +1950,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             CLRType t = type as CLRType;
                                             int idx = (int)ip->TokenLong;
                                             var f = t.GetField(idx);
-                                            var val = f.GetValue(null);
+                                            var val = t.GetFieldValue(idx, null);
                                             if (val is CrossBindingAdaptorType)
                                                 val = ((CrossBindingAdaptorType)val).ILInstance;
                                             PushObject(esp, mStack, val, f.FieldType == typeof(object));
@@ -2907,7 +2909,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         if (type.TypeForCLR != typeof(ILTypeInstance))
                                         {
-                                            arr = Array.CreateInstance(type.TypeForCLR, cnt->Value);
+                                            if (type is CLRType)
+                                            {
+                                                arr = ((CLRType)type).CreateArrayInstance(cnt->Value);
+                                            }
+                                            else
+                                            {
+                                                arr = Array.CreateInstance(type.TypeForCLR, cnt->Value);
+                                            }
+
                                             //Register Type
                                             AppDomain.GetType(arr.GetType());
                                         }
@@ -3752,7 +3762,7 @@ namespace ILRuntime.Runtime.Intepreter
                         else
                         {
                             var t = AppDomain.GetType(obj.GetType());
-                            obj = ((CLRType)t).GetField(idx).GetValue(obj);
+                            obj = ((CLRType) t).GetFieldValue(idx, obj);
                         }
                     }
                     break;
@@ -3774,7 +3784,7 @@ namespace ILRuntime.Runtime.Intepreter
                         }
                         else
                         {
-                            obj = ((CLRType)t).GetField(idx).GetValue(null);
+                            obj = ((CLRType)t).GetFieldValue(idx, null);
                         }
                     }
                     break;
@@ -3896,8 +3906,7 @@ namespace ILRuntime.Runtime.Intepreter
             else
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
-                var fi = t.GetField(idx);
-                PushObject(dst, mStack, fi.GetValue(obj));
+                PushObject(dst, mStack, t.GetFieldValue(idx, obj));
             }
         }
 
@@ -3910,9 +3919,8 @@ namespace ILRuntime.Runtime.Intepreter
             else
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
-                var fi = t.GetField(idx);
                 var v = obj.GetType().CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, AppDomain, mStack), AppDomain));
-                fi.SetValue(obj, v);
+                t.SetFieldValue(idx, ref obj, v);
             }
         }
 
@@ -4148,7 +4156,7 @@ namespace ILRuntime.Runtime.Intepreter
                     if (!isPrimitive && isValueType)
                     {
                         var t = domain.GetType(type);
-                        return ((CLRType)t).MemberwiseClone.Invoke(obj, null);
+                        return ((CLRType)t).PerformMemberwiseClone(obj);
                     }
                 }
             }
