@@ -12,11 +12,11 @@ namespace ILRuntime.Runtime.Enviorment
     {
         public AppDomain AppDomain { get; private set; }
         public StackObject* ESP { get; private set; }
-        public List<object> ManagedStack { get; private set; }
+        public IList<object> ManagedStack { get; private set; }
         public IMethod Method { get; private set; }
         public ILIntepreter Interpreter { get; private set; }
 
-        internal ILContext(AppDomain domain,ILIntepreter intpreter, StackObject* esp, List<object> mStack, IMethod method)
+        internal ILContext(AppDomain domain,ILIntepreter intpreter, StackObject* esp, IList<object> mStack, IMethod method)
         {
             AppDomain = domain;
             ESP = esp;

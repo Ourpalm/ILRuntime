@@ -11,6 +11,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Debugger;
 using ILRuntime.CLR.Utils;
+using ILRuntime.Other;
 
 namespace ILRuntime.Runtime.Intepreter
 {
@@ -61,7 +62,7 @@ namespace ILRuntime.Runtime.Intepreter
         }
         public object Run(ILMethod method, object instance, object[] p)
         {
-            List<object> mStack = stack.ManagedStack;
+            IList<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
             StackObject* esp = stack.StackBase;
             if (method.HasThis)
@@ -77,7 +78,11 @@ namespace ILRuntime.Runtime.Intepreter
             esp = Execute(method, esp, out unhandledException);
             object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(StackObject.ToObject((esp - 1), domain, mStack)) : null;
             //ClearStack
-            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
+#if DEBUG
+            ((List<object>)mStack).RemoveRange(mStackBase, mStack.Count - mStackBase);
+#else
+            ((UncheckedList<object>)mStack).RemoveRange(mStackBase, mStack.Count - mStackBase);
+#endif
             return result;
         }
         internal StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
@@ -105,7 +110,7 @@ namespace ILRuntime.Runtime.Intepreter
 
             esp = frame.BasePointer;
             StackObject* arg = Minus(frame.LocalVarPointer, method.ParameterCount);
-            List<object> mStack = stack.ManagedStack;
+            IList<object> mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
             if (method.HasThis)//this parameter is always object reference
             {
@@ -3740,7 +3745,7 @@ namespace ILRuntime.Runtime.Intepreter
             return stack.PopFrame(ref frame, esp, mStack);
         }
 
-        object RetriveObject(StackObject* esp, List<object> mStack)
+        object RetriveObject(StackObject* esp, IList<object> mStack)
         {
             StackObject* objRef = GetObjectAndResolveReference(esp);
             if (objRef->ObjectType == ObjectTypes.Null)
@@ -3897,7 +3902,7 @@ namespace ILRuntime.Runtime.Intepreter
             return res;
         }
 
-        void LoadFromFieldReference(object obj, int idx, StackObject* dst, List<object> mStack)
+        void LoadFromFieldReference(object obj, int idx, StackObject* dst, IList<object> mStack)
         {
             if (obj is ILTypeInstance)
             {
@@ -3906,11 +3911,11 @@ namespace ILRuntime.Runtime.Intepreter
             else
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
-                PushObject(dst, mStack, t.GetFieldValue(idx, obj));
+                ILIntepreter.PushObject(dst, mStack, t.GetFieldValue(idx, obj));
             }
         }
 
-        void StoreValueToFieldReference(object obj, int idx, StackObject* val, List<object> mStack)
+        void StoreValueToFieldReference(object obj, int idx, StackObject* val, IList<object> mStack)
         {
             if (obj is ILTypeInstance)
             {
@@ -3924,13 +3929,13 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void LoadFromArrayReference(object obj, int idx, StackObject* objRef, IType t, List<object> mStack)
+        void LoadFromArrayReference(object obj, int idx, StackObject* objRef, IType t, IList<object> mStack)
         {
             var nT = t.TypeForCLR;
             LoadFromArrayReference(obj, idx, objRef, nT, mStack);
         }
 
-        void LoadFromArrayReference(object obj, int idx, StackObject* objRef, Type nT, List<object> mStack)
+        void LoadFromArrayReference(object obj, int idx, StackObject* objRef, Type nT, IList<object> mStack)
         {
             if (nT.IsPrimitive)
             {
@@ -4010,13 +4015,13 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void StoreValueToArrayReference(StackObject* objRef, StackObject* val, IType t, List<object> mStack)
+        void StoreValueToArrayReference(StackObject* objRef, StackObject* val, IType t, IList<object> mStack)
         {
             var nT = t.TypeForCLR;
             StoreValueToArrayReference(objRef, val, nT, mStack);
         }
 
-        void StoreValueToArrayReference(StackObject* objRef, StackObject* val, Type nT, List<object> mStack)
+        void StoreValueToArrayReference(StackObject* objRef, StackObject* val, Type nT, IList<object> mStack)
         {
             if (nT.IsPrimitive)
             {
@@ -4100,7 +4105,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         StackObject* PushParameters(IMethod method, StackObject* esp, object[] p)
         {
-            List<object> mStack = stack.ManagedStack;
+            IList<object> mStack = stack.ManagedStack;
             var plist = method.Parameters;
             int pCnt = plist != null ? plist.Count : 0;
             int pCnt2 = p != null ? p.Length : 0;
@@ -4116,13 +4121,13 @@ namespace ILRuntime.Runtime.Intepreter
                     object obj = p[i];
                     if (obj is CrossBindingAdaptorType)
                         obj = ((CrossBindingAdaptorType)obj).ILInstance;
-                    esp = PushObject(esp, mStack, obj, isBox);
+                    esp = ILIntepreter.PushObject(esp, mStack, obj, isBox);
                 }
             }
             return esp;
         }
 
-        public void CopyToStack(StackObject* dst, StackObject* src, List<object> mStack)
+        public void CopyToStack(StackObject* dst, StackObject* src, IList<object> mStack)
         {
             *dst = *src;
             if (dst->ObjectType >= ObjectTypes.Object)
@@ -4250,7 +4255,7 @@ namespace ILRuntime.Runtime.Intepreter
                 throw new NotImplementedException();
         }
 
-        public static StackObject* PushObject(StackObject* esp, List<object> mStack, object obj, bool isBox = false)
+        public static StackObject* PushObject(StackObject* esp, IList<object> mStack, object obj, bool isBox = false)
         {
             if (obj != null)
             {
