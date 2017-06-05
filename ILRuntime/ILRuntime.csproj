@@ -50,6 +50,7 @@
     <Compile Include="CLR\TypeSystem\ILGenericParameterType.cs" />
     <Compile Include="CLR\TypeSystem\ILType.cs" />
     <Compile Include="CLR\TypeSystem\CLRType.cs" />
+    <Compile Include="Other\ByReferenceKeyComparer.cs" />
     <Compile Include="Other\DelegateExportAttribute.cs" />
     <Compile Include="Other\NeedAdaptorAttribute.cs" />
     <Compile Include="Reflection\Extensions.cs" />

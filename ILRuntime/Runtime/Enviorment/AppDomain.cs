@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,9 +26,9 @@ namespace ILRuntime.Runtime.Enviorment
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<int, ILIntepreter> intepreters = new Dictionary<int, ILIntepreter>();
-        Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>();
+        Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>(new ByReferenceKeyComparer<Type>());
         Dictionary<string, IType> mapType = new Dictionary<string, IType>();
-        Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>();
+        Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>(new ByReferenceKeyComparer<Type>());
         Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
         Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
         Dictionary<long, string> mapString = new Dictionary<long, string>();
