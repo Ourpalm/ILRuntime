@@ -640,14 +640,14 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        public unsafe StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack)
+        public unsafe StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, IList<object> mStack)
         {
             var ebp = esp;
             esp = ILInvokeSub(intp, esp, mStack);
             return ClearStack(intp, esp, ebp, mStack);
         }
 
-        unsafe StackObject* ILInvokeSub(ILIntepreter intp, StackObject* esp, List<object> mStack)
+        unsafe StackObject* ILInvokeSub(ILIntepreter intp, StackObject* esp, IList<object> mStack)
         {
             var ebp = esp;
             bool unhandled;
@@ -673,7 +673,7 @@ namespace ILRuntime.Runtime.Intepreter
             return ret;
         }
 
-        unsafe StackObject* ClearStack(ILIntepreter intp, StackObject* esp, StackObject* ebp, List<object> mStack)
+        unsafe StackObject* ClearStack(ILIntepreter intp, StackObject* esp, StackObject* ebp, IList<object> mStack)
         {
             int paramCnt = method.ParameterCount;
             object retObj = null;
@@ -844,7 +844,7 @@ namespace ILRuntime.Runtime.Intepreter
         IDelegateAdapter Next { get; }
         ILTypeInstance Instance { get; }
         ILMethod Method { get; }
-        StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, List<object> mStack);
+        StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, IList<object> mStack);
         IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method);
         bool IsClone { get; }
         IDelegateAdapter Clone();

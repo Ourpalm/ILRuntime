@@ -299,7 +299,7 @@ namespace ILRuntime.Runtime.Generated
             StringBuilder sb = new StringBuilder();
             if (type.IsPrimitive)
             {
-                sb.AppendLine(string.Format("        static {0} GetInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack)", typeClsName));
+                sb.AppendLine(string.Format("        static {0} GetInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, IList<object> __mStack)", typeClsName));
                 sb.AppendLine("        {");
                 if (type.IsPrimitive || type.IsValueType)
                     sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
@@ -360,7 +360,7 @@ namespace ILRuntime.Runtime.Generated
             }
             if (!type.IsPrimitive && !type.IsAbstract)
             {
-                sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, ref {0} instance_of_this_method)", typeClsName));
+                sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, IList<object> __mStack, ref {0} instance_of_this_method)", typeClsName));
                 sb.AppendLine("        {");
                 sb.AppendLine(@"            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             switch(ptr_of_this_method->ObjectType)
@@ -428,7 +428,7 @@ namespace ILRuntime.Runtime.Generated
                     continue;
                 var param = i.GetParameters();
                 int paramCnt = param.Length;
-                sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", idx));
+                sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)", idx));
                 sb.AppendLine("        {");
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");
@@ -560,7 +560,7 @@ namespace ILRuntime.Runtime.Generated
                 int paramCnt = param.Length;
                 if (!i.IsStatic)
                     paramCnt++;
-                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", i.Name, idx));
+                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)", i.Name, idx));
                 sb.AppendLine("        {");
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");
