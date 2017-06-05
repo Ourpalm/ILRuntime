@@ -8,1186 +8,992 @@ using System.Threading;
 
 namespace ILRuntime.Other
 {
-   /// <summary>
-   /// This is a copy of the latest .NET framework 4.5 List implementation, with all extraneous checking removed.
-   /// 
-   /// Note Sort() is unimplemented due to internal classes being unavailable.
-   /// </summary>
-   /// <typeparam name="T"></typeparam>
-  [Serializable]
-  public class UncheckedList<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, IList, ICollection
-  {
-    private static readonly T[] _emptyArray = new T[0];
-    private const int _defaultCapacity = 4;
-    private T[] _items;
-    private int _size;
-    private int _version;
-    [NonSerialized]
-    private object _syncRoot;
-
-    /// <summary>Gets or sets the total number of elements the internal data structure can hold without resizing.</summary>
-    /// <returns>The number of elements that the <see cref="T:System.Collections.Generic.List`1" /> can contain before resizing is required.</returns>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <see cref="P:System.Collections.Generic.List`1.Capacity" /> is set to a value that is less than <see cref="P:System.Collections.Generic.UncheckedList`1.Count" />. </exception>
-    /// <exception cref="T:System.OutOfMemoryException">There is not enough memory available on the system.</exception>
-    public int Capacity
+    /// <summary>
+    /// This is a copy of the latest .NET framework 4.5 List implementation, with all extraneous checking removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    [Serializable]
+    public class UncheckedList<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, IList, ICollection
     {
-      get
-      {
-        return this._items.Length;
-      }
-      set
-      {
-        //if (value < this._size)
-          //TODO // ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.value, ExceptionResource.ArgumentOutOfRange_SmallCapacity);
-        if (value == this._items.Length)
-          return;
-        if (value > 0)
+
+       private const int _defaultCapacity = 4;
+
+        private T[] _items;
+        private int _size;
+        private int _version;
+        [NonSerialized]
+        private Object _syncRoot;
+
+        private static readonly T[] _emptyArray = new T[0];
+
+        // Constructs a UncheckedList. The list is initially empty and has a capacity
+        // of zero. Upon adding the first element to the list the capacity is
+        // increased to _defaultCapacity, and then increased in multiples of two
+        // as required.
+        public UncheckedList()
         {
-          T[] objArray = new T[value];
-          if (this._size > 0)
-            Array.Copy((Array) this._items, 0, (Array) objArray, 0, this._size);
-          this._items = objArray;
+            _items = _emptyArray;
         }
-        else
-          this._items = UncheckedList<T>._emptyArray;
-      }
-    }
 
-    /// <summary>Gets the number of elements contained in the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.List`1" />.</returns>
-    public int Count
-    {
-      get
-      {
-        return this._size;
-      }
-    }
-
-    bool IList.IsFixedSize
-    {
-      get
-      {
-        return false;
-      }
-    }
-
-    bool ICollection<T>.IsReadOnly
-    {
-      get
-      {
-        return false;
-      }
-    }
-
-    bool IList.IsReadOnly
-    {
-      get
-      {
-        return false;
-      }
-    }
-
-    bool ICollection.IsSynchronized
-    {
-      get
-      {
-        return false;
-      }
-    }
-
-    object ICollection.SyncRoot
-    {
-      get
-      {
-        if (this._syncRoot == null)
-          Interlocked.CompareExchange<object>(ref this._syncRoot, new object(), (object) null);
-        return this._syncRoot;
-      }
-    }
-
-    /// <summary>Gets or sets the element at the specified index.</summary>
-    /// <returns>The element at the specified index.</returns>
-    /// <param name="index">The zero-based index of the element to get or set.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="index" /> is equal to or greater than <see cref="P:System.Collections.Generic.List`1.Count" />. </exception>
-    public T this[int index]
-    {
-      get
-      {
-        //if ((uint) index >= (uint) this._size)
-          // TODO ThrowHelper.ThrowArgumentOutOfRangeException();
-        return this._items[index];
-      }
-      set
-      {
-        //if ((uint) index >= (uint) this._size)
-          // TODO ThrowHelper.ThrowArgumentOutOfRangeException();
-        this._items[index] = value;
-        this._version = this._version + 1;
-      }
-    }
-
-    object IList.this[int index]
-    {
-      get
-      {
-        return (object) this[index];
-      }
-      set
-      {
-        // TODO ThrowHelper.IfNullAndNullsAreIllegalThenThrow<T>(value, ExceptionArgument.value);
-        try
+        // Constructs a UncheckedList with a given initial capacity. The list is
+        // initially empty, but will have room for the given number of elements
+        // before any reallocations are required.
+        // 
+        public UncheckedList(int capacity)
         {
-          this[index] = (T) value;
+            if (capacity == 0)
+                _items = _emptyArray;
+            else
+                _items = new T[capacity];
         }
-        catch (InvalidCastException ex)
+
+        // Constructs a UncheckedList, copying the contents of the given collection. The
+        // size and capacity of the new list will both be equal to the size of the
+        // given collection.
+        // 
+        public UncheckedList(IEnumerable<T> collection)
         {
-          // TODO ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof (T));
+            ICollection<T> c = collection as ICollection<T>;
+            if (c != null)
+            {
+                int count = c.Count;
+                if (count == 0)
+                {
+                    _items = _emptyArray;
+                }
+                else
+                {
+                    _items = new T[count];
+                    c.CopyTo(_items, 0);
+                    _size = count;
+                }
+            }
+            else
+            {
+                _size = 0;
+                _items = _emptyArray;
+                AddEnumerable(collection);
+            }
         }
-      }
-    }
 
-    /// <summary>Initializes a new instance of the <see cref="T:System.Collections.Generic.List`1" /> class that is empty and has the default initial capacity.</summary>
-    public UncheckedList()
-    {
-      this._items = UncheckedList<T>._emptyArray;
-    }
-
-    /// <summary>Initializes a new instance of the <see cref="T:System.Collections.Generic.List`1" /> class that is empty and has the specified initial capacity.</summary>
-    /// <param name="capacity">The number of elements that the new list can initially store.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="capacity" /> is less than 0. </exception>
-    public UncheckedList(int capacity)
-    {
-      //if (capacity < 0)
-        // TODO ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (capacity == 0)
-        this._items = UncheckedList<T>._emptyArray;
-      else
-        this._items = new T[capacity];
-    }
-
-    /// <summary>Initializes a new instance of the <see cref="T:System.Collections.Generic.List`1" /> class that contains elements copied from the specified collection and has sufficient capacity to accommodate the number of elements copied.</summary>
-    /// <param name="collection">The collection whose elements are copied to the new list.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="collection" /> is null.</exception>
-    public UncheckedList(IEnumerable<T> collection)
-    {
-      //if (collection == null)
-        // TODO ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
-      ICollection<T> objs = collection as ICollection<T>;
-      if (objs != null)
-      {
-        int count = objs.Count;
-        if (count == 0)
+        // Gets and sets the capacity of this list.  The capacity is the size of
+        // the internal array used to hold items.  When set, the internal 
+        // array of the list is reallocated to the given capacity.
+        // 
+        public int Capacity
         {
-          this._items = UncheckedList<T>._emptyArray;
+            get
+            {
+                return _items.Length;
+            }
+            set
+            {
+                if (value != _items.Length)
+                {
+                    if (value > 0)
+                    {
+                        T[] newItems = new T[value];
+                        if (_size > 0)
+                        {
+                            Array.Copy(_items, 0, newItems, 0, _size);
+                        }
+                        _items = newItems;
+                    }
+                    else
+                    {
+                        _items = _emptyArray;
+                    }
+                }
+            }
         }
-        else
+
+        // Read-only property describing how many elements are in the UncheckedList.
+        public int Count
         {
-          this._items = new T[count];
-          objs.CopyTo(this._items, 0);
-          this._size = count;
+            get
+            {
+                return _size;
+            }
         }
-      }
-      else
-      {
-        this._size = 0;
-        this._items = UncheckedList<T>._emptyArray;
-        foreach (T obj in collection)
-          this.Add(obj);
-      }
-    }
 
-    private static bool IsCompatibleObject(object value)
-    {
-      if (value is T)
-        return true;
-      if (value == null)
-        return (object) default (T) == null;
-      return false;
-    }
-
-    /// <summary>Adds an object to the end of the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <param name="item">The object to be added to the end of the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    public void Add(T item)
-    {
-      if (this._size == this._items.Length)
-        this.EnsureCapacity(this._size + 1);
-      T[] items = this._items;
-      int size = this._size;
-      this._size = size + 1;
-      int index = size;
-      T obj = item;
-      items[index] = obj;
-      this._version = this._version + 1;
-    }
-
-    int IList.Add(object item)
-    {
-      //ThrowHelper.IfNullAndNullsAreIllegalThenThrow<T>(item, ExceptionArgument.item);
-      try
-      {
-        this.Add((T) item);
-      }
-      catch (InvalidCastException ex)
-      {
-        //ThrowHelper.ThrowWrongValueTypeArgumentException(item, typeof (T));
-      }
-      return this.Count - 1;
-    }
-
-    /// <summary>Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <param name="collection">The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1" />. The collection itself cannot be null, but it can contain elements that are null, if type <paramref name="T" /> is a reference type.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="collection" /> is null.</exception>
-    public void AddRange(IEnumerable<T> collection)
-    {
-      this.InsertRange(this._size, collection);
-    }
-
-    /// <summary>Returns a read-only <see cref="T:System.Collections.Generic.IList`1" /> wrapper for the current collection.</summary>
-    /// <returns>A <see cref="T:System.Collections.ObjectModel.ReadOnlyCollection`1" /> that acts as a read-only wrapper around the current <see cref="T:System.Collections.Generic.List`1" />.</returns>
-    public ReadOnlyCollection<T> AsReadOnly()
-    {
-      return new ReadOnlyCollection<T>((IList<T>) this);
-    }
-
-    /// <summary>Searches a range of elements in the sorted <see cref="T:System.Collections.Generic.List`1" /> for an element using the specified comparer and returns the zero-based index of the element.</summary>
-    /// <returns>The zero-based index of <paramref name="item" /> in the sorted <see cref="T:System.Collections.Generic.List`1" />, if <paramref name="item" /> is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="item" /> or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.Generic.UncheckedList`1.Count" />.</returns>
-    /// <param name="index">The zero-based starting index of the range to search.</param>
-    /// <param name="count">The length of the range to search.</param>
-    /// <param name="item">The object to locate. The value can be null for reference types.</param>
-    /// <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1" /> implementation to use when comparing elements, or null to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" />.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="count" /> is less than 0. </exception>
-    /// <exception cref="T:System.ArgumentException">
-    /// <paramref name="index" /> and <paramref name="count" /> do not denote a valid range in the <see cref="T:System.Collections.Generic.List`1" />.</exception>
-    /// <exception cref="T:System.InvalidOperationException">
-    /// <paramref name="comparer" /> is null, and the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" /> cannot find an implementation of the <see cref="T:System.IComparable`1" /> generic interface or the <see cref="T:System.IComparable" /> interface for type <paramref name="T" />.</exception>
-    public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
-    {
-      /*if (index < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (count < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (this._size - index < count)
-        ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);*/
-      return Array.BinarySearch<T>(this._items, index, count, item, comparer);
-    }
-
-    /// <summary>Searches the entire sorted <see cref="T:System.Collections.Generic.List`1" /> for an element using the default comparer and returns the zero-based index of the element.</summary>
-    /// <returns>The zero-based index of <paramref name="item" /> in the sorted <see cref="T:System.Collections.Generic.List`1" />, if <paramref name="item" /> is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="item" /> or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.Generic.UncheckedList`1.Count" />.</returns>
-    /// <param name="item">The object to locate. The value can be null for reference types.</param>
-    /// <exception cref="T:System.InvalidOperationException">The default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" /> cannot find an implementation of the <see cref="T:System.IComparable`1" /> generic interface or the <see cref="T:System.IComparable" /> interface for type <paramref name="T" />.</exception>
-    public int BinarySearch(T item)
-    {
-      return this.BinarySearch(0, this.Count, item, (IComparer<T>) null);
-    }
-
-    /// <summary>Searches the entire sorted <see cref="T:System.Collections.Generic.List`1" /> for an element using the specified comparer and returns the zero-based index of the element.</summary>
-    /// <returns>The zero-based index of <paramref name="item" /> in the sorted <see cref="T:System.Collections.Generic.List`1" />, if <paramref name="item" /> is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="item" /> or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.Generic.UncheckedList`1.Count" />.</returns>
-    /// <param name="item">The object to locate. The value can be null for reference types.</param>
-    /// <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1" /> implementation to use when comparing elements.-or-null to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" />.</param>
-    /// <exception cref="T:System.InvalidOperationException">
-    /// <paramref name="comparer" /> is null, and the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" /> cannot find an implementation of the <see cref="T:System.IComparable`1" /> generic interface or the <see cref="T:System.IComparable" /> interface for type <paramref name="T" />.</exception>
-    public int BinarySearch(T item, IComparer<T> comparer)
-    {
-      return this.BinarySearch(0, this.Count, item, comparer);
-    }
-
-    /// <summary>Removes all elements from the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    public void Clear()
-    {
-      if (this._size > 0)
-      {
-        Array.Clear((Array) this._items, 0, this._size);
-        this._size = 0;
-      }
-      this._version = this._version + 1;
-    }
-
-    /// <summary>Determines whether an element is in the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>true if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.List`1" />; otherwise, false.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    public bool Contains(T item)
-    {
-      if ((object) item == null)
-      {
-        for (int index = 0; index < this._size; ++index)
+        bool System.Collections.IList.IsFixedSize
         {
-          if ((object) this._items[index] == null)
+            get { return false; }
+        }
+
+
+        // Is this UncheckedList read-only?
+        bool ICollection<T>.IsReadOnly
+        {
+            get { return false; }
+        }
+
+        bool System.Collections.IList.IsReadOnly
+        {
+            get { return false; }
+        }
+
+        // Is this UncheckedList synchronized (thread-safe)?
+        bool System.Collections.ICollection.IsSynchronized
+        {
+            get { return false; }
+        }
+
+        // Synchronization root for this object.
+        Object System.Collections.ICollection.SyncRoot
+        {
+            get
+            {
+                if (_syncRoot == null)
+                {
+                    System.Threading.Interlocked.CompareExchange<Object>(ref _syncRoot, new Object(), null);
+                }
+                return _syncRoot;
+            }
+        }
+        // Sets or Gets the element at the given index.
+        // 
+        public T this[int index]
+        {
+            get
+            {
+                return _items[index];
+            }
+
+            set
+            {
+                _items[index] = value;
+                _version++;
+            }
+        }
+
+        private static bool IsCompatibleObject(object value)
+        {
+            // Non-null values are fine.  Only accept nulls if T is a class or Nullable<U>.
+            // Note that default(T) is not equal to null for value types except when T is Nullable<U>. 
+            return ((value is T) || (value == null && default(T) == null));
+        }
+
+        Object System.Collections.IList.this[int index]
+        {
+            get
+            {
+                return this[index];
+            }
+            set
+            {
+                try
+                {
+                    this[index] = (T)value;
+                }
+                catch (InvalidCastException)
+                {
+                }
+            }
+        }
+
+        // Adds the given object to the end of this list. The size of the list is
+        // increased by one. If required, the capacity of the list is doubled
+        // before adding the new element.
+        public void Add(T item)
+        {
+            var array = _items;
+            var size = _size;
+            _version++;
+            if ((uint)size < (uint)array.Length)
+            {
+                _size = size + 1;
+                array[size] = item;
+            }
+            else
+            {
+                AddWithResize(item);
+            }
+        }
+
+        // Non-inline from UncheckedList.Add to improve its code quality as uncommon path
+        private void AddWithResize(T item)
+        {
+            var size = _size;
+            EnsureCapacity(size + 1);
+            _size = size + 1;
+            _items[size] = item;
+        }
+
+        int System.Collections.IList.Add(Object item)
+        {
+            try
+            {
+                Add((T)item);
+            }
+            catch (InvalidCastException)
+            {
+            }
+
+            return Count - 1;
+        }
+
+
+        // Adds the elements of the given collection to the end of this list. If
+        // required, the capacity of the list is increased to twice the previous
+        // capacity or the new size, whichever is larger.
+        //
+        public void AddRange(IEnumerable<T> collection)
+        {
+            InsertRange(_size, collection);
+        }
+
+        public ReadOnlyCollection<T> AsReadOnly()
+        {
+            return new ReadOnlyCollection<T>(this);
+        }
+
+        // Searches a section of the list for a given element using a binary search
+        // algorithm. Elements of the list are compared to the search value using
+        // the given IComparer interface. If comparer is null, elements of
+        // the list are compared to the search value using the IComparable
+        // interface, which in that case must be implemented by all elements of the
+        // list and the given search value. This method assumes that the given
+        // section of the list is already sorted; if this is not the case, the
+        // result will be incorrect.
+        //
+        // The method returns the index of the given value in the list. If the
+        // list does not contain the given value, the method returns a negative
+        // integer. The bitwise complement operator (~) can be applied to a
+        // negative result to produce the index of the first element (if any) that
+        // is larger than the given search value. This is also the index at which
+        // the search value should be inserted into the list in order for the list
+        // to remain sorted.
+        // 
+        // The method uses the Array.BinarySearch method to perform the
+        // search.
+        // 
+        public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
+        {
+            if (index < 0) return -1;
+            return Array.BinarySearch<T>(_items, index, count, item, comparer);
+        }
+
+        public int BinarySearch(T item)
+        {
+            return BinarySearch(0, Count, item, null);
+        }
+
+        public int BinarySearch(T item, IComparer<T> comparer)
+        {
+            return BinarySearch(0, Count, item, comparer);
+        }
+
+
+        // Clears the contents of UncheckedList.
+        public void Clear()
+        {
+            if (!typeof(T).IsValueType)
+            {
+                int size = _size;
+                _size = 0;
+                _version++;
+                if (size > 0)
+                {
+                    Array.Clear(_items, 0, size); // Clear the elements so that the gc can reclaim the references.
+                }
+            }
+            else
+            {
+                _size = 0;
+                _version++;
+            }
+        }
+
+        // Contains returns true if the specified element is in the UncheckedList.
+        // It does a linear, O(n) search.  Equality is determined by calling
+        // EqualityComparer<T>.Default.Equals().
+
+        public bool Contains(T item)
+        {
+            // PERF: IndexOf calls Array.IndexOf, which internally
+            // calls EqualityComparer<T>.Default.IndexOf, which
+            // is specialized for different types. This
+            // boosts performance since instead of making a
+            // virtual method call each iteration of the loop,
+            // via EqualityComparer<T>.Default.Equals, we
+            // only make one virtual call to EqualityComparer.IndexOf.
+
+            return _size != 0 && IndexOf(item) != -1;
+        }
+
+        bool System.Collections.IList.Contains(Object item)
+        {
+            if (IsCompatibleObject(item))
+            {
+                return Contains((T)item);
+            }
+            return false;
+        }
+
+        public UncheckedList<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter)
+        {
+            UncheckedList<TOutput> list = new UncheckedList<TOutput>(_size);
+            for (int i = 0; i < _size; i++)
+            {
+                list._items[i] = converter(_items[i]);
+            }
+            list._size = _size;
+            return list;
+        }
+
+        // Copies this UncheckedList into array, which must be of a 
+        // compatible array type.  
+        //
+        public void CopyTo(T[] array)
+        {
+            CopyTo(array, 0);
+        }
+
+        // Copies this UncheckedList into array, which must be of a 
+        // compatible array type.  
+        //
+        void System.Collections.ICollection.CopyTo(Array array, int arrayIndex)
+        {
+            try
+            {
+                // Array.Copy will check for NULL.
+                Array.Copy(_items, 0, array, arrayIndex, _size);
+            }
+            catch (ArrayTypeMismatchException)
+            {
+            }
+        }
+
+        // Copies a section of this list to the given array at the given index.
+        // 
+        // The method uses the Array.Copy method to copy the elements.
+        // 
+        public void CopyTo(int index, T[] array, int arrayIndex, int count)
+        {
+            // Delegate rest of error checking to Array.Copy.
+            Array.Copy(_items, index, array, arrayIndex, count);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            // Delegate rest of error checking to Array.Copy.
+            Array.Copy(_items, 0, array, arrayIndex, _size);
+        }
+
+        // Ensures that the capacity of this list is at least the given minimum
+        // value. If the current capacity of the list is less than min, the
+        // capacity is increased to twice the current capacity or to min,
+        // whichever is larger.
+        private void EnsureCapacity(int min)
+        {
+            if (_items.Length < min)
+            {
+                int newCapacity = _items.Length == 0 ? _defaultCapacity : _items.Length * 2;
+                // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
+                // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
+                if ((uint) newCapacity > Int32.MaxValue) newCapacity = Int32.MaxValue;
+                if (newCapacity < min) newCapacity = min;
+                Capacity = newCapacity;
+            }
+        }
+
+        public bool Exists(Predicate<T> match)
+        {
+            return FindIndex(match) != -1;
+        }
+
+        public T Find(Predicate<T> match)
+        {
+            for (int i = 0; i < _size; i++)
+            {
+                if (match(_items[i]))
+                {
+                    return _items[i];
+                }
+            }
+            return default(T);
+        }
+
+        public UncheckedList<T> FindAll(Predicate<T> match)
+        {
+            UncheckedList<T> list = new UncheckedList<T>();
+            for (int i = 0; i < _size; i++)
+            {
+                if (match(_items[i]))
+                {
+                    list.Add(_items[i]);
+                }
+            }
+            return list;
+        }
+
+        public int FindIndex(Predicate<T> match)
+        {
+            return FindIndex(0, _size, match);
+        }
+
+        public int FindIndex(int startIndex, Predicate<T> match)
+        {
+            return FindIndex(startIndex, _size - startIndex, match);
+        }
+
+        public int FindIndex(int startIndex, int count, Predicate<T> match)
+        {
+            int endIndex = startIndex + count;
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                if (match(_items[i])) return i;
+            }
+            return -1;
+        }
+
+        public T FindLast(Predicate<T> match)
+        {
+            for (int i = _size - 1; i >= 0; i--)
+            {
+                if (match(_items[i]))
+                {
+                    return _items[i];
+                }
+            }
+            return default(T);
+        }
+
+        public int FindLastIndex(Predicate<T> match)
+        {
+            return FindLastIndex(_size - 1, _size, match);
+        }
+
+        public int FindLastIndex(int startIndex, Predicate<T> match)
+        {
+            return FindLastIndex(startIndex, startIndex + 1, match);
+        }
+
+        public int FindLastIndex(int startIndex, int count, Predicate<T> match)
+        {
+            int endIndex = startIndex - count;
+            for (int i = startIndex; i > endIndex; i--)
+            {
+                if (match(_items[i]))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public void ForEach(Action<T> action)
+        {
+            int version = _version;
+
+            for (int i = 0; i < _size; i++)
+            {
+                if (version != _version)
+                {
+                    break;
+                }
+                action(_items[i]);
+            }
+        }
+
+        // Returns an enumerator for this list with the given
+        // permission for removal of elements. If modifications made to the list 
+        // while an enumeration is in progress, the MoveNext and 
+        // GetObject methods of the enumerator will throw an exception.
+        //
+        public Enumerator GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        public UncheckedList<T> GetRange(int index, int count)
+        {
+            UncheckedList<T> list = new UncheckedList<T>(count);
+            Array.Copy(_items, index, list._items, 0, count);
+            list._size = count;
+            return list;
+        }
+
+
+        // Returns the index of the first occurrence of a given value in a range of
+        // this list. The list is searched forwards from beginning to end.
+        // The elements of the list are compared to the given value using the
+        // Object.Equals method.
+        // 
+        // This method uses the Array.IndexOf method to perform the
+        // search.
+        // 
+        public int IndexOf(T item)
+        {
+            return Array.IndexOf(_items, item, 0, _size);
+        }
+
+        int System.Collections.IList.IndexOf(Object item)
+        {
+            if (IsCompatibleObject(item))
+            {
+                return IndexOf((T)item);
+            }
+            return -1;
+        }
+
+        // Returns the index of the first occurrence of a given value in a range of
+        // this list. The list is searched forwards, starting at index
+        // index and ending at count number of elements. The
+        // elements of the list are compared to the given value using the
+        // Object.Equals method.
+        // 
+        // This method uses the Array.IndexOf method to perform the
+        // search.
+        // 
+        public int IndexOf(T item, int index)
+        {
+            return Array.IndexOf(_items, item, index, _size - index);
+        }
+
+        // Returns the index of the first occurrence of a given value in a range of
+        // this list. The list is searched forwards, starting at index
+        // index and upto count number of elements. The
+        // elements of the list are compared to the given value using the
+        // Object.Equals method.
+        // 
+        // This method uses the Array.IndexOf method to perform the
+        // search.
+        // 
+        public int IndexOf(T item, int index, int count)
+        {
+            return Array.IndexOf(_items, item, index, count);
+        }
+
+        // Inserts an element into this list at a given index. The size of the list
+        // is increased by one. If required, the capacity of the list is doubled
+        // before inserting the new element.
+        // 
+        public void Insert(int index, T item)
+        {
+            if (_size == _items.Length) EnsureCapacity(_size + 1);
+            if (index < _size)
+            {
+                Array.Copy(_items, index, _items, index + 1, _size - index);
+            }
+            _items[index] = item;
+            _size++;
+            _version++;
+        }
+
+        void System.Collections.IList.Insert(int index, Object item)
+        {
+            try
+            {
+                Insert(index, (T)item);
+            }
+            catch (InvalidCastException)
+            {
+            }
+        }
+
+        // Inserts the elements of the given collection at a given index. If
+        // required, the capacity of the list is increased to twice the previous
+        // capacity or the new size, whichever is larger.  Ranges may be added
+        // to the end of the list by setting index to the UncheckedList's size.
+        //
+        public void InsertRange(int index, IEnumerable<T> collection)
+        {
+            ICollection<T> c = collection as ICollection<T>;
+            if (c != null)
+            {    // if collection is ICollection<T>
+                int count = c.Count;
+                if (count > 0)
+                {
+                    EnsureCapacity(_size + count);
+                    if (index < _size)
+                    {
+                        Array.Copy(_items, index, _items, index + count, _size - index);
+                    }
+
+                    // If we're inserting a UncheckedList into itself, we want to be able to deal with that.
+                    if (this == c)
+                    {
+                        // Copy first part of _items to insert location
+                        Array.Copy(_items, 0, _items, index, index);
+                        // Copy last part of _items back to inserted location
+                        Array.Copy(_items, index + count, _items, index * 2, _size - index);
+                    }
+                    else
+                    {
+                        c.CopyTo(_items, index);
+                    }
+                    _size += count;
+                }
+            }
+            else if (index < _size)
+            {
+                // We're inserting a lazy enumerable. Call Insert on each of the constituent items.
+                using (IEnumerator<T> en = collection.GetEnumerator())
+                {
+                    while (en.MoveNext())
+                    {
+                        Insert(index++, en.Current);
+                    }
+                }
+            }
+            else
+            {
+                // We're adding a lazy enumerable because the index is at the end of this list.
+                AddEnumerable(collection);
+            }
+            _version++;
+        }
+
+        // Returns the index of the last occurrence of a given value in a range of
+        // this list. The list is searched backwards, starting at the end 
+        // and ending at the first element in the list. The elements of the list 
+        // are compared to the given value using the Object.Equals method.
+        // 
+        // This method uses the Array.LastIndexOf method to perform the
+        // search.
+        // 
+        public int LastIndexOf(T item)
+        {
+            if (_size == 0)
+            {  // Special case for empty list
+                return -1;
+            }
+            else
+            {
+                return LastIndexOf(item, _size - 1, _size);
+            }
+        }
+
+        // Returns the index of the last occurrence of a given value in a range of
+        // this list. The list is searched backwards, starting at index
+        // index and ending at the first element in the list. The 
+        // elements of the list are compared to the given value using the 
+        // Object.Equals method.
+        // 
+        // This method uses the Array.LastIndexOf method to perform the
+        // search.
+        // 
+        public int LastIndexOf(T item, int index)
+        {
+            return LastIndexOf(item, index, index + 1);
+        }
+
+        // Returns the index of the last occurrence of a given value in a range of
+        // this list. The list is searched backwards, starting at index
+        // index and upto count elements. The elements of
+        // the list are compared to the given value using the Object.Equals
+        // method.
+        // 
+        // This method uses the Array.LastIndexOf method to perform the
+        // search.
+        // 
+        public int LastIndexOf(T item, int index, int count)
+        {
+            if (_size == 0)
+            {  // Special case for empty list
+                return -1;
+            }
+
+            return Array.LastIndexOf(_items, item, index, count);
+        }
+
+        // Removes the element at the given index. The size of the list is
+        // decreased by one.
+        // 
+        public bool Remove(T item)
+        {
+            int index = IndexOf(item);
+            if (index >= 0)
+            {
+                RemoveAt(index);
+                return true;
+            }
+
+            return false;
+        }
+
+        void System.Collections.IList.Remove(Object item)
+        {
+            if (IsCompatibleObject(item))
+            {
+                Remove((T)item);
+            }
+        }
+
+        // This method removes all items which matches the predicate.
+        // The complexity is O(n).   
+        public int RemoveAll(Predicate<T> match)
+        {
+            int freeIndex = 0;   // the first free slot in items array
+
+            // Find the first item which needs to be removed.
+            while (freeIndex < _size && !match(_items[freeIndex])) freeIndex++;
+            if (freeIndex >= _size) return 0;
+
+            int current = freeIndex + 1;
+            while (current < _size)
+            {
+                // Find the first item which needs to be kept.
+                while (current < _size && match(_items[current])) current++;
+
+                if (current < _size)
+                {
+                    // copy item to the free slot.
+                    _items[freeIndex++] = _items[current++];
+                }
+            }
+
+            if (!typeof(T).IsValueType)
+            {
+                Array.Clear(_items, freeIndex, _size - freeIndex); // Clear the elements so that the gc can reclaim the references.
+            }
+
+            int result = _size - freeIndex;
+            _size = freeIndex;
+            _version++;
+            return result;
+        }
+
+        // Removes the element at the given index. The size of the list is
+        // decreased by one.
+        // 
+        public void RemoveAt(int index)
+        {
+            _size--;
+            if (index < _size)
+            {
+                Array.Copy(_items, index + 1, _items, index, _size - index);
+            }
+            if (!typeof(T).IsValueType)
+            {
+                _items[_size] = default(T);
+            }
+            _version++;
+        }
+
+        // Removes a range of elements from this list.
+        // 
+        public void RemoveRange(int index, int count)
+        {
+            if (count > 0)
+            {
+                int i = _size;
+                _size -= count;
+                if (index < _size)
+                {
+                    Array.Copy(_items, index + count, _items, index, _size - index);
+                }
+
+                _version++;
+                if (!typeof(T).IsValueType)
+                {
+                    Array.Clear(_items, _size, count);
+                }
+            }
+        }
+
+        // Reverses the elements in this list.
+        public void Reverse()
+        {
+            Reverse(0, Count);
+        }
+
+        // Reverses the elements in a range of this list. Following a call to this
+        // method, an element in the range given by index and count
+        // which was previously located at index i will now be located at
+        // index index + (index + count - i - 1).
+        // 
+        public void Reverse(int index, int count)
+        {
+            if (count > 1)
+            {
+                Array.Reverse(_items, index, count);
+            }
+            _version++;
+        }
+
+        // Sorts the elements in this list.  Uses the default comparer and 
+        // Array.Sort.
+        public void Sort()
+        {
+            Sort(0, Count, null);
+        }
+
+        // Sorts the elements in this list.  Uses Array.Sort with the
+        // provided comparer.
+        public void Sort(IComparer<T> comparer)
+        {
+            Sort(0, Count, comparer);
+        }
+
+        // Sorts the elements in a section of this list. The sort compares the
+        // elements to each other using the given IComparer interface. If
+        // comparer is null, the elements are compared to each other using
+        // the IComparable interface, which in that case must be implemented by all
+        // elements of the list.
+        // 
+        // This method uses the Array.Sort method to sort the elements.
+        // 
+        public void Sort(int index, int count, IComparer<T> comparer)
+        {
+            if (count > 1)
+            {
+                Array.Sort<T>(_items, index, count, comparer);
+            }
+            _version++;
+        }
+
+        public void Sort(Comparison<T> comparison)
+        {
+            throw new NotImplementedException();
+            /*if (_size > 1)
+            {
+                ArraySortHelper<T>.Sort(_items, 0, _size, comparison);
+            }
+            _version++;*/
+        }
+
+        // ToArray returns an array containing the contents of the UncheckedList.
+        // This requires copying the UncheckedList, which is an O(n) operation.
+        public T[] ToArray()
+        {
+            if (_size == 0)
+            {
+                return _emptyArray;
+            }
+
+            T[] array = new T[_size];
+            Array.Copy(_items, 0, array, 0, _size);
+            return array;
+        }
+
+        // Sets the capacity of this list to the size of the list. This method can
+        // be used to minimize a list's memory overhead once it is known that no
+        // new elements will be added to the list. To completely clear a list and
+        // release all memory referenced by the list, execute the following
+        // statements:
+        // 
+        // list.Clear();
+        // list.TrimExcess();
+        // 
+        public void TrimExcess()
+        {
+            int threshold = (int)(((double)_items.Length) * 0.9);
+            if (_size < threshold)
+            {
+                Capacity = _size;
+            }
+        }
+
+        public bool TrueForAll(Predicate<T> match)
+        {
+            for (int i = 0; i < _size; i++)
+            {
+                if (!match(_items[i]))
+                {
+                    return false;
+                }
+            }
             return true;
         }
-        return false;
-      }
-      EqualityComparer<T> equalityComparer = EqualityComparer<T>.Default;
-      for (int index = 0; index < this._size; ++index)
-      {
-        if (equalityComparer.Equals(this._items[index], item))
-          return true;
-      }
-      return false;
-    }
 
-    bool IList.Contains(object item)
-    {
-      if (UncheckedList<T>.IsCompatibleObject(item))
-        return this.Contains((T) item);
-      return false;
-    }
-
-    /// <summary>Converts the elements in the current <see cref="T:System.Collections.Generic.List`1" /> to another type, and returns a UncheckedList containing the converted elements.</summary>
-    /// <returns>A <see cref="T:System.Collections.Generic.List`1" /> of the target type containing the converted elements from the current <see cref="T:System.Collections.Generic.UncheckedList`1" />.</returns>
-    /// <param name="converter">A <see cref="T:System.Converter`2" /> delegate that converts each element from one type to another type.</param>
-    /// <typeparam name="TOutput">The type of the elements of the target array.</typeparam>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="converter" /> is null.</exception>
-    public UncheckedList<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter)
-    {
-      /*if (converter == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.converter);*/
-      UncheckedList<TOutput> outputList = new UncheckedList<TOutput>(this._size);
-      for (int index = 0; index < this._size; ++index)
-        outputList._items[index] = converter(this._items[index]);
-      outputList._size = this._size;
-      return outputList;
-    }
-
-    /// <summary>Copies the entire <see cref="T:System.Collections.Generic.List`1" /> to a compatible one-dimensional array, starting at the beginning of the target array.</summary>
-    /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.List`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="array" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.List`1" /> is greater than the number of elements that the destination <paramref name="array" /> can contain.</exception>
-    public void CopyTo(T[] array)
-    {
-      this.CopyTo(array, 0);
-    }
-
-    void ICollection.CopyTo(Array array, int arrayIndex)
-    {
-      /*if (array != null && array.Rank != 1)
-        ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);*/
-      try
-      {
-        Array.Copy((Array) this._items, 0, array, arrayIndex, this._size);
-      }
-      catch (ArrayTypeMismatchException ex)
-      {
-        //ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidArrayType);
-      }
-    }
-
-    /// <summary>Copies a range of elements from the <see cref="T:System.Collections.Generic.List`1" /> to a compatible one-dimensional array, starting at the specified index of the target array.</summary>
-    /// <param name="index">The zero-based index in the source <see cref="T:System.Collections.Generic.List`1" /> at which copying begins.</param>
-    /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.List`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
-    /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-    /// <param name="count">The number of elements to copy.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="array" /> is null. </exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="arrayIndex" /> is less than 0.-or-<paramref name="count" /> is less than 0. </exception>
-    /// <exception cref="T:System.ArgumentException">
-    /// <paramref name="index" /> is equal to or greater than the <see cref="P:System.Collections.Generic.List`1.Count" /> of the source <see cref="T:System.Collections.Generic.UncheckedList`1" />.-or-The number of elements from <paramref name="index" /> to the end of the source <see cref="T:System.Collections.Generic.UncheckedList`1" /> is greater than the available space from <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />. </exception>
-    public void CopyTo(int index, T[] array, int arrayIndex, int count)
-    {
-      /*if (this._size - index < count)
-        ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);*/
-      Array.Copy((Array) this._items, index, (Array) array, arrayIndex, count);
-    }
-
-    /// <summary>Copies the entire <see cref="T:System.Collections.Generic.List`1" /> to a compatible one-dimensional array, starting at the specified index of the target array.</summary>
-    /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.List`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
-    /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="array" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="arrayIndex" /> is less than 0.</exception>
-    /// <exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.List`1" /> is greater than the available space from <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />.</exception>
-    public void CopyTo(T[] array, int arrayIndex)
-    {
-      Array.Copy((Array) this._items, 0, (Array) array, arrayIndex, this._size);
-    }
-
-    private void EnsureCapacity(int min)
-    {
-      if (this._items.Length >= min)
-        return;
-      int num = this._items.Length == 0 ? 4 : this._items.Length * 2;
-      if ((uint) num > 2146435071U)
-        num = 2146435071;
-      if (num < min)
-        num = min;
-      this.Capacity = num;
-    }
-
-    /// <summary>Determines whether the <see cref="T:System.Collections.Generic.List`1" /> contains elements that match the conditions defined by the specified predicate.</summary>
-    /// <returns>true if the <see cref="T:System.Collections.Generic.List`1" /> contains one or more elements that match the conditions defined by the specified predicate; otherwise, false.</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the elements to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public bool Exists(Predicate<T> match)
-    {
-      return this.FindIndex(match) != -1;
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the first occurrence within the entire <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>The first element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <paramref name="T" />.</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public T Find(Predicate<T> match)
-    {
-      /*if (match == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      for (int index = 0; index < this._size; ++index)
-      {
-        if (match(this._items[index]))
-          return this._items[index];
-      }
-      return default (T);
-    }
-
-    /// <summary>Retrieves all the elements that match the conditions defined by the specified predicate.</summary>
-    /// <returns>A <see cref="T:System.Collections.Generic.List`1" /> containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty <see cref="T:System.Collections.Generic.UncheckedList`1" />.</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the elements to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public UncheckedList<T> FindAll(Predicate<T> match)
-    {
-      /*if (match == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      UncheckedList<T> objList = new UncheckedList<T>();
-      for (int index = 0; index < this._size; ++index)
-      {
-        if (match(this._items[index]))
-          objList.Add(this._items[index]);
-      }
-      return objList;
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the first occurrence within the entire <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="match" />, if found; otherwise, –1.</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public int FindIndex(Predicate<T> match)
-    {
-      return this.FindIndex(0, this._size, match);
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the first occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that extends from the specified index to the last element.</summary>
-    /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="match" />, if found; otherwise, –1.</returns>
-    /// <param name="startIndex">The zero-based starting index of the search.</param>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="startIndex" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />.</exception>
-    public int FindIndex(int startIndex, Predicate<T> match)
-    {
-      return this.FindIndex(startIndex, this._size - startIndex, match);
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the first occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that starts at the specified index and contains the specified number of elements.</summary>
-    /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="match" />, if found; otherwise, –1.</returns>
-    /// <param name="startIndex">The zero-based starting index of the search.</param>
-    /// <param name="count">The number of elements in the section to search.</param>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="startIndex" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />.-or-<paramref name="count" /> is less than 0.-or-<paramref name="startIndex" /> and <paramref name="count" /> do not specify a valid section in the <see cref="T:System.Collections.Generic.UncheckedList`1" />.</exception>
-    public int FindIndex(int startIndex, int count, Predicate<T> match)
-    {
-      /*if ((uint) startIndex > (uint) this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.startIndex, ExceptionResource.ArgumentOutOfRange_Index);
-      if (count < 0 || startIndex > this._size - count)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_Count);
-      if (match == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      int num = startIndex + count;
-      for (int index = startIndex; index < num; ++index)
-      {
-        if (match(this._items[index]))
-          return index;
-      }
-      return -1;
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the last occurrence within the entire <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>The last element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <paramref name="T" />.</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public T FindLast(Predicate<T> match)
-    {
-      /*if (match == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      for (int index = this._size - 1; index >= 0; --index)
-      {
-        if (match(this._items[index]))
-          return this._items[index];
-      }
-      return default (T);
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the last occurrence within the entire <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="match" />, if found; otherwise, –1.</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public int FindLastIndex(Predicate<T> match)
-    {
-      return this.FindLastIndex(this._size - 1, this._size, match);
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the last occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that extends from the first element to the specified index.</summary>
-    /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="match" />, if found; otherwise, –1.</returns>
-    /// <param name="startIndex">The zero-based starting index of the backward search.</param>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="startIndex" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />.</exception>
-    public int FindLastIndex(int startIndex, Predicate<T> match)
-    {
-      return this.FindLastIndex(startIndex, startIndex + 1, match);
-    }
-
-    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the last occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that contains the specified number of elements and ends at the specified index.</summary>
-    /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="match" />, if found; otherwise, –1.</returns>
-    /// <param name="startIndex">The zero-based starting index of the backward search.</param>
-    /// <param name="count">The number of elements in the section to search.</param>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the element to search for.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="startIndex" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />.-or-<paramref name="count" /> is less than 0.-or-<paramref name="startIndex" /> and <paramref name="count" /> do not specify a valid section in the <see cref="T:System.Collections.Generic.UncheckedList`1" />.</exception>
-    public int FindLastIndex(int startIndex, int count, Predicate<T> match)
-    {
-      /*if (match == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      if (this._size == 0)
-      {
-        /*if (startIndex != -1)
-          ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.startIndex, ExceptionResource.ArgumentOutOfRange_Index);*/
-      }
-      /*else if ((uint) startIndex >= (uint) this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.startIndex, ExceptionResource.ArgumentOutOfRange_Index);*/
-      /*if (count < 0 || startIndex - count + 1 < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_Count);*/
-      int num = startIndex - count;
-      for (int index = startIndex; index > num; --index)
-      {
-        if (match(this._items[index]))
-          return index;
-      }
-      return -1;
-    }
-
-    /// <summary>Performs the specified action on each element of the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <param name="action">The <see cref="T:System.Action`1" /> delegate to perform on each element of the <see cref="T:System.Collections.Generic.List`1" />.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="action" /> is null.</exception>
-    /// <exception cref="T:System.InvalidOperationException">An element in the collection has been modified. CautionThis exception is thrown starting with the .NET Framework 4.5. </exception>
-    public void ForEach(Action<T> action)
-    {
-      /*if (action == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      int version = this._version;
-      for (int index = 0; index < this._size && (version == this._version); ++index)
-        action(this._items[index]);
-      if (version == this._version)
-        return;
-      //ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_EnumFailedVersion);
-    }
-
-    /// <summary>Returns an enumerator that iterates through the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>A <see cref="T:System.Collections.Generic.List`1.Enumerator" /> for the <see cref="T:System.Collections.Generic.UncheckedList`1" />.</returns>
-    public UncheckedList<T>.Enumerator GetEnumerator()
-    {
-      return new UncheckedList<T>.Enumerator(this);
-    }
-
-    IEnumerator<T> IEnumerable<T>.GetEnumerator()
-    {
-      return (IEnumerator<T>) new UncheckedList<T>.Enumerator(this);
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      return (IEnumerator) new UncheckedList<T>.Enumerator(this);
-    }
-
-    /// <summary>Creates a shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>A shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.List`1" />.</returns>
-    /// <param name="index">The zero-based <see cref="T:System.Collections.Generic.List`1" /> index at which the range starts.</param>
-    /// <param name="count">The number of elements in the range.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="count" /> is less than 0.</exception>
-    /// <exception cref="T:System.ArgumentException">
-    /// <paramref name="index" /> and <paramref name="count" /> do not denote a valid range of elements in the <see cref="T:System.Collections.Generic.List`1" />.</exception>
-    public UncheckedList<T> GetRange(int index, int count)
-    {
-      /*if (index < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (count < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (this._size - index < count)
-        ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);*/
-      UncheckedList<T> objList = new UncheckedList<T>(count);
-      Array.Copy((Array) this._items, index, (Array) objList._items, 0, count);
-      objList._size = count;
-      return objList;
-    }
-
-    /// <summary>Searches for the specified object and returns the zero-based index of the first occurrence within the entire <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>The zero-based index of the first occurrence of <paramref name="item" /> within the entire <see cref="T:System.Collections.Generic.List`1" />, if found; otherwise, –1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    public int IndexOf(T item)
-    {
-      return Array.IndexOf<T>(this._items, item, 0, this._size);
-    }
-
-    int IList.IndexOf(object item)
-    {
-      if (UncheckedList<T>.IsCompatibleObject(item))
-        return this.IndexOf((T) item);
-      return -1;
-    }
-
-    /// <summary>Searches for the specified object and returns the zero-based index of the first occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that extends from the specified index to the last element.</summary>
-    /// <returns>The zero-based index of the first occurrence of <paramref name="item" /> within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that extends from <paramref name="index" /> to the last element, if found; otherwise, –1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    /// <param name="index">The zero-based starting index of the search. 0 (zero) is valid in an empty list.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />.</exception>
-    public int IndexOf(T item, int index)
-    {
-      /*if (index > this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_Index);*/
-      return Array.IndexOf<T>(this._items, item, index, this._size - index);
-    }
-
-    /// <summary>Searches for the specified object and returns the zero-based index of the first occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that starts at the specified index and contains the specified number of elements.</summary>
-    /// <returns>The zero-based index of the first occurrence of <paramref name="item" /> within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that starts at <paramref name="index" /> and contains <paramref name="count" /> number of elements, if found; otherwise, –1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    /// <param name="index">The zero-based starting index of the search. 0 (zero) is valid in an empty list.</param>
-    /// <param name="count">The number of elements in the section to search.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />.-or-<paramref name="count" /> is less than 0.-or-<paramref name="index" /> and <paramref name="count" /> do not specify a valid section in the <see cref="T:System.Collections.Generic.UncheckedList`1" />.</exception>
-    public int IndexOf(T item, int index, int count)
-    {
-      /*if (index > this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_Index);
-      if (count < 0 || index > this._size - count)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_Count);*/
-      return Array.IndexOf<T>(this._items, item, index, count);
-    }
-
-    /// <summary>Inserts an element into the <see cref="T:System.Collections.Generic.List`1" /> at the specified index.</summary>
-    /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
-    /// <param name="item">The object to insert. The value can be null for reference types.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="index" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.</exception>
-    public void Insert(int index, T item)
-    {
-      /*if ((uint) index > (uint) this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_ListInsert);*/
-      if (this._size == this._items.Length)
-        this.EnsureCapacity(this._size + 1);
-      if (index < this._size)
-        Array.Copy((Array) this._items, index, (Array) this._items, index + 1, this._size - index);
-      this._items[index] = item;
-      this._size = this._size + 1;
-      this._version = this._version + 1;
-    }
-
-    void IList.Insert(int index, object item)
-    {
-      //ThrowHelper.IfNullAndNullsAreIllegalThenThrow<T>(item, ExceptionArgument.item);
-      try
-      {
-        this.Insert(index, (T) item);
-      }
-      catch (InvalidCastException ex)
-      {
-        //ThrowHelper.ThrowWrongValueTypeArgumentException(item, typeof (T));
-      }
-    }
-
-    /// <summary>Inserts the elements of a collection into the <see cref="T:System.Collections.Generic.List`1" /> at the specified index.</summary>
-    /// <param name="index">The zero-based index at which the new elements should be inserted.</param>
-    /// <param name="collection">The collection whose elements should be inserted into the <see cref="T:System.Collections.Generic.List`1" />. The collection itself cannot be null, but it can contain elements that are null, if type <paramref name="T" /> is a reference type.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="collection" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="index" /> is greater than <see cref="P:System.Collections.Generic.List`1.Count" />.</exception>
-    public void InsertRange(int index, IEnumerable<T> collection)
-    {
-      /*if (collection == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
-      if ((uint) index > (uint) this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_Index);*/
-      ICollection<T> objs = collection as ICollection<T>;
-      if (objs != null)
-      {
-        int count = objs.Count;
-        if (count > 0)
+        private void AddEnumerable(IEnumerable<T> enumerable)
         {
-          this.EnsureCapacity(this._size + count);
-          if (index < this._size)
-            Array.Copy((Array) this._items, index, (Array) this._items, index + count, this._size - index);
-          if (this == objs)
-          {
-            Array.Copy((Array) this._items, 0, (Array) this._items, index, index);
-            Array.Copy((Array) this._items, index + count, (Array) this._items, index * 2, this._size - index);
-          }
-          else
-          {
-            T[] array = new T[count];
-            objs.CopyTo(array, 0);
-            array.CopyTo((Array) this._items, index);
-          }
-          this._size = this._size + count;
+            Debug.Assert(enumerable != null);
+            Debug.Assert(!(enumerable is ICollection<T>), "We should have optimized for this beforehand.");
+
+            using (IEnumerator<T> en = enumerable.GetEnumerator())
+            {
+                _version++; // Even if the enumerable has no items, we can update _version.
+
+                while (en.MoveNext())
+                {
+                    // Capture Current before doing anything else. If this throws
+                    // an exception, we want to make a clean break.
+                    T current = en.Current;
+
+                    if (_size == _items.Length)
+                    {
+                        EnsureCapacity(_size + 1);
+                    }
+
+                    _items[_size++] = current;
+                }
+            }
         }
-      }
-      else
-      {
-        foreach (T obj in collection)
-          this.Insert(index++, obj);
-      }
-      this._version = this._version + 1;
-    }
 
-    /// <summary>Searches for the specified object and returns the zero-based index of the last occurrence within the entire <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>The zero-based index of the last occurrence of <paramref name="item" /> within the entire the <see cref="T:System.Collections.Generic.List`1" />, if found; otherwise, –1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    public int LastIndexOf(T item)
-    {
-      if (this._size == 0)
-        return -1;
-      return this.LastIndexOf(item, this._size - 1, this._size);
-    }
-
-    /// <summary>Searches for the specified object and returns the zero-based index of the last occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that extends from the first element to the specified index.</summary>
-    /// <returns>The zero-based index of the last occurrence of <paramref name="item" /> within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that extends from the first element to <paramref name="index" />, if found; otherwise, –1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    /// <param name="index">The zero-based starting index of the backward search.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />. </exception>
-    public int LastIndexOf(T item, int index)
-    {
-      /*if (index >= this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_Index);*/
-      return this.LastIndexOf(item, index, index + 1);
-    }
-
-    /// <summary>Searches for the specified object and returns the zero-based index of the last occurrence within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that contains the specified number of elements and ends at the specified index.</summary>
-    /// <returns>The zero-based index of the last occurrence of <paramref name="item" /> within the range of elements in the <see cref="T:System.Collections.Generic.List`1" /> that contains <paramref name="count" /> number of elements and ends at <paramref name="index" />, if found; otherwise, –1.</returns>
-    /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    /// <param name="index">The zero-based starting index of the backward search.</param>
-    /// <param name="count">The number of elements in the section to search.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is outside the range of valid indexes for the <see cref="T:System.Collections.Generic.List`1" />.-or-<paramref name="count" /> is less than 0.-or-<paramref name="index" /> and <paramref name="count" /> do not specify a valid section in the <see cref="T:System.Collections.Generic.UncheckedList`1" />. </exception>
-    public int LastIndexOf(T item, int index, int count)
-    {
-      /*if (this.Count != 0 && index < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (this.Count != 0 && count < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);*/
-      if (this._size == 0)
-        return -1;
-      /*if (index >= this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_BiggerThanCollection);
-      if (count > index + 1)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_BiggerThanCollection);*/
-      return Array.LastIndexOf<T>(this._items, item, index, count);
-    }
-
-    /// <summary>Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <returns>true if <paramref name="item" /> is successfully removed; otherwise, false.  This method also returns false if <paramref name="item" /> was not found in the <see cref="T:System.Collections.Generic.List`1" />.</returns>
-    /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.</param>
-    public bool Remove(T item)
-    {
-      int index = this.IndexOf(item);
-      if (index < 0)
-        return false;
-      this.RemoveAt(index);
-      return true;
-    }
-
-    void IList.Remove(object item)
-    {
-      if (!UncheckedList<T>.IsCompatibleObject(item))
-        return;
-      this.Remove((T) item);
-    }
-
-    /// <summary>Removes all the elements that match the conditions defined by the specified predicate.</summary>
-    /// <returns>The number of elements removed from the <see cref="T:System.Collections.Generic.List`1" /> .</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions of the elements to remove.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public int RemoveAll(Predicate<T> match)
-    {
-      /*if (match == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      int index1 = 0;
-      while (index1 < this._size && !match(this._items[index1]))
-        ++index1;
-      if (index1 >= this._size)
-        return 0;
-      int index2 = index1 + 1;
-      while (index2 < this._size)
-      {
-        while (index2 < this._size && match(this._items[index2]))
-          ++index2;
-        if (index2 < this._size)
-          this._items[index1++] = this._items[index2++];
-      }
-      Array.Clear((Array) this._items, index1, this._size - index1);
-      int num = this._size - index1;
-      this._size = index1;
-      this._version = this._version + 1;
-      return num;
-    }
-
-    /// <summary>Removes the element at the specified index of the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <param name="index">The zero-based index of the element to remove.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="index" /> is equal to or greater than <see cref="P:System.Collections.Generic.List`1.Count" />.</exception>
-    public void RemoveAt(int index)
-    {
-      /*if ((uint) index >= (uint) this._size)
-        ThrowHelper.ThrowArgumentOutOfRangeException();*/
-      this._size = this._size - 1;
-      if (index < this._size)
-        Array.Copy((Array) this._items, index + 1, (Array) this._items, index, this._size - index);
-      this._items[this._size] = default (T);
-      this._version = this._version + 1;
-    }
-
-    /// <summary>Removes a range of elements from the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    /// <param name="index">The zero-based starting index of the range of elements to remove.</param>
-    /// <param name="count">The number of elements to remove.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="count" /> is less than 0.</exception>
-    /// <exception cref="T:System.ArgumentException">
-    /// <paramref name="index" /> and <paramref name="count" /> do not denote a valid range of elements in the <see cref="T:System.Collections.Generic.List`1" />.</exception>
-    public void RemoveRange(int index, int count)
-    {
-      /*if (index < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (count < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (this._size - index < count)
-        ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);*/
-      if (count <= 0)
-        return;
-      int size = this._size;
-      this._size = this._size - count;
-      if (index < this._size)
-        Array.Copy((Array) this._items, index + count, (Array) this._items, index, this._size - index);
-      Array.Clear((Array) this._items, this._size, count);
-      this._version = this._version + 1;
-    }
-
-    /// <summary>Reverses the order of the elements in the entire <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    public void Reverse()
-    {
-      this.Reverse(0, this.Count);
-    }
-
-    /// <summary>Reverses the order of the elements in the specified range.</summary>
-    /// <param name="index">The zero-based starting index of the range to reverse.</param>
-    /// <param name="count">The number of elements in the range to reverse.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="count" /> is less than 0. </exception>
-    /// <exception cref="T:System.ArgumentException">
-    /// <paramref name="index" /> and <paramref name="count" /> do not denote a valid range of elements in the <see cref="T:System.Collections.Generic.List`1" />. </exception>
-    public void Reverse(int index, int count)
-    {
-      /*if (index < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (count < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (this._size - index < count)
-        ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);*/
-      Array.Reverse((Array) this._items, index, count);
-      this._version = this._version + 1;
-    }
-
-    /// <summary>Sorts the elements in the entire <see cref="T:System.Collections.Generic.List`1" /> using the default comparer.</summary>
-    /// <exception cref="T:System.InvalidOperationException">The default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" /> cannot find an implementation of the <see cref="T:System.IComparable`1" /> generic interface or the <see cref="T:System.IComparable" /> interface for type <paramref name="T" />.</exception>
-    public void Sort()
-    {
-      this.Sort(0, this.Count, (IComparer<T>) null);
-    }
-
-    /// <summary>Sorts the elements in the entire <see cref="T:System.Collections.Generic.List`1" /> using the specified comparer.</summary>
-    /// <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1" /> implementation to use when comparing elements, or null to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" />.</param>
-    /// <exception cref="T:System.InvalidOperationException">
-    /// <paramref name="comparer" /> is null, and the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" /> cannot find implementation of the <see cref="T:System.IComparable`1" /> generic interface or the <see cref="T:System.IComparable" /> interface for type <paramref name="T" />.</exception>
-    /// <exception cref="T:System.ArgumentException">The implementation of <paramref name="comparer" /> caused an error during the sort. For example, <paramref name="comparer" /> might not return 0 when comparing an item with itself.</exception>
-    public void Sort(IComparer<T> comparer)
-    {
-      this.Sort(0, this.Count, comparer);
-    }
-
-    /// <summary>Sorts the elements in a range of elements in <see cref="T:System.Collections.Generic.List`1" /> using the specified comparer.</summary>
-    /// <param name="index">The zero-based starting index of the range to sort.</param>
-    /// <param name="count">The length of the range to sort.</param>
-    /// <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1" /> implementation to use when comparing elements, or null to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" />.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">
-    /// <paramref name="index" /> is less than 0.-or-<paramref name="count" /> is less than 0.</exception>
-    /// <exception cref="T:System.ArgumentException">
-    /// <paramref name="index" /> and <paramref name="count" /> do not specify a valid range in the <see cref="T:System.Collections.Generic.List`1" />.-or-The implementation of <paramref name="comparer" /> caused an error during the sort. For example, <paramref name="comparer" /> might not return 0 when comparing an item with itself.</exception>
-    /// <exception cref="T:System.InvalidOperationException">
-    /// <paramref name="comparer" /> is null, and the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default" /> cannot find implementation of the <see cref="T:System.IComparable`1" /> generic interface or the <see cref="T:System.IComparable" /> interface for type <paramref name="T" />.</exception>
-    public void Sort(int index, int count, IComparer<T> comparer)
-    {
-      /*if (index < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (count < 0)
-        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-      if (this._size - index < count)
-        ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);*/
-      Array.Sort<T>(this._items, index, count, comparer);
-      this._version = this._version + 1;
-    }
-
-    /// <summary>Sorts the elements in the entire <see cref="T:System.Collections.Generic.List`1" /> using the specified <see cref="T:System.Comparison`1" />.</summary>
-    /// <param name="comparison">The <see cref="T:System.Comparison`1" /> to use when comparing elements.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="comparison" /> is null.</exception>
-    /// <exception cref="T:System.ArgumentException">The implementation of <paramref name="comparison" /> caused an error during the sort. For example, <paramref name="comparison" /> might not return 0 when comparing an item with itself.</exception>
-    public void Sort(Comparison<T> comparison)
-    {
-      throw new NotImplementedException(); // TODO
-      /*if (comparison == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      /*if (this._size <= 0)
-        return;
-      Array.Sort<T>(this._items, 0, this._size, (IComparer<T>) new Array.FunctorComparer<T>(comparison));*/
-    }
-
-    /// <summary>Copies the elements of the <see cref="T:System.Collections.Generic.List`1" /> to a new array.</summary>
-    /// <returns>An array containing copies of the elements of the <see cref="T:System.Collections.Generic.List`1" />.</returns>
-    public T[] ToArray()
-    {
-      T[] objArray = new T[this._size];
-      Array.Copy((Array) this._items, 0, (Array) objArray, 0, this._size);
-      return objArray;
-    }
-
-    /// <summary>Sets the capacity to the actual number of elements in the <see cref="T:System.Collections.Generic.List`1" />, if that number is less than a threshold value.</summary>
-    public void TrimExcess()
-    {
-      if (this._size >= (int) ((double) this._items.Length * 0.9))
-        return;
-      this.Capacity = this._size;
-    }
-
-    /// <summary>Determines whether every element in the <see cref="T:System.Collections.Generic.List`1" /> matches the conditions defined by the specified predicate.</summary>
-    /// <returns>true if every element in the <see cref="T:System.Collections.Generic.List`1" /> matches the conditions defined by the specified predicate; otherwise, false. If the UncheckedList has no elements, the return value is true.</returns>
-    /// <param name="match">The <see cref="T:System.Predicate`1" /> delegate that defines the conditions to check against the elements.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="match" /> is null.</exception>
-    public bool TrueForAll(Predicate<T> match)
-    {
-      /*if (match == null)
-        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);*/
-      for (int index = 0; index < this._size; ++index)
-      {
-        if (!match(this._items[index]))
-          return false;
-      }
-      return true;
-    }
-
-    internal static IList<T> Synchronized(UncheckedList<T> list)
-    {
-      return (IList<T>) new UncheckedList<T>.SynchronizedList(list);
-    }
-
-    [Serializable]
-    internal class SynchronizedList : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable
-    {
-      private UncheckedList<T> _list;
-      private object _root;
-
-      public int Count
-      {
-        get
+        public struct Enumerator : IEnumerator<T>, System.Collections.IEnumerator
         {
-          lock (this._root)
-            return this._list.Count;
+            private UncheckedList<T> list;
+            private int index;
+            private int version;
+            private T current;
+
+            internal Enumerator(UncheckedList<T> list)
+            {
+                this.list = list;
+                index = 0;
+                version = list._version;
+                current = default(T);
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public bool MoveNext()
+            {
+                UncheckedList<T> localUncheckedList = list;
+
+                if (version == localUncheckedList._version && ((uint)index < (uint)localUncheckedList._size))
+                {
+                    current = localUncheckedList._items[index];
+                    index++;
+                    return true;
+                }
+                return MoveNextRare();
+            }
+
+            private bool MoveNextRare()
+            {
+                index = list._size + 1;
+                current = default(T);
+                return false;
+            }
+
+            public T Current
+            {
+                get
+                {
+                    return current;
+                }
+            }
+
+            Object System.Collections.IEnumerator.Current
+            {
+                get
+                {
+                    return Current;
+                }
+            }
+
+            void System.Collections.IEnumerator.Reset()
+            {
+                index = 0;
+                current = default(T);
+            }
         }
-      }
-
-      public bool IsReadOnly
-      {
-        get
-        {
-          return ((ICollection<T>) this._list).IsReadOnly;
-        }
-      }
-
-      public T this[int index]
-      {
-        get
-        {
-          lock (this._root)
-            return this._list[index];
-        }
-        set
-        {
-          lock (this._root)
-            this._list[index] = value;
-        }
-      }
-
-      internal SynchronizedList(UncheckedList<T> list)
-      {
-        this._list = list;
-        this._root = ((ICollection) list).SyncRoot;
-      }
-
-      public void Add(T item)
-      {
-        lock (this._root)
-          this._list.Add(item);
-      }
-
-      public void Clear()
-      {
-        lock (this._root)
-          this._list.Clear();
-      }
-
-      public bool Contains(T item)
-      {
-        lock (this._root)
-          return this._list.Contains(item);
-      }
-
-      public void CopyTo(T[] array, int arrayIndex)
-      {
-        lock (this._root)
-          this._list.CopyTo(array, arrayIndex);
-      }
-
-      public bool Remove(T item)
-      {
-        lock (this._root)
-          return this._list.Remove(item);
-      }
-
-      IEnumerator IEnumerable.GetEnumerator()
-      {
-        lock (this._root)
-          return (IEnumerator) this._list.GetEnumerator();
-      }
-
-      IEnumerator<T> IEnumerable<T>.GetEnumerator()
-      {
-        lock (this._root)
-          return ((IEnumerable<T>) this._list).GetEnumerator();
-      }
-
-      public int IndexOf(T item)
-      {
-        lock (this._root)
-          return this._list.IndexOf(item);
-      }
-
-      public void Insert(int index, T item)
-      {
-        lock (this._root)
-          this._list.Insert(index, item);
-      }
-
-      public void RemoveAt(int index)
-      {
-        lock (this._root)
-          this._list.RemoveAt(index);
-      }
     }
-
-    /// <summary>Enumerates the elements of a <see cref="T:System.Collections.Generic.List`1" />.</summary>
-    [Serializable]
-    public struct Enumerator : IEnumerator<T>, IDisposable, IEnumerator
-    {
-      private UncheckedList<T> list;
-      private int index;
-      private int version;
-      private T current;
-
-      /// <summary>Gets the element at the current position of the enumerator.</summary>
-      /// <returns>The element in the <see cref="T:System.Collections.Generic.List`1" /> at the current position of the enumerator.</returns>
-      public T Current
-      {
-        get
-        {
-          return this.current;
-        }
-      }
-
-      object IEnumerator.Current
-      {
-        get
-        {
-          /*if (this.index == 0 || this.index == this.list._size + 1)
-            ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_EnumOpCantHappen);*/
-          return (object) this.Current;
-        }
-      }
-
-      internal Enumerator(UncheckedList<T> list)
-      {
-        this.list = list;
-        this.index = 0;
-        this.version = list._version;
-        this.current = default (T);
-      }
-
-      /// <summary>Releases all resources used by the <see cref="T:System.Collections.Generic.List`1.Enumerator" />.</summary>
-      public void Dispose()
-      {
-      }
-
-      /// <summary>Advances the enumerator to the next element of the <see cref="T:System.Collections.Generic.List`1" />.</summary>
-      /// <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the collection.</returns>
-      /// <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created. </exception>
-      public bool MoveNext()
-      {
-        UncheckedList<T> list = this.list;
-        if (this.version != list._version || (uint) this.index >= (uint) list._size)
-          return this.MoveNextRare();
-        this.current = list._items[this.index];
-        this.index = this.index + 1;
-        return true;
-      }
-
-      private bool MoveNextRare()
-      {
-        /*if (this.version != this.list._version)
-          ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_EnumFailedVersion);*/
-        this.index = this.list._size + 1;
-        this.current = default (T);
-        return false;
-      }
-
-      void IEnumerator.Reset()
-      {
-        /*if (this.version != this.list._version)
-          ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_EnumFailedVersion);*/
-        this.index = 0;
-        this.current = default (T);
-      }
-    }
-  }
 }
