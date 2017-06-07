@@ -9,10 +9,10 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="<%- url_for("ILRuntime/v1/guide/use.html") %>" class="nav-link-li<%- page.path.match(/use/) ? ' current' : '' %>">使用案例</a></li>
-            <li><a href="<%- url_for("ILRuntime/v1/guide/version.html") %>" class="nav-link-li<%- page.path.match(/version/) ? ' current' : '' %>">更新记录</a></li>
-            <li><a href="<%- url_for("ILRuntime/v1/guide/contribution.html") %>" class="nav-link-li<%- page.path.match(/contribution/) ? ' current' : '' %>">贡献指南</li>
-            <li><a href="<%- url_for("ILRuntime/v1/guide/index.html") %>" class="nav-link-li<%- page.path.match(/index/) ? ' current' : '' %>">教程</a></li>
+            <li><a href="<%- url_for("/ILRuntime/v1/guide/use.html") %>" class="nav-link-li<%- page.path.match(/use/) ? ' current' : '' %>">使用案例</a></li>
+            <li><a href="<%- url_for("/ILRuntime/v1/guide/version.html") %>" class="nav-link-li<%- page.path.match(/version/) ? ' current' : '' %>">更新记录</a></li>
+            <li><a href="<%- url_for("/ILRuntime/v1/guide/contribution.html") %>" class="nav-link-li<%- page.path.match(/contribution/) ? ' current' : '' %>">贡献指南</li>
+            <li><a href="<%- url_for("/ILRuntime/v1/guide/index.html") %>" class="nav-link-li<%- page.path.match(/index/) ? ' current' : '' %>">教程</a></li>
             <li><a href="<%- url_for("/") %>" class="nav-link-li<%- page.path.match(/\//) ? ' current' : '' %>">首页</a></li>
         </ul>
     </div>
