@@ -1,0 +1,64 @@
+<div id="mobile-header">
+    <a id="mobile-nav-toggle" href="#">
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+      <span class="mobile-nav-toggle-bar"></span>
+    </a>
+    <a id="github" href="<%- theme.github %>">
+      <img src="<%- url_for("/images/github.png") %>">
+    </a>
+</div>
+
+<div id="header">
+  <ul id="nav">
+    <%- partial('partials/nav') %>
+  </ul>
+</div>
+
+<div id="index-body">
+    <h2>可靠 , 简单 &amp; 强大的 Unity3D 组件化全栈框架</h2>
+    <a id="get-start" href="<%- url_for("/v1/guide/index.html") %>">了解更多</a>
+</div>
+
+<div id="index-content" class="clear">
+
+    <ul class="clear">
+        <li>
+            <div class="intro-feature">
+                <img src="<%- url_for("/images/reliable.png") %>" />
+                <h3>可靠</h3>
+                <p>94% 的整体测试覆盖率 , 重要组件 100% 覆盖 .</p>
+            </div>
+        </li>
+
+        <li>
+            <div class="intro-feature">
+                <img src="<%- url_for("/images/simple.png") %>" />
+                <h3>简单</h3>
+                <p>简单明了的预制 API , 1分钟快速上手 .</p>
+            </div>
+        </li>
+
+        <li>
+            <div class="intro-feature">
+                <img src="<%- url_for("/images/power.png") %>" />
+                <h3>强大</h3>
+                <p>高可持续性 &amp; 可拓展性 , 轻松应对需求变化 .</p>
+            </div>
+        </li>
+
+        <li>
+            <div class="intro-feature">
+                <img src="<%- url_for("/images/quick.png") %>" />
+                <h3>快速</h3>
+                <p>开箱即用 , 基本不需要进行什么配置就可以被使用 .</p>
+            </div>
+        </li>
+    </ul>
+
+</div>
+
+<div id="footer">
+    <p>© 2017 <a href="<%- theme.github %>">catlib.io</a></p>
+    <p>Power by Yu Bin / MIT licensed</p>
+</div>
