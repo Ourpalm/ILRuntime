@@ -83,18 +83,18 @@ namespace TestCases
             return a.ToString();
         }
 
-        public static string Test07()
-        {
-            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Create))
-            {
-                fs.WriteByte(100);
-            }
-
-            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Open))
-            {
-                return fs.ReadByte().ToString();
-            }
-        }
+        //        public static string Test07()
+        //        {
+        //            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Create))
+        //            {
+        //                fs.WriteByte(100);
+        //            }
+        //
+        //            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Open))
+        //            {
+        //                return fs.ReadByte().ToString();
+        //            }
+        //        }
 
         public static void Test08()
         {
@@ -109,10 +109,12 @@ namespace TestCases
             dic[TestEnum.Enum2] = 123;
 
             int res;
-            if(dic.TryGetValue(TestEnum.Enum2, out res))
+            if (dic.TryGetValue(TestEnum.Enum2, out res))
             {
                 Console.WriteLine(res);
             }
         }
+
+
     }
 }

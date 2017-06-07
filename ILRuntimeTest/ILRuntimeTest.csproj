@@ -69,6 +69,7 @@
     <Compile Include="AutoGenerate\System_Single_Binding.cs" />
     <Compile Include="AutoGenerate\System_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_ValueType_Binding.cs" />
+    <Compile Include="TestFramework\TestCLREnum.cs" />
     <Compile Include="TestMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
