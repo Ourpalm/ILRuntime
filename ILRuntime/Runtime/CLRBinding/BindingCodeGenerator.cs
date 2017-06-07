@@ -9,7 +9,7 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     public class BindingCodeGenerator
     {
-        public static void GenerateBindingCode(List<Type> types, string outputPath, HashSet<MethodBase> excludes = null)
+        public static void GenerateBindingCode(List<Type> types, string outputPath, HashSet<MethodBase> excludeMethods = null, HashSet<FieldInfo> excludeFields = null)
         {
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
@@ -32,6 +32,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     sw.Write(@"using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
@@ -50,23 +51,33 @@ namespace ILRuntime.Runtime.Generated
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
+            FieldInfo field;
             Type[] args;
             Type type = typeof(");
                     sw.Write(realClsName);
                     sw.WriteLine(");");
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                    string registerCode = GenerateRegisterCode(i, methods, excludes);
+                    FieldInfo[] fields = i.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                    string registerMethodCode = GenerateMethodRegisterCode(i, methods, excludeMethods);
+                    string registerFieldCode = GenerateFieldRegisterCode(i, fields, excludeFields);
+                    string registerMiscCode = GenerateMiscRegisterCode(i, realClsName);
                     string commonCode = GenerateCommonCode(i, realClsName);
                     ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                    string ctorRegisterCode = GenerateConstructorRegisterCode(i, ctors, excludes);
-                    string wraperCode = GenerateWraperCode(i, methods, realClsName, excludes);
-                    string ctorWraperCode = GenerateConstructorWraperCode(i, ctors, realClsName, excludes);
-                    sw.WriteLine(registerCode);
+                    string ctorRegisterCode = GenerateConstructorRegisterCode(i, ctors, excludeMethods);
+                    string methodWraperCode = GenerateMethodWraperCode(i, methods, realClsName, excludeMethods);
+                    string fieldWraperCode = GenerateFieldWraperCode(i, fields, realClsName, excludeFields);
+                    string cloneWraperCode = GenerateCloneWraperCode(i, fields, realClsName);
+                    string ctorWraperCode = GenerateConstructorWraperCode(i, ctors, realClsName, excludeMethods);
+                    sw.WriteLine(registerMethodCode);
+                    sw.WriteLine(registerFieldCode);
+                    sw.WriteLine(registerMiscCode);
                     sw.WriteLine(ctorRegisterCode);
                     sw.WriteLine("        }");
                     sw.WriteLine();
                     sw.WriteLine(commonCode);
-                    sw.WriteLine(wraperCode);
+                    sw.WriteLine(methodWraperCode);
+                    sw.WriteLine(fieldWraperCode);
+                    sw.WriteLine(cloneWraperCode);
                     sw.WriteLine(ctorWraperCode);
                     sw.WriteLine("    }");
                     sw.WriteLine("}");
@@ -134,7 +145,22 @@ namespace ILRuntime.Runtime.Generated
             return false;
         }
 
-        static string GenerateRegisterCode(Type type, MethodInfo[] methods, HashSet<MethodBase> excludes)
+        static bool ShouldSkipField(Type type, FieldInfo i)
+        {
+            if (i.IsPrivate)
+                return true;
+            //EventHandler is currently not supported
+            if (i.IsSpecialName)
+            {
+                return true;
+            }
+            if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                return true;
+            return false;
+        }
+
+
+        static string GenerateMethodRegisterCode(Type type, MethodInfo[] methods, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
             int idx = 0;
@@ -168,6 +194,31 @@ namespace ILRuntime.Runtime.Generated
                 sb.AppendLine(string.Format("            args = new Type[]{0};", sb2));
                 sb.AppendLine(string.Format("            method = type.GetMethod(\"{0}\", flag, null, args, null);", i.Name));
                 sb.AppendLine(string.Format("            app.RegisterCLRMethodRedirection(method, {0}_{1});", i.Name, idx));
+
+                idx++;
+            }
+            return sb.ToString();
+        }
+
+        static string GenerateFieldRegisterCode(Type type, FieldInfo[] fields, HashSet<FieldInfo> excludes)
+        {
+            StringBuilder sb = new StringBuilder();
+            int idx = 0;
+            foreach (var i in fields)
+            {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
+                if (ShouldSkipField(type, i))
+                    continue;
+                if (i.IsSpecialName)
+                    continue;
+
+                sb.AppendLine(string.Format("            field = type.GetField(\"{0}\", flag);", i.Name));
+                sb.AppendLine(string.Format("            app.RegisterCLRFieldGetter(field, get_{0}_{1});", i.Name, idx));
+                if (!i.IsInitOnly && !i.IsLiteral)
+                {
+                    sb.AppendLine(string.Format("            app.RegisterCLRFieldSetter(field, set_{0}_{1});", i.Name, idx));
+                }
 
                 idx++;
             }
@@ -213,6 +264,34 @@ namespace ILRuntime.Runtime.Generated
             return sb.ToString();
         }
 
+        private static string GenerateMiscRegisterCode(Type type, string typeClsName)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (type.IsValueType && !type.IsPrimitive && !type.IsEnum)
+            {
+                sb.AppendLine("            app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);");
+            }
+
+            if (!type.IsPrimitive && !type.IsAbstract)
+            {
+                var constructorFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+                var hasDefaultConstructor = type.GetConstructor(constructorFlags, null, new Type[0], null) != null;
+
+                if (hasDefaultConstructor || type.IsValueType)
+                {
+                    sb.AppendLine(string.Format("            app.RegisterCLRCreateDefaultInstance(type, () => new {0}());", typeClsName));
+                }
+            }
+
+            if (!type.IsAbstract || !type.IsSealed)
+            {
+                sb.AppendLine(string.Format("            app.RegisterCLRCreateArrayInstance(type, s => new {0}[s]);", typeClsName));
+            }
+
+            return sb.ToString();
+        }
+
         static string GenerateCommonCode(Type type, string typeClsName)
         {
             if (!type.IsValueType)
@@ -220,7 +299,7 @@ namespace ILRuntime.Runtime.Generated
             StringBuilder sb = new StringBuilder();
             if (type.IsPrimitive)
             {
-                sb.AppendLine(string.Format("        static {0} GetInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack)", typeClsName));
+                sb.AppendLine(string.Format("        static {0} GetInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, IList<object> __mStack)", typeClsName));
                 sb.AppendLine("        {");
                 if (type.IsPrimitive || type.IsValueType)
                     sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
@@ -242,7 +321,7 @@ namespace ILRuntime.Runtime.Generated
                             var t = __domain.GetType(instance_of_fieldReference.GetType()) as CLRType;
                             instance_of_this_method = (");
                 sb.Append(typeClsName);
-                sb.Append(")t.GetField(ptr_of_this_method->ValueLow).GetValue(instance_of_fieldReference);");
+                sb.Append(")t.GetFieldValue(ptr_of_this_method->ValueLow, instance_of_fieldReference);");
                 sb.Append(@"
                         }
                     }
@@ -260,7 +339,7 @@ namespace ILRuntime.Runtime.Generated
                         {
                             instance_of_this_method = (");
                 sb.Append(typeClsName);
-                sb.Append(@")((CLRType)t).GetField(ptr_of_this_method->ValueLow).GetValue(null);
+                sb.Append(@")((CLRType)t).GetFieldValue(ptr_of_this_method->ValueLow, null);
                         }
                     }
                     break;
@@ -281,7 +360,7 @@ namespace ILRuntime.Runtime.Generated
             }
             if (!type.IsPrimitive && !type.IsAbstract)
             {
-                sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, List<object> __mStack, ref {0} instance_of_this_method)", typeClsName));
+                sb.AppendLine(string.Format("        static void WriteBackInstance(ILRuntime.Runtime.Enviorment.AppDomain __domain, StackObject* ptr_of_this_method, IList<object> __mStack, ref {0} instance_of_this_method)", typeClsName));
                 sb.AppendLine("        {");
                 sb.AppendLine(@"            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             switch(ptr_of_this_method->ObjectType)
@@ -302,7 +381,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, instance_of_this_method");
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, instance_of_this_method");
                 sb.Append(@");
                         }
                     }
@@ -317,7 +396,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method");
+                            ((CLRType)t).SetStaticFieldValue(ptr_of_this_method->ValueLow, instance_of_this_method");
                 sb.Append(@");
                         }
                     }
@@ -349,7 +428,7 @@ namespace ILRuntime.Runtime.Generated
                     continue;
                 var param = i.GetParameters();
                 int paramCnt = param.Length;
-                sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", idx));
+                sb.AppendLine(string.Format("        static StackObject* Ctor_{0}(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)", idx));
                 sb.AppendLine("        {");
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");
@@ -419,7 +498,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -436,7 +515,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
+                            ((CLRType)t).SetStaticFieldValue(ptr_of_this_method->ValueLow, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -465,7 +544,7 @@ namespace ILRuntime.Runtime.Generated
             return sb.ToString();
         }
 
-        static string GenerateWraperCode(Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
+        static string GenerateMethodWraperCode(Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -481,7 +560,7 @@ namespace ILRuntime.Runtime.Generated
                 int paramCnt = param.Length;
                 if (!i.IsStatic)
                     paramCnt++;
-                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter __intp, StackObject* __esp, List<object> __mStack, CLRMethod __method, bool isNewObj)", i.Name, idx));
+                sb.AppendLine(string.Format("        static StackObject* {0}_{1}(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)", i.Name, idx));
                 sb.AppendLine("        {");
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 sb.AppendLine("            StackObject* ptr_of_this_method;");
@@ -683,7 +762,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, ");
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -700,7 +779,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, ");
+                            ((CLRType)t).SetStaticFieldValue(ptr_of_this_method->ValueLow, ");
                     sb.Append(p.Name);
                     sb.Append(@");
                         }
@@ -729,6 +808,81 @@ namespace ILRuntime.Runtime.Generated
                 sb.AppendLine();
                 idx++;
             }
+
+            return sb.ToString();
+        }
+
+        static string GenerateFieldWraperCode(Type type, FieldInfo[] fields, string typeClsName, HashSet<FieldInfo> excludes)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            int idx = 0;
+            foreach (var i in fields)
+            {
+                if (excludes != null && excludes.Contains(i))
+                    continue;
+                if (ShouldSkipField(type, i))
+                    continue;
+                sb.AppendLine(string.Format("        static object get_{0}_{1}(ref object o)", i.Name, idx));
+                sb.AppendLine("        {");
+                if (i.IsStatic)
+                {
+                    sb.AppendLine(string.Format("            return {0}.{1};", typeClsName, i.Name));
+                }
+                else
+                {
+                    sb.AppendLine(string.Format("            return (({0})o).{1};", typeClsName, i.Name));
+                }
+                sb.AppendLine("        }");
+
+                if (!i.IsInitOnly && !i.IsLiteral)
+                {
+                    sb.AppendLine(string.Format("        static void set_{0}_{1}(ref object o, object v)", i.Name, idx));
+                    sb.AppendLine("        {");
+                    if (i.IsStatic)
+                    {
+                        sb.AppendLine(string.Format("            {0}.{1} = ({2})v;", typeClsName, i.Name, i.FieldType.FullName));
+                    }
+                    else
+                    {
+                        if (type.IsValueType)
+                        {
+                            sb.AppendLine("            var h = GCHandle.Alloc(o, GCHandleType.Pinned);");
+                            sb.AppendLine(string.Format("            {0}* p = ({0} *)(void *)h.AddrOfPinnedObject();", typeClsName));
+                            sb.AppendLine(string.Format("            p->{0} = ({1})v;", i.Name, i.FieldType.FullName));
+                            sb.AppendLine("            h.Free();");
+                        }
+                        else
+                        {
+                            sb.AppendLine(string.Format("            (({0})o).{1} = ({2})v;", typeClsName, i.Name, i.FieldType.FullName));
+                        }
+                    }
+                    sb.AppendLine("        }");
+                }
+                idx++;
+            }
+
+            return sb.ToString();
+        }
+
+        static string GenerateCloneWraperCode(Type type, FieldInfo[] fields, string typeClsName)
+        {
+            if (!type.IsValueType || type.IsPrimitive) return string.Empty;
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("        static object PerformMemberwiseClone(ref object o)");
+            sb.AppendLine("        {");
+            sb.AppendLine(string.Format("            return new {0}", typeClsName));
+            sb.AppendLine("            {");
+
+            foreach (var i in fields)
+            {
+                if (i.IsStatic || i.IsInitOnly || i.IsLiteral) continue;
+                sb.AppendLine(string.Format("                {0} = (({1}) o).{0},", i.Name, typeClsName));
+            }
+
+            sb.AppendLine("            };");
+            sb.AppendLine("        }");
 
             return sb.ToString();
         }

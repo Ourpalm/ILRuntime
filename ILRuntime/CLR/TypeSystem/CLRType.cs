@@ -7,6 +7,8 @@ using System.Reflection;
 using Mono.Cecil;
 using ILRuntime.CLR.Method;
 using ILRuntime.Reflection;
+using ILRuntime.Runtime.Enviorment;
+
 namespace ILRuntime.CLR.TypeSystem
 {
     public class CLRType : IType
@@ -19,12 +21,17 @@ namespace ILRuntime.CLR.TypeSystem
         List<CLRType> genericInstances;
         Dictionary<string, int> fieldMapping;
         Dictionary<int, FieldInfo> fieldInfoCache;
+        Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
+        Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
+        CLRMemberwiseCloneDelegate memberwiseCloneDelegate;
+        CLRCreateDefaultInstanceDelegate createDefaultInstanceDelegate;
+        CLRCreateArrayInstanceDelegate createArrayInstanceDelegate;
         Dictionary<int, int> fieldTokenMapping;
         IType byRefType, arrayType, elementType;
+        IType[] interfaces;
         bool isDelegate;
         IType baseType;
-        bool isBaseTypeInitialized = false;
-        MethodInfo memberwiseClone;
+        bool isBaseTypeInitialized = false, interfaceInitialized = false;
         ILRuntimeWrapperType wraperType;
 
         int hashCode = -1;
@@ -156,16 +163,36 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public new MethodInfo MemberwiseClone
+        public IType[] Implements
         {
             get
             {
-                if (clrType.IsValueType && memberwiseClone == null)
-                {
-                    memberwiseClone = clrType.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                }
-                return memberwiseClone;
+                if (!interfaceInitialized)
+                    InitializeInterfaces();
+                return interfaces;
             }
+        }
+
+        public object PerformMemberwiseClone(object target)
+        {
+            if (memberwiseCloneDelegate == null)
+            {
+                if (!AppDomain.MemberwiseCloneMap.TryGetValue(this.clrType, out memberwiseCloneDelegate))
+                {
+                    var memberwiseClone = clrType.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+                    if (memberwiseClone != null)
+                    {
+                        memberwiseCloneDelegate = (ref object t) => memberwiseClone.Invoke(t, null);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Memberwise clone method not found for " + clrType.FullName);
+                    }
+                }
+            }
+
+            return memberwiseCloneDelegate(ref target);
         }
 
         void InitializeBaseType()
@@ -176,6 +203,95 @@ namespace ILRuntime.CLR.TypeSystem
                 baseType = null;
             }
             isBaseTypeInitialized = true;
+        }
+
+        void InitializeInterfaces()
+        {
+            interfaceInitialized = true;
+            var arr = clrType.GetInterfaces();
+            if (arr.Length >0)
+            {
+                interfaces = new IType[arr.Length];
+                for (int i = 0; i < interfaces.Length; i++)
+                {
+                    interfaces[i] = appdomain.GetType(arr[i]);
+                }
+            }
+        }
+
+        public object GetFieldValue(int hash, object target)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+
+            var getter = GetFieldGetter(hash);
+            if (getter != null)
+            {
+                return getter(ref target);
+            }
+
+            var fieldinfo = GetField(hash);
+            if (fieldinfo != null)
+            {
+                return fieldinfo.GetValue(target);
+            }
+
+            return null;
+        }
+
+        public void SetStaticFieldValue(int hash, object value)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+
+            var fieldInfo = GetField(hash);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(null, value);
+            }
+        }
+
+        public unsafe void SetFieldValue(int hash, ref object target, object value)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+
+            var setter = GetFieldSetter(hash);
+            if (setter != null)
+            {
+                setter(ref target, value);
+                return;
+            }
+
+            var fieldInfo = GetField(hash);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(target, value);
+            }
+        }
+
+        private CLRFieldGetterDelegate GetFieldGetter(int hash)
+        {
+            var dic = fieldGetterCache;
+            CLRFieldGetterDelegate res;
+            if (dic != null && dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetFieldGetter(hash);
+            else
+                return null;
+        }
+
+        private CLRFieldSetterDelegate GetFieldSetter(int hash)
+        {
+            var dic = fieldSetterCache;
+            CLRFieldSetterDelegate res;
+            if (dic != null && dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetFieldSetter(hash);
+            else
+                return null;
         }
 
         public FieldInfo GetField(int hash)
@@ -244,11 +360,26 @@ namespace ILRuntime.CLR.TypeSystem
             var fields = clrType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
             foreach (var i in fields)
             {
+                int hashCode = i.GetHashCode();
+
                 if (i.IsPublic || i.IsFamily)
                 {
-                    int hashCode = i.GetHashCode();
                     fieldMapping[i.Name] = hashCode;
                     fieldInfoCache[hashCode] = i;
+                }
+
+                CLRFieldGetterDelegate getter;
+                if (AppDomain.FieldGetterMap.TryGetValue(i, out getter))
+                {
+                    if (fieldGetterCache == null) fieldGetterCache = new Dictionary<int, CLRFieldGetterDelegate>();
+                    fieldGetterCache[hashCode] = getter;
+                }
+
+                CLRFieldSetterDelegate setter;
+                if (AppDomain.FieldSetterMap.TryGetValue(i, out setter))
+                {
+                    if (fieldSetterCache == null) fieldSetterCache = new Dictionary<int, CLRFieldSetterDelegate>();
+                    fieldSetterCache[hashCode] = setter;
                 }
             }
         }
@@ -462,6 +593,32 @@ namespace ILRuntime.CLR.TypeSystem
 
             genericInstances.Add(res);
             return res;
+        }
+
+        public object CreateDefaultInstance()
+        {
+            if (createDefaultInstanceDelegate == null)
+            {
+                if (!AppDomain.CreateDefaultInstanceMap.TryGetValue(clrType, out createDefaultInstanceDelegate))
+                {
+                    createDefaultInstanceDelegate = () => Activator.CreateInstance(TypeForCLR);
+                }
+            }
+
+            return createDefaultInstanceDelegate();
+        }
+
+        public object CreateArrayInstance(int size)
+        {
+            if (createArrayInstanceDelegate == null)
+            {
+                if (!AppDomain.CreateArrayInstanceMap.TryGetValue(clrType, out createArrayInstanceDelegate))
+                {
+                    createArrayInstanceDelegate = s => Array.CreateInstance(TypeForCLR, s);
+                }
+            }
+
+            return createArrayInstanceDelegate(size);
         }
 
         public IType MakeByRefType()

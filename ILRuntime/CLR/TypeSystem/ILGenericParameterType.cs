@@ -163,5 +163,13 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get { return false; }
         }
+
+        public IType[] Implements
+        {
+            get
+            {
+                return null;
+            }
+        }
     }
 }
