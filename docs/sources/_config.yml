@@ -19,7 +19,7 @@ permalink_defaults:
 
 # Directory
 source_dir: src
-public_dir: .
+public_dir: ..
 tag_dir: tags
 archive_dir: archives
 category_dir: categories
