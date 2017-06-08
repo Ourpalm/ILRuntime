@@ -1,15 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-public class ByReferenceKeyComparer<T> : IEqualityComparer<T>
+namespace ILRuntime.Other
 {
-    public bool Equals(T x, T y)
+    class ByReferenceKeyComparer<T> : IEqualityComparer<T>
     {
-        return object.ReferenceEquals(x, y);
-    }
+        public bool Equals(T x, T y)
+        {
+            return object.ReferenceEquals(x, y);
+        }
 
-    public int GetHashCode(T obj)
-    {
-        return RuntimeHelpers.GetHashCode(obj);
+        public int GetHashCode(T obj)
+        {
+            return RuntimeHelpers.GetHashCode(obj);
+        }
     }
 }

@@ -63,6 +63,12 @@
     <Compile Include="Reflection\ILRuntimeWrapperType.cs" />
     <Compile Include="Reflection\ILRuntimeType.cs" />
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
+    <Compile Include="Runtime\CLRBinding\BindingGeneratorExtensions.cs" />
+    <Compile Include="Runtime\CLRBinding\CommonBindingGenerator.cs" />
+    <Compile Include="Runtime\CLRBinding\ValueTypeBindingGenerator.cs" />
+    <Compile Include="Runtime\CLRBinding\FieldBindingGenerator.cs" />
+    <Compile Include="Runtime\CLRBinding\MethodBindingGenerator.cs" />
+    <Compile Include="Runtime\CLRBinding\ConstructorBindingGenerator.cs" />
     <Compile Include="Runtime\CLRBinding\BindingCodeGenerator.cs" />
     <Compile Include="Runtime\Debugger\BreakpointInfo.cs" />
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />

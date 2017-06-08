@@ -13,7 +13,7 @@ using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class System_Array_Binding
+    unsafe class System_Linq_Enumerable_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
@@ -21,7 +21,7 @@ namespace ILRuntime.Runtime.Generated
             MethodBase method;
             FieldInfo field;
             Type[] args;
-            Type type = typeof(System.Array);
+            Type type = typeof(System.Linq.Enumerable);
 
 
         }

@@ -13,6 +13,7 @@ using ILRuntime.CLR.Utils;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Debugger;
 using ILRuntime.Runtime.Stack;
+using ILRuntime.Other;
 namespace ILRuntime.Runtime.Enviorment
 {
     public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj);
