@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -85,6 +86,11 @@ namespace TestCases
 
         public static string Test07()
         {
+            if (File.Exists("test.txt"))
+            {
+                File.Delete("test.txt");
+            }
+
             using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Create))
             {
                 fs.WriteByte(100);
@@ -109,10 +115,12 @@ namespace TestCases
             dic[TestEnum.Enum2] = 123;
 
             int res;
-            if(dic.TryGetValue(TestEnum.Enum2, out res))
+            if (dic.TryGetValue(TestEnum.Enum2, out res))
             {
                 Console.WriteLine(res);
             }
         }
+
+
     }
 }
