@@ -383,9 +383,9 @@ namespace TestCases
 
         public static bool TestVirtualMethod01()
         {
-            var aa = new Base2();
+            Base aa = new Base3();
 
-            if (aa.Value() == 1)
+            if (aa.Value() == 2)
             {
                 return true;
             }
@@ -398,7 +398,7 @@ namespace TestCases
         {
             Base aa = new Base2();
 
-            if (aa.Value() == 1)
+            if (aa.Value() == 2)
             {
                 return true;
             }
