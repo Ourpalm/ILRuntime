@@ -9,6 +9,20 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     static class BindingGeneratorExtensions
     {
+        internal static bool ShouldSkipField(this Type type, FieldInfo i)
+        {
+            if (i.IsPrivate)
+                return true;
+            //EventHandler is currently not supported
+            if (i.IsSpecialName)
+            {
+                return true;
+            }
+            if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                return true;
+            return false;
+        }
+
         internal static bool ShouldSkipMethod(this Type type, MethodBase i)
         {
             if (i.IsPrivate)
@@ -218,6 +232,89 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb.Append(paramName);
                     sb.AppendLine(";");
                 }
+            }
+        }
+
+        internal static void GetReturnValueCode(this Type type, StringBuilder sb)
+        {
+            if (type.IsPrimitive)
+            {
+                if (type == typeof(int))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(long))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Long;");
+                    sb.AppendLine("            *(long*)&__ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(short))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(bool))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method ? 1 : 0;");
+                }
+                else if (type == typeof(ushort))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(float))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Float;");
+                    sb.AppendLine("            *(float*)&__ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(double))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Double;");
+                    sb.AppendLine("            *(double*)&__ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(byte))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(sbyte))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = result_of_this_method;");
+                }
+                else if (type == typeof(uint))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = (int)result_of_this_method;");
+                }
+                else if (type == typeof(char))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Integer;");
+                    sb.AppendLine("            __ret->Value = (int)result_of_this_method;");
+                }
+                else if (type == typeof(ulong))
+                {
+                    sb.AppendLine("            __ret->ObjectType = ObjectTypes.Long;");
+                    sb.AppendLine("            *(ulong*)&__ret->Value = result_of_this_method;");
+                }
+                else
+                    throw new NotImplementedException();
+                sb.AppendLine("            return __ret + 1;");
+
+            }
+            else
+            {
+                if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
+                {
+                    sb.AppendLine(@"            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }");
+                }
+                sb.AppendLine("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);");
             }
         }
     }
