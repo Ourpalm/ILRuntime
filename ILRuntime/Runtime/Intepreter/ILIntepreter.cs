@@ -4311,11 +4311,10 @@ namespace ILRuntime.Runtime.Intepreter
                 if (esp->Value == stack.ManagedStack.Count - 1)
                     stack.ManagedStack.RemoveAt(esp->Value);
             }
-#if DEBUG
+
             esp->ObjectType = ObjectTypes.Null;
             esp->Value = -1;
             esp->ValueLow = 0;
-#endif
         }
     }
 }
