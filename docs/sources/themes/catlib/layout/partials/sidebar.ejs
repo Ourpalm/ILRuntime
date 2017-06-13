@@ -1,6 +1,6 @@
 <section class="sidebar clearfix">
     <ul>
-        <% site.pages.find({type: page.type , lang: page.lang}).sort('order').each(function (p) { %>
+        <% site.pages.find({type: 'guide' , lang: page.lang}).sort('order').each(function (p) { %>
             <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
             <% if(fileName == 'index'){%>
                 <li><h3>基础</h3></li>

@@ -1,6 +1,6 @@
-# CatLib.io 教程文档
+# ILRuntime 教程文档
 
-这是CatLib的教程文档网站，文档是使用[hexo](http://hexo.io/)构建的。 文档内容在“src”文件夹中，使用Markdown格式编写。
+这是ILRuntime的教程文档网站，文档是使用[hexo](http://hexo.io/)构建的。 文档内容在“src”文件夹中，使用Markdown格式编写。
 
 ## 搭建本地文档环境
 
