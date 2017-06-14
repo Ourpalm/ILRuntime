@@ -29,7 +29,7 @@ td {
 }
 text-align center {
   -webkit-text-size-adjust: none;
-  color: #1a94d3;
+  color: #3d9cff;
 }
 body,
 button,
@@ -52,7 +52,7 @@ td {
   outline: none;
   font: 1em "Helvetica Neue", "Helvetica", "Lucida Grande", "Arial", "Hiragino Sans GB", "Microsoft Yahei", "WenQuanYi Micro Hei", "sans-serif", arial, sans-serif;
   text-align: left;
-  color: #1a94d3;
+  color: #3d9cff;
 }
 body {
   background-color: #fff;
@@ -63,7 +63,7 @@ ol {
   list-style: none;
 }
 a {
-  color: #1a94d3;
+  color: #3d9cff;
   text-decoration: none;
 }
 a text-decoration none {
@@ -76,7 +76,7 @@ a text-decoration none {
 a:hover {
   text-decoration: underline;
   outline: 0;
-  color: #1a94d3;
+  color: #3d9cff;
 }
 .abs {
   position: absolute;
@@ -122,7 +122,7 @@ body {
   display: none;
 }
 #header {
-  background-color: #1a94d3;
+  background-color: #3d9cff;
   height: 32px;
   padding: 6px 20px;
   position: relative;
@@ -189,7 +189,7 @@ body {
     padding: 6px 20px;
     height: 32px;
     display: block;
-    background-color: #1a94d3;
+    background-color: #3d9cff;
   }
   #mobile-header #github {
     display: block;
@@ -215,7 +215,7 @@ body {
   }
 }
 #index-body {
-  background: #1a94d3;
+  background: #3d9cff;
   height: 325px;
   text-align: center;
 }
@@ -233,7 +233,7 @@ body {
 }
 #index-body #get-start:hover {
   background-color: #fff;
-  color: #1a94d3;
+  color: #3d9cff;
 }
 @media screen and (max-width: 699px) {
   #index-content {
@@ -250,7 +250,7 @@ body {
     height: 45px;
   }
   #index-content .intro-feature h3 {
-    color: #1a94d3;
+    color: #3d9cff;
     font-size: 20px;
     padding-bottom: 20px;
   }
@@ -285,7 +285,7 @@ body {
     height: 45px;
   }
   #index-content li .intro-feature h3 {
-    color: #1a94d3;
+    color: #3d9cff;
     font-size: 24px;
   }
   #index-content li .intro-feature p {
