@@ -1,10 +1,10 @@
 ---
-title: 基础教程
+title: 从零开始
 type: guide
 order: 100
 ---
 
-## 基础教程
+## 从零开始
 
 欢迎您选择ILRuntime ， 根据下面教程您可以快速的开始。
 
