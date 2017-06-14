@@ -158,16 +158,16 @@
 <h3 id="启步"><a href="#启步" class="headerlink" title="启步"></a>启步</h3><h4 id="从Unity开始"><a href="#从Unity开始" class="headerlink" title="从Unity开始"></a><strong>从Unity开始</strong></h4><p>如果你希望在Unity中使用ILRuntime，推荐的方式是直接使用ILRuntime的源代码，这样ILRuntime可以根据你的发布设置自动进行优化。</p>
 <p>你需要将下列源码目录复制Unity工程的Assets目录：</p>
 <ul>
-<li>Mono.Cecil.20</li>
-<li>Mono.Cecil.Pdb</li>
-<li>ILRuntime</li>
+<li><code>Mono.Cecil.20</code></li>
+<li><code>Mono.Cecil.Pdb</code></li>
+<li><code>ILRuntime</code></li>
 </ul>
 <blockquote>
 <p>需要注意的是，需要删除这些目录里面的<code>bin</code>、<code>obj</code>、<code>Properties子目录</code>，以及<code>.csproj文件</code>。此外，由于ILRuntime使用了<code>unsafe</code>代码来优化执行效率，所以你需要在Unity中开启<code>unsafe</code>模式：</p>
 </blockquote>
 <ul>
-<li>在Assets目录里建立一个名为smcs.rsp的文本文件</li>
-<li>在smcs.rsp文件中加入”-unsafe”</li>
+<li>在<code>Assets</code>目录里建立一个名为<code>smcs.rsp</code>的文本文件</li>
+<li>在<code>smcs.rsp</code>文件中加入 <code>-unsafe</code></li>
 </ul>
 <h4 id="从Visual-Studio开始"><a href="#从Visual-Studio开始" class="headerlink" title="从Visual Studio开始"></a><strong>从Visual Studio开始</strong></h4><p>如果你希望在VisualStudio的C#项目中使用ILRuntime， 你只需要引用编译好的<code>ILRuntime.dll</code>，<code>Mono.Cecil.20.dll</code>以及<code>Mono.Cecil.Pdb</code>即可。</p>
 <h3 id="使用之前"><a href="#使用之前" class="headerlink" title="使用之前"></a>使用之前</h3><p>请先执行一次测试用例以保证您下载的ILRuntime没有问题。</p>
@@ -177,7 +177,7 @@
 <p>这个例子为了演示方便，直接从StreamingAssets目录里读取了脚本DLL文件以及调试符号PDB文件， 实际发布的时候，如果要热更，肯定是将DLL和PDB文件打包到Assetbundle中进行动态加载的，这个不是ILRuntime的范畴，故不具体演示了。</p>
 <h3 id="调试插件"><a href="#调试插件" class="headerlink" title="调试插件"></a>调试插件</h3><p>ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试你的热更脚本。</p>
 <p>你可以在<a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="external">这里</a>下载到最新的VS2015调试插件。</p>
-<p>使用方法如下：</p>
+<p><strong>使用方法如下：</strong></p>
 <ul>
 <li>安装ILRuntime调试插件，并重新启动VS2015</li>
 <li>运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器</li>
@@ -186,7 +186,7 @@
 <li>在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口</li>
 <li>点击Attach按钮后，即可像UnityVS一样下断点调试</li>
 </ul>
-<p>注意事项：</p>
+<p><strong>注意事项：</strong></p>
 <ul>
 <li>调试插件需要Visual Studio 2015 Update3以上版本</li>
 <li>调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值</li>

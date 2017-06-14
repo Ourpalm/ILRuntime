@@ -16,14 +16,14 @@ order: 100
 
 你需要将下列源码目录复制Unity工程的Assets目录：
 
-- Mono.Cecil.20
-- Mono.Cecil.Pdb
-- ILRuntime
+- `Mono.Cecil.20`
+- `Mono.Cecil.Pdb`
+- `ILRuntime`
 
 > 需要注意的是，需要删除这些目录里面的`bin`、`obj`、`Properties子目录`，以及`.csproj文件`。此外，由于ILRuntime使用了`unsafe`代码来优化执行效率，所以你需要在Unity中开启`unsafe`模式：
 
-- 在Assets目录里建立一个名为smcs.rsp的文本文件
-- 在smcs.rsp文件中加入"-unsafe"
+- 在`Assets`目录里建立一个名为`smcs.rsp`的文本文件
+- 在`smcs.rsp`文件中加入 `-unsafe`
 
 #### **从Visual Studio开始**
 
@@ -95,7 +95,7 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 
 你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的VS2015调试插件。
 
-使用方法如下：
+**使用方法如下：**
 
 - 安装ILRuntime调试插件，并重新启动VS2015
 - 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
@@ -104,7 +104,7 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 - 在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口
 - 点击Attach按钮后，即可像UnityVS一样下断点调试
 
-注意事项：
+**注意事项：**
 
 - 调试插件需要Visual Studio 2015 Update3以上版本
 - 调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值
