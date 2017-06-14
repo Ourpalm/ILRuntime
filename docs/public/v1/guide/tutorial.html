@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+    <title>基础教程 — CatLib</title>
+    <meta charset="utf-8">
+    <meta name="description" content="ILRuntime">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" href="/public/css/page.css">
+
+    <script src="/public/js/vue.js"></script>
+    <script src="/public/js/jquery.js"></script>
+    </head>
+
+    <body>
+        
+            <nav class="nav">
+    <div class="border">
+        <img src="/public/images/logo.png" />
+        <button class="hiden-in-phone">V1.0</button>
+        <button id="btn-menu" class="hiden-in-pc">菜单</button>
+        <ul class="nav-link hiden-in-phone">
+            <!--li>
+                <form id="search-form">
+                    <input type="text" id="search-query" class="search-query">
+                </form>
+            </li!-->
+            <li><a href="/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
+            <li><a href="/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
+            <li><a href="/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/public/" class="nav-link-li current">首页</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div id="container" class="container clear">
+    <section class="sidebar clearfix">
+    <ul>
+        
+            
+            
+                <li><h3>基础</h3></li>
+            
+            
+            <li>
+                <p><a href="/public/v1/guide/index.html" class="sidebar-link">介绍</a></p>
+            </li>
+        
+            
+            
+            
+            <li>
+                <p><a href="/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
+            </li>
+        
+            
+            
+            
+            <li>
+                <p><a href="/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
+            </li>
+        
+            
+            
+            
+            <li>
+                <p><a href="/public/v1/guide/contribution.html" class="sidebar-link">贡献指南</a></p>
+            </li>
+        
+            
+            
+            
+                <li><h3>教程</h3></li>
+            
+            <li>
+                <p><a href="/public/v1/guide/tutorial.html" class="sidebar-link current">基础教程</a></p>
+            </li>
+        
+    </ul>
+</section>
+    <article class="clearfix">
+    <h2 id="基础教程"><a href="#基础教程" class="headerlink" title="基础教程"></a>基础教程</h2><p>欢迎您选择ILRuntime ， 根据下面教程您可以快速的开始。</p>
+<h3 id="启步"><a href="#启步" class="headerlink" title="启步"></a>启步</h3><h4 id="从Unity开始"><a href="#从Unity开始" class="headerlink" title="从Unity开始"></a><strong>从Unity开始</strong></h4><p>如果你希望在Unity中使用ILRuntime，推荐的方式是直接使用ILRuntime的源代码，这样ILRuntime可以根据你的发布设置自动进行优化。</p>
+<p>你需要将下列源码目录复制Unity工程的Assets目录：</p>
+<ul>
+<li>Mono.Cecil.20</li>
+<li>Mono.Cecil.Pdb</li>
+<li>ILRuntime</li>
+</ul>
+<blockquote>
+<p>需要注意的是，需要删除这些目录里面的<code>bin</code>、<code>obj</code>、<code>Properties子目录</code>，以及<code>.csproj文件</code>。此外，由于ILRuntime使用了<code>unsafe</code>代码来优化执行效率，所以你需要在Unity中开启<code>unsafe</code>模式：</p>
+</blockquote>
+<ul>
+<li>在Assets目录里建立一个名为smcs.rsp的文本文件</li>
+<li>在smcs.rsp文件中加入”-unsafe”</li>
+</ul>
+<h4 id="从Visual-Studio开始"><a href="#从Visual-Studio开始" class="headerlink" title="从Visual Studio开始"></a><strong>从Visual Studio开始</strong></h4><p>如果你希望在VisualStudio的C#项目中使用ILRuntime， 你只需要引用编译好的<code>ILRuntime.dll</code>，<code>Mono.Cecil.20.dll</code>以及<code>Mono.Cecil.Pdb</code>即可。</p>
+<h3 id="使用之前"><a href="#使用之前" class="headerlink" title="使用之前"></a>使用之前</h3><p>请先执行一次测试用例以保证您下载的ILRuntime没有问题。</p>
+<p>ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRuntime的正常运行，在运行测试用例前，需要手动生成一下TestCases里面的工程，生成DLL文件。</p>
+<h3 id="开始使用"><a href="#开始使用" class="headerlink" title="开始使用"></a>开始使用</h3><p>使用ILRuntime非常简单，只需要以下这些代码即可运行一个完整的例子：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">ILRuntime.Runtime.Enviorment.AppDomain appdomain;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></div><div class="line">&#123;</div><div class="line">    StartCoroutine(LoadILRuntime());</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function">IEnumerator <span class="title">LoadILRuntime</span>(<span class="params"></span>)</span></div><div class="line">&#123;</div><div class="line">    appdomain = <span class="keyword">new</span> ILRuntime.Runtime.Enviorment.AppDomain();</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_ANDROID</span></div><div class="line">    WWW www = <span class="keyword">new</span> WWW(Application.streamingAssetsPath + <span class="string">"/Hotfix.dll"</span>);</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line">    WWW www = <span class="keyword">new</span> WWW(<span class="string">"file:///"</span> + Application.streamingAssetsPath + <span class="string">"/Hotfix.dll"</span>);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    <span class="keyword">while</span> (!www.isDone)</div><div class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(www.error))</div><div class="line">        D.error(www.error);</div><div class="line">    <span class="keyword">byte</span>[] dll = www.bytes;</div><div class="line">    www.Dispose();</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_ANDROID</span></div><div class="line">    www = <span class="keyword">new</span> WWW(Application.streamingAssetsPath + <span class="string">"/Hotfix.pdb"</span>);</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line">    www = <span class="keyword">new</span> WWW(<span class="string">"file:///"</span> + Application.streamingAssetsPath + <span class="string">"/Hotfix.pdb"</span>);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    <span class="keyword">while</span> (!www.isDone)</div><div class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(www.error))</div><div class="line">        D.error(www.error);</div><div class="line">    <span class="keyword">byte</span>[] pdb = www.bytes;</div><div class="line">    <span class="keyword">using</span> (System.IO.MemoryStream fs = <span class="keyword">new</span> MemoryStream(dll))</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">using</span> (System.IO.MemoryStream p = <span class="keyword">new</span> MemoryStream(pdb))</div><div class="line">        &#123;</div><div class="line">            appdomain.LoadAssembly(fs, p, <span class="keyword">new</span> Mono.Cecil.Pdb.PdbReaderProvider());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    OnILRuntimeInitialized();</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnILRuntimeInitialized</span>(<span class="params"></span>)</span></div><div class="line">&#123;</div><div class="line">    appdomain.Invoke(<span class="string">"Hotfix.Game"</span>, <span class="string">"Initialize"</span>, <span class="literal">null</span>, <span class="literal">null</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个例子为了演示方便，直接从StreamingAssets目录里读取了脚本DLL文件以及调试符号PDB文件， 实际发布的时候，如果要热更，肯定是将DLL和PDB文件打包到Assetbundle中进行动态加载的，这个不是ILRuntime的范畴，故不具体演示了。</p>
+<h3 id="调试插件"><a href="#调试插件" class="headerlink" title="调试插件"></a>调试插件</h3><p>ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试你的热更脚本。</p>
+<p>你可以在<a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="external">这里</a>下载到最新的VS2015调试插件。</p>
+<p>使用方法如下：</p>
+<ul>
+<li>安装ILRuntime调试插件，并重新启动VS2015</li>
+<li>运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器</li>
+<li>用VS2015打开热更DLL项目</li>
+<li>点击菜单中的Debug-&gt;Attach to ILRuntime按钮</li>
+<li>在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口</li>
+<li>点击Attach按钮后，即可像UnityVS一样下断点调试</li>
+</ul>
+<p>注意事项：</p>
+<ul>
+<li>调试插件需要Visual Studio 2015 Update3以上版本</li>
+<li>调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值</li>
+</ul>
+
+    <div class="footer">
+        发现错误？想参与编辑？ 
+        <a href="https://github.com/Ourpalm/ILRuntime/tree/master/docs/sources/src/v1/guide/tutorial.md" target="_blank">
+            在 Github 上编辑此页！
+        </a>
+    </div>
+</article>
+
+<div class="sub-nav hiden-in-phone">
+    <dl id="sub-nav">
+        <dt>本文内容</dt>
+        <dd v-for="(ele, index) in sub_nav">
+           <a v-bind:href="ele.href">{{ ele.name }}</a>
+        </dd>
+    </dl>
+</div> 
+</div>
+
+<footer>
+    <div>
+        <p>© Copyright 2017 Ourpalm All Rights Reserved</p>
+        <p>掌趣科技2017</p>
+    </div>
+</footer>
+
+
+<script>
+var vm = new Vue({
+    el : '#container',
+    data: {
+        sub_nav : [ ]
+    },
+    created:function(){
+        var obj = [];
+        $("article h3").each(function(){
+            obj.push({name :  $(this).find("a").attr("title") , href : "#"+$(this).attr("id") });
+        });
+
+        this.sub_nav = obj;       
+    }
+});
+
+var isShow = false;
+$("nav").on("click","#btn-menu" , function(){
+
+    if(!isShow){
+        
+        if($(document).scrollTop() > $(".sidebar").height() - 100){
+
+            $('html, body').animate({scrollTop:0} , 300, "swing",function(){
+
+                $(".sidebar").fadeIn();
+                $(".container").animate({"left" : "15rem"}, 500,"swing");
+            });
+        }else{
+
+                $(".sidebar").fadeIn();
+                $(".container").animate({"left" : "15rem"}, 500,"swing");
+
+        }
+
+    }else{
+        $(".sidebar").fadeOut();
+        $(".container").animate({"left" : "0rem"}, 500,"swing");
+    }
+    isShow = !isShow;
+
+});
+
+$(".container").on("click" , "article" , function(){
+
+    if(isShow){
+        $(".sidebar").fadeOut();
+        $(".container").animate({"left" : "0rem"}, 500,"swing");
+        isShow = false;    
+    }
+
+});
+</script>
+        
+    </body>
+</html>
