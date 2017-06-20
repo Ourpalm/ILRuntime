@@ -867,9 +867,15 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 return true;
             }
-            else if (BaseType != null)
+
+            if (BaseType != null)
+            {
                 res = BaseType.CanAssignTo(type);
-            if (!res && Implements != null)
+
+                if (res) return true;
+            }
+
+            if (Implements != null)
             {
                 for (int i = 0; i < interfaces.Length; i++)
                 {

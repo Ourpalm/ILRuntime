@@ -36,7 +36,7 @@ namespace TestCases
 
             Console.WriteLine("TestCls.TestVal2 = " + cls.TestVal2);
 
-            
+
             ClassInheritanceTest.Test3(cls);
             ClassInheritanceTest.Test3(cls2);
             ClassInheritanceTest.Test3(cls3);
@@ -96,7 +96,7 @@ namespace TestCases
             }
         }
 
-        
+
     }
     class TestCls : ClassInheritanceTest
     {
@@ -280,6 +280,144 @@ namespace TestCases
                 throw new Exception("error");
             }
             return true;
+        }
+    }
+
+
+
+    class TestIs
+    {
+        public class Base
+        {
+            public virtual int Value()
+            {
+                return 0;
+            }
+        }
+
+        public class Base2 : Base
+        {
+
+        }
+
+        public class Base3 : Base2
+        {
+
+        }
+
+        public static bool TestIs01()
+        {
+            AA aa = new AA();
+            if (aa is IAs1)
+            {
+                throw new Exception("error");
+            }
+            return true;
+        }
+
+        public static bool TestIs02()
+        {
+            AA aa = new AA();
+            if (aa is AABase == false)
+            {
+                throw new Exception("error");
+            }
+            return true;
+        }
+
+        public static bool TestIs03()
+        {
+            AA aa = new AA();
+            if (aa is IDisposable == false)
+            {
+                throw new Exception("error");
+            }
+            return true;
+        }
+
+        public static bool TestIs04()
+        {
+            IDisposable aa = new AA();
+            if (aa is AABase == false)
+            {
+                throw new Exception("error");
+            }
+            return true;
+        }
+
+        public static bool TestIs05()
+        {
+            Base aa = new Base3();
+            if (aa is Base2 == false)
+            {
+                throw new Exception("error");
+            }
+            return true;
+        }
+
+
+    }
+
+    public class TestVirtual
+    {
+        public class Base
+        {
+            public virtual int Value()
+            {
+                return 0;
+            }
+        }
+
+        public class Base2 : Base
+        {
+            public override int Value()
+            {
+                return 2;
+            }
+        }
+
+        public class Base3 : Base2
+        {
+
+        }
+
+        public static bool TestVirtualMethod01()
+        {
+            var aa = new Base2();
+
+            if (aa.Value() == 1)
+            {
+                return true;
+            }
+
+            throw new Exception("error");
+
+        }
+
+        public static bool TestVirtualMethod02()
+        {
+            Base aa = new Base2();
+
+            if (aa.Value() == 1)
+            {
+                return true;
+            }
+
+            throw new Exception("error");
+
+        }
+
+        public static bool TestVirtualMethod03()
+        {
+            Base2 aa = new Base2();
+
+            if (aa.Value() == 2)
+            {
+                return true;
+            }
+
+            throw new Exception("error");
+
         }
     }
 

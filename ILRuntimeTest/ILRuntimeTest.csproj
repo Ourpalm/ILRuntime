@@ -117,6 +117,7 @@
     <Compile Include="AutoGenerate\System_Reflection_MethodBase_Binding.cs" />
     <Compile Include="AutoGenerate\System_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Type_Binding.cs" />
+    <Compile Include="TestFramework\TestCLREnum.cs" />
     <Compile Include="TestMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
