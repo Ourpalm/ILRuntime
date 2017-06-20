@@ -61,6 +61,7 @@
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_BaseClassTest_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_Adaptor_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_DelegateTest_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate2_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass3_Binding.cs" />
