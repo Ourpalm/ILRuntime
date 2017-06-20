@@ -244,6 +244,14 @@ namespace ILRuntime.CLR.TypeSystem
             if (fieldMapping == null)
                 InitializeFields();
 
+            var setter = GetFieldSetter(hash);
+            object target = null;
+            if (setter != null)
+            {
+                setter(ref target, value);
+                return;
+            }
+
             var fieldInfo = GetField(hash);
             if (fieldInfo != null)
             {

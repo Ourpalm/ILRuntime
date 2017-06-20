@@ -5,6 +5,7 @@ using System.Text;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Other;
 using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter;
 namespace ILRuntime.CLR.Utils

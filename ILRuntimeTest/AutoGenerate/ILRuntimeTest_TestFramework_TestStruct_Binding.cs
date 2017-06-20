@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
@@ -18,6 +19,7 @@ namespace ILRuntime.Runtime.Generated
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
+            FieldInfo field;
             Type[] args;
             Type type = typeof(ILRuntimeTest.TestFramework.TestStruct);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct).MakeByRefType()};
@@ -29,9 +31,10 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct)};
             method = type.GetMethod("DoTest2", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, DoTest2_2);
-            args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
-            method = type.GetMethod("Add", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Add_3);
+
+            app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);
+
+            app.RegisterCLRCreateDefaultInstance(type, () => new ILRuntimeTest.TestFramework.TestStruct());
 
 
         }
@@ -56,7 +59,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, instance_of_this_method);
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, instance_of_this_method);
                         }
                     }
                     break;
@@ -69,7 +72,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, instance_of_this_method);
+                            ((CLRType)t).SetStaticFieldValue(ptr_of_this_method->ValueLow, instance_of_this_method);
                         }
                     }
                     break;
@@ -112,7 +115,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, a);
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, a);
                         }
                     }
                     break;
@@ -125,7 +128,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, a);
+                            ((CLRType)t).SetStaticFieldValue(ptr_of_this_method->ValueLow, a);
                         }
                     }
                     break;
@@ -171,7 +174,7 @@ namespace ILRuntime.Runtime.Generated
                         else
                         {
                             var t = __domain.GetType(___obj.GetType()) as CLRType;
-                            t.GetField(ptr_of_this_method->ValueLow).SetValue(___obj, a);
+                            t.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, a);
                         }
                     }
                     break;
@@ -184,7 +187,7 @@ namespace ILRuntime.Runtime.Generated
                         }
                         else
                         {
-                            ((CLRType)t).GetField(ptr_of_this_method->ValueLow).SetValue(null, a);
+                            ((CLRType)t).SetStaticFieldValue(ptr_of_this_method->ValueLow, a);
                         }
                     }
                     break;
@@ -213,23 +216,15 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Add_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+
+        static object PerformMemberwiseClone(ref object o)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int32 b = ptr_of_this_method->Value;
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Int32 a = ptr_of_this_method->Value;
-
-            var result_of_this_method = ILRuntimeTest.TestFramework.TestStruct.Add(a, b);
-
-            __ret->ObjectType = ObjectTypes.Integer;
-            __ret->Value = result_of_this_method;
-            return __ret + 1;
+            return new ILRuntimeTest.TestFramework.TestStruct
+            {
+                testField = ((ILRuntimeTest.TestFramework.TestStruct) o).testField,
+                value = ((ILRuntimeTest.TestFramework.TestStruct) o).value,
+            };
         }
-
 
 
     }

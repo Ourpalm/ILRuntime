@@ -6,6 +6,7 @@ using System.Text;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Stack;
+using ILRuntime.Other;
 using ILRuntime.Runtime.Enviorment;
 
 namespace ILRuntime.Runtime.Intepreter
