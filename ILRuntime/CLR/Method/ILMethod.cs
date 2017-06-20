@@ -408,7 +408,7 @@ namespace ILRuntime.CLR.Method
                 case OpCodeEnum.Ldfld:
                 case OpCodeEnum.Ldflda:
                     {
-                        code.TokenInteger = appdomain.GetFieldIndex(token, declaringType, this);
+                        code.TokenLong = appdomain.GetStaticFieldIndex(token, declaringType, this);
                     }
                     break;
 

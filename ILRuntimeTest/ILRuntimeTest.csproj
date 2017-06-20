@@ -100,7 +100,6 @@
     <Compile Include="AutoGenerate\System_Collections_IEnumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Console_Binding.cs" />
     <Compile Include="AutoGenerate\System_Convert_Binding.cs" />
-    <Compile Include="AutoGenerate\System_Delegate_Binding.cs" />
     <Compile Include="AutoGenerate\System_Diagnostics_Stopwatch_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
     <Compile Include="AutoGenerate\System_Func_2_Int32_Int32_Binding.cs" />
@@ -116,7 +115,6 @@
     <Compile Include="AutoGenerate\System_Reflection_FieldInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_MemberInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_MethodBase_Binding.cs" />
-    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_RuntimeHelpers_Binding.cs" />
     <Compile Include="AutoGenerate\System_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Type_Binding.cs" />
     <Compile Include="TestMainForm.cs">

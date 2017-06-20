@@ -32,6 +32,10 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("DoTest2", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, DoTest2_2);
 
+            app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);
+
+            app.RegisterCLRCreateDefaultInstance(type, () => new ILRuntimeTest.TestFramework.TestStruct());
+
 
         }
 
@@ -212,6 +216,15 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
+
+        static object PerformMemberwiseClone(ref object o)
+        {
+            return new ILRuntimeTest.TestFramework.TestStruct
+            {
+                testField = ((ILRuntimeTest.TestFramework.TestStruct) o).testField,
+                value = ((ILRuntimeTest.TestFramework.TestStruct) o).value,
+            };
+        }
 
 
     }

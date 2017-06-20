@@ -23,6 +23,10 @@ namespace ILRuntime.Runtime.Generated
             Type[] args;
             Type type = typeof(ILRuntimeTest.TestFramework.TestClass3);
 
+            field = type.GetField("Struct", flag);
+            app.RegisterCLRFieldGetter(field, get_Struct_0);
+            app.RegisterCLRFieldSetter(field, set_Struct_0);
+
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Ctor_0);
@@ -30,6 +34,15 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+
+        static object get_Struct_0(ref object o)
+        {
+            return ((ILRuntimeTest.TestFramework.TestClass3)o).Struct;
+        }
+        static void set_Struct_0(ref object o, object v)
+        {
+            ((ILRuntimeTest.TestFramework.TestClass3)o).Struct = (ILRuntimeTest.TestFramework.TestStruct)v;
+        }
 
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {

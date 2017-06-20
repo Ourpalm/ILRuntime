@@ -9,11 +9,11 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     static class CommonBindingGenerator
     {
-        internal static string GenerateMiscRegisterCode(this Type type, string typeClsName)
+        internal static string GenerateMiscRegisterCode(this Type type, string typeClsName, bool defaultCtor, bool newArr)
         {
             StringBuilder sb = new StringBuilder();
 
-            if (!type.IsPrimitive && !type.IsAbstract)
+            if (defaultCtor && !type.IsPrimitive && !type.IsAbstract)
             {
                 var constructorFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
                 var hasDefaultConstructor = type.GetConstructor(constructorFlags, null, new Type[0], null) != null;
@@ -24,9 +24,12 @@ namespace ILRuntime.Runtime.CLRBinding
                 }
             }
 
-            if (!type.IsAbstract || !type.IsSealed)
+            if (newArr)
             {
-                sb.AppendLine(string.Format("            app.RegisterCLRCreateArrayInstance(type, s => new {0}[s]);", typeClsName));
+                if (!type.IsAbstract || !type.IsSealed)
+                {
+                    sb.AppendLine(string.Format("            app.RegisterCLRCreateArrayInstance(type, s => new {0}[s]);", typeClsName));
+                }
             }
 
             return sb.ToString();

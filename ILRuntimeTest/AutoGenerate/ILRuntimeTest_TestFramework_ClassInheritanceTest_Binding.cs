@@ -35,6 +35,10 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("Test3", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Test3_3);
 
+            field = type.GetField("TestVal2", flag);
+            app.RegisterCLRFieldGetter(field, get_TestVal2_0);
+            app.RegisterCLRFieldSetter(field, set_TestVal2_0);
+
 
         }
 
@@ -98,6 +102,15 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
+
+        static object get_TestVal2_0(ref object o)
+        {
+            return ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2;
+        }
+        static void set_TestVal2_0(ref object o, object v)
+        {
+            ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2 = (System.Int32)v;
+        }
 
 
     }

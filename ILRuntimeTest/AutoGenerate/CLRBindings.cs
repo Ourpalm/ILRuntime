@@ -21,8 +21,8 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_List_1_Adaptor_Binding.Register(app);
             System_String_Binding.Register(app);
             System_Type_Binding.Register(app);
-            System_Reflection_MethodBase_Binding.Register(app);
             System_Object_Binding.Register(app);
+            System_Reflection_MethodBase_Binding.Register(app);
             System_Activator_Binding.Register(app);
             System_Reflection_MemberInfo_Binding.Register(app);
             System_Reflection_FieldInfo_Binding.Register(app);
@@ -32,7 +32,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_Adaptor_Binding.Register(app);
             System_Exception_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Adaptor_Binding.Register(app);
-            System_Delegate_Binding.Register(app);
+            ILRuntimeTest_TestFramework_DelegateTest_Binding.Register(app);
             ILRuntimeTest_TestFramework_IntDelegate_Binding.Register(app);
             System_Action_1_Int32_Binding.Register(app);
             ILRuntimeTest_TestFramework_IntDelegate2_Binding.Register(app);
@@ -43,6 +43,7 @@ namespace ILRuntime.Runtime.Generated
             System_Action_1_String_Binding.Register(app);
             System_Boolean_Binding.Register(app);
             System_Math_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
             System_Byte_Binding.Register(app);
             System_IO_FileStream_Binding.Register(app);
@@ -57,10 +58,8 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_List_1_List_1_Int32_Binding.Register(app);
             System_Collections_Generic_List_1_List_1_List_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_ILTypeInstance_Int32_Binding.Register(app);
-            System_Runtime_CompilerServices_RuntimeHelpers_Binding.Register(app);
             System_Array_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Array_Binding.Register(app);
-            ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
             System_Convert_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollection_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollection_Binding_Enumerator_Binding.Register(app);

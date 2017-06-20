@@ -26,6 +26,10 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("DoTest", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, DoTest_0);
 
+            field = type.GetField("testField", flag);
+            app.RegisterCLRFieldGetter(field, get_testField_0);
+            app.RegisterCLRFieldSetter(field, set_testField_0);
+
 
         }
 
@@ -41,6 +45,15 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
+
+        static object get_testField_0(ref object o)
+        {
+            return ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField;
+        }
+        static void set_testField_0(ref object o, object v)
+        {
+            ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField = (System.Boolean)v;
+        }
 
 
     }

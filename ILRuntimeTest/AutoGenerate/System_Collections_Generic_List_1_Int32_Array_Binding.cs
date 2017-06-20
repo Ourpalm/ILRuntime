@@ -26,6 +26,8 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("Add", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Add_0);
 
+            app.RegisterCLRCreateArrayInstance(type, s => new System.Collections.Generic.List<System.Int32[]>[s]);
+
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Ctor_0);

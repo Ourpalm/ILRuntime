@@ -1790,16 +1790,16 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             ILTypeInstance instance = obj as ILTypeInstance;
                                             StackObject* val = esp - 1;
-                                            instance.AssignFromStack(ip->TokenInteger, val, AppDomain, mStack);
+                                            instance.AssignFromStack((int)ip->TokenLong, val, AppDomain, mStack);
                                         }
                                         else
                                         {
                                             var t = obj.GetType();
-                                            var type = AppDomain.GetType(t);
+                                            var type = AppDomain.GetType((int)(ip->TokenLong >> 32));
                                             if (type != null)
                                             {
                                                 var val = esp - 1;
-                                                var fieldToken = ip->TokenInteger;
+                                                var fieldToken = (int)ip->TokenLong;
                                                 var f = ((CLRType)type).GetField(fieldToken);
                                                 ((CLRType)type).SetFieldValue(fieldToken, ref obj, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
                                                 //Writeback
@@ -1864,15 +1864,15 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (obj is ILTypeInstance)
                                         {
                                             ILTypeInstance instance = obj as ILTypeInstance;
-                                            instance.PushToStack(ip->TokenInteger, esp - 1, AppDomain, mStack);
+                                            instance.PushToStack((int)ip->TokenLong, esp - 1, AppDomain, mStack);
                                         }
                                         else
                                         {
-                                            var t = obj.GetType();
-                                            var type = AppDomain.GetType(t);
+                                            //var t = obj.GetType();
+                                            var type = AppDomain.GetType((int)(ip->TokenLong >> 32));
                                             if (type != null)
                                             {
-                                                var token = ip->TokenInteger;
+                                                var token = (int)ip->TokenLong;
                                                 var ft = ((CLRType)type).GetField(token);
                                                 var val = ((CLRType)type).GetFieldValue(token, obj);
                                                 if (val is CrossBindingAdaptorType)
@@ -1899,7 +1899,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (obj is ILTypeInstance)
                                         {
                                             ILTypeInstance instance = obj as ILTypeInstance;
-                                            instance.PushFieldAddress(ip->TokenInteger, esp - 1, mStack);
+                                            instance.PushFieldAddress((int)ip->TokenLong, esp - 1, mStack);
                                         }
                                         else
                                         {
@@ -1907,7 +1907,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             objRef->ObjectType = ObjectTypes.FieldReference;
                                             objRef->Value = mStack.Count;
                                             mStack.Add(obj);
-                                            objRef->ValueLow = ip->TokenInteger;
+                                            objRef->ValueLow = (int)ip->TokenLong;
                                         }
                                     }
                                     else

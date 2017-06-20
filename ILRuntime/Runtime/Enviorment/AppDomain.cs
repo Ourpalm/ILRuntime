@@ -1116,17 +1116,6 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        internal int GetFieldIndex(object token, IType contextType, IMethod contextMethod)
-        {
-            FieldReference f = token as FieldReference;
-            var type = GetType(f.DeclaringType, contextType, contextMethod);
-            if(type != null)
-            {
-                return type.GetFieldIndex(token);
-            }
-            throw new KeyNotFoundException();
-        }
-
         internal long GetStaticFieldIndex(object token, IType contextType, IMethod contextMethod)
         {
             FieldReference f = token as FieldReference;
