@@ -449,7 +449,9 @@ namespace ILRuntime.CLR.TypeSystem
                         }
                     }
                     if (baseType == null)
+                    {
                         throw new TypeLoadException("Cannot find Adaptor for:" + definition.BaseType.FullName);
+                    }
                 }
                 else
                 {

@@ -229,7 +229,7 @@ namespace ILRuntimeTest
 
         private void btnGenerateBinding_Click(object sender, EventArgs e)
         {
-            List<Type> types = new List<Type>();
+            /*List<Type> types = new List<Type>();
             types.Add(typeof(int));
             types.Add(typeof(float));
             types.Add(typeof(long));
@@ -241,8 +241,15 @@ namespace ILRuntimeTest
             types.Add(typeof(Dictionary<string, int>));
             types.Add(typeof(Dictionary<ILRuntime.Runtime.Intepreter.ILTypeInstance, int>));
             types.Add(typeof(TestFramework.TestStruct));
-            //ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(types, "..\\..\\AutoGenerate");
-            ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(_app, "..\\..\\AutoGenerate");
+            ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(types, "..\\..\\AutoGenerate");*/
+            ILRuntime.Runtime.Enviorment.AppDomain domain = new ILRuntime.Runtime.Enviorment.AppDomain();
+            using (FileStream fs = new FileStream(txtPath.Text, FileMode.Open, FileAccess.Read))
+            {
+                domain.LoadAssembly(fs);
+            }
+            //Crossbind Adapter is needed to generate the correct binding code
+            ILRuntimeHelper.Init(domain);
+            ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, "..\\..\\AutoGenerate");
         }
     }
 }

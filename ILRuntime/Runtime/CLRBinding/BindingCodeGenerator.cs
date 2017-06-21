@@ -149,13 +149,13 @@ namespace ILRuntime.Runtime.Generated
                 return;
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
+            Dictionary<Type, CLRBindingGenerateInfo> infos = new Dictionary<Type, CLRBindingGenerateInfo>(new ByReferenceKeyComparer<Type>());
+            CrawlAppdomain(domain, infos);
             string[] oldFiles = System.IO.Directory.GetFiles(outputPath, "*.cs");
             foreach (var i in oldFiles)
             {
                 System.IO.File.Delete(i);
             }
-            Dictionary<Type, CLRBindingGenerateInfo> infos = new Dictionary<Type, CLRBindingGenerateInfo>(new ByReferenceKeyComparer<Type>());
-            CrawlAppdomain(domain, infos);
 
             HashSet<MethodBase> excludeMethods = null;
             HashSet<FieldInfo> excludeFields = null;
