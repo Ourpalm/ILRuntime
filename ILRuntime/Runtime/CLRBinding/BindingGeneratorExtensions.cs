@@ -64,7 +64,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     first = false;
                 else
                     sb.Append(", ");
-                if (j.IsOut)
+                if (j.IsOut && j.ParameterType.IsByRef)
                     sb.Append("out ");
                 else if (j.ParameterType.IsByRef)
                     sb.Append("ref ");

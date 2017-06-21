@@ -418,6 +418,8 @@ namespace ILRuntime.Runtime.Generated
                                                 //Cannot explicit call base class's constructor directly
                                                 if (m.IsConstructor)
                                                     continue;
+                                                if (!m.MethodInfo.IsPublic)
+                                                    continue;
                                                 Type t = m.DeclearingType.TypeForCLR;
                                                 CLRBindingGenerateInfo info;
                                                 if (!infos.TryGetValue(t, out info))
