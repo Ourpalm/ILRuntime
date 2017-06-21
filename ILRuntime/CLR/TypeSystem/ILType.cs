@@ -887,7 +887,7 @@ namespace ILRuntime.CLR.TypeSystem
                         return true;
                 }
             }
-            return false;
+            return res;
         }
 
         public ILTypeInstance Instantiate(bool callDefaultConstructor = true)
