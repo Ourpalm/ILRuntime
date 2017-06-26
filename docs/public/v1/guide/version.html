@@ -90,7 +90,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">委托</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">ILRuntime中使用委托</a></p>
             </li>
         
             
@@ -98,7 +98,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">跨域继承</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">在ILRuntime中跨域继承</a></p>
             </li>
         
             
@@ -154,7 +154,15 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-11"><a href="#V1-11" class="headerlink" title="V1.11"></a>V1.11</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-2"><a href="#V1-2" class="headerlink" title="V1.2"></a>V1.2</h3><ul>
+<li>完善系统反射接口的支持，并且提供获取ILRuntime中定义的类型作为泛型参数的接口</li>
+<li>集成Litjson库</li>
+<li>增加了字段，值类型复制，创建默认实例等操作的CLR绑定，改善这些操作的性能</li>
+<li>加入一种新的CLR绑定代码生成方式，可根据指定的DLL自动生成所需的CLR绑定代码，<br>无需再手动指定需要生成的类型</li>
+<li>修复若干泛型方法的Bug</li>
+<li>修复若干类型判断的Bug</li>
+</ul>
+<h3 id="V1-11"><a href="#V1-11" class="headerlink" title="V1.11"></a>V1.11</h3><ul>
 <li>修复了几个bug</li>
 <li>现在在Dictionary或者List等容器中存ILRuntime里定义的委托类型不在算跨域调用了</li>
 </ul>

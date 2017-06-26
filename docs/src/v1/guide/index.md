@@ -6,7 +6,7 @@ order: 0
 
 ## ILRuntime
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT) [![GitHub version](https://badge.fury.io/gh/Ourpalm%2FILRuntime.svg)](https://badge.fury.io/gh/Ourpalm%2FILRuntime) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT) [![release](https://img.shields.io/badge/release-v1.1.0-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
 
 ILRuntime项目为基于C#的平台（例如Unity）提供了一个`纯C#实现`，`快速`、`方便`且`可靠`的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新
 
@@ -32,3 +32,10 @@ Lua是一个已经非常成熟的解决方案，但是对于Unity项目而言，
 
 Lua的优势在于解决方案足够成熟，之前的C++团队可能比起C#，更加习惯使用Lua来进行逻辑开发。此外借助luajit，在某些情况下的执行效率会非常不错，但是luajit现在维护情况也不容乐观，官方还是推荐使用公版Lua来开发。
 
+>如果需要测试ILRuntime对比Lua的性能Benchmark，需要确认以下几点：
+- ILRuntime加载的dll文件是`Release`模式编译的
+- dll中对外部API的调用都进行了`CLR绑定`
+- 确保`没有勾选Development Build`的情况下发布成正式真机运行包，而`不是在Editor中直接运行`
+
+>ILRuntime设计上为了在开发时提供更多的调试支持，在Unity Editor中运行会有很多额外的性能开销，
+因此在Unity Editor中直接测试并不能代表ILRuntime的实际运行性能。

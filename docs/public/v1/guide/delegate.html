@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
 
-    <title>委托 — ILRuntime</title>
+    <title>ILRuntime中使用委托 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -90,7 +90,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link current">委托</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link current">ILRuntime中使用委托</a></p>
             </li>
         
             
@@ -98,7 +98,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">跨域继承</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">在ILRuntime中跨域继承</a></p>
             </li>
         
             
@@ -154,9 +154,36 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="委托"><a href="#委托" class="headerlink" title="委托"></a>委托</h2><blockquote>
-<p>这份文档等待您进行完善</p>
+    <h2 id="ILRuntime中使用委托"><a href="#ILRuntime中使用委托" class="headerlink" title="ILRuntime中使用委托"></a>ILRuntime中使用委托</h2><p>如果只在热更新的DLL项目中使用的委托，是不需要任何额外操作的，就跟在通常的C#里那样使用即可</p>
+<p>如果你需要将委托实例传给ILRuntime外部使用，那则根据情况，你需要额外添加适配器或者转换器。<br>需要注意的是，一些编译器功能也会生成将委托传出给外部使用的代码，例如：</p>
+<blockquote>
+<p>Linq当中where xxxx == xxx，会需要将xxx == xxx这个作为lambda表达式传给Linq.Where这个外部方法使用<br>OrderBy()方法，原因同上</p>
 </blockquote>
+<p>如果在运行时发现缺少注册某个指定类型的委托适配器或者转换器时，ILRuntime会抛出相应的异常，根据提示添加注册即可。</p>
+<h3 id="委托适配器（DelegateAdapter）"><a href="#委托适配器（DelegateAdapter）" class="headerlink" title="委托适配器（DelegateAdapter）"></a><strong>委托适配器（DelegateAdapter）</strong></h3><p>如果将委托实例传出给ILRuntime外部使用，那就意味着需要将委托实例转换成真正的CLR（C#运行时）委托实例，这个过程需要动态创建CLR的委托实例。由于IL2CPP之类的AOT编译技术无法在运行时生成新的类型，所以在创建委托实例的时候ILRuntime选择了显式注册的方式，以保证问题不被隐藏到上线后才发现。</p>
+<blockquote>
+<p>同一个参数组合的委托，只需要注册一次即可，例如：</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">SomeDelegate</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">float</span> b</span>)</span>;</div><div class="line"></div><div class="line">Action&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt; act;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>这两个委托都只需要注册一个适配器即可。 注册方法如下</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">appDomain.DelegateManager.RegisterMethodDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;();</div></pre></td></tr></table></figure>
+<blockquote>
+<p>如果是带返回类型的委托，例如：</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">delegate</span> <span class="keyword">bool</span> <span class="title">SomeFunction</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">float</span> b</span>)</span>;</div><div class="line"></div><div class="line">Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt; act;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>需要按照以下方式注册</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">appDomain.DelegateManager.RegisterFunctionDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;();</div></pre></td></tr></table></figure>
+<h3 id="委托转换器（DelegateConvertor）"><a href="#委托转换器（DelegateConvertor）" class="headerlink" title="委托转换器（DelegateConvertor）"></a><strong>委托转换器（DelegateConvertor）</strong></h3><p>ILRuntime内部是使用Action,以及Func这两个系统自带委托类型来生成的委托实例，所以如果你需要将一个<code>不是Action或者Func类型</code>的委托实例传到ILRuntime外部使用的话，除了委托适配器，还需要额外写一个转换器，将Action和Func转换成你真正需要的那个委托类型。</p>
+<p>比如上面例子中的SomeFunction类型的委托，其所需的Convertor应如下实现：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">app.DelegateManager.RegisterDelegateConvertor&lt;SomeFunction&gt;((action) =&gt;</div><div class="line">&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> SomeFunction((a, b) =&gt;</div><div class="line">    &#123;</div><div class="line">       <span class="keyword">return</span> ((Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;)action)(a, b);</div><div class="line">    &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a><strong>建议</strong></h3><p>为了避免不必要的麻烦，以及后期热更出现问题，建议项目遵循以下几点：</p>
+<ul>
+<li>尽量<code>避免不必要的</code>跨域委托调用</li>
+<li>尽量使用<code>Action以及Func</code>这两个系统内置万用委托类型</li>
+</ul>
 
     <div class="footer">
         发现错误？想参与编辑？ 
