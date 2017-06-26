@@ -1,10 +1,10 @@
 ---
-title: 在ILRuntime中跨域继承
+title: ILRuntime中跨域继承
 type: guide
 order: 120
 ---
 
-## 在ILRuntime中跨域继承
+## ILRuntime中跨域继承
 
 如果你想在热更DLL项目当中`继承一个Unity主工程里的类`，或者`实现一个主工程里的接口`，你需要在Unity主工程中实现一个继承适配器。
 方法如下：
@@ -59,7 +59,7 @@ order: 120
         }
 
         //实际的适配器类需要继承你想继承的那个类，并且实现CrossBindingAdaptorType接口
-        class Adaptor : ClassInheritanceTest, CrossBindingAdaptorType
+        class Adaptor : ClassInheritanceTest,CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
