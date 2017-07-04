@@ -168,7 +168,7 @@ article h3:before {
   opacity: 0.3;
 }
 article h4 {
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-top: 2.125rem;
   margin-bottom: 1.25rem;
 }
@@ -178,7 +178,7 @@ article h5 {
   margin-top: 2.125rem;
 }
 article p {
-  font-size: 1rem;
+  font-size: 0.95rem;
   margin-bottom: 1.25rem;
   margin-top: 0.625rem;
   line-height: 1.8;
@@ -191,7 +191,36 @@ article ul {
   font-size: 0.9rem;
 }
 article ul li {
+  padding-bottom: 0.4rem;
   color: #525252;
+  line-height: 1.5rem;
+}
+article table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 0;
+  border-spacing: 0;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+article table tr:nth-child(even) td {
+  background-color: #f7f7f7;
+}
+article table .title-row {
+  background-color: #ededed;
+}
+article table tr th,
+article table tr td {
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  color: #525252;
+}
+article table tr th {
+  background-color: #e8e8e8;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+article table tr td {
+  font-size: 0.75rem;
 }
 article blockquote {
   padding: 12px 24px 12px 30px;
@@ -259,11 +288,6 @@ article p.tip p a {
 article p.tip p a:hover {
   color: #fcd8d6;
 }
-article hr {
-  height: 1px;
-  border: none;
-  border-top: 1px dashed #dcdcdc;
-}
 article ol {
   list-style-type: none;
   counter-reset: sectioncounter;
@@ -273,10 +297,16 @@ article ol {
 }
 article ol li {
   color: #525252;
+  padding-top: 0.25rem;
 }
 article ol li:before {
   content: counter(sectioncounter) ". ";
   counter-increment: sectioncounter;
+}
+article hr {
+  height: 1px;
+  border: none;
+  border-top: 1px dashed #dcdcdc;
 }
 article figure {
   margin: 1.2rem 0;
@@ -458,6 +488,7 @@ nav img {
 }
 nav .nav-link li {
   float: right;
+  font-size: 0.95rem;
   padding: 1.75rem 1rem;
 }
 nav .nav-link li a {
@@ -504,6 +535,9 @@ article {
 .sub-nav dl dd {
   margin-bottom: 0.25rem;
   padding-left: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
 }
 .sub-nav dl dd.select {
   border-left: 0.125rem #3d9cff solid;
