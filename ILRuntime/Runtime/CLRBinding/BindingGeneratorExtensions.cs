@@ -30,6 +30,7 @@ namespace ILRuntime.Runtime.CLRBinding
             if (i.IsGenericMethod)
                 return true;
             //EventHandler is currently not supported
+            var param = i.GetParameters();
             if (i.IsSpecialName)
             {
                 string[] t = i.Name.Split('_');
@@ -37,16 +38,29 @@ namespace ILRuntime.Runtime.CLRBinding
                     return true;
                 if (t[0] == "get" || t[0] == "set")
                 {
-                    var prop = type.GetProperty(t[1]);
+                    Type[] ts;
+                    if (t[1] == "Item")
+                    {
+                        var cnt = t[0] == "set" ? param.Length - 1 : param.Length;
+                        ts = new Type[cnt];
+                        for (int j = 0; j < cnt; j++)
+                        {
+                            ts[j] = param[j].ParameterType;
+                        }
+                    }
+                    else
+                        ts = new Type[0];
+                    var prop = type.GetProperty(t[1], ts);
                     if (prop == null)
+                    {
                         return true;
+                    }
                     if (prop.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
                         return true;
                 }
             }
             if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
                 return true;
-            var param = i.GetParameters();
             foreach (var j in param)
             {
                 if (j.ParameterType.IsPointer)
