@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
 
-    <title>ILRT实现原理 — ILRuntime</title>
+    <title>ILRuntime的实现原理 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -132,7 +132,7 @@
                 <li><h3>其他</h3></li>
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包事项</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包注意事项</a></p>
             </li>
         
             
@@ -140,7 +140,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRT性能优化</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRuntime的性能优化建议</a></p>
             </li>
         
             
@@ -148,15 +148,23 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link current">ILRT实现原理</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link current">ILRuntime的实现原理</a></p>
             </li>
         
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="ILRT实现原理"><a href="#ILRT实现原理" class="headerlink" title="ILRT实现原理"></a>ILRT实现原理</h2><blockquote>
-<p>这份文档等待您进行完善</p>
-</blockquote>
+    <h2 id="ILRuntime的实现原理"><a href="#ILRuntime的实现原理" class="headerlink" title="ILRuntime的实现原理"></a>ILRuntime的实现原理</h2><p>ILRuntime借助Mono.Cecil库来读取DLL的PE信息，以及当中类型的所有信息，最终得到方法的IL汇编码，然后通过内置的IL解译执行虚拟机来执行DLL中的代码。</p>
+<h3 id="IL托管栈和托管对象栈"><a href="#IL托管栈和托管对象栈" class="headerlink" title="IL托管栈和托管对象栈"></a>IL托管栈和托管对象栈</h3><p>为了高性能进行运算，尤其是栈上的基础类型运算，如int,float,long之类类型的运算，直接借助C#的Stack类实现IL托管栈肯定是个非常糟糕的做法。因为这意味着每次读取和写入这些基础类型的值，都需要将他们进行装箱和拆箱操作，这个过程会非常耗时并且会产生巨量的GC Alloc，使得整个运行时执行效率非常低下。</p>
+<p>因此ILRuntime使用unsafe代码以及非托管内存，实现了自己的IL托管栈。</p>
+<p>ILRuntime中的所有对象都是以StackObject类来表示的，他的定义如下：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> StackObject</div><div class="line">&#123;</div><div class="line">    <span class="keyword">public</span> ObjectTypes ObjectType;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Value; <span class="comment">//高32位</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> ValueLow; <span class="comment">//低32位</span></div><div class="line">&#125;</div><div class="line"><span class="keyword">enum</span> ObjectTypes</div><div class="line">&#123;</div><div class="line">    Null,<span class="comment">//null</span></div><div class="line">    Integer,</div><div class="line">    Long,</div><div class="line">    Float,</div><div class="line">    Double,</div><div class="line">    StackObjectReference,<span class="comment">//引用指针，Value = 指针地址, </span></div><div class="line">    StaticFieldReference,<span class="comment">//静态变量引用,Value = 类型Hash， ValueLow= Field的Index</span></div><div class="line">    Object,<span class="comment">//托管对象，Value = 对象Index</span></div><div class="line">    FieldReference,<span class="comment">//类成员变量引用，Value = 对象Index, ValueLow = Field的Index</span></div><div class="line">    ArrayReference,<span class="comment">//数组引用，Value = 对象Index, ValueLow = 元素的Index</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通过StackObject这个值类型，我们可以表达C#当中所有的基础类型，因为所有基础类型都可以表达为8位到64位的integer。对于非基础类型而言，我们额外需要一个List来储存他的object引用对象，而Value则可以存储这个对象在List中的Index。由此我们就可以表达C#中所有的类型了。</p>
+<h3 id="托管调用栈"><a href="#托管调用栈" class="headerlink" title="托管调用栈"></a>托管调用栈</h3><p>ILRuntime在进行方法调用时，需要将方法的参数先压入托管栈，然后执行完毕后需要将栈还原，并把方法返回值压入栈。</p>
+<p>具体过程如下图所示</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">调用前:                                调用完成后:</div><div class="line">|---------------|                     |---------------|</div><div class="line">|     参数1     |     |--------------&gt;|   [返回值]    |</div><div class="line">|---------------|     |               |---------------|</div><div class="line">|      ...      |     |               |     NULL      |</div><div class="line">|---------------|     |               |---------------|</div><div class="line">|     参数N     |     |               |      ...      |</div><div class="line">|---------------|     |</div><div class="line">|   局部变量1   |     |</div><div class="line">|---------------|     |</div><div class="line">|      ...      |     |</div><div class="line">|---------------|     |</div><div class="line">|   局部变量1   |     |</div><div class="line">|---------------|     |</div><div class="line">|  方法栈基址   |     |</div><div class="line">|---------------|     |</div><div class="line">|   [返回值]    |------</div><div class="line">|---------------|</div></pre></td></tr></table></figure>
+<p>函数调用进入目标方法体后，栈指针（后面我们简称为ESP）会被指向方法栈基址那个位置，可以通过ESP-X获取到该方法的参数和方法内部申明的局部变量，在方法执行完毕后，如果有返回值，则把返回值写在方法栈基址位置即可（上图因为空间原因写在了基址后面）。</p>
+<p>当方法体执行完毕后，ILRuntime会自动平衡托管栈，释放所有方法体占用的栈内存，然后把返回值复制到参数1的位置，这样后续代码直接取栈顶部就可以取到上次方法调用的返回值了。</p>
 
     <div class="footer">
         发现错误？想参与编辑？ 
