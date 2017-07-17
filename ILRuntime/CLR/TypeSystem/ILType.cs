@@ -696,6 +696,13 @@ namespace ILRuntime.CLR.TypeSystem
             return constructors;
         }
 
+        public IMethod GetStaticConstroctor()
+        {
+            if (constructors == null)
+                InitializeMethods();
+            return staticConstructor;
+        }
+
         public IMethod GetConstructor(int paramCnt)
         {
             if (constructors == null)
