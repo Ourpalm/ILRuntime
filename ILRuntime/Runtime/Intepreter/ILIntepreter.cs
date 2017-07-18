@@ -145,25 +145,33 @@ namespace ILRuntime.Runtime.Intepreter
             //Managed Stack reserved for local variable
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
+                mStack.Add(null);
+            }
+
+            for (int i = 0; i < method.LocalVariableCount; i++)
+            {
                 var v = method.Variables[i];
                 if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
                 {
                     var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
                     if (t is ILType)
                     {
-                        var obj = ((ILType)t).Instantiate(false);
+                        //var obj = ((ILType)t).Instantiate(false);
                         var loc = Add(v1, i);
-                        loc->ObjectType = ObjectTypes.Object;
+                        stack.AllocValueType(loc, t);
+
+                        /*loc->ObjectType = ObjectTypes.Object;
                         loc->Value = mStack.Count;
-                        mStack.Add(obj);
+                        mStack.Add(obj);*/
+
                     }
                     else
                     {
-                        var obj = ((CLRType) t).CreateDefaultInstance();
+                        var obj = ((CLRType)t).CreateDefaultInstance();
                         var loc = Add(v1, i);
                         loc->ObjectType = ObjectTypes.Object;
-                        loc->Value = mStack.Count;
-                        mStack.Add(obj);
+                        loc->Value = locBase + i;
+                        mStack[locBase + i] = obj;
                     }
                 }
                 else
@@ -178,9 +186,8 @@ namespace ILRuntime.Runtime.Intepreter
                     {
                         var loc = Add(v1, i);
                         loc->ObjectType = ObjectTypes.Object;
-                        loc->Value = mStack.Count;
+                        loc->Value = locBase + i;
                     }
-                    mStack.Add(null);
                 }
             }
             fixed (OpCode* ptr = body)
@@ -294,7 +301,6 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_1:
                                 {
                                     esp--;
-                                    *v2 = *esp;
                                     int idx = locBase + 1;
                                     switch (esp->ObjectType)
                                     {
@@ -306,11 +312,27 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Object:
                                         case ObjectTypes.FieldReference:
                                         case ObjectTypes.ArrayReference:
-                                            mStack[idx] = CheckAndCloneValueType(mStack[v2->Value], domain);
-                                            v2->Value = idx;
-                                            Free(esp);
+                                            if (v2->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                            {
+                                                var obj = mStack[v2->Value];
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    var dst = *(StackObject**)&v2->Value;
+                                                    ((ILTypeInstance)obj).CopyToStack(dst, mStack);
+                                                }
+                                                else
+                                                    throw new NotImplementedException();
+                                            }
+                                            else
+                                            {
+                                                *v2 = *esp;
+                                                mStack[idx] = CheckAndCloneValueType(mStack[v2->Value], domain);
+                                                v2->Value = idx;
+                                                Free(esp);
+                                            }
                                             break;
                                         default:
+                                            *v2 = *esp;
                                             mStack[idx] = null;
                                             break;
                                     }

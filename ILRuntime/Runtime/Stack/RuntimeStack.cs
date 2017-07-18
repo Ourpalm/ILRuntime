@@ -126,13 +126,48 @@ namespace ILRuntime.Runtime.Stack
                     throw new NotImplementedException();
                 }
                 ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
-                *(StackObject**)ptr->Value = valueTypePtr;
-                valueTypePtr = ILIntepreter.Minus(ptr, fieldCount);
+                var dst = valueTypePtr;
+                *(StackObject**)&ptr->Value = dst;
+                valueTypePtr = ILIntepreter.Minus(valueTypePtr, fieldCount);
                 if (valueTypePtr <= StackBase)
                     throw new StackOverflowException();
+                InitializeValueTypeObject(type, dst);
             }
             else
                 throw new ArgumentException(type.FullName + " is not a value type.", "type");
+        }
+
+        void InitializeValueTypeObject(IType type, StackObject* ptr)
+        {
+            if (type is ILType)
+            {
+                ILType t = (ILType)type;
+                for (int i = 0; i < t.FieldTypes.Length; i++)
+                {
+                    var ft = t.FieldTypes[i];
+                    StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i);
+                    var tClr = ft.TypeForCLR;
+                    if (tClr.IsPrimitive)
+                        StackObject.Initialized(val, tClr);
+                    else
+                    {
+                        if (ft.IsValueType)
+                        {
+                            AllocValueType(val, ft);
+                        }
+                        else
+                        {
+                            val->ObjectType = ObjectTypes.Object;
+                            val->Value = managedStack.Count;
+                            managedStack.Add(null);
+                        }
+                    }
+                }
+                if (type.BaseType != null && type.BaseType is ILType)
+                    InitializeValueTypeObject((ILType)type.BaseType, ptr);
+            }
+            else
+                throw new NotImplementedException();
         }
         
         public void Dispose()

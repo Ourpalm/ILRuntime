@@ -280,6 +280,38 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        internal unsafe void CopyToStack(StackObject* ptr, IList<object> mStack)
+        {
+            for(int i = 0; i < fields.Length; i++)
+            {
+                var val = ILIntepreter.Minus(ptr, i);
+                switch (val->ObjectType)
+                {
+                    case ObjectTypes.Object:
+                    case ObjectTypes.FieldReference:
+                    case ObjectTypes.ArrayReference:
+                        mStack[val->Value] = managedObjs[i];
+                        val->ValueLow = fields[i].ValueLow;
+                        break;
+                    case ObjectTypes.ValueTypeObjectReference:
+                        {
+                            var obj = managedObjs[i];
+                            var dst = *(StackObject**)&val->Value;
+                            if (obj is ILTypeInstance)
+                            {
+                                ((ILTypeInstance)obj).CopyToStack(dst, mStack);
+                            }
+                            else
+                                throw new NotImplementedException();
+                        }
+                        break;
+                    default:
+                        *val = fields[i];
+                        break;
+                }                
+            }
+        }
+
         internal void Clear()
         {   
             InitializeFields(type);
