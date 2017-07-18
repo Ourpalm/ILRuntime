@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.0</button>
+        <button class="hiden-in-phone">V1.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -90,7 +90,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">委托</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">ILRuntime中使用委托</a></p>
             </li>
         
             
@@ -98,7 +98,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">跨域继承</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">ILRuntime中跨域继承</a></p>
             </li>
         
             
@@ -106,7 +106,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">反射</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">ILRuntime中的反射</a></p>
             </li>
         
             
@@ -114,7 +114,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">重定向</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">CLR重定向</a></p>
             </li>
         
             
@@ -122,7 +122,15 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">绑定</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">CLR绑定</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/litjson.html" class="sidebar-link">LitJson集成</a></p>
             </li>
         
             
@@ -132,7 +140,7 @@
                 <li><h3>其他</h3></li>
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包事项</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包注意事项</a></p>
             </li>
         
             
@@ -140,7 +148,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRT性能优化</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRuntime的性能优化</a></p>
             </li>
         
             
@@ -148,7 +156,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRT实现原理</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRuntime的实现原理</a></p>
             </li>
         
     </ul>
@@ -169,6 +177,15 @@
 <li>在<code>Assets</code>目录里建立一个名为<code>smcs.rsp</code>的文本文件</li>
 <li>在<code>smcs.rsp</code>文件中加入 <code>-unsafe</code></li>
 </ul>
+<blockquote>
+<ul>
+<li>如果你使用的是<code>Unity5.4</code>及以前的版本，并且使用的编译设置是<code>.Net 2.0</code>而不是<code>.Net 2.0 Subset</code>的话，<br>你需要将上述说明中的<code>smcs.rsp</code>文件名改成<code>gmcs.rsp</code>。</li>
+<li>如果你使用的是<code>Unity5.5</code>以上的版本，你需要将上述说明中的<code>smcs.rsp</code>文件名改成<code>mcs.rsp</code></li>
+</ul>
+</blockquote>
+<h4 id="Unity3D的示例工程"><a href="#Unity3D的示例工程" class="headerlink" title="Unity3D的示例工程"></a><strong>Unity3D的示例工程</strong></h4><p>你可以在<a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="external">这里</a>下载到最新的Unity实例工程，该示例是在Unity5.4下制作的。</p>
+<p>里面有2个工程，其中ILRuntimeDemo是Unity的主工程。实例都在这个工程当中的各个示例场景中，这个工程是在Unity5.4下完成的，如果你使用的是其他版本的Unity，可能需要自己做一些修改。</p>
+<p>HotFix_Project是热更DLL工程，请用VS2015之类的C# IDE打开和进行编译，在编译前请确保至少打开过一次Unity的主工程，如果编译依然说找不到UnityEngine等dll，请手动重新指认一下</p>
 <h4 id="从Visual-Studio开始"><a href="#从Visual-Studio开始" class="headerlink" title="从Visual Studio开始"></a><strong>从Visual Studio开始</strong></h4><p>如果你希望在VisualStudio的C#项目中使用ILRuntime， 你只需要引用编译好的<code>ILRuntime.dll</code>，<code>Mono.Cecil.20.dll</code>以及<code>Mono.Cecil.Pdb</code>即可。</p>
 <h3 id="使用之前"><a href="#使用之前" class="headerlink" title="使用之前"></a>使用之前</h3><p>请先执行一次测试用例以保证您下载的ILRuntime没有问题。</p>
 <p>ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRuntime的正常运行，在运行测试用例前，需要手动生成一下TestCases里面的工程，生成DLL文件。</p>
@@ -188,8 +205,8 @@
 </ul>
 <p><strong>注意事项：</strong></p>
 <ul>
-<li>调试插件需要Visual Studio 2015 Update3以上版本</li>
-<li>调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值</li>
+<li>调试插件需要<code>Visual Studio 2015 Update3</code>以上版本</li>
+<li>调试插件目前<code>仍热在开发中</code>，目前断点后仅能查看基础类型的局部变量和函数参数的值</li>
 </ul>
 
     <div class="footer">

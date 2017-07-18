@@ -28,11 +28,11 @@ namespace ILRuntime.Runtime.Enviorment
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
         Dictionary<int, ILIntepreter> intepreters = new Dictionary<int, ILIntepreter>();
         Dictionary<Type, CrossBindingAdaptor> crossAdaptors = new Dictionary<Type, CrossBindingAdaptor>(new ByReferenceKeyComparer<Type>());
-        Dictionary<string, IType> mapType = new Dictionary<string, IType>();
+        ThreadSafeDictionary<string, IType> mapType = new ThreadSafeDictionary<string, IType>();
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>(new ByReferenceKeyComparer<Type>());
-        Dictionary<int, IType> mapTypeToken = new Dictionary<int, IType>();
-        Dictionary<int, IMethod> mapMethod = new Dictionary<int, IMethod>();
-        Dictionary<long, string> mapString = new Dictionary<long, string>();
+        ThreadSafeDictionary<int, IType> mapTypeToken = new ThreadSafeDictionary<int, IType>();
+        ThreadSafeDictionary<int, IMethod> mapMethod = new ThreadSafeDictionary<int, IMethod>();
+        ThreadSafeDictionary<long, string> mapString = new ThreadSafeDictionary<long, string>();
         Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate> redirectMap = new Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate>();
         Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate> fieldGetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate>();
         Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate> fieldSetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate>();
@@ -130,7 +130,10 @@ namespace ILRuntime.Runtime.Enviorment
         public IType DoubleType { get { return doubleType; } }
         public IType ObjectType { get { return objectType; } }
 
-        public Dictionary<string, IType> LoadedTypes { get { return mapType; } }
+        /// <summary>
+        /// Attention, this property isn't thread safe
+        /// </summary>
+        public Dictionary<string, IType> LoadedTypes { get { return mapType.InnerDictionary; } }
         internal Dictionary<MethodBase, CLRRedirectionDelegate> RedirectMap { get { return redirectMap; } }
         internal Dictionary<FieldInfo, CLRFieldGetterDelegate> FieldGetterMap { get { return fieldGetterMap; } }
         internal Dictionary<FieldInfo, CLRFieldSetterDelegate> FieldSetterMap { get { return fieldSetterMap; } }

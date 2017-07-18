@@ -25,6 +25,19 @@ order: 100
 - 在`Assets`目录里建立一个名为`smcs.rsp`的文本文件
 - 在`smcs.rsp`文件中加入 `-unsafe`
 
+>- 如果你使用的是`Unity5.4`及以前的版本，并且使用的编译设置是`.Net 2.0`而不是`.Net 2.0 Subset`的话，
+你需要将上述说明中的`smcs.rsp`文件名改成`gmcs.rsp`。
+- 如果你使用的是`Unity5.5 `以上的版本，你需要将上述说明中的`smcs.rsp`文件名改成`mcs.rsp`
+
+#### **Unity3D的示例工程**
+
+你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的Unity实例工程，该示例是在Unity5.4下制作的。
+
+里面有2个工程，其中ILRuntimeDemo是Unity的主工程。实例都在这个工程当中的各个示例场景中，这个工程是在Unity5.4下完成的，如果你使用的是其他版本的Unity，可能需要自己做一些修改。
+
+HotFix_Project是热更DLL工程，请用VS2015之类的C# IDE打开和进行编译，在编译前请确保至少打开过一次Unity的主工程，如果编译依然说找不到UnityEngine等dll，请手动重新指认一下
+
+
 #### **从Visual Studio开始**
 
 如果你希望在VisualStudio的C#项目中使用ILRuntime， 你只需要引用编译好的`ILRuntime.dll`，`Mono.Cecil.20.dll`以及`Mono.Cecil.Pdb`即可。
@@ -106,5 +119,5 @@ ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试�
 
 **注意事项：**
 
-- 调试插件需要Visual Studio 2015 Update3以上版本
-- 调试插件目前仍热在开发中，目前断点后仅能查看基础类型的局部变量和函数参数的值
+- 调试插件需要`Visual Studio 2015 Update3`以上版本
+- 调试插件目前`仍热在开发中`，目前断点后仅能查看基础类型的局部变量和函数参数的值

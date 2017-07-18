@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.0</button>
+        <button class="hiden-in-phone">V1.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -90,7 +90,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">委托</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">ILRuntime中使用委托</a></p>
             </li>
         
             
@@ -98,7 +98,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">跨域继承</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">ILRuntime中跨域继承</a></p>
             </li>
         
             
@@ -106,7 +106,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">反射</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">ILRuntime中的反射</a></p>
             </li>
         
             
@@ -114,7 +114,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">重定向</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">CLR重定向</a></p>
             </li>
         
             
@@ -122,7 +122,15 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">绑定</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">CLR绑定</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/litjson.html" class="sidebar-link">LitJson集成</a></p>
             </li>
         
             
@@ -132,7 +140,7 @@
                 <li><h3>其他</h3></li>
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包事项</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包注意事项</a></p>
             </li>
         
             
@@ -140,7 +148,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRT性能优化</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRuntime的性能优化</a></p>
             </li>
         
             
@@ -148,13 +156,13 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRT实现原理</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRuntime的实现原理</a></p>
             </li>
         
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="ILRuntime"><a href="#ILRuntime" class="headerlink" title="ILRuntime"></a>ILRuntime</h2><p><a href="https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT" target="_blank" rel="external"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="license"></a> <a href="https://badge.fury.io/gh/Ourpalm%2FILRuntime" target="_blank" rel="external"><img src="https://badge.fury.io/gh/Ourpalm%2FILRuntime.svg" alt="GitHub version"></a> <a href="https://github.com/Ourpalm/ILRuntime/pulls" target="_blank" rel="external"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg" alt="PRs Welcome"></a></p>
+    <h2 id="ILRuntime"><a href="#ILRuntime" class="headerlink" title="ILRuntime"></a>ILRuntime</h2><p><a href="https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT" target="_blank" rel="external"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="license"></a> <a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="external"><img src="https://img.shields.io/badge/release-v1.2.0-blue.svg" alt="release"></a> <a href="https://github.com/Ourpalm/ILRuntime/pulls" target="_blank" rel="external"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg" alt="PRs Welcome"></a></p>
 <p>ILRuntime项目为基于C#的平台（例如Unity）提供了一个<code>纯C#实现</code>，<code>快速</code>、<code>方便</code>且<code>可靠</code>的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新</p>
 <h3 id="ILRuntime的优势"><a href="#ILRuntime的优势" class="headerlink" title="ILRuntime的优势"></a>ILRuntime的优势</h3><p>同市面上的其他热更方案相比，ILRuntime主要有以下优点：</p>
 <ul>
@@ -170,6 +178,15 @@
 <p>Lua是一个已经非常成熟的解决方案，但是对于Unity项目而言，也有非常明显的缺点。就是如果使用Lua来进行逻辑开发，就势必要求团队当中的人员需要同时对Lua和C#都特别熟悉，或者将团队中的人员分成C#小组和Lua小组。不管哪一种方案，对于中小型团队都是非常痛苦的一件事情。</p>
 <p>用C#来作为热更语言最大的优势就是项目可以用同一个语言来进行开发，对Unity项目而言，这种方式肯定是开发效率最高的。</p>
 <p>Lua的优势在于解决方案足够成熟，之前的C++团队可能比起C#，更加习惯使用Lua来进行逻辑开发。此外借助luajit，在某些情况下的执行效率会非常不错，但是luajit现在维护情况也不容乐观，官方还是推荐使用公版Lua来开发。</p>
+<blockquote>
+<p>如果需要测试ILRuntime对比Lua的性能Benchmark，需要确认以下几点：</p>
+<ul>
+<li>ILRuntime加载的dll文件是<code>Release</code>模式编译的</li>
+<li>dll中对外部API的调用都进行了<code>CLR绑定</code></li>
+<li>确保<code>没有勾选Development Build</code>的情况下发布成正式真机运行包，而<code>不是在Editor中直接运行</code></li>
+</ul>
+<p>ILRuntime设计上为了在开发时提供更多的调试支持，在Unity Editor中运行会有很多额外的性能开销，<br>因此在Unity Editor中直接测试并不能代表ILRuntime的实际运行性能。</p>
+</blockquote>
 
     <div class="footer">
         发现错误？想参与编辑？ 

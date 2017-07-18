@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
 
-    <title>IL2CPP打包事项 — ILRuntime</title>
+    <title>IL2CPP打包注意事项 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.0</button>
+        <button class="hiden-in-phone">V1.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -90,7 +90,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">委托</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">ILRuntime中使用委托</a></p>
             </li>
         
             
@@ -98,7 +98,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">跨域继承</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">ILRuntime中跨域继承</a></p>
             </li>
         
             
@@ -106,7 +106,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">反射</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">ILRuntime中的反射</a></p>
             </li>
         
             
@@ -114,7 +114,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">重定向</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">CLR重定向</a></p>
             </li>
         
             
@@ -122,7 +122,15 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">绑定</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">CLR绑定</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/litjson.html" class="sidebar-link">LitJson集成</a></p>
             </li>
         
             
@@ -132,7 +140,7 @@
                 <li><h3>其他</h3></li>
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link current">IL2CPP打包事项</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link current">IL2CPP打包注意事项</a></p>
             </li>
         
             
@@ -140,7 +148,7 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRT性能优化</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRuntime的性能优化</a></p>
             </li>
         
             
@@ -148,15 +156,20 @@
             
             
             <li>
-                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRT实现原理</a></p>
+                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRuntime的实现原理</a></p>
             </li>
         
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="IL2CPP打包事项"><a href="#IL2CPP打包事项" class="headerlink" title="IL2CPP打包事项"></a>IL2CPP打包事项</h2><blockquote>
-<p>这份文档等待您进行完善</p>
-</blockquote>
+    <h2 id="iOS-IL2CPP打包注意事项"><a href="#iOS-IL2CPP打包注意事项" class="headerlink" title="iOS IL2CPP打包注意事项"></a>iOS IL2CPP打包注意事项</h2><p>鉴于IL2CPP的特殊性，实际在iOS的发布中可能会遇到一些问题，在这里给大家介绍几个iOS发布时可能会遇到的问题。</p>
+<p>IL2CPP和mono的最大区别就是不能在运行时动态生成代码和类型，所以这就要求必须在编译时就完全确定需要用到的类型。</p>
+<h3 id="类型裁剪"><a href="#类型裁剪" class="headerlink" title="类型裁剪"></a>类型裁剪</h3><p>IL2CPP在打包时会自动对Unity工程的DLL进行裁剪，将代码中没有引用到的类型裁剪掉，以达到减小发布后ipa包的尺寸的目的。然而在实际使用过程中，很多类型有可能会被意外剪裁掉，造成运行时抛出找不到某个类型的异常。特别是通过反射等方式在编译时无法得知的函数调用，在运行时都很有可能遇到问题。</p>
+<p>Unity提供了一个方式来告诉Unity引擎，哪些类型是不能够被剪裁掉的。具体做法就是在Unity工程的Assets目录中建立一个叫link.xml的XML文件，然后按照下面的格式指定你需要保留的类型：<br><figure class="highlight xml"><table><tr><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">linker</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">assembly</span> <span class="attr">fullname</span>=<span class="string">"UnityEngine"</span> <span class="attr">preserve</span>=<span class="string">"all"</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">assembly</span> <span class="attr">fullname</span>=<span class="string">"Assembly-CSharp"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">namespace</span> <span class="attr">fullname</span>=<span class="string">"MyGame.Utils"</span> <span class="attr">preserve</span>=<span class="string">"all"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">type</span> <span class="attr">fullname</span>=<span class="string">"MyGame.SomeClass"</span> <span class="attr">preserve</span>=<span class="string">"all"</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">assembly</span>&gt;</span>  </div><div class="line"><span class="tag">&lt;/<span class="name">linker</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h3 id="泛型实例"><a href="#泛型实例" class="headerlink" title="泛型实例"></a>泛型实例</h3><p>每个泛型实例实际上都是一个独立的类型，<code>List&lt;A&gt;</code> 和 <code>List&lt;B&gt;</code>是两个完全没有关系的类型，这意味着，如果在运行时无法通过JIT来创建新类型的话，代码中没有直接使用过的泛型实例都会在运行时出现问题。</p>
+<p>在ILRuntime中解决这个问题有两种方式，一个是使用CLR绑定，把用到的泛型实例都进行CLR绑定。另外一个方式是在Unity主工程中，建立一个类，然后在里面定义用到的那些泛型实例的public变量。这两种方式都可以告诉IL2CPP保留这个类型的代码供运行中使用。</p>
+<p>因此建议大家在实际开发中，尽量使用热更DLL内部的类作为泛型参数，因为DLL内部的类型都是ILTypeInstance，只需处理一个就行了。此外如果泛型模版类就是在DLL里定义的的话，那就完全不需要进行任何处理。</p>
+<h3 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h3><p>跟泛型实例一样，<code>foo.Bar&lt;TypeA&gt;</code> 和<code>foo.Bar&lt;TypeB&gt;</code>是两个完全不同的方法，需要在主工程中显式调用过，IL2CPP才能够完整保留，因此需要尽量避免在热更DLL中调用Unity主工程的泛型方法。如果在iOS上实际运行遇到报错，可以尝试在Unity的主工程中随便写一个static的方法，然后对这个泛型方法调用一下即可，这个方法无需被调用，只是用来告诉IL2CPP我们需要这个方法</p>
 
     <div class="footer">
         发现错误？想参与编辑？ 
