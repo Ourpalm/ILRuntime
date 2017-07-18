@@ -73,7 +73,7 @@ namespace TestCases
             Console.WriteLine(ILRuntimeTest.TestFramework.TestStruct.instance.value);
         }
 
-        public static object UnitTest_10022()
+        public static void UnitTest_10022()
         {
             Vector3 pos = Vector3.Zero;
 
@@ -89,12 +89,18 @@ namespace TestCases
             if (pos.y < -10)
                 pos.y = -10;
 
-            return tttt(pos);
+            var pos2 = tttt(pos);
+            Console.WriteLine("pos.x = " + pos.x);
+            Console.WriteLine("pos2.x = " + pos2.x);
+
+            if (pos.x == pos2.x)
+                throw new Exception("Value Type Violation");
         }
 
-        static object tttt(Vector3 a)
+        static Vector3 tttt(Vector3 a)
         {
-            return a.y;
+            a.x = 12345;
+            return a;
         }
         public static object UnitTest_1003()
         {
