@@ -1775,61 +1775,78 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Ldfld:
                                 {
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1);
-                                    object obj = RetriveObject(objRef, mStack);
-                                    Free(esp - 1);
-                                    if (obj != null)
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
-                                        if (obj is ILTypeInstance)
-                                        {
-                                            ILTypeInstance instance = obj as ILTypeInstance;
-                                            instance.PushToStack((int)ip->TokenLong, esp - 1, AppDomain, mStack);
-                                        }
-                                        else
-                                        {
-                                            //var t = obj.GetType();
-                                            var type = AppDomain.GetType((int)(ip->TokenLong >> 32));
-                                            if (type != null)
-                                            {
-                                                var token = (int)ip->TokenLong;
-                                                var ft = ((CLRType)type).GetField(token);
-                                                var val = ((CLRType)type).GetFieldValue(token, obj);
-                                                if (val is CrossBindingAdaptorType)
-                                                    val = ((CrossBindingAdaptorType)val).ILInstance;
-                                                PushObject(esp - 1, mStack, val, ft.FieldType == typeof(object));
-                                            }
-                                            else
-                                                throw new TypeLoadException();
-                                        }
+                                        var dst = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong);
+                                        CopyToStack(objRef, dst, mStack);
                                     }
                                     else
-                                        throw new NullReferenceException();
-
+                                    {
+                                        object obj = RetriveObject(objRef, mStack);
+                                        Free(esp - 1);
+                                        if (obj != null)
+                                        {
+                                            if (obj is ILTypeInstance)
+                                            {
+                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                instance.PushToStack((int)ip->TokenLong, esp - 1, AppDomain, mStack);
+                                            }
+                                            else
+                                            {
+                                                //var t = obj.GetType();
+                                                var type = AppDomain.GetType((int)(ip->TokenLong >> 32));
+                                                if (type != null)
+                                                {
+                                                    var token = (int)ip->TokenLong;
+                                                    var ft = ((CLRType)type).GetField(token);
+                                                    var val = ((CLRType)type).GetFieldValue(token, obj);
+                                                    if (val is CrossBindingAdaptorType)
+                                                        val = ((CrossBindingAdaptorType)val).ILInstance;
+                                                    PushObject(esp - 1, mStack, val, ft.FieldType == typeof(object));
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
+                                            }
+                                        }
+                                        else
+                                            throw new NullReferenceException();
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Ldflda:
                                 {
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1);
-                                    object obj = RetriveObject(objRef, mStack);
-
-                                    Free(esp - 1);
-                                    if (obj != null)
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
-                                        if (obj is ILTypeInstance)
-                                        {
-                                            ILTypeInstance instance = obj as ILTypeInstance;
-                                            instance.PushFieldAddress((int)ip->TokenLong, esp - 1, mStack);
-                                        }
-                                        else
-                                        {
-                                            objRef = esp - 1;
-                                            objRef->ObjectType = ObjectTypes.FieldReference;
-                                            objRef->Value = mStack.Count;
-                                            mStack.Add(obj);
-                                            objRef->ValueLow = (int)ip->TokenLong;
-                                        }
+                                        var dst = esp - 1;
+                                        var fieldAddr = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong);
+                                        dst->ObjectType = ObjectTypes.StackObjectReference;
+                                        *(StackObject**)&dst->Value = fieldAddr;
                                     }
                                     else
-                                        throw new NullReferenceException();
+                                    {
+                                        object obj = RetriveObject(objRef, mStack);
+
+                                        Free(esp - 1);
+                                        if (obj != null)
+                                        {
+                                            if (obj is ILTypeInstance)
+                                            {
+                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                instance.PushFieldAddress((int)ip->TokenLong, esp - 1, mStack);
+                                            }
+                                            else
+                                            {
+                                                objRef = esp - 1;
+                                                objRef->ObjectType = ObjectTypes.FieldReference;
+                                                objRef->Value = mStack.Count;
+                                                mStack.Add(obj);
+                                                objRef->ValueLow = (int)ip->TokenLong;
+                                            }
+                                        }
+                                        else
+                                            throw new NullReferenceException();
+                                    }
                                 }
                                 break;
                             case OpCodeEnum.Stsfld:
@@ -3677,7 +3694,7 @@ namespace ILRuntime.Runtime.Intepreter
                 case ObjectTypes.ArrayReference:
                     if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
                     {
-                        var obj = mStack[v->Value];
+                        var obj = mStack[esp->Value];
                         if (obj is ILTypeInstance)
                         {
                             var dst = *(StackObject**)&v->Value;
