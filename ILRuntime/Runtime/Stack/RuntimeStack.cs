@@ -85,7 +85,7 @@ namespace ILRuntime.Runtime.Stack
                 throw new NotSupportedException();
             StackObject* returnVal = esp - 1;
             var method = frame.Method;
-            StackObject* ret = frame.LocalVarPointer - method.ParameterCount;
+            StackObject* ret = ILIntepreter.Minus(frame.LocalVarPointer, method.ParameterCount);
             int mStackBase = frame.ManagedStackBase;
             if (method.HasThis)
                 ret--;
