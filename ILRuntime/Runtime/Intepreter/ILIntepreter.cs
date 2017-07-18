@@ -272,26 +272,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_0:
                                 {
                                     esp--;
-                                    *v1 = *esp;
                                     int idx = locBase;
-                                    switch (esp->ObjectType)
-                                    {
-                                        case ObjectTypes.Null:
-                                            v1->ObjectType = ObjectTypes.Object;
-                                            v1->Value = idx;
-                                            mStack[idx] = null;
-                                            break;
-                                        case ObjectTypes.Object:
-                                        case ObjectTypes.FieldReference:
-                                        case ObjectTypes.ArrayReference:
-                                            mStack[idx] = CheckAndCloneValueType(mStack[v1->Value], domain);
-                                            v1->Value = idx;
-                                            Free(esp);
-                                            break;
-                                        default:
-                                            mStack[idx] = null;
-                                            break;
-                                    }
+                                    StLocSub(esp, v1, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_0:
@@ -302,40 +284,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     int idx = locBase + 1;
-                                    switch (esp->ObjectType)
-                                    {
-                                        case ObjectTypes.Null:
-                                            v2->ObjectType = ObjectTypes.Object;
-                                            v2->Value = idx;
-                                            mStack[idx] = null;
-                                            break;
-                                        case ObjectTypes.Object:
-                                        case ObjectTypes.FieldReference:
-                                        case ObjectTypes.ArrayReference:
-                                            if (v2->ObjectType == ObjectTypes.ValueTypeObjectReference)
-                                            {
-                                                var obj = mStack[v2->Value];
-                                                if (obj is ILTypeInstance)
-                                                {
-                                                    var dst = *(StackObject**)&v2->Value;
-                                                    ((ILTypeInstance)obj).CopyToStack(dst, mStack);
-                                                }
-                                                else
-                                                    throw new NotImplementedException();
-                                            }
-                                            else
-                                            {
-                                                *v2 = *esp;
-                                                mStack[idx] = CheckAndCloneValueType(mStack[v2->Value], domain);
-                                                v2->Value = idx;
-                                                Free(esp);
-                                            }
-                                            break;
-                                        default:
-                                            *v2 = *esp;
-                                            mStack[idx] = null;
-                                            break;
-                                    }
+                                    StLocSub(esp, v2, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_1:
@@ -345,26 +294,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_2:
                                 {
                                     esp--;
-                                    *v3 = *esp;
                                     int idx = locBase + 2;
-                                    switch (esp->ObjectType)
-                                    {
-                                        case ObjectTypes.Null:
-                                            v3->ObjectType = ObjectTypes.Object;
-                                            v3->Value = idx;
-                                            mStack[idx] = null;
-                                            break;
-                                        case ObjectTypes.Object:
-                                        case ObjectTypes.FieldReference:
-                                        case ObjectTypes.ArrayReference:
-                                            mStack[idx] = CheckAndCloneValueType(mStack[v3->Value], domain);
-                                            v3->Value = idx;
-                                            Free(esp);
-                                            break;
-                                        default:
-                                            mStack[idx] = null;
-                                            break;
-                                    }
+                                    StLocSub(esp, v3, idx, mStack);
                                     break;
                                 }
                             case OpCodeEnum.Ldloc_2:
@@ -374,26 +305,9 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stloc_3:
                                 {
                                     esp--;
-                                    *v4 = *esp;
                                     int idx = locBase + 3;
-                                    switch (esp->ObjectType)
-                                    {
-                                        case ObjectTypes.Null:
-                                            v4->ObjectType = ObjectTypes.Object;
-                                            v4->Value = idx;
-                                            mStack[idx] = null;
-                                            break;
-                                        case ObjectTypes.Object:
-                                        case ObjectTypes.FieldReference:
-                                        case ObjectTypes.ArrayReference:
-                                            mStack[idx] = CheckAndCloneValueType(mStack[v4->Value], domain);
-                                            v4->Value = idx;
-                                            Free(esp);
-                                            break;
-                                        default:
-                                            mStack[idx] = null;
-                                            break;
-                                    }
+
+                                    StLocSub(esp, v4, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_3:
@@ -405,26 +319,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     var v = Add(frame.LocalVarPointer, ip->TokenInteger);
-                                    *v = *esp;
                                     int idx = locBase + ip->TokenInteger;
-                                    switch (esp->ObjectType)
-                                    {
-                                        case ObjectTypes.Null:
-                                            v->ObjectType = ObjectTypes.Object;
-                                            v->Value = idx;
-                                            mStack[idx] = null;
-                                            break;
-                                        case ObjectTypes.Object:
-                                        case ObjectTypes.FieldReference:
-                                        case ObjectTypes.ArrayReference:
-                                            mStack[idx] = CheckAndCloneValueType(mStack[v->Value], domain);
-                                            v->Value = idx;
-                                            Free(esp);
-                                            break;
-                                        default:
-                                            mStack[idx] = null;
-                                            break;
-                                    }
+                                    StLocSub(esp, v, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc:
@@ -3765,6 +3661,44 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack);
+        }
+
+        void StLocSub(StackObject* esp, StackObject* v, int idx, IList<object> mStack)
+        {
+            switch (esp->ObjectType)
+            {
+                case ObjectTypes.Null:
+                    v->ObjectType = ObjectTypes.Object;
+                    v->Value = idx;
+                    mStack[idx] = null;
+                    break;
+                case ObjectTypes.Object:
+                case ObjectTypes.FieldReference:
+                case ObjectTypes.ArrayReference:
+                    if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                    {
+                        var obj = mStack[v->Value];
+                        if (obj is ILTypeInstance)
+                        {
+                            var dst = *(StackObject**)&v->Value;
+                            ((ILTypeInstance)obj).CopyToStack(dst, mStack);
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        *v = *esp;
+                        mStack[idx] = CheckAndCloneValueType(mStack[v->Value], domain);
+                        v->Value = idx;
+                        Free(esp);
+                    }
+                    break;
+                default:
+                    *v = *esp;
+                    mStack[idx] = null;
+                    break;
+            }
         }
 
         object RetriveObject(StackObject* esp, IList<object> mStack)
