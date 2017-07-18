@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using ILRuntime.CLR.Method;
+using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Other;
 using ILRuntime.Runtime.Intepreter;
 
@@ -14,6 +14,7 @@ namespace ILRuntime.Runtime.Stack
         ILIntepreter intepreter;
         StackObject* pointer;
         StackObject* endOfMemory;
+        StackObject* valueTypePtr;
 
         IntPtr nativePointer;
 
@@ -34,6 +35,7 @@ namespace ILRuntime.Runtime.Stack
             nativePointer = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(StackObject) * MAXIMAL_STACK_OBJECTS);
             pointer = (StackObject*)nativePointer.ToPointer();
             endOfMemory = Add(pointer, MAXIMAL_STACK_OBJECTS);
+            valueTypePtr = endOfMemory - 1;
         }
 
         ~RuntimeStack()
@@ -70,6 +72,7 @@ namespace ILRuntime.Runtime.Stack
 #endif
             res.BasePointer = method.LocalVariableCount > 0 ? Add(esp, method.LocalVariableCount + 1) : esp;
             res.ManagedStackBase = managedStack.Count;
+            res.ValueTypeBasePointer = valueTypePtr;
             //frames.Push(res);
         }
         public void PushFrame(ref StackFrame frame)
@@ -105,9 +108,32 @@ namespace ILRuntime.Runtime.Stack
 #else
             ((UncheckedList<object>)mStack).RemoveRange(mStackBase, mStack.Count - mStackBase);
 #endif
+            valueTypePtr = frame.ValueTypeBasePointer;
             return ret;
         }
 
+        public void AllocValueType(StackObject* ptr, IType type)
+        {
+            if (type.IsValueType)
+            {
+                int fieldCount = 0;
+                if(type is ILType)
+                {
+                    fieldCount = ((ILType)type).TotalFieldCount;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+                ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                *(StackObject**)ptr->Value = valueTypePtr;
+                valueTypePtr = ILIntepreter.Minus(ptr, fieldCount);
+                if (valueTypePtr <= StackBase)
+                    throw new StackOverflowException();
+            }
+            else
+                throw new ArgumentException(type.FullName + " is not a value type.", "type");
+        }
         
         public void Dispose()
         {
