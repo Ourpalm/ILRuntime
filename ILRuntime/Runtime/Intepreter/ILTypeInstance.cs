@@ -282,9 +282,12 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal unsafe void CopyToStack(StackObject* ptr, IList<object> mStack)
         {
+            ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
+            ptr->Value = type.GetHashCode();
+            ptr->ValueLow = type.TotalFieldCount;
             for(int i = 0; i < fields.Length; i++)
             {
-                var val = ILIntepreter.Minus(ptr, i);
+                var val = ILIntepreter.Minus(ptr, i + 1);
                 switch (val->ObjectType)
                 {
                     case ObjectTypes.Object:

@@ -188,6 +188,7 @@ namespace ILRuntime.Runtime.Stack
         StackObjectReference,//Value = pointer, 
         StaticFieldReference,
         ValueTypeObjectReference,
+        ValueTypeDescriptor,
         Object,
         FieldReference,//Value = objIdx, ValueLow = fieldIdx
         ArrayReference,//Value = objIdx, ValueLow = elemIdx

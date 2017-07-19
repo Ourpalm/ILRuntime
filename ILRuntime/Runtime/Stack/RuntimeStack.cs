@@ -128,7 +128,10 @@ namespace ILRuntime.Runtime.Stack
                 ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
                 var dst = valueTypePtr;
                 *(StackObject**)&ptr->Value = dst;
-                valueTypePtr = ILIntepreter.Minus(valueTypePtr, fieldCount);
+                dst->ObjectType = ObjectTypes.ValueTypeDescriptor;
+                dst->Value = type.GetHashCode();
+                dst->ValueLow = fieldCount;
+                valueTypePtr = ILIntepreter.Minus(valueTypePtr, fieldCount + 1);
                 if (valueTypePtr <= StackBase)
                     throw new StackOverflowException();
                 InitializeValueTypeObject(type, dst);
@@ -145,7 +148,7 @@ namespace ILRuntime.Runtime.Stack
                 for (int i = 0; i < t.FieldTypes.Length; i++)
                 {
                     var ft = t.FieldTypes[i];
-                    StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i);
+                    StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i + 1);
                     var tClr = ft.TypeForCLR;
                     if (tClr.IsPrimitive)
                         StackObject.Initialized(val, tClr);

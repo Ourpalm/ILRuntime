@@ -1777,7 +1777,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1);
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
-                                        var dst = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong);
+                                        var dst = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong + 1);
                                         CopyToStack(objRef, dst, mStack);
                                     }
                                     else
@@ -1819,7 +1819,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         var dst = esp - 1;
-                                        var fieldAddr = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong);
+                                        var fieldAddr = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong + 1);
                                         dst->ObjectType = ObjectTypes.StackObjectReference;
                                         *(StackObject**)&dst->Value = fieldAddr;
                                     }
