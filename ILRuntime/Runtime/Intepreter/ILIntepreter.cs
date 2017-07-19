@@ -1700,73 +1700,81 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stfld:
                                 {
                                     var objRef = GetObjectAndResolveReference(esp - 1 - 1);
-                                    object obj = RetriveObject(objRef, mStack);
-
-                                    if (obj != null)
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
-                                        if (obj is ILTypeInstance)
-                                        {
-                                            ILTypeInstance instance = obj as ILTypeInstance;
-                                            StackObject* val = esp - 1;
-                                            instance.AssignFromStack((int)ip->TokenLong, val, AppDomain, mStack);
-                                        }
-                                        else
-                                        {
-                                            var t = obj.GetType();
-                                            var type = AppDomain.GetType((int)(ip->TokenLong >> 32));
-                                            if (type != null)
-                                            {
-                                                var val = esp - 1;
-                                                var fieldToken = (int)ip->TokenLong;
-                                                var f = ((CLRType)type).GetField(fieldToken);
-                                                ((CLRType)type).SetFieldValue(fieldToken, ref obj, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
-                                                //Writeback
-                                                if (t.IsValueType)
-                                                {
-                                                    switch (objRef->ObjectType)
-                                                    {
-                                                        case ObjectTypes.Object:
-                                                            break;
-                                                        case ObjectTypes.FieldReference:
-                                                            {
-                                                                var oldObj = mStack[objRef->Value];
-                                                                int idx = objRef->ValueLow;
-                                                                if (oldObj is ILTypeInstance)
-                                                                {
-                                                                    ((ILTypeInstance)oldObj)[idx] = obj;
-                                                                }
-                                                                else
-                                                                {
-                                                                    var it = AppDomain.GetType(oldObj.GetType());
-                                                                    ((CLRType)it).SetFieldValue(idx, ref oldObj, obj);
-                                                                }
-                                                            }
-                                                            break;
-                                                        case ObjectTypes.StaticFieldReference:
-                                                            {
-                                                                var it = AppDomain.GetType(objRef->Value);
-                                                                int idx = objRef->ValueLow;
-                                                                if (it is ILType)
-                                                                {
-                                                                    ((ILType)it).StaticInstance[idx] = obj;
-                                                                }
-                                                                else
-                                                                {
-                                                                    ((CLRType)it).SetStaticFieldValue(idx, obj);
-                                                                }
-                                                            }
-                                                            break;
-                                                        default:
-                                                            throw new NotImplementedException();
-                                                    }
-                                                }
-                                            }
-                                            else
-                                                throw new TypeLoadException();
-                                        }
+                                        StackObject* dst = *(StackObject**)&objRef->Value;
+                                        CopyToValueTypeField(dst, (int)ip->TokenLong + 1, esp - 1, mStack);
                                     }
                                     else
-                                        throw new NullReferenceException();
+                                    {
+                                        object obj = RetriveObject(objRef, mStack);
+
+                                        if (obj != null)
+                                        {
+                                            if (obj is ILTypeInstance)
+                                            {
+                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                StackObject* val = esp - 1;
+                                                instance.AssignFromStack((int)ip->TokenLong, val, AppDomain, mStack);
+                                            }
+                                            else
+                                            {
+                                                var t = obj.GetType();
+                                                var type = AppDomain.GetType((int)(ip->TokenLong >> 32));
+                                                if (type != null)
+                                                {
+                                                    var val = esp - 1;
+                                                    var fieldToken = (int)ip->TokenLong;
+                                                    var f = ((CLRType)type).GetField(fieldToken);
+                                                    ((CLRType)type).SetFieldValue(fieldToken, ref obj, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
+                                                    //Writeback
+                                                    if (t.IsValueType)
+                                                    {
+                                                        switch (objRef->ObjectType)
+                                                        {
+                                                            case ObjectTypes.Object:
+                                                                break;
+                                                            case ObjectTypes.FieldReference:
+                                                                {
+                                                                    var oldObj = mStack[objRef->Value];
+                                                                    int idx = objRef->ValueLow;
+                                                                    if (oldObj is ILTypeInstance)
+                                                                    {
+                                                                        ((ILTypeInstance)oldObj)[idx] = obj;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        var it = AppDomain.GetType(oldObj.GetType());
+                                                                        ((CLRType)it).SetFieldValue(idx, ref oldObj, obj);
+                                                                    }
+                                                                }
+                                                                break;
+                                                            case ObjectTypes.StaticFieldReference:
+                                                                {
+                                                                    var it = AppDomain.GetType(objRef->Value);
+                                                                    int idx = objRef->ValueLow;
+                                                                    if (it is ILType)
+                                                                    {
+                                                                        ((ILType)it).StaticInstance[idx] = obj;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        ((CLRType)it).SetStaticFieldValue(idx, obj);
+                                                                    }
+                                                                }
+                                                                break;
+                                                            default:
+                                                                throw new NotImplementedException();
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
+                                            }
+                                        }
+                                        else
+                                            throw new NullReferenceException();
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
                                     esp = esp - 1 - 1;
@@ -3678,6 +3686,43 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp, mStack);
+        }
+
+        void CopyToValueTypeField(StackObject* obj, int idx, StackObject* val, IList<object> mStack)
+        {
+            StackObject* dst = Minus(obj, idx + 1);
+            switch (val->ObjectType)
+            {
+                case ObjectTypes.Null:
+                    {
+                        mStack[dst->Value] = null;
+                    }
+                    break;
+                case ObjectTypes.Object:
+                case ObjectTypes.FieldReference:
+                case ObjectTypes.ArrayReference:
+                    {
+                        if (dst->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                        {
+                            var ins = mStack[val->Value];
+                            if (ins is ILTypeInstance)
+                            {
+                                dst = *(StackObject**)&dst->Value;
+                                ((ILTypeInstance)ins).CopyToStack(dst, mStack);
+                            }
+                            else
+                                throw new NotImplementedException();
+                        }
+                        else
+                        {
+                            mStack[dst->Value] = CheckAndCloneValueType(mStack[val->Value], domain);                            
+                        }
+                    }
+                    break;
+                default:
+                    *dst = *val;
+                    break;
+            }
         }
 
         void StLocSub(StackObject* esp, StackObject* v, int idx, IList<object> mStack)
