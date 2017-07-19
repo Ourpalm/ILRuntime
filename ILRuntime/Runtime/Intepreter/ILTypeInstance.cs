@@ -341,13 +341,41 @@ namespace ILRuntime.Runtime.Intepreter
         {
             esp = ILIntepreter.GetObjectAndResolveReference(esp);
             field = *esp;
-            if (field.ObjectType >= ObjectTypes.Object)
+            switch (field.ObjectType)
             {
-                field.Value = fieldIdx;
-                managedObjs[fieldIdx] = ILIntepreter.CheckAndCloneValueType(managedStack[esp->Value], Type.AppDomain);
+                case ObjectTypes.Object:
+                case ObjectTypes.ArrayReference:
+                case ObjectTypes.FieldReference:
+                    field.Value = fieldIdx;
+                    managedObjs[fieldIdx] = ILIntepreter.CheckAndCloneValueType(managedStack[esp->Value], Type.AppDomain);
+                    break;
+                case ObjectTypes.ValueTypeObjectReference:
+                    {
+                        field.ObjectType = ObjectTypes.Object;
+                        field.Value = fieldIdx;
+                        var ins = managedObjs[fieldIdx];
+                        if (ins == null)
+                            throw new NullReferenceException();
+                        if (ins is ILTypeInstance)
+                        {
+                            ILTypeInstance child = (ILTypeInstance)ins;
+                            StackObject* val = *(StackObject**)&esp->Value;
+                            int cnt = val->ValueLow;
+                            for(int i = 0; i < cnt; i++)
+                            {
+                                var addr = ILIntepreter.Minus(val, i + 1);
+                                child.AssignFromStack(i, addr, type.AppDomain, managedStack);
+                            }
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
+                    break;
+                default:
+                    if (managedObjs != null)
+                        managedObjs[fieldIdx] = null;
+                    break;
             }
-            else if (managedObjs != null)
-                managedObjs[fieldIdx] = null;
         }
 
         public override string ToString()
