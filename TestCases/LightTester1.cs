@@ -75,7 +75,7 @@ namespace TestCases
 
         public static void UnitTest_10022()
         {
-            Vector3 pos = Vector3.Zero;
+            Vector3 pos = Vector3.One;
 
             pos.x += 1;
             pos.y += 2;

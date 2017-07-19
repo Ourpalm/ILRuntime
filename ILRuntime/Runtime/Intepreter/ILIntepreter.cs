@@ -131,6 +131,9 @@ namespace ILRuntime.Runtime.Intepreter
                         a->Value = mStack.Count;
                         mStack.Add(null);
                         break;
+                    case ObjectTypes.ValueTypeObjectReference:
+                        CloneStackValueType(a, a, mStack);
+                        break;
                     case ObjectTypes.Object:
                     case ObjectTypes.FieldReference:
                     case ObjectTypes.ArrayReference:
@@ -1703,7 +1706,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         StackObject* dst = *(StackObject**)&objRef->Value;
-                                        CopyToValueTypeField(dst, (int)ip->TokenLong + 1, esp - 1, mStack);
+                                        CopyToValueTypeField(dst, (int)ip->TokenLong, esp - 1, mStack);
                                     }
                                     else
                                     {
@@ -2203,9 +2206,23 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            var obj = type.Instantiate(false);
                                             var a = esp - m.ParameterCount;
-                                            var objRef = PushObject(esp, mStack, obj);//this parameter for constructor
+                                            StackObject* objRef;
+                                            ILTypeInstance obj = null;
+                                            bool isValueType = type.IsValueType;
+                                            if (isValueType)
+                                            {
+                                                stack.AllocValueType(esp, type);
+                                                objRef = esp + 1;
+                                                objRef->ObjectType = ObjectTypes.StackObjectReference;
+                                                *(StackObject**)&objRef->Value = esp;
+                                                objRef++;
+                                            }
+                                            else
+                                            {
+                                                obj = type.Instantiate(false);
+                                                objRef = PushObject(esp, mStack, obj);//this parameter for constructor
+                                            }
                                             esp = objRef;
                                             for (int i = 0; i < m.ParameterCount; i++)
                                             {
@@ -2213,7 +2230,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp++;
                                             }
                                             esp = Execute((ILMethod)m, esp, out unhandledException);
-                                            esp = PushObject(a, mStack, obj);//new constructedObj
+                                            if (isValueType)
+                                            {
+                                                var ins = objRef - 1 - 1;
+                                                *a = *ins;
+                                                esp = a + 1;
+                                            }
+                                            else
+                                                esp = PushObject(a, mStack, obj);//new constructedObj
                                         }
                                         if (unhandledException)
                                             returned = true;
@@ -3646,7 +3670,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 while (stack.Frames.Peek().BasePointer != frame.BasePointer)
                                 {
                                     var f = stack.Frames.Peek();
-                                    esp = stack.PopFrame(ref f, esp, mStack);
+                                    esp = stack.PopFrame(ref f, esp);
                                     if (f.Method.ReturnType != AppDomain.VoidType)
                                     {
                                         Free(esp - 1);
@@ -3685,7 +3709,50 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
 #endif
             //ClearStack
-            return stack.PopFrame(ref frame, esp, mStack);
+            return stack.PopFrame(ref frame, esp);
+        }
+
+        void CloneStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
+        {
+            StackObject* descriptor = *(StackObject**)&src->Value;
+            stack.AllocValueType(dst, AppDomain.GetType(descriptor->Value));
+            StackObject* dstDescriptor = *(StackObject**)&dst->Value;
+            int cnt = descriptor->ValueLow;
+            for(int i = 0; i < cnt; i++)
+            {
+                StackObject* val = Minus(descriptor, i + 1);
+                CopyToValueTypeField(dstDescriptor, i, val, mStack);
+            }
+        }
+
+        void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
+        {
+            StackObject* descriptor = *(StackObject**)&src->Value;
+            StackObject* dstDescriptor = *(StackObject**)&dst->Value;
+            if (descriptor->Value != dstDescriptor->Value)
+                throw new InvalidCastException();
+            int cnt = descriptor->ValueLow;
+            for(int i = 0; i < cnt; i++)
+            {
+                StackObject* srcVal = Minus(descriptor, i + 1);
+                StackObject* dstVal = Minus(dstDescriptor, i + 1);
+                if (srcVal->ObjectType != dstVal->ObjectType)
+                    throw new NotSupportedException();
+                switch (dstVal->ObjectType)
+                {
+                    case ObjectTypes.Object:
+                    case ObjectTypes.ArrayReference:
+                    case ObjectTypes.FieldReference:
+                        mStack[dstVal->Value] = mStack[srcVal->Value];
+                        break;
+                    case ObjectTypes.ValueTypeObjectReference:
+                        CopyStackValueType(srcVal, dstVal, mStack);
+                        break;
+                    default:
+                        *dstVal = *srcVal;
+                        break;
+                }
+            }
         }
 
         void CopyToValueTypeField(StackObject* obj, int idx, StackObject* val, IList<object> mStack)
@@ -3719,6 +3786,8 @@ namespace ILRuntime.Runtime.Intepreter
                         }
                     }
                     break;
+                case ObjectTypes.ValueTypeObjectReference:
+                    throw new NotImplementedException();
                 default:
                     *dst = *val;
                     break;
@@ -3755,6 +3824,14 @@ namespace ILRuntime.Runtime.Intepreter
                         v->Value = idx;
                         Free(esp);
                     }
+                    break;
+                case ObjectTypes.ValueTypeObjectReference:
+                    if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                    {
+                        CopyStackValueType(esp, v, mStack);
+                    }
+                    else
+                        throw new NotImplementedException();
                     break;
                 default:
                     *v = *esp;
