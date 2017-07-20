@@ -105,11 +105,12 @@ namespace TestCases
         {
             return left.x * right.x + left.y * right.y + left.z * right.z;
         }
+        static Vector3 one = new Vector3(1, 1, 1);
         public static Vector3 One
         {
             get
             {
-                return new Vector3(1, 1, 1);
+                return one;
             }
         }
         public static Vector3 Zero

@@ -109,6 +109,7 @@ namespace ILRuntime.Runtime.Intepreter
             int finallyEndAddress = 0;
 
             esp = frame.BasePointer;
+            var bp = esp;
             StackObject* arg = Minus(frame.LocalVarPointer, method.ParameterCount);
             IList<object> mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
@@ -276,7 +277,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     int idx = locBase;
-                                    StLocSub(esp, v1, idx, mStack);
+                                    StLocSub(esp, v1, bp, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_0:
@@ -287,7 +288,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     int idx = locBase + 1;
-                                    StLocSub(esp, v2, idx, mStack);
+                                    StLocSub(esp, v2, bp, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_1:
@@ -298,7 +299,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     int idx = locBase + 2;
-                                    StLocSub(esp, v3, idx, mStack);
+                                    StLocSub(esp, v3, bp, idx, mStack);
                                     break;
                                 }
                             case OpCodeEnum.Ldloc_2:
@@ -310,7 +311,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     int idx = locBase + 3;
 
-                                    StLocSub(esp, v4, idx, mStack);
+                                    StLocSub(esp, v4, bp, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_3:
@@ -323,7 +324,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     var v = Add(frame.LocalVarPointer, ip->TokenInteger);
                                     int idx = locBase + ip->TokenInteger;
-                                    StLocSub(esp, v, idx, mStack);
+                                    StLocSub(esp, v, bp, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc:
@@ -3794,7 +3795,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void StLocSub(StackObject* esp, StackObject* v, int idx, IList<object> mStack)
+        void StLocSub(StackObject* esp, StackObject* v, StackObject* bp, int idx, IList<object> mStack)
         {
             switch (esp->ObjectType)
             {
@@ -3822,8 +3823,8 @@ namespace ILRuntime.Runtime.Intepreter
                         *v = *esp;
                         mStack[idx] = CheckAndCloneValueType(mStack[v->Value], domain);
                         v->Value = idx;
-                        Free(esp);
                     }
+                    Free(esp);
                     break;
                 case ObjectTypes.ValueTypeObjectReference:
                     if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
@@ -3832,6 +3833,8 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                         throw new NotImplementedException();
+                    if (esp >= bp)//Only Stack allocation after base pointer should be freed, local variable are freed automatically
+                        FreeStackValueType(esp);
                     break;
                 default:
                     *v = *esp;
@@ -4411,6 +4414,63 @@ namespace ILRuntime.Runtime.Intepreter
             esp->Value = -1;
             esp->ValueLow = 0;
 #endif
+        }
+        public void FreeStackValueType(StackObject* esp)
+        {
+            if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                int start = int.MaxValue;
+                int end = int.MinValue;
+                CountValueTypeManaged(esp, ref start, ref end);
+                if(start != int.MaxValue)
+                {
+                    var mStack = stack.ManagedStack;
+                    if (end == mStack.Count - 1)
+                    {
+#if DEBUG
+                        ((List<object>)mStack).RemoveRange(start, mStack.Count - start);
+#else
+                        ((UncheckedList<object>)managedStack).RemoveRange(start, mStack.Count - start);
+#endif
+                    }
+                    else
+                        throw new NotSupportedException();
+                }
+            }
+            else
+                throw new ArgumentException();
+        }
+
+        void CountValueTypeManaged(StackObject* esp, ref int start, ref int end)
+        {
+            StackObject* descriptor = *(StackObject**)&esp->Value;
+            int cnt = descriptor->ValueLow;
+            for(int i = 0; i < cnt; i++)
+            {
+                StackObject* addr = Minus(descriptor, i + 1);
+                switch(addr->ObjectType)
+                {
+                    case ObjectTypes.Object:
+                    case ObjectTypes.ArrayReference:
+                    case ObjectTypes.FieldReference:
+                        {
+                            if (start == int.MaxValue)
+                            {
+                                start = addr->Value;
+                                end = start;
+                            }
+                            else if (addr->Value == end + 1)
+                                end++;
+                            else
+                                throw new NotSupportedException();
+                        }
+                        break;
+                    case ObjectTypes.ValueTypeObjectReference:
+                        CountValueTypeManaged(addr, ref start, ref end);
+                        break;
+                }
+                
+            }
         }
     }
 }
