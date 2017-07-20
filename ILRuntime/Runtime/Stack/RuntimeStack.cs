@@ -51,6 +51,14 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
+        public StackObject* ValueTypeStackPointer
+        {
+            get
+            {
+                return valueTypePtr;
+            }
+        }
+
         public IList<object> ManagedStack { get { return managedStack; } }
 
         public void InitializeFrame(ILMethod method, StackObject* esp, out StackFrame res)
@@ -103,7 +111,9 @@ namespace ILRuntime.Runtime.Stack
                 }
                 else if(ret->ObjectType == ObjectTypes.ValueTypeObjectReference)
                 {
+                    StackObject* oriAddr = frame.ValueTypeBasePointer;
                     RelocateValueType(ret, ref frame.ValueTypeBasePointer, ref mStackBase);
+                    *(StackObject**)&ret->Value = oriAddr;
                 }
                 ret++;
             }
@@ -122,30 +132,31 @@ namespace ILRuntime.Runtime.Stack
             if (descriptor > dst)
                 throw new StackOverflowException();
             *dst = *descriptor;
-            dst--;
             int cnt = descriptor->ValueLow;
+            StackObject* endAddr = ILIntepreter.Minus(dst, cnt + 1);
             for(int i = 0; i < cnt; i++)
             {
                 StackObject* addr = ILIntepreter.Minus(descriptor, i + 1);
-                *dst = *addr;
-                dst--;
+                StackObject* tarVal = ILIntepreter.Minus(dst, i + 1);
+                *tarVal = *addr;
                 switch (addr->ObjectType)
                 {
                     case ObjectTypes.Object:
                     case ObjectTypes.ArrayReference:
                     case ObjectTypes.FieldReference:
-                        if (dst->Value >= mStackBase)
+                        if (tarVal->Value >= mStackBase)
                         {
-                            dst->Value = mStackBase;
+                            tarVal->Value = mStackBase;
                             managedStack[mStackBase] = managedStack[addr->Value];
                             mStackBase++;
                         }
                         break;
-                    case ObjectTypes.StackObjectReference:
-                        RelocateValueType(addr, ref dst, ref mStackBase);
+                    case ObjectTypes.ValueTypeObjectReference:
+                        RelocateValueType(addr, ref endAddr, ref mStackBase);
                         break;
                 }
             }
+            dst = endAddr;
         }
 
         public void AllocValueType(StackObject* ptr, IType type)

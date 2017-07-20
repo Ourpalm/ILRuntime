@@ -109,7 +109,6 @@ namespace ILRuntime.Runtime.Intepreter
             int finallyEndAddress = 0;
 
             esp = frame.BasePointer;
-            var bp = esp;
             StackObject* arg = Minus(frame.LocalVarPointer, method.ParameterCount);
             IList<object> mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
@@ -194,6 +193,8 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                 }
             }
+            var bp = stack.ValueTypeStackPointer;
+
             fixed (OpCode* ptr = body)
             {
                 OpCode* ip = ptr;
@@ -3788,7 +3789,15 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     break;
                 case ObjectTypes.ValueTypeObjectReference:
-                    throw new NotImplementedException();
+                    {
+                        if (dst->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                        {
+                            CopyStackValueType(val, dst, mStack);
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
+                    break;
                 default:
                     *dst = *val;
                     break;
@@ -3833,7 +3842,8 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                         throw new NotImplementedException();
-                    if (esp >= bp)//Only Stack allocation after base pointer should be freed, local variable are freed automatically
+                    var addr = *(StackObject**)&esp->Value;
+                    if (addr <= bp)//Only Stack allocation after base pointer should be freed, local variable are freed automatically
                         FreeStackValueType(esp);
                     break;
                 default:
