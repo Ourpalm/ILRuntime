@@ -1673,8 +1673,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (m == null)
                                     {
                                         //Irrelevant method
-                                        Free(esp - 1);
-                                        esp--;
+                                        int cnt = (int)ip->TokenLong;
+                                        //Balance the stack
+                                        for (int i = 0; i < cnt; i++)
+                                        {
+                                            Free(esp - 1);
+                                            esp--;
+                                        }
                                     }
                                     else
                                     {
