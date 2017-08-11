@@ -811,11 +811,10 @@ namespace ILRuntime.Runtime.Intepreter
                         {
                             sb.Append(", ");
                         }
-                        sb.Append(", ");
                         i.TypeForCLR.GetClassName(out clsName, out rName, out isByRef);
                         sb.Append(rName);                        
                     }
-                    sb.AppendLine(">");
+                    sb.AppendLine(">();");
                 }
                 else
                 {
