@@ -178,6 +178,10 @@ namespace ILRuntime.Runtime.Enviorment
                         i.ParameterType.GetClassName(out clsName, out rName, out isByRef);
                         sb.Append(rName);
                     }
+                    if (!first)
+                        sb.Append(", ");
+                    mi.ReturnType.GetClassName(out clsName, out rName, out isByRef);
+                    sb.Append(rName);
                 }
                 else
                 {
