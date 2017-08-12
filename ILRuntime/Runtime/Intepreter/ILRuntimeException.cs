@@ -25,12 +25,14 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
             {
+#if ILRUNTIME_DEBUG
                 stackTrace = ds.GetStackTrance(intepreter);
                 if (method.HasThis)
                     thisInfo = ds.GetThisInfo(intepreter);
                 else
                     thisInfo = "";
                 localInfo = ds.GetLocalVariableInfo(intepreter);
+#endif
             }
         }
 

@@ -139,7 +139,7 @@ namespace ILRuntime.CLR.Method
                 isDelegateInvoke = true;
             this.appdomain = domain;
             paramCnt = def.HasParameters ? def.Parameters.Count : 0;
-#if DEBUG
+#if ILRUNTIME_DEBUG
             if (def.HasBody)
             {
                 var sp = DebugService.FindSequencePoint(def.Body.Instructions[0]);
