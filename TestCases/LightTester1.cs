@@ -8,6 +8,10 @@ namespace TestCases
     //原来C#LightTestor的部分
     public class ExpTest_10
     {
+        struct tttttt
+        {
+            public bool aol;
+        }
         //只要有一个静态函数包含UnitTest名称的，就作为单元测试
         public static object UnitTest_1001()
         {
@@ -23,8 +27,17 @@ namespace TestCases
 
             Vector3 v3 = new Vector3((252.0f / 255.0f), (207.0f / 255.0f), (20.0f / 255.0f));
             Console.WriteLine("v3=" + v3);
+            tttttt b = new tttttt();
+            UnitTest_1002_Sub(ref b.aol);
+            Console.WriteLine("bol=" + b.aol.ToString());
             return (2 + 55) * 3434 + a;
 
+        }
+
+        static void UnitTest_1002_Sub(ref bool aol)
+        {
+            aol = true;
+            Console.WriteLine("bol=" + aol.ToString());
         }
 
         class StructTest

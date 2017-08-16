@@ -107,6 +107,7 @@
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_FileStream_Binding.cs" />
+    <Compile Include="AutoGenerate\System_IO_File_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_Stream_Binding.cs" />
     <Compile Include="AutoGenerate\System_Linq_Enumerable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Math_Binding.cs" />

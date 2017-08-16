@@ -46,6 +46,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
             System_Byte_Binding.Register(app);
+            System_IO_File_Binding.Register(app);
             System_IO_FileStream_Binding.Register(app);
             System_IO_Stream_Binding.Register(app);
             System_IDisposable_Binding.Register(app);
