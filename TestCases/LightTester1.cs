@@ -15,9 +15,20 @@ namespace TestCases
         //只要有一个静态函数包含UnitTest名称的，就作为单元测试
         public static object UnitTest_1001()
         {
+            object[] arr = new object[3];
+            arr[1] = 1;
             //1001 _1001_expression
-            return 1 + 2 > 3 / 4;
+            return TestIsInt(arr);
 
+        }
+
+        static bool TestIsInt(object[] obj)
+        {
+            if (obj[1] is StructTest2)
+                return false;
+            if (obj[1] is int)
+                return true;
+            return false;
         }
         public static object UnitTest_1002()
         {

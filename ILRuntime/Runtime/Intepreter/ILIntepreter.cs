@@ -2864,49 +2864,105 @@ namespace ILRuntime.Runtime.Intepreter
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type != null)
                                     {
-                                        var obj = RetriveObject(objRef, mStack);
-                                        Free(objRef);
-
-                                        if (obj != null)
+                                        objRef = GetObjectAndResolveReference(objRef);
+                                        if (objRef->ObjectType <= ObjectTypes.Double)
                                         {
-                                            if (obj is ILTypeInstance)
+                                            var tclr = type.TypeForCLR;
+                                            switch (objRef->ObjectType)
                                             {
-                                                if (((ILTypeInstance)obj).CanAssignTo(type))
-                                                {
-                                                    esp = PushObject(objRef, mStack, obj);
-                                                }
-                                                else
-                                                {
-#if !DEBUG
+                                                case ObjectTypes.Integer:
+                                                    {
+                                                        if (tclr != typeof(int) && tclr != typeof(bool) && tclr != typeof(short) && tclr != typeof(byte) && tclr != typeof(ushort) && tclr !=typeof(uint))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Long:
+                                                    {
+                                                        if (tclr != typeof(long) && tclr != typeof(ulong))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Float:
+                                                    {
+                                                        if (tclr != typeof(float))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Double:
+                                                    {
+                                                        if (tclr != typeof(double))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Null:
                                                     objRef->ObjectType = ObjectTypes.Null;
                                                     objRef->Value = -1;
                                                     objRef->ValueLow = 0;
-#endif
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
-                                                {
-                                                    esp = PushObject(objRef, mStack, obj, true);
-                                                }
-                                                else
-                                                {
-#if !DEBUG
-                                                    objRef->ObjectType = ObjectTypes.Null;
-                                                    objRef->Value = -1;
-                                                    objRef->ValueLow = 0;
-#endif
-                                                }
+                                                    break;
                                             }
                                         }
                                         else
                                         {
+                                            var obj = RetriveObject(objRef, mStack);
+                                            Free(objRef);
+
+                                            if (obj != null)
+                                            {
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    if (((ILTypeInstance)obj).CanAssignTo(type))
+                                                    {
+                                                        esp = PushObject(objRef, mStack, obj);
+                                                    }
+                                                    else
+                                                    {
 #if !DEBUG
-                                                objRef->ObjectType = ObjectTypes.Null;
-                                                objRef->Value = -1;
-                                                objRef->ValueLow = 0;
+                                                        objRef->ObjectType = ObjectTypes.Null;
+                                                        objRef->Value = -1;
+                                                        objRef->ValueLow = 0;
 #endif
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
+                                                    {
+                                                        esp = PushObject(objRef, mStack, obj, true);
+                                                    }
+                                                    else
+                                                    {
+#if !DEBUG
+                                                        objRef->ObjectType = ObjectTypes.Null;
+                                                        objRef->Value = -1;
+                                                        objRef->ValueLow = 0;
+#endif
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+#if !DEBUG
+                                                    objRef->ObjectType = ObjectTypes.Null;
+                                                    objRef->Value = -1;
+                                                    objRef->ValueLow = 0;
+#endif
+                                            }
                                         }
                                     }
                                     else
