@@ -19,6 +19,20 @@ namespace TestCases
             Console.WriteLine("CallGC!");
             dataManager.CallGC();
         }
+
+        public static void TestDicEnumerator()
+        {
+            Dictionary<string, int> p3 = new Dictionary<string, int>();
+            p3["1"] = 1;
+            p3["2"] = 2;
+            string key;
+            Dictionary<string, int>.Enumerator enumerator = p3.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                key = enumerator.Current.Key;
+                Console.WriteLine(key);
+            }
+        }
     }
     class DataManager
     {

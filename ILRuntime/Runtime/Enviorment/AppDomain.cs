@@ -513,6 +513,7 @@ namespace ILRuntime.Runtime.Enviorment
                     mapTypeToken[bt.GetHashCode()] = bt;
                     if (!isByRef)
                     {
+                        mapType[fullname] = bt;
                         return bt;
                     }
                 }
@@ -526,7 +527,10 @@ namespace ILRuntime.Runtime.Enviorment
                     return res;
                 }
                 else
+                {
+                    mapType[fullname] = bt;
                     return bt;
+                }
             }
             else
             {
