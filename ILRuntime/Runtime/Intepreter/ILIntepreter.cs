@@ -1284,6 +1284,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         switch (a->ObjectType)
                                         {
+                                            case ObjectTypes.Null:
+                                                transfer = true;
+                                                break;
                                             case ObjectTypes.Integer:
                                                 transfer = a->Value == b->Value;
                                                 break;
@@ -1324,6 +1327,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         switch (a->ObjectType)
                                         {
+                                            case ObjectTypes.Null:
+                                                transfer = false;
+                                                break;
                                             case ObjectTypes.Integer:
                                                 transfer = (uint)a->Value != (uint)b->Value;
                                                 break;
