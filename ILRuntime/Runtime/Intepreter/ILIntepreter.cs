@@ -2141,16 +2141,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (obj1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
-                                            res = (uint)obj1->Value < (uint)obj2->Value;
+                                            res = (uint)obj1->Value < (uint)obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Long:
-                                            res = (ulong)*(long*)&obj1->Value < (ulong)*(long*)&obj2->Value;
+                                            res = (ulong)*(long*)&obj1->Value < (ulong)*(long*)&obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value;
+                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&obj1->Value < *(double*)&obj2->Value;
+                                            res = *(double*)&obj1->Value < *(double*)&obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -2169,16 +2169,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (obj1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
-                                            res = obj1->Value > obj2->Value;
+                                            res = obj1->Value > obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Long:
-                                            res = *(long*)&obj1->Value > *(long*)&obj2->Value;
+                                            res = *(long*)&obj1->Value > *(long*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value;
+                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value;
+                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -2197,16 +2197,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (obj1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
-                                            res = (uint)obj1->Value > (uint)obj2->Value;
+                                            res = ((uint)obj1->Value > (uint)obj2->Value) || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Long:
-                                            res = (ulong)*(long*)&obj1->Value > (ulong)*(long*)&obj2->Value;
+                                            res = (ulong)*(long*)&obj1->Value > (ulong)*(long*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value;
+                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value;
+                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Object:
                                             res = mStack[obj1->Value] != null && obj2->ObjectType == ObjectTypes.Null;

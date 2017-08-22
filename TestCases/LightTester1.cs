@@ -15,8 +15,17 @@ namespace TestCases
         //只要有一个静态函数包含UnitTest名称的，就作为单元测试
         public static object UnitTest_1001()
         {
+            int[] aaa = new int[10];
+            for (uint i = 0; i < 10; i++)
+            {
+                aaa[i] = 1;
+            }
             object[] arr = new object[3];
-            arr[1] = 1;
+
+            for (uint i = 0; i < 2; i++)
+            {
+                arr[i + 1] = 1;
+            }
             //1001 _1001_expression
             return TestIsInt(arr);
 
