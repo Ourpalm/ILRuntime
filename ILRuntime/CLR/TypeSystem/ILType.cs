@@ -505,7 +505,7 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
-        public IMethod GetMethod(string name, int paramCount)
+        public IMethod GetMethod(string name, int paramCount, bool declaredOnly = false)
         {
             if (methods == null)
                 InitializeMethods();
@@ -568,7 +568,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
-            var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType);
+            var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
             if (m == null)
             {
                 if (BaseType != null)
@@ -584,7 +584,7 @@ namespace ILRuntime.CLR.TypeSystem
                 return method;
         }
 
-        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null)
+        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null, bool declaredOnly = false)
         {
             if (methods == null)
                 InitializeMethods();

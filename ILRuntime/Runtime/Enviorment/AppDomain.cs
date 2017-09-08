@@ -1091,7 +1091,7 @@ namespace ILRuntime.Runtime.Enviorment
                 method = type.GetConstructor(paramList);
             else
             {
-                method = type.GetMethod(methodname, paramList, genericArguments, returnType);
+                method = type.GetMethod(methodname, paramList, genericArguments, returnType, true);
             }
 
             if (method == null)
