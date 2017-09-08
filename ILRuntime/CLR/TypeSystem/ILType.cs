@@ -518,7 +518,15 @@ namespace ILRuntime.CLR.TypeSystem
                         return i;
                 }
             }
-            return null;
+            if (declaredOnly)
+                return null;
+            else
+            {
+                if (BaseType != null)
+                    return BaseType.GetMethod(name, paramCount, false);
+                else
+                    return null;
+            }
         }
 
         void InitializeMethods()
@@ -632,7 +640,15 @@ namespace ILRuntime.CLR.TypeSystem
                 lst.Add((ILMethod)m);
                 return m;
             }
-            return null;
+            if (declaredOnly)
+                return null;
+            else
+            {
+                if (BaseType != null)
+                    return BaseType.GetMethod(name, param, genericArguments, returnType, false);
+                else
+                    return null;
+            }
         }
 
         bool CheckGenericArguments(ILMethod i, IType[] genericArguments)
