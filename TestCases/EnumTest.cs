@@ -8,7 +8,7 @@ namespace TestCases
 {
     public class EnumTest
     {
-        enum TestEnum : long
+        public enum TestEnum : long
         {
             Enum1,
             Enum2,

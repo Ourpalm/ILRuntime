@@ -284,19 +284,19 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (!baseTypeInitialized)
                     InitializeBaseType();
-                if (definition.IsEnum)
-                {
-                    if (enumType == null)
-                        InitializeFields();
-                    return enumType.TypeForCLR;
-                }
-                else if (typeRef is ArrayType)
+                if (typeRef is ArrayType)
                 {
                     return arrayCLRType;
                 }
                 else if (typeRef is ByReferenceType)
                 {
                     return byRefCLRType;
+                }
+                else if (definition.IsEnum)
+                {
+                    if (enumType == null)
+                        InitializeFields();
+                    return enumType.TypeForCLR;
                 }
                 else if (FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
                 {
