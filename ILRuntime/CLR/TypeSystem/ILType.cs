@@ -522,7 +522,8 @@ namespace ILRuntime.CLR.TypeSystem
                 return null;
             else
             {
-                if (BaseType != null)
+                //skip clr base type, this doesn't make any sense
+                if (BaseType != null && !(BaseType is CrossBindingAdaptor))
                     return BaseType.GetMethod(name, paramCount, false);
                 else
                     return null;
