@@ -170,7 +170,7 @@ namespace ILRuntime.Runtime.Stack
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    fieldCount = ((CLRType)type).Fields.Count;
                 }
                 ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
                 var dst = valueTypePtr;
@@ -217,7 +217,35 @@ namespace ILRuntime.Runtime.Stack
                     InitializeValueTypeObject((ILType)type.BaseType, ptr);
             }
             else
-                throw new NotImplementedException();
+            {
+                CLRType t = (CLRType)type;
+                for(int i = 0; i < t.Fields.Count; i++)
+                {
+                    var ft = t.Fields[t.FieldIndexReverseMapping[i]].FieldType;
+                    StackObject* val = ILIntepreter.Minus(ptr, i + 1);
+                    if (ft.IsPrimitive)
+                        StackObject.Initialized(val, ft);
+                    else
+                    {
+                        if (ft.IsValueType)
+                        {
+                            var it = intepreter.AppDomain.GetType(ft);
+                            if (((CLRType)it).ValueTypeBinder != null)
+                                AllocValueType(val, it);
+                            else
+                            {
+                                throw new NotSupportedException();
+                            }
+                        }
+                        else
+                        {
+                            val->ObjectType = ObjectTypes.Object;
+                            val->Value = managedStack.Count;
+                            managedStack.Add(null);
+                        }
+                    }
+                }
+            }
         }
         
         public void Dispose()

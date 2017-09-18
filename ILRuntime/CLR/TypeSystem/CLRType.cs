@@ -23,6 +23,8 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
         Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
+        Dictionary<int, int> fieldIdxMapping, fieldIdxReverseMapping;
+
         CLRMemberwiseCloneDelegate memberwiseCloneDelegate;
         CLRCreateDefaultInstanceDelegate createDefaultInstanceDelegate;
         CLRCreateArrayInstanceDelegate createArrayInstanceDelegate;
@@ -31,8 +33,9 @@ namespace ILRuntime.CLR.TypeSystem
         IType[] interfaces;
         bool isDelegate;
         IType baseType;
-        bool isBaseTypeInitialized = false, interfaceInitialized = false;
+        bool isBaseTypeInitialized = false, interfaceInitialized = false, valueTypeBinderGot = false;
         ILRuntimeWrapperType wraperType;
+        ValueTypeBinder valueTypeBinder;
 
         int hashCode = -1;
         static int instance_id = 0x20000000;
@@ -44,6 +47,19 @@ namespace ILRuntime.CLR.TypeSystem
                 if (fieldMapping == null)
                     InitializeFields();
                 return fieldInfoCache;
+            }
+        }
+
+        public Dictionary<int, int> FieldIndexMapping
+        {
+            get { return fieldIdxMapping; }
+        }
+
+        public Dictionary<int, int> FieldIndexReverseMapping
+        {
+            get
+            {
+                return fieldIdxReverseMapping;
             }
         }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
@@ -170,6 +186,24 @@ namespace ILRuntime.CLR.TypeSystem
                 if (!interfaceInitialized)
                     InitializeInterfaces();
                 return interfaces;
+            }
+        }
+
+        public ValueTypeBinder ValueTypeBinder
+        {
+            get
+            {
+                if (clrType.IsValueType)
+                {
+                    if (!valueTypeBinderGot)
+                    {
+                        valueTypeBinderGot = true;
+                        appdomain.ValueTypeBinders.TryGetValue(clrType, out valueTypeBinder);
+                    }
+                    return valueTypeBinder;
+                }
+                else
+                    return null;
             }
         }
 
@@ -366,14 +400,26 @@ namespace ILRuntime.CLR.TypeSystem
             fieldInfoCache = new Dictionary<int, FieldInfo>();
 
             var fields = clrType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+            int idx = 0;
+            bool hasValueTypeBinder = ValueTypeBinder != null;
+            if (hasValueTypeBinder)
+            {
+                fieldIdxMapping = new Dictionary<int, int>();
+                fieldIdxReverseMapping = new Dictionary<int, int>();
+            }
             foreach (var i in fields)
             {
                 int hashCode = i.GetHashCode();
 
-                if (i.IsPublic || i.IsFamily)
+                if (i.IsPublic || i.IsFamily || hasValueTypeBinder)
                 {
                     fieldMapping[i.Name] = hashCode;
                     fieldInfoCache[hashCode] = i;
+                }
+                if (hasValueTypeBinder)
+                {
+                    fieldIdxReverseMapping[idx] = hashCode;
+                    fieldIdxMapping[hashCode] = idx++;
                 }
 
                 CLRFieldGetterDelegate getter;

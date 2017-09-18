@@ -131,6 +131,7 @@ namespace ILRuntimeTest
                     }
 
                     ILRuntimeHelper.Init(_app);
+                    _app.RegisterValueTypeBinder(typeof(TestVector3), new TestVector3Binder());
                     LoadTest();
                     UpdateBtnState();
                 }

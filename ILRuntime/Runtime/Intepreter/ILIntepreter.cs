@@ -3777,7 +3777,7 @@ namespace ILRuntime.Runtime.Intepreter
                             if (ins is ILTypeInstance)
                             {
                                 dst = *(StackObject**)&dst->Value;
-                                ((ILTypeInstance)ins).CopyToStack(dst, mStack);
+                                ((ILTypeInstance)ins).CopyValueTypeToStack(dst, mStack);
                             }
                             else
                                 throw new NotImplementedException();
@@ -3822,7 +3822,7 @@ namespace ILRuntime.Runtime.Intepreter
                         if (obj is ILTypeInstance)
                         {
                             var dst = *(StackObject**)&v->Value;
-                            ((ILTypeInstance)obj).CopyToStack(dst, mStack);
+                            ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStack);
                         }
                         else
                             throw new NotImplementedException();

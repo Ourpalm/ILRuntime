@@ -280,7 +280,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        internal unsafe void CopyToStack(StackObject* ptr, IList<object> mStack)
+        internal unsafe void CopyValueTypeToStack(StackObject* ptr, IList<object> mStack)
         {
             ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
             ptr->Value = type.GetHashCode();
@@ -302,7 +302,7 @@ namespace ILRuntime.Runtime.Intepreter
                             var dst = *(StackObject**)&val->Value;
                             if (obj is ILTypeInstance)
                             {
-                                ((ILTypeInstance)obj).CopyToStack(dst, mStack);
+                                ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStack);
                             }
                             else
                                 throw new NotImplementedException();

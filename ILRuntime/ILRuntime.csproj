@@ -90,8 +90,8 @@
     <Compile Include="Runtime\Debugger\StepTypes.cs" />
     <Compile Include="Runtime\Debugger\VariableInfo.cs" />
     <Compile Include="Runtime\Debugger\StackFrameInfo.cs" />
+    <Compile Include="Runtime\Enviorment\ValueTypeBinder.cs" />
     <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
-    <Compile Include="Runtime\Enviorment\ILContext.cs" />
     <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />
     <Compile Include="Runtime\Enviorment\DelegateManager.cs" />
     <Compile Include="Runtime\Enviorment\CLRRedirections.cs" />
