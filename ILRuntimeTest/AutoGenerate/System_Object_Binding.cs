@@ -30,8 +30,6 @@ namespace ILRuntime.Runtime.Generated
             app.RegisterCLRMethodRedirection(method, ToString_1);
 
             app.RegisterCLRCreateArrayInstance(type, s => new System.Object[s]);
-
-
         }
 
 

@@ -1716,7 +1716,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         StackObject* dst = *(StackObject**)&objRef->Value;
-                                        CopyToValueTypeField(dst, (int)ip->TokenLong, esp - 1, mStack);
+                                        var ft = domain.GetType(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->TokenLong, esp - 1, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong], esp - 1, mStack);
                                     }
                                     else
                                     {
@@ -1798,7 +1802,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     StackObject* objRef = GetObjectAndResolveReference(esp - 1);
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
-                                        var dst = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong + 1);
+                                        var dst = *(StackObject**)&objRef->Value;
+                                        var ft = domain.GetType(dst->Value);
+                                        if (ft is ILType)
+                                            dst = Minus(dst, (int)ip->TokenLong + 1);
+                                        else
+                                            dst = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
                                         CopyToStack(objRef, dst, mStack);
                                     }
                                     else

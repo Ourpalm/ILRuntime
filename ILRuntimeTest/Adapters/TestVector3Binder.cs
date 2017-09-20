@@ -25,11 +25,6 @@ namespace ILRuntimeTest.TestFramework
             *(float*)&v->Value = vec.Z;
         }
 
-        public override unsafe void InitializeValueTypeObject(StackObject* ptr)
-        {
-            throw new NotImplementedException();
-        }
-
         public override unsafe object ToObject(StackObject* ptr, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
         {
             TestVector3 vec = new TestVector3();
@@ -42,7 +37,30 @@ namespace ILRuntimeTest.TestFramework
 
             return vec;
         }
+
+        public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+        {
+            base.RegisterCLRRedirection(appdomain);
+        }
+
+        public unsafe static StackObject* NewVector3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var instance = ILIntepreter.Minus(esp, 4);
+            var dst = *(StackObject**)&instance->Value;
+            var f = ILIntepreter.Minus(dst, 1);
+            var v = ILIntepreter.Minus(esp, 3);
+            *f = *v;
+
+            f = ILIntepreter.Minus(dst, 2);
+            v = ILIntepreter.Minus(esp, 2);
+            *f = *v;
+
+            f = ILIntepreter.Minus(dst, 3);
+            v = ILIntepreter.Minus(esp, 1);
+            *f = *v;
+
+            intp.FreeStackValueType(instance);
+            return instance;
+        }
     }
-
-
 }

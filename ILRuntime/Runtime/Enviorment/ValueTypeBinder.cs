@@ -28,12 +28,6 @@ namespace ILRuntime.Runtime.Enviorment
                     throw new NotSupportedException();
             }
         }
-        public abstract void AssignFromStack(object ins, int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack);
-
-        public abstract void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack);
-
-        public abstract object ToObject(StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack);
-
         public int TotalFieldCount
         {
             get
@@ -41,6 +35,16 @@ namespace ILRuntime.Runtime.Enviorment
                 return totalFieldCnt;
             }
         }
-        public abstract void InitializeValueTypeObject(StackObject* ptr);
+
+        public abstract void AssignFromStack(object ins, int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack);
+
+        public abstract void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack);
+
+        public abstract object ToObject(StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack);
+
+        public virtual void RegisterCLRRedirection(Enviorment.AppDomain appdomain)
+        {
+
+        }
     }
 }
