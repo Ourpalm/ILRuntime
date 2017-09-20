@@ -4513,5 +4513,10 @@ namespace ILRuntime.Runtime.Intepreter
                 
             }
         }
+
+        public void AllocValueType(StackObject* ptr, IType type)
+        {
+            stack.AllocValueType(ptr, type);
+        }
     }
 }

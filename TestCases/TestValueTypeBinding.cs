@@ -20,6 +20,15 @@ namespace TestCases
 
             Console.WriteLine(TestVector3.One.ToString());
         }
+
+        public static void Test02()
+        {
+            TestVector3 vec = new TestVector3(100, 1, 0);
+            vec += TestVector3.One;
+
+            Console.WriteLine(vec.ToString());
+        }
+
         public static void UnitTest_10022()
         {
             TestVector3 pos = TestVector3.One;

@@ -210,6 +210,7 @@ namespace ILRuntime.CLR.TypeSystem
                     {
                         valueTypeBinderGot = true;
                         appdomain.ValueTypeBinders.TryGetValue(clrType, out valueTypeBinder);
+                        valueTypeBinder.CLRType = this;
                     }
                     return valueTypeBinder;
                 }

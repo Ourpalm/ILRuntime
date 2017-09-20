@@ -442,7 +442,10 @@ namespace ILRuntime.Runtime.Enviorment
         public void RegisterValueTypeBinder(Type t, ValueTypeBinder binder)
         {
             if (!valueTypeBinders.ContainsKey(t))
+            {
                 valueTypeBinders[t] = binder;
+                binder.RegisterCLRRedirection(this);
+            }
         }
 
         /// <summary>

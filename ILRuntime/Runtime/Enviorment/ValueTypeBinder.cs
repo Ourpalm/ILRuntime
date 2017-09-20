@@ -12,8 +12,7 @@ namespace ILRuntime.Runtime.Enviorment
     public unsafe abstract class ValueTypeBinder
     {
         CLRType clrType;
-        int totalFieldCnt;
-
+        
         public CLRType CLRType
         {
             get { return clrType; }
@@ -22,17 +21,9 @@ namespace ILRuntime.Runtime.Enviorment
                 if (clrType == null)
                 {
                     clrType = value;
-                    totalFieldCnt = clrType.TotalFieldCount;
                 }
                 else
                     throw new NotSupportedException();
-            }
-        }
-        public int TotalFieldCount
-        {
-            get
-            {
-                return totalFieldCnt;
             }
         }
 
