@@ -170,11 +170,19 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                     {
-                        var obj = ((CLRType)t).CreateDefaultInstance();
+                        CLRType cT = (CLRType)t;
                         var loc = Add(v1, i);
-                        loc->ObjectType = ObjectTypes.Object;
-                        loc->Value = locBase + i;
-                        mStack[locBase + i] = obj;
+                        if (cT.ValueTypeBinder != null)
+                        {
+                            stack.AllocValueType(loc, t);
+                        }
+                        else
+                        {
+                            var obj = ((CLRType)t).CreateDefaultInstance();
+                            loc->ObjectType = ObjectTypes.Object;
+                            loc->Value = locBase + i;
+                            mStack[locBase + i] = obj;
+                        }
                     }
                 }
                 else
@@ -1832,7 +1840,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         var dst = esp - 1;
-                                        var fieldAddr = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong + 1);
+                                        var ft = domain.GetType((int)(ip->TokenLong >> 32));
+                                        StackObject* fieldAddr;
+                                        if (ft is ILType)
+                                        {
+                                            fieldAddr = Minus(*(StackObject**)&objRef->Value, (int)ip->TokenLong + 1);                                            
+                                        }
+                                        else
+                                        {
+                                            fieldAddr = Minus(*(StackObject**)&objRef->Value, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
+                                        }
                                         dst->ObjectType = ObjectTypes.StackObjectReference;
                                         *(StackObject**)&dst->Value = fieldAddr;
                                     }
@@ -3825,7 +3842,12 @@ namespace ILRuntime.Runtime.Intepreter
                             ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStack);
                         }
                         else
-                            throw new NotImplementedException();
+                        {
+                            var dst = *(StackObject**)&v->Value;
+                            var ct = domain.GetType(dst->Value) as CLRType;
+                            var binder = ct.ValueTypeBinder;
+                            binder.CopyValueTypeToStack(obj, dst, mStack);
+                        }                            
                     }
                     else
                     {
@@ -4440,7 +4462,7 @@ namespace ILRuntime.Runtime.Intepreter
 #if DEBUG
                         ((List<object>)mStack).RemoveRange(start, mStack.Count - start);
 #else
-                        ((UncheckedList<object>)managedStack).RemoveRange(start, mStack.Count - start);
+                        ((UncheckedList<object>)mStack).RemoveRange(start, mStack.Count - start);
 #endif
                     }
                     else

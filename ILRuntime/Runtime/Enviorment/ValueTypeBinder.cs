@@ -11,9 +11,36 @@ namespace ILRuntime.Runtime.Enviorment
 {
     public unsafe abstract class ValueTypeBinder
     {
+        CLRType clrType;
+        int totalFieldCnt;
+
+        public CLRType CLRType
+        {
+            get { return clrType; }
+            set
+            {
+                if (clrType == null)
+                {
+                    clrType = value;
+                    totalFieldCnt = clrType.TotalFieldCount;
+                }
+                else
+                    throw new NotSupportedException();
+            }
+        }
         public abstract void AssignFromStack(object ins, int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack);
+
         public abstract void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack);
-        public abstract int TotalFieldCount { get; }
+
+        public abstract object ToObject(StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack);
+
+        public int TotalFieldCount
+        {
+            get
+            {
+                return totalFieldCnt;
+            }
+        }
         public abstract void InitializeValueTypeObject(StackObject* ptr);
     }
 }

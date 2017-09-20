@@ -62,6 +62,17 @@ namespace ILRuntime.CLR.TypeSystem
                 return fieldIdxReverseMapping;
             }
         }
+
+        public int TotalFieldCount
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields();
+                return fieldIdxMapping.Count;
+            }
+        }
+
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
             get
@@ -416,7 +427,7 @@ namespace ILRuntime.CLR.TypeSystem
                     fieldMapping[i.Name] = hashCode;
                     fieldInfoCache[hashCode] = i;
                 }
-                if (hasValueTypeBinder)
+                if (hasValueTypeBinder && !i.IsStatic)
                 {
                     fieldIdxReverseMapping[idx] = hashCode;
                     fieldIdxMapping[hashCode] = idx++;

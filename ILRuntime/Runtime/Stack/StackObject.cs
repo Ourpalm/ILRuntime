@@ -89,7 +89,7 @@ namespace ILRuntime.Runtime.Stack
                         {
                             ILType iltype = (ILType)type;
                             var ins = iltype.Instantiate(false);
-                            for(int i = 0; i < dst->ValueLow; i++)
+                            for (int i = 0; i < dst->ValueLow; i++)
                             {
                                 var addr = ILIntepreter.Minus(dst, i + 1);
                                 ins.AssignFromStack(i, addr, appdomain, mStack);
@@ -97,7 +97,9 @@ namespace ILRuntime.Runtime.Stack
                             return ins;
                         }
                         else
-                            throw new NotImplementedException();
+                        {
+                            return ((CLRType)type).ValueTypeBinder.ToObject(dst, appdomain, mStack);
+                        }
                     }
                 case ObjectTypes.Null:
                     return null;

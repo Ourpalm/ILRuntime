@@ -170,7 +170,7 @@ namespace ILRuntime.Runtime.Stack
                 }
                 else
                 {
-                    fieldCount = ((CLRType)type).Fields.Count;
+                    fieldCount = ((CLRType)type).TotalFieldCount;
                 }
                 ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
                 var dst = valueTypePtr;
@@ -219,7 +219,8 @@ namespace ILRuntime.Runtime.Stack
             else
             {
                 CLRType t = (CLRType)type;
-                for(int i = 0; i < t.Fields.Count; i++)
+                var cnt = t.TotalFieldCount;
+                for(int i = 0; i < cnt; i++)
                 {
                     var ft = t.Fields[t.FieldIndexReverseMapping[i]].FieldType;
                     StackObject* val = ILIntepreter.Minus(ptr, i + 1);
