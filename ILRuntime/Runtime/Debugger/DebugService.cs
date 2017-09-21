@@ -503,12 +503,7 @@ namespace ILRuntime.Runtime.Debugger
             var end = esp + 10;
             var frames = stack.Frames;
             var mStack = stack.ManagedStack;
-            HashSet<int> leakMObj = new HashSet<int>();
             HashSet<long> leakVObj = new HashSet<long>();
-            for (int i = 0; i < mStack.Count; i++)
-            {
-                leakMObj.Add(i);
-            }
             for (var i = stack.ValueTypeStackBase; i > stack.ValueTypeStackPointer;)
             {
                 leakVObj.Add((long)i);
@@ -541,10 +536,6 @@ namespace ILRuntime.Runtime.Debugger
                 GetStackObjectText(sb, i, mStack);
                 if (i < esp)
                 {
-                    if (i->ObjectType >= ObjectTypes.Object)
-                    {
-                        leakMObj.Remove(i->Value);
-                    }
                     if (i->ObjectType == ObjectTypes.ValueTypeObjectReference)
                         VisitValueTypeReference(*(StackObject**)&i->Value, leakVObj);
                 }
@@ -584,13 +575,10 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 i = Minus(i, i->ValueLow + 1);
             }
-            if (leakMObj.Count > 0)
+            System.Diagnostics.Debug.Print("Managed Objects:");
+            for (int i = 0; i < mStack.Count; i++)
             {
-                System.Diagnostics.Debug.Print("Leak ManagedObject:");
-                foreach (var i in leakMObj)
-                {
-                    System.Diagnostics.Debug.Print(string.Format("({0}){1}", i, mStack[i]));
-                }
+                System.Diagnostics.Debug.Print(string.Format("({0}){1}", i, mStack[i]));
             }
         }
 

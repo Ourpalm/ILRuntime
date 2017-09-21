@@ -260,7 +260,66 @@ namespace ILRuntime.Runtime.Stack
                 }
             }
         }
-        
+
+        public void FreeValueTypeObject(StackObject* esp)
+        {
+            int start = int.MaxValue;
+            int end = int.MinValue;
+            StackObject* endAddr;
+            CountValueTypeManaged(esp, ref start, ref end, &endAddr);
+
+            if (endAddr == valueTypePtr)
+                valueTypePtr = *(StackObject**)&esp->Value;
+            else
+                throw new NotSupportedException();
+            if (start != int.MaxValue)
+            {
+                if (end == managedStack.Count - 1)
+                {
+#if DEBUG
+                    ((List<object>)managedStack).RemoveRange(start, managedStack.Count - start);
+#else
+                    ((UncheckedList<object>)managedStack).RemoveRange(start, managedStack.Count - start);
+#endif
+                }
+                else
+                    throw new NotSupportedException();
+            }
+        }
+
+        void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)
+        {
+            StackObject* descriptor = *(StackObject**)&esp->Value;
+            int cnt = descriptor->ValueLow;
+            *endAddr = ILIntepreter.Minus(descriptor, cnt + 1);
+            for (int i = 0; i < cnt; i++)
+            {
+                StackObject* addr = ILIntepreter.Minus(descriptor, i + 1);
+                switch (addr->ObjectType)
+                {
+                    case ObjectTypes.Object:
+                    case ObjectTypes.ArrayReference:
+                    case ObjectTypes.FieldReference:
+                        {
+                            if (start == int.MaxValue)
+                            {
+                                start = addr->Value;
+                                end = start;
+                            }
+                            else if (addr->Value == end + 1)
+                                end++;
+                            else
+                                throw new NotSupportedException();
+                        }
+                        break;
+                    case ObjectTypes.ValueTypeObjectReference:
+                        CountValueTypeManaged(addr, ref start, ref end, endAddr);
+                        break;
+                }
+
+            }
+        }
+
         public void Dispose()
         {
             if (nativePointer != IntPtr.Zero)

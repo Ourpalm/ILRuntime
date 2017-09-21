@@ -4469,58 +4469,10 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
-                int start = int.MaxValue;
-                int end = int.MinValue;
-                CountValueTypeManaged(esp, ref start, ref end);
-                if(start != int.MaxValue)
-                {
-                    var mStack = stack.ManagedStack;
-                    if (end == mStack.Count - 1)
-                    {
-#if DEBUG
-                        ((List<object>)mStack).RemoveRange(start, mStack.Count - start);
-#else
-                        ((UncheckedList<object>)mStack).RemoveRange(start, mStack.Count - start);
-#endif
-                    }
-                    else
-                        throw new NotSupportedException();
-                }
+                stack.FreeValueTypeObject(esp);
             }
             else
                 throw new ArgumentException();
-        }
-
-        void CountValueTypeManaged(StackObject* esp, ref int start, ref int end)
-        {
-            StackObject* descriptor = *(StackObject**)&esp->Value;
-            int cnt = descriptor->ValueLow;
-            for(int i = 0; i < cnt; i++)
-            {
-                StackObject* addr = Minus(descriptor, i + 1);
-                switch(addr->ObjectType)
-                {
-                    case ObjectTypes.Object:
-                    case ObjectTypes.ArrayReference:
-                    case ObjectTypes.FieldReference:
-                        {
-                            if (start == int.MaxValue)
-                            {
-                                start = addr->Value;
-                                end = start;
-                            }
-                            else if (addr->Value == end + 1)
-                                end++;
-                            else
-                                throw new NotSupportedException();
-                        }
-                        break;
-                    case ObjectTypes.ValueTypeObjectReference:
-                        CountValueTypeManaged(addr, ref start, ref end);
-                        break;
-                }
-                
-            }
         }
 
         public void AllocValueType(StackObject* ptr, IType type)
