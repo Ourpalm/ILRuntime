@@ -3740,6 +3740,152 @@ namespace ILRuntime.Runtime.Intepreter
             return stack.PopFrame(ref frame, esp);
         }
 
+        void DumpStack(StackObject* esp)
+        {
+            var stack = Stack;
+            var start = stack.StackBase;
+            var end = esp + 10;
+            var frames = stack.Frames;
+            var mStack = stack.ManagedStack;
+            HashSet<int> leakMObj = new HashSet<int>();
+            HashSet<long> leakVObj = new HashSet<long>();
+            for(int i = 0; i < mStack.Count; i++)
+            {
+                leakMObj.Add(i);
+            }
+            for(var i = stack.ValueTypeStackBase; i > stack.ValueTypeStackPointer;)
+            {
+                leakVObj.Add((long)i);
+                i = Minus(i, i->ValueLow + 1);
+            }
+            for(var i = start; i <= end; i++)
+            {
+                StringBuilder sb = new StringBuilder();
+                ILMethod localMethod = null, baseMethod = null;
+                bool isLocal = false;
+                bool isBase = false;
+                int localIdx = 0;
+                if (i == esp)
+                    sb.Append("->");
+                foreach(var j in frames)
+                {
+                    if(i>= j.LocalVarPointer && i < j.BasePointer)
+                    {
+                        isLocal = true;
+                        localIdx = (int)(i - j.LocalVarPointer);
+                        localMethod = j.Method;
+                    }
+                    else if(i == j.BasePointer)
+                    {
+                        isBase = true;
+                        baseMethod = j.Method;
+                    }
+                }
+                sb.Append(string.Format("(0x{0:X8}) Type:{1} ", (long)i, i->ObjectType));
+                string text = "null";
+                switch (i->ObjectType)
+                {
+                    case ObjectTypes.StackObjectReference:
+                        {
+                            sb.Append(string.Format("Value:0x{0:X8}", (long)*(StackObject**)&i->Value));
+                        }
+                        break;
+                    case ObjectTypes.ValueTypeObjectReference:
+                        {
+                            var obj = StackObject.ToObject(i, domain, mStack);
+                            if (obj != null)
+                                text = obj.ToString();
+
+                            var dst = *(StackObject**)&i->Value;
+                            text += string.Format("({0})", domain.GetType(dst->Value));
+                        }
+                        sb.Append(string.Format("Value:0x{0:X8} Text:{1} ", (long)*(StackObject**)&i->Value, text));
+                        break;
+                    default:
+                        {
+                            if (i->ObjectType <= ObjectTypes.ArrayReference)
+                            {
+                                if (i->ObjectType < ObjectTypes.Object || i->Value < mStack.Count)
+                                {
+                                    var obj = StackObject.ToObject(i, domain, mStack);
+                                    if (obj != null)
+                                        text = obj.ToString();
+                                }
+                            }
+
+                            sb.Append(string.Format("Value:{0} ValueLow:{1} Text:{2} ", i->Value, i->ValueLow, text));
+                        }
+                        break;
+                        
+                }
+                if(i < esp)
+                {
+                    if(i->ObjectType >= ObjectTypes.Object)
+                    {
+                        leakMObj.Remove(i->Value);
+                    }
+                    if (i->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                        VisitValueTypeReference(*(StackObject**)&i->Value, leakVObj);
+                }
+                if (isLocal)
+                {
+                    sb.Append(string.Format("|Loc:{0}", localIdx));
+                    if (localIdx == 0)
+                    {
+                        sb.Append(" Method:");
+                        sb.Append(localMethod.ToString());
+                    }
+                }
+                if(isBase)
+                {
+                    sb.Append("|Base");
+                    sb.Append(" Method:");
+                    sb.Append(baseMethod.ToString());
+                }
+
+                System.Diagnostics.Debug.Print(sb.ToString());
+            }
+            if(leakMObj.Count > 0)
+            {
+                System.Diagnostics.Debug.Print("Leak ManagedObject:");
+                foreach(var i in leakMObj)
+                {
+                    System.Diagnostics.Debug.Print(string.Format("({0}){1}", i, mStack[i]));
+                }
+            }
+            if(leakVObj.Count > 0)
+            {
+                System.Diagnostics.Debug.Print("Leak ValueType Object:");
+                foreach (var i in leakVObj)
+                {
+                    string text = "null";
+                    StackObject ptr = new StackObject();
+                    ptr.ObjectType = ObjectTypes.ValueTypeObjectReference;
+                    *(long*)&ptr.Value = i;
+                    var obj = StackObject.ToObject(&ptr, domain, mStack);
+                    if (obj != null)
+                        text = obj.ToString();
+
+                    var dst = *(StackObject**)&ptr.Value;
+                    text += string.Format("({0})", domain.GetType(dst->Value));
+                    System.Diagnostics.Debug.Print(string.Format("(0x{0:X8}){1}", i, text));
+                }
+            }
+        }
+
+        void VisitValueTypeReference(StackObject* esp, HashSet<long> leak)
+        {
+            leak.Remove((long)esp);
+            for (int i = 0; i < esp->ValueLow; i++)
+            {
+                var ptr = Minus(esp, i + 1);
+                if (ptr->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                {
+                    VisitValueTypeReference(*(StackObject**)&ptr->Value, leak);
+                }
+            }
+        }
+
         void CloneStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
         {
             StackObject* descriptor = *(StackObject**)&src->Value;
@@ -3800,13 +3946,17 @@ namespace ILRuntime.Runtime.Intepreter
                         if (dst->ObjectType == ObjectTypes.ValueTypeObjectReference)
                         {
                             var ins = mStack[val->Value];
+                            dst = *(StackObject**)&dst->Value;
+
                             if (ins is ILTypeInstance)
                             {
-                                dst = *(StackObject**)&dst->Value;
                                 ((ILTypeInstance)ins).CopyValueTypeToStack(dst, mStack);
                             }
                             else
-                                throw new NotImplementedException();
+                            {
+                                var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder;
+                                vb.CopyValueTypeToStack(ins, dst, mStack);
+                            }
                         }
                         else
                         {

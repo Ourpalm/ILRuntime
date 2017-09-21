@@ -59,35 +59,35 @@ namespace TestCases
             return a;
         }
 
-        /*public static void UnitTest_10023()
+        public static void UnitTest_10023()
         {
-            StructTest3 a;
+            TestVectorStruct a;
             a = Sub10023();
-            Vector3 pos = a.C;
-            pos.x += 123;
+            TestVector3 pos = a.C;
+            pos.X += 123;
 
-            Vector3 pos2 = a.B.Vector;
-            pos2.x -= 120;
+            TestVector3 pos2 = a.B.Vector;
+            pos2.X -= 120;
 
-            Console.WriteLine("pos.x=" + pos.x);
-            Console.WriteLine("a.C.x=" + a.C.x);
-            if (pos.x == a.C.x)
+            Console.WriteLine("pos.x=" + pos.X);
+            Console.WriteLine("a.C.x=" + a.C.X);
+            if (pos.X == a.C.X)
                 throw new Exception("Value Type Violation");
-            Console.WriteLine("pos2.x=" + pos2.x);
-            Console.WriteLine("a.B.Vector.x=" + a.B.Vector.x);
-            if (pos2.x == a.B.Vector.x)
+            Console.WriteLine("pos2.x=" + pos2.X);
+            Console.WriteLine("a.B.Vector.x=" + a.B.Vector.X);
+            if (pos2.X == a.B.Vector.X)
                 throw new Exception("Value Type Violation");
 
         }
 
-        static StructTest3 Sub10023()
+        static TestVectorStruct Sub10023()
         {
-            StructTest3 a;
+            TestVectorStruct a;
             a.A = 123;
-            a.C = Vector3.One;
-            a.B = new StructTest();
-            a.B.Vector = Vector3.One * 123;
+            a.C = TestVector3.One;
+            a.B = new TestVectorStruct2();
+            a.B.Vector = TestVector3.One * 123;
             return a;
-        }*/
+        }
     }
 }

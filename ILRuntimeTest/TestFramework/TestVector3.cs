@@ -29,9 +29,38 @@ namespace ILRuntimeTest.TestFramework
             return res;
         }
 
+        public static TestVector3 operator *(TestVector3 a, float b)
+        {
+            TestVector3 res = new TestVector3();
+            res.X = a.X * b;
+            res.Y = a.Y * b;
+            res.Z = a.Z * b;
+
+            return res;
+        }
+
         public override string ToString()
         {
             return string.Format("({0},{1},{2})", X, Y, Z);
         }
+    }
+
+    public struct TestVectorStruct
+    {
+        public int A;
+        public TestVectorStruct2 B;
+        public TestVector3 C;
+    }
+
+    public struct TestVectorStruct2
+    {
+        public TestVectorStruct3 A;
+        public TestVector3 Vector;
+    }
+
+    public struct TestVectorStruct3
+    {
+        public float A;
+        public float B;
     }
 }

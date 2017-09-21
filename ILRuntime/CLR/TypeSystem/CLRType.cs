@@ -209,8 +209,8 @@ namespace ILRuntime.CLR.TypeSystem
                     if (!valueTypeBinderGot)
                     {
                         valueTypeBinderGot = true;
-                        appdomain.ValueTypeBinders.TryGetValue(clrType, out valueTypeBinder);
-                        valueTypeBinder.CLRType = this;
+                        if (appdomain.ValueTypeBinders.TryGetValue(clrType, out valueTypeBinder))
+                            valueTypeBinder.CLRType = this;
                     }
                     return valueTypeBinder;
                 }
@@ -718,6 +718,11 @@ namespace ILRuntime.CLR.TypeSystem
             if (hashCode == -1)
                 hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return clrType.ToString();
         }
     }
 }

@@ -2,28 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using ILRuntime.CLR.Method;
+using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 
 namespace ILRuntimeTest.TestFramework
 {
-    public unsafe class TestVector3Binder : ValueTypeBinder
+    public unsafe class TestVector3Binder : ValueTypeBinder<TestVector3>
     {
-        public override void AssignFromStack(object ins, int fieldIdx, StackObject* esp, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
-        {
-            throw new NotImplementedException();
-        }
-
         public override void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack)
         {
-            TestVector3 vec = (TestVector3)ins;
+            TestVector3 tmp = (TestVector3)ins;
+            CopyValueTypeToStack(ref tmp, ptr, mStack);
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref TestVector3 ins, StackObject* ptr, IList<object> mStack)
+        {
             var v = ILIntepreter.Minus(ptr, 1);
-            *(float*)&v->Value = vec.X;
+            *(float*)&v->Value = ins.X;
             v = ILIntepreter.Minus(ptr, 2);
-            *(float*)&v->Value = vec.Y;
+            *(float*)&v->Value = ins.Y;
             v = ILIntepreter.Minus(ptr, 3);
-            *(float*)&v->Value = vec.Z;
+            *(float*)&v->Value = ins.Z;
         }
 
         public override object ToObject(StackObject* ptr, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
@@ -52,30 +53,19 @@ namespace ILRuntimeTest.TestFramework
             args = new Type[] { typeof(TestVector3), typeof(TestVector3) };
             method = type.GetMethod("op_Addition", flag, null, args, null);
             appdomain.RegisterCLRMethodRedirection(method, Vector3_Add);
+
+            args = new Type[] { typeof(TestVector3), typeof(float) };
+            method = type.GetMethod("op_Multiply", flag, null, args, null);
+            appdomain.RegisterCLRMethodRedirection(method, Vector3_Multiply);
         }
 
         public StackObject* Vector3_Add(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
             var ret = ILIntepreter.Minus(esp, 2);
-            var a = ILIntepreter.GetObjectAndResolveReference(ret);
-            var b = ILIntepreter.GetObjectAndResolveReference(ILIntepreter.Minus(esp, 1));
+            var ptrB = ILIntepreter.Minus(esp, 1);
+            var b = ILIntepreter.GetObjectAndResolveReference(ptrB);
 
             float x, y, z, x2, y2, z2;
-            if(a->ObjectType == ObjectTypes.ValueTypeObjectReference)
-            {
-                var src = *(StackObject**)&a->Value;
-                x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
-                y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
-                z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
-            }
-            else
-            {
-                var src = (TestVector3)mStack[a->Value];
-                x = src.X;
-                y = src.Y;
-                z = src.Z;
-            }
-
             if (b->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
                 var src = *(StackObject**)&b->Value;
@@ -89,6 +79,25 @@ namespace ILRuntimeTest.TestFramework
                 x2 = src.X;
                 y2 = src.Y;
                 z2 = src.Z;
+                intp.Free(ptrB);
+            }
+
+            var ptrA = ILIntepreter.Minus(esp, 2);
+            var a = ILIntepreter.GetObjectAndResolveReference(ptrA);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
+                y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
+                z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+            }
+            else
+            {
+                var src = (TestVector3)mStack[a->Value];
+                x = src.X;
+                y = src.Y;
+                z = src.Z;
+                intp.Free(ptrA);
             }
 
             intp.AllocValueType(ret, CLRType);
@@ -97,6 +106,45 @@ namespace ILRuntimeTest.TestFramework
             *(float*)&ILIntepreter.Minus(dst, 1)->Value = x + x2;
             *(float*)&ILIntepreter.Minus(dst, 2)->Value = y + y2;
             *(float*)&ILIntepreter.Minus(dst, 3)->Value = z + z2;
+
+            return ret + 1;
+        }
+
+        public StackObject* Vector3_Multiply(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = ILIntepreter.Minus(esp, 2);
+
+            var ptr = ILIntepreter.Minus(esp, 1);
+            var b = ILIntepreter.GetObjectAndResolveReference(ptr);
+
+            float val = *(float*)&b->Value;
+
+            float x, y, z;
+
+            ptr = ILIntepreter.Minus(esp, 2);
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
+                y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
+                z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+            }
+            else
+            {
+                var src = (TestVector3)mStack[a->Value];
+                x = src.X;
+                y = src.Y;
+                z = src.Z;
+                intp.Free(ptr);
+            }
+
+            intp.AllocValueType(ret, CLRType);
+            var dst = *((StackObject**)&ret->Value);
+
+            *(float*)&ILIntepreter.Minus(dst, 1)->Value = x * val;
+            *(float*)&ILIntepreter.Minus(dst, 2)->Value = y * val;
+            *(float*)&ILIntepreter.Minus(dst, 3)->Value = z * val;
 
             return ret + 1;
         }
@@ -119,6 +167,52 @@ namespace ILRuntimeTest.TestFramework
             *f = *v;
 
             return ret;
+        }
+    }
+
+    public unsafe class TestVectorStructBinder : ValueTypeBinder<TestVectorStruct>
+    {
+        public override void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack)
+        {
+            TestVectorStruct vec = (TestVectorStruct)ins;
+            CopyValueTypeToStack(ref vec, ptr, mStack);
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref TestVectorStruct ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            v->Value = ins.A;
+            v = ILIntepreter.Minus(ptr, 2);
+            CopyValueTypeToStack(ref ins.B, v, mStack);
+            v = ILIntepreter.Minus(ptr, 3);
+            CopyValueTypeToStack(ref ins.C, v, mStack);
+        }
+
+        public override object ToObject(StackObject* ptr, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
+        {
+            return null;
+        }
+    }
+
+    public unsafe class TestVectorStruct2Binder : ValueTypeBinder<TestVectorStruct2>
+    {
+        public override void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack)
+        {
+            TestVectorStruct2 vec = (TestVectorStruct2)ins;
+            CopyValueTypeToStack(ref vec, ptr, mStack);
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref TestVectorStruct2 ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            CopyValueTypeToStack(ref ins.A, v, mStack);
+            v = ILIntepreter.Minus(ptr, 2);
+            CopyValueTypeToStack(ref ins.Vector, v, mStack);
+        }
+
+        public override object ToObject(StackObject* ptr, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
+        {
+            return null;
         }
     }
 }

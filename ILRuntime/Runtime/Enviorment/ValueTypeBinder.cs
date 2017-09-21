@@ -12,7 +12,8 @@ namespace ILRuntime.Runtime.Enviorment
     public unsafe abstract class ValueTypeBinder
     {
         CLRType clrType;
-        
+        Enviorment.AppDomain domain;
+
         public CLRType CLRType
         {
             get { return clrType; }
@@ -21,13 +22,12 @@ namespace ILRuntime.Runtime.Enviorment
                 if (clrType == null)
                 {
                     clrType = value;
+                    domain = value.AppDomain;
                 }
                 else
                     throw new NotSupportedException();
             }
         }
-
-        public abstract void AssignFromStack(object ins, int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack);
 
         public abstract void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack);
 
@@ -37,5 +37,29 @@ namespace ILRuntime.Runtime.Enviorment
         {
 
         }
+
+        protected void CopyValueTypeToStack<K>(ref K ins, StackObject* esp, IList<object> mStack)
+            where K : struct
+        {
+            if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var dst = *(StackObject**)&esp->Value;
+                var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder as ValueTypeBinder<K>;
+                if (vb != null)
+                {
+                    vb.CopyValueTypeToStack(ref ins, dst, mStack);
+                }
+                else
+                    throw new NotSupportedException();
+            }
+            else
+                throw new NotImplementedException();
+        }
+    }
+
+    public unsafe abstract class ValueTypeBinder<T> : ValueTypeBinder
+        where T : struct
+    {
+        public abstract void CopyValueTypeToStack(ref T ins, StackObject* ptr, IList<object> mStack);
     }
 }

@@ -59,6 +59,14 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
+        public StackObject* ValueTypeStackBase
+        {
+            get
+            {
+                return endOfMemory - 1;
+            }
+        }
+
         public IList<object> ManagedStack { get { return managedStack; } }
 
         public void InitializeFrame(ILMethod method, StackObject* esp, out StackFrame res)
@@ -235,7 +243,9 @@ namespace ILRuntime.Runtime.Stack
                                 AllocValueType(val, it);
                             else
                             {
-                                throw new NotSupportedException();
+                                val->ObjectType = ObjectTypes.Object;
+                                val->Value = managedStack.Count;
+                                managedStack.Add(((CLRType)it).CreateDefaultInstance());
                             }
                         }
                         else
