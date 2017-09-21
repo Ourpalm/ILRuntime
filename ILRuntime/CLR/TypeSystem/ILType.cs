@@ -1002,5 +1002,10 @@ namespace ILRuntime.CLR.TypeSystem
                 hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return FullName;
+        }
     }
 }

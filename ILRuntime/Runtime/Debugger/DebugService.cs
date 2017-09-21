@@ -503,6 +503,7 @@ namespace ILRuntime.Runtime.Debugger
             var end = esp + 10;
             var frames = stack.Frames;
             var mStack = stack.ManagedStack;
+            var valuePointerEnd = stack.ValueTypeStackPointer;
             HashSet<long> leakVObj = new HashSet<long>();
             for (var i = stack.ValueTypeStackBase; i > stack.ValueTypeStackPointer;)
             {
@@ -533,7 +534,7 @@ namespace ILRuntime.Runtime.Debugger
                     }
                 }
                 sb.Append(string.Format("(0x{0:X8}) Type:{1} ", (long)i, i->ObjectType));
-                GetStackObjectText(sb, i, mStack);
+                GetStackObjectText(sb, i, mStack, valuePointerEnd);
                 if (i < esp)
                 {
                     if (i->ObjectType == ObjectTypes.ValueTypeObjectReference)
@@ -570,7 +571,7 @@ namespace ILRuntime.Runtime.Debugger
                     StringBuilder sb = new StringBuilder();
                     var ptr = Minus(i, j + 1);
                     sb.Append(string.Format("(0x{0:X8}) Type:{1} ", (long)ptr, ptr->ObjectType));
-                    GetStackObjectText(sb, ptr, mStack);
+                    GetStackObjectText(sb, ptr, mStack, valuePointerEnd);
                     System.Diagnostics.Debug.Print(sb.ToString());
                 }
                 i = Minus(i, i->ValueLow + 1);
@@ -582,7 +583,7 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
-        unsafe void GetStackObjectText(StringBuilder sb, StackObject* esp, IList<object> mStack)
+        unsafe void GetStackObjectText(StringBuilder sb, StackObject* esp, IList<object> mStack, StackObject* valueTypeEnd)
         {
             string text = "null";
             switch (esp->ObjectType)
@@ -594,11 +595,13 @@ namespace ILRuntime.Runtime.Debugger
                     break;
                 case ObjectTypes.ValueTypeObjectReference:
                     {
-                        var obj = StackObject.ToObject(esp, domain, mStack);
+                        object obj = null;
+                        var dst = *(StackObject**)&esp->Value;
+                        if (dst > valueTypeEnd)
+                            obj = StackObject.ToObject(esp, domain, mStack);
                         if (obj != null)
                             text = obj.ToString();
 
-                        var dst = *(StackObject**)&esp->Value;
                         text += string.Format("({0})", domain.GetType(dst->Value));
                     }
                     sb.Append(string.Format("Value:0x{0:X8} Text:{1} ", (long)*(StackObject**)&esp->Value, text));

@@ -65,6 +65,7 @@ namespace ILRuntime.Runtime.Intepreter
             IList<object> mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
             StackObject* esp = stack.StackBase;
+            stack.ResetValueTypePointer();
             if (method.HasThis)
             {
                 if (instance is CrossBindingAdaptorType)
@@ -2434,23 +2435,37 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else
                                             {
-                                                if (obj->ObjectType != ObjectTypes.Null)
+                                                switch (obj->ObjectType)
                                                 {
-                                                    var val = mStack[obj->Value];
-                                                    Free(obj);
-                                                    ILTypeInstance ins = (ILTypeInstance)val;
-                                                    if (ins != null)
-                                                    {
-                                                        if (ins.IsValueType)
+                                                    case ObjectTypes.Null:
+                                                        break;
+                                                    case ObjectTypes.ValueTypeObjectReference:
                                                         {
-                                                            ins.Boxed = true;
+                                                            ILTypeInstance ins = ((ILType)type).Instantiate(false);
+                                                            ins.AssignFromStack(obj, domain, mStack);
+                                                            FreeStackValueType(obj);
+                                                            esp = PushObject(obj, mStack, ins, true);
                                                         }
-                                                        esp = PushObject(obj, mStack, ins, true);
-                                                    }
-                                                    else
-                                                    {
-                                                        esp = PushNull(obj);
-                                                    }
+                                                        break;
+                                                    default:
+                                                        {
+                                                            var val = mStack[obj->Value];
+                                                            Free(obj);
+                                                            ILTypeInstance ins = (ILTypeInstance)val;
+                                                            if (ins != null)
+                                                            {
+                                                                if (ins.IsValueType)
+                                                                {
+                                                                    ins.Boxed = true;
+                                                                }
+                                                                esp = PushObject(obj, mStack, ins, true);
+                                                            }
+                                                            else
+                                                            {
+                                                                esp = PushNull(obj);
+                                                            }
+                                                        }
+                                                        break;
                                                 }
                                             }
                                         }
@@ -2635,6 +2650,16 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else
                                             {
+                                                if(obj->ObjectType== ObjectTypes.ValueTypeObjectReference)
+                                                {
+                                                    var dst = *(StackObject**)&obj->Value;
+                                                    var vt = domain.GetType(dst->Value);
+                                                    if (vt != type)
+                                                        throw new InvalidCastException();
+                                                    object ins = ((CLRType)vt).ValueTypeBinder.ToObject(dst, domain, mStack);
+                                                    FreeStackValueType(obj);
+                                                    esp = PushObject(obj, mStack, ins, true);
+                                                }
                                                 //nothing to do for CLR type boxing
                                             }
                                         }
@@ -2784,24 +2809,33 @@ namespace ILRuntime.Runtime.Intepreter
                                         ILType it = (ILType)type;
                                         if (it.IsValueType)
                                         {
-                                            if (objRef->ObjectType == ObjectTypes.Object)
+                                            switch (objRef->ObjectType)
                                             {
-                                                var obj = mStack[objRef->Value];
-                                                if (obj != null)
-                                                {
-                                                    if (obj is ILTypeInstance)
-                                                    {
-                                                        ILTypeInstance instance = obj as ILTypeInstance;
-                                                        instance.Clear();
-                                                    }
-                                                    else
-                                                        throw new NotSupportedException();
-                                                }
-                                                else
+                                                case ObjectTypes.Null:
                                                     throw new NullReferenceException();
+                                                case ObjectTypes.ValueTypeObjectReference:
+                                                    stack.ClearValueTypeObject(type, *(StackObject**)&objRef->Value);
+                                                    break;
+                                                case ObjectTypes.Object:
+                                                    {
+                                                        var obj = mStack[objRef->Value];
+                                                        if (obj != null)
+                                                        {
+                                                            if (obj is ILTypeInstance)
+                                                            {
+                                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                                instance.Clear();
+                                                            }
+                                                            else
+                                                                throw new NotSupportedException();
+                                                        }
+                                                        else
+                                                            throw new NullReferenceException();
+                                                    }
+                                                    break;
+                                                default:
+                                                    throw new NotImplementedException();
                                             }
-                                            else
-                                                throw new NullReferenceException();
 
                                             Free(esp - 1);
                                             esp--;
@@ -2838,7 +2872,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        //nothing to do for clr value Types
+                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        {
+                                            stack.ClearValueTypeObject(type, *(StackObject**)&objRef->Value);
+                                        }
+                                        Free(esp - 1);
+                                        esp--;
                                     }
                                 }
                                 break;

@@ -69,6 +69,11 @@ namespace ILRuntime.Runtime.Stack
 
         public IList<object> ManagedStack { get { return managedStack; } }
 
+        public void ResetValueTypePointer()
+        {
+            valueTypePtr = endOfMemory - 1;
+        }
+
         public void InitializeFrame(ILMethod method, StackObject* esp, out StackFrame res)
         {
             if (esp < pointer || esp >= endOfMemory)
@@ -154,8 +159,9 @@ namespace ILRuntime.Runtime.Stack
                     case ObjectTypes.FieldReference:
                         if (tarVal->Value >= mStackBase)
                         {
+                            int oldIdx = addr->Value;
                             tarVal->Value = mStackBase;
-                            managedStack[mStackBase] = managedStack[addr->Value];
+                            managedStack[mStackBase] = managedStack[oldIdx];
                             mStackBase++;
                         }
                         break;
@@ -255,6 +261,82 @@ namespace ILRuntime.Runtime.Stack
                             val->ObjectType = ObjectTypes.Object;
                             val->Value = managedStack.Count;
                             managedStack.Add(null);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void ClearValueTypeObject(IType type, StackObject* ptr)
+        {
+            if (type is ILType)
+            {
+                ILType t = (ILType)type;
+                for (int i = 0; i < t.FieldTypes.Length; i++)
+                {
+                    var ft = t.FieldTypes[i];
+                    StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i + 1);
+                    var tClr = ft.TypeForCLR;
+                    if (tClr.IsPrimitive)
+                        StackObject.Initialized(val, tClr);
+                    else
+                    {
+                        switch (val->ObjectType)
+                        {
+                            case ObjectTypes.ValueTypeObjectReference:
+                                ClearValueTypeObject(ft, *(StackObject**)&val->Value);
+                                break;
+                            default:
+                                if (ft.IsValueType)
+                                {
+                                    if(ft is ILType)
+                                    {
+                                        throw new NotImplementedException();
+                                    }
+                                    else
+                                    {
+                                        managedStack[val->Value] = ((CLRType)ft).CreateDefaultInstance();
+                                    }
+                                }
+                                else
+                                    managedStack[val->Value] = null;
+                                break;
+                        }
+                    }
+                }
+                if (type.BaseType != null && type.BaseType is ILType)
+                    ClearValueTypeObject((ILType)type.BaseType, ptr);
+            }
+            else
+            {
+                CLRType t = (CLRType)type;
+                var cnt = t.TotalFieldCount;
+                for (int i = 0; i < cnt; i++)
+                {
+                    var ft = t.Fields[t.FieldIndexReverseMapping[i]].FieldType;
+                    StackObject* val = ILIntepreter.Minus(ptr, i + 1);
+                    if (ft.IsPrimitive)
+                        StackObject.Initialized(val, ft);
+                    else
+                    {
+                        switch (val->ObjectType)
+                        {
+                            case ObjectTypes.ValueTypeObjectReference:
+                                {
+                                    var dst = *(StackObject**)&val->Value;
+                                    var vt = intepreter.AppDomain.GetType(dst->Value);
+                                    ClearValueTypeObject(vt, *(StackObject**)&val->Value);
+                                }
+                                break;
+                            default:
+                                if (ft.IsValueType)
+                                {
+                                    var vt = intepreter.AppDomain.GetType(ft);
+                                    managedStack[val->Value] = ((CLRType)vt).CreateDefaultInstance();
+                                }
+                                else
+                                    managedStack[val->Value] = null;
+                                break;
                         }
                     }
                 }

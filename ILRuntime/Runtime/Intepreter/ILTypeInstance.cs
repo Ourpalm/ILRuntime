@@ -300,12 +300,15 @@ namespace ILRuntime.Runtime.Intepreter
                         {
                             var obj = managedObjs[i];
                             var dst = *(StackObject**)&val->Value;
-                            if (obj is ILTypeInstance)
+                            var vt = type.AppDomain.GetType(dst->Value);
+                            if (vt is ILType)
                             {
                                 ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStack);
                             }
                             else
-                                throw new NotImplementedException();
+                            {
+                                ((CLRType)vt).ValueTypeBinder.CopyValueTypeToStack(obj, dst, mStack);
+                            }
                         }
                         break;
                     default:
@@ -337,6 +340,17 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        internal unsafe void AssignFromStack(StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack)
+        {
+            StackObject* val = *(StackObject**)&esp->Value;
+            int cnt = val->ValueLow;
+            for (int i = 0; i < cnt; i++)
+            {
+                var addr = ILIntepreter.Minus(val, i + 1);
+                AssignFromStack(i, addr, type.AppDomain, managedStack);
+            }
+        }
+
         unsafe void AssignFromStackSub(ref StackObject field, int fieldIdx, StackObject* esp, IList<object> managedStack)
         {
             esp = ILIntepreter.GetObjectAndResolveReference(esp);
@@ -351,24 +365,24 @@ namespace ILRuntime.Runtime.Intepreter
                     break;
                 case ObjectTypes.ValueTypeObjectReference:
                     {
+                        var domain = type.AppDomain;
                         field.ObjectType = ObjectTypes.Object;
                         field.Value = fieldIdx;
-                        var ins = managedObjs[fieldIdx];
-                        if (ins == null)
-                            throw new NullReferenceException();
-                        if (ins is ILTypeInstance)
+                        var dst = *(StackObject**)&esp->Value;
+                        var vt = domain.GetType(dst->Value);
+                        if(vt is ILType)
                         {
+                            var ins = managedObjs[fieldIdx];
+                            if (ins == null)
+                                throw new NullReferenceException();
                             ILTypeInstance child = (ILTypeInstance)ins;
-                            StackObject* val = *(StackObject**)&esp->Value;
-                            int cnt = val->ValueLow;
-                            for(int i = 0; i < cnt; i++)
-                            {
-                                var addr = ILIntepreter.Minus(val, i + 1);
-                                child.AssignFromStack(i, addr, type.AppDomain, managedStack);
-                            }
+                            child.AssignFromStack(esp, domain, managedStack);
                         }
                         else
-                            throw new NotImplementedException();
+                        {
+                            managedObjs[fieldIdx] = ((CLRType)vt).ValueTypeBinder.ToObject(dst, domain, managedStack);
+                        }
+                        
                     }
                     break;
                 default:
