@@ -160,7 +160,9 @@ namespace ILRuntime.Runtime.Stack
                         }
                         break;
                     case ObjectTypes.ValueTypeObjectReference:
+                        var newAddr = endAddr;
                         RelocateValueType(addr, ref endAddr, ref mStackBase);
+                        *(StackObject**)&tarVal->Value = newAddr;
                         break;
                 }
             }
