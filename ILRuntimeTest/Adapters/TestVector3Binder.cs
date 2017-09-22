@@ -11,12 +11,6 @@ namespace ILRuntimeTest.TestFramework
 {
     public unsafe class TestVector3Binder : ValueTypeBinder<TestVector3>
     {
-        public override void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack)
-        {
-            TestVector3 tmp = (TestVector3)ins;
-            CopyValueTypeToStack(ref tmp, ptr, mStack);
-        }
-
         public override unsafe void CopyValueTypeToStack(ref TestVector3 ins, StackObject* ptr, IList<object> mStack)
         {
             var v = ILIntepreter.Minus(ptr, 1);
@@ -169,12 +163,6 @@ namespace ILRuntimeTest.TestFramework
 
     public unsafe class TestVectorStructBinder : ValueTypeBinder<TestVectorStruct>
     {
-        public override void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack)
-        {
-            TestVectorStruct vec = (TestVectorStruct)ins;
-            CopyValueTypeToStack(ref vec, ptr, mStack);
-        }
-
         public override unsafe void CopyValueTypeToStack(ref TestVectorStruct ins, StackObject* ptr, IList<object> mStack)
         {
             var v = ILIntepreter.Minus(ptr, 1);
@@ -198,12 +186,6 @@ namespace ILRuntimeTest.TestFramework
 
     public unsafe class TestVectorStruct2Binder : ValueTypeBinder<TestVectorStruct2>
     {
-        public override void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack)
-        {
-            TestVectorStruct2 vec = (TestVectorStruct2)ins;
-            CopyValueTypeToStack(ref vec, ptr, mStack);
-        }
-
         public override unsafe void CopyValueTypeToStack(ref TestVectorStruct2 ins, StackObject* ptr, IList<object> mStack)
         {
             var v = ILIntepreter.Minus(ptr, 1);

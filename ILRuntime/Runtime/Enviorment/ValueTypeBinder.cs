@@ -94,6 +94,12 @@ namespace ILRuntime.Runtime.Enviorment
     public unsafe abstract class ValueTypeBinder<T> : ValueTypeBinder
         where T : struct
     {
+        public override unsafe void CopyValueTypeToStack(object ins, StackObject* ptr, IList<object> mStack)
+        {
+            T obj = (T)ins;
+            CopyValueTypeToStack(ref obj, ptr, mStack);
+        }
+
         public abstract void CopyValueTypeToStack(ref T ins, StackObject* ptr, IList<object> mStack);
 
         public override unsafe object ToObject(StackObject* esp, IList<object> managedStack)
