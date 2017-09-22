@@ -98,7 +98,7 @@ namespace ILRuntime.Runtime.Stack
                         }
                         else
                         {
-                            return ((CLRType)type).ValueTypeBinder.ToObject(dst, appdomain, mStack);
+                            return ((CLRType)type).ValueTypeBinder.ToObject(dst, mStack);
                         }
                     }
                 case ObjectTypes.Null:

@@ -2443,7 +2443,6 @@ namespace ILRuntime.Runtime.Intepreter
                                                         {
                                                             ILTypeInstance ins = ((ILType)type).Instantiate(false);
                                                             ins.AssignFromStack(obj, domain, mStack);
-                                                            FreeStackValueType(obj);
                                                             esp = PushObject(obj, mStack, ins, true);
                                                         }
                                                         break;
@@ -2656,8 +2655,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     var vt = domain.GetType(dst->Value);
                                                     if (vt != type)
                                                         throw new InvalidCastException();
-                                                    object ins = ((CLRType)vt).ValueTypeBinder.ToObject(dst, domain, mStack);
-                                                    FreeStackValueType(obj);
+                                                    object ins = ((CLRType)vt).ValueTypeBinder.ToObject(dst, mStack);
                                                     esp = PushObject(obj, mStack, ins, true);
                                                 }
                                                 //nothing to do for CLR type boxing

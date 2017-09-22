@@ -380,7 +380,7 @@ namespace ILRuntime.Runtime.Intepreter
                         }
                         else
                         {
-                            managedObjs[fieldIdx] = ((CLRType)vt).ValueTypeBinder.ToObject(dst, domain, managedStack);
+                            managedObjs[fieldIdx] = ((CLRType)vt).ValueTypeBinder.ToObject(dst, managedStack);
                         }
                         
                     }

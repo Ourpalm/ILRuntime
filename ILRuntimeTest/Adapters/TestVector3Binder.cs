@@ -27,17 +27,14 @@ namespace ILRuntimeTest.TestFramework
             *(float*)&v->Value = ins.Z;
         }
 
-        public override object ToObject(StackObject* ptr, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
+        public override unsafe void AssignFromStack(ref TestVector3 ins, StackObject* ptr, IList<object> mStack)
         {
-            TestVector3 vec = new TestVector3();
             var v = ILIntepreter.Minus(ptr, 1);
-            vec.X = *(float*)&v->Value;
+            ins.X = *(float*)&v->Value;
             v = ILIntepreter.Minus(ptr, 2);
-            vec.Y = *(float*)&v->Value;
+            ins.Y = *(float*)&v->Value;
             v = ILIntepreter.Minus(ptr, 3);
-            vec.Z = *(float*)&v->Value;
-
-            return vec;
+            ins.Z = *(float*)&v->Value;
         }
 
         public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
@@ -188,9 +185,14 @@ namespace ILRuntimeTest.TestFramework
             CopyValueTypeToStack(ref ins.C, v, mStack);
         }
 
-        public override object ToObject(StackObject* ptr, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
+        public override unsafe void AssignFromStack(ref TestVectorStruct ins, StackObject* ptr, IList<object> mStack)
         {
-            return null;
+            var v = ILIntepreter.Minus(ptr, 1);
+            ins.A = v->Value;
+            v = ILIntepreter.Minus(ptr, 2);
+            AssignFromStack(ref ins.B, v, mStack);
+            v = ILIntepreter.Minus(ptr, 3);
+            AssignFromStack(ref ins.C, v, mStack);
         }
     }
 
@@ -210,9 +212,12 @@ namespace ILRuntimeTest.TestFramework
             CopyValueTypeToStack(ref ins.Vector, v, mStack);
         }
 
-        public override object ToObject(StackObject* ptr, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> managedStack)
+        public override unsafe void AssignFromStack(ref TestVectorStruct2 ins, StackObject* ptr, IList<object> mStack)
         {
-            return null;
+            var v = ILIntepreter.Minus(ptr, 1);
+            AssignFromStack(ref ins.A, v, mStack);
+            v = ILIntepreter.Minus(ptr, 2);
+            AssignFromStack(ref ins.Vector, v, mStack);
         }
     }
 }

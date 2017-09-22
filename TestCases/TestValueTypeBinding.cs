@@ -5,6 +5,11 @@ namespace TestCases
 {
     public class TestValueTypeBinding
     {
+        class TestValueTypeCls
+        {
+            public TestVectorStruct A;
+            public Vector3 B;
+        }
         public static void Test00()
         {
             var a = TestVector3.One;
@@ -88,6 +93,30 @@ namespace TestCases
             a.B = new TestVectorStruct2();
             a.B.Vector = TestVector3.One * 123;
             return a;
+        }
+
+        public static void UnitTest_10024()
+        {
+            TestVectorStruct a;
+            a = Sub10023();
+
+            Sub10024(a);
+        }
+
+        static void Sub10024(object obj)
+        {
+            TestVectorStruct a = (TestVectorStruct)obj;
+            Console.WriteLine("a.B.Vector.x=" + a.B.Vector.X);
+        }
+
+        public static void UnitTest_10025()
+        {
+            TestValueTypeCls cls = new TestValueTypeCls();
+            cls.A = Sub10023();
+            cls.B = Vector3.One;
+
+            Console.WriteLine("a.B.Vector.x=" + cls.A.B.Vector.X);
+            Console.WriteLine("cls.B.x=" + cls.B.x);
         }
     }
 }

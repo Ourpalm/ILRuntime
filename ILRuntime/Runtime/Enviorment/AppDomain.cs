@@ -1200,6 +1200,7 @@ namespace ILRuntime.Runtime.Enviorment
         public void RegisterCrossBindingAdaptor(CrossBindingAdaptor adaptor)
         {
             var bType = adaptor.BaseCLRType;
+            
             if (bType != null)
             {
                 if (!crossAdaptors.ContainsKey(bType))
