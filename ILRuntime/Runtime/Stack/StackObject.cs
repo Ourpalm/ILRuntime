@@ -81,6 +81,26 @@ namespace ILRuntime.Runtime.Stack
                     {
                         return ToObject((*(StackObject**)&esp->Value), appdomain, mStack);
                     }
+                case ObjectTypes.ValueTypeObjectReference:
+                    {
+                        StackObject* dst = *(StackObject**)&esp->Value;
+                        IType type = appdomain.GetType(dst->Value);
+                        if (type is ILType)
+                        {
+                            ILType iltype = (ILType)type;
+                            var ins = iltype.Instantiate(false);
+                            for (int i = 0; i < dst->ValueLow; i++)
+                            {
+                                var addr = ILIntepreter.Minus(dst, i + 1);
+                                ins.AssignFromStack(i, addr, appdomain, mStack);
+                            }
+                            return ins;
+                        }
+                        else
+                        {
+                            return ((CLRType)type).ValueTypeBinder.ToObject(dst, mStack);
+                        }
+                    }
                 case ObjectTypes.Null:
                     return null;
                 default:
@@ -187,6 +207,8 @@ namespace ILRuntime.Runtime.Stack
         Double,
         StackObjectReference,//Value = pointer, 
         StaticFieldReference,
+        ValueTypeObjectReference,
+        ValueTypeDescriptor,
         Object,
         FieldReference,//Value = objIdx, ValueLow = fieldIdx
         ArrayReference,//Value = objIdx, ValueLow = elemIdx
