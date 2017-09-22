@@ -55,7 +55,18 @@ namespace ILRuntime.Runtime.CLRBinding
                         {
                             instance_of_this_method = (");
                 sb.Append(typeClsName);
-                sb.Append(")((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];");
+                sb.Append(")");
+                if(type == typeof(bool))
+                {
+                    sb.Append("((int)");
+                }
+                sb.Append("((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow]");
+                if (type == typeof(bool))
+                {
+                    sb.Append(" == 1);");
+                }
+                else
+                    sb.Append(";");
                 sb.Append(@"
                         }
                         else
@@ -75,7 +86,19 @@ namespace ILRuntime.Runtime.CLRBinding
                         {
                             instance_of_this_method = (");
                 sb.Append(typeClsName);
-                sb.Append(@")((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                sb.Append(")");
+                if (type == typeof(bool))
+                {
+                    sb.Append("((int)");
+                }
+                sb.Append("((ILType)t).StaticInstance[ptr_of_this_method->ValueLow]");
+                if (type == typeof(bool))
+                {
+                    sb.Append(" == 1);");
+                }
+                else
+                    sb.Append(";");
+                sb.Append(@"
                         }
                         else
                         {

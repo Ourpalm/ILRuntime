@@ -389,6 +389,15 @@ namespace ILRuntime.CLR.Method
                             else
                                 code.TokenInteger = token.GetHashCode();
                         }
+                        else
+                        {
+                            //Cannot find method or the method is dummy
+                            MethodReference _ref = (MethodReference)token;
+                            int paramCnt = _ref.HasParameters ? _ref.Parameters.Count : 0;
+                            if (_ref.HasThis)
+                                paramCnt++;
+                            code.TokenLong = paramCnt;
+                        }
                     }
                     break;
                 case OpCodeEnum.Constrained:

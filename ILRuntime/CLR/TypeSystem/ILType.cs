@@ -284,19 +284,19 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (!baseTypeInitialized)
                     InitializeBaseType();
-                if (definition.IsEnum)
-                {
-                    if (enumType == null)
-                        InitializeFields();
-                    return enumType.TypeForCLR;
-                }
-                else if (typeRef is ArrayType)
+                if (typeRef is ArrayType)
                 {
                     return arrayCLRType;
                 }
                 else if (typeRef is ByReferenceType)
                 {
                     return byRefCLRType;
+                }
+                else if (definition.IsEnum)
+                {
+                    if (enumType == null)
+                        InitializeFields();
+                    return enumType.TypeForCLR;
                 }
                 else if (FirstCLRBaseType != null && FirstCLRBaseType is CrossBindingAdaptor)
                 {
@@ -505,7 +505,7 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
-        public IMethod GetMethod(string name, int paramCount)
+        public IMethod GetMethod(string name, int paramCount, bool declaredOnly = false)
         {
             if (methods == null)
                 InitializeMethods();
@@ -518,7 +518,15 @@ namespace ILRuntime.CLR.TypeSystem
                         return i;
                 }
             }
-            return null;
+            if (declaredOnly)
+                return null;
+            else
+            {
+                if (BaseType != null)
+                    return BaseType.GetMethod(name, paramCount, false);
+                else
+                    return null;
+            }
         }
 
         void InitializeMethods()
@@ -568,7 +576,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
-            var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType);
+            var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
             if (m == null)
             {
                 if (BaseType != null)
@@ -584,7 +592,7 @@ namespace ILRuntime.CLR.TypeSystem
                 return method;
         }
 
-        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null)
+        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null, bool declaredOnly = false)
         {
             if (methods == null)
                 InitializeMethods();
@@ -632,7 +640,15 @@ namespace ILRuntime.CLR.TypeSystem
                 lst.Add((ILMethod)m);
                 return m;
             }
-            return null;
+            if (declaredOnly)
+                return null;
+            else
+            {
+                if (BaseType != null)
+                    return BaseType.GetMethod(name, param, genericArguments, returnType, false);
+                else
+                    return null;
+            }
         }
 
         bool CheckGenericArguments(ILMethod i, IType[] genericArguments)

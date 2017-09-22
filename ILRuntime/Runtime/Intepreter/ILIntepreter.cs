@@ -1216,6 +1216,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         switch (a->ObjectType)
                                         {
+                                            case ObjectTypes.Null:
+                                                transfer = true;
+                                                break;
                                             case ObjectTypes.Integer:
                                                 transfer = a->Value == b->Value;
                                                 break;
@@ -1256,6 +1259,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         switch (a->ObjectType)
                                         {
+                                            case ObjectTypes.Null:
+                                                transfer = false;
+                                                break;
                                             case ObjectTypes.Integer:
                                                 transfer = (uint)a->Value != (uint)b->Value;
                                                 break;
@@ -1605,8 +1611,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (m == null)
                                     {
                                         //Irrelevant method
-                                        Free(esp - 1);
-                                        esp--;
+                                        int cnt = (int)ip->TokenLong;
+                                        //Balance the stack
+                                        for (int i = 0; i < cnt; i++)
+                                        {
+                                            Free(esp - 1);
+                                            esp--;
+                                        }
                                     }
                                     else
                                     {
@@ -2105,16 +2116,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (obj1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
-                                            res = (uint)obj1->Value < (uint)obj2->Value;
+                                            res = (uint)obj1->Value < (uint)obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Long:
-                                            res = (ulong)*(long*)&obj1->Value < (ulong)*(long*)&obj2->Value;
+                                            res = (ulong)*(long*)&obj1->Value < (ulong)*(long*)&obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value;
+                                            res = *(float*)&obj1->Value < *(float*)&obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&obj1->Value < *(double*)&obj2->Value;
+                                            res = *(double*)&obj1->Value < *(double*)&obj2->Value && obj2->ObjectType != ObjectTypes.Null;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -2133,16 +2144,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (obj1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
-                                            res = obj1->Value > obj2->Value;
+                                            res = obj1->Value > obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Long:
-                                            res = *(long*)&obj1->Value > *(long*)&obj2->Value;
+                                            res = *(long*)&obj1->Value > *(long*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value;
+                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value;
+                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -2161,16 +2172,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (obj1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
-                                            res = (uint)obj1->Value > (uint)obj2->Value;
+                                            res = ((uint)obj1->Value > (uint)obj2->Value) || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Long:
-                                            res = (ulong)*(long*)&obj1->Value > (ulong)*(long*)&obj2->Value;
+                                            res = (ulong)*(long*)&obj1->Value > (ulong)*(long*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value;
+                                            res = *(float*)&obj1->Value > *(float*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value;
+                                            res = *(double*)&obj1->Value > *(double*)&obj2->Value || obj2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Object:
                                             res = mStack[obj1->Value] != null && obj2->ObjectType == ObjectTypes.Null;
@@ -2885,49 +2896,105 @@ namespace ILRuntime.Runtime.Intepreter
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type != null)
                                     {
-                                        var obj = RetriveObject(objRef, mStack);
-                                        Free(objRef);
-
-                                        if (obj != null)
+                                        objRef = GetObjectAndResolveReference(objRef);
+                                        if (objRef->ObjectType <= ObjectTypes.Double)
                                         {
-                                            if (obj is ILTypeInstance)
+                                            var tclr = type.TypeForCLR;
+                                            switch (objRef->ObjectType)
                                             {
-                                                if (((ILTypeInstance)obj).CanAssignTo(type))
-                                                {
-                                                    esp = PushObject(objRef, mStack, obj);
-                                                }
-                                                else
-                                                {
-#if !DEBUG
+                                                case ObjectTypes.Integer:
+                                                    {
+                                                        if (tclr != typeof(int) && tclr != typeof(bool) && tclr != typeof(short) && tclr != typeof(byte) && tclr != typeof(ushort) && tclr !=typeof(uint))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Long:
+                                                    {
+                                                        if (tclr != typeof(long) && tclr != typeof(ulong))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Float:
+                                                    {
+                                                        if (tclr != typeof(float))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Double:
+                                                    {
+                                                        if (tclr != typeof(double))
+                                                        {
+                                                            objRef->ObjectType = ObjectTypes.Null;
+                                                            objRef->Value = -1;
+                                                            objRef->ValueLow = 0;
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Null:
                                                     objRef->ObjectType = ObjectTypes.Null;
                                                     objRef->Value = -1;
                                                     objRef->ValueLow = 0;
-#endif
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
-                                                {
-                                                    esp = PushObject(objRef, mStack, obj, true);
-                                                }
-                                                else
-                                                {
-#if !DEBUG
-                                                    objRef->ObjectType = ObjectTypes.Null;
-                                                    objRef->Value = -1;
-                                                    objRef->ValueLow = 0;
-#endif
-                                                }
+                                                    break;
                                             }
                                         }
                                         else
                                         {
+                                            var obj = RetriveObject(objRef, mStack);
+                                            Free(objRef);
+
+                                            if (obj != null)
+                                            {
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    if (((ILTypeInstance)obj).CanAssignTo(type))
+                                                    {
+                                                        esp = PushObject(objRef, mStack, obj);
+                                                    }
+                                                    else
+                                                    {
 #if !DEBUG
-                                                objRef->ObjectType = ObjectTypes.Null;
-                                                objRef->Value = -1;
-                                                objRef->ValueLow = 0;
+                                                        objRef->ObjectType = ObjectTypes.Null;
+                                                        objRef->Value = -1;
+                                                        objRef->ValueLow = 0;
 #endif
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
+                                                    {
+                                                        esp = PushObject(objRef, mStack, obj, true);
+                                                    }
+                                                    else
+                                                    {
+#if !DEBUG
+                                                        objRef->ObjectType = ObjectTypes.Null;
+                                                        objRef->Value = -1;
+                                                        objRef->ValueLow = 0;
+#endif
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+#if !DEBUG
+                                                    objRef->ObjectType = ObjectTypes.Null;
+                                                    objRef->Value = -1;
+                                                    objRef->ValueLow = 0;
+#endif
+                                            }
                                         }
                                     }
                                     else

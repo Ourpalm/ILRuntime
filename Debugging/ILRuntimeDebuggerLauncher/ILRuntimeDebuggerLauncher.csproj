@@ -8,8 +8,10 @@
     </NuGetPackageImportStamp>
     <UseCodebase>true</UseCodebase>
     <TargetFrameworkProfile />
-    <FileUpgradeFlags>40</FileUpgradeFlags>
-    <UpgradeBackupLocation>E:\SVN\ILRuntime\Backup\</UpgradeBackupLocation>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>14.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup>

@@ -7,6 +7,12 @@ namespace TestCases
 {
     class Test01
     {
+        public static Dictionary<EnumTest.TestEnum, EnumTest.TestEnum[]> dicAttrConver5 = new Dictionary<EnumTest.TestEnum, EnumTest.TestEnum[]>()
+        {
+            {
+                EnumTest.TestEnum.Enum1,new EnumTest.TestEnum[]{ EnumTest.TestEnum.Enum2}
+            },
+        };
         public static int foo(int init)
         {
             int b = init;

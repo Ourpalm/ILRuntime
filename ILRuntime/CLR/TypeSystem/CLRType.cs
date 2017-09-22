@@ -480,7 +480,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
             return null;
         }
-        public IMethod GetMethod(string name, int paramCount)
+        public IMethod GetMethod(string name, int paramCount, bool declaredOnly = false)
         {
             if (methods == null)
                 InitializeMethods();
@@ -496,7 +496,7 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
-        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null)
+        public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null, bool declaredOnly = false)
         {
             if (methods == null)
                 InitializeMethods();

@@ -108,7 +108,7 @@ order: 120
                 {
                     isTestVirtualInvoking = true;
 					param1[0] = a;
-                    appdomain.Invoke(mTestVirtual, instance, a);
+                    appdomain.Invoke(mTestVirtual, instance, this.param1);
                     isTestVirtualInvoking = false;
                 }
                 else

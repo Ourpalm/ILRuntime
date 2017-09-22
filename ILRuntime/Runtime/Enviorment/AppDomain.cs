@@ -524,6 +524,7 @@ namespace ILRuntime.Runtime.Enviorment
                     mapTypeToken[bt.GetHashCode()] = bt;
                     if (!isByRef)
                     {
+                        mapType[fullname] = bt;
                         return bt;
                     }
                 }
@@ -537,7 +538,10 @@ namespace ILRuntime.Runtime.Enviorment
                     return res;
                 }
                 else
+                {
+                    mapType[fullname] = bt;
                     return bt;
+                }
             }
             else
             {
@@ -1098,7 +1102,7 @@ namespace ILRuntime.Runtime.Enviorment
                 method = type.GetConstructor(paramList);
             else
             {
-                method = type.GetMethod(methodname, paramList, genericArguments, returnType);
+                method = type.GetMethod(methodname, paramList, genericArguments, returnType, true);
             }
 
             if (method == null)
