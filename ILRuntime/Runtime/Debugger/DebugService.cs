@@ -499,6 +499,7 @@ namespace ILRuntime.Runtime.Debugger
 
         internal unsafe void DumpStack(StackObject* esp, RuntimeStack stack)
         {
+#if !UNITY_5 && !UNITY_2017 && !UNITY_4
             var start = stack.StackBase;
             var end = esp + 10;
             var frames = stack.Frames;
@@ -581,6 +582,7 @@ namespace ILRuntime.Runtime.Debugger
             {
                 System.Diagnostics.Debug.Print(string.Format("({0}){1}", i, mStack[i]));
             }
+#endif
         }
 
         unsafe void GetStackObjectText(StringBuilder sb, StackObject* esp, IList<object> mStack, StackObject* valueTypeEnd)
