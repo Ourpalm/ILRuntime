@@ -32,6 +32,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         bool IsDelegate { get; }
 
+        bool IsPrimitive { get; }
+
         bool HasGenericParameter { get; }
 
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }

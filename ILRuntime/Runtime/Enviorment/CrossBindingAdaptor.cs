@@ -180,6 +180,14 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
+        public bool IsPrimitive
+        {
+            get
+            {
+                return type.IsPrimitive;
+            }
+        }
+
         public bool IsDelegate
         {
             get

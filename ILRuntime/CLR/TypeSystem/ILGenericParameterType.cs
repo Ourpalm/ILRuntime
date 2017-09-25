@@ -122,6 +122,11 @@ namespace ILRuntime.CLR.TypeSystem
             get { throw new NotImplementedException(); }
         }
 
+        public bool IsPrimitive
+        {
+            get { return false; }
+        }
+
         public string Name
         {
             get

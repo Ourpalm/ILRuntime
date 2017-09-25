@@ -27,6 +27,7 @@ namespace ILRuntime.Runtime.Intepreter
         public StepTypes CurrentStepType { get; set; }
         public StackObject* LastStepFrameBase { get; set; }
         public int LastStepInstructionIndex { get; set; }
+        StackObject* ValueTypeBasePointer;
         public ILIntepreter(Enviorment.AppDomain domain)
         {
             this.domain = domain;
@@ -192,7 +193,7 @@ namespace ILRuntime.Runtime.Intepreter
                     {
                         var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
                         var loc = Add(v1, i);
-                        StackObject.Initialized(loc, t.TypeForCLR);
+                        StackObject.Initialized(loc, t);
                     }
                     else
                     {
@@ -203,7 +204,7 @@ namespace ILRuntime.Runtime.Intepreter
                 }
             }
             var bp = stack.ValueTypeStackPointer;
-
+            ValueTypeBasePointer = bp;
             fixed (OpCode* ptr = body)
             {
                 OpCode* ip = ptr;
@@ -1647,6 +1648,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                                 }
                                                 esp = Execute(ilm, esp, out unhandledException);
+                                                ValueTypeBasePointer = bp;
                                                 if (unhandledException)
                                                     returned = true;
                                             }
@@ -2270,6 +2272,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp++;
                                             }
                                             esp = Execute((ILMethod)m, esp, out unhandledException);
+                                            ValueTypeBasePointer = bp;
                                             if (isValueType)
                                             {
                                                 var ins = objRef - 1 - 1;
@@ -2454,6 +2457,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         {
                                                             ILTypeInstance ins = ((ILType)type).Instantiate(false);
                                                             ins.AssignFromStack(obj, domain, mStack);
+                                                            FreeStackValueType(obj);
                                                             esp = PushObject(obj, mStack, ins, true);
                                                         }
                                                         break;
@@ -2667,6 +2671,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (vt != type)
                                                         throw new InvalidCastException();
                                                     object ins = ((CLRType)vt).ValueTypeBinder.ToObject(dst, mStack);
+                                                    FreeStackValueType(obj);
                                                     esp = PushObject(obj, mStack, ins, true);
                                                 }
                                                 //nothing to do for CLR type boxing
@@ -3986,9 +3991,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                         throw new NotImplementedException();
-                    var addr = *(StackObject**)&esp->Value;
-                    if (addr <= bp)//Only Stack allocation after base pointer should be freed, local variable are freed automatically
-                        FreeStackValueType(esp);
+                    FreeStackValueType(esp);
                     break;
                 default:
                     *v = *esp;
@@ -4573,10 +4576,10 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
-                stack.FreeValueTypeObject(esp);
+                var addr = *(StackObject**)&esp->Value;
+                if (addr <= ValueTypeBasePointer)//Only Stack allocation after base pointer should be freed, local variable are freed automatically
+                    stack.FreeValueTypeObject(esp);
             }
-            else
-                throw new ArgumentException();
         }
 
         public void AllocValueType(StackObject* ptr, IType type)

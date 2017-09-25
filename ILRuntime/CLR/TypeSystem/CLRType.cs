@@ -14,6 +14,7 @@ namespace ILRuntime.CLR.TypeSystem
     public class CLRType : IType
     {
         Type clrType;
+        bool isPrimitive;
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
@@ -23,7 +24,8 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
         Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
-        Dictionary<int, int> fieldIdxMapping, fieldIdxReverseMapping;
+        Dictionary<int, int> fieldIdxMapping;
+        IType[] orderedFieldTypes;
 
         CLRMemberwiseCloneDelegate memberwiseCloneDelegate;
         CLRCreateDefaultInstanceDelegate createDefaultInstanceDelegate;
@@ -55,11 +57,13 @@ namespace ILRuntime.CLR.TypeSystem
             get { return fieldIdxMapping; }
         }
 
-        public Dictionary<int, int> FieldIndexReverseMapping
+        public IType[] OrderedFieldTypes
         {
             get
             {
-                return fieldIdxReverseMapping;
+                if (fieldMapping == null)
+                    InitializeFields();
+                return orderedFieldTypes;
             }
         }
 
@@ -85,6 +89,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             this.clrType = clrType;
             this.appdomain = appdomain;
+            isPrimitive = clrType.IsPrimitive;
             isDelegate = clrType.BaseType == typeof(MulticastDelegate);
         }
 
@@ -163,6 +168,14 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return isDelegate;
+            }
+        }
+
+        public bool IsPrimitive
+        {
+            get
+            {
+                return isPrimitive;
             }
         }
         public string FullName
@@ -417,7 +430,7 @@ namespace ILRuntime.CLR.TypeSystem
             if (hasValueTypeBinder)
             {
                 fieldIdxMapping = new Dictionary<int, int>();
-                fieldIdxReverseMapping = new Dictionary<int, int>();
+                orderedFieldTypes = new IType[fields.Length];
             }
             foreach (var i in fields)
             {
@@ -430,7 +443,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
                 if (hasValueTypeBinder && !i.IsStatic)
                 {
-                    fieldIdxReverseMapping[idx] = hashCode;
+                    orderedFieldTypes[idx] = appdomain.GetType(i.FieldType);
                     fieldIdxMapping[hashCode] = idx++;
                 }
 

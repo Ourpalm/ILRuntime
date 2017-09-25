@@ -212,9 +212,8 @@ namespace ILRuntime.Runtime.Stack
                 {
                     var ft = t.FieldTypes[i];
                     StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i + 1);
-                    var tClr = ft.TypeForCLR;
-                    if (tClr.IsPrimitive)
-                        StackObject.Initialized(val, tClr);
+                    if (ft.IsPrimitive)
+                        StackObject.Initialized(val, ft);
                     else
                     {
                         if (ft.IsValueType)
@@ -238,22 +237,21 @@ namespace ILRuntime.Runtime.Stack
                 var cnt = t.TotalFieldCount;
                 for(int i = 0; i < cnt; i++)
                 {
-                    var ft = t.Fields[t.FieldIndexReverseMapping[i]].FieldType;
+                    var it = t.OrderedFieldTypes[i] as CLRType;
                     StackObject* val = ILIntepreter.Minus(ptr, i + 1);
-                    if (ft.IsPrimitive)
-                        StackObject.Initialized(val, ft);
+                    if (it.IsPrimitive)
+                        StackObject.Initialized(val, it);
                     else
                     {
-                        if (ft.IsValueType)
+                        if (it.IsValueType)
                         {
-                            var it = intepreter.AppDomain.GetType(ft);
-                            if (((CLRType)it).ValueTypeBinder != null)
+                            if (it.ValueTypeBinder != null)
                                 AllocValueType(val, it);
                             else
                             {
                                 val->ObjectType = ObjectTypes.Object;
                                 val->Value = managedStack.Count;
-                                managedStack.Add(((CLRType)it).CreateDefaultInstance());
+                                managedStack.Add(it.CreateDefaultInstance());
                             }
                         }
                         else
@@ -276,9 +274,8 @@ namespace ILRuntime.Runtime.Stack
                 {
                     var ft = t.FieldTypes[i];
                     StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i + 1);
-                    var tClr = ft.TypeForCLR;
-                    if (tClr.IsPrimitive)
-                        StackObject.Initialized(val, tClr);
+                    if (ft.IsPrimitive)
+                        StackObject.Initialized(val, ft);
                     else
                     {
                         switch (val->ObjectType)
@@ -313,10 +310,10 @@ namespace ILRuntime.Runtime.Stack
                 var cnt = t.TotalFieldCount;
                 for (int i = 0; i < cnt; i++)
                 {
-                    var ft = t.Fields[t.FieldIndexReverseMapping[i]].FieldType;
+                    var vt = t.OrderedFieldTypes[i] as CLRType;
                     StackObject* val = ILIntepreter.Minus(ptr, i + 1);
-                    if (ft.IsPrimitive)
-                        StackObject.Initialized(val, ft);
+                    if (vt.IsPrimitive)
+                        StackObject.Initialized(val, vt);
                     else
                     {
                         switch (val->ObjectType)
@@ -324,15 +321,13 @@ namespace ILRuntime.Runtime.Stack
                             case ObjectTypes.ValueTypeObjectReference:
                                 {
                                     var dst = *(StackObject**)&val->Value;
-                                    var vt = intepreter.AppDomain.GetType(dst->Value);
                                     ClearValueTypeObject(vt, *(StackObject**)&val->Value);
                                 }
                                 break;
                             default:
-                                if (ft.IsValueType)
+                                if (vt.IsValueType)
                                 {
-                                    var vt = intepreter.AppDomain.GetType(ft);
-                                    managedStack[val->Value] = ((CLRType)vt).CreateDefaultInstance();
+                                    managedStack[val->Value] = vt.CreateDefaultInstance();
                                 }
                                 else
                                     managedStack[val->Value] = null;

@@ -160,8 +160,9 @@ namespace ILRuntime.Runtime.Stack
         }
 
         //IL2CPP can't process esp->Initialized() properly, so I can only use static function for this
-        public unsafe static void Initialized(StackObject* esp, Type t)
+        public unsafe static void Initialized(StackObject* esp, IType type)
         {
+            var t = type.TypeForCLR;
             if (t.IsPrimitive)
             {
                 if (t == typeof(int) || t == typeof(uint) || t == typeof(short) || t == typeof(ushort) || t == typeof(byte) || t == typeof(sbyte) || t == typeof(char) || t == typeof(bool))

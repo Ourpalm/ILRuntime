@@ -278,6 +278,11 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public bool IsPrimitive
+        {
+            get { return false; }
+        }
+
         public Type TypeForCLR
         {
             get
