@@ -14,7 +14,7 @@ namespace ILRuntime.CLR.TypeSystem
     public class CLRType : IType
     {
         Type clrType;
-        bool isPrimitive;
+        bool isPrimitive, isValueType;
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
@@ -90,6 +90,7 @@ namespace ILRuntime.CLR.TypeSystem
             this.clrType = clrType;
             this.appdomain = appdomain;
             isPrimitive = clrType.IsPrimitive;
+            isValueType = clrType.IsValueType;
             isDelegate = clrType.BaseType == typeof(MulticastDelegate);
         }
 
@@ -160,7 +161,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return clrType.IsValueType;
+                return isValueType;
             }
         }
         public bool IsDelegate
