@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.3.7"
+    "version": "3.3.9"
   },
   "dependencies": {
-    "hexo": "^3.3.7",
+    "hexo": "^3.3.9",
     "hexo-cli": "^1.0.3",
     "hexo-generator-archive": "^0.1.4",
     "hexo-generator-category": "^0.1.3",

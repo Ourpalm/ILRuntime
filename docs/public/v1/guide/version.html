@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.2</button>
+        <button class="hiden-in-phone">V1.3</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -162,7 +162,13 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-2"><a href="#V1-2" class="headerlink" title="V1.2"></a>V1.2</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-3"><a href="#V1-3" class="headerlink" title="V1.3"></a>V1.3</h3><ul>
+<li>增加栈上分配值类型的机制，值类型可以不再强制装箱而直接在栈上分配。</li>
+<li>增加值类型绑定（ValueTypeBinding）机制，可以将ILRuntime外部的CLR值类型在栈上分配，大幅提升相关操作性能</li>
+<li>修复若干泛型方法寻找方法的bug</li>
+<li>改善委托缺少适配器或者转换器时自动生成的代码提示</li>
+</ul>
+<h3 id="V1-2"><a href="#V1-2" class="headerlink" title="V1.2"></a>V1.2</h3><ul>
 <li>完善系统反射接口的支持，并且提供获取ILRuntime中定义的类型作为泛型参数的接口</li>
 <li>集成Litjson库</li>
 <li>增加了字段，值类型复制，创建默认实例等操作的CLR绑定，改善这些操作的性能</li>

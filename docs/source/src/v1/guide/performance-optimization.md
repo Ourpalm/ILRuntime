@@ -20,9 +20,9 @@ ILRuntime的性能跟编译模式和Unity发布选项有着非常大的关系，
 
 ### 值类型
 
-由于值类型的特殊和ILRuntime的实现原理，目前没有办法做到直接在栈上为所有类型申请内存，因此依然只有将值类型进行装箱，然后在通过深层拷贝来模拟值类型的行为。
+由于值类型的特殊和ILRuntime的实现原理，使用ILRuntime外部定义的值类型（例如UnityEngine.Vector3）在默认情况下会造成额外的装箱拆箱开销，以及相对应的GC Alloc内存分配。
 
-因此在ILRuntime中值类型的运行效率会低于引用类型，并且在赋值时可能还会产生额外的GC Alloc，因此在热更DLL当中应该尽量避免大量使用值类型
+为了解决这个问题，ILRuntime在1.3.0版中增加了值类型绑定（ValueTypeBinding）机制，通过对这些值类型添加绑定器，可以大幅增加值类型的执行效率，以及避免GC Alloc内存分配。具体用法请参考ILRuntime的Unity3D示例工程或者ILRuntime的TestCases测试用例工程。
 
 ### 接口调用建议
 为了调用方便，ILRuntime的很多接口使用了params可变参数，但是有可能会无意间忽视这个操作带来的GCAlloc，例如下面的操作：
