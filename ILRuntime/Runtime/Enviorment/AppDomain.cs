@@ -445,6 +445,9 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 valueTypeBinders[t] = binder;
                 binder.RegisterCLRRedirection(this);
+
+                var ct = GetType(t) as CLRType;
+                binder.CLRType = ct;
             }
         }
 

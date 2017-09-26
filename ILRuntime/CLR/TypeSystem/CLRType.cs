@@ -223,8 +223,7 @@ namespace ILRuntime.CLR.TypeSystem
                     if (!valueTypeBinderGot)
                     {
                         valueTypeBinderGot = true;
-                        if (appdomain.ValueTypeBinders.TryGetValue(clrType, out valueTypeBinder))
-                            valueTypeBinder.CLRType = this;
+                        appdomain.ValueTypeBinders.TryGetValue(clrType, out valueTypeBinder);
                     }
                     return valueTypeBinder;
                 }
