@@ -44,9 +44,11 @@
     <Compile Include="IJsonWrapper.cs" />
     <Compile Include="JsonData.cs" />
     <Compile Include="JsonException.cs" />
+    <Compile Include="JsonIgnoreAttribute.cs" />
     <Compile Include="JsonMapper.cs" />
     <Compile Include="JsonMockWrapper.cs" />
     <Compile Include="JsonReader.cs" />
+    <Compile Include="JsonUtility.cs" />
     <Compile Include="JsonWriter.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="ParserToken.cs" />

@@ -190,7 +190,7 @@ namespace LitJson
             }
             else
             {
-                foreach (PropertyInfo p_info in type.GetProperties())
+                foreach (PropertyInfo p_info in JsonUtility.GetPropertyInfos(type))
                 {
                     if (p_info.Name != "Item")
                         continue;
@@ -224,7 +224,7 @@ namespace LitJson
                 data.IsDictionary = true;
 
             data.Properties = new Dictionary<string, PropertyMetadata> ();
-            foreach (PropertyInfo p_info in type.GetProperties ()) {
+            foreach (PropertyInfo p_info in JsonUtility.GetPropertyInfos(type)) {
                 if (p_info.Name == "Item") {
                     ParameterInfo[] parameters = p_info.GetIndexParameters ();
 
@@ -251,7 +251,7 @@ namespace LitJson
                 data.Properties.Add (p_info.Name, p_data);
             }
 
-            foreach (FieldInfo f_info in type.GetFields ()) {
+            foreach (FieldInfo f_info in JsonUtility.GetFieldInfos(type)) {
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
                 p_data.IsField = true;
@@ -276,7 +276,7 @@ namespace LitJson
 
             IList<PropertyMetadata> props = new List<PropertyMetadata> ();
 
-            foreach (PropertyInfo p_info in type.GetProperties ()) {
+            foreach (PropertyInfo p_info in JsonUtility.GetPropertyInfos(type)) {
                 if (p_info.Name == "Item")
                     continue;
 
@@ -286,7 +286,7 @@ namespace LitJson
                 props.Add (p_data);
             }
 
-            foreach (FieldInfo f_info in type.GetFields ()) {
+            foreach (FieldInfo f_info in JsonUtility.GetFieldInfos(type)) {
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
                 p_data.IsField = true;
