@@ -163,14 +163,10 @@ namespace ILRuntime.Reflection
             if (customAttributes == null)
                 InitializeCustomAttribute();
 
-            var typeFullName = attributeType.FullName;
-
             List<object> res = new List<object>();
             for (int i = 0; i < customAttributes.Length; i++)
             {
-                var fullName = attributeTypes[i].FullName;
-
-                if (fullName == typeFullName)
+                if (attributeTypes[i].Equals(attributeType))
                 {
                     res.Add(customAttributes[i]);
                 }
@@ -183,13 +179,9 @@ namespace ILRuntime.Reflection
             if (customAttributes == null)
                 InitializeCustomAttribute();
 
-            var typeFullName = attributeType.FullName;
-
             for (int i = 0; i < customAttributes.Length; i++)
             {
-                var fullName = attributeTypes[i].FullName;
-
-                if (fullName == typeFullName)
+                if (attributeTypes[i].Equals(attributeType))
                 {
                     return true;
                 }
