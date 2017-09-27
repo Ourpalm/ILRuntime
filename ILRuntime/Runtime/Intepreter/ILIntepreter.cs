@@ -2416,7 +2416,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             var tt = type.TypeForCLR;
                                             if (tt.IsEnum)
                                             {
-                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)));
+                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)), true);
                                             }
                                             else if (tt.IsPrimitive)
                                             {
