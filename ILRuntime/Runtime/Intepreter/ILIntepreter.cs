@@ -1821,7 +1821,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Ldfld:
                                 {
-                                    StackObject* objRef = GetObjectAndResolveReference(esp - 1);
+                                    var ret = esp - 1;
+                                    StackObject* objRef = GetObjectAndResolveReference(ret);
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         var dst = *(StackObject**)&objRef->Value;
@@ -1830,18 +1831,18 @@ namespace ILRuntime.Runtime.Intepreter
                                             dst = Minus(dst, (int)ip->TokenLong + 1);
                                         else
                                             dst = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
-                                        CopyToStack(objRef, dst, mStack);
+                                        CopyToStack(ret, dst, mStack);
                                     }
                                     else
                                     {
                                         object obj = RetriveObject(objRef, mStack);
-                                        Free(esp - 1);
+                                        Free(ret);
                                         if (obj != null)
                                         {
                                             if (obj is ILTypeInstance)
                                             {
                                                 ILTypeInstance instance = obj as ILTypeInstance;
-                                                instance.PushToStack((int)ip->TokenLong, esp - 1, AppDomain, mStack);
+                                                instance.PushToStack((int)ip->TokenLong, ret, AppDomain, mStack);
                                             }
                                             else
                                             {
@@ -1854,7 +1855,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     var val = ((CLRType)type).GetFieldValue(token, obj);
                                                     if (val is CrossBindingAdaptorType)
                                                         val = ((CrossBindingAdaptorType)val).ILInstance;
-                                                    PushObject(esp - 1, mStack, val, ft.FieldType == typeof(object));
+                                                    PushObject(ret, mStack, val, ft.FieldType == typeof(object));
                                                 }
                                                 else
                                                     throw new TypeLoadException();
@@ -2424,7 +2425,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             var tt = type.TypeForCLR;
                                             if (tt.IsEnum)
                                             {
-                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)), true);
+                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)));
                                             }
                                             else if (tt.IsPrimitive)
                                             {
