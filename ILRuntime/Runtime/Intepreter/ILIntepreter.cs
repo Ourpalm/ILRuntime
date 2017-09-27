@@ -1794,6 +1794,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                                     }
                                                                 }
                                                                 break;
+                                                            case ObjectTypes.ValueTypeObjectReference:
+                                                                {
+                                                                    var dst = *(StackObject**)&objRef->Value;
+                                                                    var ct = domain.GetType(dst->Value) as CLRType;
+                                                                    var binder = ct.ValueTypeBinder;
+                                                                    binder.CopyValueTypeToStack(obj, dst, mStack);
+                                                                }
+                                                                break;
                                                             default:
                                                                 throw new NotImplementedException();
                                                         }
@@ -4047,6 +4055,9 @@ namespace ILRuntime.Runtime.Intepreter
                             obj = ((CLRType)t).GetFieldValue(idx, null);
                         }
                     }
+                    break;
+                case ObjectTypes.ValueTypeObjectReference:
+                    obj = StackObject.ToObject(objRef, domain, mStack);
                     break;
                 default:
                     throw new NotImplementedException();
