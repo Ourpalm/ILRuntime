@@ -3078,6 +3078,10 @@ namespace ILRuntime.Runtime.Intepreter
                                             case ObjectTypes.Double:
                                                 arr.SetValue(*(double*)&val->Value, idx->Value);
                                                 break;
+                                            case ObjectTypes.ValueTypeObjectReference:
+                                                ArraySetValue(arr, StackObject.ToObject(val, domain, mStack), idx->Value);
+                                                FreeStackValueType(esp - 1);
+                                                break;
                                             default:
                                                 throw new NotImplementedException();
                                         }
@@ -3115,6 +3119,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     ((double[])arr)[idx->Value] = *(double*)&val->Value;
                                                 }
+                                                break;
+                                            case ObjectTypes.ValueTypeObjectReference:
+                                                ArraySetValue(arr, StackObject.ToObject(val, domain, mStack), idx->Value);
+                                                FreeStackValueType(esp - 1);
                                                 break;
                                             default:
                                                 throw new NotImplementedException();

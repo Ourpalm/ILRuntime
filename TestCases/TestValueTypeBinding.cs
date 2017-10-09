@@ -34,6 +34,17 @@ namespace TestCases
             Console.WriteLine(vec.ToString());
         }
 
+        public static object Test03()
+        {
+            TestVector3[] a = new TestVector3[10000];
+            for (int i = 0; i < 10000; i++)
+            {
+                a[i] = TestVector3.One;
+            }
+
+            return a;
+        }
+
         public static void UnitTest_10022()
         {
             TestVector3 pos = TestVector3.One;
