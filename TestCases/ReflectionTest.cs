@@ -50,7 +50,7 @@ namespace TestCases
                 TestAttribute a = (TestAttribute)i;
                 Console.WriteLine(a.TestProp);
             }
-            
+
             arr = typeof(TestCls).GetCustomAttributes(false);
             foreach (var i in arr)
             {
@@ -96,6 +96,59 @@ namespace TestCases
             Console.WriteLine(SingletonTest.Inst.testFloat);
         }
 
+        public static void ReflectionTest07()
+        {
+            //-----------------------------CLR-----------------------------//
+            var isDefined = typeof(TestCls2).IsDefined(typeof(ObsoleteAttribute), true);
+
+            if (isDefined == false)
+            {
+                throw new Exception("isDefeinded == false 1");
+            }
+
+            isDefined = typeof(TestCls2).GetProperty("Attribute_prop").IsDefined(typeof(TestCLRAttribute), true);
+
+            if (isDefined == false)
+            {
+                throw new Exception("isDefeinded == false 2");
+            }
+
+            isDefined = typeof(TestCls2).GetField("Attribute_field").IsDefined(typeof(TestCLRAttribute), true);
+
+            if (isDefined == false)
+            {
+                throw new Exception("isDefeinded == false 3");
+            }
+        }
+
+        public static void ReflectionTest08()
+        {
+            //-----------------------------CLR-----------------------------//
+            var isDefined = typeof(TestCls2).IsDefined(typeof(TestAttribute), true);
+
+            if (isDefined == false)
+            {
+                throw new Exception("isDefeinded == false 1");
+            }
+
+            isDefined = typeof(TestCls2).GetProperty("ILAttribute_prop").IsDefined(typeof(TestAttribute), true);
+
+            if (isDefined == false)
+            {
+                throw new Exception("isDefeinded == false 2");
+            }
+
+            isDefined = typeof(TestCls2).GetField("ILAttribute_field").IsDefined(typeof(TestAttribute), true);
+
+            if (isDefined == false)
+            {
+                throw new Exception("isDefeinded == false 3");
+            }
+        }
+
+
+
+
         [Obsolete("gasdgas")]
         class TestCls
         {
@@ -118,11 +171,24 @@ namespace TestCases
             }
         }
 
+        
+        [Serializable]
+        [Obsolete]
         [Test(true, TestProp = "1234")]
         [Test]
-        [Serializable]
-        class TestCls2
+        public class TestCls2
         {
+            [TestCLR]
+            public int Attribute_field;
+
+            [Test]
+            public int ILAttribute_field;
+
+            [TestCLR]
+            public int Attribute_prop { get; set; }
+
+            [Test]
+            public int ILAttribute_prop { get; set; }
 
         }
 
