@@ -159,5 +159,13 @@ namespace ILRuntime.Reflection
             }
             return false;
         }
+
+        public override Type ReturnType
+        {
+            get
+            {
+                return method.ReturnType.ReflectionType;
+            }
+        }
     }
 }
