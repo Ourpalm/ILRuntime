@@ -522,7 +522,7 @@ namespace ILRuntime.Runtime.Enviorment
 
                 if (isArray)
                 {
-                    bt = bt.MakeArrayType();
+                    bt = bt.MakeArrayType(1);
                     mapType[bt.FullName] = bt;
                     mapTypeToken[bt.GetHashCode()] = bt;
                     if (!isByRef)
@@ -704,10 +704,11 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 if (_ref.IsArray)
                 {
+                    ArrayType at = (ArrayType)_ref;
                     var t = GetType(_ref.GetElementType(), contextType, contextMethod);
                     if (t != null)
                     {
-                        res = t.MakeArrayType();
+                        res = t.MakeArrayType(at.Rank);
                         if (res is ILType)
                         {
                             ///Unify the TypeReference

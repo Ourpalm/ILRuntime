@@ -110,5 +110,18 @@ namespace TestCases
                 Console.Write("true 2");
             }
         }
+
+        public static void MultiDimensionalArrayTest()
+        {
+            int[,] arr = new int[3, 4];
+            arr[1, 2] = 3;
+
+            MultiDimensionalArrayTestSub(arr);
+        }
+
+        static void MultiDimensionalArrayTestSub(int[,] arr)
+        {
+            Console.WriteLine("arr = " + arr[1, 2]);
+        }
     }
 }

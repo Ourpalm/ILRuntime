@@ -12,11 +12,17 @@ namespace ILRuntime.Runtime
         public static void GetClassName(this Type type, out string clsName, out string realClsName, out bool isByRef, bool simpleClassName = false)
         {
             isByRef = type.IsByRef;
+            int arrayRank = 1;
             bool isArray = type.IsArray;
             if (isByRef)
+            {
                 type = type.GetElementType();
+            }
             if (isArray)
+            {
+                arrayRank = type.GetArrayRank();
                 type = type.GetElementType();
+            }
             string realNamespace = null;
             bool isNestedGeneric = false;
             if (type.IsNested)
@@ -71,7 +77,11 @@ namespace ILRuntime.Runtime
             if (!simpleClassName)
                 clsName += "_Binding";
             if (isArray)
+            {
                 clsName += "_Array";
+                if (arrayRank > 1)
+                    clsName += arrayRank;
+            }
 
             realClsName = realNamespace;
             if (isGeneric)
@@ -89,7 +99,22 @@ namespace ILRuntime.Runtime
                 realClsName += type.Name;
 
             if (isArray)
-                realClsName += "[]";
+            {
+                if (arrayRank <= 1)
+                    realClsName += "[]";
+                else
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(realClsName);
+                    sb.Append('[');
+                    for(int i=0;i<arrayRank - 1; i++)
+                    {
+                        sb.Append(',');
+                    }
+                    sb.Append(']');
+                    realClsName = sb.ToString();
+                }
+            }
 
         }
         public static int ToInt32(this object obj)

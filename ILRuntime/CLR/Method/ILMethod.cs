@@ -536,6 +536,7 @@ namespace ILRuntime.CLR.Method
                 IType type = null;
                 bool isByRef = false;
                 bool isArray = false;
+                int rank = 1;
                 TypeReference pt = i.ParameterType;
                 if (i.ParameterType.IsByReference)
                 {
@@ -545,6 +546,7 @@ namespace ILRuntime.CLR.Method
                 if (i.ParameterType.IsArray)
                 {
                     isArray = true;
+                    rank = ((ArrayType)pt).Rank;
                     pt = pt.GetElementType();
                 }
                 if (pt.IsGenericParameter)
@@ -572,7 +574,7 @@ namespace ILRuntime.CLR.Method
                     if (isByRef)
                         type = type.MakeByRefType();
                     if (isArray)
-                        type = type.MakeArrayType();
+                        type = type.MakeArrayType(rank);
                 }
                 else
                     type = appdomain.GetType(i.ParameterType, declaringType, this);

@@ -67,6 +67,9 @@
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass3_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestStruct_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVector3_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorStruct_Binding.cs" />
     <Compile Include="AutoGenerate\LitJson_JsonMapper_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_1_String_Binding.cs" />
@@ -86,9 +89,11 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Type_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_IEnumerator_1_KeyValuePair_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_Int32_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Adaptor_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILTypeInstance_Binding_Enumerator_Binding.cs" />
@@ -107,6 +112,7 @@
     <Compile Include="AutoGenerate\System_Func_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Int32_Binding_Array2.cs" />
     <Compile Include="AutoGenerate\System_IO_FileStream_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_File_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_Stream_Binding.cs" />

@@ -69,20 +69,27 @@ namespace ILRuntime.Runtime.CLRBinding
             return false;
         }
 
-        internal static void AppendParameters(this ParameterInfo[] param, StringBuilder sb)
+        internal static void AppendParameters(this ParameterInfo[] param, StringBuilder sb, bool isMultiArr = false, int skipLast = 0)
         {
             bool first = true;
-            foreach (var j in param)
+            for (int i = 0; i < param.Length - skipLast; i++)
             {
                 if (first)
                     first = false;
                 else
                     sb.Append(", ");
+                var j = param[i];
                 if (j.IsOut && j.ParameterType.IsByRef)
                     sb.Append("out ");
                 else if (j.ParameterType.IsByRef)
                     sb.Append("ref ");
-                sb.Append(j.Name);
+                if (isMultiArr)
+                {
+                    sb.Append("a");
+                    sb.Append(i + 1);
+                }
+                else
+                    sb.Append(j.Name);
             }
         }
 

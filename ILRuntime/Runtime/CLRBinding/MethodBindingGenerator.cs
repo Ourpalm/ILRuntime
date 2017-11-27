@@ -52,7 +52,7 @@ namespace ILRuntime.Runtime.CLRBinding
         internal static string GenerateMethodWraperCode(this Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes)
         {
             StringBuilder sb = new StringBuilder();
-
+            bool isMultiArr = type.IsArray && type.GetArrayRank() > 1;
             int idx = 0;
             foreach (var i in methods)
             {
@@ -79,7 +79,12 @@ namespace ILRuntime.Runtime.CLRBinding
                     p.ParameterType.GetClassName(out tmp, out clsName, out isByRef);
                     if (isByRef)
                         sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
-                    sb.AppendLine(string.Format("            {0} {1} = {2};", clsName, p.Name, p.ParameterType.GetRetrieveValueCode(clsName)));
+                    if (isMultiArr)
+                    {
+                        sb.AppendLine(string.Format("            {0} a{1} = {2};", clsName, j, p.ParameterType.GetRetrieveValueCode(clsName)));
+                    }
+                    else
+                        sb.AppendLine(string.Format("            {0} {1} = {2};", clsName, p.Name, p.ParameterType.GetRetrieveValueCode(clsName)));
                     if (!isByRef && !p.ParameterType.IsPrimitive)
                         sb.AppendLine("            __intp.Free(ptr_of_this_method);");
                 }
@@ -221,6 +226,24 @@ namespace ILRuntime.Runtime.CLRBinding
                         }
                         else
                             throw new NotImplementedException();
+                    }
+                    else if(isMultiArr)
+                    {
+                        if (i.Name == "Get")
+                        {
+                            sb.Append("instance_of_this_method[");
+                            param.AppendParameters(sb, true);
+                            sb.AppendLine("];");
+                        }
+                        else
+                        {
+                            sb.Append("instance_of_this_method[");
+                            param.AppendParameters(sb, true, 1);
+                            sb.Append("]");
+                            sb.Append(" = a");
+                            sb.Append(param.Length);
+                            sb.AppendLine(";");
+                        }
                     }
                     else
                     {

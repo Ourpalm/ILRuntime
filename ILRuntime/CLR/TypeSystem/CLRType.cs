@@ -31,7 +31,8 @@ namespace ILRuntime.CLR.TypeSystem
         CLRCreateDefaultInstanceDelegate createDefaultInstanceDelegate;
         CLRCreateArrayInstanceDelegate createArrayInstanceDelegate;
         Dictionary<int, int> fieldTokenMapping;
-        IType byRefType, arrayType, elementType;
+        IType byRefType, elementType;
+        Dictionary<int, IType> arrayTypes;
         IType[] interfaces;
         bool isDelegate;
         IType baseType;
@@ -148,11 +149,16 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return arrayType;
+                return arrayTypes != null ? arrayTypes[1] : null;
             }
         }
 
         public bool IsArray
+        {
+            get;private set;
+        }
+
+        public int ArrayRank
         {
             get;private set;
         }
@@ -709,16 +715,23 @@ namespace ILRuntime.CLR.TypeSystem
             }
             return byRefType;
         }
-        public IType MakeArrayType()
+        public IType MakeArrayType(int rank)
         {
-            if (arrayType == null)
+            if (arrayTypes == null)
             {
-                Type t = clrType.MakeArrayType();
-                arrayType = new CLRType(t, appdomain);
-                ((CLRType)arrayType).elementType = this;
-                ((CLRType)arrayType).IsArray = true;
+                arrayTypes = new Dictionary<int, IType>();
             }
-            return arrayType;
+            IType atype;
+            if (!arrayTypes.TryGetValue(rank, out atype))
+            {
+                Type t = rank > 1 ? clrType.MakeArrayType(rank) : clrType.MakeArrayType();
+                atype = new CLRType(t, appdomain);
+                ((CLRType)atype).elementType = this;
+                ((CLRType)atype).IsArray = true;
+                ((CLRType)atype).ArrayRank = rank;
+                arrayTypes[rank] = atype;
+            }
+            return atype;
         }
 
         public IType ResolveGenericType(IType contextType)
