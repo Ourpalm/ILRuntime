@@ -17,12 +17,23 @@ namespace TestCases
         }
         class JsonTestClass
         {
+            public static int StaticField;
+            public static int StaticProp { get; set; }
+
             public int IntProp { get; set; }
             public string StringProp { get; set; }
             public JsonTestEnum EnumProp { get; set; }
             public JsonTestSubClass SubClassProp { get; set; }
             public Dictionary<string, JsonTestSubClass> DicTest { get; set; }
             public Dictionary<string, int> DicTest2 { get; set; }
+
+            [JsonIgnore]
+            public int IgnoreField;
+
+            [JsonIgnore]
+            public int IgnoreProp { get; set; }
+
+
         }
 
         class JsonTestSubClass
@@ -142,5 +153,55 @@ namespace TestCases
             }
         }
 
+
+        public static void JsonTest6()
+        {
+            JsonTestClass.StaticField = 10;
+            JsonTestClass.StaticProp = 30;
+
+            JsonTestClass cls = new TestCases.JsonTest.JsonTestClass();
+            var str = JsonMapper.ToJson(cls);
+
+            Console.WriteLine(str);
+
+            if (str.Contains("StaticField"))
+            {
+                throw new Exception("Static Field should not be serilized");
+            }
+
+            if (str.Contains("StaticProp"))
+            {
+                throw new Exception("Static Field should not be serilized");
+            }
+
+            Console.WriteLine(str);
+            var cls2 = JsonMapper.ToObject<JsonTestClass>(str);
+        }
+
+        public static void JsonIgnoreTest()
+        {
+            JsonTestClass cls = new TestCases.JsonTest.JsonTestClass();
+            var str = JsonMapper.ToJson(cls);
+
+            Console.WriteLine(str);
+
+            if (str.Contains("IntProp") == false)
+            {
+                throw new Exception("IntProp should be serilized");
+            }
+
+            if (str.Contains("IgnoreField"))
+            {
+                throw new Exception("Ignore Field should not be serilized");
+            }
+
+            if (str.Contains("IgnoreProp"))
+            {
+                throw new Exception("Ignore Prop should not be serilized");
+            }
+
+            Console.WriteLine(str);
+            var cls2 = JsonMapper.ToObject<JsonTestClass>(str);
+        }
     }
 }
