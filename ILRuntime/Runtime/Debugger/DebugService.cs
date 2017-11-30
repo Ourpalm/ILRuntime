@@ -599,7 +599,7 @@ namespace ILRuntime.Runtime.Debugger
 #if !UNITY_5 && !UNITY_2017 && !UNITY_4
             System.Diagnostics.Debug.Print(final.ToString());
 #else
-            UnityEngine.Debug.Warning(final.ToString());
+            UnityEngine.Debug.LogWarning(final.ToString());
 #endif
         }
 
