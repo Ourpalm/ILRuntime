@@ -138,20 +138,27 @@ namespace ILRuntime.Runtime.Debugger
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < fields.Count; i++)
             {
-                var f = fields[i];
-                if (f.IsStatic)
-                    continue;
-                var field = instance.Fields[idx];
-                var v = StackObject.ToObject(&field, intepreter.AppDomain, instance.ManagedObjects);
-                if (v == null)
-                    v = "null";
-                string name = f.Name;
-                sb.AppendFormat("{0} {1} = {2}", f.FieldType.Name, name, v);
-                if ((idx % 3 == 0 && idx != 0) || idx == instance.Fields.Length - 1)
-                    sb.AppendLine();
-                else
-                    sb.Append(", ");
-                idx++;
+                try
+                {
+                    var f = fields[i];
+                    if (f.IsStatic)
+                        continue;
+                    var field = instance.Fields[idx];
+                    var v = StackObject.ToObject(&field, intepreter.AppDomain, instance.ManagedObjects);
+                    if (v == null)
+                        v = "null";
+                    string name = f.Name;
+                    sb.AppendFormat("{0} {1} = {2}", f.FieldType.Name, name, v);
+                    if ((idx % 3 == 0 && idx != 0) || idx == instance.Fields.Length - 1)
+                        sb.AppendLine();
+                    else
+                        sb.Append(", ");
+                    idx++;
+                }
+                catch
+                {
+
+                }
             }
             return sb.ToString();
         }
@@ -163,17 +170,24 @@ namespace ILRuntime.Runtime.Debugger
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < m.LocalVariableCount; i++)
             {
-                var lv = m.Definition.Body.Variables[i];
-                var val = Add(topFrame.LocalVarPointer, i);
-                var v = StackObject.ToObject(val, intepreter.AppDomain, intepreter.Stack.ManagedStack);
-                if (v == null)
-                    v = "null";
-                string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
-                sb.AppendFormat("{0} {1} = {2}", lv.VariableType.Name, name, v);
-                if ((i % 3 == 0 && i != 0) || i == m.LocalVariableCount - 1)
-                    sb.AppendLine();
-                else
-                    sb.Append(", ");
+                try
+                {
+                    var lv = m.Definition.Body.Variables[i];
+                    var val = Add(topFrame.LocalVarPointer, i);
+                    var v = StackObject.ToObject(val, intepreter.AppDomain, intepreter.Stack.ManagedStack);
+                    if (v == null)
+                        v = "null";
+                    string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
+                    sb.AppendFormat("{0} {1} = {2}", lv.VariableType.Name, name, v);
+                    if ((i % 3 == 0 && i != 0) || i == m.LocalVariableCount - 1)
+                        sb.AppendLine();
+                    else
+                        sb.Append(", ");
+                }
+                catch
+                {
+
+                }
             }
             return sb.ToString();
         }
@@ -499,12 +513,12 @@ namespace ILRuntime.Runtime.Debugger
 
         internal unsafe void DumpStack(StackObject* esp, RuntimeStack stack)
         {
-#if !UNITY_5 && !UNITY_2017 && !UNITY_4
             var start = stack.StackBase;
             var end = esp + 10;
             var frames = stack.Frames;
             var mStack = stack.ManagedStack;
             var valuePointerEnd = stack.ValueTypeStackPointer;
+            StringBuilder final = new StringBuilder();
             HashSet<long> leakVObj = new HashSet<long>();
             for (var i = stack.ValueTypeStackBase; i > stack.ValueTypeStackPointer;)
             {
@@ -557,7 +571,7 @@ namespace ILRuntime.Runtime.Debugger
                     sb.Append(baseMethod.ToString());
                 }
 
-                System.Diagnostics.Debug.Print(sb.ToString());
+                final.AppendLine(sb.ToString());
             }
 
             for (var i = stack.ValueTypeStackBase; i > stack.ValueTypeStackPointer;)
@@ -565,23 +579,27 @@ namespace ILRuntime.Runtime.Debugger
                 var vt = domain.GetType(i->Value);
                 var cnt = i->ValueLow;
                 bool leak = leakVObj.Contains((long)i);
-                System.Diagnostics.Debug.Print("----------------------------------------------");
-                System.Diagnostics.Debug.Print(string.Format("{2}(0x{0:X8}){1}", (long)i, vt, leak ? "*" : ""));
+                final.AppendLine("----------------------------------------------");
+                final.AppendLine(string.Format("{2}(0x{0:X8}){1}", (long)i, vt, leak ? "*" : ""));
                 for (int j = 0; j < cnt; j++)
                 {
                     StringBuilder sb = new StringBuilder();
                     var ptr = Minus(i, j + 1);
                     sb.Append(string.Format("(0x{0:X8}) Type:{1} ", (long)ptr, ptr->ObjectType));
                     GetStackObjectText(sb, ptr, mStack, valuePointerEnd);
-                    System.Diagnostics.Debug.Print(sb.ToString());
+                    final.AppendLine(sb.ToString());
                 }
                 i = Minus(i, i->ValueLow + 1);
             }
-            System.Diagnostics.Debug.Print("Managed Objects:");
+            final.AppendLine("Managed Objects:");
             for (int i = 0; i < mStack.Count; i++)
             {
-                System.Diagnostics.Debug.Print(string.Format("({0}){1}", i, mStack[i]));
+                final.AppendLine(string.Format("({0}){1}", i, mStack[i]));
             }
+#if !UNITY_5 && !UNITY_2017 && !UNITY_4
+            System.Diagnostics.Debug.Print(final.ToString());
+#else
+            UnityEngine.Debug.Warning(final.ToString());
 #endif
         }
 
