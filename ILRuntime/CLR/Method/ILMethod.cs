@@ -602,28 +602,33 @@ namespace ILRuntime.CLR.Method
             return m;
         }
 
+        string cachedName;
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(declaringType.FullName);
-            sb.Append('.');
-            sb.Append(Name);
-            sb.Append('(');
-            bool isFirst = true;
-            if (parameters == null)
-                InitParameters();
-            for (int i = 0; i < parameters.Count; i++)
+            if (cachedName == null)
             {
-                if (isFirst)
-                    isFirst = false;
-                else
-                    sb.Append(", ");
-                sb.Append(parameters[i].Name);
-                sb.Append(' ');
-                sb.Append(def.Parameters[i].Name);
+                StringBuilder sb = new StringBuilder();
+                sb.Append(declaringType.FullName);
+                sb.Append('.');
+                sb.Append(Name);
+                sb.Append('(');
+                bool isFirst = true;
+                if (parameters == null)
+                    InitParameters();
+                for (int i = 0; i < parameters.Count; i++)
+                {
+                    if (isFirst)
+                        isFirst = false;
+                    else
+                        sb.Append(", ");
+                    sb.Append(parameters[i].Name);
+                    sb.Append(' ');
+                    sb.Append(def.Parameters[i].Name);
+                }
+                sb.Append(')');
+                cachedName = sb.ToString();
             }
-            sb.Append(')');
-            return sb.ToString();
+            return cachedName;
         }
 
         public override int GetHashCode()
