@@ -575,7 +575,14 @@ namespace ILRuntime.CLR.TypeSystem
                             }
                             if (match)
                             {
-                                match = returnType == null || i.ReturnType.TypeForCLR == returnType.TypeForCLR;
+                                try
+                                {
+                                    match = returnType == null || (i.ReturnType != null && i.ReturnType.TypeForCLR == returnType.TypeForCLR);
+                                }
+                                catch
+                                {
+
+                                }
                             }
                             if (match)
                             {
@@ -651,33 +658,36 @@ namespace ILRuntime.CLR.TypeSystem
 
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
         {
-            if (genericInstances == null)
-                genericInstances = new List<CLRType>();
-            foreach (var i in genericInstances)
+            lock (this)
             {
-                bool match = true;
-                for (int j = 0; j < genericArguments.Length; j++)
+                if (genericInstances == null)
+                    genericInstances = new List<CLRType>();
+                foreach (var i in genericInstances)
                 {
-                    if (i.genericArguments[j].Value != genericArguments[j].Value)
+                    bool match = true;
+                    for (int j = 0; j < genericArguments.Length; j++)
                     {
-                        match = false;
-                        break;
+                        if (i.genericArguments[j].Value != genericArguments[j].Value)
+                        {
+                            match = false;
+                            break;
+                        }
                     }
+                    if (match)
+                        return i;
                 }
-                if (match)
-                    return i;
-            }
-            Type[] args = new Type[genericArguments.Length];
-            for (int i = 0; i < genericArguments.Length; i++)
-            {
-                args[i] = genericArguments[i].Value.TypeForCLR;
-            }
-            Type newType = clrType.MakeGenericType(args);
-            var res = new CLRType(newType, appdomain);
-            res.genericArguments = genericArguments;
+                Type[] args = new Type[genericArguments.Length];
+                for (int i = 0; i < genericArguments.Length; i++)
+                {
+                    args[i] = genericArguments[i].Value.TypeForCLR;
+                }
+                Type newType = clrType.MakeGenericType(args);
+                var res = new CLRType(newType, appdomain);
+                res.genericArguments = genericArguments;
 
-            genericInstances.Add(res);
-            return res;
+                genericInstances.Add(res);
+                return res;
+            }
         }
 
         public object CreateDefaultInstance()

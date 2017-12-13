@@ -39,7 +39,7 @@ namespace ILRuntime.Runtime
                     }
                 }
                 GetClassName(rt, out bClsName, out bRealClsName, out tmp);
-                clsName = simpleClassName ? "" : bClsName + "_";
+                clsName = bClsName + "_";
                 realNamespace = bRealClsName + ".";
             }
             else
