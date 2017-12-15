@@ -258,10 +258,11 @@ namespace ILRuntimeDebugEngine.AD7
         }
 
         VariableInfo resolved;
-        public VariableInfo ResolveVariable(VariableReference reference, string name)
+        public VariableInfo ResolveVariable(VariableReference reference, string name, int threadId)
         {
             CSResolveVariable msg = new CSResolveVariable();
             msg.Name = name;
+            msg.ThreadHashCode = threadId;
             msg.Parent = reference;
             resolved = null;
             SendResolveVariable(msg);
@@ -276,6 +277,7 @@ namespace ILRuntimeDebugEngine.AD7
         void SendResolveVariable(CSResolveVariable msg)
         {
             sendStream.Position = 0;
+            bw.Write(msg.ThreadHashCode);
             bw.Write(msg.Name);
             WriteVariableReference(msg.Parent);
             socket.Send(DebugMessageType.CSResolveVariable, sendStream.GetBuffer(), (int)sendStream.Position);
@@ -284,10 +286,13 @@ namespace ILRuntimeDebugEngine.AD7
         void WriteVariableReference(VariableReference reference)
         {
             bw.Write(reference != null);
-            bw.Write(reference.Address);
-            bw.Write((byte)reference.Type);
-            bw.Write(reference.Offset);
-            WriteVariableReference(reference.Parent);
+            if (reference != null)
+            {
+                bw.Write(reference.Address);
+                bw.Write((byte)reference.Type);
+                bw.Write(reference.Offset);
+                WriteVariableReference(reference.Parent);
+            }
         }
 
         void OnReceiveSCBreakpointHit(SCBreakpointHit msg)

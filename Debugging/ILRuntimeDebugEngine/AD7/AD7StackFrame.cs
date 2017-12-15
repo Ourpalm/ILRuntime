@@ -69,7 +69,7 @@ namespace ILRuntimeDebugEngine.AD7
             }
             else
             {
-                ppExpr = new AD7Expression(Engine, root, names);
+                ppExpr = new AD7Expression(Engine, Thread, root, names);
                 return Constants.S_OK;
             }
             /*string lookup = pszCode;

@@ -159,6 +159,7 @@ namespace ILRuntime.Runtime.Debugger
                 case DebugMessageType.CSResolveVariable:
                     {
                         CSResolveVariable msg = new CSResolveVariable();
+                        msg.ThreadHashCode = br.ReadInt32();
                         msg.Name = br.ReadString();
                         msg.Parent = ReadVariableReference(br);
                         var info = ds.ResolveVariable(msg.Parent, msg.Name);

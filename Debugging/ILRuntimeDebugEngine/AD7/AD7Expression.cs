@@ -13,6 +13,7 @@ namespace ILRuntimeDebugEngine.AD7
     {
         ILProperty property, parent;
         AD7Engine engine;
+        AD7Thread thread;
         string[] names;
         int curIdx;
         public AD7Expression(ILProperty property)
@@ -20,10 +21,11 @@ namespace ILRuntimeDebugEngine.AD7
             this.property = property;
         }
 
-        public AD7Expression(AD7Engine engine, ILProperty root, string[] names)
+        public AD7Expression(AD7Engine engine, AD7Thread thread, ILProperty root, string[] names)
         {
             this.engine = engine;
             this.parent = root;
+            this.thread = thread;
             this.names = names;
             curIdx = 1;
         }
@@ -56,10 +58,13 @@ namespace ILRuntimeDebugEngine.AD7
         public void DoResolve()
         {
             string member = names[curIdx];
-            if(!parent.Children.TryGetValue(member, out parent))
+            ILProperty prop;
+            if(!parent.Children.TryGetValue(member, out prop))
             {
                 VariableReference reference = parent.GetVariableReference();
-                var info = engine.DebuggedProcess.ResolveVariable(reference, member);
+                uint threadHash;
+                thread.GetThreadId(out threadHash);
+                var info = engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
                 parent.Children[member] = new AD7.ILProperty(info);
             }
             curIdx++;
