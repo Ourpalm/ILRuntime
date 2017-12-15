@@ -15,6 +15,7 @@ namespace ILRuntimeDebugEngine.AD7
         AD7Engine engine;
         AD7Thread thread;
         string[] names;
+        bool resolved;
         int curIdx;
         public AD7Expression(ILProperty property)
         {
@@ -43,7 +44,7 @@ namespace ILRuntimeDebugEngine.AD7
         public int EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback,
             out IDebugProperty2 ppResult)
         {
-            if (property != null)
+            if (property != null || resolved)
             {
                 ppResult = property;
                 return Constants.S_OK;
@@ -51,7 +52,7 @@ namespace ILRuntimeDebugEngine.AD7
             else
             {
                 DoResolve();
-                ppResult = null;
+                ppResult = property;
                 return Constants.S_OK;
             }
         }
@@ -59,19 +60,36 @@ namespace ILRuntimeDebugEngine.AD7
         {
             string member = names[curIdx];
             ILProperty prop;
-            if(!parent.Children.TryGetValue(member, out prop))
+            if (!parent.Children.TryGetValue(member, out prop))
             {
                 VariableReference reference = parent.GetVariableReference();
-                uint threadHash;
-                thread.GetThreadId(out threadHash);
-                var info = engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
-                parent.Children[member] = new AD7.ILProperty(info);
+                if (reference != null)
+                {
+                    uint threadHash;
+                    thread.GetThreadId(out threadHash);
+                    var info = engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
+                    if(info ==null)
+                    {
+                        info = new VariableInfo();
+                        info.Name = member;
+                        info.Value = "null";
+                        info.TypeName = "null";                        
+                    }
+                    prop = new AD7.ILProperty(info);
+                }
+                else
+                    prop = null;
+                parent.Children[member] = prop;
             }
+            parent = prop;
             curIdx++;
-            if (curIdx < names.Length)
+            if (curIdx < names.Length && parent != null)
                 DoResolve();
             else
+            {
+                resolved = true;
                 property = parent;
+            }
         }
     }
 }

@@ -290,53 +290,57 @@ namespace ILRuntime.Runtime.Debugger
             if (server != null && server.IsAttached)
             {
                 int methodHash = method.GetHashCode();
+                BreakpointInfo[] lst = null;
+
                 lock (activeBreakpoints)
                 {
-                    LinkedList<BreakpointInfo> lst;
-                    bool bpHit = false;
+                    LinkedList<BreakpointInfo> bps;
+                    if (activeBreakpoints.TryGetValue(methodHash, out bps))
+                        lst = bps.ToArray();
+                }
+                bool bpHit = false;
 
-                    if (activeBreakpoints.TryGetValue(methodHash, out lst))
+                if (lst != null)
+                {
+                    var sp = method.Definition.Body.Instructions[ip].SequencePoint;
+                    if (sp != null)
                     {
-                        var sp = method.Definition.Body.Instructions[ip].SequencePoint;
-                        if (sp != null)
+                        foreach (var i in lst)
                         {
-                            foreach (var i in lst)
+                            if ((i.StartLine + 1) == sp.StartLine)
                             {
-                                if ((i.StartLine + 1) == sp.StartLine)
-                                {
-                                    DoBreak(intp, i.BreakpointHashCode, false);
-                                    bpHit = true;
-                                    break;
-                                }
+                                DoBreak(intp, i.BreakpointHashCode, false);
+                                bpHit = true;
+                                break;
                             }
                         }
                     }
+                }
 
-                    if (!bpHit)
+                if (!bpHit)
+                {
+                    var sp = method.Definition.Body.Instructions[ip].SequencePoint;
+                    if (sp != null && IsSequenceValid(sp))
                     {
-                        var sp = method.Definition.Body.Instructions[ip].SequencePoint;
-                        if (sp != null && IsSequenceValid(sp))
-                        {                            
-                            switch (intp.CurrentStepType)
-                            {
-                                case StepTypes.Into:
+                        switch (intp.CurrentStepType)
+                        {
+                            case StepTypes.Into:
+                                DoBreak(intp, 0, true);
+                                break;
+                            case StepTypes.Over:
+                                if (intp.Stack.Frames.Peek().BasePointer <= intp.LastStepFrameBase && ip != intp.LastStepInstructionIndex)
+                                {
                                     DoBreak(intp, 0, true);
-                                    break;
-                                case StepTypes.Over:
-                                    if (intp.Stack.Frames.Peek().BasePointer <= intp.LastStepFrameBase && ip != intp.LastStepInstructionIndex)
+                                }
+                                break;
+                            case StepTypes.Out:
+                                {
+                                    if (intp.Stack.Frames.Count > 0 && intp.Stack.Frames.Peek().BasePointer < intp.LastStepFrameBase)
                                     {
                                         DoBreak(intp, 0, true);
                                     }
-                                    break;
-                                case StepTypes.Out:
-                                    {
-                                        if (intp.Stack.Frames.Count > 0 && intp.Stack.Frames.Peek().BasePointer < intp.LastStepFrameBase)
-                                        {
-                                            DoBreak(intp, 0, true);
-                                        }
-                                    }
-                                    break;
-                            }
+                                }
+                                break;
                         }
                     }
                 }
@@ -460,9 +464,71 @@ namespace ILRuntime.Runtime.Debugger
             return frameInfos;
         }
 
-        internal VariableInfo ResolveVariable(VariableReference parent, string name)
+        internal unsafe VariableInfo ResolveVariable(int threadHashCode, VariableReference parent, string name)
         {
-            return null;
+            ILIntepreter intepreter;
+            if (AppDomain.Intepreters.TryGetValue(threadHashCode, out intepreter))
+            {
+                switch(parent.Type)
+                {
+                    case VariableTypes.Normal:
+                        {
+                            StackObject* ptr = (StackObject*)parent.Address;
+                            object obj = StackObject.ToObject(ptr, AppDomain, intepreter.Stack.ManagedStack);
+                            if (obj != null)
+                            {
+                                if (obj is ILTypeInstance)
+                                {
+                                    var type = ((ILTypeInstance)obj).Type.ReflectionType;
+                                    var fi = type.GetField(name);
+                                    if (fi != null)
+                                    {
+                                        var res = fi.GetValue(obj);
+                                        var rt = res.GetType();
+                                        VariableInfo info = new VariableInfo();
+
+                                        info.Address = parent.Address;
+                                        info.Name = name;
+                                        info.Type = VariableTypes.FieldReference;
+                                        info.TypeName = fi.FieldType.FullName;
+                                        info.Value = res != null ? res.ToString() : "null";
+
+                                        return info;
+                                    }
+                                    else
+                                    {
+                                        var pi = type.GetProperty(name);
+                                        if (pi != null)
+                                        {
+                                            var res = pi.GetValue(obj, null);
+                                            var rt = res.GetType();
+                                            VariableInfo info = new VariableInfo();
+
+                                            info.Address = parent.Address;
+                                            info.Name = name;
+                                            info.Type = VariableTypes.PropertyReference;
+                                            info.TypeName = pi.PropertyType.FullName;
+                                            info.Value = res != null ? res.ToString() : "null";
+                                            info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
+                                            return info;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                VariableInfo info = new VariableInfo();
+                                info.Type = VariableTypes.Error;
+                                return info;
+                            }
+                            return null;
+                        }
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else
+                return null;
         }
 
         unsafe bool GetValueExpandable(StackObject* esp, IList<object> mStack)

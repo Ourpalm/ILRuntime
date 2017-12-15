@@ -9,6 +9,7 @@ namespace ILRuntime.Runtime.Debugger
     {
         Normal,
         FieldReference,
+        PropertyReference,
         Error,
     }
 

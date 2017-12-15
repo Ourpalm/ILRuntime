@@ -12,6 +12,7 @@ namespace ILRuntimeDebugEngine.AD7
     {
         System.IO.MemoryStream sendStream = new System.IO.MemoryStream(64 * 1024);
         System.IO.BinaryWriter bw;
+        bool closed;
         DebugSocket socket;
         AD7Engine engine;
         Dictionary<int, AD7PendingBreakPoint> breakpoints = new Dictionary<int, AD7PendingBreakPoint>();
@@ -61,6 +62,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         void OnClose()
         {
+            closed = true;
             if (OnDisconnected != null)
                 OnDisconnected();
         }
@@ -149,6 +151,11 @@ namespace ILRuntimeDebugEngine.AD7
                                 OnReceiveSCModuleLoaded(msg);
                             }
                             break;
+                        case DebugMessageType.SCResolveVariableResult:
+                            {
+                                resolved = ReadVariableInfo(br);
+                            }
+                            break;
                     }
                 }
             }
@@ -176,15 +183,7 @@ namespace ILRuntimeDebugEngine.AD7
                     info.LocalVariables = new VariableInfo[vcnt];
                     for (int k = 0; k < vcnt; k++)
                     {
-                        VariableInfo vinfo = new VariableInfo();
-                        vinfo.Address = br.ReadInt64();
-                        vinfo.Type = (VariableTypes)br.ReadByte();
-                        vinfo.Offset = br.ReadInt32();
-                        vinfo.Name = br.ReadString();
-                        vinfo.Value = br.ReadString();
-                        vinfo.TypeName = br.ReadString();
-                        vinfo.Expandable = br.ReadBoolean();
-                        info.LocalVariables[k] = vinfo;
+                        info.LocalVariables[k] = ReadVariableInfo(br);
                     }
                     arr[j] = info;
                 }
@@ -196,6 +195,20 @@ namespace ILRuntimeDebugEngine.AD7
             }
 
             return res;
+        }
+
+        VariableInfo ReadVariableInfo(System.IO.BinaryReader br)
+        {
+            VariableInfo vinfo = new VariableInfo();
+            vinfo.Address = br.ReadInt64();
+            vinfo.Type = (VariableTypes)br.ReadByte();
+            vinfo.Offset = br.ReadInt32();
+            vinfo.Name = br.ReadString();
+            vinfo.Value = br.ReadString();
+            vinfo.TypeName = br.ReadString();
+            vinfo.Expandable = br.ReadBoolean();
+
+            return vinfo;
         }
         public void AddPendingBreakpoint(AD7PendingBreakPoint bp)
         {
@@ -267,7 +280,7 @@ namespace ILRuntimeDebugEngine.AD7
             resolved = null;
             SendResolveVariable(msg);
 
-            while(resolved == null)
+            while(resolved == null && !closed)
             {
                 System.Threading.Thread.Sleep(10);
             }

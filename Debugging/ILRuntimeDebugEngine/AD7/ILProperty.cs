@@ -111,6 +111,8 @@ namespace ILRuntimeDebugEngine.AD7
             if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB) != 0)
             {
                 propertyInfo.dwAttrib = enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
+                if (info.Type == VariableTypes.PropertyReference)
+                    propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_PROPERTY;
 
                 if (IsExpandable())
                 {
@@ -135,12 +137,18 @@ namespace ILRuntimeDebugEngine.AD7
 
         public VariableReference GetVariableReference()
         {
-            VariableReference res = new VariableReference();
-            res.Address = info.Address;
-            res.Type = info.Type;
-            res.Offset = info.Offset;
+            if (info != null)
+            {
+                VariableReference res = new VariableReference();
+                res.Address = info.Address;
+                res.Type = info.Type;
+                res.Offset = info.Offset;
 
-            return res;
+                return res;
+            }
+            else
+                return null;
+
         }
     }
 }
