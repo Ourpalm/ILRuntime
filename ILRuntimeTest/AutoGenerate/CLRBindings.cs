@@ -54,10 +54,10 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_IEnumerator_1_KeyValuePair_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_Int32_Int32_Binding.Register(app);
             System_Collections_IEnumerator_Binding.Register(app);
+            System_Array_Binding.Register(app);
             System_Collections_Generic_List_1_List_1_Int32_Binding.Register(app);
             System_Collections_Generic_List_1_List_1_List_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_ILTypeInstance_Int32_Binding.Register(app);
-            System_Array_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Array_Binding.Register(app);
             System_Convert_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollection_Binding.Register(app);

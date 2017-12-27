@@ -8,7 +8,27 @@ namespace TestCases
 
     class Test03
     {
-        
+        public static void Test_01()
+        {
+            Console.WriteLine(Equals2(new int[] { 1 }, 1)); //NotSupportedException: Not supported opcode Readonly
+            Console.WriteLine(Equals(1, new object())); //InvalidCastException: Cannot cast from source type to destination type.
+            Console.WriteLine(IndexOf(new byte[] { 0, 1, 2, 3 }, (byte)1)); //NullReferenceException: Object reference not set to an instance of an object
+        }
+
+        static bool Equals2<T>(T[] a, T b)
+        {
+            return a[0].Equals(b);
+        }
+
+        static bool Equals<T>(T a, object b)
+        {
+            return a.Equals(b);
+        }
+
+        static int IndexOf<T>(T[] array, T value)
+        {
+            return System.Array.IndexOf(array, value);
+        }
 
         public static object Run()
         {

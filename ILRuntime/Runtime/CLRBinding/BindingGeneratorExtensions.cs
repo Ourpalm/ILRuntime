@@ -327,15 +327,22 @@ namespace ILRuntime.Runtime.CLRBinding
             }
             else
             {
+                string isBox;
+                if (type == typeof(object))
+                    isBox = ", true";
+                else
+                    isBox = "";
                 if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
                 {
-                    sb.AppendLine(@"            object obj_result_of_this_method = result_of_this_method;
+                    sb.Append(@"            object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
             {    
-                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance");
+                    sb.Append(isBox);
+                    sb.AppendLine(@");
             }");
                 }
-                sb.AppendLine("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);");
+                sb.AppendLine(string.Format("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method{0});", isBox));
             }
         }
     }

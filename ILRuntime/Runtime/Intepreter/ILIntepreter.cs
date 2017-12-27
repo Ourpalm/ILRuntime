@@ -3801,6 +3801,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Volatile:
                             case OpCodeEnum.Castclass:
+                            case OpCodeEnum.Readonly:
                                 break;
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
