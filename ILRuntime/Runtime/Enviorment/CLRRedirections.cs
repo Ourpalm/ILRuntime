@@ -791,7 +791,23 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 bool unhandled;
                 var ilmethod = ((ILRuntimeMethodInfo)instance).ILMethod;
-                return intp.Execute(ilmethod, esp, out unhandled);
+                ret = intp.Execute(ilmethod, esp, out unhandled);
+                ILRuntimeMethodInfo imi = (ILRuntimeMethodInfo)instance;
+                var rt = imi.ReturnType;
+                if (rt != domain.VoidType)
+                {
+                    var res = ret - 1;
+                    if (res->ObjectType < ObjectTypes.Object)
+                    {
+                        if (rt is ILRuntimeWrapperType)
+                            rt = ((ILRuntimeWrapperType)rt).CLRType.TypeForCLR;
+                        return ILIntepreter.PushObject(res, mStack, rt.CheckCLRTypes(StackObject.ToObject(res, domain, mStack)), true);
+                    }
+                    else
+                        return ret;
+                }
+                else
+                    return ret;                
             }
             else
                 return ILIntepreter.PushObject(ret, mStack, ((MethodInfo)instance).Invoke(obj, (object[])p));

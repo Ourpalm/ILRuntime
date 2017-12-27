@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 using ILRuntimeTest.TestFramework;
 
@@ -207,5 +208,44 @@ namespace TestCases
 
             public string TestProp { get; set; }
         }
+
+        public class MyClass
+        {
+            public uint B { get; set; }
+        }
+
+        public static void ReflectionTest09()
+        {
+            var r = new MyClass()
+            {
+                B = 14,
+            };
+
+            PropertyInfo p = typeof(MyClass).GetProperty("B");
+            object obj = p.GetGetMethod().Invoke(r, null);
+            Console.WriteLine("p type: " + obj.GetType().FullName); //显示System.Int32，正确应该是System.UInt32
+
+            if (obj is ValueType)
+            {
+                Console.WriteLine("value type");
+            }
+            else
+            {
+                Console.WriteLine("not value type"); //走进了这里
+            }
+
+            obj = p.GetValue(r, null);
+            Console.WriteLine("p type: " + obj.GetType().FullName); //显示System.Int32，正确应该是System.UInt32
+
+            if (obj is ValueType)
+            {
+                Console.WriteLine("value type");
+            }
+            else
+            {
+                Console.WriteLine("not value type"); //走进了这里
+            }
+        }
+
     }
 }

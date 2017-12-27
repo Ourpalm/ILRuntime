@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Globalization;
 
 using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Reflection
 {
@@ -142,7 +143,7 @@ namespace ILRuntime.Reflection
             if (method.HasThis)
             {
                 var res = appdomain.Invoke(method, obj, parameters);
-                return res;
+                return ReturnType.CheckCLRTypes(res);
             }
             else
                 return appdomain.Invoke(method, null, parameters);
