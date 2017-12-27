@@ -2856,6 +2856,25 @@ namespace ILRuntime.Runtime.Intepreter
                                                             throw new NullReferenceException();
                                                     }
                                                     break;
+                                                case ObjectTypes.ArrayReference:
+                                                    {
+                                                        var arr = mStack[objRef->Value] as Array;
+                                                        var idx = objRef->ValueLow;
+                                                        var obj = arr.GetValue(idx);
+                                                        if (obj == null)
+                                                            arr.SetValue(it.Instantiate(), idx);
+                                                        else
+                                                        {
+                                                            if (obj is ILTypeInstance)
+                                                            {
+                                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                                instance.Clear();
+                                                            }
+                                                            else
+                                                                throw new NotImplementedException();
+                                                        }
+                                                    }
+                                                    break;
                                                 default:
                                                     throw new NotImplementedException();
                                             }

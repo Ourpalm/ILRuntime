@@ -125,4 +125,18 @@ namespace TestCases
         public static explicit operator int(Vector3 b) { return 0; } //这是一个显式转换
         public static implicit operator float(Vector3 a) { return 1; } //这是一个隐式转换
     }
+
+    public class StructTests
+    {
+        struct MyStruct
+        {
+            public int i;
+        }
+
+        public static void StructTest1()
+        {
+            var m = new MyStruct[10];
+            m[1] = new MyStruct();   // `Throw exception here.`
+        }
+    }
 }
