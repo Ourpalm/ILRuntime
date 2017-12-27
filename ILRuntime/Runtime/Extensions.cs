@@ -22,6 +22,32 @@ namespace ILRuntime.Runtime
             {
                 arrayRank = type.GetArrayRank();
                 type = type.GetElementType();
+                if (type.IsArray)
+                {
+                    type.GetClassName(out clsName, out realClsName, out isByRef, simpleClassName);
+
+                    clsName += "_Array";
+                    if (!simpleClassName)
+                        clsName += "_Binding";
+                    if (arrayRank > 1)
+                        clsName += arrayRank;
+                    if (arrayRank <= 1)
+                        realClsName += "[]";
+                    else
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(realClsName);
+                        sb.Append('[');
+                        for (int i = 0; i < arrayRank - 1; i++)
+                        {
+                            sb.Append(',');
+                        }
+                        sb.Append(']');
+                        realClsName = sb.ToString();
+                    }
+
+                    return;
+                }
             }
             string realNamespace = null;
             bool isNestedGeneric = false;
@@ -74,14 +100,14 @@ namespace ILRuntime.Runtime
                 }
                 ga += ">";
             }
-            if (!simpleClassName)
-                clsName += "_Binding";
             if (isArray)
             {
                 clsName += "_Array";
                 if (arrayRank > 1)
                     clsName += arrayRank;
             }
+            if (!simpleClassName)
+                clsName += "_Binding";
 
             realClsName = realNamespace;
             if (isGeneric)

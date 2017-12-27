@@ -49,6 +49,7 @@
     <Compile Include="LightTester2.cs" />
     <Compile Include="LightTester1.cs" />
     <Compile Include="EnumTest.cs" />
+    <Compile Include="ArrayTest.cs" />
     <Compile Include="RefOutTest.cs" />
     <Compile Include="SimpleTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

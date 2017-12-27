@@ -106,8 +106,10 @@
     <Compile Include="AutoGenerate\System_Diagnostics_Stopwatch_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Int32_Array2_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Int32_Array_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Int32_Array_Binding_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Binding.cs" />
-    <Compile Include="AutoGenerate\System_Int32_Binding_Array2.cs" />
     <Compile Include="AutoGenerate\System_IO_FileStream_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_File_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_Stream_Binding.cs" />

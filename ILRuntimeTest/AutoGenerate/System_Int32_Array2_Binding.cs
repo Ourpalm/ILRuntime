@@ -13,7 +13,7 @@ using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class System_Int32_Binding_Array2
+    unsafe class System_Int32_Array2_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {

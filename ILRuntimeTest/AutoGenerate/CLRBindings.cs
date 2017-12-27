@@ -46,7 +46,9 @@ namespace ILRuntime.Runtime.Generated
             System_IO_Stream_Binding.Register(app);
             System_IDisposable_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.Register(app);
-            System_Int32_Binding_Array2.Register(app);
+            System_Int32_Array_Binding.Register(app);
+            System_Int32_Array_Binding_Array_Binding.Register(app);
+            System_Int32_Array2_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.Register(app);
             System_Diagnostics_Stopwatch_Binding.Register(app);
