@@ -46,7 +46,7 @@ namespace TestCases
             Console.WriteLine(obj);
 
             var arr = t.GetCustomAttributes(typeof(TestAttribute), false);
-            foreach(var i in arr)
+            foreach (var i in arr)
             {
                 TestAttribute a = (TestAttribute)i;
                 Console.WriteLine(a.TestProp);
@@ -172,7 +172,7 @@ namespace TestCases
             }
         }
 
-        
+
         [Serializable]
         [Obsolete]
         [Test(true, TestProp = "1234")]
@@ -231,7 +231,7 @@ namespace TestCases
             }
             else
             {
-                Console.WriteLine("not value type"); //走进了这里
+                throw new Exception("not value type"); //走进了这里
             }
 
             obj = p.GetValue(r, null);
@@ -243,9 +243,44 @@ namespace TestCases
             }
             else
             {
-                Console.WriteLine("not value type"); //走进了这里
+                throw new Exception("not value type"); //走进了这里
             }
         }
 
+        public class Tx
+        {
+            public float FloatField { get; set; }
+            public int IntField { get; set; }
+        }
+
+        public static void ReflectionTest10()
+        {
+            Tx obj = new Tx { FloatField = 21, IntField = 21 };
+            Type t = obj.GetType();
+            var fields = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var info = fields[0]; //FloatField
+
+            object value = info.GetGetMethod().Invoke(obj, null);
+            Console.WriteLine(string.Format("{0} = {1}", info.Name, value));
+
+            if (value == null)
+            {
+                throw new Exception("null obj - FloatField"); // 不应该走到这里来，但走到了这里
+            }
+
+            info = fields[1];
+
+            value = info.GetGetMethod().Invoke(obj, null);
+            Console.WriteLine(string.Format("{0} = {1}", info.Name, value));
+
+            if (value == null)
+            {
+                throw new Exception("null obj - IntField");
+            }
+            else
+            {
+                Console.WriteLine("not null obj - IntField"); // 对于int是正确的，走到了这里
+            }
+        }
     }
 }
