@@ -327,6 +327,12 @@ namespace ILRuntime.CLR.Method
                             }
                         }
                         break;
+                    case ObjectTypes.ArrayReference:
+                        {
+                            var arr = mStack[p->Value] as Array;
+                            arr.SetValue(val, p->ValueLow);
+                        }
+                        break;
                 }
             }
         }

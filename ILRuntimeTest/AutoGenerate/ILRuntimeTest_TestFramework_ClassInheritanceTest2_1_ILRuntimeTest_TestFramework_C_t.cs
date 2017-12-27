@@ -13,7 +13,7 @@ using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_Adaptor_Binding
+    unsafe class ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_ClassInheritanceTest2Adaptor_Binding_Adaptor_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
