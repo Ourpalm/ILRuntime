@@ -153,7 +153,7 @@ namespace ILRuntime.Reflection
         {
             get
             {
-                throw new NotImplementedException();
+                return type.TypeDefinition.Namespace;
             }
         }
 
