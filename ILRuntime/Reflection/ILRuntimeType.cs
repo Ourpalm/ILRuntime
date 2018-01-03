@@ -113,7 +113,12 @@ namespace ILRuntime.Reflection
         {
             get
             {
-                return type.BaseType != null ? type.BaseType.ReflectionType : null;
+                if (type.IsEnum)
+                    return typeof(Enum);
+                else
+                {
+                    return type.BaseType != null ? type.BaseType.ReflectionType : null;
+                }
             }
         }
 
