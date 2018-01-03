@@ -321,7 +321,7 @@ namespace ILRuntime.Runtime.Stack
                             case ObjectTypes.ValueTypeObjectReference:
                                 {
                                     var dst = *(StackObject**)&val->Value;
-                                    ClearValueTypeObject(vt, *(StackObject**)&val->Value);
+                                    ClearValueTypeObject(vt, dst);
                                 }
                                 break;
                             default:

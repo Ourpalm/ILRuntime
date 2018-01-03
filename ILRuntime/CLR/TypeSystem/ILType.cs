@@ -563,7 +563,7 @@ namespace ILRuntime.CLR.TypeSystem
                         methods[i.Name] = lst;
                     }
                     var m = new ILMethod(i, this, appdomain);
-                    lst.Add(new ILMethod(i, this, appdomain));
+                    lst.Add(m);
                 }
             }
 

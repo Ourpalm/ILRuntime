@@ -347,13 +347,14 @@ namespace ILRuntime.Runtime.Enviorment
 
             if (module.HasAssemblyReferences) //如果此模块引用了其他模块
             {
-                foreach (var ar in module.AssemblyReferences)
+                /*foreach (var ar in module.AssemblyReferences)
                 {
-                    /*if (moduleref.Contains(ar.Name) == false)
+                    if (moduleref.Contains(ar.Name) == false)
                         moduleref.Add(ar.Name);
                     if (moduleref.Contains(ar.FullName) == false)
-                        moduleref.Add(ar.FullName);*/
+                        moduleref.Add(ar.FullName);
                 }
+                */
             }
 
             if (module.HasTypes)
