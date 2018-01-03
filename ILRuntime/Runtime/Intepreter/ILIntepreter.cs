@@ -1680,10 +1680,19 @@ namespace ILRuntime.Runtime.Intepreter
                                                     var objRef = GetObjectAndResolveReference(Minus(esp, ilm.ParameterCount + 1));
                                                     if (objRef->ObjectType == ObjectTypes.Null)
                                                         throw new NullReferenceException();
-                                                    var obj = mStack[objRef->Value];
-                                                    if (obj == null)
-                                                        throw new NullReferenceException();
-                                                    ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                                    {
+                                                        StackObject* dst = *(StackObject**)&objRef->Value;
+                                                        var ft = domain.GetType(dst->Value) as ILType;
+                                                        ilm = ft.GetVirtualMethod(ilm) as ILMethod;
+                                                    }
+                                                    else
+                                                    {
+                                                        var obj = mStack[objRef->Value];
+                                                        if (obj == null)
+                                                            throw new NullReferenceException();
+                                                        ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                                    }                                                    
                                                 }
                                                 esp = Execute(ilm, esp, out unhandledException);
                                                 ValueTypeBasePointer = bp;
