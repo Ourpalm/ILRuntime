@@ -762,6 +762,34 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Stind_I8:
+                                {
+                                    var dst = GetObjectAndResolveReference(esp - 1 - 1);
+                                    var val = esp - 1;
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, typeof(long), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = val->ValueLow;
+                                            }
+                                            break;
+                                    }
+
+                                    Free(esp - 1);
+                                    Free(esp - 1 - 1);
+                                    esp = esp - 1 - 1;
+                                }
+                                break;
                             case OpCodeEnum.Stind_R8:
                                 {
                                     var dst = GetObjectAndResolveReference(esp - 1 - 1);
@@ -771,6 +799,11 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.FieldReference:
                                             {
                                                 StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, typeof(double), mStack);
                                             }
                                             break;
                                         default:
@@ -795,6 +828,11 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.FieldReference:
                                             {
                                                 StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, typeof(object), mStack);
                                             }
                                             break;
                                         default:
@@ -4262,7 +4300,6 @@ namespace ILRuntime.Runtime.Intepreter
                     long[] arr = obj as long[];
                     objRef->ObjectType = ObjectTypes.Long;
                     *(long*)&objRef->Value = arr[idx];
-                    objRef->ValueLow = 0;
                 }
                 else if (nT == typeof(float))
                 {
@@ -4276,7 +4313,6 @@ namespace ILRuntime.Runtime.Intepreter
                     double[] arr = obj as double[];
                     objRef->ObjectType = ObjectTypes.Double;
                     *(double*)&objRef->Value = arr[idx];
-                    objRef->ValueLow = 0;
                 }
                 else if (nT == typeof(byte))
                 {
@@ -4305,6 +4341,12 @@ namespace ILRuntime.Runtime.Intepreter
                     objRef->ObjectType = ObjectTypes.Integer;
                     objRef->Value = arr[idx];
                     objRef->ValueLow = 0;
+                }
+                else if (nT == typeof(ulong))
+                {
+                    ulong[] arr = obj as ulong[];
+                    objRef->ObjectType = ObjectTypes.Long;
+                    *(ulong*)&objRef->Value = arr[idx];
                 }
                 else
                     throw new NotImplementedException();

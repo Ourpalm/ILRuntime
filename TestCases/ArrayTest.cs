@@ -22,5 +22,23 @@ namespace TestCases
             int i = aa[index]; //throw exception here
 
         }
+
+        public static void ArrayTest03()
+        {
+            double[] propValueArr = new double[] { 0.5, 0.5 };
+            ArrayTest03Sub(propValueArr, 1, new ArrayTest03Cls(), 14);
+        }
+
+        class ArrayTest03Cls
+        {
+            public float[] levelParam = new float[] { 0.5f, 0.5f };
+        }
+
+        static void ArrayTest03Sub(double[] propValurArr, int i, ArrayTest03Cls conf, int skillLevel)
+        {
+            propValurArr[i] += conf.levelParam[i] * (skillLevel - 1);
+            Console.WriteLine("{0} buff0 {1} {2} {3} {4} {5} {6}", 61901, skillLevel, 0, 0, propValurArr[i], conf.levelParam[i], conf.levelParam[i] * (skillLevel - 1));
+        }
+
     }
 }

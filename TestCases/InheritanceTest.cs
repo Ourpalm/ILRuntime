@@ -98,10 +98,11 @@ namespace TestCases
 
         public static void InheritanceTest06()
         {
-            InheritanceTest06_Sub<MyClass>();
+            InheritanceTest it = new InheritanceTest();
+            it.InheritanceTest06_Sub<MyClass>();
         }
 
-        static void InheritanceTest06_Sub<T>() where T:MyClass
+        void InheritanceTest06_Sub<T>() where T:MyClass
         {
             T obj = Activator.CreateInstance(typeof(T)) as T; //这样写错误
                                                               //MyClass obj = Activator.CreateInstance(typeof(T)) as  MyClass; //这样写正确
