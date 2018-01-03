@@ -3595,6 +3595,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Conv_U4:
+                            case OpCodeEnum.Conv_U:
                             case OpCodeEnum.Conv_Ovf_U4:
                             case OpCodeEnum.Conv_Ovf_U4_Un:
                                 {
@@ -3623,6 +3624,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Conv_I4:
+                            case OpCodeEnum.Conv_I:
                             case OpCodeEnum.Conv_Ovf_I:
                             case OpCodeEnum.Conv_Ovf_I_Un:
                             case OpCodeEnum.Conv_Ovf_I4:
