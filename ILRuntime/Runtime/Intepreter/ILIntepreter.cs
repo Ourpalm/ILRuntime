@@ -2474,18 +2474,25 @@ namespace ILRuntime.Runtime.Intepreter
                                                         {
                                                             var val = mStack[obj->Value];
                                                             Free(obj);
-                                                            ILTypeInstance ins = (ILTypeInstance)val;
-                                                            if (ins != null)
+                                                            if (type.IsArray)
                                                             {
-                                                                if (ins.IsValueType)
-                                                                {
-                                                                    ins.Boxed = true;
-                                                                }
-                                                                esp = PushObject(obj, mStack, ins, true);
+                                                                esp = PushObject(obj, mStack, val, true);
                                                             }
                                                             else
                                                             {
-                                                                esp = PushNull(obj);
+                                                                ILTypeInstance ins = (ILTypeInstance)val;
+                                                                if (ins != null)
+                                                                {
+                                                                    if (ins.IsValueType)
+                                                                    {
+                                                                        ins.Boxed = true;
+                                                                    }
+                                                                    esp = PushObject(obj, mStack, ins, true);
+                                                                }
+                                                                else
+                                                                {
+                                                                    esp = PushNull(obj);
+                                                                }
                                                             }
                                                         }
                                                         break;
