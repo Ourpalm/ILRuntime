@@ -96,6 +96,37 @@ namespace TestCases
             }
         }
 
+        public static void InheritanceTest06()
+        {
+            InheritanceTest06_Sub<MyClass>();
+        }
+
+        static void InheritanceTest06_Sub<T>() where T:MyClass
+        {
+            T obj = Activator.CreateInstance(typeof(T)) as T; //这样写错误
+                                                              //MyClass obj = Activator.CreateInstance(typeof(T)) as  MyClass; //这样写正确
+            obj.Reg();
+        }
+
+        interface IMy
+        {
+        }
+
+
+        class MyClass
+        {
+            public void Reg()
+            {
+                if (this is IMy)
+                {
+                    Console.WriteLine("is IMy"); //正确结果不应该打印这句；但实际上会打印这句，还会抛一个异常
+                }
+                else
+                {
+                    Console.WriteLine("not is IMy");
+                }
+            }
+        }
 
     }
     class TestCls : ClassInheritanceTest
