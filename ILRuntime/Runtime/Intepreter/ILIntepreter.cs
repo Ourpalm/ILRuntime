@@ -2464,7 +2464,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else
                                             {
-                                                //Nothing to do for normal IL Types
+                                                object res = RetriveObject(obj, mStack);
+                                                Free(objRef);
+                                                esp = PushObject(objRef, mStack, res, true);
                                             }
                                         }
                                         else
@@ -2480,7 +2482,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else
                                             {
-                                                //Nothing to do for other CLR types
+                                                object res = RetriveObject(obj, mStack);
+                                                Free(objRef);
+                                                esp = PushObject(objRef, mStack, res, true);
                                             }
                                         }
                                     }
@@ -2980,6 +2984,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Isinst:
                                 {
                                     var objRef = esp - 1;
+                                    var oriRef = objRef;
                                     var type = domain.GetType(ip->TokenInteger);
                                     if (type != null)
                                     {
@@ -2993,9 +2998,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(int) && tclr != typeof(bool) && tclr != typeof(short) && tclr != typeof(byte) && tclr != typeof(ushort) && tclr !=typeof(uint))
                                                         {
-                                                            objRef->ObjectType = ObjectTypes.Null;
-                                                            objRef->Value = -1;
-                                                            objRef->ValueLow = 0;
+                                                            oriRef->ObjectType = ObjectTypes.Null;
+                                                            oriRef->Value = -1;
+                                                            oriRef->ValueLow = 0;
                                                         }
                                                     }
                                                     break;
@@ -3003,9 +3008,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(long) && tclr != typeof(ulong))
                                                         {
-                                                            objRef->ObjectType = ObjectTypes.Null;
-                                                            objRef->Value = -1;
-                                                            objRef->ValueLow = 0;
+                                                            oriRef->ObjectType = ObjectTypes.Null;
+                                                            oriRef->Value = -1;
+                                                            oriRef->ValueLow = 0;
                                                         }
                                                     }
                                                     break;
@@ -3013,9 +3018,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(float))
                                                         {
-                                                            objRef->ObjectType = ObjectTypes.Null;
-                                                            objRef->Value = -1;
-                                                            objRef->ValueLow = 0;
+                                                            oriRef->ObjectType = ObjectTypes.Null;
+                                                            oriRef->Value = -1;
+                                                            oriRef->ValueLow = 0;
                                                         }
                                                     }
                                                     break;
@@ -3023,23 +3028,23 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(double))
                                                         {
-                                                            objRef->ObjectType = ObjectTypes.Null;
-                                                            objRef->Value = -1;
-                                                            objRef->ValueLow = 0;
+                                                            oriRef->ObjectType = ObjectTypes.Null;
+                                                            oriRef->Value = -1;
+                                                            oriRef->ValueLow = 0;
                                                         }
                                                     }
                                                     break;
                                                 case ObjectTypes.Null:
-                                                    objRef->ObjectType = ObjectTypes.Null;
-                                                    objRef->Value = -1;
-                                                    objRef->ValueLow = 0;
+                                                    oriRef->ObjectType = ObjectTypes.Null;
+                                                    oriRef->Value = -1;
+                                                    oriRef->ValueLow = 0;
                                                     break;
                                             }
                                         }
                                         else
                                         {
                                             var obj = RetriveObject(objRef, mStack);
-                                            Free(objRef);
+                                            Free(oriRef);
 
                                             if (obj != null)
                                             {
@@ -3047,14 +3052,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     if (((ILTypeInstance)obj).CanAssignTo(type))
                                                     {
-                                                        esp = PushObject(objRef, mStack, obj);
+                                                        esp = PushObject(oriRef, mStack, obj);
                                                     }
                                                     else
                                                     {
 #if !DEBUG || DISABLE_ILRUNTIME_DEBUG
-                                                        objRef->ObjectType = ObjectTypes.Null;
-                                                        objRef->Value = -1;
-                                                        objRef->ValueLow = 0;
+                                                        oriRef->ObjectType = ObjectTypes.Null;
+                                                        oriRef->Value = -1;
+                                                        oriRef->ValueLow = 0;
 #endif
                                                     }
                                                 }
@@ -3062,14 +3067,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
                                                     {
-                                                        esp = PushObject(objRef, mStack, obj, true);
+                                                        esp = PushObject(oriRef, mStack, obj, true);
                                                     }
                                                     else
                                                     {
 #if !DEBUG || DISABLE_ILRUNTIME_DEBUG
-                                                        objRef->ObjectType = ObjectTypes.Null;
-                                                        objRef->Value = -1;
-                                                        objRef->ValueLow = 0;
+                                                        oriRef->ObjectType = ObjectTypes.Null;
+                                                        oriRef->Value = -1;
+                                                        oriRef->ValueLow = 0;
 #endif
                                                     }
                                                 }
@@ -3077,9 +3082,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             else
                                             {
 #if !DEBUG || DISABLE_ILRUNTIME_DEBUG
-                                                    objRef->ObjectType = ObjectTypes.Null;
-                                                    objRef->Value = -1;
-                                                    objRef->ValueLow = 0;
+                                                    oriRef->ObjectType = ObjectTypes.Null;
+                                                    oriRef->Value = -1;
+                                                    oriRef->ValueLow = 0;
 #endif
                                             }
                                         }

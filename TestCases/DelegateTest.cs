@@ -158,6 +158,17 @@ namespace TestCases
             a("ffff");
         }
 
+        public static void DelegateTest15()
+        {
+            DelegateTestCls cls = new DelegateTestCls(123);
+            DelegateTest15Sub(cls.IntTest);
+        }
+
+        static void DelegateTest15Sub(Action<int> test)
+        {
+            test(555);
+        }
+
         static void TestString(string a)
         {
             Console.WriteLine("test1:" + a);
