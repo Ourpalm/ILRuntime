@@ -124,9 +124,9 @@ namespace ILRuntimeTest
                 {
                     var path = Path.GetDirectoryName(txtPath.Text);
                     var name = Path.GetFileNameWithoutExtension(txtPath.Text);
-                    //using (var fs2 = new System.IO.FileStream($"{path}\\{name}.pdb", FileMode.Open))
+                    using (var fs2 = new System.IO.FileStream($"{path}\\{name}.pdb", FileMode.Open))
                     {
-                        _app.LoadAssembly(fs, null, new Mono.Cecil.Pdb.PdbReaderProvider());
+                        _app.LoadAssembly(fs, fs2, new Mono.Cecil.Pdb.PdbReaderProvider());
                         _isLoadAssembly = true;
                     }
 
