@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 using ILRuntime.Runtime.Debugger;
+using ILRuntimeDebugEngine.Expressions;
 
 namespace ILRuntimeDebugEngine.AD7
 {
@@ -16,6 +17,8 @@ namespace ILRuntimeDebugEngine.AD7
         public StackFrameInfo StackFrameInfo { get; private set; }
         ILProperty[] localVars;
         Dictionary<string, ILProperty> propertyMapping = new Dictionary<string, ILProperty>();
+
+        public Dictionary<string, ILProperty> Properties { get { return propertyMapping; } }
 
         private string _functionName;
 
@@ -50,7 +53,23 @@ namespace ILRuntimeDebugEngine.AD7
             pbstrError = "";
             pichError = 0;
             ppExpr = null;
-            string[] names = pszCode.Split('.');
+
+            Expressions.Lexer lexer = new Expressions.Lexer(pszCode);
+            Expressions.Parser parser = new Expressions.Parser(lexer);
+            Expressions.EvalExpression exp = null;
+            try
+            {
+                exp = parser.Parse();
+            }
+            catch (Exception ex)
+            {
+                pbstrError = ex.Message;
+                pichError = (uint)pbstrError.Length;
+                return Constants.S_FALSE;
+            }
+            ppExpr = new AD7Expression(this, exp);
+            return Constants.S_OK;
+            /*string[] names = pszCode.Split('.');
             ILProperty root = null;
             if(!propertyMapping.TryGetValue(names[0], out root))
             {
@@ -71,7 +90,7 @@ namespace ILRuntimeDebugEngine.AD7
             {
                 ppExpr = new AD7Expression(Engine, Thread, root, names);
                 return Constants.S_OK;
-            }
+            }*/
             /*string lookup = pszCode;
 
 
@@ -81,7 +100,7 @@ namespace ILRuntimeDebugEngine.AD7
                 ppExpr = new AD7Expression(new MonoProperty(ThreadContext, result));
                 return VSConstants.S_OK;
             }
-            */            
+            */
         }
 
         public int EnumProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout,

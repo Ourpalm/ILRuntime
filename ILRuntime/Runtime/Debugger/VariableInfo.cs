@@ -10,6 +10,8 @@ namespace ILRuntime.Runtime.Debugger
         Normal,
         FieldReference,
         PropertyReference,
+        IndexAccess,
+        Invocation,
         Error,
     }
 

@@ -51,6 +51,10 @@ namespace ILRuntimeDebugEngine.Expressions
                 }
                 curToken = lexer.GetNextToken();
             }
+            if(res != null && !res.Completed)
+            {
+                throw new NotSupportedException("Unexpected token: EOF");
+            }
             return res;
         }
     }
