@@ -14,6 +14,7 @@ namespace ILRuntimeDebugEngine.AD7
         Dictionary<string, ILProperty> children = new Dictionary<string, ILProperty>();
 
         public Dictionary<string, ILProperty> Children { get { return children; } }
+        public ILProperty Parent { get; set; }
         public ILProperty(VariableInfo info)
         {
             this.info = info;
@@ -141,14 +142,15 @@ namespace ILRuntimeDebugEngine.AD7
             {
                 VariableReference res = new VariableReference();
                 res.Address = info.Address;
+                res.Name = info.Name;
                 res.Type = info.Type;
                 res.Offset = info.Offset;
-
+                if (Parent != null)
+                    res.Parent = Parent.GetVariableReference();
                 return res;
             }
             else
                 return null;
-
         }
     }
 }

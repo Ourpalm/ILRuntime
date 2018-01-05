@@ -179,6 +179,7 @@ namespace ILRuntime.Runtime.Debugger
                 res.Address = br.ReadInt64();
                 res.Type = (VariableTypes)br.ReadByte();
                 res.Offset = br.ReadInt32();
+                res.Name = br.ReadString();
                 res.Parent = ReadVariableReference(br);
             }
             return res;

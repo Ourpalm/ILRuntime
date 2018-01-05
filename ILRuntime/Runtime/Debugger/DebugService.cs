@@ -487,7 +487,7 @@ namespace ILRuntime.Runtime.Debugger
                                         var rt = res.GetType();
                                         VariableInfo info = new VariableInfo();
 
-                                        info.Address = parent.Address;
+                                        info.Address = 0;
                                         info.Name = name;
                                         info.Type = VariableTypes.FieldReference;
                                         info.TypeName = fi.FieldType.FullName;
@@ -504,7 +504,7 @@ namespace ILRuntime.Runtime.Debugger
                                             var rt = res.GetType();
                                             VariableInfo info = new VariableInfo();
 
-                                            info.Address = parent.Address;
+                                            info.Address = 0;
                                             info.Name = name;
                                             info.Type = VariableTypes.PropertyReference;
                                             info.TypeName = pi.PropertyType.FullName;
@@ -519,6 +519,9 @@ namespace ILRuntime.Runtime.Debugger
                             {
                                 VariableInfo info = new VariableInfo();
                                 info.Type = VariableTypes.Error;
+                                info.Name = "";
+                                info.TypeName = "";
+                                info.Value = "NullReferenceException";
                                 return info;
                             }
                             return null;

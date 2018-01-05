@@ -304,6 +304,7 @@ namespace ILRuntimeDebugEngine.AD7
                 bw.Write(reference.Address);
                 bw.Write((byte)reference.Type);
                 bw.Write(reference.Offset);
+                bw.Write(reference.Name);
                 WriteVariableReference(reference.Parent);
             }
         }

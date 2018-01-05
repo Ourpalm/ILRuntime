@@ -65,20 +65,25 @@ namespace ILRuntimeDebugEngine.AD7
                 VariableReference reference = parent.GetVariableReference();
                 if (reference != null)
                 {
-                    uint threadHash;
-                    thread.GetThreadId(out threadHash);
-                    var info = engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
-                    if(info ==null)
+                    if (reference.Type != VariableTypes.Error)
                     {
-                        info = new VariableInfo();
-                        info.Name = member;
-                        info.Value = "null";
-                        info.TypeName = "null";                        
-                    }
-                    prop = new AD7.ILProperty(info);
+                        uint threadHash;
+                        thread.GetThreadId(out threadHash);
+                        var info = engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
+                        if (info == null)
+                        {
+                            info = new VariableInfo();
+                            info.Name = member;
+                            info.Value = "null";
+                            info.TypeName = "null";
+                        }
+                        prop = new AD7.ILProperty(info);
+                    }                    
                 }
                 else
                     prop = null;
+                if (prop != null)
+                    prop.Parent = parent;
                 parent.Children[member] = prop;
             }
             parent = prop;

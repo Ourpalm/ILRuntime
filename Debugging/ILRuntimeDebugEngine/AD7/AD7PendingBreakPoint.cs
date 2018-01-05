@@ -69,7 +69,8 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int Delete()
         {
-            _engine.DebuggedProcess.SendDeleteBreakpoint(GetHashCode());
+            if (_engine != null && _engine.DebuggedProcess != null)
+                _engine.DebuggedProcess.SendDeleteBreakpoint(GetHashCode());
             return Constants.S_OK;
         }
 

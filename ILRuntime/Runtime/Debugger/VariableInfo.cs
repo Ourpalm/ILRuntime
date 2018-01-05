@@ -18,6 +18,7 @@ namespace ILRuntime.Runtime.Debugger
         public long Address { get; set; }
         public VariableTypes Type { get; set; }
         public int Offset { get; set; }
+        public string Name { get; set; }
         public VariableReference Parent { get; set; }
     }
 
