@@ -257,6 +257,7 @@ namespace ILRuntimeDebugEngine.AD7
             vinfo.Offset = br.ReadInt32();
             vinfo.Name = br.ReadString();
             vinfo.Value = br.ReadString();
+            vinfo.ValueType = (ValueTypes)br.ReadByte();
             vinfo.TypeName = br.ReadString();
             vinfo.Expandable = br.ReadBoolean();
 
@@ -323,25 +324,50 @@ namespace ILRuntimeDebugEngine.AD7
         }
 
         //VariableInfo resolved;
-        public VariableInfo ResolveVariable(VariableReference reference, string name, int threadId)
+        public VariableInfo ResolveVariable(VariableReference parent, string name, int threadId, uint dwTimeout)
         {
             CSResolveVariable msg = new CSResolveVariable();
-            msg.Name = name;
             msg.ThreadHashCode = threadId;
-            msg.Parent = reference;
+            msg.Variable = VariableReference.GetMember(name, parent);
             SendResolveVariable(msg);
 
             bool aborted;
-            return AwaitRPCRequest<VariableInfo>(out aborted);
+            var res = AwaitRPCRequest<VariableInfo>(out aborted, (int)dwTimeout);
+            if (aborted)
+                return VariableInfo.RequestTimeout;
+            return res;
         }
 
         void SendResolveVariable(CSResolveVariable msg)
         {
             sendStream.Position = 0;
             bw.Write(msg.ThreadHashCode);
-            bw.Write(msg.Name);
-            WriteVariableReference(msg.Parent);
+            WriteVariableReference(msg.Variable);
             socket.Send(DebugMessageType.CSResolveVariable, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        public VariableInfo ResolveIndexAccess(VariableReference body, VariableReference idx, int threadId, uint dwTimeout)
+        {
+            CSResolveIndexer msg = new CSResolveIndexer();
+            msg.Body = body;
+            msg.Index = idx;
+            msg.ThreadHashCode = threadId;
+            SendResolveIndexAccess(msg);
+
+            bool aborted;
+            var res = AwaitRPCRequest<VariableInfo>(out aborted, (int)dwTimeout);
+            if (aborted)
+                return VariableInfo.RequestTimeout;
+            return res;
+        }
+
+        void SendResolveIndexAccess(CSResolveIndexer msg)
+        {
+            sendStream.Position = 0;
+            bw.Write(msg.ThreadHashCode);
+            WriteVariableReference(msg.Body);
+            WriteVariableReference(msg.Index);
+            socket.Send(DebugMessageType.CSResolveIndexAccess, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
         void WriteVariableReference(VariableReference reference)
@@ -354,6 +380,16 @@ namespace ILRuntimeDebugEngine.AD7
                 bw.Write(reference.Offset);
                 bw.Write(reference.Name);
                 WriteVariableReference(reference.Parent);
+                if (reference.Parameters != null)
+                {
+                    bw.Write(reference.Parameters.Length);
+                    foreach (var i in reference.Parameters)
+                    {
+                        WriteVariableReference(i);
+                    }
+                }
+                else
+                    bw.Write(0);
             }
         }
 

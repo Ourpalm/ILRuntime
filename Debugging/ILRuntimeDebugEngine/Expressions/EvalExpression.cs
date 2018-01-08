@@ -10,6 +10,8 @@ namespace ILRuntimeDebugEngine.Expressions
     {
         public virtual bool Completed { get { return true; } }
         public abstract bool Parse(Token curToken, Lexer lexer);
+
+        public bool IsRoot { get; set; }
     }
 
     class NameExpression : EvalExpression

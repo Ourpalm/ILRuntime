@@ -25,6 +25,7 @@ namespace ILRuntimeDebugEngine.Expressions
                     if (curToken.Type == TokenTypes.Name)
                     {
                         res = new NameExpression(((NameToken)curToken).Content);
+                        res.IsRoot = true;
                     }
                     else
                         throw new NotSupportedException("Unexpected token:" + curToken.Type);
@@ -36,13 +37,19 @@ namespace ILRuntimeDebugEngine.Expressions
                         switch (curToken.Type)
                         {
                             case TokenTypes.MemberAccess:
+                                res.IsRoot = false;
                                 res = new MemberAcessExpression(res);
+                                res.IsRoot = true;
                                 break;
                             case TokenTypes.IndexStart:
+                                res.IsRoot = false;
                                 res = new IndexAccessExpression(res);
+                                res.IsRoot = true;
                                 break;
                             case TokenTypes.InvocationStart:
+                                res.IsRoot = false;
                                 res = new InvocationExpression(res);
+                                res.IsRoot = true;
                                 break;
                             default:
                                 throw new NotSupportedException("Unexpected token:" + curToken.Type);

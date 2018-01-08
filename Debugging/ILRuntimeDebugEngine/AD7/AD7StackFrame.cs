@@ -67,7 +67,7 @@ namespace ILRuntimeDebugEngine.AD7
                 pichError = (uint)pbstrError.Length;
                 return Constants.S_FALSE;
             }
-            ppExpr = new AD7Expression(this, exp);
+            ppExpr = new AD7Expression(this, exp, pszCode);
             return Constants.S_OK;
             /*string[] names = pszCode.Split('.');
             ILProperty root = null;

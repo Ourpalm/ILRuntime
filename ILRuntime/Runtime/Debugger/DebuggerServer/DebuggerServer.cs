@@ -160,10 +160,37 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         CSResolveVariable msg = new CSResolveVariable();
                         msg.ThreadHashCode = br.ReadInt32();
-                        msg.Name = br.ReadString();
-                        msg.Parent = ReadVariableReference(br);
-                        object res;
-                        var info = ds.ResolveVariable(msg.ThreadHashCode, msg.Parent, msg.Name, out res);
+                        msg.Variable = ReadVariableReference(br);
+                        VariableInfo info;
+                        try
+                        {
+                            object res;
+                            info = ds.ResolveVariable(msg.ThreadHashCode, msg.Variable, out res);
+                        }
+                        catch (Exception ex)
+                        {
+                            info = VariableInfo.GetException(ex);
+                        }
+                        SendSCResolveVariableResult(info);
+                    }
+                    break;
+                case DebugMessageType.CSResolveIndexAccess:
+                    {
+                        CSResolveIndexer msg = new CSResolveIndexer();
+                        msg.ThreadHashCode = br.ReadInt32();
+                        msg.Body = ReadVariableReference(br);
+                        msg.Index = ReadVariableReference(br);
+
+                        VariableInfo info;
+                        try
+                        {
+                            object res;
+                            info = ds.ResolveIndexAccess(msg.ThreadHashCode, msg.Body, msg.Index, out res);
+                        }
+                        catch(Exception ex)
+                        {
+                            info = VariableInfo.GetException(ex);
+                        }
                         SendSCResolveVariableResult(info);
                     }
                     break;
@@ -182,6 +209,12 @@ namespace ILRuntime.Runtime.Debugger
                 res.Offset = br.ReadInt32();
                 res.Name = br.ReadString();
                 res.Parent = ReadVariableReference(br);
+                int cnt = br.ReadInt32();
+                res.Parameters = new VariableReference[cnt];
+                for(int i = 0; i < cnt; i++)
+                {
+                    res.Parameters[i] = ReadVariableReference(br);
+                }
             }
             return res;
         }
@@ -316,6 +349,7 @@ namespace ILRuntime.Runtime.Debugger
             bw.Write(k.Offset);
             bw.Write(k.Name);
             bw.Write(k.Value);
+            bw.Write((byte)k.ValueType);
             bw.Write(k.TypeName);
             bw.Write(k.Expandable);
         }

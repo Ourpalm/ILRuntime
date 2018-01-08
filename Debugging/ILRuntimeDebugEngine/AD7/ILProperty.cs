@@ -15,6 +15,8 @@ namespace ILRuntimeDebugEngine.AD7
 
         public Dictionary<string, ILProperty> Children { get { return children; } }
         public ILProperty Parent { get; set; }
+        public VariableReference[] Parameters { get; set; }
+        public string Name { get { return info.Name; } set { info.Name = value; } }
         public ILProperty(VariableInfo info)
         {
             this.info = info;
@@ -29,27 +31,32 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int GetDerivedMostProperty(out IDebugProperty2 ppDerivedMost)
         {
-            throw new NotImplementedException();
+            ppDerivedMost = null;
+            return Constants.E_NOTIMPL;
         }
 
         public int GetExtendedInfo(ref Guid guidExtendedInfo, out object pExtendedInfo)
         {
-            throw new NotImplementedException();
+            pExtendedInfo = null;
+            return Constants.E_NOTIMPL;
         }
 
         public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes)
         {
-            throw new NotImplementedException();
+            ppMemoryBytes = null;
+            return Constants.E_NOTIMPL;
         }
 
         public int GetMemoryContext(out IDebugMemoryContext2 ppMemory)
         {
-            throw new NotImplementedException();
+            ppMemory = null;
+            return Constants.E_NOTIMPL;
         }
 
         public int GetParent(out IDebugProperty2 ppParent)
         {
-            throw new NotImplementedException();
+            ppParent = Parent;
+            return Constants.S_OK;
         }
 
         public int GetPropertyInfo(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, uint dwTimeout,
@@ -114,7 +121,19 @@ namespace ILRuntimeDebugEngine.AD7
                 propertyInfo.dwAttrib = enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
                 if (info.Type == VariableTypes.PropertyReference)
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_PROPERTY;
-
+                if(info.Type >= VariableTypes.Error)
+                    propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_ERROR;
+                if(info.Type == VariableTypes.Timeout)
+                    propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_TIMEOUT;
+                if (info.ValueType == ValueTypes.String)
+                    propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_RAW_STRING;
+                if(info.ValueType == ValueTypes.Boolean)
+                {
+                    if(info.Offset == 1)
+                        propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_BOOLEAN_TRUE;
+                    else
+                        propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_BOOLEAN;
+                }
                 if (IsExpandable())
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
@@ -147,6 +166,8 @@ namespace ILRuntimeDebugEngine.AD7
                 res.Offset = info.Offset;
                 if (Parent != null)
                     res.Parent = Parent.GetVariableReference();
+                res.Parameters = Parameters;
+
                 return res;
             }
             else
