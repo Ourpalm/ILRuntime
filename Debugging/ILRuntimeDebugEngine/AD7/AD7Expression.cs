@@ -101,30 +101,40 @@ namespace ILRuntimeDebugEngine.AD7
             ILProperty body = Resolve(exp.Body);
             string member = exp.Member;
             ILProperty prop;
-            if (!body.Children.TryGetValue(member, out prop))
+            if (body != null)
             {
-                VariableReference reference = body.GetVariableReference();
-                if (reference != null)
+                if (!body.Children.TryGetValue(member, out prop))
                 {
-                    if (reference.Type != VariableTypes.Error)
+                    VariableReference reference = body.GetVariableReference();
+                    if (reference != null)
                     {
-                        uint threadHash;
-                        frame.Thread.GetThreadId(out threadHash);
-
-                        var info = frame.Engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
-                        if (info == null)
+                        if (reference.Type < VariableTypes.Error)
                         {
-                            info = new VariableInfo();
-                            info.Name = member;
-                            info.Value = "null";
-                            info.TypeName = "null";
+                            uint threadHash;
+                            frame.Thread.GetThreadId(out threadHash);
+
+                            var info = frame.Engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
+                            if (info == null)
+                            {
+                                info = new VariableInfo();
+                                info.Name = member;
+                                info.Value = "null";
+                                info.TypeName = "null";
+                            }
+                            prop = new AD7.ILProperty(info);
+                            prop.Parent = body;
+                            body.Children[member] = prop;
                         }
-                        prop = new AD7.ILProperty(info);
-                        prop.Parent = body;
-                        body.Children[member] = prop;
+                        else if(reference.Type == VariableTypes.NotFound)
+                        {
+
+                        }
+
                     }
                 }
             }
+            else
+                prop = new ILProperty(VariableInfo.NullReferenceExeption); 
             return prop;
         }
 

@@ -469,69 +469,85 @@ namespace ILRuntime.Runtime.Debugger
             ILIntepreter intepreter;
             if (AppDomain.Intepreters.TryGetValue(threadHashCode, out intepreter))
             {
-                switch(parent.Type)
+                if (parent != null)
                 {
-                    case VariableTypes.Normal:
-                        {
-                            StackObject* ptr = (StackObject*)parent.Address;
-                            object obj = StackObject.ToObject(ptr, AppDomain, intepreter.Stack.ManagedStack);
-                            if (obj != null)
+                    switch (parent.Type)
+                    {
+                        case VariableTypes.Normal:
                             {
-                                if (obj is ILTypeInstance)
+                                StackObject* ptr = (StackObject*)parent.Address;
+                                object obj = StackObject.ToObject(ptr, AppDomain, intepreter.Stack.ManagedStack);
+                                if (obj != null)
                                 {
-                                    var type = ((ILTypeInstance)obj).Type.ReflectionType;
-                                    var fi = type.GetField(name);
-                                    if (fi != null)
-                                    {
-                                        var res = fi.GetValue(obj);
-                                        var rt = res.GetType();
-                                        VariableInfo info = new VariableInfo();
-
-                                        info.Address = 0;
-                                        info.Name = name;
-                                        info.Type = VariableTypes.FieldReference;
-                                        info.TypeName = fi.FieldType.FullName;
-                                        info.Value = res != null ? res.ToString() : "null";
-
-                                        return info;
-                                    }
-                                    else
-                                    {
-                                        var pi = type.GetProperty(name);
-                                        if (pi != null)
-                                        {
-                                            var res = pi.GetValue(obj, null);
-                                            var rt = res.GetType();
-                                            VariableInfo info = new VariableInfo();
-
-                                            info.Address = 0;
-                                            info.Name = name;
-                                            info.Type = VariableTypes.PropertyReference;
-                                            info.TypeName = pi.PropertyType.FullName;
-                                            info.Value = res != null ? res.ToString() : "null";
-                                            info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
-                                            return info;
-                                        }
-                                    }
+                                    return ResolveMember(obj, name);   
+                                }
+                                else
+                                {
+                                    return VariableInfo.NullReferenceExeption;
                                 }
                             }
-                            else
-                            {
-                                VariableInfo info = new VariableInfo();
-                                info.Type = VariableTypes.Error;
-                                info.Name = "";
-                                info.TypeName = "";
-                                info.Value = "NullReferenceException";
-                                return info;
-                            }
-                            return null;
-                        }
-                    default:
-                        throw new NotImplementedException();
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else
+                {
+                    var frame = intepreter.Stack.Frames.Peek();
+                    var m = frame.Method;
+                    if (m.HasThis)
+                    {
+                        var addr = Minus(frame.LocalVarPointer, m.ParameterCount + 1);
+                        var v = StackObject.ToObject(addr, intepreter.AppDomain, intepreter.Stack.ManagedStack);
+                        return ResolveMember(v, name);
+                    }
+                    else
+                    {
+                        return VariableInfo.GetCannotFind(name);
+                    }
                 }
             }
             else
-                return null;
+                return VariableInfo.GetCannotFind(name);
+        }
+
+        VariableInfo ResolveMember(object obj, string name)
+        {
+            if (obj is ILTypeInstance)
+            {
+                var type = ((ILTypeInstance)obj).Type.ReflectionType;
+                var fi = type.GetField(name);
+                if (fi != null)
+                {
+                    var res = fi.GetValue(obj);
+                    VariableInfo info = new VariableInfo();
+
+                    info.Address = 0;
+                    info.Name = name;
+                    info.Type = VariableTypes.FieldReference;
+                    info.TypeName = fi.FieldType.FullName;
+                    info.Value = res != null ? res.ToString() : "null";
+
+                    return info;
+                }
+                else
+                {
+                    var pi = type.GetProperty(name);
+                    if (pi != null)
+                    {
+                        var res = pi.GetValue(obj, null);
+                        VariableInfo info = new VariableInfo();
+
+                        info.Address = 0;
+                        info.Name = name;
+                        info.Type = VariableTypes.PropertyReference;
+                        info.TypeName = pi.PropertyType.FullName;
+                        info.Value = res != null ? res.ToString() : "null";
+                        info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
+                        return info;
+                    }
+                }
+            }
+            return VariableInfo.GetCannotFind(name);
         }
 
         unsafe bool GetValueExpandable(StackObject* esp, IList<object> mStack)

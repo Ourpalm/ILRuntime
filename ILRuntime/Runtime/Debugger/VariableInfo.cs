@@ -10,9 +10,11 @@ namespace ILRuntime.Runtime.Debugger
         Normal,
         FieldReference,
         PropertyReference,
+        TypeReference,
         IndexAccess,
-        Invocation,
+        Invocation,        
         Error,
+        NotFound,
     }
 
     public class VariableReference
@@ -33,5 +35,26 @@ namespace ILRuntime.Runtime.Debugger
         public string Value { get; set; }
         public bool Expandable { get; set; }
         public int Offset { get; set;}
+
+        public static VariableInfo NullReferenceExeption = new VariableInfo
+        {
+            Type = VariableTypes.Error,
+            Name = "",
+            TypeName = "",
+            Value = "NullReferenceException"
+        };
+
+        public static VariableInfo GetCannotFind(string name)
+        {
+            var res = new VariableInfo
+            {
+                Type = VariableTypes.NotFound,
+                TypeName = "",
+            };
+            res.Name = name;
+            res.Value = string.Format("Cannot find {0} in current scope.", name);
+
+            return res;
+        }
     }
 }
