@@ -464,9 +464,10 @@ namespace ILRuntime.Runtime.Debugger
             return frameInfos;
         }
 
-        internal unsafe VariableInfo ResolveVariable(int threadHashCode, VariableReference parent, string name)
+        internal unsafe VariableInfo ResolveVariable(int threadHashCode, VariableReference parent, string name, out object res)
         {
             ILIntepreter intepreter;
+            res = null;
             if (AppDomain.Intepreters.TryGetValue(threadHashCode, out intepreter))
             {
                 if (parent != null)
@@ -479,7 +480,21 @@ namespace ILRuntime.Runtime.Debugger
                                 object obj = StackObject.ToObject(ptr, AppDomain, intepreter.Stack.ManagedStack);
                                 if (obj != null)
                                 {
-                                    return ResolveMember(obj, name);   
+                                    return ResolveMember(obj, name, out res);   
+                                }
+                                else
+                                {
+                                    return VariableInfo.NullReferenceExeption;
+                                }
+                            }
+                        case VariableTypes.FieldReference:
+                        case VariableTypes.PropertyReference:
+                            {
+                                object obj;
+                                var info = ResolveVariable(threadHashCode, parent.Parent, parent.Name, out obj);
+                                if (obj != null)
+                                {
+                                    return ResolveMember(obj, name, out res);
                                 }
                                 else
                                 {
@@ -498,7 +513,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         var addr = Minus(frame.LocalVarPointer, m.ParameterCount + 1);
                         var v = StackObject.ToObject(addr, intepreter.AppDomain, intepreter.Stack.ManagedStack);
-                        return ResolveMember(v, name);
+                        return ResolveMember(v, name, out res);
                     }
                     else
                     {
@@ -510,15 +525,16 @@ namespace ILRuntime.Runtime.Debugger
                 return VariableInfo.GetCannotFind(name);
         }
 
-        VariableInfo ResolveMember(object obj, string name)
+        VariableInfo ResolveMember(object obj, string name, out object res)
         {
+            res = null;
             if (obj is ILTypeInstance)
             {
                 var type = ((ILTypeInstance)obj).Type.ReflectionType;
                 var fi = type.GetField(name);
                 if (fi != null)
                 {
-                    var res = fi.GetValue(obj);
+                    res = fi.GetValue(obj);
                     VariableInfo info = new VariableInfo();
 
                     info.Address = 0;
@@ -534,7 +550,7 @@ namespace ILRuntime.Runtime.Debugger
                     var pi = type.GetProperty(name);
                     if (pi != null)
                     {
-                        var res = pi.GetValue(obj, null);
+                        res = pi.GetValue(obj, null);
                         VariableInfo info = new VariableInfo();
 
                         info.Address = 0;

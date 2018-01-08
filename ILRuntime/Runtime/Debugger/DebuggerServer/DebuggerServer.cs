@@ -162,7 +162,8 @@ namespace ILRuntime.Runtime.Debugger
                         msg.ThreadHashCode = br.ReadInt32();
                         msg.Name = br.ReadString();
                         msg.Parent = ReadVariableReference(br);
-                        var info = ds.ResolveVariable(msg.ThreadHashCode, msg.Parent, msg.Name);
+                        object res;
+                        var info = ds.ResolveVariable(msg.ThreadHashCode, msg.Parent, msg.Name, out res);
                         SendSCResolveVariableResult(info);
                     }
                     break;
