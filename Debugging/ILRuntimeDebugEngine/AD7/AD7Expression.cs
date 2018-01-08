@@ -108,11 +108,11 @@ namespace ILRuntimeDebugEngine.AD7
                     VariableReference reference = body.GetVariableReference();
                     if (reference != null)
                     {
-                        if (reference.Type < VariableTypes.Error)
-                        {
-                            uint threadHash;
-                            frame.Thread.GetThreadId(out threadHash);
+                        uint threadHash;
+                        frame.Thread.GetThreadId(out threadHash);
 
+                        if (reference.Type < VariableTypes.Error)
+                        {                            
                             var info = frame.Engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash);
                             if (info == null)
                             {
@@ -127,7 +127,8 @@ namespace ILRuntimeDebugEngine.AD7
                         }
                         else if(reference.Type == VariableTypes.NotFound)
                         {
-
+                            var info = frame.Engine.DebuggedProcess.ResolveVariable(null, reference.Name + "." + member, (int)threadHash);
+                            prop = new AD7.ILProperty(info);                            
                         }
 
                     }
