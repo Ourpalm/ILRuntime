@@ -71,6 +71,10 @@ namespace ILRuntimeDebugEngine.AD7
                 {
                     return ResolveMemberAccessExpression((MemberAcessExpression)exp);
                 }
+                if(exp is IndexAccessExpression)
+                {
+                    return ResolveIndexAccessExpression((IndexAccessExpression)exp);
+                }
             }
             return null;
         }
@@ -136,6 +140,50 @@ namespace ILRuntimeDebugEngine.AD7
             }
             else
                 prop = new ILProperty(VariableInfo.NullReferenceExeption); 
+            return prop;
+        }
+
+        ILProperty ResolveIndexAccessExpression(IndexAccessExpression exp)
+        {
+            ILProperty body = Resolve(exp.Body);
+            ILProperty prop = null;
+            if (body != null)
+            {
+                VariableReference reference = body.GetVariableReference();
+                if (reference != null)
+                {
+                    uint threadHash;
+                    frame.Thread.GetThreadId(out threadHash);
+
+                    if (reference.Type < VariableTypes.Error)
+                    {
+                        var idx = exp.Index;
+                        
+                        if(idx is NameExpression)
+                        {
+                            int idxInt;
+                            if(int.TryParse(((NameExpression)idx).Content, out idxInt))
+                            {
+
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                        else if(idx is StringLiteralExpression)
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+            }
+            else
+                prop = new ILProperty(VariableInfo.NullReferenceExeption);
             return prop;
         }
 
