@@ -551,7 +551,7 @@ namespace ILRuntime.Runtime.Debugger
                 info.Type = VariableTypes.IndexAccess;
                 info.Offset = i;
                 info.Value = string.Format("{0},{1}", SafeToString(keys[i]), SafeToString(values[i]));
-
+                info.Expandable = true;
                 res[i] = info;
             }
             return res;
@@ -589,6 +589,8 @@ namespace ILRuntime.Runtime.Debugger
                 info.TypeName = i.FieldType.FullName;
                 info.Name = i.Name;
                 info.Expandable = !i.FieldType.IsPrimitive && val != null;
+                info.IsPrivate = i.IsPrivate;
+                info.IsProtected = i.IsFamily;
 
                 lst.Add(info);
             }
@@ -603,6 +605,8 @@ namespace ILRuntime.Runtime.Debugger
                 info.TypeName = i.PropertyType.FullName;
                 info.Name = i.Name;
                 info.Expandable = !i.PropertyType.IsPrimitive && val != null;
+                info.IsPrivate = i.GetGetMethod().IsPrivate;
+                info.IsProtected = i.GetGetMethod().IsFamily;
 
                 lst.Add(info);
             }
@@ -624,6 +628,8 @@ namespace ILRuntime.Runtime.Debugger
                 info.TypeName = i.FieldType.FullName;
                 info.Name = i.Name;
                 info.Expandable = !i.FieldType.IsPrimitive && val != null;
+                info.IsPrivate = i.IsPrivate;
+                info.IsProtected = i.IsFamily;
 
                 lst.Add(info);
             }
@@ -638,6 +644,8 @@ namespace ILRuntime.Runtime.Debugger
                 info.TypeName = i.PropertyType.FullName;
                 info.Name = i.Name;
                 info.Expandable = !i.PropertyType.IsPrimitive && val != null;
+                info.IsPrivate = i.GetGetMethod().IsPrivate;
+                info.IsProtected = i.GetGetMethod().IsFamily;
 
                 lst.Add(info);
             }
@@ -693,6 +701,26 @@ namespace ILRuntime.Runtime.Debugger
                             }
                             else
                             {
+                                if(obj is IDictionary && idxObj is int)
+                                {
+                                    IDictionary dic = (IDictionary)obj;
+                                    var keys = GetArray(dic.Keys);                                    
+                                    if (keys[0].GetType() != typeof(int))
+                                    {
+                                        int index = (int)idxObj;
+                                        var values = GetArray(dic.Values);
+                                        var t = typeof(KeyValuePair<,>).MakeGenericType(keys[index].GetType(), values[index].GetType());
+                                        var ctor = t.GetConstructor(new Type[] { keys[index].GetType(), values[index].GetType() });
+                                        res = ctor.Invoke(new object[] { keys[index], values[index] });
+                                        info = VariableInfo.FromObject(res);
+                                        info.Type = VariableTypes.IndexAccess;
+                                        info.Offset = index;
+                                        info.TypeName = t.FullName;
+                                        info.Expandable = true;
+
+                                        return info;
+                                    }
+                                }
                                 var pi = obj.GetType().GetProperty("Item");
                                 if (pi != null)
                                 {
@@ -822,38 +850,47 @@ namespace ILRuntime.Runtime.Debugger
         VariableInfo ResolveMember(object obj, string name, out object res)
         {
             res = null;
+            Type type = null;
             if (obj is ILTypeInstance)
             {
-                var type = ((ILTypeInstance)obj).Type.ReflectionType;
-                var fi = type.GetField(name);
-                if (fi != null)
+                type = ((ILTypeInstance)obj).Type.ReflectionType;
+            }
+            else if (obj is Enviorment.CrossBindingAdaptorType)
+                type = ((Enviorment.CrossBindingAdaptorType)obj).ILInstance.Type.ReflectionType;
+            else
+                type = obj.GetType();
+            var fi = type.GetField(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (fi != null)
+            {
+                res = fi.GetValue(obj);
+                VariableInfo info = VariableInfo.FromObject(res);
+
+                info.Address = 0;
+                info.Name = name;
+                info.Type = VariableTypes.FieldReference;
+                info.TypeName = fi.FieldType.FullName;
+                info.IsPrivate = fi.IsPrivate;
+                info.IsProtected = fi.IsFamily;
+                info.Expandable = res != null && !fi.FieldType.IsPrimitive;
+
+                return info;
+            }
+            else
+            {
+                var pi = type.GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (pi != null)
                 {
-                    res = fi.GetValue(obj);
+                    res = pi.GetValue(obj, null);
                     VariableInfo info = VariableInfo.FromObject(res);
 
                     info.Address = 0;
                     info.Name = name;
-                    info.Type = VariableTypes.FieldReference;
-                    info.TypeName = fi.FieldType.FullName;
-                    info.Expandable = res != null && !fi.FieldType.IsPrimitive;
-
+                    info.Type = VariableTypes.PropertyReference;
+                    info.TypeName = pi.PropertyType.FullName;
+                    info.IsPrivate = pi.GetGetMethod(true).IsPrivate;
+                    info.IsProtected = pi.GetGetMethod(true).IsFamily;
+                    info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
                     return info;
-                }
-                else
-                {
-                    var pi = type.GetProperty(name);
-                    if (pi != null)
-                    {
-                        res = pi.GetValue(obj, null);
-                        VariableInfo info = VariableInfo.FromObject(res);
-
-                        info.Address = 0;
-                        info.Name = name;
-                        info.Type = VariableTypes.PropertyReference;
-                        info.TypeName = pi.PropertyType.FullName;
-                        info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
-                        return info;
-                    }
                 }
             }
             return VariableInfo.GetCannotFind(name);

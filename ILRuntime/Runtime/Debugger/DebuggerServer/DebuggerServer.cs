@@ -385,6 +385,8 @@ namespace ILRuntime.Runtime.Debugger
             bw.Write((byte)k.ValueType);
             bw.Write(k.TypeName);
             bw.Write(k.Expandable);
+            bw.Write(k.IsPrivate);
+            bw.Write(k.IsProtected);
         }
 
         internal void SendSCThreadStarted(int threadHash)

@@ -99,6 +99,8 @@ namespace ILRuntime.Runtime.Debugger
         public string Value { get; set; }
         public ValueTypes ValueType { get; set; }
         public bool Expandable { get; set; }
+        public bool IsPrivate { get; set; }
+        public bool IsProtected { get; set; }
         public int Offset { get; set;}
 
         public static VariableInfo FromObject(object obj, bool retriveType = false)

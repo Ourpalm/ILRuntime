@@ -271,6 +271,8 @@ namespace ILRuntimeDebugEngine.AD7
             vinfo.ValueType = (ValueTypes)br.ReadByte();
             vinfo.TypeName = br.ReadString();
             vinfo.Expandable = br.ReadBoolean();
+            vinfo.IsPrivate = br.ReadBoolean();
+            vinfo.IsProtected = br.ReadBoolean();
 
             return vinfo;
         }
