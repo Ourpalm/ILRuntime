@@ -161,8 +161,7 @@ namespace ILRuntimeDebugEngine.AD7
                             }
                         }
 
-                        var cl = GetParentMethod<ClassDeclarationSyntax>(method);
-                        string className = cl.Identifier.Text;
+                        string className = GetClassName(method);
 
                         var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
                         string nsname = ns.Name.ToString();
@@ -189,6 +188,21 @@ namespace ILRuntimeDebugEngine.AD7
             return false;
         }
 
+        string GetClassName(BaseMethodDeclarationSyntax method)
+        {
+            ClassDeclarationSyntax cur = GetParentMethod<ClassDeclarationSyntax>(method);
+            string clsName = null;
+            while (cur != null)
+            {
+                if (clsName == null)
+                    clsName = cur.Identifier.Text;
+                else
+                    clsName = string.Format("{0}/{1}", cur.Identifier.Text, clsName);
+                cur = GetParentMethod<ClassDeclarationSyntax>(cur.Parent);
+            }
+
+            return clsName;
+        }
         private T GetParentMethod<T>(SyntaxNode node) where T : SyntaxNode
         {
             if (node == null)
