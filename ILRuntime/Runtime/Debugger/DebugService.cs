@@ -506,13 +506,22 @@ namespace ILRuntime.Runtime.Debugger
 
             for(int i = 0; i < arr.Length; i++)
             {
-                var obj = arr.GetValue(i);
+                try
+                {
+                    var obj = arr.GetValue(i);
 
-                VariableInfo info = VariableInfo.FromObject(obj, true);
-                info.Name = string.Format("[{0}]", i);
-                info.Offset = i;
-                info.Type = VariableTypes.IndexAccess;
-                res[i] = info;
+                    VariableInfo info = VariableInfo.FromObject(obj, true);
+                    info.Name = string.Format("[{0}]", i);
+                    info.Offset = i;
+                    info.Type = VariableTypes.IndexAccess;
+                    res[i] = info;
+                }
+                catch(Exception ex)
+                {
+                    var info = VariableInfo.GetException(ex);
+                    info.Name = string.Format("[{0}]", i);
+                    res[i] = info;
+                }
             }
 
             return res;
@@ -524,14 +533,23 @@ namespace ILRuntime.Runtime.Debugger
 
             for (int i = 0; i < lst.Count; i++)
             {
-                var obj = lst[i];
+                try
+                {
+                    var obj = lst[i];
 
-                VariableInfo info = VariableInfo.FromObject(obj, true);
-                info.Name = string.Format("[{0}]", i);
-                info.Offset = i;
-                info.Type = VariableTypes.IndexAccess;
+                    VariableInfo info = VariableInfo.FromObject(obj, true);
+                    info.Name = string.Format("[{0}]", i);
+                    info.Offset = i;
+                    info.Type = VariableTypes.IndexAccess;
 
-                res[i] = info;
+                    res[i] = info;
+                }
+                catch (Exception ex)
+                {
+                    var info = VariableInfo.GetException(ex);
+                    info.Name = string.Format("[{0}]", i);
+                    res[i] = info;
+                }
             }
 
             return res;
@@ -545,14 +563,23 @@ namespace ILRuntime.Runtime.Debugger
             var values = GetArray(lst.Values);
             for (int i = 0; i < lst.Count; i++)
             {
-                var obj = values[i];
-                VariableInfo info = VariableInfo.FromObject(obj, true);
-                info.Name = string.Format("[{0}]", i);
-                info.Type = VariableTypes.IndexAccess;
-                info.Offset = i;
-                info.Value = string.Format("{0},{1}", SafeToString(keys[i]), SafeToString(values[i]));
-                info.Expandable = true;
-                res[i] = info;
+                try
+                {
+                    var obj = values[i];
+                    VariableInfo info = VariableInfo.FromObject(obj, true);
+                    info.Name = string.Format("[{0}]", i);
+                    info.Type = VariableTypes.IndexAccess;
+                    info.Offset = i;
+                    info.Value = string.Format("{0},{1}", SafeToString(keys[i]), SafeToString(values[i]));
+                    info.Expandable = true;
+                    res[i] = info;
+                }
+                catch (Exception ex)
+                {
+                    var info = VariableInfo.GetException(ex);
+                    info.Name = string.Format("[{0}]", i);
+                    res[i] = info;
+                }
             }
             return res;
         }
@@ -577,77 +604,65 @@ namespace ILRuntime.Runtime.Debugger
 
         VariableInfo[] EnumILTypeInstance(ILTypeInstance obj, ILIntepreter intepreter)
         {
-            List<VariableInfo> lst = new List<VariableInfo>();
-            var t = obj.Type.ReflectionType;
-            foreach (var i in t.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
-            {
-                if (i.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false).Length > 0)
-                    continue;
-                var val = i.GetValue(obj);
-                VariableInfo info = VariableInfo.FromObject(val);
-                info.Type = VariableTypes.FieldReference;
-                info.TypeName = i.FieldType.FullName;
-                info.Name = i.Name;
-                info.Expandable = !i.FieldType.IsPrimitive && val != null;
-                info.IsPrivate = i.IsPrivate;
-                info.IsProtected = i.IsFamily;
-
-                lst.Add(info);
-            }
-
-            foreach (var i in t.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
-            {
-                if (i.GetIndexParameters().Length > 0)
-                    continue;
-                var val = i.GetValue(obj, null);
-                VariableInfo info = VariableInfo.FromObject(val);
-                info.Type = VariableTypes.PropertyReference;
-                info.TypeName = i.PropertyType.FullName;
-                info.Name = i.Name;
-                info.Expandable = !i.PropertyType.IsPrimitive && val != null;
-                info.IsPrivate = i.GetGetMethod(true).IsPrivate;
-                info.IsProtected = i.GetGetMethod(true).IsFamily;
-
-                lst.Add(info);
-            }
-
-            return lst.ToArray();
+            return EnumObject(obj, obj.Type.ReflectionType);
         }
 
         VariableInfo[] EnumCLRObject(object obj, ILIntepreter intepreter)
         {
+            return EnumObject(obj, obj.GetType());
+        }
+
+        VariableInfo[] EnumObject(object obj, Type t)
+        {
             List<VariableInfo> lst = new List<VariableInfo>();
-            var t = obj.GetType();
             foreach (var i in t.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
             {
-                if (i.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false).Length > 0)
-                    continue;
-                var val = i.GetValue(obj);
-                VariableInfo info = VariableInfo.FromObject(val);
-                info.Type = VariableTypes.FieldReference;
-                info.TypeName = i.FieldType.FullName;
-                info.Name = i.Name;
-                info.Expandable = !i.FieldType.IsPrimitive && val != null;
-                info.IsPrivate = i.IsPrivate;
-                info.IsProtected = i.IsFamily;
+                try
+                {
+                    if (i.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false).Length > 0)
+                        continue;
+                    var val = i.GetValue(obj);
+                    VariableInfo info = VariableInfo.FromObject(val);
+                    info.Type = VariableTypes.FieldReference;
+                    info.TypeName = i.FieldType.FullName;
+                    info.Name = i.Name;
+                    info.Expandable = !i.FieldType.IsPrimitive && val != null;
+                    info.IsPrivate = i.IsPrivate;
+                    info.IsProtected = i.IsFamily;
 
-                lst.Add(info);
+                    lst.Add(info);
+                }
+                catch (Exception ex)
+                {
+                    var info = VariableInfo.GetException(ex);
+                    info.Name = i.Name;
+                    lst.Add(info);
+                }
             }
 
             foreach (var i in t.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
             {
-                if (i.GetIndexParameters().Length > 0)
-                    continue;
-                var val = i.GetValue(obj, null);
-                VariableInfo info = VariableInfo.FromObject(val);
-                info.Type = VariableTypes.PropertyReference;
-                info.TypeName = i.PropertyType.FullName;
-                info.Name = i.Name;
-                info.Expandable = !i.PropertyType.IsPrimitive && val != null;
-                info.IsPrivate = i.GetGetMethod(true).IsPrivate;
-                info.IsProtected = i.GetGetMethod(true).IsFamily;
+                try
+                {
+                    if (i.GetIndexParameters().Length > 0)
+                        continue;
+                    var val = i.GetValue(obj, null);
+                    VariableInfo info = VariableInfo.FromObject(val);
+                    info.Type = VariableTypes.PropertyReference;
+                    info.TypeName = i.PropertyType.FullName;
+                    info.Name = i.Name;
+                    info.Expandable = !i.PropertyType.IsPrimitive && val != null;
+                    info.IsPrivate = i.GetGetMethod(true).IsPrivate;
+                    info.IsProtected = i.GetGetMethod(true).IsFamily;
 
-                lst.Add(info);
+                    lst.Add(info);
+                }
+                catch (Exception ex)
+                {
+                    var info = VariableInfo.GetException(ex);
+                    info.Name = i.Name;
+                    lst.Add(info);
+                }
             }
 
             return lst.ToArray();
