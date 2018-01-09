@@ -61,6 +61,8 @@ namespace ILRuntime.Runtime.Debugger
                 this.listener.Stop();
             mainLoop.Abort();
             mainLoop = null;
+            if (clientSocket != null)
+                clientSocket.Close();
         }
 
         void NetworkLoop()
