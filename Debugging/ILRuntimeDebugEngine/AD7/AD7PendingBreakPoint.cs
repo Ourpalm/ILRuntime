@@ -138,8 +138,28 @@ namespace ILRuntimeDebugEngine.AD7
                         SyntaxTree sourceTree = location.SourceTree;
                         SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
 
-                        var method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
-                        string methodName = method.Identifier.Text;
+                        bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
+                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);                        
+                        string methodName = null;
+                        if (method != null)
+                            methodName = ((MethodDeclarationSyntax)method).Identifier.Text;
+                        else
+                        {
+                             method = GetParentMethod<ConstructorDeclarationSyntax>(node.Parent);
+                            if (method != null)
+                            {
+                                bool isStatic = false;
+                                foreach (var i in method.Modifiers)
+                                {
+                                    if (i.Text == "static")
+                                        isStatic = true;
+                                }
+                                if (isStatic)
+                                    methodName = ".cctor";
+                                else
+                                    methodName = ".ctor";
+                            }
+                        }
 
                         var cl = GetParentMethod<ClassDeclarationSyntax>(method);
                         string className = cl.Identifier.Text;
@@ -151,6 +171,7 @@ namespace ILRuntimeDebugEngine.AD7
 
                         bindRequest = new CSBindBreakpoint();
                         bindRequest.BreakpointHashCode = this.GetHashCode();
+                        bindRequest.IsLambda = isLambda;
                         bindRequest.TypeName = name;
                         bindRequest.MethodName = methodName;
                         bindRequest.StartLine = StartLine;

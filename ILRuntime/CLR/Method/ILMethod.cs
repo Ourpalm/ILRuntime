@@ -142,11 +142,11 @@ namespace ILRuntime.CLR.Method
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             if (def.HasBody)
             {
-                var sp = DebugService.FindSequencePoint(def.Body.Instructions[0]);
+                var sp = GetValidSequence(0, 1);
                 if (sp != null)
                 {
                     StartLine = sp.StartLine;
-                    sp = DebugService.FindSequencePoint(def.Body.Instructions[def.Body.Instructions.Count - 1]);
+                    sp = GetValidSequence(def.Body.Instructions.Count - 1, -1);
                     if (sp != null)
                     {
                         EndLine = sp.EndLine;
@@ -154,6 +154,23 @@ namespace ILRuntime.CLR.Method
                 }
             }
 #endif
+        }
+
+        Mono.Cecil.Cil.SequencePoint GetValidSequence(int startIdx, int dir)
+        {
+            var cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx]);
+            while (cur != null && cur.StartLine == 0x0feefee)
+            {
+                startIdx += dir;
+                if (startIdx >= 0 && startIdx < def.Body.Instructions.Count)
+                {
+                    cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx]);
+                }
+                else
+                    break;
+            }
+
+            return cur;
         }
 
         public IType FindGenericArgument(string name)

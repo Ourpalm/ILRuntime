@@ -285,6 +285,7 @@ namespace ILRuntimeDebugEngine.AD7
         {
             sendStream.Position = 0;
             bw.Write(msg.BreakpointHashCode);
+            bw.Write(msg.IsLambda);
             bw.Write(msg.TypeName);
             bw.Write(msg.MethodName);
             bw.Write(msg.StartLine);

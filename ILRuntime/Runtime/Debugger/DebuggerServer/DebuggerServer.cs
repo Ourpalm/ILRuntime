@@ -12,7 +12,7 @@ namespace ILRuntime.Runtime.Debugger
 {
     public class DebuggerServer
     {
-        public const int Version = 1;
+        public const int Version = 2;
         TcpListener listener;
         //HashSet<Session<T>> clients = new HashSet<Session<T>>();
         bool isUp = false;
@@ -127,6 +127,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         CSBindBreakpoint msg = new Protocol.CSBindBreakpoint();
                         msg.BreakpointHashCode = br.ReadInt32();
+                        msg.IsLambda = br.ReadBoolean();
                         msg.TypeName = br.ReadString();
                         msg.MethodName = br.ReadString();
                         msg.StartLine = br.ReadInt32();
@@ -263,42 +264,105 @@ namespace ILRuntime.Runtime.Debugger
             SCBindBreakpointResult res = new Protocol.SCBindBreakpointResult();
             res.BreakpointHashCode = msg.BreakpointHashCode;
             IType type;
-            if (domain.LoadedTypes.TryGetValue(msg.TypeName, out type))
+            if (msg.IsLambda)
             {
-                if(type is ILType)
+                ILMethod found = null;
+                foreach (var i in domain.LoadedTypes)
                 {
-                    ILType it = (ILType)type;
-                    ILMethod found = null;
-                    foreach(var i in it.GetMethods())
+                    var vt = i.Value as ILType;
+                    if (vt != null)
                     {
-                        if(i.Name == msg.MethodName)
+                        if (vt.FullName.Contains(msg.TypeName))
                         {
-                            ILMethod ilm = (ILMethod)i;
-                            if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
+                            foreach (var j in vt.GetMethods())
                             {
-                                found = ilm;
-                                break;
+                                if (j.Name.Contains(string.Format("<{0}>", msg.MethodName)))
+                                {
+                                    ILMethod ilm = (ILMethod)j;
+                                    if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
+                                    {
+                                        found = ilm;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
-                    if(found != null)
+                    if (found != null)
+                        break;
+                }
+                if (found != null)
+                {
+                    ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine);
+                    res.Result = BindBreakpointResults.OK;
+                }
+                else
+                {
+                    res.Result = BindBreakpointResults.CodeNotFound;
+                }
+            }
+            else
+            {
+                if (domain.LoadedTypes.TryGetValue(msg.TypeName, out type))
+                {
+                    if (type is ILType)
                     {
-                        ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine);
-                        res.Result = BindBreakpointResults.OK;
+                        ILType it = (ILType)type;
+                        ILMethod found = null;
+                        if (msg.MethodName == ".ctor")
+                        {
+                            foreach (var i in it.GetConstructors())
+                            {
+                                ILMethod ilm = (ILMethod)i;
+                                if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
+                                {
+                                    found = ilm;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (msg.MethodName == ".cctor")
+                        {
+                            ILMethod ilm = it.GetStaticConstroctor() as ILMethod;
+                            if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
+                            {
+                                found = ilm;
+                            }
+                        }
+                        else
+                        {
+                            foreach (var i in it.GetMethods())
+                            {
+                                if (i.Name == msg.MethodName)
+                                {
+                                    ILMethod ilm = (ILMethod)i;
+                                    if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
+                                    {
+                                        found = ilm;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (found != null)
+                        {
+                            ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine);
+                            res.Result = BindBreakpointResults.OK;
+                        }
+                        else
+                        {
+                            res.Result = BindBreakpointResults.CodeNotFound;
+                        }
                     }
                     else
                     {
-                        res.Result = BindBreakpointResults.CodeNotFound;
+                        res.Result = BindBreakpointResults.TypeNotFound;
                     }
                 }
                 else
                 {
                     res.Result = BindBreakpointResults.TypeNotFound;
                 }
-            }
-            else
-            {
-                res.Result = BindBreakpointResults.TypeNotFound;
             }
             SendSCBindBreakpointResult(res);
         }

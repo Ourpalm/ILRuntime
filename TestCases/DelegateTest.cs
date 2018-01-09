@@ -112,7 +112,11 @@ namespace TestCases
         {
             Action<int, string, string> a = (b, c, d) =>
             {
-                Console.WriteLine(string.Format("{0},{1},{2}", b, c, d));
+                Action act = () =>
+                {
+                    Console.WriteLine(string.Format("{0},{1},{2}", b, c, d));
+                };
+                act();
             };
 
             a(1, "2", "3");
