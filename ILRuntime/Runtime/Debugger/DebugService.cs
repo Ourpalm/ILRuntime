@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Linq;
 
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
@@ -455,6 +457,192 @@ namespace ILRuntime.Runtime.Debugger
                 frameInfos[j] = info;
             }
             return frameInfos;
+        }
+
+        internal unsafe VariableInfo[] EnumChildren(int threadHashCode, VariableReference parent)
+        {
+            ILIntepreter intepreter;
+            if (AppDomain.Intepreters.TryGetValue(threadHashCode, out intepreter))
+            {
+                object obj;
+                var info = ResolveVariable(threadHashCode, parent, out obj);
+                if (obj != null)
+                {
+                    if(obj is Array)
+                    {
+                        return EnumArray((Array)obj, intepreter);
+                    }
+                    else if(obj is IList)
+                    {
+                        return EnumList((IList)obj, intepreter);
+                    }
+                    else if(obj is IDictionary)
+                    {
+                        return EnumDictionary((IDictionary)obj, intepreter);
+                    }
+                    else if(obj is ILTypeInstance)
+                    {
+                        return EnumILTypeInstance((ILTypeInstance)obj, intepreter);
+                    }
+                    else if(obj is ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)
+                    {
+                        return EnumILTypeInstance(((Enviorment.CrossBindingAdaptorType)obj).ILInstance, intepreter);
+                    }
+                    else
+                    {
+                        return EnumCLRObject(obj, intepreter);
+                    }
+                }
+                else
+                    return new VariableInfo[] { VariableInfo.NullReferenceExeption };
+            }
+            else
+                return new VariableInfo[] { VariableInfo.NullReferenceExeption };
+        }
+
+        VariableInfo[] EnumArray(Array arr, ILIntepreter intepreter)
+        {
+            VariableInfo[] res = new VariableInfo[arr.Length];
+
+            for(int i = 0; i < arr.Length; i++)
+            {
+                var obj = arr.GetValue(i);
+
+                VariableInfo info = VariableInfo.FromObject(obj, true);
+                info.Name = string.Format("[{0}]", i);
+                info.Offset = i;
+                info.Type = VariableTypes.IndexAccess;
+                res[i] = info;
+            }
+
+            return res;
+        }
+
+        VariableInfo[] EnumList(IList lst, ILIntepreter intepreter)
+        {
+            VariableInfo[] res = new VariableInfo[lst.Count];
+
+            for (int i = 0; i < lst.Count; i++)
+            {
+                var obj = lst[i];
+
+                VariableInfo info = VariableInfo.FromObject(obj, true);
+                info.Name = string.Format("[{0}]", i);
+                info.Offset = i;
+                info.Type = VariableTypes.IndexAccess;
+
+                res[i] = info;
+            }
+
+            return res;
+        }
+
+        VariableInfo[] EnumDictionary(IDictionary lst, ILIntepreter intepreter)
+        {
+            VariableInfo[] res = new VariableInfo[lst.Count];
+
+            var keys = GetArray(lst.Keys);
+            var values = GetArray(lst.Values);
+            for (int i = 0; i < lst.Count; i++)
+            {
+                var obj = values[i];
+                VariableInfo info = VariableInfo.FromObject(obj, true);
+                info.Name = string.Format("[{0}]", i);
+                info.Type = VariableTypes.IndexAccess;
+                info.Offset = i;
+                info.Value = string.Format("{0},{1}", SafeToString(keys[i]), SafeToString(values[i]));
+
+                res[i] = info;
+            }
+            return res;
+        }
+
+        string SafeToString(object obj)
+        {
+            if (obj != null)
+                return obj.ToString();
+            else
+                return "null";
+        }
+        object[] GetArray(ICollection lst)
+        {
+            object[] res = new object[lst.Count];
+            int idx = 0;
+            foreach(var i in lst)
+            {
+                res[idx++] = i;
+            }
+            return res;
+        }
+
+        VariableInfo[] EnumILTypeInstance(ILTypeInstance obj, ILIntepreter intepreter)
+        {
+            List<VariableInfo> lst = new List<VariableInfo>();
+            var t = obj.Type.ReflectionType;
+            foreach (var i in t.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+            {
+                if (i.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false).Length > 0)
+                    continue;
+                var val = i.GetValue(obj);
+                VariableInfo info = VariableInfo.FromObject(val);
+                info.Type = VariableTypes.FieldReference;
+                info.TypeName = i.FieldType.FullName;
+                info.Name = i.Name;
+                info.Expandable = !i.FieldType.IsPrimitive && val != null;
+
+                lst.Add(info);
+            }
+
+            foreach (var i in t.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+            {
+                if (i.GetIndexParameters().Length > 0)
+                    continue;
+                var val = i.GetValue(obj, null);
+                VariableInfo info = VariableInfo.FromObject(val);
+                info.Type = VariableTypes.PropertyReference;
+                info.TypeName = i.PropertyType.FullName;
+                info.Name = i.Name;
+                info.Expandable = !i.PropertyType.IsPrimitive && val != null;
+
+                lst.Add(info);
+            }
+
+            return lst.ToArray();
+        }
+
+        VariableInfo[] EnumCLRObject(object obj, ILIntepreter intepreter)
+        {
+            List<VariableInfo> lst = new List<VariableInfo>();
+            var t = obj.GetType();
+            foreach (var i in t.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+            {
+                if (i.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false).Length > 0)
+                    continue;
+                var val = i.GetValue(obj);
+                VariableInfo info = VariableInfo.FromObject(val);
+                info.Type = VariableTypes.FieldReference;
+                info.TypeName = i.FieldType.FullName;
+                info.Name = i.Name;
+                info.Expandable = !i.FieldType.IsPrimitive && val != null;
+
+                lst.Add(info);
+            }
+
+            foreach (var i in t.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+            {
+                if (i.GetIndexParameters().Length > 0)
+                    continue;
+                var val = i.GetValue(obj, null);
+                VariableInfo info = VariableInfo.FromObject(val);
+                info.Type = VariableTypes.PropertyReference;
+                info.TypeName = i.PropertyType.FullName;
+                info.Name = i.Name;
+                info.Expandable = !i.PropertyType.IsPrimitive && val != null;
+
+                lst.Add(info);
+            }
+
+            return lst.ToArray();
         }
 
         internal unsafe VariableInfo ResolveIndexAccess(int threadHashCode, VariableReference body, VariableReference idx, out object res)

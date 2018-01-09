@@ -75,6 +75,8 @@
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
     <Compile Include="Runtime\Debugger\DebugSocket.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\SCEnumChildrenResult.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\CSEnumChildren.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSResolveIndexer.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSResolveVariable.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSStep.cs" />

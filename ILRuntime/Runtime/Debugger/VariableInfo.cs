@@ -101,7 +101,7 @@ namespace ILRuntime.Runtime.Debugger
         public bool Expandable { get; set; }
         public int Offset { get; set;}
 
-        public static VariableInfo FromObject(object obj)
+        public static VariableInfo FromObject(object obj, bool retriveType = false)
         {
             VariableInfo info = new VariableInfo();
             info.Name = "";
@@ -120,6 +120,22 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     info.ValueType = ValueTypes.String;
                 }
+                if (retriveType)
+                {
+                    if (obj is Runtime.Intepreter.ILTypeInstance)
+                    {
+                        info.TypeName = ((Intepreter.ILTypeInstance)obj).Type.FullName;                        
+                    }
+                    else if (obj is Enviorment.CrossBindingAdaptorType)
+                    {
+                        info.TypeName = ((Enviorment.CrossBindingAdaptorType)obj).ILInstance.Type.FullName;
+                    }
+                    else
+                    {
+                        info.TypeName = obj.GetType().FullName;
+                    }
+                }
+                info.Expandable = !obj.GetType().IsPrimitive && !(obj is string);
             }
             else
             {

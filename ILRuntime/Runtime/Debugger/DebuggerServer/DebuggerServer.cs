@@ -194,6 +194,23 @@ namespace ILRuntime.Runtime.Debugger
                         SendSCResolveVariableResult(info);
                     }
                     break;
+                case DebugMessageType.CSEnumChildren:
+                    {
+                        int thId = br.ReadInt32();
+                        var parent = ReadVariableReference(br);
+
+                        VariableInfo[] info = null;
+                        try
+                        {
+                            info = ds.EnumChildren(thId, parent);
+                        }
+                        catch(Exception ex)
+                        {
+                            info = new VariableInfo[] { VariableInfo.GetException(ex) };
+                        }
+                        SendSCEnumChildrenResult(info);
+                    }
+                    break;
             }
 
         }
@@ -316,6 +333,22 @@ namespace ILRuntime.Runtime.Debugger
             sendStream.Position = 0;
             WriteVariableInfo(info);
             DoSend(DebugMessageType.SCResolveVariableResult);
+        }
+
+        void SendSCEnumChildrenResult(VariableInfo[] info)
+        {
+            sendStream.Position = 0;
+            if (info != null)
+            {
+                bw.Write(info.Length);
+                for (int i = 0; i < info.Length; i++)
+                {
+                    WriteVariableInfo(info[i]);
+                }
+            }
+            else
+                bw.Write(0);
+            DoSend(DebugMessageType.SCEnumChildrenResult);
         }
 
         void WriteStackFrames(KeyValuePair<int, StackFrameInfo[]>[] info)

@@ -10,6 +10,8 @@ namespace ILRuntimeDebugEngine.AD7
 {
     class ILProperty : IDebugProperty2
     {
+        AD7Engine engine;
+        AD7Thread thread;
         VariableInfo info;
         Dictionary<string, ILProperty> children = new Dictionary<string, ILProperty>();
 
@@ -17,15 +19,30 @@ namespace ILRuntimeDebugEngine.AD7
         public ILProperty Parent { get; set; }
         public VariableReference[] Parameters { get; set; }
         public string Name { get { return info.Name; } set { info.Name = value; } }
-        public ILProperty(VariableInfo info)
+        public ILProperty(AD7Engine engine, AD7Thread thread, VariableInfo info)
         {
+            this.engine = engine;
+            this.thread = thread;
             this.info = info;
         }
         public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref Guid guidFilter,
             enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout,
             out IEnumDebugPropertyInfo2 ppEnum)
         {
-            ppEnum = null;
+            uint thId;
+            thread.GetThreadId(out thId);
+            var children = engine.DebuggedProcess.EnumChildren(GetVariableReference(), (int)thId, dwTimeout);
+            DEBUG_PROPERTY_INFO[] info = new DEBUG_PROPERTY_INFO[children.Length];
+            for (int i = 0; i < children.Length; i++)
+            {
+                var vi = children[i];
+                ILProperty prop = new ILProperty(engine, thread, vi);
+                if (vi.Type == VariableTypes.IndexAccess)
+                    prop.Parameters = new VariableReference[] { VariableReference.GetInteger(vi.Offset) };
+                prop.Parent = this;
+                info[i] = prop.GetDebugPropertyInfo(dwFields);
+            }
+            ppEnum = new AD7PropertyInfoEnum(info);
             return Constants.S_OK;
         }
 

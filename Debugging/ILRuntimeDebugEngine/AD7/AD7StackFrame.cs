@@ -37,7 +37,7 @@ namespace ILRuntimeDebugEngine.AD7
                 localVars = new ILProperty[info.LocalVariables.Length];
                 for (int i = 0; i < localVars.Length; i++)
                 {
-                    localVars[i] = new ILProperty(info.LocalVariables[i]);
+                    localVars[i] = new ILProperty(engine, thread, info.LocalVariables[i]);
                     propertyMapping[info.LocalVariables[i].Name] = localVars[i];
                 }
             }

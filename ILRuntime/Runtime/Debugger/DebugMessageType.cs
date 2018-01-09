@@ -23,5 +23,7 @@ namespace ILRuntime.Runtime.Debugger
         SCResolveVariableResult,
         CSResolveIndexAccess,
         SCResolveIndexAccessResult,
+        CSEnumChildren,
+        SCEnumChildrenResult,
     }
 }

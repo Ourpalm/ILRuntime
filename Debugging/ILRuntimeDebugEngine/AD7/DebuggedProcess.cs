@@ -208,6 +208,17 @@ namespace ILRuntimeDebugEngine.AD7
                                 CompleteRPCRequest(ReadVariableInfo(br));                                
                             }
                             break;
+                        case DebugMessageType.SCEnumChildrenResult:
+                            {
+                                int cnt = br.ReadInt32();
+                                VariableInfo[] res = new VariableInfo[cnt];
+                                for(int i = 0; i < cnt; i++)
+                                {
+                                    res[i] = ReadVariableInfo(br);
+                                }
+                                CompleteRPCRequest(res);
+                            }
+                            break;
                     }
                 }
             }
@@ -368,6 +379,28 @@ namespace ILRuntimeDebugEngine.AD7
             WriteVariableReference(msg.Body);
             WriteVariableReference(msg.Index);
             socket.Send(DebugMessageType.CSResolveIndexAccess, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        public VariableInfo[] EnumChildren(VariableReference parent, int threadId, uint dwTimeout)
+        {
+            CSEnumChildren msg = new CSEnumChildren();
+            msg.ThreadHashCode = threadId;
+            msg.Parent = parent;
+            SendEnumChildren(msg);
+
+            bool aborted;
+            var res = AwaitRPCRequest<VariableInfo[]>(out aborted, (int)dwTimeout);
+            if (aborted)
+                return new VariableInfo[] { VariableInfo.RequestTimeout };
+            return res;
+        }
+
+        void SendEnumChildren(CSEnumChildren msg)
+        {
+            sendStream.Position = 0;
+            bw.Write(msg.ThreadHashCode);
+            WriteVariableReference(msg.Parent);
+            socket.Send(DebugMessageType.CSEnumChildren, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
         void WriteVariableReference(VariableReference reference)
