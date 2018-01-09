@@ -605,8 +605,8 @@ namespace ILRuntime.Runtime.Debugger
                 info.TypeName = i.PropertyType.FullName;
                 info.Name = i.Name;
                 info.Expandable = !i.PropertyType.IsPrimitive && val != null;
-                info.IsPrivate = i.GetGetMethod().IsPrivate;
-                info.IsProtected = i.GetGetMethod().IsFamily;
+                info.IsPrivate = i.GetGetMethod(true).IsPrivate;
+                info.IsProtected = i.GetGetMethod(true).IsFamily;
 
                 lst.Add(info);
             }
@@ -644,8 +644,8 @@ namespace ILRuntime.Runtime.Debugger
                 info.TypeName = i.PropertyType.FullName;
                 info.Name = i.Name;
                 info.Expandable = !i.PropertyType.IsPrimitive && val != null;
-                info.IsPrivate = i.GetGetMethod().IsPrivate;
-                info.IsProtected = i.GetGetMethod().IsFamily;
+                info.IsPrivate = i.GetGetMethod(true).IsPrivate;
+                info.IsProtected = i.GetGetMethod(true).IsFamily;
 
                 lst.Add(info);
             }

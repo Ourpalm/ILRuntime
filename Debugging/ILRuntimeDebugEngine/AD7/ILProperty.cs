@@ -19,6 +19,44 @@ namespace ILRuntimeDebugEngine.AD7
         public ILProperty Parent { get; set; }
         public VariableReference[] Parameters { get; set; }
         public string Name { get { return info.Name; } set { info.Name = value; } }
+
+        public string FullName
+        {
+            get
+            {
+                if (Parent != null)
+                {
+                    switch (info.Type)
+                    {
+                        case VariableTypes.FieldReference:
+                        case VariableTypes.PropertyReference:
+                            return string.Format("{0}.{1}", Parent.FullName, Name);
+                        case VariableTypes.IndexAccess:
+                            return string.Format("{0}[{1}]", Parent.FullName, Parameters[0].FullName);
+                        case VariableTypes.Error:
+                        case VariableTypes.NotFound:
+                        case VariableTypes.Timeout:
+                            return Name;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else
+                {
+                    switch (info.Type)
+                    {
+                        case VariableTypes.String:
+                            return string.Format("\"{0}\"", Name);
+                        case VariableTypes.Integer:
+                            return info.Offset.ToString();
+                        case VariableTypes.Boolean:
+                            return (info.Offset == 1).ToString();
+                        default:
+                            return Name;
+                    }
+                }
+            }
+        }
         public ILProperty(AD7Engine engine, AD7Thread thread, VariableInfo info)
         {
             this.engine = engine;
@@ -110,7 +148,7 @@ namespace ILRuntimeDebugEngine.AD7
             var propertyInfo = new DEBUG_PROPERTY_INFO();
             if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME) != 0)
             {
-                propertyInfo.bstrFullName = info != null ? info.Name : info.Name;
+                propertyInfo.bstrFullName = FullName;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME;
             }
 

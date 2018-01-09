@@ -40,6 +40,42 @@ namespace ILRuntime.Runtime.Debugger
         public VariableReference Parent { get; set; }
         public VariableReference[] Parameters { get; set; }
 
+        public string FullName
+        {
+            get
+            {
+                if (Parent != null)
+                {
+                    switch (Type)
+                    {
+                        case VariableTypes.FieldReference:
+                        case VariableTypes.PropertyReference:
+                            return string.Format("{0}.{1}", Parent.FullName, Name);
+                        case VariableTypes.IndexAccess:
+                            return string.Format("{0}[{1}]", Parent.FullName, Parameters[0].FullName);
+                        case VariableTypes.Error:
+                            return Name;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                else
+                {
+                    switch (Type)
+                    {
+                        case VariableTypes.String:
+                            return string.Format("\"{0}\"", Name);
+                        case VariableTypes.Integer:
+                            return Offset.ToString();
+                        case VariableTypes.Boolean:
+                            return (Offset == 1).ToString();
+                        default:
+                            return Name;
+                    }
+                }
+            }
+        }
+
         public static VariableReference Null = new VariableReference
         {
             Type = VariableTypes.Null,
