@@ -429,8 +429,6 @@ namespace ILRuntime.Runtime.Debugger
                         var lv = m.Definition.Parameters[argIdx];
                         name = string.IsNullOrEmpty(lv.Name) ? "arg" + lv.Index : lv.Name;
                         typeName = lv.ParameterType.FullName;
-                        if (v != null)
-                            v = m.Parameters[argIdx].TypeForCLR.CheckCLRTypes(v);
                     }
                     else
                     {
@@ -452,7 +450,7 @@ namespace ILRuntime.Runtime.Debugger
                     var lv = m.Definition.Body.Variables[locIdx];
                     var val = Add(topFrame.LocalVarPointer, locIdx);
                     var v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
-                    v = intp.AppDomain.GetType(lv.VariableType, m.DeclearingType, m).TypeForCLR.CheckCLRTypes(v);
+                    var type = intp.AppDomain.GetType(lv.VariableType, m.DeclearingType, m);
                     string name = string.IsNullOrEmpty(lv.Name) ? "v" + lv.Index : lv.Name;
                     VariableInfo vinfo = VariableInfo.FromObject(v);
                     vinfo.Address = (long)val;
