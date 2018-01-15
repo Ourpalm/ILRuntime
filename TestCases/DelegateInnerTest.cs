@@ -32,7 +32,7 @@ namespace TestCases
             }
 
             var result = from num in list where num < 8 select num;
-            Console.WriteLine("result:{0}", result);
+            Console.WriteLine("result:{0}", result.Count());
         }
 
         private static int OnFuncNameXiaQi(int arg)

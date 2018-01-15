@@ -27,7 +27,7 @@ namespace ILRuntime.Runtime.CLRBinding
         {
             if (i.IsPrivate)
                 return true;
-            if (i.IsGenericMethod)
+            if (i.IsGenericMethodDefinition)
                 return true;
             //EventHandler is currently not supported
             var param = i.GetParameters();
@@ -237,7 +237,20 @@ namespace ILRuntime.Runtime.CLRBinding
             }
             else
             {
-                if (!type.IsValueType)
+                sb.Append(@"                        object ___obj = ");
+                sb.Append(paramName);
+                sb.AppendLine(";");
+                sb.AppendLine(@"                        if (___dst->ObjectType >= ObjectTypes.Object)
+                        {
+                            if (___obj is CrossBindingAdaptorType)
+                                ___obj = ((CrossBindingAdaptorType)___obj).ILInstance;
+                            __mStack[___dst->Value] = ___obj;
+                        }
+                        else
+                        {
+                            ILIntepreter.UnboxObject(___dst, ___obj, __mStack, __domain);
+                        }");
+                /*if (!type.IsValueType)
                 {
                     sb.Append(@"                        object ___obj = ");
                     sb.Append(paramName);
@@ -252,7 +265,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb.Append("                        __mStack[___dst->Value] = ");
                     sb.Append(paramName);
                     sb.AppendLine(";");
-                }
+                }*/
             }
         }
 

@@ -111,7 +111,9 @@ namespace ILRuntime.CLR.Method
             {
                 if (def.IsGenericMethod && !def.IsGenericMethodDefinition)
                 {
-                    appdomain.RedirectMap.TryGetValue(def.GetGenericMethodDefinition(), out redirect);
+                    //Redirection of Generic method Definition will be prioritized
+                    if(!appdomain.RedirectMap.TryGetValue(def.GetGenericMethodDefinition(), out redirect))
+                        appdomain.RedirectMap.TryGetValue(def, out redirect);
                 }
                 else
                     appdomain.RedirectMap.TryGetValue(def, out redirect);

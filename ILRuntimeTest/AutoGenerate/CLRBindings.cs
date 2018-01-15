@@ -11,15 +11,19 @@ namespace ILRuntime.Runtime.Generated
         /// </summary>
         public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
+            System_Runtime_CompilerServices_AsyncVoidMethodBuilder_Binding.Register(app);
+            System_Threading_Tasks_Task_Binding.Register(app);
+            System_Threading_Tasks_Task_1_Int32_Binding.Register(app);
+            System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.Register(app);
+            System_String_Binding.Register(app);
+            System_Console_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Binding.Register(app);
             System_Linq_Enumerable_Binding.Register(app);
-            System_Console_Binding.Register(app);
             System_Collections_Generic_List_1_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding.Register(app);
             LitJson_JsonMapper_Binding.Register(app);
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_TestClass3Adaptor_Binding_Adaptor_Binding.Register(app);
-            System_String_Binding.Register(app);
             System_Type_Binding.Register(app);
             System_Object_Binding.Register(app);
             System_Reflection_MethodBase_Binding.Register(app);
@@ -48,6 +52,8 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.Register(app);
             System_Int32_Array_Binding.Register(app);
             System_Int32_Array_Binding_Array_Binding.Register(app);
+            System_Double_Binding.Register(app);
+            System_Single_Binding.Register(app);
             System_Int32_Array2_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.Register(app);

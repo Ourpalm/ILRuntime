@@ -105,6 +105,7 @@
     <Compile Include="AutoGenerate\System_Console_Binding.cs" />
     <Compile Include="AutoGenerate\System_Convert_Binding.cs" />
     <Compile Include="AutoGenerate\System_Diagnostics_Stopwatch_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array2_Binding.cs" />
@@ -123,7 +124,12 @@
     <Compile Include="AutoGenerate\System_Reflection_MemberInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_MethodBase_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_PropertyInfo_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncVoidMethodBuilder_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Single_Binding.cs" />
     <Compile Include="AutoGenerate\System_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_Binding.cs" />
     <Compile Include="AutoGenerate\System_Type_Binding.cs" />
     <Compile Include="TestFramework\TestCLRAttribute.cs" />
     <Compile Include="TestFramework\TestVector3.cs" />
