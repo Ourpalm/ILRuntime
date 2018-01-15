@@ -45,7 +45,9 @@ namespace ILRuntime.Runtime.Intepreter
             //Clear old debug state
             ClearDebugState();
             lock (_lockObj)
+            {
                 Monitor.Wait(_lockObj);
+            }
         }
 
         public void Resume()
@@ -4558,7 +4560,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         public static void UnboxObject(StackObject* esp, object obj, IList<object> mStack = null, Enviorment.AppDomain domain = null)
         {
-            if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference && domain != null)
             {
                 var dst = *(StackObject**)&esp->Value;
                 var vt = domain.GetType(dst->Value);

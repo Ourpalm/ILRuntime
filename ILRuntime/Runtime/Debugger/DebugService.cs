@@ -364,7 +364,14 @@ namespace ILRuntime.Runtime.Debugger
                 if (j.Value != intp)
                 {
                     j.Value.ShouldBreak = true;
-                    frames[idx++] = new KeyValuePair<int, Debugger.StackFrameInfo[]>(j.Value.GetHashCode(), GetStackFrameInfo(j.Value));
+                    try
+                    {
+                        frames[idx++] = new KeyValuePair<int, Debugger.StackFrameInfo[]>(j.Value.GetHashCode(), GetStackFrameInfo(j.Value));
+                    }
+                    catch
+                    {
+                        frames[idx++] = new KeyValuePair<int, Debugger.StackFrameInfo[]>(j.Value.GetHashCode(), new StackFrameInfo[0]);
+                    }
                 }
             }
             if (!isStep)
