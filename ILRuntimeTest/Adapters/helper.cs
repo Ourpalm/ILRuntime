@@ -22,6 +22,7 @@ namespace ILRuntimeTest.TestFramework
             app.RegisterCrossBindingAdaptor(new TestClass4Adaptor());
             app.RegisterCrossBindingAdaptor(new IDisposableClassInheritanceAdaptor());
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTest2Adaptor());
+            app.RegisterCrossBindingAdaptor(new IAsyncStateMachineClassInheritanceAdaptor());
 
             // delegate register 
 
@@ -35,9 +36,9 @@ namespace ILRuntimeTest.TestFramework
 			
 			app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.BaseClassTest>();
 
+            app.DelegateManager.RegisterFunctionDelegate<System.Int32>();
+            // delegate convertor
 
-			// delegate convertor
-            
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.IntDelegate>((action) =>
             {
                 return new ILRuntimeTest.TestFramework.IntDelegate((a) =>

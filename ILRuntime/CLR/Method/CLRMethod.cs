@@ -296,7 +296,7 @@ namespace ILRuntime.CLR.Method
                             }
                             else
                             {
-                                ILIntepreter.UnboxObject(dst, val);
+                                ILIntepreter.UnboxObject(dst, val, mStack, appdomain);
                             }
                         }
                         break;

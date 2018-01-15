@@ -4020,8 +4020,15 @@ namespace ILRuntime.Runtime.Intepreter
                             }
                             else
                             {
-                                var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder;
-                                vb.CopyValueTypeToStack(ins, dst, mStack);
+                                if (ins is CrossBindingAdaptorType)
+                                {
+                                    ((CrossBindingAdaptorType)ins).ILInstance.CopyValueTypeToStack(dst, mStack);
+                                }
+                                else
+                                {
+                                    var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder;
+                                    vb.CopyValueTypeToStack(ins, dst, mStack);
+                                }
                             }
                         }
                         else
@@ -4549,7 +4556,7 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        public static void UnboxObject(StackObject* esp, object obj)
+        public static void UnboxObject(StackObject* esp, object obj, IList<object> mStack = null, Enviorment.AppDomain domain = null)
         {
             if (obj is int)
             {
@@ -4611,6 +4618,26 @@ namespace ILRuntime.Runtime.Intepreter
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (sbyte)obj;
             }
+            else if(esp ->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var dst = *(StackObject**)&esp->Value;
+                var vt = domain.GetType(dst->Value);
+
+                if (obj is ILTypeInstance)
+                {
+                    var ins = (ILTypeInstance)obj;
+                    ins.CopyValueTypeToStack(dst, mStack);
+                }
+                else if(obj is CrossBindingAdaptorType)
+                {
+                    var ins = ((CrossBindingAdaptorType)obj).ILInstance;
+                    ins.CopyValueTypeToStack(dst, mStack);
+                }
+                else
+                {
+                    ((CLRType)vt).ValueTypeBinder.CopyValueTypeToStack(obj, dst, mStack);
+                }
+            }
             else
                 throw new NotImplementedException();
         }
@@ -4625,7 +4652,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                     if ((typeFlags & CLR.Utils.Extensions.TypeFlags.IsPrimitive) != 0)
                     {
-                        UnboxObject(esp, obj);
+                        UnboxObject(esp, obj, mStack);
                     }
                     else if ((typeFlags & CLR.Utils.Extensions.TypeFlags.IsEnum) != 0)
                     {

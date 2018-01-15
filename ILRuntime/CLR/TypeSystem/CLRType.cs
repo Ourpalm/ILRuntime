@@ -74,7 +74,11 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (fieldMapping == null)
                     InitializeFields();
-                return fieldIdxMapping.Count;
+
+                if (fieldIdxMapping != null)
+                    return fieldIdxMapping.Count;
+                else
+                    throw new NotSupportedException("Cannot find ValueTypeBinder for type:" + clrType.FullName);
             }
         }
 

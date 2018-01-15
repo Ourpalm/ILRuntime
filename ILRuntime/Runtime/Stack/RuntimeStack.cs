@@ -218,7 +218,14 @@ namespace ILRuntime.Runtime.Stack
                     {
                         if (ft.IsValueType)
                         {
-                            AllocValueType(val, ft);
+                            if (ft is ILType || ((CLRType)ft).ValueTypeBinder != null)
+                                AllocValueType(val, ft);
+                            else
+                            {
+                                val->ObjectType = ObjectTypes.Object;
+                                val->Value = managedStack.Count;
+                                managedStack.Add(((CLRType)ft).CreateDefaultInstance());
+                            }
                         }
                         else
                         {

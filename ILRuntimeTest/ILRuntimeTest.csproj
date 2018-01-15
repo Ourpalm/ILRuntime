@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ILRuntimeTest</RootNamespace>
     <AssemblyName>ILRuntimeTest</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\ClassInheritanceTestAdaptor.cs" />
+    <Compile Include="Adapters\IAsyncStateMachineAdaptor.cs" />
     <Compile Include="Adapters\TestVector3Binder.cs" />
     <Compile Include="AutoGenerate\CLRBindings.cs" />
     <Compile Include="Adapters\helper.cs" />
