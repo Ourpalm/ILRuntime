@@ -4558,7 +4558,27 @@ namespace ILRuntime.Runtime.Intepreter
 
         public static void UnboxObject(StackObject* esp, object obj, IList<object> mStack = null, Enviorment.AppDomain domain = null)
         {
-            if (obj is int)
+            if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var dst = *(StackObject**)&esp->Value;
+                var vt = domain.GetType(dst->Value);
+
+                if (obj is ILTypeInstance)
+                {
+                    var ins = (ILTypeInstance)obj;
+                    ins.CopyValueTypeToStack(dst, mStack);
+                }
+                else if (obj is CrossBindingAdaptorType)
+                {
+                    var ins = ((CrossBindingAdaptorType)obj).ILInstance;
+                    ins.CopyValueTypeToStack(dst, mStack);
+                }
+                else
+                {
+                    ((CLRType)vt).ValueTypeBinder.CopyValueTypeToStack(obj, dst, mStack);
+                }
+            }
+            else if (obj is int)
             {
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (int)obj;
@@ -4617,27 +4637,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (sbyte)obj;
-            }
-            else if(esp ->ObjectType == ObjectTypes.ValueTypeObjectReference)
-            {
-                var dst = *(StackObject**)&esp->Value;
-                var vt = domain.GetType(dst->Value);
-
-                if (obj is ILTypeInstance)
-                {
-                    var ins = (ILTypeInstance)obj;
-                    ins.CopyValueTypeToStack(dst, mStack);
-                }
-                else if(obj is CrossBindingAdaptorType)
-                {
-                    var ins = ((CrossBindingAdaptorType)obj).ILInstance;
-                    ins.CopyValueTypeToStack(dst, mStack);
-                }
-                else
-                {
-                    ((CLRType)vt).ValueTypeBinder.CopyValueTypeToStack(obj, dst, mStack);
-                }
-            }
+            }            
             else
                 throw new NotImplementedException();
         }
