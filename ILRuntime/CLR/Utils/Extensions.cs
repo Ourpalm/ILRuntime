@@ -243,8 +243,8 @@ namespace ILRuntime.CLR.Utils
                 if (!(obj is ILEnumTypeInstance))
                 {
                     var ins = (ILTypeInstance)obj;
-                    if (ins.IsValueType)
-                        ins = ins.Clone();
+                    /*if (ins.IsValueType)
+                        ins = ins.Clone();*/
                     return ins.CLRInstance;
                 }
             }

@@ -462,7 +462,8 @@ namespace ILRuntime.Runtime.Generated
             info.Methods = new HashSet<MethodInfo>();
             info.Fields = new HashSet<FieldInfo>();
             info.Constructors = new HashSet<ConstructorInfo>();
-
+            if (t.IsValueType)
+                info.DefaultInstanceNeeded = true;
             return info;
         }
     }

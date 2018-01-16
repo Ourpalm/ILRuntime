@@ -222,7 +222,8 @@ namespace ILRuntime.CLR.Method
             for (int i = paramCount; i >= 1; i--)
             {
                 var p = Minus(esp, i);
-                var obj = this.param[paramCount - i].ParameterType.CheckCLRTypes(StackObject.ToObject(p, appdomain, mStack));
+                var pt = this.param[paramCount - i].ParameterType;
+                var obj = pt.CheckCLRTypes(StackObject.ToObject(p, appdomain, mStack));
                 obj = ILIntepreter.CheckAndCloneValueType(obj, appdomain);
                 param[paramCount - i] = obj;
             }
@@ -250,7 +251,7 @@ namespace ILRuntime.CLR.Method
                 {
                     var res = cDef.Invoke(param);
 
-                    FixReference(paramCount, esp, param, mStack);
+                    FixReference(paramCount, esp, param, mStack, null, false);
                     return res;
                 }
 
@@ -262,6 +263,8 @@ namespace ILRuntime.CLR.Method
                 if (!def.IsStatic)
                 {
                     instance = declaringType.TypeForCLR.CheckCLRTypes(StackObject.ToObject((Minus(esp, paramCount + 1)), appdomain, mStack));
+                    if (declaringType.IsValueType)
+                        instance = ILIntepreter.CheckAndCloneValueType(instance, appdomain);
                     if (instance == null)
                         throw new NullReferenceException();
                 }
@@ -273,17 +276,18 @@ namespace ILRuntime.CLR.Method
                     res = def.Invoke(instance, param);
                 }
 
-                FixReference(paramCount, esp, param, mStack);
+                FixReference(paramCount, esp, param, mStack, instance, !def.IsStatic);
                 return res;
             }
         }
 
-        unsafe void FixReference(int paramCount, StackObject* esp, object[] param, IList<object> mStack)
+        unsafe void FixReference(int paramCount, StackObject* esp, object[] param, IList<object> mStack,object instance, bool hasThis)
         {
-            for (int i = paramCount; i >= 1; i--)
+            var cnt = hasThis ? paramCount + 1 : paramCount;
+            for (int i = cnt; i >= 1; i--)
             {
                 var p = Minus(esp, i);
-                var val = param[paramCount - i];
+                var val = i <= paramCount ? param[paramCount - i] : instance;
                 switch (p->ObjectType)
                 {
                     case ObjectTypes.StackObjectReference:

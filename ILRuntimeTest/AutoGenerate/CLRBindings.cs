@@ -11,12 +11,13 @@ namespace ILRuntime.Runtime.Generated
         /// </summary>
         public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
-            System_Runtime_CompilerServices_AsyncVoidMethodBuilder_Binding.Register(app);
+            System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.Register(app);
+            System_Console_Binding.Register(app);
             System_Threading_Tasks_Task_Binding.Register(app);
+            System_Runtime_CompilerServices_TaskAwaiter_Binding.Register(app);
             System_Threading_Tasks_Task_1_Int32_Binding.Register(app);
             System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.Register(app);
             System_String_Binding.Register(app);
-            System_Console_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Binding.Register(app);
             System_Linq_Enumerable_Binding.Register(app);
             System_Collections_Generic_List_1_ILTypeInstance_Binding.Register(app);

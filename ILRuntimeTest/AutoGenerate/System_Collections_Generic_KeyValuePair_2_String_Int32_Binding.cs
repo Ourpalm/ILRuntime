@@ -26,6 +26,8 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("get_Key", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, get_Key_0);
 
+            app.RegisterCLRCreateDefaultInstance(type, () => new System.Collections.Generic.KeyValuePair<System.String, System.Int32>());
+
 
         }
 

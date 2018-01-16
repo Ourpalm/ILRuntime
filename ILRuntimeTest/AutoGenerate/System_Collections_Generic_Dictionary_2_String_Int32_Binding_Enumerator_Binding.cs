@@ -29,6 +29,8 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("MoveNext", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, MoveNext_1);
 
+            app.RegisterCLRCreateDefaultInstance(type, () => new System.Collections.Generic.Dictionary<System.String, System.Int32>.Enumerator());
+
 
         }
 

@@ -9,12 +9,15 @@ namespace TestCases
 {
     class AsyncAwaitTest
     {
-        public static void TestRun()
+        public async static Task TestRun()
         {
-            TestRunSub();
+            Console.WriteLine("Start: TestRunSub1..");
+            await TestRunSub();
+            Console.WriteLine("Result: TestRunSub1 complete..");
         }
 
-        async static void TestRunSub()
+
+        async static Task TestRunSub()
         {
             int cnt = 0;
             var res = await Task.Run<int>(() =>

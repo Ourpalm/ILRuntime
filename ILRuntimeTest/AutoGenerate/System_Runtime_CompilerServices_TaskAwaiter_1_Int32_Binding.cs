@@ -29,6 +29,8 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("GetResult", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, GetResult_1);
 
+            app.RegisterCLRCreateDefaultInstance(type, () => new System.Runtime.CompilerServices.TaskAwaiter<System.Int32>());
+
 
         }
 

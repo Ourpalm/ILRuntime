@@ -423,18 +423,6 @@ namespace ILRuntime.Runtime.Intepreter
                 ins.fields[i] = fields[i];
                 ins.managedObjs[i] = ILIntepreter.CheckAndCloneValueType(managedObjs[i],Type.AppDomain);
             }
-            if (type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
-            {
-                ins.clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRBaseType).CreateCLRInstance(type.AppDomain, ins);
-            }
-            else if(type.FirstCLRInterface is Enviorment.CrossBindingAdaptor)
-            {
-                ins.clrInstance = ((Enviorment.CrossBindingAdaptor)type.FirstCLRInterface).CreateCLRInstance(type.AppDomain, ins);
-            }
-            else
-            {
-                ins.clrInstance = ins;
-            }
             return ins;
         }
 
