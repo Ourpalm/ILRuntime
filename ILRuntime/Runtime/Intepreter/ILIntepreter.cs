@@ -2765,7 +2765,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (t != null)
                                             {
                                                 var type = t.TypeForCLR;
-                                                if ((t is CLRType) && type.IsPrimitive)
+                                                bool isEnumObj = obj is ILEnumTypeInstance;
+                                                if ((t is CLRType) && type.IsPrimitive && !isEnumObj)
                                                 {
                                                     if (type == typeof(int))
                                                     {
