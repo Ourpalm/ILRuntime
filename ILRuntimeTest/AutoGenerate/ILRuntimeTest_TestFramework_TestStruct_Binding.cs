@@ -229,11 +229,9 @@ namespace ILRuntime.Runtime.Generated
 
         static object PerformMemberwiseClone(ref object o)
         {
-            return new ILRuntimeTest.TestFramework.TestStruct
-            {
-                testField = ((ILRuntimeTest.TestFramework.TestStruct) o).testField,
-                value = ((ILRuntimeTest.TestFramework.TestStruct) o).value,
-            };
+            var ins = new ILRuntimeTest.TestFramework.TestStruct();
+            ins = (ILRuntimeTest.TestFramework.TestStruct)o;
+            return ins;
         }
 
 

@@ -104,6 +104,7 @@
     <Compile Include="AutoGenerate\System_Collections_IEnumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Console_Binding.cs" />
     <Compile Include="AutoGenerate\System_Convert_Binding.cs" />
+    <Compile Include="AutoGenerate\System_DateTime_Binding.cs" />
     <Compile Include="AutoGenerate\System_Diagnostics_Stopwatch_Binding.cs" />
     <Compile Include="AutoGenerate\System_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />

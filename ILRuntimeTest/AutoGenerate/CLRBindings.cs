@@ -81,6 +81,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestVector3_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.Register(app);
+            System_DateTime_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);
         }
