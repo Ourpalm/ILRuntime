@@ -619,7 +619,7 @@ namespace ILRuntime.CLR.TypeSystem
                     if (i.ParameterCount == pCnt)
                     {
                         bool match = true;
-                        if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
+                        if (genericArguments != null && i.GenericParameterCount == genericArguments.Length && genericMethod == null)
                         {
                             genericMethod = CheckGenericParams(i, param, ref match);
                         }
@@ -699,6 +699,12 @@ namespace ILRuntime.CLR.TypeSystem
                     var p = i.Parameters[j];
                     if (p.HasGenericParameter)
                     {
+                        var p2 = param[0];
+                        if(p.Name != p2.Name)
+                        {
+                            match = false;
+                            break;
+                        }
                         //TODO should match the generic parameters;
                         continue;
                     }

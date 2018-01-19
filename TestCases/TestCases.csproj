@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="AsyncAwaitTest.cs" />
     <Compile Include="DelegateInnerTest.cs" />
+    <Compile Include="GenericMethodTest.cs" />
     <Compile Include="JsonTest.cs" />
     <Compile Include="ReflectionTest.cs" />
     <Compile Include="InheritanceTest.cs" />
