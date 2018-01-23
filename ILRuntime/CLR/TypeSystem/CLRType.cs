@@ -125,6 +125,14 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public bool IsGenericParameter
+        {
+            get
+            {
+                return clrType.IsGenericParameter;
+            }
+        }
+
         public Type TypeForCLR
         {
             get

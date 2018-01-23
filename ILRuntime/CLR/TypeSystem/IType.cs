@@ -38,6 +38,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         bool HasGenericParameter { get; }
 
+        bool IsGenericParameter { get; }
+
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
 
         /// <summary>

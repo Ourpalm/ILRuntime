@@ -235,6 +235,14 @@ namespace ILRuntime.Runtime.Enviorment
                 return type.HasGenericParameter;
             }
         }
+
+        public bool IsGenericParameter
+        {
+            get
+            {
+                return type.IsGenericParameter;
+            }
+        }
         public bool IsArray
         {
             get { return false; }

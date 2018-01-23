@@ -30,6 +30,14 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public bool IsGenericParameter
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public Type TypeForCLR
         {
             get { return typeof(ILGenericParameterType); }
