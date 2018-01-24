@@ -146,6 +146,13 @@ namespace ILRuntime.Runtime.Enviorment
         public void Dispose()
         {
             mStack.Clear();
+            domain.FreeILIntepreter(intp);
+
+            esp = null;
+            intp = null;
+            domain = null;
+            method = null;
+            mStack = null;
         }
     }
 }

@@ -8,7 +8,7 @@ using ILRuntime.Other;
 namespace ILRuntimeTest.TestFramework
 {
     [NeedAdaptor]
-    abstract class TestClass2
+    public abstract class TestClass2
     {
         public void Method1()
         {

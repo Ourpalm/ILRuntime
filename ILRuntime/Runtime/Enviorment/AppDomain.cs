@@ -953,6 +953,59 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
+        ILIntepreter RequestILIntepreter()
+        {
+            ILIntepreter inteptreter = null;
+            lock (freeIntepreters)
+            {
+                if (freeIntepreters.Count > 0)
+                {
+                    inteptreter = freeIntepreters.Dequeue();
+                    //Clear debug state, because it may be in ShouldBreak State
+                    inteptreter.ClearDebugState();
+                }
+                else
+                {
+                    inteptreter = new ILIntepreter(this);
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                    intepreters[inteptreter.GetHashCode()] = inteptreter;
+                    debugService.ThreadStarted(inteptreter);
+#endif
+                }
+            }
+
+            return inteptreter;
+        }
+
+        internal void FreeILIntepreter(ILIntepreter inteptreter)
+        {
+            lock (freeIntepreters)
+            {
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                if (inteptreter.CurrentStepType != StepTypes.None)
+                {
+                    //We should resume all other threads if we are currently doing stepping operation
+                    foreach (var i in intepreters)
+                    {
+                        if (i.Value != inteptreter)
+                        {
+                            i.Value.ClearDebugState();
+                            i.Value.Resume();
+                        }
+                    }
+                    inteptreter.ClearDebugState();
+                }
+#endif
+                inteptreter.Stack.ManagedStack.Clear();
+                inteptreter.Stack.Frames.Clear();
+                freeIntepreters.Enqueue(inteptreter);
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                //debugService.ThreadEnded(inteptreter);
+#endif
+
+            }
+        }
+
         /// <summary>
         /// Invokes a specific method
         /// </summary>
@@ -965,61 +1018,30 @@ namespace ILRuntime.Runtime.Enviorment
             object res = null;
             if (m is ILMethod)
             {
-                ILIntepreter inteptreter = null;
-                lock (freeIntepreters)
-                {
-                    if (freeIntepreters.Count > 0)
-                    {
-                        inteptreter = freeIntepreters.Dequeue();
-                        //Clear debug state, because it may be in ShouldBreak State
-                        inteptreter.ClearDebugState();
-                    }
-                    else
-                    {
-                        inteptreter = new ILIntepreter(this);
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                        intepreters[inteptreter.GetHashCode()] = inteptreter;
-                        debugService.ThreadStarted(inteptreter);
-#endif
-                    }
-                }
+                ILIntepreter inteptreter = RequestILIntepreter();
                 try
                 {
                     res = inteptreter.Run((ILMethod)m, instance, p);
                 }
                 finally
                 {
-                    lock (freeIntepreters)
-                    {
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                        if (inteptreter.CurrentStepType!= StepTypes.None)
-                        {
-                            //We should resume all other threads if we are currently doing stepping operation
-                            foreach(var i in intepreters)
-                            {
-                                if(i.Value != inteptreter)
-                                {
-                                    i.Value.ClearDebugState();
-                                    i.Value.Resume();
-                                }
-                            }
-                            inteptreter.ClearDebugState();
-                        }
-#endif
-                        inteptreter.Stack.ManagedStack.Clear();
-                        inteptreter.Stack.Frames.Clear();
-                        freeIntepreters.Enqueue(inteptreter);
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                        //debugService.ThreadEnded(inteptreter);
-#endif
-
-                    }
+                    FreeILIntepreter(inteptreter);
                 }
             }
 
             return res;
         }
 
+        public InvocationContext BeginInvoke(IMethod m)
+        {
+            if (m is ILMethod)
+            {
+                ILIntepreter inteptreter = RequestILIntepreter();
+                return new InvocationContext(inteptreter, (ILMethod)m);
+            }
+            else
+                throw new NotSupportedException("Cannot invoke CLRMethod");
+        }
         internal IMethod GetMethod(object token, ILType contextType,ILMethod contextMethod, out bool invalidToken)
         {
             string methodname = null;
