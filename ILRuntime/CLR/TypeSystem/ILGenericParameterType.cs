@@ -177,6 +177,22 @@ namespace ILRuntime.CLR.TypeSystem
             get { return false; }
         }
 
+        public bool IsByRef
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public IType ElementType
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public int ArrayRank
         {
             get { return 1; }

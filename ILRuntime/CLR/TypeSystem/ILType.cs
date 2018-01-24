@@ -269,6 +269,14 @@ namespace ILRuntime.CLR.TypeSystem
             get; private set;
         }
 
+        public bool IsByRef
+        {
+            get
+            {
+                return definition.IsByReference;
+            }
+        }
+
         private bool? isValueType;
 
         public bool IsValueType
@@ -705,8 +713,12 @@ namespace ILRuntime.CLR.TypeSystem
                 for (int j = 0; j < param.Count; j++)
                 {
                     var p = i.Parameters[j];
+                    if (p.IsByRef)
+                        p = p.ElementType;
+
                     if (p.IsGenericParameter)
                         continue;
+
                     if (p.HasGenericParameter)
                     {
                         var p2 = param[j];

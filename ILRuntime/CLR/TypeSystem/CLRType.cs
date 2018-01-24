@@ -182,6 +182,15 @@ namespace ILRuntime.CLR.TypeSystem
                 return isValueType;
             }
         }
+
+        public bool IsByRef
+        {
+            get
+            {
+                return clrType.IsByRef;
+            }
+        }
+
         public bool IsDelegate
         {
             get
@@ -734,6 +743,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 Type t = clrType.MakeByRefType();
                 byRefType = new CLRType(t, appdomain);
+                ((CLRType)byRefType).elementType = this;
             }
             return byRefType;
         }
