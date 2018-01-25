@@ -510,22 +510,26 @@ namespace ILRuntime.Runtime.Enviorment
                     bt = bt.MakeGenericInstance(genericArguments);
                     mapType[bt.FullName] = bt;
                     mapTypeToken[bt.GetHashCode()] = bt;
-                    /*StringBuilder sb = new StringBuilder();
-                    sb.Append(baseType);
-                    sb.Append('<');
-                    for (int i = 0; i < genericParams.Count; i++)
+                    if (bt is CLRType)
                     {
-                        if (i > 0)
-                            sb.Append(",");
-                        if (genericParams[i].Contains(","))
-                            sb.Append(genericParams[i].Substring(0, genericParams[i].IndexOf(',')));
-                        else
-                            sb.Append(genericParams[i]);
+                        //It still make sense for CLRType, since CLR uses [T] for generics instead of <T>
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(baseType);
+                        sb.Append('<');
+                        for (int i = 0; i < genericParams.Count; i++)
+                        {
+                            if (i > 0)
+                                sb.Append(",");
+                            if (genericParams[i].Contains(","))
+                                sb.Append(genericParams[i].Substring(0, genericParams[i].IndexOf(',')));
+                            else
+                                sb.Append(genericParams[i]);
+                        }
+                        sb.Append('>');
+                        var asmName = sb.ToString();
+                        if (bt.FullName != asmName)
+                            mapType[asmName] = bt;
                     }
-                    sb.Append('>');
-                    var asmName = sb.ToString();
-                    if (bt.FullName != asmName)
-                        mapType[asmName] = bt;*/
                 }
 
                 if (isArray)
