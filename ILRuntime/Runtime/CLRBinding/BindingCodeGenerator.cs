@@ -28,9 +28,10 @@ namespace ILRuntime.Runtime.CLRBinding
                     continue;
                 i.GetClassName(out clsName, out realClsName, out isByRef);
                 clsNames.Add(clsName);
-                using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/" + clsName + ".cs", false, Encoding.UTF8))
+                using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/" + clsName + ".cs", false, new UTF8Encoding(false)))
                 {
-                    sw.Write(@"using System;
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(@"using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -46,17 +47,17 @@ using ILRuntime.CLR.Utils;
 namespace ILRuntime.Runtime.Generated
 {
     unsafe class ");
-                    sw.WriteLine(clsName);
-                    sw.Write(@"    {
+                    sb.AppendLine(clsName);
+                    sb.Append(@"    {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
-            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodBase method;
-            FieldInfo field;
-            Type[] args;
-            Type type = typeof(");
-                    sw.Write(realClsName);
-                    sw.WriteLine(");");
+");
+                    string flagDef = "            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;";
+                    string methodDef = "            MethodBase method;";
+                    string fieldDef = "            FieldInfo field;";
+                    string argsDef = "            Type[] args;";
+                    string typeDef = string.Format("            Type type = typeof({0});", realClsName);
+
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     FieldInfo[] fields = i.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string registerMethodCode = i.GenerateMethodRegisterCode(methods, excludeMethods);
@@ -70,27 +71,50 @@ namespace ILRuntime.Runtime.Generated
                     string fieldWraperCode = i.GenerateFieldWraperCode(fields, realClsName, excludeFields);
                     string cloneWraperCode = i.GenerateCloneWraperCode(fields, realClsName);
                     string ctorWraperCode = i.GenerateConstructorWraperCode(ctors, realClsName, excludeMethods);
-                    sw.WriteLine(registerMethodCode);
-                    sw.WriteLine(registerFieldCode);
-                    sw.WriteLine(registerValueTypeCode);
-                    sw.WriteLine(registerMiscCode);
-                    sw.WriteLine(ctorRegisterCode);
-                    sw.WriteLine("        }");
-                    sw.WriteLine();
-                    sw.WriteLine(commonCode);
-                    sw.WriteLine(methodWraperCode);
-                    sw.WriteLine(fieldWraperCode);
-                    sw.WriteLine(cloneWraperCode);
-                    sw.WriteLine(ctorWraperCode);
-                    sw.WriteLine("    }");
-                    sw.WriteLine("}");
+
+                    bool hasMethodCode = !string.IsNullOrEmpty(registerMethodCode);
+                    bool hasFieldCode = !string.IsNullOrEmpty(registerFieldCode);
+                    bool hasValueTypeCode = !string.IsNullOrEmpty(registerValueTypeCode);
+                    bool hasMiscCode = !string.IsNullOrEmpty(registerMiscCode);
+                    bool hasCtorCode = !string.IsNullOrEmpty(ctorRegisterCode);
+                    bool hasNormalMethod = methods.Where(x => !x.IsGenericMethod).Count() != 0;
+
+                    if ((hasMethodCode && hasNormalMethod) || hasFieldCode || hasCtorCode)
+                        sb.AppendLine(flagDef);
+                    if (hasMethodCode || hasCtorCode)
+                        sb.AppendLine(methodDef);
+                    if (hasFieldCode)
+                        sb.AppendLine(fieldDef);
+                    if (hasMethodCode || hasFieldCode || hasCtorCode)
+                        sb.AppendLine(argsDef);
+                    if (hasMethodCode || hasFieldCode || hasValueTypeCode || hasMiscCode || hasCtorCode)
+                        sb.AppendLine(typeDef);
+
+
+                    sb.AppendLine(registerMethodCode);
+                    sb.AppendLine(registerFieldCode);
+                    sb.AppendLine(registerValueTypeCode);
+                    sb.AppendLine(registerMiscCode);
+                    sb.AppendLine(ctorRegisterCode);
+                    sb.AppendLine("        }");
+                    sb.AppendLine();
+                    sb.AppendLine(commonCode);
+                    sb.AppendLine(methodWraperCode);
+                    sb.AppendLine(fieldWraperCode);
+                    sb.AppendLine(cloneWraperCode);
+                    sb.AppendLine(ctorWraperCode);
+                    sb.AppendLine("    }");
+                    sb.AppendLine("}");
+
+                    sw.Write(sb.Replace("\r\n", "\n").Replace("\n", "\r\n"));
                     sw.Flush();
                 }
             }
 
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, Encoding.UTF8))
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, new UTF8Encoding(false)))
             {
-                sw.WriteLine(@"using System;
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine(@"using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -105,14 +129,15 @@ namespace ILRuntime.Runtime.Generated
         {");
                 foreach (var i in clsNames)
                 {
-                    sw.Write("            ");
-                    sw.Write(i);
-                    sw.WriteLine(".Register(app);");
+                    sb.Append("            ");
+                    sb.Append(i);
+                    sb.AppendLine(".Register(app);");
                 }
 
-                sw.WriteLine(@"        }
+                sb.AppendLine(@"        }
     }
 }");
+                sw.Write(sb.Replace("\r\n", "\n").Replace("\n", "\r\n"));
             }
         }
 
