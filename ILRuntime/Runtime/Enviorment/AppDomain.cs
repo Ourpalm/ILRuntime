@@ -510,7 +510,7 @@ namespace ILRuntime.Runtime.Enviorment
                     bt = bt.MakeGenericInstance(genericArguments);
                     mapType[bt.FullName] = bt;
                     mapTypeToken[bt.GetHashCode()] = bt;
-                    StringBuilder sb = new StringBuilder();
+                    /*StringBuilder sb = new StringBuilder();
                     sb.Append(baseType);
                     sb.Append('<');
                     for (int i = 0; i < genericParams.Count; i++)
@@ -525,7 +525,7 @@ namespace ILRuntime.Runtime.Enviorment
                     sb.Append('>');
                     var asmName = sb.ToString();
                     if (bt.FullName != asmName)
-                        mapType[asmName] = bt;
+                        mapType[asmName] = bt;*/
                 }
 
                 if (isArray)

@@ -370,11 +370,35 @@ namespace ILRuntime.CLR.TypeSystem
                 return definition.IsEnum;
             }
         }
+
+        string fullName;
         public string FullName
         {
             get
             {
-                return typeRef.FullName;
+                if (string.IsNullOrEmpty(fullName))
+                {
+                    if (typeRef.HasGenericParameters && genericArguments != null)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(typeRef.FullName);
+                        sb.Append('<');
+                        bool first = true;
+                        foreach (var i in genericArguments)
+                        {
+                            if (first)
+                                first = false;
+                            else
+                                sb.Append(", ");
+                            sb.Append(i.Value.FullName);
+                        }
+                        sb.Append('>');
+                        fullName = sb.ToString();
+                    }
+                    else
+                        fullName = typeRef.FullName;
+                }
+                return fullName;
             }
         }
         public string Name

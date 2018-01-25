@@ -55,6 +55,26 @@ namespace TestCases
             public T t;
         }
 
+        public delegate void CallbackDelegate<T>(T response);
+
+        public class Command<T>
+        {
+            public T Decode()
+            {
+                var json = "{}";
+                return LitJson.JsonMapper.ToObject<T>(json);
+            }
+        }
+
+        public class OneCallbackData
+        {
+            public string Message = $"This is {nameof(OneCallbackData)}";
+        }
+
+        public class AnotherCallbackData
+        {
+            public string Message = $"This is {nameof(AnotherCallbackData)}";
+        }
         class TClass
         {
             public void Output<T>(T d, ACallback<T> callback)
@@ -65,6 +85,15 @@ namespace TestCases
             public void Test<T>(T d, ACallback<T> callback)
             {
                 Output(d, callback);
+            }
+            public void DoSomething<T>(Command<T> command, CallbackDelegate<T> callback)
+            {
+                callback(command.Decode());
+            }
+
+            public void Test<T>(CallbackDelegate<T> callback)
+            {
+                DoSomething(new Command<T>(), callback);
             }
         }
         public static void GenericMethodTest1()
@@ -102,6 +131,21 @@ namespace TestCases
             tclass.Test(ga, param =>
             {
                 Console.WriteLine($"param: {LitJson.JsonMapper.ToJson(param)}");
+            });
+        }
+
+        public static void GenericMethodTest4()
+        {
+            var tclass = new TClass();
+
+            tclass.Test<OneCallbackData>(param =>
+            {
+                Console.WriteLine($"输出: {LitJson.JsonMapper.ToJson(param)}");
+            });
+
+            tclass.Test<AnotherCallbackData>(param =>
+            {
+                Console.WriteLine($"输出: {LitJson.JsonMapper.ToJson(param)}");
             });
         }
     }
