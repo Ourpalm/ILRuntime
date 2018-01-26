@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Other;
 
@@ -106,7 +107,7 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine("    }");
                     sb.AppendLine("}");
 
-                    sw.Write(sb.Replace("\r\n", "\n").Replace("\n", "\r\n"));
+                    sw.Write(Regex.Replace(sb.ToString(), "(?<!\r)\n", "\r\n"));
                     sw.Flush();
                 }
             }
@@ -137,7 +138,7 @@ namespace ILRuntime.Runtime.Generated
                 sb.AppendLine(@"        }
     }
 }");
-                sw.Write(sb.Replace("\r\n", "\n").Replace("\n", "\r\n"));
+                sw.Write(Regex.Replace(sb.ToString(), "(?<!\r)\n", "\r\n"));
             }
         }
 
@@ -297,7 +298,7 @@ namespace ILRuntime.Runtime.Generated
                     sb.AppendLine("    }");
                     sb.AppendLine("}");
 
-                    sw.Write(sb.Replace("\r\n", "\n").Replace("\n", "\r\n"));
+                    sw.Write(Regex.Replace(sb.ToString(), "(?<!\r)\n", "\r\n"));
                     sw.Flush();
                 }
             }
@@ -328,7 +329,7 @@ namespace ILRuntime.Runtime.Generated
                 sb.AppendLine(@"        }
     }
 }");
-                sw.Write(sb.Replace("\r\n", "\n").Replace("\n", "\r\n"));
+                sw.Write(Regex.Replace(sb.ToString(), "(?<!\r)\n", "\r\n"));
             }
         }
 
