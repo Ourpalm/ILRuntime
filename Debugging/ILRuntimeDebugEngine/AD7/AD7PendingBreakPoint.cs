@@ -138,11 +138,30 @@ namespace ILRuntimeDebugEngine.AD7
                         SyntaxTree sourceTree = location.SourceTree;
                         SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
 
-                        var method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
-                        string methodName = method.Identifier.Text;
+                        bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
+                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);                        
+                        string methodName = null;
+                        if (method != null)
+                            methodName = ((MethodDeclarationSyntax)method).Identifier.Text;
+                        else
+                        {
+                             method = GetParentMethod<ConstructorDeclarationSyntax>(node.Parent);
+                            if (method != null)
+                            {
+                                bool isStatic = false;
+                                foreach (var i in method.Modifiers)
+                                {
+                                    if (i.Text == "static")
+                                        isStatic = true;
+                                }
+                                if (isStatic)
+                                    methodName = ".cctor";
+                                else
+                                    methodName = ".ctor";
+                            }
+                        }
 
-                        var cl = GetParentMethod<ClassDeclarationSyntax>(method);
-                        string className = cl.Identifier.Text;
+                        string className = GetClassName(method);
 
                         var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
                         string nsname = ns.Name.ToString();
@@ -151,6 +170,7 @@ namespace ILRuntimeDebugEngine.AD7
 
                         bindRequest = new CSBindBreakpoint();
                         bindRequest.BreakpointHashCode = this.GetHashCode();
+                        bindRequest.IsLambda = isLambda;
                         bindRequest.TypeName = name;
                         bindRequest.MethodName = methodName;
                         bindRequest.StartLine = StartLine;
@@ -168,6 +188,21 @@ namespace ILRuntimeDebugEngine.AD7
             return false;
         }
 
+        string GetClassName(BaseMethodDeclarationSyntax method)
+        {
+            ClassDeclarationSyntax cur = GetParentMethod<ClassDeclarationSyntax>(method);
+            string clsName = null;
+            while (cur != null)
+            {
+                if (clsName == null)
+                    clsName = cur.Identifier.Text;
+                else
+                    clsName = string.Format("{0}/{1}", cur.Identifier.Text, clsName);
+                cur = GetParentMethod<ClassDeclarationSyntax>(cur.Parent);
+            }
+
+            return clsName;
+        }
         private T GetParentMethod<T>(SyntaxNode node) where T : SyntaxNode
         {
             if (node == null)

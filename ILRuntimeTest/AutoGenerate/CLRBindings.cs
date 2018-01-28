@@ -11,26 +11,33 @@ namespace ILRuntime.Runtime.Generated
         /// </summary>
         public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
+            System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.Register(app);
+            System_Console_Binding.Register(app);
+            System_Threading_Tasks_Task_Binding.Register(app);
+            System_Runtime_CompilerServices_TaskAwaiter_Binding.Register(app);
+            System_Threading_Tasks_Task_1_Int32_Binding.Register(app);
+            System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.Register(app);
+            System_String_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Binding.Register(app);
             System_Linq_Enumerable_Binding.Register(app);
-            System_Console_Binding.Register(app);
+            System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.Register(app);
+            System_Collections_Generic_Dictionary_2_String_Object_Binding.Register(app);
+            ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.Register(app);
+            System_Int32_Binding.Register(app);
+            System_Activator_Binding.Register(app);
+            LitJson_JsonMapper_Binding.Register(app);
             System_Collections_Generic_List_1_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding.Register(app);
-            LitJson_JsonMapper_Binding.Register(app);
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_TestClass3Adaptor_Binding_Adaptor_Binding.Register(app);
-            System_String_Binding.Register(app);
             System_Type_Binding.Register(app);
             System_Object_Binding.Register(app);
             System_Reflection_MethodBase_Binding.Register(app);
-            System_Activator_Binding.Register(app);
             System_Reflection_MemberInfo_Binding.Register(app);
             System_Reflection_FieldInfo_Binding.Register(app);
             System_Exception_Binding.Register(app);
             System_Reflection_PropertyInfo_Binding.Register(app);
-            ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.Register(app);
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
-            System_Int32_Binding.Register(app);
             ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_ClassInheritanceTest2Adaptor_Binding_Adaptor_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_DelegateTest_Binding.Register(app);
@@ -48,6 +55,8 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.Register(app);
             System_Int32_Array_Binding.Register(app);
             System_Int32_Array_Binding_Array_Binding.Register(app);
+            System_Double_Binding.Register(app);
+            System_Single_Binding.Register(app);
             System_Int32_Array2_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.Register(app);
@@ -74,6 +83,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestVector3_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.Register(app);
+            System_DateTime_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);
         }

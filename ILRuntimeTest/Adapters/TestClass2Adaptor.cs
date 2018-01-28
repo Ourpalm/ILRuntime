@@ -28,7 +28,7 @@ namespace ILRuntimeTest.TestFramework
             return new Adaptor(appdomain, instance);
         }
 
-		internal class Adaptor : TestClass2, CrossBindingAdaptorType
+        internal class Adaptor : TestClass2, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -81,7 +81,7 @@ namespace ILRuntimeTest.TestFramework
                     isVMethod2Invoking = true;
                     var res = (Boolean)appdomain.Invoke(mVMethod2, instance );
                     isVMethod2Invoking = false;
-					return res;
+                    return res;
                 }
                 else
                     return (Boolean)base.VMethod2();
@@ -103,12 +103,18 @@ namespace ILRuntimeTest.TestFramework
             {
                 if(mAbMethod2 == null)
                 {
-                    mAbMethod2 = instance.Type.GetMethod("AbMethod2", 0);
+                    mAbMethod2 = instance.Type.GetMethod("AbMethod2", 1);
                 }
 
                 if (mAbMethod2 != null)
                 {
-					return (Single)appdomain.Invoke(mAbMethod2, instance ,arg1);
+                    using(var ctx = appdomain.BeginInvoke(mAbMethod2))
+                    {
+                        ctx.PushObject(instance);
+                        ctx.PushInteger(arg1);
+                        ctx.Invoke();
+                        return ctx.ReadFloat();
+                    }                    
                 }
                 
                 return 0;

@@ -74,7 +74,11 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (fieldMapping == null)
                     InitializeFields();
-                return fieldIdxMapping.Count;
+
+                if (fieldIdxMapping != null)
+                    return fieldIdxMapping.Count;
+                else
+                    throw new NotSupportedException("Cannot find ValueTypeBinder for type:" + clrType.FullName);
             }
         }
 
@@ -118,6 +122,14 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return clrType.ContainsGenericParameters;
+            }
+        }
+
+        public bool IsGenericParameter
+        {
+            get
+            {
+                return clrType.IsGenericParameter;
             }
         }
 
@@ -170,6 +182,15 @@ namespace ILRuntime.CLR.TypeSystem
                 return isValueType;
             }
         }
+
+        public bool IsByRef
+        {
+            get
+            {
+                return clrType.IsByRef;
+            }
+        }
+
         public bool IsDelegate
         {
             get
@@ -722,6 +743,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 Type t = clrType.MakeByRefType();
                 byRefType = new CLRType(t, appdomain);
+                ((CLRType)byRefType).elementType = this;
             }
             return byRefType;
         }

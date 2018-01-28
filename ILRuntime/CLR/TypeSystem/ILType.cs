@@ -152,6 +152,14 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public bool IsGenericParameter
+        {
+            get
+            {
+                return definition.IsGenericParameter && genericArguments == null;
+            }
+        }
+
         public Dictionary<string, int> StaticFieldMapping { get { return staticFieldMapping; } }
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
@@ -261,6 +269,14 @@ namespace ILRuntime.CLR.TypeSystem
             get; private set;
         }
 
+        public bool IsByRef
+        {
+            get
+            {
+                return definition.IsByReference;
+            }
+        }
+
         private bool? isValueType;
 
         public bool IsValueType
@@ -354,11 +370,35 @@ namespace ILRuntime.CLR.TypeSystem
                 return definition.IsEnum;
             }
         }
+
+        string fullName;
         public string FullName
         {
             get
             {
-                return typeRef.FullName;
+                if (string.IsNullOrEmpty(fullName))
+                {
+                    if (typeRef.HasGenericParameters && genericArguments != null)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(typeRef.FullName);
+                        sb.Append('<');
+                        bool first = true;
+                        foreach (var i in genericArguments)
+                        {
+                            if (first)
+                                first = false;
+                            else
+                                sb.Append(", ");
+                            sb.Append(i.Value.FullName);
+                        }
+                        sb.Append('>');
+                        fullName = sb.ToString();
+                    }
+                    else
+                        fullName = typeRef.FullName;
+                }
+                return fullName;
             }
         }
         public string Name
@@ -619,7 +659,7 @@ namespace ILRuntime.CLR.TypeSystem
                     if (i.ParameterCount == pCnt)
                     {
                         bool match = true;
-                        if (genericArguments != null && i.GenericParameterCount == genericArguments.Length)
+                        if (genericArguments != null && i.GenericParameterCount == genericArguments.Length && genericMethod == null)
                         {
                             genericMethod = CheckGenericParams(i, param, ref match);
                         }
@@ -697,8 +737,20 @@ namespace ILRuntime.CLR.TypeSystem
                 for (int j = 0; j < param.Count; j++)
                 {
                     var p = i.Parameters[j];
+                    if (p.IsByRef)
+                        p = p.ElementType;
+
+                    if (p.IsGenericParameter)
+                        continue;
+
                     if (p.HasGenericParameter)
                     {
+                        var p2 = param[j];
+                        if(p.Name != p2.Name)
+                        {
+                            match = false;
+                            break;
+                        }
                         //TODO should match the generic parameters;
                         continue;
                     }

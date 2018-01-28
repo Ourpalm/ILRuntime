@@ -45,7 +45,9 @@ namespace ILRuntime.Runtime.Intepreter
             //Clear old debug state
             ClearDebugState();
             lock (_lockObj)
+            {
                 Monitor.Wait(_lockObj);
+            }
         }
 
         public void Resume()
@@ -2763,7 +2765,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             if (t != null)
                                             {
                                                 var type = t.TypeForCLR;
-                                                if ((t is CLRType) && type.IsPrimitive)
+                                                bool isEnumObj = obj is ILEnumTypeInstance;
+                                                if ((t is CLRType) && type.IsPrimitive && !isEnumObj)
                                                 {
                                                     if (type == typeof(int))
                                                     {
@@ -3120,6 +3123,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         else
                                         {
                                             arr = new ILTypeInstance[cnt->Value];
+                                            ILTypeInstance[] ilArr = (ILTypeInstance[])arr;
+                                            if (type.IsValueType)
+                                            {
+                                                for(int i = 0; i < cnt->Value; i++)
+                                                {
+                                                    ilArr[i] = ((ILType)type).Instantiate(true);
+                                                }
+                                            }
                                         }
                                     }
                                     cnt->ObjectType = ObjectTypes.Object;
@@ -3225,7 +3236,21 @@ namespace ILRuntime.Runtime.Intepreter
                                     Free(esp - 1);
                                     Free(esp - 1 - 1);
 
-                                    esp = PushObject(esp - 1 - 1, mStack, val);
+                                    if (val is ILTypeInstance)
+                                    {
+                                        ILTypeInstance ins = (ILTypeInstance)val;
+                                        if (ins.Type.IsValueType && !ins.Boxed)
+                                        {
+                                            AllocValueType(arrRef, ins.Type);
+                                            StackObject* dst = *((StackObject**)&arrRef->Value);
+                                            ins.CopyValueTypeToStack(dst, mStack);
+                                            esp = idx;
+                                        }
+                                        else
+                                            esp = PushObject(esp - 1 - 1, mStack, val);
+                                    }
+                                    else
+                                        esp = PushObject(esp - 1 - 1, mStack, val);
                                 }
                                 break;
                             case OpCodeEnum.Stelem_I1:
@@ -4020,8 +4045,15 @@ namespace ILRuntime.Runtime.Intepreter
                             }
                             else
                             {
-                                var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder;
-                                vb.CopyValueTypeToStack(ins, dst, mStack);
+                                if (ins is CrossBindingAdaptorType)
+                                {
+                                    ((CrossBindingAdaptorType)ins).ILInstance.CopyValueTypeToStack(dst, mStack);
+                                }
+                                else
+                                {
+                                    var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder;
+                                    vb.CopyValueTypeToStack(ins, dst, mStack);
+                                }
                             }
                         }
                         else
@@ -4549,9 +4581,29 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
-        public static void UnboxObject(StackObject* esp, object obj)
+        public static void UnboxObject(StackObject* esp, object obj, IList<object> mStack = null, Enviorment.AppDomain domain = null)
         {
-            if (obj is int)
+            if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference && domain != null)
+            {
+                var dst = *(StackObject**)&esp->Value;
+                var vt = domain.GetType(dst->Value);
+
+                if (obj is ILTypeInstance)
+                {
+                    var ins = (ILTypeInstance)obj;
+                    ins.CopyValueTypeToStack(dst, mStack);
+                }
+                else if (obj is CrossBindingAdaptorType)
+                {
+                    var ins = ((CrossBindingAdaptorType)obj).ILInstance;
+                    ins.CopyValueTypeToStack(dst, mStack);
+                }
+                else
+                {
+                    ((CLRType)vt).ValueTypeBinder.CopyValueTypeToStack(obj, dst, mStack);
+                }
+            }
+            else if (obj is int)
             {
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (int)obj;
@@ -4610,7 +4662,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (sbyte)obj;
-            }
+            }            
             else
                 throw new NotImplementedException();
         }
@@ -4625,7 +4677,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                     if ((typeFlags & CLR.Utils.Extensions.TypeFlags.IsPrimitive) != 0)
                     {
-                        UnboxObject(esp, obj);
+                        UnboxObject(esp, obj, mStack);
                     }
                     else if ((typeFlags & CLR.Utils.Extensions.TypeFlags.IsEnum) != 0)
                     {

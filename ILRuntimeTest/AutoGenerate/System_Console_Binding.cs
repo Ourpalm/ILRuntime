@@ -22,10 +22,10 @@ namespace ILRuntime.Runtime.Generated
             FieldInfo field;
             Type[] args;
             Type type = typeof(System.Console);
-            args = new Type[]{typeof(System.String), typeof(System.Object)};
+            args = new Type[]{typeof(System.String)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_0);
-            args = new Type[]{typeof(System.String)};
+            args = new Type[]{typeof(System.String), typeof(System.Object)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_1);
             args = new Type[]{typeof(System.Int64)};
@@ -52,12 +52,29 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.UInt64)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_9);
+            args = new Type[]{typeof(System.String), typeof(System.Object[])};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_10);
 
 
         }
 
 
         static StackObject* WriteLine_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.String value = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -70,20 +87,6 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
 
             System.Console.WriteLine(format, arg0);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String value = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            System.Console.WriteLine(value);
 
             return __ret;
         }
@@ -190,6 +193,23 @@ namespace ILRuntime.Runtime.Generated
             System.UInt64 value = *(ulong*)&ptr_of_this_method->Value;
 
             System.Console.WriteLine(value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_10(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Object[] arg = (System.Object[])typeof(System.Object[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String format = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            System.Console.WriteLine(format, arg);
 
             return __ret;
         }

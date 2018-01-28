@@ -106,9 +106,16 @@ namespace ILRuntime.Runtime.Generated
                     {
                         var ___dst = *(StackObject**)&ptr_of_this_method->Value;
                         object ___obj = value;
-                        if (___obj is CrossBindingAdaptorType)
-                            ___obj = ((CrossBindingAdaptorType)___obj).ILInstance;
-                        __mStack[___dst->Value] = ___obj; 
+                        if (___dst->ObjectType >= ObjectTypes.Object)
+                        {
+                            if (___obj is CrossBindingAdaptorType)
+                                ___obj = ((CrossBindingAdaptorType)___obj).ILInstance;
+                            __mStack[___dst->Value] = ___obj;
+                        }
+                        else
+                        {
+                            ILIntepreter.UnboxObject(___dst, ___obj, __mStack, __domain);
+                        }
                     }
                     break;
                 case ObjectTypes.FieldReference:

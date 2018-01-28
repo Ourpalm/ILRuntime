@@ -79,11 +79,9 @@ namespace ILRuntime.Runtime.Generated
 
         static object PerformMemberwiseClone(ref object o)
         {
-            return new ILRuntimeTest.TestFramework.TestVectorStruct2
-            {
-                A = ((ILRuntimeTest.TestFramework.TestVectorStruct2) o).A,
-                Vector = ((ILRuntimeTest.TestFramework.TestVectorStruct2) o).Vector,
-            };
+            var ins = new ILRuntimeTest.TestFramework.TestVectorStruct2();
+            ins = (ILRuntimeTest.TestFramework.TestVectorStruct2)o;
+            return ins;
         }
 
 

@@ -115,6 +115,8 @@ namespace ILRuntime.Reflection
             {
                 if (type.IsEnum)
                     return typeof(Enum);
+                else if (type.IsArray)
+                    return typeof(Array);
                 else
                 {
                     return type.BaseType != null ? type.BaseType.ReflectionType : null;

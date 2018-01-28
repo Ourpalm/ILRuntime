@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ILRuntimeTest</RootNamespace>
     <AssemblyName>ILRuntimeTest</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\ClassInheritanceTestAdaptor.cs" />
+    <Compile Include="Adapters\IAsyncStateMachineAdaptor.cs" />
     <Compile Include="Adapters\TestVector3Binder.cs" />
     <Compile Include="AutoGenerate\CLRBindings.cs" />
     <Compile Include="Adapters\helper.cs" />
@@ -85,10 +86,12 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Type_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_IEnumerator_1_KeyValuePair_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTes_t.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_TestClass3Adaptor_B_t.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILTypeInstance_Binding.cs" />
@@ -103,7 +106,9 @@
     <Compile Include="AutoGenerate\System_Collections_IEnumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Console_Binding.cs" />
     <Compile Include="AutoGenerate\System_Convert_Binding.cs" />
+    <Compile Include="AutoGenerate\System_DateTime_Binding.cs" />
     <Compile Include="AutoGenerate\System_Diagnostics_Stopwatch_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array2_Binding.cs" />
@@ -122,7 +127,13 @@
     <Compile Include="AutoGenerate\System_Reflection_MemberInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_MethodBase_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_PropertyInfo_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Single_Binding.cs" />
     <Compile Include="AutoGenerate\System_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_Binding.cs" />
     <Compile Include="AutoGenerate\System_Type_Binding.cs" />
     <Compile Include="TestFramework\TestCLRAttribute.cs" />
     <Compile Include="TestFramework\TestVector3.cs" />

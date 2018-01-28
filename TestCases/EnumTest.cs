@@ -121,6 +121,11 @@ namespace TestCases
             }
         }
 
-
+        public static void Test10()
+        {
+            object e = TestEnum3.Enum2bbb;
+            byte b = (byte)e; //InvalidCastException
+            Console.WriteLine(b);
+        }
     }
 }

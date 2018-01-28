@@ -160,12 +160,9 @@ namespace ILRuntime.Runtime.Generated
 
         static object PerformMemberwiseClone(ref object o)
         {
-            return new ILRuntimeTest.TestFramework.TestVector3
-            {
-                X = ((ILRuntimeTest.TestFramework.TestVector3) o).X,
-                Y = ((ILRuntimeTest.TestFramework.TestVector3) o).Y,
-                Z = ((ILRuntimeTest.TestFramework.TestVector3) o).Z,
-            };
+            var ins = new ILRuntimeTest.TestFramework.TestVector3();
+            ins = (ILRuntimeTest.TestFramework.TestVector3)o;
+            return ins;
         }
 
 

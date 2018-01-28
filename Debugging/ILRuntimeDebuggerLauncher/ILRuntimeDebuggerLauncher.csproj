@@ -80,6 +80,10 @@
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
     <Content Include="index.html" />
+    <Content Include="LICENSE.TXT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\AttachToILRuntime.png" />
     <Content Include="Resources\AttachToILRuntimePackage.ico" />
     <Content Include="stylesheet.css" />

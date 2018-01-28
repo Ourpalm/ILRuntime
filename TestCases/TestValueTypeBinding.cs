@@ -37,6 +37,8 @@ namespace TestCases
         public static object Test03()
         {
             TestVector3[] a = new TestVector3[10000];
+            Vector3[] b = new Vector3[100];
+            Console.WriteLine(b[0]);
             for (int i = 0; i < 10000; i++)
             {
                 a[i] = TestVector3.One;
@@ -128,6 +130,11 @@ namespace TestCases
 
             Console.WriteLine("a.B.Vector.x=" + cls.A.B.Vector.X);
             Console.WriteLine("cls.B.x=" + cls.B.x);
+        }
+
+        public static void UnitTest_10026()
+        {
+            Console.WriteLine(DateTime.UtcNow.ToString());
         }
     }
 }

@@ -37,7 +37,7 @@ namespace ILRuntimeDebugEngine.AD7
                 localVars = new ILProperty[info.LocalVariables.Length];
                 for (int i = 0; i < localVars.Length; i++)
                 {
-                    localVars[i] = new ILProperty(info.LocalVariables[i]);
+                    localVars[i] = new ILProperty(engine, thread, info.LocalVariables[i]);
                     propertyMapping[info.LocalVariables[i].Name] = localVars[i];
                 }
             }
@@ -67,7 +67,7 @@ namespace ILRuntimeDebugEngine.AD7
                 pichError = (uint)pbstrError.Length;
                 return Constants.S_FALSE;
             }
-            ppExpr = new AD7Expression(this, exp);
+            ppExpr = new AD7Expression(this, exp, pszCode);
             return Constants.S_OK;
             /*string[] names = pszCode.Split('.');
             ILProperty root = null;

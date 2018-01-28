@@ -75,6 +75,9 @@
     <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
     <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
     <Compile Include="Runtime\Debugger\DebugSocket.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\SCEnumChildrenResult.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\CSEnumChildren.cs" />
+    <Compile Include="Runtime\Debugger\Protocol\CSResolveIndexer.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSResolveVariable.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSStep.cs" />
     <Compile Include="Runtime\Debugger\Protocol\CSExecute.cs" />
@@ -90,6 +93,7 @@
     <Compile Include="Runtime\Debugger\StepTypes.cs" />
     <Compile Include="Runtime\Debugger\VariableInfo.cs" />
     <Compile Include="Runtime\Debugger\StackFrameInfo.cs" />
+    <Compile Include="Runtime\Enviorment\InvocationContext.cs" />
     <Compile Include="Runtime\Enviorment\ValueTypeBinder.cs" />
     <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
     <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />

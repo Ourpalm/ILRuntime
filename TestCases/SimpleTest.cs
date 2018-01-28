@@ -23,11 +23,19 @@ namespace TestCases
         public SimpleTest()
             : this(1)
         {
-            c = 2;
+            Action a = () =>
+            {
+                c = 2;
+            };
+            a();
         }
         public SimpleTest(int a)
         {
-            this.a = a;
+            Action act = () =>
+            {
+                this.a = a;
+            };
+            act();
         }
 
         public void Test(int a, int c)

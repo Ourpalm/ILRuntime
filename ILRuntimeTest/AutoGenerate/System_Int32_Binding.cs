@@ -42,7 +42,7 @@ namespace ILRuntime.Runtime.Generated
                         var instance_of_fieldReference = __mStack[ptr_of_this_method->Value];
                         if(instance_of_fieldReference is ILTypeInstance)
                         {
-                            instance_of_this_method = (System.Int32)((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow];
+                            instance_of_this_method = (System.Int32)typeof(System.Int32).CheckCLRTypes(((ILTypeInstance)instance_of_fieldReference)[ptr_of_this_method->ValueLow]);
                         }
                         else
                         {
@@ -56,7 +56,7 @@ namespace ILRuntime.Runtime.Generated
                         var t = __domain.GetType(ptr_of_this_method->Value);
                         if(t is ILType)
                         {
-                            instance_of_this_method = (System.Int32)((ILType)t).StaticInstance[ptr_of_this_method->ValueLow];
+                            instance_of_this_method = (System.Int32)typeof(System.Int32).CheckCLRTypes(((ILType)t).StaticInstance[ptr_of_this_method->ValueLow]);
                         }
                         else
                         {

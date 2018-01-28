@@ -15,6 +15,9 @@ namespace ILRuntimeDebugEngine.AD7
         bool closed;
         DebugSocket socket;
         AD7Engine engine;
+        bool rpcStarted = false;
+        bool rpcCompleted = false;
+        object rpcResult;
         Dictionary<int, AD7PendingBreakPoint> breakpoints = new Dictionary<int, AD7PendingBreakPoint>();
         Dictionary<int, AD7Thread> threads = new Dictionary<int, AD7Thread>();
         public Dictionary<int, AD7Thread> Threads { get { return threads; } }
@@ -85,6 +88,55 @@ namespace ILRuntimeDebugEngine.AD7
             return RemoteDebugVersion == DebuggerServer.Version;
         }
 
+        public T AwaitRPCRequest<T>(out bool aborted, int timeout = 0)
+        {
+            aborted = false;
+            if (!rpcStarted)
+            {
+                rpcCompleted = false;
+                rpcResult = null;
+                rpcStarted = true;
+                var rpcStartTime = DateTime.Now;
+                while(!rpcCompleted)
+                {
+                    if(timeout > 0)
+                    {
+                        if((DateTime.Now - rpcStartTime).TotalMilliseconds > timeout)
+                        {
+                            rpcCompleted = true;
+                            rpcResult = null;
+                            rpcStarted = false;
+                            aborted = true;
+                            break;
+                        }
+                    }
+                    if (closed)
+                    {
+                        rpcCompleted = true;
+                        rpcResult = null;
+                        rpcStarted = false;
+                        aborted = true;
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(10);
+                }
+
+                return (T)rpcResult;
+            }
+            else
+                throw new NotSupportedException();
+        }
+
+        void CompleteRPCRequest(object obj)
+        {
+            if (rpcStarted)
+            {
+                rpcResult = obj;
+                rpcCompleted = true;
+                rpcStarted = false;
+            }
+        }
+
         void OnReceiveMessage(DebugMessageType type, byte[] buffer)
         {
             using (System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer))
@@ -153,7 +205,18 @@ namespace ILRuntimeDebugEngine.AD7
                             break;
                         case DebugMessageType.SCResolveVariableResult:
                             {
-                                resolved = ReadVariableInfo(br);
+                                CompleteRPCRequest(ReadVariableInfo(br));                                
+                            }
+                            break;
+                        case DebugMessageType.SCEnumChildrenResult:
+                            {
+                                int cnt = br.ReadInt32();
+                                VariableInfo[] res = new VariableInfo[cnt];
+                                for(int i = 0; i < cnt; i++)
+                                {
+                                    res[i] = ReadVariableInfo(br);
+                                }
+                                CompleteRPCRequest(res);
                             }
                             break;
                     }
@@ -205,8 +268,11 @@ namespace ILRuntimeDebugEngine.AD7
             vinfo.Offset = br.ReadInt32();
             vinfo.Name = br.ReadString();
             vinfo.Value = br.ReadString();
+            vinfo.ValueType = (ValueTypes)br.ReadByte();
             vinfo.TypeName = br.ReadString();
             vinfo.Expandable = br.ReadBoolean();
+            vinfo.IsPrivate = br.ReadBoolean();
+            vinfo.IsProtected = br.ReadBoolean();
 
             return vinfo;
         }
@@ -219,6 +285,7 @@ namespace ILRuntimeDebugEngine.AD7
         {
             sendStream.Position = 0;
             bw.Write(msg.BreakpointHashCode);
+            bw.Write(msg.IsLambda);
             bw.Write(msg.TypeName);
             bw.Write(msg.MethodName);
             bw.Write(msg.StartLine);
@@ -270,30 +337,73 @@ namespace ILRuntimeDebugEngine.AD7
             }
         }
 
-        VariableInfo resolved;
-        public VariableInfo ResolveVariable(VariableReference reference, string name, int threadId)
+        //VariableInfo resolved;
+        public VariableInfo ResolveVariable(VariableReference parent, string name, int threadId, uint dwTimeout)
         {
             CSResolveVariable msg = new CSResolveVariable();
-            msg.Name = name;
             msg.ThreadHashCode = threadId;
-            msg.Parent = reference;
-            resolved = null;
+            msg.Variable = VariableReference.GetMember(name, parent);
             SendResolveVariable(msg);
 
-            while(resolved == null && !closed)
-            {
-                System.Threading.Thread.Sleep(10);
-            }
-            return resolved;
+            bool aborted;
+            var res = AwaitRPCRequest<VariableInfo>(out aborted, (int)dwTimeout);
+            if (aborted)
+                return VariableInfo.RequestTimeout;
+            return res;
         }
 
         void SendResolveVariable(CSResolveVariable msg)
         {
             sendStream.Position = 0;
             bw.Write(msg.ThreadHashCode);
-            bw.Write(msg.Name);
-            WriteVariableReference(msg.Parent);
+            WriteVariableReference(msg.Variable);
             socket.Send(DebugMessageType.CSResolveVariable, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        public VariableInfo ResolveIndexAccess(VariableReference body, VariableReference idx, int threadId, uint dwTimeout)
+        {
+            CSResolveIndexer msg = new CSResolveIndexer();
+            msg.Body = body;
+            msg.Index = idx;
+            msg.ThreadHashCode = threadId;
+            SendResolveIndexAccess(msg);
+
+            bool aborted;
+            var res = AwaitRPCRequest<VariableInfo>(out aborted, (int)dwTimeout);
+            if (aborted)
+                return VariableInfo.RequestTimeout;
+            return res;
+        }
+
+        void SendResolveIndexAccess(CSResolveIndexer msg)
+        {
+            sendStream.Position = 0;
+            bw.Write(msg.ThreadHashCode);
+            WriteVariableReference(msg.Body);
+            WriteVariableReference(msg.Index);
+            socket.Send(DebugMessageType.CSResolveIndexAccess, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        public VariableInfo[] EnumChildren(VariableReference parent, int threadId, uint dwTimeout)
+        {
+            CSEnumChildren msg = new CSEnumChildren();
+            msg.ThreadHashCode = threadId;
+            msg.Parent = parent;
+            SendEnumChildren(msg);
+
+            bool aborted;
+            var res = AwaitRPCRequest<VariableInfo[]>(out aborted, (int)dwTimeout);
+            if (aborted)
+                return new VariableInfo[] { VariableInfo.RequestTimeout };
+            return res;
+        }
+
+        void SendEnumChildren(CSEnumChildren msg)
+        {
+            sendStream.Position = 0;
+            bw.Write(msg.ThreadHashCode);
+            WriteVariableReference(msg.Parent);
+            socket.Send(DebugMessageType.CSEnumChildren, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
         void WriteVariableReference(VariableReference reference)
@@ -306,6 +416,16 @@ namespace ILRuntimeDebugEngine.AD7
                 bw.Write(reference.Offset);
                 bw.Write(reference.Name);
                 WriteVariableReference(reference.Parent);
+                if (reference.Parameters != null)
+                {
+                    bw.Write(reference.Parameters.Length);
+                    foreach (var i in reference.Parameters)
+                    {
+                        WriteVariableReference(i);
+                    }
+                }
+                else
+                    bw.Write(0);
             }
         }
 

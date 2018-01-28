@@ -102,7 +102,17 @@ namespace ILRuntime.Runtime.Generated
                 case ObjectTypes.StackObjectReference:
                     {
                         var ___dst = *(StackObject**)&ptr_of_this_method->Value;
-                        __mStack[___dst->Value] = a;
+                        object ___obj = a;
+                        if (___dst->ObjectType >= ObjectTypes.Object)
+                        {
+                            if (___obj is CrossBindingAdaptorType)
+                                ___obj = ((CrossBindingAdaptorType)___obj).ILInstance;
+                            __mStack[___dst->Value] = ___obj;
+                        }
+                        else
+                        {
+                            ILIntepreter.UnboxObject(___dst, ___obj, __mStack, __domain);
+                        }
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -219,11 +229,9 @@ namespace ILRuntime.Runtime.Generated
 
         static object PerformMemberwiseClone(ref object o)
         {
-            return new ILRuntimeTest.TestFramework.TestStruct
-            {
-                testField = ((ILRuntimeTest.TestFramework.TestStruct) o).testField,
-                value = ((ILRuntimeTest.TestFramework.TestStruct) o).value,
-            };
+            var ins = new ILRuntimeTest.TestFramework.TestStruct();
+            ins = (ILRuntimeTest.TestFramework.TestStruct)o;
+            return ins;
         }
 
 

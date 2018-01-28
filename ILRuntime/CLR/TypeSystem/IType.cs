@@ -36,7 +36,13 @@ namespace ILRuntime.CLR.TypeSystem
 
         bool IsPrimitive { get; }
 
+        bool IsByRef { get; }
+
+        IType ElementType { get; }
+
         bool HasGenericParameter { get; }
+
+        bool IsGenericParameter { get; }
 
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
 
