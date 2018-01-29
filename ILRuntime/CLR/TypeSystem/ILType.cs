@@ -148,7 +148,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.HasGenericParameters && genericArguments == null;
+                return  typeRef.HasGenericParameters && genericArguments == null;
             }
         }
 
@@ -156,7 +156,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.IsGenericParameter && genericArguments == null;
+                return typeRef.IsGenericParameter && genericArguments == null;
             }
         }
 
@@ -273,7 +273,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.IsByReference;
+                return typeRef.IsByReference;
             }
         }
 
