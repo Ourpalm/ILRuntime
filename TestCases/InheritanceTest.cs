@@ -6,14 +6,19 @@ using System.Text;
 using ILRuntimeTest.TestFramework;
 
 namespace TestCases
-{
+{   public interface InterfaceTest2
+    {
+        void TestVirtual();
+        void TestAbstract();
+        void TestField();
+    }
+
     public class InheritanceTest
     {
         public static void InheritanceTest01()
         {
             TestCls cls = new TestCls();
             TestCls2 cls2 = new TestCls2();
-            TestCls3 cls3 = new TestCls3();
 
             Console.WriteLine("Test invoking from sub type...");
             Console.WriteLine(cls.ToString());
@@ -26,10 +31,10 @@ namespace TestCases
             cls2.TestVirtual();
             cls2.TestField();
 
-            Console.WriteLine(cls3.ToString());
-            cls3.TestAbstract();
-            cls3.TestVirtual();
-            cls3.TestField();
+            Console.WriteLine("----------------------------------");
+
+           
+            Console.WriteLine("----------------------------------");
 
             Test01Sub(cls);
             Test01Sub(cls2);
@@ -39,8 +44,15 @@ namespace TestCases
 
             ClassInheritanceTest.Test3(cls);
             ClassInheritanceTest.Test3(cls2);
-            ClassInheritanceTest.Test3(cls3);
+        }
 
+        public static void InheritanceTest_Interface()
+        {
+            TestCls3 cls3 = new TestCls3();
+            Console.WriteLine(cls3.ToString());
+            cls3.TestAbstract();
+            ((InterfaceTest2)cls3).TestVirtual();
+            cls3.TestField();
         }
 
         static void Test01Sub(ClassInheritanceTest cls)
@@ -190,7 +202,7 @@ namespace TestCases
         }
     }
 
-    class TestCls3 : InterfaceTest
+    class TestCls3 : InterfaceTest2
     {
         int testVal;
 
@@ -208,9 +220,9 @@ namespace TestCases
             Console.WriteLine("testValChild = " + testVal);
         }
 
-        public void TestVirtual()
+        void InterfaceTest2.TestVirtual()
         {
-            Console.WriteLine("This is TestCls3.TestVirtual");
+            Console.WriteLine("TestVirtual = " + testVal);
         }
     }
 

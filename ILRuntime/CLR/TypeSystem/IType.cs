@@ -38,6 +38,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         bool IsByRef { get; }
 
+        bool IsInterface { get; }
+
         IType ElementType { get; }
 
         bool HasGenericParameter { get; }

@@ -135,6 +135,11 @@ namespace ILRuntime.CLR.TypeSystem
             get { return false; }
         }
 
+        public bool IsInterface
+        {
+            get { return false; }
+        }
+
         public string Name
         {
             get

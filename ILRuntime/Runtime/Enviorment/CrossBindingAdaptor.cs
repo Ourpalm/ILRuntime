@@ -255,6 +255,11 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
+        public bool IsInterface
+        {
+            get { return type.IsInterface; }
+        }
+
         public IType ElementType
         {
             get

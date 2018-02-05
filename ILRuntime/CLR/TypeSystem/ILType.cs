@@ -305,6 +305,14 @@ namespace ILRuntime.CLR.TypeSystem
             get { return false; }
         }
 
+        public bool IsInterface
+        {
+            get
+            {
+                return TypeDefinition.IsInterface;
+            }
+        }
+
         public Type TypeForCLR
         {
             get
@@ -629,6 +637,11 @@ namespace ILRuntime.CLR.TypeSystem
             }
 
             var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
+            if (m == null && method.DeclearingType.IsInterface)
+            {
+                m = GetMethod(string.Format("{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+            }
+
             if (m == null)
             {
                 if (BaseType != null)

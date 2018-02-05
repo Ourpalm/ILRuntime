@@ -64,9 +64,11 @@
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_C_t.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_DelegateTest_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass2_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass3_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestStruct_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVector3_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorClass_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorStruct_Binding.cs" />
     <Compile Include="AutoGenerate\LitJson_JsonMapper_Binding.cs" />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -25,6 +25,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.Register(app);
             System_Int32_Binding.Register(app);
             System_Activator_Binding.Register(app);
+            System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.Register(app);
             LitJson_JsonMapper_Binding.Register(app);
             System_Collections_Generic_List_1_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Binding.Register(app);
@@ -39,10 +40,10 @@ namespace ILRuntime.Runtime.Generated
             System_Reflection_PropertyInfo_Binding.Register(app);
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_ClassInheritanceTest2Adaptor_Binding_Adaptor_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestClass2_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_DelegateTest_Binding.Register(app);
             ILRuntimeTest_TestFramework_BaseClassTest_Binding.Register(app);
-            System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.Register(app);
             System_Boolean_Binding.Register(app);
             System_Math_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
@@ -84,6 +85,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestVectorStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.Register(app);
             System_DateTime_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestVectorClass_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);
         }
