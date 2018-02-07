@@ -101,6 +101,25 @@ namespace TestCases
             Console.WriteLine(cls.AbMethod2(122));
         }
 
+        public static void InheritanceTest08()
+        {
+            AABase obj = new AABase();
+            obj.R = 1;
+            obj.R2 = 2;
+
+            var m = typeof(InheritanceTest).GetMethod("InheritanceTest08_Sub");
+
+            m.Invoke(null, new object[] { obj });
+        }
+
+        static void InheritanceTest08_Sub(AABase obj)
+        {
+            var k = obj.R;
+            var l = obj.R2;
+
+            Console.WriteLine(string.Format("{0},{1}", k, l));
+        }
+
         class TestCls5 : TestClass2
         {
             public override float AbMethod2(int arg1)
@@ -161,6 +180,7 @@ namespace TestCases
         }
 
     }
+
     class TestCls : ClassInheritanceTest
     {
         public TestCls()
@@ -241,6 +261,8 @@ namespace TestCases
 
     class AABase : IDisposable
     {
+        public int R;
+        public int R2 { get; set; }
         public void AA1()
         {
             Console.WriteLine("AABase");
