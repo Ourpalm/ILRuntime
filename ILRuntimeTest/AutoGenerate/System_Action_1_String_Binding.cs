@@ -1,0 +1,31 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.InteropServices;
+
+using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Enviorment;
+using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Stack;
+using ILRuntime.Reflection;
+using ILRuntime.CLR.Utils;
+
+namespace ILRuntime.Runtime.Generated
+{
+    unsafe class System_Action_1_String_Binding
+    {
+        public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
+        {
+            app.DelegateManager.RegisterMethodDelegate<System.String> ();
+
+            app.DelegateManager.RegisterDelegateConvertor<System.Action<System.String>>((act) =>
+            {
+                return new System.Action<System.String>((obj) =>
+                {
+                    ((Action<System.String>)act)(obj);
+                });
+            });
+        }
+    }
+}

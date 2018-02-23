@@ -105,15 +105,14 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestVector3 b = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
+            ILRuntimeTest.TestFramework.TestVector3 b = ValueTypeBinderMapping.Parse_ILRuntimeTest_TestFramework_TestVector3_Binding (__intp, ptr_of_this_method, __mStack);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVector3 a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
+            ILRuntimeTest.TestFramework.TestVector3 a = ValueTypeBinderMapping.Parse_ILRuntimeTest_TestFramework_TestVector3_Binding (__intp, ptr_of_this_method, __mStack);
 
             var result_of_this_method = a + b;
 
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            ValueTypeBinderMapping.Push_ILRuntimeTest_TestFramework_TestVector3_Binding(ref result_of_this_method, __intp, __ret, __mStack);
+            return __ret + 1;
         }
 
         static StackObject* op_Multiply_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
@@ -124,12 +123,12 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.Single b = *(float*)&ptr_of_this_method->Value;
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVector3 a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
+            ILRuntimeTest.TestFramework.TestVector3 a = ValueTypeBinderMapping.Parse_ILRuntimeTest_TestFramework_TestVector3_Binding (__intp, ptr_of_this_method, __mStack);
 
             var result_of_this_method = a * b;
 
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            ValueTypeBinderMapping.Push_ILRuntimeTest_TestFramework_TestVector3_Binding(ref result_of_this_method, __intp, __ret, __mStack);
+            return __ret + 1;
         }
 
 
@@ -199,10 +198,11 @@ namespace ILRuntime.Runtime.Generated
             if(!isNewObj)
             {
                 __ret--;
-                WriteBackInstance(__domain, __ret, __mStack, ref result_of_this_method);
+                ValueTypeBinderMapping.WriteBack_ILRuntimeTest_TestFramework_TestVector3_Binding(__domain, __ret, __mStack, ref result_of_this_method);
                 return __ret;
             }
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            ValueTypeBinderMapping.Push_ILRuntimeTest_TestFramework_TestVector3_Binding(ref result_of_this_method, __intp, __ret, __mStack);
+            return __ret + 1;
         }
 
 
