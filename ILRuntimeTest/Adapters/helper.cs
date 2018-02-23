@@ -5,6 +5,7 @@ namespace ILRuntimeTest.TestFramework
 {
     class ILRuntimeHelper
     {
+        // manual register
         public static void Init(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             if (app == null)
@@ -23,6 +24,12 @@ namespace ILRuntimeTest.TestFramework
             app.RegisterCrossBindingAdaptor(new IDisposableClassInheritanceAdaptor());
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTest2Adaptor());
             app.RegisterCrossBindingAdaptor(new IAsyncStateMachineClassInheritanceAdaptor());
+
+            // value type register
+
+            app.RegisterValueTypeBinder(typeof(TestVector3), new TestVector3Binder());
+            app.RegisterValueTypeBinder(typeof(TestVectorStruct), new TestVectorStructBinder());
+            app.RegisterValueTypeBinder(typeof(TestVectorStruct2), new TestVectorStruct2Binder());
 
             // delegate register 
 
@@ -84,6 +91,8 @@ namespace ILRuntimeTest.TestFramework
                 });
             });
 
+            // LitJson register
+            LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(app);
         }
     }
 }

@@ -179,6 +179,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="AutoGenerate\CLRBindings_Delegate.cs" />
+    <Compile Include="AutoGenerate\ValueTypeBinderMapping.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate2_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_1_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_3_Int32_String_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Func_2_Int32_Int32_Binding.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -199,6 +207,10 @@
     <ProjectReference Include="..\Mono.Cecil.Pdb\Mono.Cecil.Pdb.csproj">
       <Project>{cea7a85f-2523-4ad0-8296-6e8e0a2e6df7}</Project>
       <Name>Mono.Cecil.Pdb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Cecil.Mdb\Mono.Cecil.Mdb.csproj">
+      <Project>{86F36240-E07C-4840-9C8B-9CD94C03EC62}</Project>
+      <Name>Mono.Cecil.Mdb</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
