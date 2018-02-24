@@ -148,7 +148,7 @@ namespace ILRuntime.Runtime.CLRBinding
                         sb.AppendLine(string.Format("            {0} a{1} = {2};", clsName, j, p.ParameterType.GetRetrieveValueCode(clsName)));
                     }
                     else
-                        sb.AppendLine(string.Format("            {0} {1} = {2};", clsName, p.Name, p.ParameterType.GetRetrieveValueCode(clsName)));
+                        sb.AppendLine(string.Format("            {0} @{1} = {2};", clsName, p.Name, p.ParameterType.GetRetrieveValueCode(clsName)));
                     if (!isByRef && !p.ParameterType.IsPrimitive)
                         sb.AppendLine("            __intp.Free(ptr_of_this_method);");
                 }
