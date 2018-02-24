@@ -64,11 +64,21 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.RuntimeTypeHandle handle = (System.RuntimeTypeHandle)typeof(System.RuntimeTypeHandle).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = System.Type.GetTypeFromHandle(handle);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            CLRType __clrType = null; ValueTypeBinder __binder = null;
+            System.RuntimeTypeHandle @handle = new System.RuntimeTypeHandle();
+            __clrType = (CLRType)__domain.GetType (typeof(System.RuntimeTypeHandle));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                @handle = ((ValueTypeBinder<System.RuntimeTypeHandle>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
+            } else {
+                @handle = (System.RuntimeTypeHandle)typeof(System.RuntimeTypeHandle).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+                __intp.Free(ptr_of_this_method);
+            }
+
+
+            var result_of_this_method = System.Type.GetTypeFromHandle(@handle);
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
@@ -83,15 +93,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Type o = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Type instance_of_this_method;
-            instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type @o = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = instance_of_this_method.Equals(o);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = instance_of_this_method.Equals(@o);
 
             __ret->ObjectType = ObjectTypes.Integer;
             __ret->Value = result_of_this_method ? 1 : 0;
@@ -103,12 +114,15 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Type right = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type @right = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Type left = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type @left = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
+
 
             var result_of_this_method = left == right;
 
@@ -122,12 +136,15 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Type right = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type @right = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Type left = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type @left = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
+
 
             var result_of_this_method = left != right;
 
@@ -141,15 +158,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Type instance_of_this_method;
-            instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String @name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = instance_of_this_method.GetMethod(name);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = instance_of_this_method.GetMethod(@name);
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
@@ -164,11 +182,13 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String typeName = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String @typeName = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = System.Type.GetType(typeName);
+
+            var result_of_this_method = System.Type.GetType(@typeName);
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
@@ -183,15 +203,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Type instance_of_this_method;
-            instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String @name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = instance_of_this_method.GetField(name);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = instance_of_this_method.GetField(@name);
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
@@ -206,9 +227,9 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Type instance_of_this_method;
-            instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetFields();
@@ -221,15 +242,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Type instance_of_this_method;
-            instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String @name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = instance_of_this_method.GetProperty(name);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = instance_of_this_method.GetProperty(@name);
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
@@ -244,9 +266,9 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Type instance_of_this_method;
-            instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.FullName;
@@ -259,15 +281,24 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Reflection.BindingFlags bindingAttr = (System.Reflection.BindingFlags)typeof(System.Reflection.BindingFlags).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
+            CLRType __clrType = null; ValueTypeBinder __binder = null;
+            System.Reflection.BindingFlags @bindingAttr = new System.Reflection.BindingFlags();
+            __clrType = (CLRType)__domain.GetType (typeof(System.Reflection.BindingFlags));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                @bindingAttr = ((ValueTypeBinder<System.Reflection.BindingFlags>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
+            } else {
+                @bindingAttr = (System.Reflection.BindingFlags)typeof(System.Reflection.BindingFlags).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+                __intp.Free(ptr_of_this_method);
+            }
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Type instance_of_this_method;
-            instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = instance_of_this_method.GetProperties(bindingAttr);
+            var result_of_this_method = instance_of_this_method.GetProperties(@bindingAttr);
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }

@@ -62,14 +62,22 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Threading.Tasks.Task instance_of_this_method;
-            instance_of_this_method = (System.Threading.Tasks.Task)typeof(System.Threading.Tasks.Task).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Threading.Tasks.Task instance_of_this_method = (System.Threading.Tasks.Task)typeof(System.Threading.Tasks.Task).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetAwaiter();
 
+            CLRType __clrType = null; ValueTypeBinder __binder = null;
+            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.TaskAwaiter));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                ((ValueTypeBinder<System.Runtime.CompilerServices.TaskAwaiter>)__binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
         }
 
         static StackObject* Run_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
@@ -77,11 +85,13 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Func<System.Int32> function = (System.Func<System.Int32>)typeof(System.Func<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Func<System.Int32> @function = (System.Func<System.Int32>)typeof(System.Func<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = System.Threading.Tasks.Task.Run<System.Int32>(function);
+
+            var result_of_this_method = System.Threading.Tasks.Task.Run<System.Int32>(@function);
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)

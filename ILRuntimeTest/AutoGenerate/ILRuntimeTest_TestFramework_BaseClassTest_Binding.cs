@@ -39,6 +39,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
 
+
             ILRuntimeTest.TestFramework.BaseClassTest.DoTest();
 
             return __ret;

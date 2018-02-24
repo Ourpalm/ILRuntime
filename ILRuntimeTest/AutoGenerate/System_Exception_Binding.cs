@@ -46,9 +46,9 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception instance_of_this_method;
-            instance_of_this_method = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Exception instance_of_this_method = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Message;
@@ -61,9 +61,9 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception instance_of_this_method;
-            instance_of_this_method = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Exception instance_of_this_method = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Data;
@@ -81,9 +81,9 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception instance_of_this_method;
-            instance_of_this_method = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Exception instance_of_this_method = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.StackTrace;
@@ -98,10 +98,11 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.String message = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String @message = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = new System.Exception(message);
+
+            var result_of_this_method = new System.Exception(@message);
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }

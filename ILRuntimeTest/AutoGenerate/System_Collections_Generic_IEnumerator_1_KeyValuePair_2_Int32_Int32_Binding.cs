@@ -34,14 +34,22 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>> instance_of_this_method;
-            instance_of_this_method = (System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>>)typeof(System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>> instance_of_this_method = (System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>>)typeof(System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Current;
 
+            CLRType __clrType = null; ValueTypeBinder __binder = null;
+            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                ((ValueTypeBinder<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>>)__binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
         }
 
 

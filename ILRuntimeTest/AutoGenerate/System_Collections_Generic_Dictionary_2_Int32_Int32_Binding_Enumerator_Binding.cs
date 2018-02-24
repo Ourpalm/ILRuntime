@@ -84,16 +84,37 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator instance_of_this_method;
-            instance_of_this_method = (System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator)typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            CLRType __clrType = null; ValueTypeBinder __binder = null;
+            System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator instance_of_this_method = new System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator();
+            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                instance_of_this_method = ((ValueTypeBinder<System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
+            } else {
+                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+                instance_of_this_method = (System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator)typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            }
 
             var result_of_this_method = instance_of_this_method.Current;
 
-            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                ((ValueTypeBinder<System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            } else {
+                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            }
 
+            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                ((ValueTypeBinder<System.Collections.Generic.KeyValuePair<System.Int32, System.Int32>>)__binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
         }
 
         static StackObject* MoveNext_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
@@ -101,14 +122,28 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator instance_of_this_method;
-            instance_of_this_method = (System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator)typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            CLRType __clrType = null; ValueTypeBinder __binder = null;
+            System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator instance_of_this_method = new System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator();
+            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                instance_of_this_method = ((ValueTypeBinder<System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
+            } else {
+                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+                instance_of_this_method = (System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator)typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            }
 
             var result_of_this_method = instance_of_this_method.MoveNext();
 
-            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator));
+            __binder = __clrType.ValueTypeBinder;
+            if (__binder != null) {
+                ((ValueTypeBinder<System.Collections.Generic.Dictionary<System.Int32, System.Int32>.Enumerator>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            } else {
+                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            }
 
             __ret->ObjectType = ObjectTypes.Integer;
             __ret->Value = result_of_this_method ? 1 : 0;
