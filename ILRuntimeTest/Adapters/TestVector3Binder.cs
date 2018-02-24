@@ -33,162 +33,162 @@ namespace ILRuntimeTest.TestFramework
 
         public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
         {
-            //BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            //MethodBase method;
-            //Type[] args;
-            //Type type = typeof(TestVector3);
-            //args = new Type[] { typeof(float), typeof(float), typeof(float) };
-            //method = type.GetConstructor(flag, null, args, null);
-            //appdomain.RegisterCLRMethodRedirection(method, NewVector3);
+            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+            MethodBase method;
+            Type[] args;
+            Type type = typeof(TestVector3);
+            args = new Type[] { typeof(float), typeof(float), typeof(float) };
+            method = type.GetConstructor(flag, null, args, null);
+            appdomain.RegisterCLRMethodRedirection(method, NewVector3);
 
-            //args = new Type[] { typeof(TestVector3), typeof(TestVector3) };
-            //method = type.GetMethod("op_Addition", flag, null, args, null);
-            //appdomain.RegisterCLRMethodRedirection(method, Vector3_Add);
+            args = new Type[] { typeof(TestVector3), typeof(TestVector3) };
+            method = type.GetMethod("op_Addition", flag, null, args, null);
+            appdomain.RegisterCLRMethodRedirection(method, Vector3_Add);
 
-            //args = new Type[] { typeof(TestVector3), typeof(float) };
-            //method = type.GetMethod("op_Multiply", flag, null, args, null);
-            //appdomain.RegisterCLRMethodRedirection(method, Vector3_Multiply);
+            args = new Type[] { typeof(TestVector3), typeof(float) };
+            method = type.GetMethod("op_Multiply", flag, null, args, null);
+            appdomain.RegisterCLRMethodRedirection(method, Vector3_Multiply);
         }
 
-        //public StackObject* Vector3_Add(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
-        //{
-        //    var ret = ILIntepreter.Minus(esp, 2);
-        //    var ptrB = ILIntepreter.Minus(esp, 1);
-        //    var b = ILIntepreter.GetObjectAndResolveReference(ptrB);
+        public StackObject* Vector3_Add(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = ILIntepreter.Minus(esp, 2);
+            var ptrB = ILIntepreter.Minus(esp, 1);
+            var b = ILIntepreter.GetObjectAndResolveReference(ptrB);
 
-        //    float x, y, z, x2, y2, z2;
-        //    if (b->ObjectType == ObjectTypes.ValueTypeObjectReference)
-        //    {
-        //        var src = *(StackObject**)&b->Value;
-        //        x2 = *(float*)&ILIntepreter.Minus(src, 1)->Value;
-        //        y2 = *(float*)&ILIntepreter.Minus(src, 2)->Value;
-        //        z2 = *(float*)&ILIntepreter.Minus(src, 3)->Value;
-        //    }
-        //    else
-        //    {
-        //        var src = (TestVector3)mStack[b->Value];
-        //        x2 = src.X;
-        //        y2 = src.Y;
-        //        z2 = src.Z;
-        //        intp.Free(ptrB);
-        //    }
+            float x, y, z, x2, y2, z2;
+            if (b->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&b->Value;
+                x2 = *(float*)&ILIntepreter.Minus(src, 1)->Value;
+                y2 = *(float*)&ILIntepreter.Minus(src, 2)->Value;
+                z2 = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+            }
+            else
+            {
+                var src = (TestVector3)mStack[b->Value];
+                x2 = src.X;
+                y2 = src.Y;
+                z2 = src.Z;
+                intp.Free(ptrB);
+            }
 
-        //    var ptrA = ILIntepreter.Minus(esp, 2);
-        //    var a = ILIntepreter.GetObjectAndResolveReference(ptrA);
-        //    if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
-        //    {
-        //        var src = *(StackObject**)&a->Value;
-        //        x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
-        //        y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
-        //        z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
-        //    }
-        //    else
-        //    {
-        //        var src = (TestVector3)mStack[a->Value];
-        //        x = src.X;
-        //        y = src.Y;
-        //        z = src.Z;
-        //        intp.Free(ptrA);
-        //    }
+            var ptrA = ILIntepreter.Minus(esp, 2);
+            var a = ILIntepreter.GetObjectAndResolveReference(ptrA);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
+                y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
+                z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+            }
+            else
+            {
+                var src = (TestVector3)mStack[a->Value];
+                x = src.X;
+                y = src.Y;
+                z = src.Z;
+                intp.Free(ptrA);
+            }
 
-        //    intp.AllocValueType(ret, CLRType);
-        //    var dst = *((StackObject**)&ret->Value);
+            intp.AllocValueType(ret, CLRType);
+            var dst = *((StackObject**)&ret->Value);
 
-        //    *(float*)&ILIntepreter.Minus(dst, 1)->Value = x + x2;
-        //    *(float*)&ILIntepreter.Minus(dst, 2)->Value = y + y2;
-        //    *(float*)&ILIntepreter.Minus(dst, 3)->Value = z + z2;
+            *(float*)&ILIntepreter.Minus(dst, 1)->Value = x + x2;
+            *(float*)&ILIntepreter.Minus(dst, 2)->Value = y + y2;
+            *(float*)&ILIntepreter.Minus(dst, 3)->Value = z + z2;
 
-        //    return ret + 1;
-        //}
+            return ret + 1;
+        }
 
-        //public StackObject* Vector3_Multiply(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
-        //{
-        //    var ret = ILIntepreter.Minus(esp, 2);
+        public StackObject* Vector3_Multiply(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = ILIntepreter.Minus(esp, 2);
 
-        //    var ptr = ILIntepreter.Minus(esp, 1);
-        //    var b = ILIntepreter.GetObjectAndResolveReference(ptr);
+            var ptr = ILIntepreter.Minus(esp, 1);
+            var b = ILIntepreter.GetObjectAndResolveReference(ptr);
 
-        //    float val = *(float*)&b->Value;
+            float val = *(float*)&b->Value;
 
-        //    float x, y, z;
+            float x, y, z;
 
-        //    ptr = ILIntepreter.Minus(esp, 2);
-        //    var a = ILIntepreter.GetObjectAndResolveReference(ptr);
-        //    if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
-        //    {
-        //        var src = *(StackObject**)&a->Value;
-        //        x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
-        //        y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
-        //        z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
-        //    }
-        //    else
-        //    {
-        //        var src = (TestVector3)mStack[a->Value];
-        //        x = src.X;
-        //        y = src.Y;
-        //        z = src.Z;
-        //        intp.Free(ptr);
-        //    }
+            ptr = ILIntepreter.Minus(esp, 2);
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
+                y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
+                z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+            }
+            else
+            {
+                var src = (TestVector3)mStack[a->Value];
+                x = src.X;
+                y = src.Y;
+                z = src.Z;
+                intp.Free(ptr);
+            }
 
-        //    intp.AllocValueType(ret, CLRType);
-        //    var dst = *((StackObject**)&ret->Value);
+            intp.AllocValueType(ret, CLRType);
+            var dst = *((StackObject**)&ret->Value);
 
-        //    *(float*)&ILIntepreter.Minus(dst, 1)->Value = x * val;
-        //    *(float*)&ILIntepreter.Minus(dst, 2)->Value = y * val;
-        //    *(float*)&ILIntepreter.Minus(dst, 3)->Value = z * val;
+            *(float*)&ILIntepreter.Minus(dst, 1)->Value = x * val;
+            *(float*)&ILIntepreter.Minus(dst, 2)->Value = y * val;
+            *(float*)&ILIntepreter.Minus(dst, 3)->Value = z * val;
 
-        //    return ret + 1;
-        //}
+            return ret + 1;
+        }
 
-        //public StackObject* NewVector3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
-        //{
-        //    StackObject* ret = null;
-        //    if (isNewObj)
-        //    {
-        //        ret = ILIntepreter.Minus(esp, 2);
-        //        TestVector3 vec;
-        //        var ptr = ILIntepreter.Minus(esp, 1);
-        //        vec.Z = *(float*)&ptr->Value;
-        //        ptr = ILIntepreter.Minus(esp, 2);
-        //        vec.Y = *(float*)&ptr->Value;
-        //        ptr = ILIntepreter.Minus(esp, 3);
-        //        vec.X = *(float*)&ptr->Value;
+        public StackObject* NewVector3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            StackObject* ret = null;
+            if (isNewObj)
+            {
+                ret = ILIntepreter.Minus(esp, 2);
+                TestVector3 vec;
+                var ptr = ILIntepreter.Minus(esp, 1);
+                vec.Z = *(float*)&ptr->Value;
+                ptr = ILIntepreter.Minus(esp, 2);
+                vec.Y = *(float*)&ptr->Value;
+                ptr = ILIntepreter.Minus(esp, 3);
+                vec.X = *(float*)&ptr->Value;
 
-        //        PushVector3(ref vec, intp, ptr, mStack);
-        //    }
-        //    else
-        //    {
-        //        ret = ILIntepreter.Minus(esp, 4);
-        //        var instance = ILIntepreter.GetObjectAndResolveReference(ret);
-        //        if (instance->ObjectType == ObjectTypes.StackObjectReference)
-        //        {
-        //            var dst = *(StackObject**)&instance->Value;
-        //            var f = ILIntepreter.Minus(dst, 1);
-        //            var v = ILIntepreter.Minus(esp, 3);
-        //            *f = *v;
+                PushVector3(ref vec, intp, ptr, mStack);
+            }
+            else
+            {
+                ret = ILIntepreter.Minus(esp, 4);
+                var instance = ILIntepreter.GetObjectAndResolveReference(ret);
+                if (instance->ObjectType == ObjectTypes.StackObjectReference)
+                {
+                    var dst = *(StackObject**)&instance->Value;
+                    var f = ILIntepreter.Minus(dst, 1);
+                    var v = ILIntepreter.Minus(esp, 3);
+                    *f = *v;
 
-        //            f = ILIntepreter.Minus(dst, 2);
-        //            v = ILIntepreter.Minus(esp, 2);
-        //            *f = *v;
+                    f = ILIntepreter.Minus(dst, 2);
+                    v = ILIntepreter.Minus(esp, 2);
+                    *f = *v;
 
-        //            f = ILIntepreter.Minus(dst, 3);
-        //            v = ILIntepreter.Minus(esp, 1);
-        //            *f = *v;
-        //        }
-        //        else
-        //        {
+                    f = ILIntepreter.Minus(dst, 3);
+                    v = ILIntepreter.Minus(esp, 1);
+                    *f = *v;
+                }
+                else
+                {
                     
-        //        }
-        //    }
-        //    return ret;
-        //}
+                }
+            }
+            return ret;
+        }
 
-        //public void PushVector3(ref TestVector3 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
-        //{
-        //    intp.AllocValueType(ptr, CLRType);
-        //    var dst = *((StackObject**)&ptr->Value);
-        //    CopyValueTypeToStack(ref vec, dst, mStack);
-        //}
+        public void PushVector3(ref TestVector3 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
+        {
+            intp.AllocValueType(ptr, CLRType);
+            var dst = *((StackObject**)&ptr->Value);
+            CopyValueTypeToStack(ref vec, dst, mStack);
+        }
     }
 
     public unsafe class TestVectorStructBinder : ValueTypeBinder<TestVectorStruct>
