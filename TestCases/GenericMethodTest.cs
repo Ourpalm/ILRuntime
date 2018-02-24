@@ -155,6 +155,18 @@ namespace TestCases
             test.Test();
         }
 
+        public static void GenericMethodTest6()
+        {
+            int i = 0;
+            Foo(2, out i);
+            Console.WriteLine(i);
+        }
+
+        static void Foo<T>(T arr, out int i)
+        {
+            i = 1;
+            Console.WriteLine(arr.ToString());
+        }
 
         class BugTest
         {
