@@ -143,7 +143,6 @@ namespace ILRuntimeTest
 
                     ILRuntimeHelper.Init(_app);
                     ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
-                    ILRuntime.Runtime.Generated.CLRDelegateBindings.Initialize(_app);
 
                     LoadTest();
                     UpdateBtnState();
