@@ -199,7 +199,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 {
                     if (isProperty)
                     {
-                        string[] t = i.Name.Split('_');
+                        string[] t = new string[2];
+                        int firstUnderlineIndex = i.Name.IndexOf("_");
+                        t[0] = i.Name.Substring(0, firstUnderlineIndex);
+                        t[1] = i.Name.Substring(firstUnderlineIndex + 1);
                         string propType = t[0];
 
                         if (propType == "get")
@@ -286,7 +289,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 {
                     if (isProperty)
                     {
-                        string[] t = i.Name.Split('_');
+                        string[] t = new string[2];
+                        int firstUnderlineIndex = i.Name.IndexOf("_");
+                        t[0] = i.Name.Substring(0, firstUnderlineIndex);
+                        t[1] = i.Name.Substring(firstUnderlineIndex + 1);
                         string propType = t[0];
 
                         if (propType == "get")
