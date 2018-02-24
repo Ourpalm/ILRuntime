@@ -150,7 +150,7 @@ namespace ILRuntime.Runtime.CLRBinding
                             sb.AppendLine(string.Format("            {0} a{1} = ValueTypeBinderMapping.Parse_{2} (__intp, ptr_of_this_method, __mStack);", clsName, j, tmp));
                         }
                         else
-                            sb.AppendLine(string.Format("            {0} {1} = ValueTypeBinderMapping.Parse_{2} (__intp, ptr_of_this_method, __mStack);", clsName, p.Name, tmp));
+                            sb.AppendLine(string.Format("            {0} @{1} = ValueTypeBinderMapping.Parse_{2} (__intp, ptr_of_this_method, __mStack);", clsName, p.Name, tmp));
                     }
                     else
                     {
@@ -161,7 +161,7 @@ namespace ILRuntime.Runtime.CLRBinding
                             sb.AppendLine(string.Format("            {0} a{1} = {2};", clsName, j, p.ParameterType.GetRetrieveValueCode(clsName)));
                         }
                         else
-                            sb.AppendLine(string.Format("            {0} {1} = {2};", clsName, p.Name, p.ParameterType.GetRetrieveValueCode(clsName)));
+                            sb.AppendLine(string.Format("            {0} @{1} = {2};", clsName, p.Name, p.ParameterType.GetRetrieveValueCode(clsName)));
                         if (!isByRef && !p.ParameterType.IsPrimitive)
                             sb.AppendLine("            __intp.Free(ptr_of_this_method);");
                     }
@@ -222,7 +222,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 {
                     if (isProperty)
                     {
-                        string[] t = i.Name.Split('_');
+                        string[] t = new string[2];
+                        int firstUnderlineIndex = i.Name.IndexOf("_");
+                        t[0] = i.Name.Substring(0, firstUnderlineIndex);
+                        t[1] = i.Name.Substring(firstUnderlineIndex + 1);
                         string propType = t[0];
 
                         if (propType == "get")
@@ -309,7 +312,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 {
                     if (isProperty)
                     {
-                        string[] t = i.Name.Split('_');
+                        string[] t = new string[2];
+                        int firstUnderlineIndex = i.Name.IndexOf("_");
+                        t[0] = i.Name.Substring(0, firstUnderlineIndex);
+                        t[1] = i.Name.Substring(firstUnderlineIndex + 1);
                         string propType = t[0];
 
                         if (propType == "get")

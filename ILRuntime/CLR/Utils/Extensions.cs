@@ -80,31 +80,43 @@ namespace ILRuntime.CLR.Utils
                 return EmptyParamList;
         }
 
-        static string ReplaceGenericArgument(string typename, string argumentName, string argumentType)
+        static string ReplaceGenericArgument(string typename, string argumentName, string argumentType, bool isGA = false)
         {
             string baseType;
             StringBuilder sb = new StringBuilder();
             List<string> ga;
             bool isArray;
             Runtime.Enviorment.AppDomain.ParseGenericType(typename, out baseType, out ga, out isArray);
+            bool hasGA = ga != null && ga.Count > 0;
             if (baseType == argumentName)
-                sb.Append(argumentType);
-            else
-                sb.Append(baseType);
-            if (ga != null && ga.Count > 0)
             {
-                sb.Append("<");
+                if (isGA)
+                    sb.Append('[');
+                sb.Append(argumentType);
+                if (isGA)
+                    sb.Append(']');
+            }
+            else
+            {
+                if (isGA && !hasGA)
+                    sb.Append('[');
+                sb.Append(baseType);
+                if (isGA && !hasGA)
+                    sb.Append(']');
+            }
+            if (hasGA)
+            {
+                sb.Append("[");
                 bool isFirst = true;
-                foreach(var i in ga)
+                foreach (var i in ga)
                 {
                     if (isFirst)
                         isFirst = false;
                     else
                         sb.Append(",");
-
-                    sb.Append(ReplaceGenericArgument(i, argumentName, argumentType));
+                    sb.Append(ReplaceGenericArgument(i, argumentName, argumentType, true));
                 }
-                sb.Append(">");
+                sb.Append("]");
             }
             if (isArray)
                 sb.Append("[]");
