@@ -140,24 +140,54 @@ namespace ILRuntimeTest.TestFramework
             return ret + 1;
         }
 
-        public static StackObject* NewVector3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public StackObject* NewVector3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = ILIntepreter.Minus(esp, 4);
-            var instance = ILIntepreter.GetObjectAndResolveReference(ret);
-            var dst = *(StackObject**)&instance->Value;
-            var f = ILIntepreter.Minus(dst, 1);
-            var v = ILIntepreter.Minus(esp, 3);
-            *f = *v;
+            StackObject* ret = null;
+            if (isNewObj)
+            {
+                ret = ILIntepreter.Minus(esp, 2);
+                TestVector3 vec;
+                var ptr = ILIntepreter.Minus(esp, 1);
+                vec.Z = *(float*)&ptr->Value;
+                ptr = ILIntepreter.Minus(esp, 2);
+                vec.Y = *(float*)&ptr->Value;
+                ptr = ILIntepreter.Minus(esp, 3);
+                vec.X = *(float*)&ptr->Value;
 
-            f = ILIntepreter.Minus(dst, 2);
-            v = ILIntepreter.Minus(esp, 2);
-            *f = *v;
+                PushVector3(ref vec, intp, ptr, mStack);
+            }
+            else
+            {
+                ret = ILIntepreter.Minus(esp, 4);
+                var instance = ILIntepreter.GetObjectAndResolveReference(ret);
+                if (instance->ObjectType == ObjectTypes.StackObjectReference)
+                {
+                    var dst = *(StackObject**)&instance->Value;
+                    var f = ILIntepreter.Minus(dst, 1);
+                    var v = ILIntepreter.Minus(esp, 3);
+                    *f = *v;
 
-            f = ILIntepreter.Minus(dst, 3);
-            v = ILIntepreter.Minus(esp, 1);
-            *f = *v;
+                    f = ILIntepreter.Minus(dst, 2);
+                    v = ILIntepreter.Minus(esp, 2);
+                    *f = *v;
 
+                    f = ILIntepreter.Minus(dst, 3);
+                    v = ILIntepreter.Minus(esp, 1);
+                    *f = *v;
+                }
+                else
+                {
+                    
+                }
+            }
             return ret;
+        }
+
+        public void PushVector3(ref TestVector3 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
+        {
+            intp.AllocValueType(ptr, CLRType);
+            var dst = *((StackObject**)&ptr->Value);
+            CopyValueTypeToStack(ref vec, dst, mStack);
         }
     }
 

@@ -148,5 +148,28 @@ namespace TestCases
                 Console.WriteLine($"输出: {LitJson.JsonMapper.ToJson(param)}");
             });
         }
+
+        public static void GenericMethodTest5()
+        {
+            BugTest test = new BugTest();
+            test.Test();
+        }
+
+
+        class BugTest
+        {
+            public class TestClass<T>
+            {
+
+            }
+            public void Test()
+            {
+                TestClass<int> r;
+                dict.TryGetValue(0, out r);
+            }
+            Dictionary<int, TestClass<int>> dict = new Dictionary<int, TestClass<int>>();
+        }
+
+        
     }
 }

@@ -136,5 +136,13 @@ namespace TestCases
         {
             Console.WriteLine(DateTime.UtcNow.ToString());
         }
+
+        public static void UnitTest_10027()
+        {
+            TestVectorClass cls = new TestVectorClass();
+            cls.vector = new TestVector3(123, 123, 123);
+
+            Console.WriteLine("x:" + cls.vector.X + " y:" + cls.vector.Y + " z:" + cls.vector.Z);
+        }
     }
 }

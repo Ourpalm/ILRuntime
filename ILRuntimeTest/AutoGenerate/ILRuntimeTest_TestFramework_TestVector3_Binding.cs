@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -38,12 +38,18 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("Y", flag);
             app.RegisterCLRFieldGetter(field, get_Y_2);
             app.RegisterCLRFieldSetter(field, set_Y_2);
+            field = type.GetField("Z", flag);
+            app.RegisterCLRFieldGetter(field, get_Z_3);
+            app.RegisterCLRFieldSetter(field, set_Z_3);
 
             app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);
 
             app.RegisterCLRCreateDefaultInstance(type, () => new ILRuntimeTest.TestFramework.TestVector3());
             app.RegisterCLRCreateArrayInstance(type, s => new ILRuntimeTest.TestFramework.TestVector3[s]);
 
+            args = new Type[]{typeof(System.Single), typeof(System.Single), typeof(System.Single)};
+            method = type.GetConstructor(flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Ctor_0);
 
         }
 
@@ -157,12 +163,46 @@ namespace ILRuntime.Runtime.Generated
             p->Y = (System.Single)v;
             h.Free();
         }
+        static object get_Z_3(ref object o)
+        {
+            return ((ILRuntimeTest.TestFramework.TestVector3)o).Z;
+        }
+        static void set_Z_3(ref object o, object v)
+        {
+            var h = GCHandle.Alloc(o, GCHandleType.Pinned);
+            ILRuntimeTest.TestFramework.TestVector3* p = (ILRuntimeTest.TestFramework.TestVector3 *)(void *)h.AddrOfPinnedObject();
+            p->Z = (System.Single)v;
+            h.Free();
+        }
 
         static object PerformMemberwiseClone(ref object o)
         {
             var ins = new ILRuntimeTest.TestFramework.TestVector3();
             ins = (ILRuntimeTest.TestFramework.TestVector3)o;
             return ins;
+        }
+
+        static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Single z = *(float*)&ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Single y = *(float*)&ptr_of_this_method->Value;
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Single x = *(float*)&ptr_of_this_method->Value;
+
+            var result_of_this_method = new ILRuntimeTest.TestFramework.TestVector3(x, y, z);
+
+            if(!isNewObj)
+            {
+                __ret--;
+                WriteBackInstance(__domain, __ret, __mStack, ref result_of_this_method);
+                return __ret;
+            }
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
 

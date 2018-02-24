@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -17,10 +17,6 @@ namespace ILRuntime.Runtime.Generated
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
-            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-            MethodBase method;
-            FieldInfo field;
-            Type[] args;
             Type type = typeof(ILRuntimeTest.TestFramework.TestVectorStruct);
 
             app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);

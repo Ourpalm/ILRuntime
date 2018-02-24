@@ -772,7 +772,7 @@ namespace ILRuntime.Runtime.Enviorment
             intp.Free(param);
 
             param = ILIntepreter.Minus(esp, 3);
-            object instance = StackObject.ToObject(param, domain, mStack);
+            object instance = CheckCrossBindingAdapter(StackObject.ToObject(param, domain, mStack));
             intp.Free(param);
 
             if (instance is ILRuntimeMethodInfo)
@@ -786,7 +786,7 @@ namespace ILRuntime.Runtime.Enviorment
                     object[] arr = (object[])p;
                     foreach (var i in arr)
                     {
-                        esp = ILIntepreter.PushObject(esp, mStack, i);
+                        esp = ILIntepreter.PushObject(esp, mStack, CheckCrossBindingAdapter(i));
                     }
                 }
                 bool unhandled;
@@ -811,6 +811,15 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
                 return ILIntepreter.PushObject(ret, mStack, ((MethodInfo)instance).Invoke(obj, (object[])p));
+        }
+
+        static object CheckCrossBindingAdapter(object obj)
+        {
+            if(obj is CrossBindingAdaptorType)
+            {
+                return ((CrossBindingAdaptorType)obj).ILInstance;
+            }
+            return obj;
         }
 
         /*public unsafe static object MethodInfoInvoke(ILContext ctx, object instance, object[] param, IType[] genericArguments)

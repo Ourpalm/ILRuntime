@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -37,7 +37,6 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* DoTest_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
 
             ILRuntimeTest.TestFramework.BaseClassTest.DoTest();

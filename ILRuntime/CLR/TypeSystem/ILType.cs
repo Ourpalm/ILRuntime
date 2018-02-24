@@ -148,7 +148,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.HasGenericParameters && genericArguments == null;
+                return  typeRef.HasGenericParameters && genericArguments == null;
             }
         }
 
@@ -156,7 +156,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.IsGenericParameter && genericArguments == null;
+                return typeRef.IsGenericParameter && genericArguments == null;
             }
         }
 
@@ -273,7 +273,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.IsByReference;
+                return typeRef.IsByReference;
             }
         }
 
@@ -303,6 +303,14 @@ namespace ILRuntime.CLR.TypeSystem
         public bool IsPrimitive
         {
             get { return false; }
+        }
+
+        public bool IsInterface
+        {
+            get
+            {
+                return TypeDefinition.IsInterface;
+            }
         }
 
         public Type TypeForCLR
@@ -629,6 +637,11 @@ namespace ILRuntime.CLR.TypeSystem
             }
 
             var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
+            if (m == null && method.DeclearingType.IsInterface)
+            {
+                m = GetMethod(string.Format("{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+            }
+
             if (m == null)
             {
                 if (BaseType != null)

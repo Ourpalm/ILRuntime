@@ -45,6 +45,11 @@ namespace ILRuntimeTest.TestFramework
         }
     }
 
+    public class TestVectorClass
+    {
+        public TestVector3 vector;
+    }
+
     public struct TestVectorStruct
     {
         public int A;

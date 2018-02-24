@@ -133,6 +133,11 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        public bool IsInterface
+        {
+            get { return clrType.IsInterface; }
+        }
+
         public Type TypeForCLR
         {
             get
