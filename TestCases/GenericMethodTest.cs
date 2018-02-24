@@ -155,7 +155,32 @@ namespace TestCases
             test.Test();
         }
 
+        public static void GenericMethodTest6()
+        {
+            int i = 0;
+            Foo(2, out i);
+            Console.WriteLine(i);
+        }
 
+        static void Foo<T>(T arr, out int i)
+        {
+            i = 1;
+            Console.WriteLine(arr.ToString());
+        }
+
+        public static void GenericMethodTest7()
+        {
+            Foo(new List<int> { }, Bar); //NullReferenceException: Object reference not set to an instance of an object (at Assets/ILRuntime/CLR/TypeSystem/ILType.cs:762)
+        }
+
+        public static int Bar(List<int> o)
+        {
+            return 0;
+        }
+        public static void Foo<T1, T2>(T1 t, Func<T1, T2> func)
+        {
+
+        }
         class BugTest
         {
             public class TestClass<T>

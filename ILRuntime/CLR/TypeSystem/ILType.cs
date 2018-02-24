@@ -756,9 +756,11 @@ namespace ILRuntime.CLR.TypeSystem
                     if (p.IsGenericParameter)
                         continue;
 
+                    var p2 = param[j];
+                    if (p2.IsByRef)
+                        p2 = p2.ElementType;
                     if (p.HasGenericParameter)
                     {
-                        var p2 = param[j];
                         if(p.Name != p2.Name)
                         {
                             match = false;
@@ -768,7 +770,8 @@ namespace ILRuntime.CLR.TypeSystem
                         continue;
                     }
 
-                    if (param[j] != p)
+                    
+                    if (p2 != p)
                     {
                         match = false;
                         break;
