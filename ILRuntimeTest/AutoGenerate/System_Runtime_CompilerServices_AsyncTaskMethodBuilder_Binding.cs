@@ -149,15 +149,7 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Create();
 
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
-                return __ret + 1;
-            } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
-            }
         }
 
         static StackObject* Start_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
@@ -171,26 +163,12 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = new System.Runtime.CompilerServices.AsyncTaskMethodBuilder();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             instance_of_this_method.Start<ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @stateMachine);
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             switch(ptr_of_this_method->ObjectType)
@@ -256,26 +234,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = new System.Runtime.CompilerServices.AsyncTaskMethodBuilder();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             var result_of_this_method = instance_of_this_method.Task;
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
@@ -300,26 +264,12 @@ namespace ILRuntime.Runtime.Generated
             System.Runtime.CompilerServices.TaskAwaiter @awaiter = (System.Runtime.CompilerServices.TaskAwaiter)typeof(System.Runtime.CompilerServices.TaskAwaiter).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = new System.Runtime.CompilerServices.AsyncTaskMethodBuilder();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @awaiter, ref @stateMachine);
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             switch(ptr_of_this_method->ObjectType)
@@ -443,26 +393,12 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = new System.Runtime.CompilerServices.AsyncTaskMethodBuilder();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             instance_of_this_method.SetException(@exception);
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             return __ret;
         }
@@ -474,26 +410,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = new System.Runtime.CompilerServices.AsyncTaskMethodBuilder();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             instance_of_this_method.SetResult();
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             return __ret;
         }
@@ -513,26 +435,12 @@ namespace ILRuntime.Runtime.Generated
             System.Runtime.CompilerServices.TaskAwaiter<System.Int32> @awaiter = (System.Runtime.CompilerServices.TaskAwaiter<System.Int32>)typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = new System.Runtime.CompilerServices.AsyncTaskMethodBuilder();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<System.Int32>, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @awaiter, ref @stateMachine);
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.AsyncTaskMethodBuilder>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             switch(ptr_of_this_method->ObjectType)

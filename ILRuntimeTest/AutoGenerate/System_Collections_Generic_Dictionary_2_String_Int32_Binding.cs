@@ -118,15 +118,7 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = instance_of_this_method.GetEnumerator();
 
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.Dictionary<System.String, System.Int32>.Enumerator));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Collections.Generic.Dictionary<System.String, System.Int32>.Enumerator>)__binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
-                return __ret + 1;
-            } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
-            }
         }
 
 

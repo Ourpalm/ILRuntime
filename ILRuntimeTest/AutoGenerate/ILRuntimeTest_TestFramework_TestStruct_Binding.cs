@@ -222,16 +222,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            ILRuntimeTest.TestFramework.TestStruct @aaa = new ILRuntimeTest.TestFramework.TestStruct();
-            __clrType = (CLRType)__domain.GetType (typeof(ILRuntimeTest.TestFramework.TestStruct));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                @aaa = ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestStruct>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                @aaa = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-                __intp.Free(ptr_of_this_method);
-            }
+            ILRuntimeTest.TestFramework.TestStruct @aaa = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
 
             ILRuntimeTest.TestFramework.TestStruct.DoTest2(@aaa);

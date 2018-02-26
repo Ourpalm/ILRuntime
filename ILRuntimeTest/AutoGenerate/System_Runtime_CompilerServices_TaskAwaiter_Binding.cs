@@ -86,26 +86,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.TaskAwaiter instance_of_this_method = new System.Runtime.CompilerServices.TaskAwaiter();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.TaskAwaiter));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.TaskAwaiter>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter)typeof(System.Runtime.CompilerServices.TaskAwaiter).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.TaskAwaiter instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter)typeof(System.Runtime.CompilerServices.TaskAwaiter).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             var result_of_this_method = instance_of_this_method.IsCompleted;
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.TaskAwaiter));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.TaskAwaiter>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             __ret->ObjectType = ObjectTypes.Integer;
             __ret->Value = result_of_this_method ? 1 : 0;
@@ -119,26 +105,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Runtime.CompilerServices.TaskAwaiter instance_of_this_method = new System.Runtime.CompilerServices.TaskAwaiter();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.TaskAwaiter));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Runtime.CompilerServices.TaskAwaiter>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter)typeof(System.Runtime.CompilerServices.TaskAwaiter).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Runtime.CompilerServices.TaskAwaiter instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter)typeof(System.Runtime.CompilerServices.TaskAwaiter).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             instance_of_this_method.GetResult();
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.TaskAwaiter));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.TaskAwaiter>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             return __ret;
         }

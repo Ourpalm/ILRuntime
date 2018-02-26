@@ -66,16 +66,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.RuntimeTypeHandle @handle = new System.RuntimeTypeHandle();
-            __clrType = (CLRType)__domain.GetType (typeof(System.RuntimeTypeHandle));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                @handle = ((ValueTypeBinder<System.RuntimeTypeHandle>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                @handle = (System.RuntimeTypeHandle)typeof(System.RuntimeTypeHandle).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-                __intp.Free(ptr_of_this_method);
-            }
+            System.RuntimeTypeHandle @handle = (System.RuntimeTypeHandle)typeof(System.RuntimeTypeHandle).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
 
             var result_of_this_method = System.Type.GetTypeFromHandle(@handle);
@@ -283,16 +275,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Reflection.BindingFlags @bindingAttr = new System.Reflection.BindingFlags();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Reflection.BindingFlags));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                @bindingAttr = ((ValueTypeBinder<System.Reflection.BindingFlags>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                @bindingAttr = (System.Reflection.BindingFlags)typeof(System.Reflection.BindingFlags).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-                __intp.Free(ptr_of_this_method);
-            }
+            System.Reflection.BindingFlags @bindingAttr = (System.Reflection.BindingFlags)typeof(System.Reflection.BindingFlags).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));

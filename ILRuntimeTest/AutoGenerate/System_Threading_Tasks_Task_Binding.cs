@@ -69,15 +69,7 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = instance_of_this_method.GetAwaiter();
 
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            __clrType = (CLRType)__domain.GetType (typeof(System.Runtime.CompilerServices.TaskAwaiter));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Runtime.CompilerServices.TaskAwaiter>)__binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
-                return __ret + 1;
-            } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
-            }
         }
 
         static StackObject* Run_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)

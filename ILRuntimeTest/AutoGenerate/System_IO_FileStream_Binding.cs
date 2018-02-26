@@ -36,16 +36,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.IO.FileMode @mode = new System.IO.FileMode();
-            __clrType = (CLRType)__domain.GetType (typeof(System.IO.FileMode));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                @mode = ((ValueTypeBinder<System.IO.FileMode>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                @mode = (System.IO.FileMode)typeof(System.IO.FileMode).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-                __intp.Free(ptr_of_this_method);
-            }
+            System.IO.FileMode @mode = (System.IO.FileMode)typeof(System.IO.FileMode).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.String @path = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));

@@ -83,26 +83,12 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            CLRType __clrType = null; ValueTypeBinder __binder = null;
-            System.Collections.Generic.KeyValuePair<System.String, System.Int32> instance_of_this_method = new System.Collections.Generic.KeyValuePair<System.String, System.Int32>();
-            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.KeyValuePair<System.String, System.Int32>));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                instance_of_this_method = ((ValueTypeBinder<System.Collections.Generic.KeyValuePair<System.String, System.Int32>>)__binder).ParseValue (__intp, ptr_of_this_method, __mStack);
-            } else {
-                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-                instance_of_this_method = (System.Collections.Generic.KeyValuePair<System.String, System.Int32>)typeof(System.Collections.Generic.KeyValuePair<System.String, System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            }
+            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+            System.Collections.Generic.KeyValuePair<System.String, System.Int32> instance_of_this_method = (System.Collections.Generic.KeyValuePair<System.String, System.Int32>)typeof(System.Collections.Generic.KeyValuePair<System.String, System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             var result_of_this_method = instance_of_this_method.Key;
 
-            __clrType = (CLRType)__domain.GetType (typeof(System.Collections.Generic.KeyValuePair<System.String, System.Int32>));
-            __binder = __clrType.ValueTypeBinder;
-            if (__binder != null) {
-                ((ValueTypeBinder<System.Collections.Generic.KeyValuePair<System.String, System.Int32>>)__binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
+            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
