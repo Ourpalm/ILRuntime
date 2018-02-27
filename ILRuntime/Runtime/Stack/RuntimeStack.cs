@@ -91,7 +91,7 @@ namespace ILRuntime.Runtime.Stack
                 p->ObjectType = ObjectTypes.Null;
             }
 #endif
-            res.BasePointer = method.LocalVariableCount > 0 ? Add(esp, method.LocalVariableCount + 1) : esp;
+            res.BasePointer = method.LocalVariableCount > 0 ? Add(esp, method.LocalVariableCount) : esp;
             res.ManagedStackBase = managedStack.Count;
             res.ValueTypeBasePointer = valueTypePtr;
             //frames.Push(res);
