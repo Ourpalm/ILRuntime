@@ -181,6 +181,20 @@ namespace TestCases
         {
 
         }
+
+        public static void GenericMethodTest8()
+        {
+            Foo2(new object[][] { }, Bar2);  //NullReferenceException: Object reference not set to an instance of an object (at Assets/ILRuntime/CLR/TypeSystem/ILType.cs:762)
+        }
+
+        public static object Bar2(object o)
+        {
+            return o;
+        }
+        public static void Foo2<T1, T2>(T1[] t, Func<T1, T2> func)
+        {
+
+        }
         class BugTest
         {
             public class TestClass<T>
