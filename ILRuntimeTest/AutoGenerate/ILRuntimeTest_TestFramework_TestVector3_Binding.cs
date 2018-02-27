@@ -108,7 +108,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ILRuntimeTest.TestFramework.TestVector3 @b = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                @b = ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>)ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder).ParseValue (__intp, ptr_of_this_method, __mStack);
+                @b = ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);
             } else {
                 @b = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
                 __intp.Free(ptr_of_this_method);
@@ -117,7 +117,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ILRuntimeTest.TestFramework.TestVector3 @a = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                @a = ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>)ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder).ParseValue (__intp, ptr_of_this_method, __mStack);
+                @a = ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);
             } else {
                 @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
                 __intp.Free(ptr_of_this_method);
@@ -127,7 +127,7 @@ namespace ILRuntime.Runtime.Generated
             var result_of_this_method = a + b;
 
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>)ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
                 return __ret + 1;
             } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -146,7 +146,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ILRuntimeTest.TestFramework.TestVector3 @a = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                @a = ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>)ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder).ParseValue (__intp, ptr_of_this_method, __mStack);
+                @a = ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);
             } else {
                 @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
                 __intp.Free(ptr_of_this_method);
@@ -156,7 +156,7 @@ namespace ILRuntime.Runtime.Generated
             var result_of_this_method = a * b;
 
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>)ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
                 return __ret + 1;
             } else {
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -234,7 +234,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 __ret--;
                 if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                    ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>)ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder).WriteBackValue(__domain, __ret, __mStack, ref result_of_this_method);
+                    ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.WriteBackValue(__domain, __ret, __mStack, ref result_of_this_method);
                 } else {
                     WriteBackInstance(__domain, __ret, __mStack, ref result_of_this_method);
                 }
@@ -242,7 +242,7 @@ namespace ILRuntime.Runtime.Generated
             }
 
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ((ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>)ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
                 return __ret + 1;
             } else {
                 return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);

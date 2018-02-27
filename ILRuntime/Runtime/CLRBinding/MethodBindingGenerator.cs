@@ -153,9 +153,9 @@ namespace ILRuntime.Runtime.CLRBinding
                         sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
 
                         if (isMultiArr)
-                            sb.AppendLine(string.Format("                a{0} = ((ValueTypeBinder<{1}>)ILRuntime.Runtime.Generated.CLRBindings.s_{2}_Binder).ParseValue (__intp, ptr_of_this_method, __mStack);", j, realClsName, clsName));
+                            sb.AppendLine(string.Format("                a{0} = ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);", j, clsName));
                         else
-                            sb.AppendLine(string.Format("                @{0} = ((ValueTypeBinder<{1}>)ILRuntime.Runtime.Generated.CLRBindings.s_{2}_Binder).ParseValue (__intp, ptr_of_this_method, __mStack);", p.Name, realClsName, clsName));
+                            sb.AppendLine(string.Format("                @{0} = ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);", p.Name, clsName));
 
                         sb.AppendLine("            } else {");
 
@@ -198,7 +198,7 @@ namespace ILRuntime.Runtime.CLRBinding
 
                         sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
 
-                        sb.AppendLine(string.Format("                instance_of_this_method = ((ValueTypeBinder<{0}>)ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder).ParseValue (__intp, ptr_of_this_method, __mStack);", realClsName, clsName));
+                        sb.AppendLine(string.Format("                instance_of_this_method = ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);", clsName));
 
                         sb.AppendLine("            } else {");
 
@@ -407,7 +407,7 @@ namespace ILRuntime.Runtime.CLRBinding
 
                         sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
 
-                        sb.AppendLine(string.Format("                ((ValueTypeBinder<{0}>)ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);", realClsName, clsName));
+                        sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);", clsName));
 
                         sb.AppendLine("            } else {");
 
@@ -442,7 +442,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     {
                         sb.AppendLine(string.Format("                if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
 
-                        sb.AppendLine(string.Format("                        ((ValueTypeBinder<{0}>)ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder).WriteBackValue(__domain, ptr_of_this_method, __mStack, ref {2});", realClsName, clsName, p.Name));
+                        sb.AppendLine(string.Format("                        ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref {1});", clsName, p.Name));
 
                         sb.AppendLine("                } else {");
 
@@ -515,7 +515,7 @@ namespace ILRuntime.Runtime.CLRBinding
 
                         sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
 
-                        sb.AppendLine(string.Format("                ((ValueTypeBinder<{0}>)ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder).PushValue(ref result_of_this_method, __intp, __ret, __mStack);", realClsName, clsName));
+                        sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);", clsName));
                         sb.AppendLine("                return __ret + 1;");
 
                         sb.AppendLine("            } else {");
