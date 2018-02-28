@@ -146,6 +146,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
 
+
             var result_of_this_method = System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Create();
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -156,15 +157,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
-            instance_of_this_method.Start<ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref stateMachine);
+            instance_of_this_method.Start<ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @stateMachine);
 
             WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
@@ -230,10 +232,10 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             var result_of_this_method = instance_of_this_method.Task;
 
@@ -252,18 +254,20 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.TaskAwaiter awaiter = (System.Runtime.CompilerServices.TaskAwaiter)typeof(System.Runtime.CompilerServices.TaskAwaiter).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.TaskAwaiter @awaiter = (System.Runtime.CompilerServices.TaskAwaiter)typeof(System.Runtime.CompilerServices.TaskAwaiter).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
-            instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref awaiter, ref stateMachine);
+            instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @awaiter, ref @stateMachine);
 
             WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
@@ -383,15 +387,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception exception = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Exception @exception = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
-            instance_of_this_method.SetException(exception);
+            instance_of_this_method.SetException(@exception);
 
             WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 
@@ -403,10 +408,10 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             instance_of_this_method.SetResult();
 
@@ -420,18 +425,20 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> awaiter = (System.Runtime.CompilerServices.TaskAwaiter<System.Int32>)typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> @awaiter = (System.Runtime.CompilerServices.TaskAwaiter<System.Int32>)typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
-            instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<System.Int32>, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref awaiter, ref stateMachine);
+            instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<System.Int32>, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @awaiter, ref @stateMachine);
 
             WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
 

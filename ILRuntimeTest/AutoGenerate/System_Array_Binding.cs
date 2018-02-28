@@ -86,13 +86,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Byte value = (byte)ptr_of_this_method->Value;
+            System.Byte @value = (byte)ptr_of_this_method->Value;
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Byte[] array = (System.Byte[])typeof(System.Byte[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Byte[] @array = (System.Byte[])typeof(System.Byte[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = System.Array.IndexOf<System.Byte>(array, value);
+
+            var result_of_this_method = System.Array.IndexOf<System.Byte>(@array, @value);
 
             __ret->ObjectType = ObjectTypes.Integer;
             __ret->Value = result_of_this_method;
@@ -104,13 +107,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int32 value = ptr_of_this_method->Value;
+            System.Int32 @value = ptr_of_this_method->Value;
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Int32[] array = (System.Int32[])typeof(System.Int32[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Int32[] @array = (System.Int32[])typeof(System.Int32[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = System.Array.IndexOf<System.Int32>(array, value);
+
+            var result_of_this_method = System.Array.IndexOf<System.Int32>(@array, @value);
 
             __ret->ObjectType = ObjectTypes.Integer;
             __ret->Value = result_of_this_method;
@@ -122,14 +128,17 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Collections.Generic.List<System.Int32[]> value = (System.Collections.Generic.List<System.Int32[]>)typeof(System.Collections.Generic.List<System.Int32[]>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Collections.Generic.List<System.Int32[]>[] array = (System.Collections.Generic.List<System.Int32[]>[])typeof(System.Collections.Generic.List<System.Int32[]>[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Collections.Generic.List<System.Int32[]> @value = (System.Collections.Generic.List<System.Int32[]>)typeof(System.Collections.Generic.List<System.Int32[]>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            var result_of_this_method = System.Array.IndexOf<System.Collections.Generic.List<System.Int32[]>>(array, value);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Collections.Generic.List<System.Int32[]>[] @array = (System.Collections.Generic.List<System.Int32[]>[])typeof(System.Collections.Generic.List<System.Int32[]>[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+
+            var result_of_this_method = System.Array.IndexOf<System.Collections.Generic.List<System.Int32[]>>(@array, @value);
 
             __ret->ObjectType = ObjectTypes.Integer;
             __ret->Value = result_of_this_method;

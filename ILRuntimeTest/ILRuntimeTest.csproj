@@ -200,6 +200,10 @@
       <Project>{cea7a85f-2523-4ad0-8296-6e8e0a2e6df7}</Project>
       <Name>Mono.Cecil.Pdb</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mono.Cecil.Mdb\Mono.Cecil.Mdb.csproj">
+      <Project>{86F36240-E07C-4840-9C8B-9CD94C03EC62}</Project>
+      <Name>Mono.Cecil.Mdb</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

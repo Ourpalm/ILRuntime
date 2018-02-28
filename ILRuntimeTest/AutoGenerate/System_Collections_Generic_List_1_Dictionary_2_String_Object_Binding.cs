@@ -40,15 +40,16 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Collections.Generic.Dictionary<System.String, System.Object> item = (System.Collections.Generic.Dictionary<System.String, System.Object>)typeof(System.Collections.Generic.Dictionary<System.String, System.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>> instance_of_this_method;
-            instance_of_this_method = (System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>)typeof(System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Collections.Generic.Dictionary<System.String, System.Object> @item = (System.Collections.Generic.Dictionary<System.String, System.Object>)typeof(System.Collections.Generic.Dictionary<System.String, System.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            instance_of_this_method.Add(item);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>> instance_of_this_method = (System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>)typeof(System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            instance_of_this_method.Add(@item);
 
             return __ret;
         }
@@ -58,9 +59,9 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>> instance_of_this_method;
-            instance_of_this_method = (System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>)typeof(System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>> instance_of_this_method = (System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>)typeof(System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.String, System.Object>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Count;
