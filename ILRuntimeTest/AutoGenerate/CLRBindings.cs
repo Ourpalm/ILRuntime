@@ -6,6 +6,11 @@ namespace ILRuntime.Runtime.Generated
 {
     class CLRBindings
     {
+
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3> s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = null;
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct> s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = null;
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2> s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = null;
+
         /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
         /// </summary>
@@ -91,11 +96,11 @@ namespace ILRuntime.Runtime.Generated
 
             ILRuntime.CLR.TypeSystem.CLRType __clrType = null;
             __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVector3));
-            ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>.s_binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>;
+            s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>;
             __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVectorStruct));
-            ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct>.s_binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct>;
+            s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct>;
             __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVectorStruct2));
-            ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2>.s_binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2>;
+            s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2>;
         }
 
         /// <summary>
@@ -103,9 +108,9 @@ namespace ILRuntime.Runtime.Generated
         /// </summary>
         public static void Shutdown(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
-            ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>.s_binder = null;
-            ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct>.s_binder = null;
-            ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2>.s_binder = null;
+            s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = null;
+            s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = null;
+            s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = null;
         }
     }
 }
