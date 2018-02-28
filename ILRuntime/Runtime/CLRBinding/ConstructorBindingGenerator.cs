@@ -83,12 +83,12 @@ namespace ILRuntime.Runtime.CLRBinding
                         else
                             sb.AppendLine(string.Format("            {0} @{1} = new {0}();", realClsName, p.Name));
 
-                        sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
+                        sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder != null) {{", realClsName));
 
                         if (isMultiArr)
-                            sb.AppendLine(string.Format("                a{0} = ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);", j, clsName));
+                            sb.AppendLine(string.Format("                a{0} = ILRuntime.Runtime.Enviorment.ValueTypeBinder<{1}>.s_binder.ParseValue (__intp, ptr_of_this_method, __mStack);", j, realClsName));
                         else
-                            sb.AppendLine(string.Format("                @{0} = ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);", p.Name, clsName));
+                            sb.AppendLine(string.Format("                @{0} = ILRuntime.Runtime.Enviorment.ValueTypeBinder<{1}>.s_binder.ParseValue (__intp, ptr_of_this_method, __mStack);", p.Name, realClsName));
 
                         sb.AppendLine("            } else {");
 
@@ -150,9 +150,9 @@ namespace ILRuntime.Runtime.CLRBinding
             {
                 __ret--;");
 
-                        sb.AppendLine(string.Format("                if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
+                        sb.AppendLine(string.Format("                if (ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder != null) {{", realClsName));
 
-                        sb.AppendLine(string.Format("                    ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder.WriteBackValue(__domain, __ret, __mStack, ref result_of_this_method);", clsName));
+                        sb.AppendLine(string.Format("                    ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder.WriteBackValue(__domain, __ret, __mStack, ref result_of_this_method);", realClsName));
 
                         sb.AppendLine("                } else {");
 
@@ -193,9 +193,9 @@ namespace ILRuntime.Runtime.CLRBinding
 
                     if (p.ParameterType.IsValueType && !p.ParameterType.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(p.ParameterType))
                     {
-                        sb.AppendLine(string.Format("                if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
+                        sb.AppendLine(string.Format("                if (ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder != null) {{", realClsName));
 
-                        sb.AppendLine(string.Format("                        ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref {1});", realClsName, p.Name));
+                        sb.AppendLine(string.Format("                        ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref {1});", realClsName, p.Name));
 
                         sb.AppendLine("                } else {");
 
@@ -265,9 +265,9 @@ namespace ILRuntime.Runtime.CLRBinding
                     bool isByRef;
                     type.GetClassName(out clsName, out realClsName, out isByRef);
 
-                    sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
+                    sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder != null) {{", realClsName));
 
-                    sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);", clsName));
+                    sb.AppendLine(string.Format("                ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);", realClsName));
                     sb.AppendLine("                return __ret + 1;");
 
                     sb.AppendLine("            } else {");

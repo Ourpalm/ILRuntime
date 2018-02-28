@@ -695,22 +695,6 @@ namespace ILRuntime.Runtime.Generated
     class CLRBindings
     {");
 
-                if (valueTypeBinders != null)
-                {
-                    sb.AppendLine();
-
-                    foreach (var i in valueTypeBinders)
-                    {
-                        string clsName, realClsName;
-                        bool isByRef;
-                        i.GetClassName(out clsName, out realClsName, out isByRef);
-
-                        sb.AppendLine(string.Format("        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}> s_{1}_Binder = null;", realClsName, clsName));
-                    }
-
-                    sb.AppendLine();
-                }
-
                 sb.AppendLine(@"        /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
         /// </summary>
@@ -738,7 +722,7 @@ namespace ILRuntime.Runtime.Generated
                         i.GetClassName(out clsName, out realClsName, out isByRef);
 
                         sb.AppendLine(string.Format("            __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof({0}));", realClsName));
-                        sb.AppendLine(string.Format("            s_{0}_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<{1}>;", clsName, realClsName));
+                        sb.AppendLine(string.Format("            ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>;", realClsName));
                     }
                 }
                 sb.AppendLine(@"        }");
@@ -757,7 +741,7 @@ namespace ILRuntime.Runtime.Generated
                         bool isByRef;
                         i.GetClassName(out clsName, out realClsName, out isByRef);
 
-                        sb.AppendLine(string.Format("            s_{0}_Binder = null;", clsName));
+                        sb.AppendLine(string.Format("            ILRuntime.Runtime.Enviorment.ValueTypeBinder<{0}>.s_binder = null;", realClsName));
                     }
                 }
                 sb.AppendLine(@"        }");
