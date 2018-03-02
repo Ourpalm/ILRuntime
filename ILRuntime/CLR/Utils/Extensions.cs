@@ -46,11 +46,7 @@ namespace ILRuntime.CLR.Utils
                                 t = appdomain.GetType(ga, contextType, contextMethod);
                                 if (t == null && genericArguments != null)
                                     t = genericArguments[j];
-                                if (name == gp.Name)
-                                {
-                                    name = t.FullName;
-                                }
-                                else if (name == gp.Name + "[]")
+                                if (name == gp.Name + "[]")
                                 {
                                     name = t.FullName + "[]";
                                 }
@@ -90,18 +86,20 @@ namespace ILRuntime.CLR.Utils
             bool hasGA = ga != null && ga.Count > 0;
             if (baseType == argumentName)
             {
-                if (isGA)
+                bool isAssemblyQualified = argumentName.Contains('=');
+                if (isGA && isAssemblyQualified)
                     sb.Append('[');
                 sb.Append(argumentType);
-                if (isGA)
+                if (isGA && isAssemblyQualified)
                     sb.Append(']');
             }
             else
             {
-                if (isGA && !hasGA)
+                bool isAssemblyQualified = baseType.Contains('=');
+                if (isGA && !hasGA && isAssemblyQualified)
                     sb.Append('[');
                 sb.Append(baseType);
-                if (isGA && !hasGA)
+                if (isGA && !hasGA && isAssemblyQualified)
                     sb.Append(']');
             }
             if (hasGA)

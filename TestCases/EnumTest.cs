@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using LitJson;
 
 namespace TestCases
 {
@@ -126,6 +127,32 @@ namespace TestCases
             object e = TestEnum3.Enum2bbb;
             byte b = (byte)e; //InvalidCastException
             Console.WriteLine(b);
+        }
+
+        public static void Test11()
+        {
+            //Enum defined in ILRuntime
+            var enumInIL = TestEnum.Enum4;
+            var valueDirectly = $"{enumInIL}";
+            var valueToString = enumInIL.ToString();
+
+            if (valueDirectly.Equals(valueToString) == false)
+            {
+                throw new Exception($"Different string value: {valueDirectly} vs. {valueToString}");
+            }
+
+            //Enum defined in native code
+            var enumInNative = JsonType.Int;
+            valueDirectly = $"{enumInNative}";
+            valueToString = enumInNative.ToString();
+
+            var enumObj = (Object)enumInNative;
+            Console.WriteLine(enumObj.GetType().FullName);
+
+            if (valueDirectly.Equals(valueToString) == false)
+            {
+                throw new Exception($"Different string value: {valueDirectly} vs. {valueToString}");
+            }
         }
     }
 }

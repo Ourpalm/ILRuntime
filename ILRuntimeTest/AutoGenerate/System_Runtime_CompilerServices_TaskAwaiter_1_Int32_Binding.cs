@@ -84,10 +84,10 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter<System.Int32>)typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter<System.Int32>)typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             var result_of_this_method = instance_of_this_method.IsCompleted;
 
@@ -103,10 +103,10 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> instance_of_this_method;
-            instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter<System.Int32>)typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> instance_of_this_method = (System.Runtime.CompilerServices.TaskAwaiter<System.Int32>)typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
             var result_of_this_method = instance_of_this_method.GetResult();
 

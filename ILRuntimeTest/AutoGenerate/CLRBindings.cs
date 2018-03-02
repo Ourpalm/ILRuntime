@@ -6,6 +6,11 @@ namespace ILRuntime.Runtime.Generated
 {
     class CLRBindings
     {
+
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3> s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = null;
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct> s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = null;
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2> s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = null;
+
         /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
         /// </summary>
@@ -24,6 +29,7 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_String_Object_Binding.Register(app);
             ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.Register(app);
             System_Int32_Binding.Register(app);
+            System_Object_Binding.Register(app);
             System_Activator_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.Register(app);
             LitJson_JsonMapper_Binding.Register(app);
@@ -32,7 +38,6 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_String_Int32_Binding.Register(app);
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_TestClass3Adaptor_Binding_Adaptor_Binding.Register(app);
             System_Type_Binding.Register(app);
-            System_Object_Binding.Register(app);
             System_Reflection_MethodBase_Binding.Register(app);
             System_Reflection_MemberInfo_Binding.Register(app);
             System_Reflection_FieldInfo_Binding.Register(app);
@@ -88,6 +93,24 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestVectorClass_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);
+
+            ILRuntime.CLR.TypeSystem.CLRType __clrType = null;
+            __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVector3));
+            s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3>;
+            __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVectorStruct));
+            s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct>;
+            __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVectorStruct2));
+            s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2>;
+        }
+
+        /// <summary>
+        /// Release the CLR binding, please invoke this BEFORE ILRuntime Appdomain destroy
+        /// </summary>
+        public static void Shutdown(ILRuntime.Runtime.Enviorment.AppDomain app)
+        {
+            s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = null;
+            s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = null;
+            s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = null;
         }
     }
 }
