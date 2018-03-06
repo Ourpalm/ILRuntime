@@ -2619,6 +2619,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2649,6 +2651,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0L, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2662,6 +2666,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (short)0, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2677,6 +2683,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0L, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2690,6 +2698,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0f, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2705,6 +2715,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0.0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2715,6 +2727,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         case ObjectTypes.Integer:
                                                             esp = PushObject(obj, mStack, (char)obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2730,6 +2744,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (uint)0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2743,6 +2759,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (ushort)0, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2758,6 +2776,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (ulong)0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2771,6 +2791,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (sbyte)0, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -3027,6 +3049,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
+                                        StackObject.Initialized(objRef, type);
                                         if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                         {
                                             stack.ClearValueTypeObject(type, *(StackObject**)&objRef->Value);
