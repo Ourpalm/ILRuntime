@@ -252,5 +252,23 @@ namespace TestCases
             var obj = Fetch<TestInterface>();
             Console.WriteLine(obj.ToString());
         }
+
+        interface IBinderCollection<T>
+        {
+            
+        }
+        class BinderCollection<T> : IBinderCollection<T>
+        {
+            public void BindToGList<TListItem>(object _list, Action<T, TListItem> _bindItemAction)
+            {
+                Console.WriteLine(_list.ToString());
+            }
+        }
+
+        public static void GenericMethodTest10()
+        {
+            BinderCollection<string> binder = new BinderCollection<string>();
+            binder.BindToGList<object>(123, (a, b) => { });
+        }
     }
 }

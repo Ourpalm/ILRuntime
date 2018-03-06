@@ -64,6 +64,16 @@ namespace ILRuntime.CLR.Utils
                                 t = null;
                             }
                         }
+                        if(dt.GenericArguments != null)
+                        {
+                            foreach(var gp in dt.GenericArguments)
+                            {
+                                if (name.Contains(gp.Key))
+                                {
+                                    name = ReplaceGenericArgument(name, gp.Key, gp.Value.FullName);
+                                }
+                            }
+                        }
                         if (t == null)
                             t = appdomain.GetType(name);
                     }
