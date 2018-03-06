@@ -209,6 +209,48 @@ namespace TestCases
             Dictionary<int, TestClass<int>> dict = new Dictionary<int, TestClass<int>>();
         }
 
-        
+        //====================分割线，复现流程============================
+        // 接口Disposer定义
+        public interface IDisposer
+        {
+            int Id { get; set; }
+            void Foo(object bar, int bar2, object bar3);
+            void Dispose();
+        }
+        // 实现IDiposer的类
+        public class TestInterface : IDisposer
+        {
+            public int Id { get; set; }
+            public void Foo(object bar, int bar2, object bar3)
+            {
+                Console.WriteLine(bar.ToString() + bar2 + bar3);
+            }
+            public void Dispose()
+            {
+            }
+        }
+
+        public static T CreateInterface<T>() where T : IDisposer
+        {
+            var type = typeof(TestInterface);
+            var result = Activator.CreateInstance(type);
+            return (T)result;
+        }
+
+
+        public static T Fetch<T>() where T : IDisposer
+        {
+            var t = CreateInterface<T>();
+            //          ((IDisposer)t).Id = 111; // ??
+            t.Id = 111; // ??
+            t.Foo(123, 456, 789);
+            return t;
+        }
+
+        public static void GenericMethodTest9()
+        {
+            var obj = Fetch<TestInterface>();
+            Console.WriteLine(obj.ToString());
+        }
     }
 }
