@@ -131,5 +131,17 @@ namespace TestCases
         {
             Console.WriteLine("arr = " + arr[1, 2]);
         }
+
+        public class FileCode<T>
+        {
+            public static readonly bool TypeSupportsPacking = default(T) != null;
+        }
+
+        public static void GenericDefaultTest()
+        {
+            var ins = new FileCode<uint>();
+            Console.WriteLine(FileCode<uint>.TypeSupportsPacking);
+            Console.WriteLine(FileCode<string>.TypeSupportsPacking);
+        }
     }
 }

@@ -2414,9 +2414,45 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeEnum.Constrained:
                                 {
-                                    var objRef = esp - 1;
-                                    var obj = GetObjectAndResolveReference(objRef);
                                     var type = domain.GetType(ip->TokenInteger);
+                                    var m = domain.GetMethod((int)ip->TokenLong);
+                                    var pCnt = m.ParameterCount;
+                                    var objRef = Minus(esp, pCnt + 1);
+                                    var insIdx = mStack.Count;
+                                    if (objRef->ObjectType < ObjectTypes.Object)
+                                    {
+                                        bool moved = false;
+                                        //move parameters
+                                        for (int i = 0; i < pCnt; i++)
+                                        {
+                                            var pPtr = Minus(esp, i + 1);
+                                            if (pPtr->ObjectType >= ObjectTypes.Object)
+                                            {
+                                                var oldVal = pPtr->Value;
+                                                insIdx--;
+                                                if (!moved)
+                                                {
+                                                    pPtr->Value = mStack.Count;
+                                                    mStack.Add(mStack[oldVal]);
+                                                    mStack[oldVal] = null;
+                                                    moved = true;
+                                                }
+                                                else
+                                                {
+                                                    mStack[oldVal + 1] = mStack[oldVal];
+                                                    mStack[oldVal] = null;
+                                                    pPtr->Value = oldVal + 1;
+                                                }
+                                            }
+                                        }
+                                        if (!moved)
+                                        {
+                                            mStack.Add(null);
+                                        }
+                                    }
+                                    else
+                                        insIdx = objRef->Value;
+                                    var obj = GetObjectAndResolveReference(objRef);
                                     if (type != null)
                                     {
                                         if (type is ILType)
@@ -2431,7 +2467,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         {
                                                             var owner = mStack[obj->Value] as ILTypeInstance;
                                                             int idx = obj->ValueLow;
-                                                            Free(objRef);
+                                                            //Free(objRef);
                                                             owner.PushToStack(idx, objRef, AppDomain, mStack);
                                                             ins.AssignFromStack(0, objRef, AppDomain, mStack);
                                                             ins.Boxed = true;
@@ -2441,7 +2477,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         {
                                                             var st = AppDomain.GetType(obj->Value) as ILType;
                                                             int idx = obj->ValueLow;
-                                                            Free(objRef);
+                                                            //Free(objRef);
                                                             st.StaticInstance.PushToStack(idx, objRef, AppDomain, mStack);
                                                             ins.AssignFromStack(0, objRef, AppDomain, mStack);
                                                             ins.Boxed = true;
@@ -2451,7 +2487,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         {
                                                             var arr = mStack[obj->Value];
                                                             var idx = obj->ValueLow;
-                                                            Free(objRef);
+                                                            //Free(objRef);
                                                             LoadFromArrayReference(arr, idx, objRef, t, mStack);
                                                             ins.AssignFromStack(0, objRef, AppDomain, mStack);
                                                             ins.Boxed = true;
@@ -2462,13 +2498,20 @@ namespace ILRuntime.Runtime.Intepreter
                                                         ins.Boxed = true;
                                                         break;
                                                 }
-                                                esp = PushObject(esp - 1, mStack, ins);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = ins;
+
+                                                //esp = PushObject(esp - 1, mStack, ins);
                                             }
                                             else
                                             {
                                                 object res = RetriveObject(obj, mStack);
-                                                Free(objRef);
-                                                esp = PushObject(objRef, mStack, res, true);
+                                                //Free(objRef);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = res;
+                                                //esp = PushObject(objRef, mStack, res, true);
                                             }
                                         }
                                         else
@@ -2476,17 +2519,26 @@ namespace ILRuntime.Runtime.Intepreter
                                             var tt = type.TypeForCLR;
                                             if (tt.IsEnum)
                                             {
-                                                esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)), true);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack));
+                                                //esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)), true);
                                             }
                                             else if (tt.IsPrimitive)
                                             {
-                                                esp = PushObject(esp - 1, mStack, tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack)));
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack));
+                                                //esp = PushObject(esp - 1, mStack, tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack)));
                                             }
                                             else
                                             {
                                                 object res = RetriveObject(obj, mStack);
-                                                Free(objRef);
-                                                esp = PushObject(objRef, mStack, res, true);
+                                                //Free(objRef);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = res;
+                                                //esp = PushObject(objRef, mStack, res, true);
                                             }
                                         }
                                     }
@@ -2567,6 +2619,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2597,6 +2651,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0L, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2610,6 +2666,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (short)0, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2625,6 +2683,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0L, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2638,6 +2698,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0f, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2653,6 +2715,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, 0.0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2663,6 +2727,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         case ObjectTypes.Integer:
                                                             esp = PushObject(obj, mStack, (char)obj->Value, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2678,6 +2744,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (uint)0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2691,6 +2759,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (ushort)0, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2706,6 +2776,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (ulong)0, true);
                                                             break;
+                                                        case ObjectTypes.Object:
+                                                            break;
                                                         default:
                                                             throw new NotImplementedException();
                                                     }
@@ -2719,6 +2791,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                             break;
                                                         case ObjectTypes.Null:
                                                             esp = PushObject(obj, mStack, (sbyte)0, true);
+                                                            break;
+                                                        case ObjectTypes.Object:
                                                             break;
                                                         default:
                                                             throw new NotImplementedException();
@@ -2975,6 +3049,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
+                                        StackObject.Initialized(objRef, type);
                                         if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                         {
                                             stack.ClearValueTypeObject(type, *(StackObject**)&objRef->Value);
