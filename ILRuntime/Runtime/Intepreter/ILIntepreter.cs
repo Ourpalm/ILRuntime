@@ -2519,16 +2519,16 @@ namespace ILRuntime.Runtime.Intepreter
                                             var tt = type.TypeForCLR;
                                             if (tt.IsEnum)
                                             {
+                                                mStack[insIdx] = Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack));
                                                 objRef->ObjectType = ObjectTypes.Object;
                                                 objRef->Value = insIdx;
-                                                mStack[insIdx] = Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack));
                                                 //esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)), true);
                                             }
                                             else if (tt.IsPrimitive)
                                             {
+                                                mStack[insIdx] = tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack));
                                                 objRef->ObjectType = ObjectTypes.Object;
                                                 objRef->Value = insIdx;
-                                                mStack[insIdx] = tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack));
                                                 //esp = PushObject(esp - 1, mStack, tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack)));
                                             }
                                             else
