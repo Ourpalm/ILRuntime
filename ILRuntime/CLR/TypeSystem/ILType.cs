@@ -43,6 +43,50 @@ namespace ILRuntime.CLR.TypeSystem
         int hashCode = -1;
         static int instance_id = 0x10000000;
         public TypeDefinition TypeDefinition { get { return definition; } }
+        bool mToStringGot, mEqualsGot, mGetHashCodeGot;
+        IMethod mToString, mEquals, mGetHashCode;
+
+        public IMethod ToStringMethod
+        {
+            get
+            {
+                if (!mToStringGot)
+                {
+                    IMethod m = appdomain.ObjectType.GetMethod("ToString", 0, true);
+                    mToString = GetVirtualMethod(m);
+                    mToStringGot = true;
+                }
+                return mToString;
+            }
+        }
+
+        public IMethod EqualsMethod
+        {
+            get
+            {
+                if (!mEqualsGot)
+                {
+                    IMethod m = appdomain.ObjectType.GetMethod("Equals", 1, true);
+                    mEquals = GetVirtualMethod(m);
+                    mEqualsGot = true;
+                }
+                return mEquals;
+            }
+        }
+
+        public IMethod GetHashCodeMethod
+        {
+            get
+            {
+                if (!mGetHashCodeGot)
+                {
+                    IMethod m = appdomain.ObjectType.GetMethod("GetHashCode", 0, true);
+                    mGetHashCode = GetVirtualMethod(m);
+                    mGetHashCodeGot = true;
+                }
+                return mGetHashCode;
+            }
+        }
 
         public TypeReference TypeReference
         {

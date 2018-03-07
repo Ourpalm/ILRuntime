@@ -392,10 +392,10 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+       
         public override string ToString()
         {
-            IMethod m = type.AppDomain.ObjectType.GetMethod("ToString", 0);
-            m = type.GetVirtualMethod(m);
+            var m = type.ToStringMethod;
             if (m != null)
             {
                 if (m is ILMethod)
@@ -408,6 +408,39 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
                 return type.FullName;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var m = type.EqualsMethod;
+            if (m != null)
+            {
+                using (var ctx = type.AppDomain.BeginInvoke(m))
+                {
+                    ctx.PushObject(this);
+                    ctx.PushObject(obj);
+                    ctx.Invoke();
+                    return ctx.ReadBool();
+                }
+            }
+            else
+                return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            var m = type.GetHashCodeMethod;
+            if (m != null)
+            {
+                using (var ctx = type.AppDomain.BeginInvoke(m))
+                {
+                    ctx.PushObject(this);
+                    ctx.Invoke();
+                    return ctx.ReadInteger();
+                }
+            }
+            else
+                return base.GetHashCode();
         }
 
         public bool CanAssignTo(IType type)

@@ -143,5 +143,28 @@ namespace TestCases
             Console.WriteLine(FileCode<uint>.TypeSupportsPacking);
             Console.WriteLine(FileCode<string>.TypeSupportsPacking);
         }
+
+        public static void EqualsTest()
+        {
+            act1 = foo4;
+            Action act2 = foo4;
+            Console.WriteLine(new Test4().Equals2(act2));//true
+            Console.WriteLine(new Test4().Equals(act2));//false
+        }
+
+        static void foo4() { }
+        static Action act1 = null;
+        class Test4
+        {
+            public bool Equals2(object obj)
+            {
+                return act1.Equals(obj);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return act1.Equals(obj);
+            }
+        }
     }
 }
