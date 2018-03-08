@@ -128,6 +128,7 @@ namespace ILRuntimeTest.TestFramework
     {
         protected int testVal = 100;
         public int TestVal2 = 200;
+        public static IDisposable staticField;
 
         public ClassInheritanceTest()
         {

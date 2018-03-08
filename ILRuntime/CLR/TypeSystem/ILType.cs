@@ -496,6 +496,8 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                 }
             }
+            if (firstCLRInterface == null && BaseType != null && BaseType is ILType)
+                firstCLRInterface = ((ILType)BaseType).FirstCLRInterface;
         }
         void InitializeBaseType()
         {
