@@ -39,6 +39,12 @@ namespace ILRuntimeTest.TestFramework
             return res;
         }
 
+        public void Test(out TestVector3 a, out float b)
+        {
+            b = 123f;
+            a = this * 123f;
+        }
+
         public override string ToString()
         {
             return string.Format("({0},{1},{2})", X, Y, Z);

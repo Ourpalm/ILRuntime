@@ -144,5 +144,14 @@ namespace TestCases
 
             Console.WriteLine("x:" + cls.vector.X + " y:" + cls.vector.Y + " z:" + cls.vector.Z);
         }
+
+        public static void UnitTest_10028()
+        {
+            TestVector3 a = TestVector3.One;
+            float b = 1f;
+
+            TestVector3 c = new TestVector3();
+            a.Test(out c, out b);
+        }
     }
 }

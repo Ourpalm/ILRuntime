@@ -3049,11 +3049,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        StackObject.Initialized(objRef, type);
                                         if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                         {
                                             stack.ClearValueTypeObject(type, *(StackObject**)&objRef->Value);
                                         }
+                                        else
+                                            StackObject.Initialized(objRef, type);
                                         Free(esp - 1);
                                         esp--;
                                     }
