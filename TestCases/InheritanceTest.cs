@@ -440,7 +440,11 @@ namespace TestCases
             return true;
         }
 
-
+        public static void TestInterface()
+        {
+            var obj = new AA();
+            ClassInheritanceTest.staticField = obj;
+        }
     }
 
     public class TestVirtual

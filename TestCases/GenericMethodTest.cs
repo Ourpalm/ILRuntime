@@ -270,5 +270,38 @@ namespace TestCases
             BinderCollection<string> binder = new BinderCollection<string>();
             binder.BindToGList<object>(123, (a, b) => { });
         }
+
+        public class TestBind<T> where T : IComparable<T>
+        {
+            public T data;
+
+
+            public T Data
+            {
+                get { return data; }
+                set
+                {
+                    if (null != data && data.CompareTo(value) == 0)
+                    {
+                        return;
+                    }
+
+                    data = value;
+                }
+            }
+        }
+
+        public class SubBind : TestBind<int>
+        {
+
+        }
+
+        public static void GenericMethodTest11()
+        {
+            SubBind bind = new SubBind();
+            bind.Data = 100;
+
+            Console.WriteLine("bind.data = " + bind.data);
+        }
     }
 }
