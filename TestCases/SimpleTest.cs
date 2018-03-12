@@ -152,6 +152,13 @@ namespace TestCases
             Console.WriteLine(new Test4().Equals(act2));//false
         }
 
+        public static void NullableTest()
+        {
+            int? val = 123;
+            if (val.HasValue)
+                Console.WriteLine(val.Value.ToString());
+        }
+
         static void foo4() { }
         static Action act1 = null;
         class Test4

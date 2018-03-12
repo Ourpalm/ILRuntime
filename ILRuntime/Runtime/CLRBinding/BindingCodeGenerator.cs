@@ -475,19 +475,36 @@ namespace ILRuntime.Runtime.Generated
                                             if (m != null)
                                             {
                                                 //Cannot explicit call base class's constructor directly
+                                                if (m.IsConstructor && m.DeclearingType.CanAssignTo(((CLR.TypeSystem.ILType)type).FirstCLRBaseType))
+                                                    continue;
                                                 if (m.IsConstructor)
-                                                    continue;
-                                                if (!m.MethodInfo.IsPublic)
-                                                    continue;
-                                                Type t = m.DeclearingType.TypeForCLR;
-                                                CLRBindingGenerateInfo info;
-                                                if (!infos.TryGetValue(t, out info))
                                                 {
-                                                    info = CreateNewBindingInfo(t);
-                                                    infos[t] = info;
-                                                }
+                                                    if (!m.ConstructorInfo.IsPublic)
+                                                        continue;
+                                                    Type t = m.DeclearingType.TypeForCLR;
+                                                    CLRBindingGenerateInfo info;
+                                                    if (!infos.TryGetValue(t, out info))
+                                                    {
+                                                        info = CreateNewBindingInfo(t);
+                                                        infos[t] = info;
+                                                    }
 
-                                                info.Methods.Add(m.MethodInfo);
+                                                    info.Constructors.Add(m.ConstructorInfo);
+                                                }
+                                                else
+                                                {
+                                                    if (!m.MethodInfo.IsPublic)
+                                                        continue;
+                                                    Type t = m.DeclearingType.TypeForCLR;
+                                                    CLRBindingGenerateInfo info;
+                                                    if (!infos.TryGetValue(t, out info))
+                                                    {
+                                                        info = CreateNewBindingInfo(t);
+                                                        infos[t] = info;
+                                                    }
+
+                                                    info.Methods.Add(m.MethodInfo);
+                                                }
                                             }
                                         }
                                         break;

@@ -112,6 +112,7 @@
     <Compile Include="AutoGenerate\System_Diagnostics_Stopwatch_Binding.cs" />
     <Compile Include="AutoGenerate\System_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
+    <Compile Include="AutoGenerate\System_IComparable_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array2_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array_Binding.cs" />
@@ -124,6 +125,8 @@
     <Compile Include="AutoGenerate\System_Math_Binding.cs" />
     <Compile Include="AutoGenerate\System_NotImplementedException_Binding.cs" />
     <Compile Include="AutoGenerate\System_NotSupportedException_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Nullable_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Object_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_FieldInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_MemberInfo_Binding.cs" />

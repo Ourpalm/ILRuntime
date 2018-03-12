@@ -30,6 +30,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.Register(app);
             System_Int32_Binding.Register(app);
             System_Object_Binding.Register(app);
+            System_Object_Array_Binding.Register(app);
             System_Activator_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.Register(app);
             LitJson_JsonMapper_Binding.Register(app);
@@ -64,6 +65,7 @@ namespace ILRuntime.Runtime.Generated
             System_Double_Binding.Register(app);
             System_Single_Binding.Register(app);
             System_Int32_Array2_Binding.Register(app);
+            System_Nullable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.Register(app);
             System_Diagnostics_Stopwatch_Binding.Register(app);
@@ -91,6 +93,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.Register(app);
             System_DateTime_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorClass_Binding.Register(app);
+            System_IComparable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);
 

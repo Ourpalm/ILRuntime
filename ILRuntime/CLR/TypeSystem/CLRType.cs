@@ -651,7 +651,10 @@ namespace ILRuntime.CLR.TypeSystem
                 return true;
             }
             else
-                return false;
+            {
+                Type cT = type != null ? type.TypeForCLR : typeof(object);
+                return TypeForCLR.IsAssignableFrom(cT);
+            }
         }
 
         public IMethod GetConstructor(List<IType> param)

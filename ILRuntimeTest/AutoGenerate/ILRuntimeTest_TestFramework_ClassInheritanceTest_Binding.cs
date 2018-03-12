@@ -38,6 +38,9 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("TestVal2", flag);
             app.RegisterCLRFieldGetter(field, get_TestVal2_0);
             app.RegisterCLRFieldSetter(field, set_TestVal2_0);
+            field = type.GetField("staticField", flag);
+            app.RegisterCLRFieldGetter(field, get_staticField_1);
+            app.RegisterCLRFieldSetter(field, set_staticField_1);
 
 
         }
@@ -112,6 +115,14 @@ namespace ILRuntime.Runtime.Generated
         static void set_TestVal2_0(ref object o, object v)
         {
             ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2 = (System.Int32)v;
+        }
+        static object get_staticField_1(ref object o)
+        {
+            return ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField;
+        }
+        static void set_staticField_1(ref object o, object v)
+        {
+            ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField = (System.IDisposable)v;
         }
 
 
