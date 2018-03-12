@@ -3071,7 +3071,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             stack.ClearValueTypeObject(type, *(StackObject**)&objRef->Value);
                                         }
-                                        else
+                                        else if(type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
                                         Free(esp - 1);
                                         esp--;
