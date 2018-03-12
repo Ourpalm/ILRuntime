@@ -19,6 +19,8 @@ namespace ILRuntimeTest.TestFramework
             Z = z;
         }
 
+        public static TestVector3 One2 { get { return new TestVector3(1, 1, 1); } }
+
         public static TestVector3 operator +(TestVector3 a, TestVector3 b)
         {
             TestVector3 res = new TestVector3();

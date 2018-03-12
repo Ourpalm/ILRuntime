@@ -435,14 +435,32 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.StackObjectReference:
                                             {
                                                 objRef = GetObjectAndResolveReference(objRef);
-                                                if (val->ObjectType >= ObjectTypes.Object)
+                                                if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                                 {
-                                                    mStack[objRef->Value] = mStack[val->Value];
-                                                    objRef->ValueLow = val->ValueLow;
+                                                    switch (val->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Object:
+                                                            StackObject* dst = *(StackObject**)&objRef->Value;
+                                                            CopyValueTypeToStack(dst, mStack[val->Value], mStack);
+                                                            break;
+                                                        case ObjectTypes.ValueTypeObjectReference:
+                                                            CopyStackValueType(val, objRef, mStack);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    *objRef = *val;
+                                                    if (val->ObjectType >= ObjectTypes.Object)
+                                                    {
+                                                        mStack[objRef->Value] = mStack[val->Value];
+                                                        objRef->ValueLow = val->ValueLow;
+                                                    }
+                                                    else
+                                                    {
+                                                        *objRef = *val;
+                                                    }
                                                 }
                                             }
                                             break;
@@ -4096,6 +4114,26 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        void CopyValueTypeToStack(StackObject*dst, object ins, IList<object> mStack)
+        {
+            if (ins is ILTypeInstance)
+            {
+                ((ILTypeInstance)ins).CopyValueTypeToStack(dst, mStack);
+            }
+            else
+            {
+                if (ins is CrossBindingAdaptorType)
+                {
+                    ((CrossBindingAdaptorType)ins).ILInstance.CopyValueTypeToStack(dst, mStack);
+                }
+                else
+                {
+                    var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder;
+                    vb.CopyValueTypeToStack(ins, dst, mStack);
+                }
+            }
+        }
+
         void CopyToValueTypeField(StackObject* obj, int idx, StackObject* val, IList<object> mStack)
         {
             StackObject* dst = Minus(obj, idx + 1);
@@ -4115,22 +4153,7 @@ namespace ILRuntime.Runtime.Intepreter
                             var ins = mStack[val->Value];
                             dst = *(StackObject**)&dst->Value;
 
-                            if (ins is ILTypeInstance)
-                            {
-                                ((ILTypeInstance)ins).CopyValueTypeToStack(dst, mStack);
-                            }
-                            else
-                            {
-                                if (ins is CrossBindingAdaptorType)
-                                {
-                                    ((CrossBindingAdaptorType)ins).ILInstance.CopyValueTypeToStack(dst, mStack);
-                                }
-                                else
-                                {
-                                    var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder;
-                                    vb.CopyValueTypeToStack(ins, dst, mStack);
-                                }
-                            }
+                            CopyValueTypeToStack(dst, ins, mStack);
                         }
                         else
                         {

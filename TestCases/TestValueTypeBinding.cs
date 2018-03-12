@@ -153,5 +153,25 @@ namespace TestCases
             TestVector3 c = new TestVector3();
             a.Test(out c, out b);
         }
+
+        public static void UnitTest_10029()
+        {
+            TestVector3 c = new TestVector3();
+            UnitTest_10029Sub2(out c);
+            Console.WriteLine(c.ToString());
+            c = new TestVector3();
+            UnitTest_10029Sub(out c);
+            Console.WriteLine(c.ToString());
+        }
+
+        static void UnitTest_10029Sub(out TestVector3 v3)
+        {
+            v3 = TestVector3.One;//
+        }
+
+        static void UnitTest_10029Sub2(out TestVector3 v3)
+        {
+            v3 = TestVector3.One2;//
+        }
     }
 }
