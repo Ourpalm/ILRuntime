@@ -652,6 +652,8 @@ namespace ILRuntime.CLR.TypeSystem
             }
             else
             {
+                if (type is ILType)
+                    return false;
                 Type cT = type != null ? type.TypeForCLR : typeof(object);
                 return TypeForCLR.IsAssignableFrom(cT);
             }

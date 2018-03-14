@@ -120,6 +120,16 @@ namespace TestCases
             Console.WriteLine(string.Format("{0},{1}", k, l));
         }
 
+        public static void InheritanceTest09()
+        {
+            ClassInheritanceTest a = new TestCls();
+            ClassInheritanceTest b = new TestCls2();
+
+            if(a is TestCls2)
+            {
+                throw new Exception("Error");
+            }
+        }
         class TestCls5 : TestClass2
         {
             public override float AbMethod2(int arg1)

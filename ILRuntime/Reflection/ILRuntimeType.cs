@@ -442,7 +442,6 @@ namespace ILRuntime.Reflection
         {
             return false;
         }
-
         protected override bool IsArrayImpl()
         {
             return type.IsArray;
