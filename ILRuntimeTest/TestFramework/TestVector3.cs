@@ -19,6 +19,8 @@ namespace ILRuntimeTest.TestFramework
             Z = z;
         }
 
+        public static TestVector3 One2 { get { return new TestVector3(1, 1, 1); } }
+
         public static TestVector3 operator +(TestVector3 a, TestVector3 b)
         {
             TestVector3 res = new TestVector3();
@@ -37,6 +39,12 @@ namespace ILRuntimeTest.TestFramework
             res.Z = a.Z * b;
 
             return res;
+        }
+
+        public void Test(out TestVector3 a, out float b)
+        {
+            b = 123f;
+            a = this * 123f;
         }
 
         public override string ToString()

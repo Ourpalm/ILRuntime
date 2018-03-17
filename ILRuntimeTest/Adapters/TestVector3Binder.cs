@@ -48,6 +48,17 @@ namespace ILRuntimeTest.TestFramework
             args = new Type[] { typeof(TestVector3), typeof(float) };
             method = type.GetMethod("op_Multiply", flag, null, args, null);
             appdomain.RegisterCLRMethodRedirection(method, Vector3_Multiply);
+
+            args = new Type[] {  };
+            method = type.GetMethod("get_One2", flag, null, args, null);
+            appdomain.RegisterCLRMethodRedirection(method, Vector3_One2);
+        }
+
+        public StackObject* Vector3_One2(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            TestVector3 res = TestVector3.One;
+            PushVector3(ref res, intp, esp, mStack);
+            return esp + 1;
         }
 
         public StackObject* Vector3_Add(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
