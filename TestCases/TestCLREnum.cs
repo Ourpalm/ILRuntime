@@ -25,5 +25,14 @@ namespace TestCases
             }
             throw new Exception("Test Fail");
         }
+
+        enum MyEnum9 { AAA }
+
+        public static void Test02()
+        {
+            object o = MyEnum9.AAA;
+            Console.WriteLine(o is MyEnum9); //true
+            Console.WriteLine(o is Enum); //false  should be true
+        }
     }
 }

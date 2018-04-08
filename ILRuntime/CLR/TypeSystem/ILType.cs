@@ -1019,6 +1019,11 @@ namespace ILRuntime.CLR.TypeSystem
                 return true;
             }
 
+            if (IsEnum)
+            {
+                if (type.TypeForCLR == typeof(Enum))
+                    return true;
+            }
             if (BaseType != null)
             {
                 res = BaseType.CanAssignTo(type);
