@@ -3341,10 +3341,10 @@ namespace ILRuntime.Runtime.Intepreter
                                             esp = idx;
                                         }
                                         else
-                                            esp = PushObject(esp - 1 - 1, mStack, val);
+                                            esp = PushObject(esp - 1 - 1, mStack, val, true);
                                     }
                                     else
-                                        esp = PushObject(esp - 1 - 1, mStack, val);
+                                        esp = PushObject(esp - 1 - 1, mStack, val, true);
                                 }
                                 break;
                             case OpCodeEnum.Stelem_I1:

@@ -101,5 +101,29 @@ namespace TestCases
         {
             public int Value { get; set; }
         }
+
+        public static void Test04()
+        {
+
+            Test04Sub((byte)1); //wrong
+            Test04Sub2(new object[] { (byte)1 }); //wrong
+            Test04Sub3((byte)1); //right
+        }
+
+        static void Test04Sub(params object[] o)
+        {
+            Test04Sub3(o[0]);
+        }
+        static void Test04Sub2(object[] o)
+        {
+            Test04Sub3(o[0]);
+        }
+
+        static void Test04Sub3(object o)
+        {
+            List<object> l = new List<object>() { o };
+            Console.WriteLine("contains int:" + l.Contains(1));
+            Console.WriteLine("contains byte:" + l.Contains((byte)1));
+        }
     }
 }
