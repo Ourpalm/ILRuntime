@@ -3028,6 +3028,27 @@ namespace ILRuntime.Runtime.Intepreter
                                                         }
                                                     }
                                                     break;
+                                                case ObjectTypes.FieldReference:
+                                                    {
+                                                        var obj = mStack[objRef->Value];
+                                                        if (obj != null)
+                                                        {
+                                                            if (obj is ILTypeInstance)
+                                                            {
+                                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                                var tar = instance[objRef->ValueLow] as ILTypeInstance;
+                                                                if (tar != null)
+                                                                    tar.Clear();
+                                                                else
+                                                                    throw new NotSupportedException();
+                                                            }
+                                                            else
+                                                                throw new NotSupportedException();
+                                                        }
+                                                        else
+                                                            throw new NullReferenceException();
+                                                    }
+                                                    break;
                                                 default:
                                                     throw new NotImplementedException();
                                             }
