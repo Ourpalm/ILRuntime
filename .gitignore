@@ -2,4 +2,4 @@
 bin/
 obj/
 *.user
-.vs/ILRuntime/v15/sqlite3/storage.ide
+.vs

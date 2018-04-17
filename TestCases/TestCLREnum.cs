@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TestCases
 {
@@ -33,6 +34,16 @@ namespace TestCases
             object o = MyEnum9.AAA;
             Console.WriteLine(o is MyEnum9); //true
             Console.WriteLine(o is Enum); //false  should be true
+        }
+
+        public static void Test03()
+        {
+            Console.WriteLine(new List<object>() { MyEnum9.AAA }.Contains((MyEnum9)123)); //should be true,because two items are ilenuminstancetype
+        }
+
+        public static void Test04()
+        {
+            Console.WriteLine(MyEnum9.AAA.GetType());//shouild be Enum20
         }
     }
 }

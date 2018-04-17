@@ -868,7 +868,7 @@ namespace ILRuntime.Runtime.Enviorment
             intp.Free(param);
              
             var type = instance.GetType();
-            if (type == typeof(ILTypeInstance))
+            if (type == typeof(ILTypeInstance) || type == typeof(ILEnumTypeInstance))
             {
                 return ILIntepreter.PushObject(ret, mStack, ((ILTypeInstance)instance).Type.ReflectionType);
             }
