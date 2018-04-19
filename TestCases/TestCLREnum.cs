@@ -45,5 +45,13 @@ namespace TestCases
         {
             Console.WriteLine(MyEnum9.AAA.GetType());//shouild be Enum20
         }
+
+        public static void Test05()
+        {
+            Dictionary<object, object> dict = new Dictionary<object, object>() { { MyEnum9.AAA, MyEnum9.AAA } };
+            Console.WriteLine(dict.ContainsKey(MyEnum9.AAA)); //false, should be true
+            Console.WriteLine(dict.ContainsValue(MyEnum9.AAA));
+
+        }
     }
 }

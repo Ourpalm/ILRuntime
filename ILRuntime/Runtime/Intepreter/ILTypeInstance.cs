@@ -460,7 +460,14 @@ namespace ILRuntime.Runtime.Intepreter
                 }
             }
             else
-                return base.GetHashCode();
+            {
+                if (this is ILEnumTypeInstance)
+                {
+                    return ((ILEnumTypeInstance)this).fields[0].Value.GetHashCode();
+                }
+                else
+                    return base.GetHashCode();
+            }
         }
 
         public bool CanAssignTo(IType type)
