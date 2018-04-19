@@ -65,5 +65,12 @@ namespace TestCases
             ILRuntimeTest.TestFramework.TestVector3[] arr = new ILRuntimeTest.TestFramework.TestVector3[] { ILRuntimeTest.TestFramework.TestVector3.One, ILRuntimeTest.TestFramework.TestVector3.One2 };
             Console.WriteLine(arr[0].ToString());
         }
+
+        public static void ArrayTest06()
+        {
+            int[,,] pos = new int[,,] { { { 1, 2, 3 }, { 3, 4, 5 } }, { { 1, 3, 3 }, { 2, 3, 4 } } };
+
+            Console.WriteLine(pos[0, 1, 1]);
+        }
     }
 }
