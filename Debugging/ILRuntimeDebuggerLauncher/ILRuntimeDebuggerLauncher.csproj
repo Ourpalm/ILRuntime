@@ -208,6 +208,8 @@
     <ProjectReference Include="..\ILRuntimeDebugEngine\ILRuntimeDebugEngine.csproj">
       <Project>{217ae15b-840c-4f8f-93cd-9d331aa4c81a}</Project>
       <Name>ILRuntimeDebugEngine</Name>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <IncludeOutputGroupsInVSIX>DebugSymbolsProjectOutputGroup%3bBuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
