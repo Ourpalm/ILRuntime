@@ -128,6 +128,10 @@ namespace TestCases
 
     public class StructTests
     {
+        class MyClass
+        {
+            MyStruct stru = new MyStruct();
+        }
         struct MyStruct
         {
             public int i;
@@ -137,6 +141,12 @@ namespace TestCases
         {
             var m = new MyStruct[10];
             m[1] = new MyStruct();   // `Throw exception here.`
+        }
+
+        public static void StructTest2()
+        {
+            MyClass c = new MyClass();
+            Console.WriteLine(c.ToString());
         }
     }
 }

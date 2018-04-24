@@ -173,6 +173,15 @@ namespace TestCases
             test(555);
         }
 
+        public static void DelegateTest16()
+        {
+            System.Action a = () => { };
+            System.Action<int> a_2 = (i) => { };
+            int a3 = 2;
+            Console.WriteLine(typeof(System.Action) == a.GetType());  //false, should be true
+            Console.WriteLine(typeof(int) == a3.GetType());  //false, should be true
+        }
+
         static void TestString(string a)
         {
             Console.WriteLine("test1:" + a);

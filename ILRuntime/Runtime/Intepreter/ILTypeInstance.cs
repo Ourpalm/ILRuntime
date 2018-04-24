@@ -424,7 +424,27 @@ namespace ILRuntime.Runtime.Intepreter
                 }
             }
             else
-                return base.Equals(obj);
+            {
+                if (this is ILEnumTypeInstance)
+                {
+                    if (obj is ILEnumTypeInstance)
+                    {
+                        ILEnumTypeInstance enum1 = (ILEnumTypeInstance)this;
+                        ILEnumTypeInstance enum2 = (ILEnumTypeInstance)obj;
+                        if (enum1.type == enum2.type)
+                        {
+                            var res = enum1.fields[0] == enum2.fields[0];
+                            return res;
+                        }
+                        else
+                            return false;
+                    }
+                    else
+                        return base.Equals(obj);
+                }
+                else
+                    return base.Equals(obj);
+            }
         }
 
         public override int GetHashCode()
@@ -440,7 +460,14 @@ namespace ILRuntime.Runtime.Intepreter
                 }
             }
             else
-                return base.GetHashCode();
+            {
+                if (this is ILEnumTypeInstance)
+                {
+                    return ((ILEnumTypeInstance)this).fields[0].Value.GetHashCode();
+                }
+                else
+                    return base.GetHashCode();
+            }
         }
 
         public bool CanAssignTo(IType type)

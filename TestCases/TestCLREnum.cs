@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TestCases
 {
@@ -24,6 +25,33 @@ namespace TestCases
                 return str.ToString();
             }
             throw new Exception("Test Fail");
+        }
+
+        enum MyEnum9 { AAA }
+
+        public static void Test02()
+        {
+            object o = MyEnum9.AAA;
+            Console.WriteLine(o is MyEnum9); //true
+            Console.WriteLine(o is Enum); //false  should be true
+        }
+
+        public static void Test03()
+        {
+            Console.WriteLine(new List<object>() { MyEnum9.AAA }.Contains((MyEnum9)123)); //should be true,because two items are ilenuminstancetype
+        }
+
+        public static void Test04()
+        {
+            Console.WriteLine(MyEnum9.AAA.GetType());//shouild be Enum20
+        }
+
+        public static void Test05()
+        {
+            Dictionary<object, object> dict = new Dictionary<object, object>() { { MyEnum9.AAA, MyEnum9.AAA } };
+            Console.WriteLine(dict.ContainsKey(MyEnum9.AAA)); //false, should be true
+            Console.WriteLine(dict.ContainsValue(MyEnum9.AAA));
+
         }
     }
 }
