@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.3</button>
+        <button class="hiden-in-phone">V1.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -28,7 +28,6 @@
                 </form>
             </li!-->
             <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -57,14 +56,6 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
-            </li>
-        
-            
-            
-            
-            
-            <li>
-                <p><a href="/ILRuntime/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
             </li>
         
             
@@ -166,11 +157,11 @@
 <h3 id="IL托管栈和托管对象栈"><a href="#IL托管栈和托管对象栈" class="headerlink" title="IL托管栈和托管对象栈"></a>IL托管栈和托管对象栈</h3><p>为了高性能进行运算，尤其是栈上的基础类型运算，如int,float,long之类类型的运算，直接借助C#的Stack类实现IL托管栈肯定是个非常糟糕的做法。因为这意味着每次读取和写入这些基础类型的值，都需要将他们进行装箱和拆箱操作，这个过程会非常耗时并且会产生巨量的GC Alloc，使得整个运行时执行效率非常低下。</p>
 <p>因此ILRuntime使用unsafe代码以及非托管内存，实现了自己的IL托管栈。</p>
 <p>ILRuntime中的所有对象都是以StackObject类来表示的，他的定义如下：</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> StackObject</div><div class="line">&#123;</div><div class="line">    <span class="keyword">public</span> ObjectTypes ObjectType;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Value; <span class="comment">//高32位</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> ValueLow; <span class="comment">//低32位</span></div><div class="line">&#125;</div><div class="line"><span class="keyword">enum</span> ObjectTypes</div><div class="line">&#123;</div><div class="line">    Null,<span class="comment">//null</span></div><div class="line">    Integer,</div><div class="line">    Long,</div><div class="line">    Float,</div><div class="line">    Double,</div><div class="line">    StackObjectReference,<span class="comment">//引用指针，Value = 指针地址, </span></div><div class="line">    StaticFieldReference,<span class="comment">//静态变量引用,Value = 类型Hash， ValueLow= Field的Index</span></div><div class="line">    Object,<span class="comment">//托管对象，Value = 对象Index</span></div><div class="line">    FieldReference,<span class="comment">//类成员变量引用，Value = 对象Index, ValueLow = Field的Index</span></div><div class="line">    ArrayReference,<span class="comment">//数组引用，Value = 对象Index, ValueLow = 元素的Index</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">struct</span> StackObject</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> ObjectTypes ObjectType;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Value; <span class="comment">//高32位</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> ValueLow; <span class="comment">//低32位</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">enum</span> ObjectTypes</span><br><span class="line">&#123;</span><br><span class="line">    Null,<span class="comment">//null</span></span><br><span class="line">    Integer,</span><br><span class="line">    Long,</span><br><span class="line">    Float,</span><br><span class="line">    Double,</span><br><span class="line">    StackObjectReference,<span class="comment">//引用指针，Value = 指针地址, </span></span><br><span class="line">    StaticFieldReference,<span class="comment">//静态变量引用,Value = 类型Hash， ValueLow= Field的Index</span></span><br><span class="line">    Object,<span class="comment">//托管对象，Value = 对象Index</span></span><br><span class="line">    FieldReference,<span class="comment">//类成员变量引用，Value = 对象Index, ValueLow = Field的Index</span></span><br><span class="line">    ArrayReference,<span class="comment">//数组引用，Value = 对象Index, ValueLow = 元素的Index</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>通过StackObject这个值类型，我们可以表达C#当中所有的基础类型，因为所有基础类型都可以表达为8位到64位的integer。对于非基础类型而言，我们额外需要一个List来储存他的object引用对象，而Value则可以存储这个对象在List中的Index。由此我们就可以表达C#中所有的类型了。</p>
 <h3 id="托管调用栈"><a href="#托管调用栈" class="headerlink" title="托管调用栈"></a>托管调用栈</h3><p>ILRuntime在进行方法调用时，需要将方法的参数先压入托管栈，然后执行完毕后需要将栈还原，并把方法返回值压入栈。</p>
 <p>具体过程如下图所示</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">调用前:                                调用完成后:</div><div class="line">|---------------|                     |---------------|</div><div class="line">|     参数1     |     |--------------&gt;|   [返回值]    |</div><div class="line">|---------------|     |               |---------------|</div><div class="line">|      ...      |     |               |     NULL      |</div><div class="line">|---------------|     |               |---------------|</div><div class="line">|     参数N     |     |               |      ...      |</div><div class="line">|---------------|     |</div><div class="line">|   局部变量1   |     |</div><div class="line">|---------------|     |</div><div class="line">|      ...      |     |</div><div class="line">|---------------|     |</div><div class="line">|   局部变量1   |     |</div><div class="line">|---------------|     |</div><div class="line">|  方法栈基址   |     |</div><div class="line">|---------------|     |</div><div class="line">|   [返回值]    |------</div><div class="line">|---------------|</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">调用前:                                调用完成后:</span><br><span class="line">|---------------|                     |---------------|</span><br><span class="line">|     参数1     |     |--------------&gt;|   [返回值]    |</span><br><span class="line">|---------------|     |               |---------------|</span><br><span class="line">|      ...      |     |               |     NULL      |</span><br><span class="line">|---------------|     |               |---------------|</span><br><span class="line">|     参数N     |     |               |      ...      |</span><br><span class="line">|---------------|     |</span><br><span class="line">|   局部变量1   |     |</span><br><span class="line">|---------------|     |</span><br><span class="line">|      ...      |     |</span><br><span class="line">|---------------|     |</span><br><span class="line">|   局部变量1   |     |</span><br><span class="line">|---------------|     |</span><br><span class="line">|  方法栈基址   |     |</span><br><span class="line">|---------------|     |</span><br><span class="line">|   [返回值]    |------</span><br><span class="line">|---------------|</span><br></pre></td></tr></table></figure>
 <p>函数调用进入目标方法体后，栈指针（后面我们简称为ESP）会被指向方法栈基址那个位置，可以通过ESP-X获取到该方法的参数和方法内部申明的局部变量，在方法执行完毕后，如果有返回值，则把返回值写在方法栈基址位置即可（上图因为空间原因写在了基址后面）。</p>
 <p>当方法体执行完毕后，ILRuntime会自动平衡托管栈，释放所有方法体占用的栈内存，然后把返回值复制到参数1的位置，这样后续代码直接取栈顶部就可以取到上次方法调用的返回值了。</p>
 

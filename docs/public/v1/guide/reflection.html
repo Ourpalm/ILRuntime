@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.3</button>
+        <button class="hiden-in-phone">V1.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -28,7 +28,6 @@
                 </form>
             </li!-->
             <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -57,14 +56,6 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
-            </li>
-        
-            
-            
-            
-            
-            <li>
-                <p><a href="/ILRuntime/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
             </li>
         
             
@@ -165,17 +156,17 @@
     <h2 id="ILRuntime中的反射"><a href="#ILRuntime中的反射" class="headerlink" title="ILRuntime中的反射"></a>ILRuntime中的反射</h2><p>用C#开发项目，很多时候会需要使用反射来实现某些功能。但是在脚本中使用反射其实是一个非常困难的事情。因为这需要把ILRuntime中的类型转换成一个真实的C#运行时类型，并把它们映射起来</p>
 <p>默认情况下，System.Reflection命名空间中的方法，并不可能得知ILRuntime中定义的类型，因此无法通过Type.GetType等接口取得热更DLL里面的类型。而且ILRuntime里的类型也并不是一个System.Type。</p>
 <p>为了解决这个问题，ILRuntime额外实现了几个用于反射的辅助类：<code>ILRuntimeType</code>，<code>ILRuntimeMethodInfo</code>，<code>ILRuntimeFieldInfo</code>等，来模拟系统的类型来提供部分反射功能</p>
-<h3 id="通过反射获取Type"><a href="#通过反射获取Type" class="headerlink" title="通过反射获取Type"></a>通过反射获取Type</h3><p>在<code>热更DLL</code>当中，直接调用Type.GetType(“TypeName”)或者typeof(TypeName)均可以得到有效System.Type类型实例<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="comment">//在热更DLL中，以下两种方式均可以</span></div><div class="line">Type t = <span class="keyword">typeof</span>(TypeName);</div><div class="line">Type t2 = Type.GetType(<span class="string">"TypeName"</span>);</div></pre></td></tr></table></figure></p>
+<h3 id="通过反射获取Type"><a href="#通过反射获取Type" class="headerlink" title="通过反射获取Type"></a>通过反射获取Type</h3><p>在<code>热更DLL</code>当中，直接调用Type.GetType(“TypeName”)或者typeof(TypeName)均可以得到有效System.Type类型实例<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//在热更DLL中，以下两种方式均可以</span></span><br><span class="line">Type t = <span class="keyword">typeof</span>(TypeName);</span><br><span class="line">Type t2 = Type.GetType(<span class="string">"TypeName"</span>);</span><br></pre></td></tr></table></figure></p>
 <p>在<code>Unity主工程中</code>，无法通过Type.GetType来取得热更DLL内部定义的类，而只能通过以下方式得到System.Type实例：</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">IType type = appdomain.LoadedTypes[<span class="string">"TypeName"</span>];</div><div class="line">Type t = type.ReflectedType;</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">IType type = appdomain.LoadedTypes[<span class="string">"TypeName"</span>];</span><br><span class="line">Type t = type.ReflectedType;</span><br></pre></td></tr></table></figure>
 <h3 id="通过反射创建实例"><a href="#通过反射创建实例" class="headerlink" title="通过反射创建实例"></a>通过反射创建实例</h3><p>在<code>热更DLL</code>当中，可以直接通过Activator来创建实例：</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">Type t = Type.GetType(<span class="string">"TypeName"</span>);<span class="comment">//或者typeof(TypeName)</span></div><div class="line"><span class="comment">//以下两种方式均可以</span></div><div class="line"><span class="keyword">object</span> instance = Activator.CreateInstance(t);</div><div class="line"><span class="keyword">object</span> instance = Activator.CreateInstance&lt;TypeName&gt;();</div></pre></td></tr></table></figure>
-<p>在<code>Unity主工程中</code>，无法通过Activator来创建热更DLL内类型的实例，必须通过AppDomain来创建实例：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="keyword">object</span> instance = appdomain.Instantiate(<span class="string">"TypeName"</span>);</div></pre></td></tr></table></figure></p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">Type t = Type.GetType(<span class="string">"TypeName"</span>);<span class="comment">//或者typeof(TypeName)</span></span><br><span class="line"><span class="comment">//以下两种方式均可以</span></span><br><span class="line"><span class="keyword">object</span> instance = Activator.CreateInstance(t);</span><br><span class="line"><span class="keyword">object</span> instance = Activator.CreateInstance&lt;TypeName&gt;();</span><br></pre></td></tr></table></figure>
+<p>在<code>Unity主工程中</code>，无法通过Activator来创建热更DLL内类型的实例，必须通过AppDomain来创建实例：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">object</span> instance = appdomain.Instantiate(<span class="string">"TypeName"</span>);</span><br></pre></td></tr></table></figure></p>
 <h3 id="通过反射调用方法"><a href="#通过反射调用方法" class="headerlink" title="通过反射调用方法"></a>通过反射调用方法</h3><p>在<code>热更DLL</code>当中，通过反射调用方法跟通常C#用法没有任何区别</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">Type type = <span class="keyword">typeof</span>(TypeName);</div><div class="line"><span class="keyword">object</span> instance = Activator.CreateInstance(type);</div><div class="line">MethodInfo mi = type.GetMethod(<span class="string">"foo"</span>);</div><div class="line">mi.Invoke(instance, <span class="literal">null</span>);</div></pre></td></tr></table></figure>
-<p>在<code>Unity主工程中</code>，可以通过C#通常用法来调用，也可以通过ILRuntime自己的接口来调用，两个方式是等效的：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">IType t = appdomain.LoadedTypes[<span class="string">"TypeName"</span>];</div><div class="line">Type type = t.ReflectedType;</div><div class="line"></div><div class="line"><span class="keyword">object</span> instance = appdomain.Instantiate(<span class="string">"TypeName"</span>);</div><div class="line"></div><div class="line"><span class="comment">//系统反射接口</span></div><div class="line">MethodInfo mi = type.GetMethod(<span class="string">"foo"</span>);</div><div class="line">mi.Invoke(instance, <span class="literal">null</span>);</div><div class="line"></div><div class="line"><span class="comment">//ILRuntime的接口</span></div><div class="line">IMethod m = t.GetMethod(<span class="string">"foo"</span>, <span class="number">0</span>);</div><div class="line">appdomain.Invoke(m, instance, <span class="literal">null</span>);</div></pre></td></tr></table></figure></p>
-<h3 id="通过反射获取和设置Field的值"><a href="#通过反射获取和设置Field的值" class="headerlink" title="通过反射获取和设置Field的值"></a>通过反射获取和设置Field的值</h3><p>在热更DLL和Unity主工程中获取和设置Field的值跟通常C#用法没有区别<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">Type t;</div><div class="line">FieldInfo fi = t.GetField(<span class="string">"field"</span>);</div><div class="line"><span class="keyword">object</span> val = fi.GetValue(instance);</div><div class="line">fi.SetValue(instance, val);</div></pre></td></tr></table></figure></p>
-<h3 id="通过反射获取Attribute标注"><a href="#通过反射获取Attribute标注" class="headerlink" title="通过反射获取Attribute标注"></a>通过反射获取Attribute标注</h3><p>在热更DLL和Unity主工程中获取Attribute标注跟通常C#用法没有区别<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">Type t;</div><div class="line">FieldInfo fi = t.GetField(<span class="string">"field"</span>);</div><div class="line"><span class="keyword">object</span>[] attributeArr = fi.GetCustomAttributes(<span class="keyword">typeof</span>(SomeAttribute), <span class="literal">false</span>);</div></pre></td></tr></table></figure></p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">Type type = <span class="keyword">typeof</span>(TypeName);</span><br><span class="line"><span class="keyword">object</span> instance = Activator.CreateInstance(type);</span><br><span class="line">MethodInfo mi = type.GetMethod(<span class="string">"foo"</span>);</span><br><span class="line">mi.Invoke(instance, <span class="literal">null</span>);</span><br></pre></td></tr></table></figure>
+<p>在<code>Unity主工程中</code>，可以通过C#通常用法来调用，也可以通过ILRuntime自己的接口来调用，两个方式是等效的：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">IType t = appdomain.LoadedTypes[<span class="string">"TypeName"</span>];</span><br><span class="line">Type type = t.ReflectedType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">object</span> instance = appdomain.Instantiate(<span class="string">"TypeName"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//系统反射接口</span></span><br><span class="line">MethodInfo mi = type.GetMethod(<span class="string">"foo"</span>);</span><br><span class="line">mi.Invoke(instance, <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//ILRuntime的接口</span></span><br><span class="line">IMethod m = t.GetMethod(<span class="string">"foo"</span>, <span class="number">0</span>);</span><br><span class="line">appdomain.Invoke(m, instance, <span class="literal">null</span>);</span><br></pre></td></tr></table></figure></p>
+<h3 id="通过反射获取和设置Field的值"><a href="#通过反射获取和设置Field的值" class="headerlink" title="通过反射获取和设置Field的值"></a>通过反射获取和设置Field的值</h3><p>在热更DLL和Unity主工程中获取和设置Field的值跟通常C#用法没有区别<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">Type t;</span><br><span class="line">FieldInfo fi = t.GetField(<span class="string">"field"</span>);</span><br><span class="line"><span class="keyword">object</span> val = fi.GetValue(instance);</span><br><span class="line">fi.SetValue(instance, val);</span><br></pre></td></tr></table></figure></p>
+<h3 id="通过反射获取Attribute标注"><a href="#通过反射获取Attribute标注" class="headerlink" title="通过反射获取Attribute标注"></a>通过反射获取Attribute标注</h3><p>在热更DLL和Unity主工程中获取Attribute标注跟通常C#用法没有区别<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">Type t;</span><br><span class="line">FieldInfo fi = t.GetField(<span class="string">"field"</span>);</span><br><span class="line"><span class="keyword">object</span>[] attributeArr = fi.GetCustomAttributes(<span class="keyword">typeof</span>(SomeAttribute), <span class="literal">false</span>);</span><br></pre></td></tr></table></figure></p>
 <h3 id="限制和注意事项"><a href="#限制和注意事项" class="headerlink" title="限制和注意事项"></a>限制和注意事项</h3><ul>
 <li>在Unity主工程中不能通过new T()的方式来创建热更工程中的类型实例</li>
 </ul>

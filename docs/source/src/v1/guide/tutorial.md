@@ -104,20 +104,19 @@ void OnILRuntimeInitialized()
 
 ### 调试插件
 
-ILRuntime提供了一个VisualStudio2015的调试插件，用来源码级调试你的热更脚本。
+ILRuntime提供了一个支持Visual Studio2015和Visual Studio 2017的调试插件，用来源码级调试你的热更脚本。
 
-你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的VS2015调试插件。
+你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的Visual Studio调试插件。
 
 **使用方法如下：**
 
-- 安装ILRuntime调试插件，并重新启动VS2015
+- 安装ILRuntime调试插件，并重新启动VS2015或VS2017
 - 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
-- 用VS2015打开热更DLL项目
+- 用VisualStudio打开热更DLL项目
 - 点击菜单中的Debug->Attach to ILRuntime按钮
 - 在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口
 - 点击Attach按钮后，即可像UnityVS一样下断点调试
 
 **注意事项：**
 
-- 调试插件需要`Visual Studio 2015 Update3`以上版本
-- 调试插件目前`仍热在开发中`，目前断点后仅能查看基础类型的局部变量和函数参数的值
+- 如果使用VS2015的话需要`Visual Studio 2015 Update3`以上版本

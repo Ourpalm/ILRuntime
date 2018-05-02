@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.3</button>
+        <button class="hiden-in-phone">V1.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -28,7 +28,6 @@
                 </form>
             </li!-->
             <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -57,14 +56,6 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
-            </li>
-        
-            
-            
-            
-            
-            <li>
-                <p><a href="/ILRuntime/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
             </li>
         
             
@@ -166,9 +157,9 @@
 <p>但是这种方式有着明显的弊端，最突出的一点就是通过反射来调用接口调用效率会比直接调用低很多，再加上反射传递函数参数时需要使用<code>object[]</code>数组，这样不可避免的每次调用都会产生不少GC Alloc。众所周知GC Alloc高意味着在Unity中执行会存在较大的性能问题。</p>
 <p>ILRuntime通过CLR方法绑定机制，可以<code>选择性</code>的对经常使用的CLR接口进行直接调用，从而尽可能的消除反射调用开销以及额外的<code>GC Alloc</code></p>
 <h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><p>CLR绑定借助了ILRuntime的CLR重定向机制来实现，因为实质上也是将对CLR方法的反射调用重定向到我们自己定义的方法里面来。但是手动编写CLR重定向方法是个工作量非常巨大的事，而且要求对ILRuntime底层机制非常了解（比如如何装拆箱基础类型，怎么处理Ref/Out引用等等），因此ILRuntime提供了一个代码生成工具来自动生成CLR绑定代码。</p>
-<p>CLR绑定代码的自动生成工具使用方法如下：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">[<span class="meta">MenuItem(<span class="meta-string">"ILRuntime/Generate CLR Binding Code"</span>)</span>]</div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">GenerateCLRBinding</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">	List&lt;Type&gt; types = <span class="keyword">new</span> List&lt;Type&gt;();</div><div class="line">	<span class="comment">//在List中添加你想进行CLR绑定的类型</span></div><div class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">int</span>));</div><div class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">float</span>));</div><div class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">long</span>));</div><div class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">object</span>));</div><div class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">string</span>));</div><div class="line">	types.Add(<span class="keyword">typeof</span>(Console));</div><div class="line">	types.Add(<span class="keyword">typeof</span>(Array));</div><div class="line">	types.Add(<span class="keyword">typeof</span>(Dictionary&lt;<span class="keyword">string</span>, <span class="keyword">int</span>&gt;));</div><div class="line">	<span class="comment">//所有ILRuntime中的类型，实际上在C#运行时中都是ILRuntime.Runtime.Intepreter.ILTypeInstance的实例，</span></div><div class="line">	<span class="comment">//因此List&lt;A&gt; List&lt;B&gt;，如果A与B都是ILRuntime中的类型，只需要添加List&lt;ILRuntime.Runtime.Intepreter.ILTypeInstance&gt;即可</span></div><div class="line">	types.Add(<span class="keyword">typeof</span>(Dictionary&lt;ILRuntime.Runtime.Intepreter.ILTypeInstance, <span class="keyword">int</span>&gt;));</div><div class="line">	<span class="comment">//第二个参数为自动生成的代码保存在何处</span></div><div class="line">	ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(types, <span class="string">"Assets/ILRuntime/Generated"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>CLR绑定代码的自动生成工具使用方法如下：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">[<span class="meta">MenuItem(<span class="meta-string">"ILRuntime/Generate CLR Binding Code"</span>)</span>]</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">GenerateCLRBinding</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	List&lt;Type&gt; types = <span class="keyword">new</span> List&lt;Type&gt;();</span><br><span class="line">	<span class="comment">//在List中添加你想进行CLR绑定的类型</span></span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">int</span>));</span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">float</span>));</span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">long</span>));</span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">object</span>));</span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(<span class="keyword">string</span>));</span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(Console));</span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(Array));</span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(Dictionary&lt;<span class="keyword">string</span>, <span class="keyword">int</span>&gt;));</span><br><span class="line">	<span class="comment">//所有ILRuntime中的类型，实际上在C#运行时中都是ILRuntime.Runtime.Intepreter.ILTypeInstance的实例，</span></span><br><span class="line">	<span class="comment">//因此List&lt;A&gt; List&lt;B&gt;，如果A与B都是ILRuntime中的类型，只需要添加List&lt;ILRuntime.Runtime.Intepreter.ILTypeInstance&gt;即可</span></span><br><span class="line">	types.Add(<span class="keyword">typeof</span>(Dictionary&lt;ILRuntime.Runtime.Intepreter.ILTypeInstance, <span class="keyword">int</span>&gt;));</span><br><span class="line">	<span class="comment">//第二个参数为自动生成的代码保存在何处</span></span><br><span class="line">	ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(types, <span class="string">"Assets/ILRuntime/Generated"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>在CLR绑定代码生成之后，需要将这些绑定代码注册到AppDomain中才能使CLR绑定生效，但是一定要记得将CLR绑定的注册写在CLR重定向的注册后面，因为同一个方法只能被重定向一次，只有先注册的那个才能生效。</p>
-<p>注册方法如下：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">ILRuntime.Runtime.Generated.CLRBindings.Initialize(appdomain);</div></pre></td></tr></table></figure></p>
+<p>注册方法如下：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">ILRuntime.Runtime.Generated.CLRBindings.Initialize(appdomain);</span><br></pre></td></tr></table></figure></p>
 
     <div class="footer">
         发现错误？想参与编辑？ 
