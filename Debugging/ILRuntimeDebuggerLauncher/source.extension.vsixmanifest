@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="847ac008-9dda-487e-9e6e-37192c654610" Version="0.98" Language="en-US" Publisher="Ourpalm" />
+        <Identity Id="847ac008-9dda-487e-9e6e-37192c654610" Version="1.0" Language="en-US" Publisher="Ourpalm" />
         <DisplayName>ILRuntime Debugger</DisplayName>
         <Description xml:space="preserve">ILRuntime Debugger Launcher</Description>
         <MoreInfo>https://github.com/Ourpalm/ILRuntime</MoreInfo>
