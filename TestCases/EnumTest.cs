@@ -154,5 +154,14 @@ namespace TestCases
                 throw new Exception($"Different string value: {valueDirectly} vs. {valueToString}");
             }
         }
+
+        public static void Test12()
+        {
+            var arr = Enum.GetValues(typeof(TestEnum));
+            foreach(var i in arr)
+            {
+                Console.WriteLine(i.ToString());
+            }
+        }
     }
 }

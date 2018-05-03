@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.3</button>
+        <button class="hiden-in-phone">V1.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -28,7 +28,6 @@
                 </form>
             </li!-->
             <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -57,14 +56,6 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
-            </li>
-        
-            
-            
-            
-            
-            <li>
-                <p><a href="/ILRuntime/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
             </li>
         
             
@@ -173,8 +164,8 @@
 </blockquote>
 <h3 id="值类型"><a href="#值类型" class="headerlink" title="值类型"></a>值类型</h3><p>由于值类型的特殊和ILRuntime的实现原理，使用ILRuntime外部定义的值类型（例如UnityEngine.Vector3）在默认情况下会造成额外的装箱拆箱开销，以及相对应的GC Alloc内存分配。</p>
 <p>为了解决这个问题，ILRuntime在1.3.0版中增加了值类型绑定（ValueTypeBinding）机制，通过对这些值类型添加绑定器，可以大幅增加值类型的执行效率，以及避免GC Alloc内存分配。具体用法请参考ILRuntime的Unity3D示例工程或者ILRuntime的TestCases测试用例工程。</p>
-<h3 id="接口调用建议"><a href="#接口调用建议" class="headerlink" title="接口调用建议"></a>接口调用建议</h3><p>为了调用方便，ILRuntime的很多接口使用了params可变参数，但是有可能会无意间忽视这个操作带来的GCAlloc，例如下面的操作：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Initialize"</span>, <span class="literal">null</span>);</div><div class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Start"</span>, <span class="literal">null</span>, <span class="number">100</span>, <span class="number">200</span>);</div></pre></td></tr></table></figure></p>
-<p>这两个操作在调用的时候，会分别生成一个<code>object[0]</code>和<code>object[2]</code>，从而产生GC Alloc，这一点很容易被忽略。所以如果你需要在Update等性能关键的地方调用热更DLL中的方法，应该按照以下方式缓存这个参数数组：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="keyword">object</span>[] param0 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">0</span>];</div><div class="line"><span class="keyword">object</span>[] param2 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">2</span>];</div><div class="line">IMethod m, m2;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    m = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"Update"</span>, <span class="number">0</span>);</div><div class="line">	m2 = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"SomethingAfterUpdate"</span>, <span class="number">2</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    appdomain.Invoke(m, <span class="literal">null</span>, param0);</div><div class="line">	param2[<span class="number">0</span>] = <span class="keyword">this</span>;</div><div class="line">	param2[<span class="number">1</span>] = appdomain;</div><div class="line">	appdomain.Invoke(m2, <span class="literal">null</span>, param2);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="接口调用建议"><a href="#接口调用建议" class="headerlink" title="接口调用建议"></a>接口调用建议</h3><p>为了调用方便，ILRuntime的很多接口使用了params可变参数，但是有可能会无意间忽视这个操作带来的GCAlloc，例如下面的操作：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Initialize"</span>, <span class="literal">null</span>);</span><br><span class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Start"</span>, <span class="literal">null</span>, <span class="number">100</span>, <span class="number">200</span>);</span><br></pre></td></tr></table></figure></p>
+<p>这两个操作在调用的时候，会分别生成一个<code>object[0]</code>和<code>object[2]</code>，从而产生GC Alloc，这一点很容易被忽略。所以如果你需要在Update等性能关键的地方调用热更DLL中的方法，应该按照以下方式缓存这个参数数组：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">object</span>[] param0 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">object</span>[] param2 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">2</span>];</span><br><span class="line">IMethod m, m2;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"Update"</span>, <span class="number">0</span>);</span><br><span class="line">	m2 = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"SomethingAfterUpdate"</span>, <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    appdomain.Invoke(m, <span class="literal">null</span>, param0);</span><br><span class="line">	param2[<span class="number">0</span>] = <span class="keyword">this</span>;</span><br><span class="line">	param2[<span class="number">1</span>] = appdomain;</span><br><span class="line">	appdomain.Invoke(m2, <span class="literal">null</span>, param2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>通过缓存IMethod实例以及参数列表数组，可以做到这个Update操作不会产生任何额外的GC Alloc，并且以最高的性能来执行</p>
 
     <div class="footer">

@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.3</button>
+        <button class="hiden-in-phone">V1.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -28,7 +28,6 @@
                 </form>
             </li!-->
             <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -57,14 +56,6 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
-            </li>
-        
-            
-            
-            
-            
-            <li>
-                <p><a href="/ILRuntime/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
             </li>
         
             
@@ -164,11 +155,11 @@
     <article class="clearfix">
     <h2 id="LitJson集成"><a href="#LitJson集成" class="headerlink" title="LitJson集成"></a>LitJson集成</h2><p>Json序列化是开发中非常经常需要用到的功能，考虑到其通用性，因此ILRuntime对LitJson这个序列化库进行了集成</p>
 <h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>在使用LitJson前，需要对LitJson进行注册，注册方法很简单，只需要在ILRuntime初始化阶段，在注册CLR绑定之前，执行下面这行代码即可：</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(appdomain);</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(appdomain);</span><br></pre></td></tr></table></figure>
 <h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>LitJson的使用非常简单，将一个对象转换成json字符串，只需要下面这行代码即可</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="keyword">string</span> json = JsonMapper.ToJson(obj);</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">string</span> json = JsonMapper.ToJson(obj);</span><br></pre></td></tr></table></figure>
 <p>将json字符串反序列化成对象也同样只需要一行代码</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">JsonTestClass obj = JsonMapper.ToObject&lt;JsonTestClass&gt;(json);</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">JsonTestClass obj = JsonMapper.ToObject&lt;JsonTestClass&gt;(json);</span><br></pre></td></tr></table></figure>
 <p>其他具体使用方法请参考LitJson库的文档即可</p>
 
     <div class="footer">
