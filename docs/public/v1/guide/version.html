@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.3</button>
+        <button class="hiden-in-phone">V1.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -28,7 +28,6 @@
                 </form>
             </li!-->
             <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li current">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -57,14 +56,6 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link current">更新记录</a></p>
-            </li>
-        
-            
-            
-            
-            
-            <li>
-                <p><a href="/ILRuntime/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
             </li>
         
             
@@ -162,7 +153,14 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-3"><a href="#V1-3" class="headerlink" title="V1.3"></a>V1.3</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-4"><a href="#V1-4" class="headerlink" title="V1.4"></a>V1.4</h3><ul>
+<li>完整实现了断点调试和VS调试插件</li>
+<li>自动CLR绑定增加了值类型Binder的使用</li>
+<li>增加了泛型方法的CLR绑定</li>
+<li>多维数组的支持</li>
+<li>修复了若干关于泛型方法匹配的Bug</li>
+</ul>
+<h3 id="V1-3"><a href="#V1-3" class="headerlink" title="V1.3"></a>V1.3</h3><ul>
 <li>增加栈上分配值类型的机制，值类型可以不再强制装箱而直接在栈上分配。</li>
 <li>增加值类型绑定（ValueTypeBinding）机制，可以将ILRuntime外部的CLR值类型在栈上分配，大幅提升相关操作性能</li>
 <li>修复若干泛型方法寻找方法的bug</li>

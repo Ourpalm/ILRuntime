@@ -347,6 +347,8 @@ namespace ILRuntime.Runtime.Stack
 
         public void FreeValueTypeObject(StackObject* esp)
         {
+            if (esp->ObjectType != ObjectTypes.ValueTypeObjectReference)
+                return;
             int start = int.MaxValue;
             int end = int.MinValue;
             StackObject* endAddr;
