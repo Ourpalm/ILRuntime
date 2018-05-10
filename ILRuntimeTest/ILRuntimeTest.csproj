@@ -84,6 +84,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Object_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Int32_Binding.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_List_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_List_1_List_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_String_Binding_Enumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_IDictionary_Binding.cs" />
@@ -111,10 +113,12 @@
     <Compile Include="AutoGenerate\System_DateTime_Binding.cs" />
     <Compile Include="AutoGenerate\System_Diagnostics_Stopwatch_Binding.cs" />
     <Compile Include="AutoGenerate\System_Double_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Enum_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
     <Compile Include="AutoGenerate\System_IComparable_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array2_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Int32_Array3_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array_Binding_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Binding.cs" />

@@ -90,8 +90,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor @value = (ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor @value = (ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             System.Int32 @key = ptr_of_this_method->Value;
