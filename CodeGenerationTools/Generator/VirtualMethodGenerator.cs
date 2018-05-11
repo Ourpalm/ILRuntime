@@ -27,6 +27,7 @@ namespace CodeGenerationTools.Generator
             argStr = argStr.Trim(',');
             argNoTypeStr = argNoTypeStr.Trim(',');
             SetKeyValue("{$args}", argStr);
+            SetKeyValue("{$args_count}", methodInfo.Parameters.Count.ToString());
             SetKeyValue("{$args_no_type}", argNoTypeStr);
             SetKeyValue("{$comma}", argStr == "" ? "" : ",");
             SetKeyValue("{$modifier}", GetAccessmodifier(methodInfo));//Accessmodifier().ToString().ToLower());

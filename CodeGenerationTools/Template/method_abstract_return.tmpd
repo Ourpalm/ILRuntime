@@ -4,7 +4,7 @@
             {
                 if(m{$AMethodName} == null)
                 {
-                    m{$AMethodName} = instance.Type.GetMethod("{$AMethodName}", 0);
+                    m{$AMethodName} = instance.Type.GetMethod("{$AMethodName}", {$args_count});
                 }
 
                 if (m{$AMethodName} != null)

@@ -6,7 +6,7 @@
             {
                 if (m{$VMethodName} == null)
                 {
-                    m{$VMethodName} = instance.Type.GetMethod("{$VMethodName}", 0);
+                    m{$VMethodName} = instance.Type.GetMethod("{$VMethodName}", {$args_count});
                 }
                 if (m{$VMethodName} != null && !is{$VMethodName}Invoking)
                 {
