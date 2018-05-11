@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Runtime.InteropServices;
 using ILRuntime.CLR.Method;
 
 namespace ILRuntime.Runtime.Intepreter.OpCodes
@@ -27,5 +27,35 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         /// Int64 操作数
         /// </summary>
         public long TokenLong;
+    }
+
+    /// <summary>
+    /// Register machine opcode
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit)]
+    struct OpCodeR
+    {
+        [FieldOffset(0)]
+        public OpCodeEnum Code;
+        [FieldOffset(4)]
+        public short Register1;
+        [FieldOffset(6)]
+        public short Register2;
+        [FieldOffset(4)]
+        public int Operand;
+        [FieldOffset(8)]
+        public short Register3;
+        [FieldOffset(10)]
+        public short Register4;
+        [FieldOffset(8)]
+        public int Operand2;
+        [FieldOffset(12)]
+        public short Register5;
+        [FieldOffset(14)]
+        public short Register6;
+        [FieldOffset(12)]
+        public int Operand3;
+        [FieldOffset(8)]
+        public long OperandLong;
     }
 }
