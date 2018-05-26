@@ -241,7 +241,7 @@ namespace ILRuntime.Reflection
                 {
                     ctx.PushObject(index[i], !setter.Parameters[i].IsPrimitive);
                 }
-                ctx.PushObject(value);
+                ctx.PushObject(value, !setter.Parameters[setter.ParameterCount - 1].IsPrimitive);
                 ctx.Invoke();
             }
             else
