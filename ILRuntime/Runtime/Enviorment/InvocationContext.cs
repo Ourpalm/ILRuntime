@@ -79,11 +79,11 @@ namespace ILRuntime.Runtime.Enviorment
             paramCnt++;
         }
 
-        public void PushObject(object obj)
+        public void PushObject(object obj, bool isBox = true)
         {
             if (obj is CrossBindingAdaptorType)
                 obj = ((CrossBindingAdaptorType)obj).ILInstance;
-            esp = ILIntepreter.PushObject(esp, mStack, obj, true);
+            esp = ILIntepreter.PushObject(esp, mStack, obj, isBox);
             paramCnt++;
         }
 

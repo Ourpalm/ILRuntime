@@ -146,10 +146,6 @@ namespace TestCases
                 throw new Exception("isDefeinded == false 3");
             }
         }
-
-
-
-
         [Obsolete("gasdgas")]
         class TestCls
         {
@@ -280,6 +276,37 @@ namespace TestCases
             else
             {
                 Console.WriteLine("not null obj - IntField"); // 对于int是正确的，走到了这里
+            }
+        }
+
+
+
+        class test24Class
+        {
+            public int this[int index, long index2]
+            {
+                get
+                {
+                    return (int)(index + index2);
+                }
+                set
+                {
+                    Console.WriteLine($"{index},{index2}={value}");
+                }
+            }
+        }
+        public static void ReflectionTest11()
+        {
+            ReflectionTest11Sub(new test24Class());
+        }
+
+        static void ReflectionTest11Sub(object o)
+        {
+            var p = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);//error
+            foreach (var i in p)
+            {
+                Console.WriteLine(i.GetValue(o, new object[] { 1, 2L ,3333}));
+                i.SetValue(o, 333, new object[] { 123, 345L, 678 });
             }
         }
     }

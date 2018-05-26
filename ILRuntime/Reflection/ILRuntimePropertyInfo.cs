@@ -19,7 +19,6 @@ namespace ILRuntime.Reflection
 
         object[] customAttributes;
         Type[] attributeTypes;
-        static object[] param = new object[1];
 
         public ILMethod Getter
         {
@@ -215,13 +214,38 @@ namespace ILRuntime.Reflection
 
         public override object GetValue(object obj, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
-            return appdomain.Invoke(getter, obj, null);
+            var indexCnt = index != null ? index.Length : 0;
+            if (getter.ParameterCount <= indexCnt)
+            {
+                var ctx = appdomain.BeginInvoke(getter);
+                ctx.PushObject(obj);
+                for (int i = 0; i < getter.ParameterCount; i++)
+                {
+                    ctx.PushObject(index[i], !getter.Parameters[i].IsPrimitive);
+                }
+                ctx.Invoke();
+                return ctx.ReadObject<object>();
+            }
+            else
+                throw new ArgumentException("Index count mismatch");
         }
 
         public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
-            param[0] = value;
-            appdomain.Invoke(setter, obj, param);
+            var indexCnt = index != null ? index.Length : 0;
+            if (setter.ParameterCount <= indexCnt + 1)
+            {
+                var ctx = appdomain.BeginInvoke(setter);
+                ctx.PushObject(obj);
+                for (int i = 0; i < setter.ParameterCount - 1; i++)
+                {
+                    ctx.PushObject(index[i], !setter.Parameters[i].IsPrimitive);
+                }
+                ctx.PushObject(value);
+                ctx.Invoke();
+            }
+            else
+                throw new ArgumentException("Index count mismatch");
         }
     }
 }
