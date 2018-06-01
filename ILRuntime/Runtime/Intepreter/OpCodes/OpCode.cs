@@ -36,26 +36,30 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
     struct OpCodeR
     {
         [FieldOffset(0)]
-        public OpCodeEnum Code;
+        public OpCodeREnum Code;
         [FieldOffset(4)]
         public short Register1;
         [FieldOffset(6)]
         public short Register2;
-        [FieldOffset(4)]
+        [FieldOffset(8)]
         public int Operand;
+        [FieldOffset(8)]
+        public float OperandFloat;
         [FieldOffset(8)]
         public short Register3;
         [FieldOffset(10)]
         public short Register4;
-        [FieldOffset(8)]
+        [FieldOffset(12)]
         public int Operand2;
         [FieldOffset(12)]
         public short Register5;
         [FieldOffset(14)]
         public short Register6;
-        [FieldOffset(12)]
+        [FieldOffset(16)]
         public int Operand3;
-        [FieldOffset(8)]
+        [FieldOffset(12)]
         public long OperandLong;
+        [FieldOffset(12)]
+        public double OperandDouble;
     }
 }

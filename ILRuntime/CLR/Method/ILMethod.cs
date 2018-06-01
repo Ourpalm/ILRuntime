@@ -15,6 +15,7 @@ namespace ILRuntime.CLR.Method
     public class ILMethod : IMethod
     {
         OpCode[] body;
+        OpCodeR[] bodyRegister;
         MethodDefinition def;
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -259,24 +260,13 @@ namespace ILRuntime.CLR.Method
             if (def.HasBody)
             {
                 localVarCnt = def.Body.Variables.Count;
-                body = new OpCode[def.Body.Instructions.Count];
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
-                for (int i = 0; i < body.Length; i++)
+
+                InitStackCodeBody(addr);
+                if (appdomain.EnableRegisterVM)
                 {
-                    var c = def.Body.Instructions[i];
-                    OpCode code = new OpCode();
-                    code.Code = (OpCodeEnum)c.OpCode.Code;
-                    addr[c] = i;
-                    body[i] = code;
-                }
-                for (int i = 0; i < body.Length; i++)
-                {
-                    var c = def.Body.Instructions[i];
-                    InitToken(ref body[i], c.Operand, addr);
-                    if (i > 0 && c.OpCode.Code == Mono.Cecil.Cil.Code.Callvirt && def.Body.Instructions[i - 1].OpCode.Code == Mono.Cecil.Cil.Code.Constrained)
-                    {
-                        body[i - 1].TokenLong = body[i].TokenInteger;
-                    }
+                    Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
+                    jit.Compile();
                 }
 
                 for (int i = 0; i < def.Body.ExceptionHandlers.Count; i++)
@@ -313,6 +303,50 @@ namespace ILRuntime.CLR.Method
             }
             else
                 body = new OpCode[0];
+        }
+
+        void InitStackCodeBody(Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
+        {
+            body = new OpCode[def.Body.Instructions.Count];
+            for (int i = 0; i < body.Length; i++)
+            {
+                var c = def.Body.Instructions[i];
+                OpCode code = new OpCode();
+                code.Code = (OpCodeEnum)c.OpCode.Code;
+                addr[c] = i;
+                body[i] = code;
+            }
+            for (int i = 0; i < body.Length; i++)
+            {
+                var c = def.Body.Instructions[i];
+                InitToken(ref body[i], c.Operand, addr);
+                if (i > 0 && c.OpCode.Code == Mono.Cecil.Cil.Code.Callvirt && def.Body.Instructions[i - 1].OpCode.Code == Mono.Cecil.Cil.Code.Constrained)
+                {
+                    body[i - 1].TokenLong = body[i].TokenInteger;
+                }
+            }
+        }
+
+        void InitRegisterCodeBody(Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
+        {
+            bodyRegister = new OpCodeR[def.Body.Instructions.Count];
+            for (int i = 0; i < body.Length; i++)
+            {
+                var c = def.Body.Instructions[i];
+                OpCodeR code = new OpCodeR();
+                code.Code = (OpCodeREnum)c.OpCode.Code;
+                addr[c] = i;
+                bodyRegister[i] = code;
+            }
+            for (int i = 0; i < body.Length; i++)
+            {
+                var c = def.Body.Instructions[i];
+                InitToken(ref body[i], c.Operand, addr);
+                if (i > 0 && c.OpCode.Code == Mono.Cecil.Cil.Code.Callvirt && def.Body.Instructions[i - 1].OpCode.Code == Mono.Cecil.Cil.Code.Constrained)
+                {
+                    body[i - 1].TokenLong = body[i].TokenInteger;
+                }
+            }
         }
 
         unsafe void InitToken(ref OpCode code, object token, Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
@@ -480,7 +514,7 @@ namespace ILRuntime.CLR.Method
             }
         }
 
-        int GetTypeTokenHashCode(object token)
+        internal int GetTypeTokenHashCode(object token)
         {
             var t = appdomain.GetType(token, declaringType, this);
             bool isGenericParameter = CheckHasGenericParamter(token);

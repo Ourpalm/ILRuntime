@@ -55,6 +55,16 @@ namespace TestCases
             sw.Stop();
             Console.WriteLine(string.Format("cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
+
+        public static int UnitTest_PerformanceSimple()
+        {
+            int cnt = 0;
+            for (int i = 0; i < 500000; i++)
+            {
+                cnt += i;
+            }
+            return cnt;
+        }
         /// <summary>
         /// 性能测试
         /// </summary>

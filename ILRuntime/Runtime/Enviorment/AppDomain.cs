@@ -54,6 +54,8 @@ namespace ILRuntime.Runtime.Enviorment
 #if UNITY_EDITOR
         public int UnityMainThreadID { get; set; }
 #endif
+
+        public bool EnableRegisterVM { get; set; }
         public unsafe AppDomain()
         {
             AllowUnboundCLRMethod = true;
