@@ -218,7 +218,8 @@ namespace ILRuntime.Reflection
             if (getter.ParameterCount <= indexCnt)
             {
                 var ctx = appdomain.BeginInvoke(getter);
-                ctx.PushObject(obj);
+                if (!IsStatic)
+                    ctx.PushObject(obj);
                 for (int i = 0; i < getter.ParameterCount; i++)
                 {
                     ctx.PushObject(index[i], !getter.Parameters[i].IsPrimitive);
@@ -236,7 +237,8 @@ namespace ILRuntime.Reflection
             if (setter.ParameterCount <= indexCnt + 1)
             {
                 var ctx = appdomain.BeginInvoke(setter);
-                ctx.PushObject(obj);
+                if (!IsStatic)
+                    ctx.PushObject(obj);
                 for (int i = 0; i < setter.ParameterCount - 1; i++)
                 {
                     ctx.PushObject(index[i], !setter.Parameters[i].IsPrimitive);

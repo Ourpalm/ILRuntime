@@ -248,13 +248,14 @@ namespace TestCases
             public float FloatField { get; set; }
             public int IntField { get; set; }
             public EnumTest.TestEnum EnumField { get; set; }
+            public static int StaticField { get; set; }
         }
 
         public static void ReflectionTest10()
         {
             Tx obj = new Tx { FloatField = 21, IntField = 21 };
             Type t = obj.GetType();
-            var fields = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var fields = t.GetProperties(BindingFlags.Public);
             var info = fields[0]; //FloatField
 
             object value = info.GetGetMethod().Invoke(obj, null);
@@ -282,6 +283,11 @@ namespace TestCases
             info = fields[2];
 
             value = info.GetGetMethod().Invoke(obj, null);
+            Console.WriteLine(string.Format("{0} = {1}", info.Name, value));
+
+            info = fields[3];
+
+            value = info.GetValue(null, null);
             Console.WriteLine(string.Format("{0} = {1}", info.Name, value));
         }
 
