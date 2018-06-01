@@ -247,6 +247,7 @@ namespace TestCases
         {
             public float FloatField { get; set; }
             public int IntField { get; set; }
+            public EnumTest.TestEnum EnumField { get; set; }
         }
 
         public static void ReflectionTest10()
@@ -277,6 +278,11 @@ namespace TestCases
             {
                 Console.WriteLine("not null obj - IntField"); // 对于int是正确的，走到了这里
             }
+
+            info = fields[2];
+
+            value = info.GetGetMethod().Invoke(obj, null);
+            Console.WriteLine(string.Format("{0} = {1}", info.Name, value));
         }
 
 

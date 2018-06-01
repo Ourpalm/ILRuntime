@@ -820,6 +820,8 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         if (rt is ILRuntimeWrapperType)
                             rt = ((ILRuntimeWrapperType)rt).CLRType.TypeForCLR;
+                        if (rt is ILRuntimeType)
+                            rt = ((ILRuntimeType)rt).ILType.TypeForCLR;
                         return ILIntepreter.PushObject(res, mStack, rt.CheckCLRTypes(StackObject.ToObject(res, domain, mStack)), true);
                     }
                     else
