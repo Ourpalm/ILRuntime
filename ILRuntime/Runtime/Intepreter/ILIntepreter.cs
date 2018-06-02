@@ -15,7 +15,7 @@ using ILRuntime.Other;
 
 namespace ILRuntime.Runtime.Intepreter
 {
-    public unsafe class ILIntepreter
+    public unsafe partial class ILIntepreter
     {
         Enviorment.AppDomain domain;
         RuntimeStack stack;
@@ -79,7 +79,10 @@ namespace ILRuntime.Runtime.Intepreter
             }
             esp = PushParameters(method, esp, p);
             bool unhandledException;
-            esp = Execute(method, esp, out unhandledException);
+            if (AppDomain.EnableRegisterVM)
+                esp = ExecuteR(method, esp, out unhandledException);
+            else
+                esp = Execute(method, esp, out unhandledException);
             object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(StackObject.ToObject((esp - 1), domain, mStack)) : null;
             //ClearStack
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG

@@ -40,7 +40,6 @@ namespace ILRuntimeTest
             listView1.View = View.Details;
             _app = new ILRuntime.Runtime.Enviorment.AppDomain();
             _app.DebugService.StartDebugService(56000);
-            _app.EnableRegisterVM = true;
         }
 
         private void OnBtnRun(object sender, EventArgs e)
@@ -162,8 +161,12 @@ namespace ILRuntimeTest
                 return;
 
             var testUnit = _testUnitList[_selectItemArgs.ItemIndex];
+
+            _app.EnableRegisterVM = true;
             testUnit.Run();
             var res = testUnit.CheckResult();
+
+            _app.EnableRegisterVM = false;
             _selectItemArgs.Item.SubItems[1].Text = res.Result.ToString();
             _selectItemArgs.Item.BackColor = res.Result ? Color.Green : Color.Red;
 

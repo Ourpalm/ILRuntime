@@ -70,7 +70,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                if (body == null)
+                if (body == null && bodyRegister == null)
                     InitCodeBody();
                 return exceptionHandler;
             }
@@ -200,6 +200,16 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        internal OpCodeR[] BodyRegister
+        {
+            get
+            {
+                if (bodyRegister == null)
+                    InitCodeBody();
+                return bodyRegister;
+            }
+        }
+
         public int LocalVariableCount
         {
             get
@@ -261,12 +271,15 @@ namespace ILRuntime.CLR.Method
             {
                 localVarCnt = def.Body.Variables.Count;
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
-
-                InitStackCodeBody(addr);
+                
                 if (appdomain.EnableRegisterVM)
                 {
                     Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
-                    jit.Compile();
+                    bodyRegister = jit.Compile();
+                }
+                else
+                {
+                    InitStackCodeBody(addr);
                 }
 
                 for (int i = 0; i < def.Body.ExceptionHandlers.Count; i++)
