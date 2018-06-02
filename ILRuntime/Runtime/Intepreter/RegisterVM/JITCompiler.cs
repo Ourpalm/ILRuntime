@@ -43,6 +43,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 locVarRegStart++;
             short baseRegIdx = (short)(locVarRegStart + body.Variables.Count);
             short baseRegStart = baseRegIdx;
+            var blocks = CodeBasicBlock.BuildBasicBlocks(body);
             List<OpCodeR> lst = new List<OpCodeR>();
             for(int i = 0; i < body.Instructions.Count; i++)
             {
