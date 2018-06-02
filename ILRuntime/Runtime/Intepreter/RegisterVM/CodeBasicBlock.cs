@@ -18,6 +18,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         List<OpCodeR> finalInstructions = new List<OpCodeR>();
         HashSet<int> canRemove = new HashSet<int>();
         HashSet<int> pendingFCP = new HashSet<int>();
+        HashSet<CodeBasicBlock> prevBlocks = new HashSet<CodeBasicBlock>();
+        HashSet<CodeBasicBlock> nextBlocks = new HashSet<CodeBasicBlock>();
         Instruction entry;
         public List<Instruction> Instructions { get { return instructions; } }
 
@@ -26,6 +28,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public HashSet<int> CanRemove { get { return canRemove; } }
 
         public HashSet<int> PendingFCP { get { return pendingFCP; } }
+
+        public HashSet<CodeBasicBlock> PreviousBlocks { get { return prevBlocks; } }
+
+        public HashSet<CodeBasicBlock> NextBlocks { get { return nextBlocks; } }
 
         public void AddInstruction(Instruction op)
         {
@@ -98,6 +104,55 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             entryMapping[cur.entry] = res.Count - 1;
 
+            for (int i = 0; i < res.Count; i++)
+            {
+                var block = res[i];
+                var lastIns = block.instructions[block.instructions.Count - 1];
+                switch (lastIns.OpCode.OperandType)
+                {
+                    case OperandType.ShortInlineBrTarget:
+                    case OperandType.InlineBrTarget:
+                        {
+                            var dstBlock = res[entryMapping[(Instruction)lastIns.Operand]];
+                            dstBlock.prevBlocks.Add(block);
+                            block.nextBlocks.Add(dstBlock);
+                            switch (lastIns.OpCode.Code)
+                            {
+                                case Code.Brfalse:
+                                case Code.Brfalse_S:
+                                case Code.Brtrue:
+                                case Code.Brtrue_S:
+                                    if (i < res.Count - 1)
+                                    {
+                                        var next = res[i + 1];
+                                        block.nextBlocks.Add(next);
+                                        next.prevBlocks.Add(block);
+                                    }
+                                    break;
+                                default:
+                                    continue;
+                            }
+                        }
+                        break;
+                    case OperandType.InlineSwitch:
+                        {
+                            Instruction[] targets = (Instruction[])lastIns.Operand;
+                            foreach(var t in targets)
+                            {
+                                var dstBlock = res[entryMapping[t]];
+                                dstBlock.prevBlocks.Add(block);
+                                block.nextBlocks.Add(dstBlock);
+                            }
+                        }
+                        break;
+                }
+                if (i < res.Count - 1)
+                {
+                    var next = res[i + 1];
+                    block.nextBlocks.Add(next);
+                    next.prevBlocks.Add(block);
+                }
+            }
             return res;
         }
     }
