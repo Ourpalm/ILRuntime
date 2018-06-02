@@ -61,5 +61,69 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public long OperandLong;
         [FieldOffset(12)]
         public double OperandDouble;
+
+        public override string ToString()
+        {
+            string param = null;
+            switch (Code)
+            {
+                case OpCodeREnum.Move:
+                    param = string.Format("r{0},r{1}", Register1, Register2);
+                    break;
+                case OpCodeREnum.Add:
+                case OpCodeREnum.Add_Ovf:
+                case OpCodeREnum.Add_Ovf_Un:
+                case OpCodeREnum.Sub:
+                case OpCodeREnum.Sub_Ovf:
+                case OpCodeREnum.Sub_Ovf_Un:
+                case OpCodeREnum.Mul:
+                case OpCodeREnum.Mul_Ovf:
+                case OpCodeREnum.Mul_Ovf_Un:
+                case OpCodeREnum.Div:
+                case OpCodeREnum.Div_Un:
+                case OpCodeREnum.Clt:
+                case OpCodeREnum.Clt_Un:
+                case OpCodeREnum.Cgt:
+                case OpCodeREnum.Cgt_Un:
+                case OpCodeREnum.Ceq:
+                    param = string.Format("r{0},r{1},r{2}", Register1, Register2, Register3);
+                    break;
+                case OpCodeREnum.Ldc_I4_0:
+                case OpCodeREnum.Ldc_I4_1:
+                case OpCodeREnum.Ldc_I4_2:
+                case OpCodeREnum.Ldc_I4_3:
+                case OpCodeREnum.Ldc_I4_4:
+                case OpCodeREnum.Ldc_I4_5:
+                case OpCodeREnum.Ldc_I4_6:
+                case OpCodeREnum.Ldc_I4_7:
+                case OpCodeREnum.Ldc_I4_8:
+                case OpCodeREnum.Ldc_I4_M1:
+                case OpCodeREnum.Ldnull:
+                case OpCodeREnum.Brtrue:
+                case OpCodeREnum.Brtrue_S:
+                case OpCodeREnum.Brfalse:
+                case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Ret:
+                    param = string.Format("r{0}", Register1);
+                    break;
+                case OpCodeREnum.Ldc_I4:
+                case OpCodeREnum.Ldc_I4_S:
+                    param = string.Format("r{0},{1}", Register1, Operand);
+                    break;
+                case OpCodeREnum.Ldc_I8:
+                    param = string.Format("r{0},{1}", Register1, OperandLong);
+                    break;
+                case OpCodeREnum.Ldc_R4:
+                    param = string.Format("r{0},{1}", Register1, OperandFloat);
+                    break;
+                case OpCodeREnum.Ldc_R8:
+                    param = string.Format("r{0},{1}", Register1, OperandDouble);
+                    break;
+                case OpCodeREnum.Ldstr:
+                    param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
+                    break;
+            }
+            return string.Format("{0} {1}", Code.ToString().ToLower().Replace('_', '.'), param);
+        }
     }
 }
