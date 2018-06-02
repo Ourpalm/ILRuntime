@@ -19,7 +19,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         ILMethod method;
         MethodDefinition def;
         bool hasReturn;
-        Dictionary<Mono.Cecil.Cil.Instruction, int> addr;
+        Dictionary<Instruction, int> entryMapping;
         public JITCompiler(Enviorment.AppDomain appDomain, ILType declaringType, ILMethod method)
         {
             this.appdomain = appDomain;
@@ -27,12 +27,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             this.method = method;
             def = method.Definition;
             hasReturn = method.ReturnType != appdomain.VoidType;
-            addr = new Dictionary<Instruction, int>();
-            for (int i = 0; i < def.Body.Instructions.Count; i++)
-            {
-                var c = def.Body.Instructions[i];
-                addr[c] = i;
-            }
+            entryMapping = null;
         }
 
         public OpCodeR[] Compile()
@@ -43,7 +38,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 locVarRegStart++;
             short baseRegIdx = (short)(locVarRegStart + body.Variables.Count);
             short baseRegStart = baseRegIdx;
-            Dictionary<Instruction, CodeBasicBlock> entryMapping;
             var blocks = CodeBasicBlock.BuildBasicBlocks(body, out entryMapping);
             foreach(var i in blocks)
             {
@@ -54,7 +48,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
             }
 
-            Optimizer.ForwardCopyPropagation(blocks, hasReturn);
+            Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
             /*List<OpCodeR> lst = new List<OpCodeR>();
             for(int i = 0; i < body.Instructions.Count; i++)
             {
@@ -77,14 +71,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             {
                 case Code.Br_S:
                 case Code.Br:
-                    op.Operand = addr[(Mono.Cecil.Cil.Instruction)token];
+                    op.Operand = entryMapping[(Mono.Cecil.Cil.Instruction)token];
                     break;
                 case Code.Brtrue:
                 case Code.Brtrue_S:
                 case Code.Brfalse:
                 case Code.Brfalse_S:
                     op.Register1 = --baseRegIdx;
-                    op.Operand = addr[(Mono.Cecil.Cil.Instruction)token];
+                    op.Operand = entryMapping[(Mono.Cecil.Cil.Instruction)token];
                     break;
                 case Code.Ldc_I4_0:
                 case Code.Ldc_I4_1:

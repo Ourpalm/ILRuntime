@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         List<Instruction> instructions = new List<Instruction>();
         List<OpCodeR> finalInstructions = new List<OpCodeR>();
         HashSet<int> canRemove = new HashSet<int>();
-        HashSet<short> pendingRegister = new HashSet<short>();
+        HashSet<int> pendingFCP = new HashSet<int>();
         Instruction entry;
         public List<Instruction> Instructions { get { return instructions; } }
 
@@ -25,7 +25,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         public HashSet<int> CanRemove { get { return canRemove; } }
 
-        public HashSet<short> PendingRegister { get { return pendingRegister; } }
+        public HashSet<int> PendingFCP { get { return pendingFCP; } }
 
         public void AddInstruction(Instruction op)
         {
@@ -34,9 +34,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             instructions.Add(op);
         }
 
-        public static List<CodeBasicBlock> BuildBasicBlocks(MethodBody body, out Dictionary<Instruction, CodeBasicBlock> entryMapping)
+        public static List<CodeBasicBlock> BuildBasicBlocks(MethodBody body, out Dictionary<Instruction, int> entryMapping)
         {
-            entryMapping = new Dictionary<Instruction, CodeBasicBlock>();
+            entryMapping = new Dictionary<Instruction, int>();
             HashSet<Instruction> branchTargets = new HashSet<Instruction>();
             foreach (var i in body.Instructions)
             {
@@ -65,7 +65,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 {
                     if(cur.entry != null && cur.entry != i)
                     {
-                        entryMapping[cur.entry] = cur;
+                        entryMapping[cur.entry] = res.Count - 1;
                         cur = new CodeBasicBlock();
                         res.Add(cur);
                     }
@@ -79,7 +79,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         {
                             if (cur.entry != (Instruction)i.Operand)
                             {
-                                entryMapping[cur.entry] = cur;
+                                entryMapping[cur.entry] = res.Count - 1;
                                 cur = new CodeBasicBlock();
                                 res.Add(cur);
                             }
@@ -88,7 +88,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         {
                             if (cur.entry != (Instruction)i.Operand)
                             {
-                                entryMapping[cur.entry] = cur;
+                                entryMapping[cur.entry] = res.Count - 1;
                                 cur = new CodeBasicBlock();
                                 res.Add(cur);
                             }
@@ -96,7 +96,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                 }
             }
-            entryMapping[cur.entry] = cur;
+            entryMapping[cur.entry] = res.Count - 1;
 
             return res;
         }

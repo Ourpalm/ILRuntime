@@ -99,12 +99,18 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ldc_I4_8:
                 case OpCodeREnum.Ldc_I4_M1:
                 case OpCodeREnum.Ldnull:
+                case OpCodeREnum.Ret:
+                    param = string.Format("r{0}", Register1);
+                    break;
                 case OpCodeREnum.Brtrue:
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
-                case OpCodeREnum.Ret:
-                    param = string.Format("r{0}", Register1);
+                    param = string.Format("r{0}, {1}", Register1, Operand);
+                    break;
+                case OpCodeREnum.Br:
+                case OpCodeREnum.Br_S:
+                    param = string.Format("{0}", Operand);
                     break;
                 case OpCodeREnum.Ldc_I4:
                 case OpCodeREnum.Ldc_I4_S:

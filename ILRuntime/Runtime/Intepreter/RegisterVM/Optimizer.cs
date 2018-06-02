@@ -14,13 +14,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     class Optimizer
     {
-        public static void ForwardCopyPropagation(List<CodeBasicBlock> blocks, bool hasReturn)
+        public static void ForwardCopyPropagation(List<CodeBasicBlock> blocks, bool hasReturn,short stackRegisterBegin)
         {
             foreach (var b in blocks)
             {
                 var lst = b.FinalInstructions;
                 HashSet<int> canRemove = b.CanRemove;
-                HashSet<short> pendingRegister = b.PendingRegister;
+                HashSet<int> pendingFCP = b.PendingFCP;
 
                 for (int i = 0; i < lst.Count; i++)
                 {
@@ -40,6 +40,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             canRemove.Add(i);
                             continue;
                         }
+                        //Only deal with local->stack, local->local, stack->stack
+                        if (xSrc >= stackRegisterBegin && xDst < stackRegisterBegin)
+                            continue;
+                        bool postPropagation = false;
+                        bool ended = false;
                         for (int j = i + 1; j < lst.Count; j++)
                         {
                             OpCodeR Y = lst[j];
@@ -49,16 +54,34 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 bool replaced = false;
                                 if (ySrc > 0 && ySrc == xDst)
                                 {
+                                    if (postPropagation)
+                                    {
+                                        postPropagation = false;
+                                        ended = true;
+                                        break;
+                                    }
                                     ReplaceOpcodeSource(ref Y, 0, xSrc);
                                     replaced = true;
                                 }
                                 if (ySrc2 > 0 && ySrc2 == xDst)
                                 {
+                                    if (postPropagation)
+                                    {
+                                        postPropagation = false;
+                                        ended = true;
+                                        break;
+                                    }
                                     ReplaceOpcodeSource(ref Y, 1, xSrc);
                                     replaced = true;
                                 }
                                 if (ySrc3 > 0 && ySrc3 == xDst)
                                 {
+                                    if (postPropagation)
+                                    {
+                                        postPropagation = false;
+                                        ended = true;
+                                        break;
+                                    }
                                     ReplaceOpcodeSource(ref Y, 2, xSrc);
                                     replaced = true;
                                 }
@@ -71,15 +94,30 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             {
                                 if (xSrc == yDst)
                                 {
-                                    pendingRegister.Add(yDst);
-                                    break;
+                                    postPropagation = true;
                                 }
                                 if (xDst == yDst)
                                 {
+                                    postPropagation = false;
                                     canRemove.Add(i);
+                                    ended = true;
                                     break;
                                 }
                             }
+
+                            if(Y.Code == OpCodeREnum.Ret)
+                            {
+                                postPropagation = false;
+                                canRemove.Add(i);
+                                ended = true;
+                                break;
+                            }
+                        }
+
+                        if (postPropagation || !ended)
+                        {
+                            if (xDst >= stackRegisterBegin)
+                                pendingFCP.Add(i);
                         }
                     }
                 }
