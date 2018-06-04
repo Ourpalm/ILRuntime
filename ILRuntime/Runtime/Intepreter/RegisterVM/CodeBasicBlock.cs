@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         List<Instruction> instructions = new List<Instruction>();
         List<OpCodeR> finalInstructions = new List<OpCodeR>();
         HashSet<int> canRemove = new HashSet<int>();
-        HashSet<int> pendingFCP = new HashSet<int>();
+        HashSet<int> pendingCP = new HashSet<int>();
         HashSet<CodeBasicBlock> prevBlocks = new HashSet<CodeBasicBlock>();
         HashSet<CodeBasicBlock> nextBlocks = new HashSet<CodeBasicBlock>();
         Instruction entry;
@@ -27,7 +27,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         public HashSet<int> CanRemove { get { return canRemove; } }
 
-        public HashSet<int> PendingFCP { get { return pendingFCP; } }
+        public HashSet<int> PendingCP { get { return pendingCP; } }
 
         public HashSet<CodeBasicBlock> PreviousBlocks { get { return prevBlocks; } }
 

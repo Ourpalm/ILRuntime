@@ -106,6 +106,8 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                    param = string.Format("r{0}, {1}", Register1, Operand);
+                    break;
                 case OpCodeREnum.Blt:
                 case OpCodeREnum.Blt_S:
                 case OpCodeREnum.Blt_Un:
@@ -126,7 +128,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Beq_S:
                 case OpCodeREnum.Bne_Un:
                 case OpCodeREnum.Bne_Un_S:
-                    param = string.Format("r{0}, {1}", Register1, Operand);
+                    param = string.Format("r{0}, r{1}, {2}", Register1, Register2, Operand);
                     break;
                 case OpCodeREnum.Br:
                 case OpCodeREnum.Br_S:

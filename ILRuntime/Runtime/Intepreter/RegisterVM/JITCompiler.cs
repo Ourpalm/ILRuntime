@@ -38,6 +38,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 locVarRegStart++;
             short baseRegIdx = (short)(locVarRegStart + body.Variables.Count);
             short baseRegStart = baseRegIdx;
+
             var blocks = CodeBasicBlock.BuildBasicBlocks(body, out entryMapping);
             foreach(var i in blocks)
             {
@@ -49,6 +50,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
+            Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
+            Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
+
             List<OpCodeR> res = new List<OpCodeR>();
             foreach(var b in blocks)
             {
@@ -80,6 +84,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Brtrue_S:
                 case Code.Brfalse:
                 case Code.Brfalse_S:
+                    op.Register1 = --baseRegIdx;
+                    op.Operand = entryMapping[(Mono.Cecil.Cil.Instruction)token];
+                    break;
                 case Code.Blt:
                 case Code.Blt_S:
                 case Code.Blt_Un:
@@ -100,7 +107,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Beq_S:
                 case Code.Bne_Un:
                 case Code.Bne_Un_S:
-                    op.Register1 = --baseRegIdx;
+                    op.Register1 = (short)(baseRegIdx - 2);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    baseRegIdx -= 2;
                     op.Operand = entryMapping[(Mono.Cecil.Cil.Instruction)token];
                     break;
                 case Code.Ldc_I4_0:
