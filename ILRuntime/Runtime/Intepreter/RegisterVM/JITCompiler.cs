@@ -49,15 +49,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
-            /*List<OpCodeR> lst = new List<OpCodeR>();
-            for(int i = 0; i < body.Instructions.Count; i++)
+            List<OpCodeR> res = new List<OpCodeR>();
+            foreach(var b in blocks)
             {
-                var ins = body.Instructions[i];
-                Translate(lst, ins, locVarRegStart, ref baseRegIdx);
+                for(int idx = 0; idx < b.FinalInstructions.Count; idx++)
+                {
+                    if (b.CanRemove.Contains(idx))
+                        continue;
+                    res.Add(b.FinalInstructions[idx]);
+                }
+
             }
-            OptimizeForward(lst);
-            return lst.ToArray();*/
-            return null;
+            return res.ToArray();
         }
 
         void Translate(List<OpCodeR> lst, Instruction ins, short locVarRegStart, ref short baseRegIdx)
@@ -77,6 +80,26 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Brtrue_S:
                 case Code.Brfalse:
                 case Code.Brfalse_S:
+                case Code.Blt:
+                case Code.Blt_S:
+                case Code.Blt_Un:
+                case Code.Blt_Un_S:
+                case Code.Ble:
+                case Code.Ble_S:
+                case Code.Ble_Un:
+                case Code.Ble_Un_S:
+                case Code.Bgt:
+                case Code.Bgt_S:
+                case Code.Bgt_Un:
+                case Code.Bgt_Un_S:
+                case Code.Bge:
+                case Code.Bge_S:
+                case Code.Bge_Un:
+                case Code.Bge_Un_S:
+                case Code.Beq:
+                case Code.Beq_S:
+                case Code.Bne_Un:
+                case Code.Bne_Un_S:
                     op.Register1 = --baseRegIdx;
                     op.Operand = entryMapping[(Mono.Cecil.Cil.Instruction)token];
                     break;

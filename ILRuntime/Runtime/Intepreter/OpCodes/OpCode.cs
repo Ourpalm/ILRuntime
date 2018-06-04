@@ -106,6 +106,26 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
                     param = string.Format("r{0}, {1}", Register1, Operand);
                     break;
                 case OpCodeREnum.Br:

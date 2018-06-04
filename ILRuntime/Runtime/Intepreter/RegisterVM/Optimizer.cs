@@ -122,6 +122,85 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                 }
             }
+
+            foreach(var b in blocks)
+            {
+                var pendingFCP = b.PendingFCP;
+
+                if (pendingFCP.Count > 0)
+                {
+                    var originBlock = b;
+                    HashSet<CodeBasicBlock> processedBlocks = new HashSet<CodeBasicBlock>();
+                    Queue<CodeBasicBlock> pendingBlocks = new Queue<CodeBasicBlock>();
+
+                    foreach (var idx in pendingFCP)
+                    {
+                        var X = originBlock.FinalInstructions[idx];
+                        short xDst;
+                        GetOpcodeDestRegister(ref X, out xDst);
+                        pendingBlocks.Clear();
+                        bool cannotRemove = false;
+                        bool isAbort = false;
+                        foreach (var nb in originBlock.NextBlocks)
+                            pendingBlocks.Enqueue(nb);
+                        while (pendingBlocks.Count > 0)
+                        {
+                            var cur = pendingBlocks.Dequeue();
+
+                            var ins = cur.FinalInstructions;
+                            var canRemove = cur.CanRemove;
+
+                            for (int j = 0; j < ins.Count; j++)
+                            {
+                                if (canRemove.Contains(j))
+                                    continue;
+                                if(cur == originBlock && j == idx)
+                                {
+                                    isAbort = true;
+                                    break;
+                                }
+                                var Y = ins[j];
+
+                                short ySrc, ySrc2, ySrc3, yDst;
+                                if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
+                                {
+                                    if (ySrc == xDst || ySrc2 == xDst || ySrc3 == xDst)
+                                    {
+                                        cannotRemove = true;
+                                        break;
+                                    }
+                                }
+                                if(GetOpcodeDestRegister(ref Y, out yDst))
+                                {
+                                    if(yDst == xDst)
+                                    {
+                                        isAbort = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (cannotRemove)
+                                break;
+
+                            processedBlocks.Add(cur);
+                            if (!isAbort)
+                            {
+                                foreach (var nb in cur.NextBlocks)
+                                {
+                                    if (!processedBlocks.Contains(nb))
+                                        pendingBlocks.Enqueue(nb);
+                                }
+                            }
+                        }
+                        if(!cannotRemove)
+                        {
+                            originBlock.CanRemove.Add(idx);
+                        }
+                    }
+                    pendingFCP.Clear();
+                }
+            }
         }
 
         static bool GetOpcodeSourceRegister(ref OpCodeR op, bool hasReturn, out short r1, out short r2, out short r3)
@@ -160,6 +239,26 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Add:
@@ -225,6 +324,26 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
                 case OpCodeREnum.Nop:
                 case OpCodeREnum.Ret:
                     return false;
@@ -290,6 +409,26 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
                     op.Register1 = src;
                     break;
                 case OpCodeREnum.Ret:
