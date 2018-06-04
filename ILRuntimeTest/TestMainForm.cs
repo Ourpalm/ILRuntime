@@ -162,7 +162,7 @@ namespace ILRuntimeTest
 
             var testUnit = _testUnitList[_selectItemArgs.ItemIndex];
 
-            _app.EnableRegisterVM = true;
+            _app.EnableRegisterVM = cbEnableRegVM.Checked;
             testUnit.Run();
             var res = testUnit.CheckResult();
 

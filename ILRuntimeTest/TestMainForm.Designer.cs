@@ -36,6 +36,7 @@
             this.txtPath = new System.Windows.Forms.TextBox();
             this.btnRunSelect = new System.Windows.Forms.Button();
             this.btnGenerateBinding = new System.Windows.Forms.Button();
+            this.cbEnableRegVM = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // OD
@@ -45,7 +46,7 @@
             // btnRun
             // 
             this.btnRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRun.Location = new System.Drawing.Point(514, 380);
+            this.btnRun.Location = new System.Drawing.Point(514, 417);
             this.btnRun.Margin = new System.Windows.Forms.Padding(2);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(62, 29);
@@ -73,13 +74,13 @@
             this.tbLog.Multiline = true;
             this.tbLog.Name = "tbLog";
             this.tbLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbLog.Size = new System.Drawing.Size(664, 206);
+            this.tbLog.Size = new System.Drawing.Size(664, 213);
             this.tbLog.TabIndex = 2;
             // 
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(332, 380);
+            this.btnLoad.Location = new System.Drawing.Point(332, 417);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(100, 29);
             this.btnLoad.TabIndex = 3;
@@ -91,7 +92,7 @@
             // 
             this.txtPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPath.Location = new System.Drawing.Point(12, 385);
+            this.txtPath.Location = new System.Drawing.Point(12, 422);
             this.txtPath.Name = "txtPath";
             this.txtPath.Size = new System.Drawing.Size(314, 21);
             this.txtPath.TabIndex = 4;
@@ -99,7 +100,7 @@
             // btnRunSelect
             // 
             this.btnRunSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRunSelect.Location = new System.Drawing.Point(438, 380);
+            this.btnRunSelect.Location = new System.Drawing.Point(438, 417);
             this.btnRunSelect.Name = "btnRunSelect";
             this.btnRunSelect.Size = new System.Drawing.Size(71, 29);
             this.btnRunSelect.TabIndex = 5;
@@ -117,11 +118,22 @@
             this.btnGenerateBinding.UseVisualStyleBackColor = true;
             this.btnGenerateBinding.Click += new System.EventHandler(this.btnGenerateBinding_Click);
             // 
+            // cbEnableRegVM
+            // 
+            this.cbEnableRegVM.AutoSize = true;
+            this.cbEnableRegVM.Location = new System.Drawing.Point(12, 387);
+            this.cbEnableRegVM.Name = "cbEnableRegVM";
+            this.cbEnableRegVM.Size = new System.Drawing.Size(132, 16);
+            this.cbEnableRegVM.TabIndex = 7;
+            this.cbEnableRegVM.Text = "Enable Register VM";
+            this.cbEnableRegVM.UseVisualStyleBackColor = true;
+            // 
             // TestMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 420);
+            this.ClientSize = new System.Drawing.Size(688, 457);
+            this.Controls.Add(this.cbEnableRegVM);
             this.Controls.Add(this.btnGenerateBinding);
             this.Controls.Add(this.btnRunSelect);
             this.Controls.Add(this.txtPath);
@@ -148,6 +160,7 @@
         private System.Windows.Forms.TextBox txtPath;
         private System.Windows.Forms.Button btnRunSelect;
         private System.Windows.Forms.Button btnGenerateBinding;
+        private System.Windows.Forms.CheckBox cbEnableRegVM;
     }
 }
 

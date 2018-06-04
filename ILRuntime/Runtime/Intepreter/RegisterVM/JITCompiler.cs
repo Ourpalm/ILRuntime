@@ -30,7 +30,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             entryMapping = null;
         }
 
-        public OpCodeR[] Compile()
+        public OpCodeR[] Compile(out int stackRegisterCnt)
         {
             var body = def.Body;
             short locVarRegStart = (short)def.Parameters.Count;
@@ -103,7 +103,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         break;
                 }
             }
-            Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
+            var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
+            stackRegisterCnt = totalRegCnt - baseRegStart;
             return res.ToArray();
         }
 

@@ -27,7 +27,7 @@ namespace ILRuntime.CLR.Method
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
         ILRuntimeConstructorInfo reflectionCtorInfo;
-        int paramCnt, localVarCnt;
+        int paramCnt, localVarCnt, stackRegisterCnt;
         Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> variables;
         int hashCode = -1;
         static int instance_id = 0x10000000;
@@ -218,6 +218,14 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public int StackRegisterCount
+        {
+            get
+            {
+                return stackRegisterCnt;
+            }
+        }
+
         public bool IsConstructor
         {
             get
@@ -275,7 +283,7 @@ namespace ILRuntime.CLR.Method
                 if (appdomain.EnableRegisterVM)
                 {
                     Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
-                    bodyRegister = jit.Compile();
+                    bodyRegister = jit.Compile(out stackRegisterCnt);
                 }
                 else
                 {

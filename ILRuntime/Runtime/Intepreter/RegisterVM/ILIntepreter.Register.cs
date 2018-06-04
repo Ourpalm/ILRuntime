@@ -34,7 +34,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v1 = frame.LocalVarPointer;
             int finallyEndAddress = 0;
 
-            esp = frame.BasePointer;
+            esp = Add(frame.BasePointer, method.StackRegisterCount);
             StackObject* r = Minus(frame.LocalVarPointer, method.ParameterCount);
             IList<object> mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
@@ -44,6 +44,7 @@ namespace ILRuntime.Runtime.Intepreter
                 paramCnt++;
             }
             unhandledException = false;
+            var hasReturn = method.ReturnType != AppDomain.VoidType;
 
             //Managed Stack reserved for arguments(In case of starg)
             for (int i = 0; i < paramCnt; i++)
@@ -130,6 +131,8 @@ namespace ILRuntime.Runtime.Intepreter
             var bp = stack.ValueTypeStackPointer;
             ValueTypeBasePointer = bp;
 
+            StackObject* reg1, reg2, reg3;
+
             fixed (OpCodeR* ptr = body)
             {
                 OpCodeR* ip = ptr;
@@ -142,6 +145,195 @@ namespace ILRuntime.Runtime.Intepreter
                         code = ip->Code;
                         switch (code)
                         {
+                            #region Load Constants
+                            case OpCodeREnum.Ldc_I4_0:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg1->ObjectType = ObjectTypes.Integer;
+                                    reg1->Value = 0;
+                                }
+                                break;
+                            case OpCodeREnum.Ldc_I4_1:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg1->ObjectType = ObjectTypes.Integer;
+                                    reg1->Value = 1;
+                                }
+                                break;
+                            case OpCodeREnum.Ldc_I4:
+                                reg1 = Add(r, ip->Register1);
+                                reg1->ObjectType = ObjectTypes.Integer;
+                                reg1->Value = ip->Operand;
+                                break;
+                            #endregion
+
+                            #region Althemetics
+                            case OpCodeREnum.Add:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) + *((long*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->Value = reg1->Value + reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) + *((float*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) + *((double*)&reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            #endregion
+
+                            #region Load Store
+                            case OpCodeREnum.Move:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+
+                                    *reg2 = *reg1;
+                                }
+                                break;
+                            #endregion
+
+                            #region Control Flow
+                            case OpCodeREnum.Ret:
+                                if (hasReturn)
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    CopyToStack(esp, reg1, mStack);
+                                    esp++;
+                                }
+                                returned = true;
+                                break;
+                            case OpCodeREnum.Br_S:
+                            case OpCodeREnum.Br:
+                                ip = ptr + ip->Operand;
+                                continue;
+                            case OpCodeREnum.Brtrue:
+                            case OpCodeREnum.Brtrue_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = reg1->Value != 0;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&reg1->Value != 0;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            res = mStack[reg1->Value] != null;
+                                            break;
+                                    }
+                                    if (res)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Brfalse:
+                            case OpCodeREnum.Brfalse_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Null:
+                                            res = true;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            res = reg1->Value == 0;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&reg1->Value == 0;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            res = mStack[reg1->Value] == null;
+                                            break;
+                                    }
+                                    if (res)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Blt:
+                            case OpCodeREnum.Blt_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    bool transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value < reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value < *(long*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value < *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value < *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            #endregion
+                            #region Compare
+                            case OpCodeREnum.Clt:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = reg1->Value < reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&reg1->Value < *(long*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value < *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value < *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
+                            #endregion
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
@@ -224,6 +416,25 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp);
+        }
+
+        public static void WriteOne(StackObject* esp)
+        {
+            esp->ObjectType = ObjectTypes.Integer;
+            esp->Value = 1;
+        }
+
+        public static void WriteZero(StackObject* esp)
+        {
+            esp->ObjectType = ObjectTypes.Integer;
+            esp->Value = 0;
+        }
+
+        public static void WriteNull(StackObject* esp)
+        {
+            esp->ObjectType = ObjectTypes.Null;
+            esp->Value = -1;
+            esp->ValueLow = 0;
         }
     }
 }
