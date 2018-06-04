@@ -113,6 +113,7 @@
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeREnum.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.BCP.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.RegisterCleanup.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.Utils.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.FCP.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\ILIntepreter.Register.cs" />

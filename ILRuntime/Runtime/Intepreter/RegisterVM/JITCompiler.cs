@@ -53,17 +53,57 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
 
+            
             List<OpCodeR> res = new List<OpCodeR>();
+            Dictionary<int, int> jumpTargets = new Dictionary<int, int>();
+            int bIdx = 0;
             foreach(var b in blocks)
             {
+                jumpTargets[bIdx++] = res.Count;
                 for(int idx = 0; idx < b.FinalInstructions.Count; idx++)
                 {
                     if (b.CanRemove.Contains(idx))
                         continue;
                     res.Add(b.FinalInstructions[idx]);
                 }
-
             }
+            for(int i = 0; i < res.Count; i++)
+            {
+                var op = res[i];
+                switch (op.Code)
+                {
+                    case OpCodeREnum.Br_S:
+                    case OpCodeREnum.Br:
+                    case OpCodeREnum.Brtrue:
+                    case OpCodeREnum.Brtrue_S:
+                    case OpCodeREnum.Brfalse:
+                    case OpCodeREnum.Brfalse_S:
+                    case OpCodeREnum.Blt:
+                    case OpCodeREnum.Blt_S:
+                    case OpCodeREnum.Blt_Un:
+                    case OpCodeREnum.Blt_Un_S:
+                    case OpCodeREnum.Ble:
+                    case OpCodeREnum.Ble_S:
+                    case OpCodeREnum.Ble_Un:
+                    case OpCodeREnum.Ble_Un_S:
+                    case OpCodeREnum.Bgt:
+                    case OpCodeREnum.Bgt_S:
+                    case OpCodeREnum.Bgt_Un:
+                    case OpCodeREnum.Bgt_Un_S:
+                    case OpCodeREnum.Bge:
+                    case OpCodeREnum.Bge_S:
+                    case OpCodeREnum.Bge_Un:
+                    case OpCodeREnum.Bge_Un_S:
+                    case OpCodeREnum.Beq:
+                    case OpCodeREnum.Beq_S:
+                    case OpCodeREnum.Bne_Un:
+                    case OpCodeREnum.Bne_Un_S:
+                        op.Operand = jumpTargets[op.Operand];
+                        res[i] = op;
+                        break;
+                }
+            }
+            Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             return res.ToArray();
         }
 

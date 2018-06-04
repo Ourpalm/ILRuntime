@@ -91,7 +91,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         if (!ended)
                         {
                             if (xDst < stackRegisterBegin)
+                            {
                                 pendingBCP.Add(i);
+                                throw new NotImplementedException();
+                            }
                         }
                     }
                 }
