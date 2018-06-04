@@ -146,10 +146,6 @@ namespace TestCases
                 throw new Exception("isDefeinded == false 3");
             }
         }
-
-
-
-
         [Obsolete("gasdgas")]
         class TestCls
         {
@@ -251,13 +247,15 @@ namespace TestCases
         {
             public float FloatField { get; set; }
             public int IntField { get; set; }
+            public EnumTest.TestEnum EnumField { get; set; }
+            public static int StaticField { get; set; }
         }
 
         public static void ReflectionTest10()
         {
             Tx obj = new Tx { FloatField = 21, IntField = 21 };
             Type t = obj.GetType();
-            var fields = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var fields = t.GetProperties(BindingFlags.Public);
             var info = fields[0]; //FloatField
 
             object value = info.GetGetMethod().Invoke(obj, null);
@@ -280,6 +278,47 @@ namespace TestCases
             else
             {
                 Console.WriteLine("not null obj - IntField"); // 对于int是正确的，走到了这里
+            }
+
+            info = fields[2];
+
+            value = info.GetGetMethod().Invoke(obj, null);
+            Console.WriteLine(string.Format("{0} = {1}", info.Name, value));
+
+            info = fields[3];
+
+            value = info.GetValue(null, null);
+            Console.WriteLine(string.Format("{0} = {1}", info.Name, value));
+        }
+
+
+
+        class test24Class
+        {
+            public int this[int index, long index2]
+            {
+                get
+                {
+                    return (int)(index + index2);
+                }
+                set
+                {
+                    Console.WriteLine($"{index},{index2}={value}");
+                }
+            }
+        }
+        public static void ReflectionTest11()
+        {
+            ReflectionTest11Sub(new test24Class());
+        }
+
+        static void ReflectionTest11Sub(object o)
+        {
+            var p = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);//error
+            foreach (var i in p)
+            {
+                Console.WriteLine(i.GetValue(o, new object[] { 1, 2L ,3333}));
+                i.SetValue(o, 333, new object[] { 123, 345L, 678 });
             }
         }
     }

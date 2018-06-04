@@ -91,6 +91,20 @@ namespace TestCases
             Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, cnt));
         }
 
+        public static void UnitTest_Performance3()
+        {
+            Console.WriteLine("UnitTest_Performance3");
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            int[] arr = new int[5000000];
+            for (int i = 0; i < 5000000; i++)
+            {
+                arr[i] = i;
+            }
+            sw.Stop();
+
+            Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, arr.Length));
+        }
         public static void UnitTest_Cls()
         {
             object obj = new object();

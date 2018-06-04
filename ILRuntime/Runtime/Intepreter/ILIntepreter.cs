@@ -5139,8 +5139,9 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (esp->ObjectType >= ObjectTypes.Object)
             {
-                if (esp->Value == stack.ManagedStack.Count - 1)
-                    stack.ManagedStack.RemoveAt(esp->Value);
+                var mStack = stack.ManagedStack;
+                if (esp->Value == mStack.Count - 1)
+                    mStack.RemoveAt(esp->Value);
             }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             esp->ObjectType = ObjectTypes.Null;
