@@ -356,9 +356,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Conv_U2:
                 case Code.Conv_U4:
                 case Code.Conv_U8:
+                case Code.Box:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     break;
+                case Code.Pop:
+                    return;
                 default:
                     throw new NotImplementedException();
             }

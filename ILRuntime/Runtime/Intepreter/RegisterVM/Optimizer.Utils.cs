@@ -22,6 +22,40 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             switch (op.Code)
             {
                 case OpCodeREnum.Move:
+                case OpCodeREnum.Conv_I:
+                case OpCodeREnum.Conv_I1:
+                case OpCodeREnum.Conv_I2:
+                case OpCodeREnum.Conv_I4:
+                case OpCodeREnum.Conv_I8:
+                case OpCodeREnum.Conv_Ovf_I:
+                case OpCodeREnum.Conv_Ovf_I1:
+                case OpCodeREnum.Conv_Ovf_I1_Un:
+                case OpCodeREnum.Conv_Ovf_I2:
+                case OpCodeREnum.Conv_Ovf_I2_Un:
+                case OpCodeREnum.Conv_Ovf_I4:
+                case OpCodeREnum.Conv_Ovf_I4_Un:
+                case OpCodeREnum.Conv_Ovf_I8:
+                case OpCodeREnum.Conv_Ovf_I8_Un:
+                case OpCodeREnum.Conv_Ovf_I_Un:
+                case OpCodeREnum.Conv_Ovf_U:
+                case OpCodeREnum.Conv_Ovf_U1:
+                case OpCodeREnum.Conv_Ovf_U1_Un:
+                case OpCodeREnum.Conv_Ovf_U2:
+                case OpCodeREnum.Conv_Ovf_U2_Un:
+                case OpCodeREnum.Conv_Ovf_U4:
+                case OpCodeREnum.Conv_Ovf_U4_Un:
+                case OpCodeREnum.Conv_Ovf_U8:
+                case OpCodeREnum.Conv_Ovf_U8_Un:
+                case OpCodeREnum.Conv_Ovf_U_Un:
+                case OpCodeREnum.Conv_R4:
+                case OpCodeREnum.Conv_R8:
+                case OpCodeREnum.Conv_R_Un:
+                case OpCodeREnum.Conv_U:
+                case OpCodeREnum.Conv_U1:
+                case OpCodeREnum.Conv_U2:
+                case OpCodeREnum.Conv_U4:
+                case OpCodeREnum.Conv_U8:
+                case OpCodeREnum.Box:
                     r1 = op.Register2;
                     return true;
                 case OpCodeREnum.Ldc_I4_0:
@@ -41,6 +75,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldc_R4:
                 case OpCodeREnum.Ldc_R8:
                 case OpCodeREnum.Ldstr:
+                case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Call:
+                case OpCodeREnum.Newobj:
                     return false;
                 case OpCodeREnum.Br_S:
                 case OpCodeREnum.Br:
@@ -50,6 +87,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Push:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Blt:
@@ -113,6 +151,40 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             switch (op.Code)
             {
                 case OpCodes.OpCodeREnum.Move:
+                case OpCodeREnum.Conv_I:
+                case OpCodeREnum.Conv_I1:
+                case OpCodeREnum.Conv_I2:
+                case OpCodeREnum.Conv_I4:
+                case OpCodeREnum.Conv_I8:
+                case OpCodeREnum.Conv_Ovf_I:
+                case OpCodeREnum.Conv_Ovf_I1:
+                case OpCodeREnum.Conv_Ovf_I1_Un:
+                case OpCodeREnum.Conv_Ovf_I2:
+                case OpCodeREnum.Conv_Ovf_I2_Un:
+                case OpCodeREnum.Conv_Ovf_I4:
+                case OpCodeREnum.Conv_Ovf_I4_Un:
+                case OpCodeREnum.Conv_Ovf_I8:
+                case OpCodeREnum.Conv_Ovf_I8_Un:
+                case OpCodeREnum.Conv_Ovf_I_Un:
+                case OpCodeREnum.Conv_Ovf_U:
+                case OpCodeREnum.Conv_Ovf_U1:
+                case OpCodeREnum.Conv_Ovf_U1_Un:
+                case OpCodeREnum.Conv_Ovf_U2:
+                case OpCodeREnum.Conv_Ovf_U2_Un:
+                case OpCodeREnum.Conv_Ovf_U4:
+                case OpCodeREnum.Conv_Ovf_U4_Un:
+                case OpCodeREnum.Conv_Ovf_U8:
+                case OpCodeREnum.Conv_Ovf_U8_Un:
+                case OpCodeREnum.Conv_Ovf_U_Un:
+                case OpCodeREnum.Conv_R4:
+                case OpCodeREnum.Conv_R8:
+                case OpCodeREnum.Conv_R_Un:
+                case OpCodeREnum.Conv_U:
+                case OpCodeREnum.Conv_U1:
+                case OpCodeREnum.Conv_U2:
+                case OpCodeREnum.Conv_U4:
+                case OpCodeREnum.Conv_U8:
+                case OpCodeREnum.Box:
                 case OpCodeREnum.Ldc_I4_0:
                 case OpCodeREnum.Ldc_I4_1:
                 case OpCodeREnum.Ldc_I4_2:
@@ -130,6 +202,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldc_R4:
                 case OpCodeREnum.Ldc_R8:
                 case OpCodeREnum.Ldstr:
+                case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Call:
+                case OpCodeREnum.Newobj:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Br_S:
@@ -160,6 +235,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Bne_Un_S:
                 case OpCodeREnum.Nop:
                 case OpCodeREnum.Ret:
+                case OpCodeREnum.Push:
                     return false;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
@@ -189,6 +265,40 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             switch (op.Code)
             {
                 case OpCodes.OpCodeREnum.Move:
+                case OpCodeREnum.Conv_I:
+                case OpCodeREnum.Conv_I1:
+                case OpCodeREnum.Conv_I2:
+                case OpCodeREnum.Conv_I4:
+                case OpCodeREnum.Conv_I8:
+                case OpCodeREnum.Conv_Ovf_I:
+                case OpCodeREnum.Conv_Ovf_I1:
+                case OpCodeREnum.Conv_Ovf_I1_Un:
+                case OpCodeREnum.Conv_Ovf_I2:
+                case OpCodeREnum.Conv_Ovf_I2_Un:
+                case OpCodeREnum.Conv_Ovf_I4:
+                case OpCodeREnum.Conv_Ovf_I4_Un:
+                case OpCodeREnum.Conv_Ovf_I8:
+                case OpCodeREnum.Conv_Ovf_I8_Un:
+                case OpCodeREnum.Conv_Ovf_I_Un:
+                case OpCodeREnum.Conv_Ovf_U:
+                case OpCodeREnum.Conv_Ovf_U1:
+                case OpCodeREnum.Conv_Ovf_U1_Un:
+                case OpCodeREnum.Conv_Ovf_U2:
+                case OpCodeREnum.Conv_Ovf_U2_Un:
+                case OpCodeREnum.Conv_Ovf_U4:
+                case OpCodeREnum.Conv_Ovf_U4_Un:
+                case OpCodeREnum.Conv_Ovf_U8:
+                case OpCodeREnum.Conv_Ovf_U8_Un:
+                case OpCodeREnum.Conv_Ovf_U_Un:
+                case OpCodeREnum.Conv_R4:
+                case OpCodeREnum.Conv_R8:
+                case OpCodeREnum.Conv_R_Un:
+                case OpCodeREnum.Conv_U:
+                case OpCodeREnum.Conv_U1:
+                case OpCodeREnum.Conv_U2:
+                case OpCodeREnum.Conv_U4:
+                case OpCodeREnum.Conv_U8:
+                case OpCodeREnum.Box:
                     op.Register2 = src;
                     break;
                 case OpCodeREnum.Add:
@@ -223,6 +333,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Push:
                     op.Register1 = src;
                     break;
                 case OpCodeREnum.Blt:
@@ -302,6 +413,43 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Cgt:
                 case OpCodeREnum.Cgt_Un:
                 case OpCodeREnum.Ceq:
+                case OpCodeREnum.Conv_I:
+                case OpCodeREnum.Conv_I1:
+                case OpCodeREnum.Conv_I2:
+                case OpCodeREnum.Conv_I4:
+                case OpCodeREnum.Conv_I8:
+                case OpCodeREnum.Conv_Ovf_I:
+                case OpCodeREnum.Conv_Ovf_I1:
+                case OpCodeREnum.Conv_Ovf_I1_Un:
+                case OpCodeREnum.Conv_Ovf_I2:
+                case OpCodeREnum.Conv_Ovf_I2_Un:
+                case OpCodeREnum.Conv_Ovf_I4:
+                case OpCodeREnum.Conv_Ovf_I4_Un:
+                case OpCodeREnum.Conv_Ovf_I8:
+                case OpCodeREnum.Conv_Ovf_I8_Un:
+                case OpCodeREnum.Conv_Ovf_I_Un:
+                case OpCodeREnum.Conv_Ovf_U:
+                case OpCodeREnum.Conv_Ovf_U1:
+                case OpCodeREnum.Conv_Ovf_U1_Un:
+                case OpCodeREnum.Conv_Ovf_U2:
+                case OpCodeREnum.Conv_Ovf_U2_Un:
+                case OpCodeREnum.Conv_Ovf_U4:
+                case OpCodeREnum.Conv_Ovf_U4_Un:
+                case OpCodeREnum.Conv_Ovf_U8:
+                case OpCodeREnum.Conv_Ovf_U8_Un:
+                case OpCodeREnum.Conv_Ovf_U_Un:
+                case OpCodeREnum.Conv_R4:
+                case OpCodeREnum.Conv_R8:
+                case OpCodeREnum.Conv_R_Un:
+                case OpCodeREnum.Conv_U:
+                case OpCodeREnum.Conv_U1:
+                case OpCodeREnum.Conv_U2:
+                case OpCodeREnum.Conv_U4:
+                case OpCodeREnum.Conv_U8:
+                case OpCodeREnum.Box:
+                case OpCodeREnum.Call:
+                case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Newobj:
                     op.Register1 = dst;
                     break;
                 case OpCodeREnum.Br_S:
@@ -332,6 +480,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Bne_Un_S:
                 case OpCodeREnum.Nop:
                 case OpCodeREnum.Ret:
+                case OpCodeREnum.Push:
                     break;
                 default:
                     throw new NotImplementedException();

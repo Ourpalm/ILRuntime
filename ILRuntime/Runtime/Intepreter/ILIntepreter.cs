@@ -314,7 +314,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     int idx = locBase;
-                                    StLocSub(esp, v1, bp, idx, mStack);
+                                    StLocSub(esp, v1, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_0:
@@ -325,7 +325,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     int idx = locBase + 1;
-                                    StLocSub(esp, v2, bp, idx, mStack);
+                                    StLocSub(esp, v2, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_1:
@@ -336,7 +336,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     esp--;
                                     int idx = locBase + 2;
-                                    StLocSub(esp, v3, bp, idx, mStack);
+                                    StLocSub(esp, v3, idx, mStack);
                                     break;
                                 }
                             case OpCodeEnum.Ldloc_2:
@@ -348,7 +348,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     int idx = locBase + 3;
 
-                                    StLocSub(esp, v4, bp, idx, mStack);
+                                    StLocSub(esp, v4, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc_3:
@@ -361,7 +361,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     var v = Add(frame.LocalVarPointer, ip->TokenInteger);
                                     int idx = locBase + ip->TokenInteger;
-                                    StLocSub(esp, v, bp, idx, mStack);
+                                    StLocSub(esp, v, idx, mStack);
                                 }
                                 break;
                             case OpCodeEnum.Ldloc:
@@ -4247,7 +4247,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void StLocSub(StackObject* esp, StackObject* v, StackObject* bp, int idx, IList<object> mStack)
+        void StLocSub(StackObject* esp, StackObject* v, int idx, IList<object> mStack)
         {
             switch (esp->ObjectType)
             {

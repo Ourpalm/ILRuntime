@@ -34,6 +34,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v1 = frame.LocalVarPointer;
             int finallyEndAddress = 0;
 
+            var stackRegStart = frame.BasePointer;
             esp = Add(frame.BasePointer, method.StackRegisterCount);
             StackObject* r = Minus(frame.LocalVarPointer, method.ParameterCount);
             IList<object> mStack = stack.ManagedStack;
@@ -72,13 +73,14 @@ namespace ILRuntime.Runtime.Intepreter
             stack.PushFrame(ref frame);
 
             int locBase = mStack.Count;
+            int locCnt = method.LocalVariableCount;
             //Managed Stack reserved for local variable
-            for (int i = 0; i < method.LocalVariableCount; i++)
+            for (int i = 0; i < locCnt; i++)
             {
                 mStack.Add(null);
             }
 
-            for (int i = 0; i < method.LocalVariableCount; i++)
+            for (int i = 0; i < locCnt; i++)
             {
                 var v = method.Variables[i];
                 if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive)
@@ -198,9 +200,15 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Move:
                                 {
                                     reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    CopyToRegister(r, ip->Register1, reg1, paramCnt, locCnt, mStack);
+                                }
+                                break;
 
-                                    *reg2 = *reg1;
+                            case OpCodeREnum.Push:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    CopyToStack(esp, reg1, mStack);
+                                    esp++;
                                 }
                                 break;
                             #endregion
@@ -303,6 +311,173 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             #endregion
+
+                            #region Initialization & Instantiation
+                            case OpCodeREnum.Newobj:
+                                {
+                                    IMethod m = domain.GetMethod(ip->Operand);
+                                    if (m is ILMethod)
+                                    {
+                                        ILType type = m.DeclearingType as ILType;
+                                        if (type.IsDelegate)
+                                        {
+                                            var objRef = GetObjectAndResolveReference(esp - 1 - 1);
+                                            var mi = (IMethod)mStack[(esp - 1)->Value];
+                                            object ins;
+                                            if (objRef->ObjectType == ObjectTypes.Null)
+                                                ins = null;
+                                            else
+                                                ins = mStack[objRef->Value];
+                                            Free(esp - 1);
+                                            Free(esp - 1 - 1);
+                                            esp = esp - 1 - 1;
+                                            object dele;
+                                            if (mi is ILMethod)
+                                            {
+                                                if (ins != null)
+                                                {
+                                                    dele = ((ILTypeInstance)ins).GetDelegateAdapter((ILMethod)mi);
+                                                    if (dele == null)
+                                                        dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                                }
+                                                else
+                                                {
+                                                    if (((ILMethod)mi).DelegateAdapter == null)
+                                                    {
+                                                        ((ILMethod)mi).DelegateAdapter = domain.DelegateManager.FindDelegateAdapter(null, (ILMethod)mi);
+                                                    }
+                                                    dele = ((ILMethod)mi).DelegateAdapter;
+                                                }
+                                            }
+
+                                            else
+                                            {
+                                                throw new NotImplementedException();
+                                            }
+                                            esp = PushObject(esp, mStack, dele);
+                                        }
+                                        else
+                                        {
+                                            var a = esp - m.ParameterCount;
+                                            StackObject* objRef;
+                                            ILTypeInstance obj = null;
+                                            bool isValueType = type.IsValueType;
+                                            if (isValueType)
+                                            {
+                                                throw new NotImplementedException();
+                                                stack.AllocValueType(esp, type);
+                                                objRef = esp + 1;
+                                                objRef->ObjectType = ObjectTypes.StackObjectReference;
+                                                *(StackObject**)&objRef->Value = esp;
+                                                objRef++;
+                                            }
+                                            else
+                                            {
+                                                obj = type.Instantiate(false);
+                                                objRef = PushObject(esp, mStack, obj);//this parameter for constructor
+                                            }
+                                            esp = objRef;
+                                            for (int i = 0; i < m.ParameterCount; i++)
+                                            {
+                                                CopyToStack(esp, a + i, mStack);
+                                                esp++;
+                                            }
+                                            esp = Execute((ILMethod)m, esp, out unhandledException);
+                                            ValueTypeBasePointer = bp;
+                                            if (isValueType)
+                                            {
+                                                var ins = objRef - 1 - 1;
+                                                *a = *ins;
+                                                esp = a + 1;
+                                            }
+                                            else
+                                            {
+                                                
+                                                esp = PushObject(a, mStack, obj);//new constructedObj
+                                                CopyToRegister(r, ip->Register1, a, paramCnt, locCnt, mStack);
+                                                Free(a);
+                                                esp = a;
+                                            }
+                                        }
+                                        if (unhandledException)
+                                            returned = true;
+                                    }
+                                    else
+                                    {
+                                        CLRMethod cm = (CLRMethod)m;
+                                        //Means new object();
+                                        if (cm == null)
+                                        {
+                                            esp = PushObject(esp, mStack, new object());
+                                        }
+                                        else
+                                        {
+                                            if (cm.DeclearingType.IsDelegate)
+                                            {
+                                                throw new NotImplementedException();
+                                                var objRef = GetObjectAndResolveReference(esp - 1 - 1);
+                                                var mi = (IMethod)mStack[(esp - 1)->Value];
+                                                object ins;
+                                                if (objRef->ObjectType == ObjectTypes.Null)
+                                                    ins = null;
+                                                else
+                                                    ins = mStack[objRef->Value];
+                                                Free(esp - 1);
+                                                Free(esp - 1 - 1);
+                                                esp = esp - 1 - 1;
+                                                object dele;
+                                                if (mi is ILMethod)
+                                                {
+                                                    if (ins != null)
+                                                    {
+                                                        dele = ((ILTypeInstance)ins).GetDelegateAdapter((ILMethod)mi);
+                                                        if (dele == null)
+                                                            dele = domain.DelegateManager.FindDelegateAdapter((ILTypeInstance)ins, (ILMethod)mi);
+                                                    }
+                                                    else
+                                                    {
+                                                        if (((ILMethod)mi).DelegateAdapter == null)
+                                                        {
+                                                            ((ILMethod)mi).DelegateAdapter = domain.DelegateManager.FindDelegateAdapter(null, (ILMethod)mi);
+                                                        }
+                                                        dele = ((ILMethod)mi).DelegateAdapter;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (ins is ILTypeInstance)
+                                                        ins = ((ILTypeInstance)ins).CLRInstance;
+                                                    dele = Delegate.CreateDelegate(cm.DeclearingType.TypeForCLR, ins, ((CLRMethod)mi).MethodInfo);
+                                                }
+                                                esp = PushObject(esp, mStack, dele);
+                                            }
+                                            else
+                                            {
+                                                var redirect = cm.Redirection;
+                                                if (redirect != null)
+                                                    esp = redirect(this, esp, mStack, cm, true);
+                                                else
+                                                {
+                                                    object result = cm.Invoke(this, esp, mStack, true);
+                                                    int paramCount = cm.ParameterCount;
+                                                    for (int i = 1; i <= paramCount; i++)
+                                                    {
+                                                        Free(esp - i);
+                                                    }
+                                                    esp = Minus(esp, paramCount);
+                                                    esp = PushObject(esp, mStack, result);//new constructedObj
+                                                }
+
+                                                esp--;
+                                                CopyToRegister(r, ip->Register1, esp, paramCnt, locCnt, mStack);
+                                                Free(esp);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            #endregion
+
                             #region Compare
                             case OpCodeREnum.Clt:
                                 {
@@ -334,6 +509,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             #endregion
+
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
@@ -416,6 +592,22 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp);
+        }
+
+        void CopyToRegister(StackObject* r, short reg, StackObject* val, int argCnt, int locCnt, IList<object> mStack)
+        {
+            if (reg < argCnt)
+                throw new NotImplementedException();
+            var dst = Add(r, reg);
+
+            if (reg < argCnt + locCnt)
+            {
+                StLocSub(val, dst, reg - argCnt, mStack);
+            }
+            else
+            {
+                CopyToStack(dst, val, mStack);
+            }
         }
 
         public static void WriteOne(StackObject* esp)
