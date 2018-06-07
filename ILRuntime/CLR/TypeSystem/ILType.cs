@@ -816,7 +816,7 @@ namespace ILRuntime.CLR.TypeSystem
                         continue;
                     }
 
-                    
+
                     if (p2 != p)
                     {
                         match = false;
@@ -1057,6 +1057,31 @@ namespace ILRuntime.CLR.TypeSystem
             }
             return res;
         }
+
+        public ILTypeInstance Instantiate(object[] args)
+        {
+            var res = new ILTypeInstance(this);
+            var argsTypes = new List<IType>(args.Length);
+            foreach (var o in args)
+            {
+                if (o is ILTypeInstance)
+                {
+                    argsTypes.Add(((ILTypeInstance)o).Type);
+                }
+                else
+                {
+                    argsTypes.Add(appdomain.GetType(o.GetType()));
+                }
+            }
+            var m = GetConstructor(argsTypes);
+            if (m != null)
+            {
+                appdomain.Invoke(m, res, args);
+            }
+
+            return res;
+        }
+
         public IType MakeGenericInstance(KeyValuePair<string, IType>[] genericArguments)
         {
             if (genericInstances == null)
@@ -1099,7 +1124,7 @@ namespace ILRuntime.CLR.TypeSystem
             if (arrayTypes == null)
                 arrayTypes = new Dictionary<int, IType>();
             IType atype;
-            if(!arrayTypes.TryGetValue(rank, out atype))
+            if (!arrayTypes.TryGetValue(rank, out atype))
             {
                 var def = new ArrayType(typeRef, rank);
                 atype = new ILType(def, appdomain);
