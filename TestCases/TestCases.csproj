@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivatorCreateInstanceTest.cs" />
     <Compile Include="AsyncAwaitTest.cs" />
     <Compile Include="DelegateInnerTest.cs" />
     <Compile Include="GenericMethodTest.cs" />

@@ -81,6 +81,34 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }*/
 
+        public static StackObject* CreateInstance3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var p = esp - 2;
+            var t = mStack[p->Value] as Type;
+            var p2 = esp - 1;
+            var t2 = mStack[p2->Value] as Object[];
+            intp.Free(p);
+            if (t != null)
+            {
+                for (int i = 0; i < t2.Length; i++)
+                {
+                    if (t2[i] == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+                }
+
+                if (t is ILRuntimeType)
+                {
+                    return ILIntepreter.PushObject(p, mStack, ((ILRuntimeType)t).ILType.Instantiate(t2));
+                }
+                else
+                    return ILIntepreter.PushObject(p, mStack, Activator.CreateInstance(t, t2));
+            }
+            else
+                return ILIntepreter.PushNull(p);
+        }
+
         public static StackObject* GetType(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
             var p = esp - 1;
@@ -104,11 +132,11 @@ namespace ILRuntime.Runtime.Enviorment
             p = ILIntepreter.Minus(esp, 2);
             var instance = StackObject.ToObject(p, dommain, mStack);
             intp.Free(p);
-            if(instance is ILRuntimeType)
+            if (instance is ILRuntimeType)
             {
                 if (other is ILRuntimeType)
                 {
-                    if(((ILRuntimeType)instance).ILType == ((ILRuntimeType)other).ILType)
+                    if (((ILRuntimeType)instance).ILType == ((ILRuntimeType)other).ILType)
                         return ILIntepreter.PushOne(ret);
                     else
                         return ILIntepreter.PushZero(ret);
@@ -118,7 +146,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
             {
-                if(((Type)typeof(Type).CheckCLRTypes(instance)).Equals(((Type)typeof(Type).CheckCLRTypes(other))))
+                if (((Type)typeof(Type).CheckCLRTypes(instance)).Equals(((Type)typeof(Type).CheckCLRTypes(other))))
                     return ILIntepreter.PushOne(ret);
                 else
                     return ILIntepreter.PushZero(ret);
@@ -420,7 +448,7 @@ namespace ILRuntime.Runtime.Enviorment
             param = esp - 1 - 1;
             object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
-            
+
             if (dele1 != null)
             {
                 if (dele2 != null)
@@ -435,7 +463,7 @@ namespace ILRuntime.Runtime.Enviorment
                             {
                                 dele = dele.Clone();
                             }
-                            if(!((IDelegateAdapter)dele2).IsClone)
+                            if (!((IDelegateAdapter)dele2).IsClone)
                             {
                                 dele2 = ((IDelegateAdapter)dele2).Clone();
                             }
@@ -828,7 +856,7 @@ namespace ILRuntime.Runtime.Enviorment
                         return ret;
                 }
                 else
-                    return ret;                
+                    return ret;
             }
             else
                 return ILIntepreter.PushObject(ret, mStack, ((MethodInfo)instance).Invoke(obj, (object[])p));
@@ -836,7 +864,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         static object CheckCrossBindingAdapter(object obj)
         {
-            if(obj is CrossBindingAdaptorType)
+            if (obj is CrossBindingAdaptorType)
             {
                 return ((CrossBindingAdaptorType)obj).ILInstance;
             }
@@ -887,7 +915,7 @@ namespace ILRuntime.Runtime.Enviorment
             var param = esp - 1;
             var instance = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
-             
+
             var type = instance.GetType();
             if (type == typeof(ILTypeInstance) || type == typeof(ILEnumTypeInstance))
             {
@@ -913,7 +941,7 @@ namespace ILRuntime.Runtime.Enviorment
             AppDomain domain = intp.AppDomain;
 
             var p = esp - 1;
-            string name = (string)StackObject.ToObject(p, domain, mStack); 
+            string name = (string)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
             p = esp - 1 - 1;
@@ -930,7 +958,7 @@ namespace ILRuntime.Runtime.Enviorment
                         var f = fields[i];
                         if (f.IsStatic)
                         {
-                            if(f.Name == name)
+                            if (f.Name == name)
                             {
                                 ILEnumTypeInstance ins = new ILEnumTypeInstance(it);
                                 ins[0] = f.Constant;
