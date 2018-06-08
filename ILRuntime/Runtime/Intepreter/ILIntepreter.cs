@@ -3386,7 +3386,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             esp = PushObject(esp - 1 - 1, mStack, val, true);
                                     }
                                     else
-                                        esp = PushObject(esp - 1 - 1, mStack, val, true);
+                                        esp = PushObject(esp - 1 - 1, mStack, val, !arr.GetType().GetElementType().IsPrimitive);
                                 }
                                 break;
                             case OpCodeEnum.Stelem_I1:
