@@ -43,6 +43,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             foreach(var i in blocks)
             {
                 var lst = i.FinalInstructions;
+                baseRegIdx = baseRegStart;
                 foreach (var ins in i.Instructions)
                 {
                     Translate(lst, ins, locVarRegStart, ref baseRegIdx);
