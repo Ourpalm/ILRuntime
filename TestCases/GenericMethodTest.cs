@@ -303,5 +303,18 @@ namespace TestCases
 
             Console.WriteLine("bind.data = " + bind.data);
         }
+
+        public static void GenericMethodTest12()
+        {
+            GenericMethodTest12Sub(new int[] { 3 }, k => {
+                k = k + 2;//error;
+                k = k << 2;//error;
+            });
+        }
+
+        static void GenericMethodTest12Sub<T>(T[] a, Action<T> func)
+        {
+            func(a[0]);
+        }
     }
 }
