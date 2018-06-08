@@ -143,6 +143,12 @@ namespace ILRuntime.Runtime.Enviorment
             return (T)typeof(T).CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
         }
 
+        public object ReadObject(Type type)
+        {
+            CheckReturnValue();
+            return type.CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
+        }
+
         public void Dispose()
         {
             domain.FreeILIntepreter(intp);

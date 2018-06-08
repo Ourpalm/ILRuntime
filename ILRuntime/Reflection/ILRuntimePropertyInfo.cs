@@ -225,7 +225,7 @@ namespace ILRuntime.Reflection
                     ctx.PushObject(index[i], !getter.Parameters[i].IsPrimitive);
                 }
                 ctx.Invoke();
-                return ctx.ReadObject<object>();
+                return ctx.ReadObject(getter.ReturnType.TypeForCLR);
             }
             else
                 throw new ArgumentException("Index count mismatch");
