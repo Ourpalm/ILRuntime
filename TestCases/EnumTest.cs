@@ -28,6 +28,33 @@ namespace TestCases
             Enum1bbb,
             Enum2bbb,
         }
+
+        enum TestEnum4 : ushort
+        {
+            零 = 0,
+            One = 1,
+            佰 = 100
+        }
+
+        enum TestEnumUint : uint
+        {
+            Zero = 0,
+            UOne = 1,
+            Max = uint.MaxValue
+        }
+
+        enum TestEnumInt:int
+        {
+            Min  = int.MinValue,
+            Max = int.MaxValue
+        }
+
+        enum TestEnumSByte : sbyte
+        {
+            Min = sbyte.MinValue,
+            Max = sbyte.MaxValue
+        }
+
         static TestEnum b = TestEnum.Enum2;
 
         public static string Test01()
@@ -158,10 +185,28 @@ namespace TestCases
         public static void Test12()
         {
             var arr = Enum.GetValues(typeof(TestEnum));
-            foreach(var i in arr)
+            foreach (var i in arr)
             {
                 Console.WriteLine(i.ToString());
             }
+        }
+
+        public static void Test13()
+        {
+            var emmm = TestEnum2.Enum3234;
+            Console.WriteLine(emmm.ToString());
+
+            var one = TestEnum4.One;
+            Console.WriteLine(one);
+
+            var hundred = TestEnum4.佰;
+            Console.WriteLine(hundred);
+            Console.WriteLine(hundred.ToString());
+
+            var UOne = TestEnumUint.Max;
+            Console.WriteLine(UOne);
+
+            Console.WriteLine(TestEnumSByte.Max);
         }
     }
 }
