@@ -33,6 +33,7 @@ namespace ILRuntimeTest.TestFramework
         public static Int2Delegate2 IntDelegateTestReturn1;
         public static IntFloatDelegate2 IntDelegateTestReturn2;
         public static Action<BaseClassTest> GenericDelegateTest;
+        public static Func<int, float, short, double> DelegatePerformanceTest;
     }
 
     public class GenericClassTest<T> : BaseClassTest

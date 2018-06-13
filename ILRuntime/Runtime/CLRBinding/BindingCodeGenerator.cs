@@ -179,8 +179,10 @@ namespace ILRuntime.Runtime.Generated
                 if (!info.Value.NeedGenerate)
                     continue;
                 Type i = info.Value.Type;
-                if (i.BaseType == typeof(MulticastDelegate))
-                    continue;
+
+                //CLR binding for delegate is important for cross domain invocation,so it should be generated
+                //if (i.BaseType == typeof(MulticastDelegate))
+                //    continue;
 
                 string clsName, realClsName;
                 bool isByRef;
@@ -372,6 +374,10 @@ namespace ILRuntime.Runtime.Generated
                         {
                             if (method.GenericParameterCount > 0 && !method.IsGenericInstance)
                                 continue;
+                            if(method.Name == "UnitTest_Performance4")
+                            {
+
+                            }
                             var body = method.Body;
                             foreach (var ins in body)
                             {

@@ -31,6 +31,9 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("GenericDelegateTest", flag);
             app.RegisterCLRFieldGetter(field, get_GenericDelegateTest_2);
             app.RegisterCLRFieldSetter(field, set_GenericDelegateTest_2);
+            field = type.GetField("DelegatePerformanceTest", flag);
+            app.RegisterCLRFieldGetter(field, get_DelegatePerformanceTest_3);
+            app.RegisterCLRFieldSetter(field, set_DelegatePerformanceTest_3);
 
 
         }
@@ -60,6 +63,14 @@ namespace ILRuntime.Runtime.Generated
         static void set_GenericDelegateTest_2(ref object o, object v)
         {
             ILRuntimeTest.TestFramework.DelegateTest.GenericDelegateTest = (System.Action<ILRuntimeTest.TestFramework.BaseClassTest>)v;
+        }
+        static object get_DelegatePerformanceTest_3(ref object o)
+        {
+            return ILRuntimeTest.TestFramework.DelegateTest.DelegatePerformanceTest;
+        }
+        static void set_DelegatePerformanceTest_3(ref object o, object v)
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.DelegatePerformanceTest = (System.Func<System.Int32, System.Single, System.Int16, System.Double>)v;
         }
 
 
