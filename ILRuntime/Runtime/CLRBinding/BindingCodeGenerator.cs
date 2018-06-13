@@ -374,10 +374,6 @@ namespace ILRuntime.Runtime.Generated
                         {
                             if (method.GenericParameterCount > 0 && !method.IsGenericInstance)
                                 continue;
-                            if(method.Name == "UnitTest_Performance4")
-                            {
-
-                            }
                             var body = method.Body;
                             foreach (var ins in body)
                             {
