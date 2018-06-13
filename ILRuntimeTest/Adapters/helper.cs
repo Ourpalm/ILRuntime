@@ -14,12 +14,12 @@ namespace ILRuntimeTest.TestFramework
                 return;
             }
 
-			// adaptor register 
+            // adaptor register 
                         
-			app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
-			app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
-			app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
-			app.RegisterCrossBindingAdaptor(new TestClass3Adaptor());
+            app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
+            app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
+            app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
+            app.RegisterCrossBindingAdaptor(new TestClass3Adaptor());
             app.RegisterCrossBindingAdaptor(new TestClass4Adaptor());
             app.RegisterCrossBindingAdaptor(new IDisposableClassInheritanceAdaptor());
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTest2Adaptor());
@@ -34,16 +34,18 @@ namespace ILRuntimeTest.TestFramework
             // delegate register 
 
             app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Boolean>();
-			
-			app.DelegateManager.RegisterMethodDelegate<System.Int32>();
-			
-			app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Int32>();
-			
-			app.DelegateManager.RegisterMethodDelegate<System.Int32,System.String,System.String>();
-			
-			app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.BaseClassTest>();
+            
+            app.DelegateManager.RegisterMethodDelegate<System.Int32>();
+            
+            app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Int32>();
+            
+            app.DelegateManager.RegisterMethodDelegate<System.Int32,System.String,System.String>();
+            
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.BaseClassTest>();
 
             app.DelegateManager.RegisterFunctionDelegate<System.Int32>();
+
+            app.DelegateManager.RegisterFunctionDelegate<System.Int32, System.Single, System.Int16, System.Double>();
             // delegate convertor
 
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.IntDelegate>((action) =>

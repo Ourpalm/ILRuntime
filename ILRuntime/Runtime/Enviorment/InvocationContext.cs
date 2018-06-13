@@ -10,6 +10,82 @@ using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.Runtime.Enviorment
 {
+    static class PrimitiveConverter<T>
+    {
+        public static Func<T, int> ToInteger;
+        public static Func<int, T> FromInteger;
+        public static Func<T, long> ToLong;
+        public static Func<long, T> FromLong;
+        public static Func<T, float> ToFloat;
+        public static Func<float, T> FromFloat;
+        public static Func<T, double> ToDouble;
+        public static Func<double, T> FromDouble;
+
+        public static int CheckAndInvokeToInteger(T val)
+        {
+            if (ToInteger != null)
+                return ToInteger(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast {0} to System.Int32", typeof(T).FullName));
+        }
+
+        public static T CheckAndInvokeFromInteger(int val)
+        {
+            if (FromInteger != null)
+                return FromInteger(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast System.Int32 to {0}", typeof(T).FullName));
+        }
+
+        public static long CheckAndInvokeToLong(T val)
+        {
+            if (ToLong != null)
+                return ToLong(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast {0} to System.Int64", typeof(T).FullName));
+        }
+
+        public static T CheckAndInvokeFromLong(long val)
+        {
+            if (FromLong != null)
+                return FromLong(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast System.Int64 to {0}", typeof(T).FullName));
+        }
+
+        public static float CheckAndInvokeToFloat(T val)
+        {
+            if (ToFloat != null)
+                return ToFloat(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast {0} to System.Single", typeof(T).FullName));
+        }
+
+        public static T CheckAndInvokeFromFloat(float val)
+        {
+            if (FromFloat != null)
+                return FromFloat(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast System.Single to {0}", typeof(T).FullName));
+        }
+
+        public static double CheckAndInvokeToDouble(T val)
+        {
+            if (ToDouble != null)
+                return ToDouble(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast {0} to System.Double", typeof(T).FullName));
+        }
+
+        public static T CheckAndInvokeFromDouble(double val)
+        {
+            if (FromDouble != null)
+                return FromDouble(val);
+            else
+                throw new InvalidCastException(string.Format("Cannot cast System.Double to {0}", typeof(T).FullName));
+        }
+    }
+
     public unsafe struct InvocationContext : IDisposable
     {
         StackObject* esp;
@@ -21,6 +97,34 @@ namespace ILRuntime.Runtime.Enviorment
         int paramCnt;
         bool hasReturn;
 
+        static InvocationContext()
+        {
+            PrimitiveConverter<int>.ToInteger = (a) => a;
+            PrimitiveConverter<int>.FromInteger = (a) => a;
+            PrimitiveConverter<short>.ToInteger = (a) => a;
+            PrimitiveConverter<short>.FromInteger = (a) => (short)a;
+            PrimitiveConverter<byte>.ToInteger = (a) => a;
+            PrimitiveConverter<byte>.FromInteger = (a) => (byte)a;
+            PrimitiveConverter<sbyte>.ToInteger = (a) => a;
+            PrimitiveConverter<sbyte>.FromInteger = (a) => (sbyte)a;
+            PrimitiveConverter<ushort>.ToInteger = (a) => a;
+            PrimitiveConverter<ushort>.FromInteger = (a) => (ushort)a;
+            PrimitiveConverter<char>.ToInteger = (a) => a;
+            PrimitiveConverter<char>.FromInteger = (a) => (char)a;
+            PrimitiveConverter<uint>.ToInteger = (a) => (int)a;
+            PrimitiveConverter<uint>.FromInteger = (a) => (uint)a;
+            PrimitiveConverter<bool>.ToInteger = (a) => a ? 1 : 0;
+            PrimitiveConverter<bool>.FromInteger = (a) => a == 1;
+            PrimitiveConverter<long>.ToLong = (a) => a;
+            PrimitiveConverter<long>.FromLong = (a) => a;
+            PrimitiveConverter<ulong>.ToLong = (a) => (long)a;
+            PrimitiveConverter<ulong>.FromLong = (a) => (ulong)a;
+            PrimitiveConverter<float>.ToFloat = (a) => a;
+            PrimitiveConverter<float>.FromFloat = (a) => a;
+            PrimitiveConverter<double>.ToDouble = (a) => a;
+            PrimitiveConverter<double>.FromDouble = (a) => a;
+
+        }
         internal InvocationContext(ILIntepreter intp, ILMethod method)
         {
             var stack = intp.Stack;
@@ -42,6 +146,16 @@ namespace ILRuntime.Runtime.Enviorment
             PushInteger(val ? 1 : 0);
         }
 
+        public void PushInteger<T>(T val)
+        {
+            PushInteger(PrimitiveConverter<T>.CheckAndInvokeToInteger(val));
+        }
+
+        public void PushLong<T>(T val)
+        {
+            PushInteger(PrimitiveConverter<T>.CheckAndInvokeToLong(val));
+        }
+
         public void PushInteger(int val)
         {
             esp->ObjectType = ObjectTypes.Integer;
@@ -61,6 +175,11 @@ namespace ILRuntime.Runtime.Enviorment
             paramCnt++;
         }
 
+        public void PushFloat<T>(T val)
+        {
+            PushFloat(PrimitiveConverter<T>.CheckAndInvokeToFloat(val));
+        }
+
         public void PushFloat(float val)
         {
             esp->ObjectType = ObjectTypes.Integer;
@@ -68,6 +187,11 @@ namespace ILRuntime.Runtime.Enviorment
 
             esp++;
             paramCnt++;
+        }
+
+        public void PushDouble<T>(T val)
+        {
+            PushFloat(PrimitiveConverter<T>.CheckAndInvokeToFloat(val));
         }
 
         public void PushDouble(double val)
@@ -112,11 +236,20 @@ namespace ILRuntime.Runtime.Enviorment
             CheckReturnValue();
             return esp->Value;
         }
+        public T ReadInteger<T>()
+        {
+            return PrimitiveConverter<T>.CheckAndInvokeFromInteger(ReadInteger());
+        }
 
         public long ReadLong()
         {
             CheckReturnValue();
             return *(long*)&esp->Value;
+        }
+
+        public T ReadLong<T>()
+        {
+            return PrimitiveConverter<T>.CheckAndInvokeFromLong(ReadLong());
         }
 
         public float ReadFloat()
@@ -125,10 +258,20 @@ namespace ILRuntime.Runtime.Enviorment
             return *(float*)&esp->Value;
         }
 
+        public T ReadFloat<T>()
+        {
+            return PrimitiveConverter<T>.CheckAndInvokeFromFloat(ReadFloat());
+        }
+
         public double ReadDouble()
         {
             CheckReturnValue();
             return *(double*)&esp->Value;
+        }
+
+        public T ReadDouble<T>()
+        {
+            return PrimitiveConverter<T>.CheckAndInvokeFromDouble(ReadDouble());
         }
 
         public bool ReadBool()

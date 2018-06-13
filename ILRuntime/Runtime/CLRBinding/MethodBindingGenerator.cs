@@ -552,7 +552,7 @@ namespace ILRuntime.Runtime.CLRBinding
                 }
                 if (i.ReturnType != typeof(void))
                 {
-                    if (i.ReturnType.IsValueType && !i.ReturnType.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(type))
+                    if (i.ReturnType.IsValueType && !i.ReturnType.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(i.ReturnType))
                     {
                         string clsName, realClsName;
                         bool isByRef;
