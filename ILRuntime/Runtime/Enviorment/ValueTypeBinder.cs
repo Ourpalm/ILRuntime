@@ -112,10 +112,8 @@ namespace ILRuntime.Runtime.Enviorment
 
         public abstract void AssignFromStack(ref T ins, StackObject* ptr, IList<object> mStack);
 
-        public T ParseValue(ILIntepreter intp, StackObject* ptr_of_this_method, IList<object> mStack)
+        public void ParseValue(ref T value, ILIntepreter intp, StackObject* ptr_of_this_method, IList<object> mStack)
         {
-            T value = new T();
-
             var a = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
             if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
@@ -128,8 +126,6 @@ namespace ILRuntime.Runtime.Enviorment
                 value = (T)StackObject.ToObject(a, intp.AppDomain, mStack);
                 intp.Free(ptr_of_this_method);
             }
-
-            return value;
         }
 
         public void WriteBackValue(ILRuntime.Runtime.Enviorment.AppDomain domain, StackObject* ptr_of_this_method, IList<object> mStack, ref T instance_of_this_method)
