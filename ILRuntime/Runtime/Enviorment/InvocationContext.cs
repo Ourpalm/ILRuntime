@@ -168,7 +168,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void PushInteger(long val)
         {
-            esp->ObjectType = ObjectTypes.Integer;
+            esp->ObjectType = ObjectTypes.Long;
             *(long*)&esp->Value = val;
 
             esp++;
@@ -182,7 +182,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void PushFloat(float val)
         {
-            esp->ObjectType = ObjectTypes.Integer;
+            esp->ObjectType = ObjectTypes.Float;
             *(float*)&esp->Value = val;
 
             esp++;
@@ -196,7 +196,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void PushDouble(double val)
         {
-            esp->ObjectType = ObjectTypes.Integer;
+            esp->ObjectType = ObjectTypes.Double;
             *(double*)&esp->Value = val;
 
             esp++;
