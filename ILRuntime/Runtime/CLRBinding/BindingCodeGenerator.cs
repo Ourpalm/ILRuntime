@@ -541,9 +541,6 @@ namespace ILRuntime.Runtime.Generated
             {
                 var mi = i.GetMethod("Invoke");
                 var miParameters = mi.GetParameters();
-                if (mi.ReturnType == typeof(void) && miParameters.Length == 0)
-                    continue;
-
                 string clsName, realClsName, paramClsName, paramRealClsName;
                 bool isByRef, paramIsByRef;
                 i.GetClassName(out clsName, out realClsName, out isByRef);
@@ -596,20 +593,27 @@ namespace ILRuntime.Runtime.Generated
                     }
                     else
                     {
-                        sb.Append("            app.DelegateManager.RegisterMethodDelegate<");
-                        first = true;
-                        foreach (var j in miParameters)
+                        if (miParameters.Length == 0)
                         {
-                            if (first)
-                            {
-                                first = false;
-                            }
-                            else
-                                sb.Append(", ");
-                            j.ParameterType.GetClassName(out paramClsName, out paramRealClsName, out paramIsByRef);
-                            sb.Append(paramRealClsName);
+                            sb.AppendLine("           app.DelegateManager.RegisterMethodDelegate ();");
                         }
-                        sb.AppendLine("> ();");
+                        else
+                        {
+                            sb.Append("            app.DelegateManager.RegisterMethodDelegate<");
+                            first = true;
+                            foreach (var j in miParameters)
+                            {
+                                if (first)
+                                {
+                                    first = false;
+                                }
+                                else
+                                    sb.Append(", ");
+                                j.ParameterType.GetClassName(out paramClsName, out paramRealClsName, out paramIsByRef);
+                                sb.Append(paramRealClsName);
+                            }
+                            sb.AppendLine("> ();");
+                        }
                     }
                     sb.AppendLine();
 
@@ -652,24 +656,32 @@ namespace ILRuntime.Runtime.Generated
                             sb.Append(", ");
                         mi.ReturnType.GetClassName(out paramClsName, out paramRealClsName, out paramIsByRef);
                         sb.Append(paramRealClsName);
+                        sb.Append(">)act)(");
                     }
                     else
                     {
-                        sb.Append("                    ((Action<");
-                        first = true;
-                        foreach (var j in miParameters)
+                        if (miParameters.Length == 0)
                         {
-                            if (first)
+                            sb.Append("                    ((Action)act)(");
+                        }
+                        else
+                        {
+                            sb.Append("                    ((Action<");
+                            first = true;
+                            foreach (var j in miParameters)
                             {
-                                first = false;
+                                if (first)
+                                {
+                                    first = false;
+                                }
+                                else
+                                    sb.Append(", ");
+                                j.ParameterType.GetClassName(out paramClsName, out paramRealClsName, out paramIsByRef);
+                                sb.Append(paramRealClsName);
                             }
-                            else
-                                sb.Append(", ");
-                            j.ParameterType.GetClassName(out paramClsName, out paramRealClsName, out paramIsByRef);
-                            sb.Append(paramRealClsName);
+                            sb.Append(">)act)(");
                         }
                     }
-                    sb.Append(">)act)(");
                     first = true;
                     foreach (var j in miParameters)
                     {
