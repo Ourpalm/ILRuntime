@@ -338,7 +338,7 @@ namespace ILRuntime.Runtime.Intepreter
                 PushParameter(ref ctx, pTypes[0], p1);
                 PushParameter(ref ctx, pTypes[1], p2);
                 PushParameter(ref ctx, pTypes[2], p3);
-                PushParameter(ref ctx, pTypes[3], p3);
+                PushParameter(ref ctx, pTypes[3], p4);
 
                 ctx.Invoke();
                 return ReadResult<TResult>(ref ctx, pTypes[4]);
