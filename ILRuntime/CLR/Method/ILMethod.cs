@@ -254,6 +254,13 @@ namespace ILRuntime.CLR.Method
             get;
             private set;
         }
+
+        public void Prewarm()
+        {
+            if (body == null)
+                InitCodeBody();
+        }
+
         void InitCodeBody()
         {
             if (def.HasBody)
