@@ -208,5 +208,14 @@ namespace TestCases
 
             Console.WriteLine(TestEnumSByte.Max);
         }
+
+        public static void Test14()
+        {
+            var arr = Enum.GetNames(typeof(TestEnum));
+            foreach (var i in arr)
+            {
+                Console.WriteLine(i);
+            }
+        }
     }
 }
