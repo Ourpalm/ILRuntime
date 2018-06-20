@@ -1051,10 +1051,10 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else if (t is ILRuntimeWrapperType)
             {
-                return ILIntepreter.PushObject(ret, mStack, Enum.GetValues(((ILRuntimeWrapperType)t).RealType), true);
+                return ILIntepreter.PushObject(ret, mStack, Enum.GetNames(((ILRuntimeWrapperType)t).RealType), true);
             }
             else
-                return ILIntepreter.PushObject(ret, mStack, Enum.GetValues(t), true);
+                return ILIntepreter.PushObject(ret, mStack, Enum.GetNames(t), true);
         }
     }
 }
