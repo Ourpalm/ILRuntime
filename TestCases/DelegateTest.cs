@@ -182,6 +182,12 @@ namespace TestCases
             Console.WriteLine(typeof(int) == a3.GetType());  //false, should be true
         }
 
+        public static void DelegateTest17()
+        {
+            Action a = () =>{ };
+            Console.WriteLine(a.GetHashCode());
+        }
+
         static void TestString(string a)
         {
             Console.WriteLine("test1:" + a);
