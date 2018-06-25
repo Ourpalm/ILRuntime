@@ -884,7 +884,6 @@ namespace ILRuntime.Runtime.Enviorment
         /// <returns></returns>
         public T Instantiate<T>(string type, object[] args = null)
         {
-            Console.WriteLine("**Calling: Instantiate<T>");
             ILTypeInstance ins = Instantiate(type, args);
             return (T)ins.CLRInstance;
         }
