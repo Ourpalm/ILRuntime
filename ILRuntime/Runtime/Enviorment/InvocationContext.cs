@@ -97,33 +97,38 @@ namespace ILRuntime.Runtime.Enviorment
         int paramCnt;
         bool hasReturn;
 
-        static InvocationContext()
+        static bool defaultConverterIntialized = false;
+        internal static void InitializeDefaultConverters()
         {
-            PrimitiveConverter<int>.ToInteger = (a) => a;
-            PrimitiveConverter<int>.FromInteger = (a) => a;
-            PrimitiveConverter<short>.ToInteger = (a) => a;
-            PrimitiveConverter<short>.FromInteger = (a) => (short)a;
-            PrimitiveConverter<byte>.ToInteger = (a) => a;
-            PrimitiveConverter<byte>.FromInteger = (a) => (byte)a;
-            PrimitiveConverter<sbyte>.ToInteger = (a) => a;
-            PrimitiveConverter<sbyte>.FromInteger = (a) => (sbyte)a;
-            PrimitiveConverter<ushort>.ToInteger = (a) => a;
-            PrimitiveConverter<ushort>.FromInteger = (a) => (ushort)a;
-            PrimitiveConverter<char>.ToInteger = (a) => a;
-            PrimitiveConverter<char>.FromInteger = (a) => (char)a;
-            PrimitiveConverter<uint>.ToInteger = (a) => (int)a;
-            PrimitiveConverter<uint>.FromInteger = (a) => (uint)a;
-            PrimitiveConverter<bool>.ToInteger = (a) => a ? 1 : 0;
-            PrimitiveConverter<bool>.FromInteger = (a) => a == 1;
-            PrimitiveConverter<long>.ToLong = (a) => a;
-            PrimitiveConverter<long>.FromLong = (a) => a;
-            PrimitiveConverter<ulong>.ToLong = (a) => (long)a;
-            PrimitiveConverter<ulong>.FromLong = (a) => (ulong)a;
-            PrimitiveConverter<float>.ToFloat = (a) => a;
-            PrimitiveConverter<float>.FromFloat = (a) => a;
-            PrimitiveConverter<double>.ToDouble = (a) => a;
-            PrimitiveConverter<double>.FromDouble = (a) => a;
+            if (!defaultConverterIntialized)
+            {
+                PrimitiveConverter<int>.ToInteger = (a) => a;
+                PrimitiveConverter<int>.FromInteger = (a) => a;
+                PrimitiveConverter<short>.ToInteger = (a) => a;
+                PrimitiveConverter<short>.FromInteger = (a) => (short)a;
+                PrimitiveConverter<byte>.ToInteger = (a) => a;
+                PrimitiveConverter<byte>.FromInteger = (a) => (byte)a;
+                PrimitiveConverter<sbyte>.ToInteger = (a) => a;
+                PrimitiveConverter<sbyte>.FromInteger = (a) => (sbyte)a;
+                PrimitiveConverter<ushort>.ToInteger = (a) => a;
+                PrimitiveConverter<ushort>.FromInteger = (a) => (ushort)a;
+                PrimitiveConverter<char>.ToInteger = (a) => a;
+                PrimitiveConverter<char>.FromInteger = (a) => (char)a;
+                PrimitiveConverter<uint>.ToInteger = (a) => (int)a;
+                PrimitiveConverter<uint>.FromInteger = (a) => (uint)a;
+                PrimitiveConverter<bool>.ToInteger = (a) => a ? 1 : 0;
+                PrimitiveConverter<bool>.FromInteger = (a) => a == 1;
+                PrimitiveConverter<long>.ToLong = (a) => a;
+                PrimitiveConverter<long>.FromLong = (a) => a;
+                PrimitiveConverter<ulong>.ToLong = (a) => (long)a;
+                PrimitiveConverter<ulong>.FromLong = (a) => (ulong)a;
+                PrimitiveConverter<float>.ToFloat = (a) => a;
+                PrimitiveConverter<float>.FromFloat = (a) => a;
+                PrimitiveConverter<double>.ToDouble = (a) => a;
+                PrimitiveConverter<double>.FromDouble = (a) => a;
 
+                defaultConverterIntialized = true;
+            }
         }
         internal InvocationContext(ILIntepreter intp, ILMethod method)
         {
@@ -228,7 +233,7 @@ namespace ILRuntime.Runtime.Enviorment
         {
             if (!invocated)
                 throw new NotSupportedException("You have to invocate first before you try to read the return value");
-            if(!hasReturn)
+            if (!hasReturn)
                 throw new NotSupportedException("The target method does not have a return value");
         }
         public int ReadInteger()

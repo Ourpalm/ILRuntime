@@ -57,6 +57,7 @@ namespace ILRuntime.Runtime.Enviorment
         public unsafe AppDomain()
         {
             AllowUnboundCLRMethod = true;
+            InvocationContext.InitializeDefaultConverters();
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
