@@ -1056,5 +1056,39 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return ILIntepreter.PushObject(ret, mStack, Enum.GetNames(t), true);
         }
+
+        public static StackObject* EnumGetName(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = esp - 2;
+            AppDomain domain = intp.AppDomain;
+
+            var p = esp - 1;
+            object val = StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            p = esp - 2;
+            Type t = (Type)StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            if (t is ILRuntimeType)
+            {
+                ILType it = ((ILRuntimeType)t).ILType;
+                
+                List<string> res = new List<string>();
+                if (it.IsEnum)
+                {
+                    ILEnumTypeInstance ins = (ILEnumTypeInstance)val;
+                    return ILIntepreter.PushObject(ret, mStack, ins.ToString(), true);
+                }
+                else
+                    throw new Exception(string.Format("{0} is not Enum", t.FullName));
+            }
+            else if (t is ILRuntimeWrapperType)
+            {
+                return ILIntepreter.PushObject(ret, mStack, Enum.GetName(((ILRuntimeWrapperType)t).RealType, val), true);
+            }
+            else
+                return ILIntepreter.PushObject(ret, mStack, Enum.GetName(t, val), true);
+        }
     }
 }
