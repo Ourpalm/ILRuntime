@@ -188,6 +188,40 @@ namespace TestCases
             Console.WriteLine(a.GetHashCode());
         }
 
+        public static void DelegateTest18()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest = DelegateTest18Sub;
+            ILRuntimeTest.TestFramework.DelegateTest.TestEnumDelegate();
+        }
+
+        static void DelegateTest18Sub(ILRuntimeTest.TestFramework.TestCLREnum e)
+        {
+            switch (e)
+            {
+                case ILRuntimeTest.TestFramework.TestCLREnum.Test1:
+                    Console.WriteLine("Test1");
+                    break;
+                case ILRuntimeTest.TestFramework.TestCLREnum.Test2:
+                    Console.WriteLine("Test2");
+                    break;
+                case ILRuntimeTest.TestFramework.TestCLREnum.Test3:
+                    Console.WriteLine("Test3");
+                    break;
+                default:
+                    throw new Exception("Should not be here");
+            }
+        }
+        public static void DelegateTest19()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest2 = DelegateTest19Sub;
+            ILRuntimeTest.TestFramework.DelegateTest.TestEnumDelegate2();
+        }
+
+        static ILRuntimeTest.TestFramework.TestCLREnum DelegateTest19Sub()
+        {
+            return ILRuntimeTest.TestFramework.TestCLREnum.Test2;
+        }
+
         static void TestString(string a)
         {
             Console.WriteLine("test1:" + a);

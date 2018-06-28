@@ -10,7 +10,7 @@ using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.Runtime.Enviorment
 {
-    static class PrimitiveConverter<T>
+    public static class PrimitiveConverter<T>
     {
         public static Func<T, int> ToInteger;
         public static Func<int, T> FromInteger;
