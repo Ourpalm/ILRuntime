@@ -66,7 +66,7 @@ namespace TestCases
 
         public ArrayCollectionA(ArrayCollectionB tb)
         {
-            m_array = new int[100000000];
+            m_array = new int[10000000];
 
             m_tb = tb;
             m_tb.TestFun();
@@ -79,7 +79,7 @@ namespace TestCases
 
         public ArrayCollectionB()
         {
-            m_array = new int[100000000];
+            m_array = new int[10000000];
         }
 
         public void TestFun()
@@ -95,7 +95,7 @@ namespace TestCases
 
         public ListCollectionA(ListCollectionB lcb)
         {
-            m_list = new List<IntWarp>(100000000);
+            m_list = new List<IntWarp>(1000000);
             this.lcb = lcb;
             lcb.TestFun();
         }
@@ -108,7 +108,7 @@ namespace TestCases
 
         public ListCollectionB()
         {
-            m_list = new List<IntWarp>(100000000);
+            m_list = new List<IntWarp>(1000000);
         }
 
         public void TestFun()

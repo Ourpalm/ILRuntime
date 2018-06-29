@@ -57,6 +57,7 @@ namespace ILRuntime.Runtime.Enviorment
         public unsafe AppDomain()
         {
             AllowUnboundCLRMethod = true;
+            InvocationContext.InitializeDefaultConverters();
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
@@ -125,6 +126,10 @@ namespace ILRuntime.Runtime.Enviorment
                 if (i.Name == "GetNames" && i.GetParameters().Length == 1)
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.EnumGetNames);
+                }
+                if(i.Name == "GetName")
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.EnumGetName);
                 }
             }
             mi = typeof(System.Type).GetMethod("GetTypeFromHandle");
@@ -773,7 +778,7 @@ namespace ILRuntime.Runtime.Enviorment
                         }
                         else
                             val = GetType(gType.GenericArguments[i], contextType, contextMethod);
-                        if (val != null && val.HasGenericParameter)
+                        if (val != null && gType.GenericArguments[i].ContainsGenericParameter)
                             dummyGenericInstance = true;
                         if (val != null)
                             genericArguments[i] = new KeyValuePair<string, IType>(key, val);

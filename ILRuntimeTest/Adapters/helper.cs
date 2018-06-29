@@ -14,8 +14,11 @@ namespace ILRuntimeTest.TestFramework
                 return;
             }
 
+            ILRuntime.Runtime.Enviorment.PrimitiveConverter<ILRuntimeTest.TestFramework.TestCLREnum>.ToInteger = (a) => (int)a;
+            ILRuntime.Runtime.Enviorment.PrimitiveConverter<ILRuntimeTest.TestFramework.TestCLREnum>.FromInteger = (a) => (ILRuntimeTest.TestFramework.TestCLREnum)a;
+
             // adaptor register 
-                        
+
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
             app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
             app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
@@ -47,6 +50,9 @@ namespace ILRuntimeTest.TestFramework
 
             app.DelegateManager.RegisterFunctionDelegate<System.Int32, System.Single, System.Int16, System.Double>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Boolean>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.TestCLREnum>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestFramework.TestCLREnum>();
+
 
             // delegate convertor
             app.DelegateManager.RegisterDelegateConvertor<System.Predicate<ILRuntime.Runtime.Intepreter.ILTypeInstance>>((act) =>
