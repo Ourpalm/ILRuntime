@@ -478,7 +478,7 @@ namespace ILRuntime.Reflection
         {
             get
             {
-                return type.HasGenericParameter;
+                return type.HasGenericParameter || type.GenericArguments != null;
             }
         }
 
