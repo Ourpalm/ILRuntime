@@ -330,5 +330,12 @@ namespace TestCases
             Console.WriteLine(speedUp);
             Console.WriteLine(speedUp2);
         }
+
+        public static void UnitTest_1011()
+        {
+            long value = 0;
+            value = value + 0xffffffff;
+            Console.WriteLine(value);
+        }
     }
 }
