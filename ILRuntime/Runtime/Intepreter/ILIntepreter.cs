@@ -1919,7 +1919,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             dst = Minus(dst, (int)ip->TokenLong + 1);
                                         else
                                             dst = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
+                                        StackObject valRef = *ret;                                        
                                         CopyToStack(ret, dst, mStack);
+                                        FreeStackValueType(&valRef);
                                     }
                                     else
                                     {

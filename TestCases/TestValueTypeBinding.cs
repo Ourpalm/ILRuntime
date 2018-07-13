@@ -173,5 +173,14 @@ namespace TestCases
         {
             v3 = TestVector3.One2;//
         }
+
+        static TestVectorClass vecCls = new TestVectorClass();
+
+        public static void UnitTest_10030()
+        {
+            vecCls.Vector2 += TestVector3.One2 * (0.456f - vecCls.Vector2.Y * 2);//这样会有
+
+            Console.WriteLine(vecCls.Vector2);
+        }
     }
 }
