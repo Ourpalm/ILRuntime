@@ -29,6 +29,8 @@ namespace ILRuntime.Runtime.CLRBinding
                 return true;
             if (i.IsGenericMethodDefinition)
                 return true;
+            if (i.IsConstructor && type.IsAbstract)
+                return true;
             //EventHandler is currently not supported
             var param = i.GetParameters();
             if (i.IsSpecialName)
