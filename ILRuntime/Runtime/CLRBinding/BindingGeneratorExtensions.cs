@@ -31,6 +31,8 @@ namespace ILRuntime.Runtime.CLRBinding
                 return true;
             if (i.IsConstructor && type.IsAbstract)
                 return true;
+            if (i is MethodInfo && ((MethodInfo)i).ReturnType.IsByRef)
+                return true;
             //EventHandler is currently not supported
             var param = i.GetParameters();
             if (i.IsSpecialName)
