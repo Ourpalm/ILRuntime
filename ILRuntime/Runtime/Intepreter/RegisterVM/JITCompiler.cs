@@ -82,7 +82,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     {
                         if (isInline)
                         {
-                            if (IsBranching(ins.Code))
+                            if (Optimizer.IsBranching(ins.Code))
                             {
                                 ins.Operand += inlineOffset;
                                 inlinedBranches.Add(res.Count);
@@ -95,7 +95,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             for(int i = 0; i < res.Count; i++)
             {
                 var op = res[i];
-                if (IsBranching(op.Code) && !inlinedBranches.Contains(i))
+                if (Optimizer.IsBranching(op.Code) && !inlinedBranches.Contains(i))
                 {
                     op.Operand = jumpTargets[op.Operand];
                     res[i] = op;
@@ -104,41 +104,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
             return res.ToArray();
-        }
-
-        bool IsBranching(OpCodeREnum op)
-        {
-            switch (op)
-            {
-                case OpCodeREnum.Br_S:
-                case OpCodeREnum.Br:
-                case OpCodeREnum.Brtrue:
-                case OpCodeREnum.Brtrue_S:
-                case OpCodeREnum.Brfalse:
-                case OpCodeREnum.Brfalse_S:
-                case OpCodeREnum.Blt:
-                case OpCodeREnum.Blt_S:
-                case OpCodeREnum.Blt_Un:
-                case OpCodeREnum.Blt_Un_S:
-                case OpCodeREnum.Ble:
-                case OpCodeREnum.Ble_S:
-                case OpCodeREnum.Ble_Un:
-                case OpCodeREnum.Ble_Un_S:
-                case OpCodeREnum.Bgt:
-                case OpCodeREnum.Bgt_S:
-                case OpCodeREnum.Bgt_Un:
-                case OpCodeREnum.Bgt_Un_S:
-                case OpCodeREnum.Bge:
-                case OpCodeREnum.Bge_S:
-                case OpCodeREnum.Bge_Un:
-                case OpCodeREnum.Bge_Un_S:
-                case OpCodeREnum.Beq:
-                case OpCodeREnum.Beq_S:
-                case OpCodeREnum.Bne_Un:
-                case OpCodeREnum.Bne_Un_S:
-                    return true;
-            }
-            return false;
         }
 
         void Translate(List<OpCodeR> lst, Instruction ins, short locVarRegStart, ref short baseRegIdx)

@@ -14,6 +14,40 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     partial class Optimizer
     {
+        public static bool IsBranching(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Br_S:
+                case OpCodeREnum.Br:
+                case OpCodeREnum.Brtrue:
+                case OpCodeREnum.Brtrue_S:
+                case OpCodeREnum.Brfalse:
+                case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
+                    return true;
+            }
+            return false;
+        }
         static bool GetOpcodeSourceRegister(ref OpCodeR op, bool hasReturn, out short r1, out short r2, out short r3)
         {
             r1 = -1;

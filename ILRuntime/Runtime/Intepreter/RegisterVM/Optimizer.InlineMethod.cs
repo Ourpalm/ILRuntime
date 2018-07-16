@@ -21,9 +21,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             OpCodeR start = new OpCodeR();
             start.Code = OpCodeREnum.InlineStart;
             ins.Add(start);
-            foreach (var i in body)
+            int branchStart = ins.Count;
+            int branchOffset = 0;
+            List<int> reloc = new List<int>();
+            for(int i=0;i<body.Length;i++)
             {
-                var opcode = i;
+                var opcode = body[i];
                 short r1 = 0;
                 short r2 = 0;
                 short r3 = 0;
@@ -47,16 +50,39 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     ReplaceOpcodeDest(ref opcode, (short)(r1 + baseRegIdx));
                 }
 
-                if (opcode.Code == OpCodeREnum.Ret && hasReturn)
+                if (opcode.Code == OpCodeREnum.Ret)
                 {
-                    opcode.Code = OpCodeREnum.Move;
-                    opcode.Register2 = opcode.Register1;
-                    opcode.Register1 = baseRegIdx;
+                    if (hasReturn)
+                    {
+                        opcode.Code = OpCodeREnum.Move;
+                        opcode.Register2 = opcode.Register1;
+                        opcode.Register1 = baseRegIdx;
+                        ins.Add(opcode);
+                        branchOffset++;
+                    }
+                    if (i < body.Length - 1)
+                    {
+                        reloc.Add(ins.Count);
+                        opcode.Code = OpCodeREnum.Br;
+                        ins.Add(opcode);
+                    }
+                    continue;
+                }
+
+                if (IsBranching(opcode.Code))
+                {
+                    opcode.Operand += branchOffset;
                 }
 
                 ins.Add(opcode);
             }
 
+            foreach(var i in reloc)
+            {
+                var opcode = ins[i];
+                opcode.Operand = ins.Count - branchStart;
+                ins[i] = opcode;
+            }
             start.Code = OpCodeREnum.InlineEnd;
             ins.Add(start);
         }

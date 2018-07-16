@@ -41,7 +41,10 @@ namespace TestCases
 
         static int Add(int a, int b)
         {
-            return a + b;
+            if (b < 0)
+                return a;
+            else
+                return a + b;
         }
 
         public static void UnitTest_Performance2()
