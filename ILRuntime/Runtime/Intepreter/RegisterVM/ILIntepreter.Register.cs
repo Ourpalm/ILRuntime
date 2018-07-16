@@ -460,6 +460,38 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Bge:
+                            case OpCodeREnum.Bge_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    bool transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value >= reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value >= *(long*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value >= *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value >= *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Call:
                             case OpCodeREnum.Callvirt:
                                 {

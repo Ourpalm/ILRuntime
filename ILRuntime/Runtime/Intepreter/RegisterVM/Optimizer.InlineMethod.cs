@@ -62,6 +62,21 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                     if (i < body.Length - 1)
                     {
+                        if (hasReturn)
+                        {
+                            for (int j = 0; j < ins.Count; j++)
+                            {
+                                var op2 = ins[j];
+                                if (IsBranching(op2.Code))
+                                {
+                                    if (op2.Operand >= i)
+                                    {
+                                        op2.Operand++;
+                                        ins[j] = op2;
+                                    }
+                                }
+                            }
+                        }
                         reloc.Add(ins.Count);
                         opcode.Code = OpCodeREnum.Br;
                         ins.Add(opcode);
