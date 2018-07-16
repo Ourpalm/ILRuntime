@@ -300,6 +300,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldarg_3:
                     op.Code = OpCodes.OpCodeREnum.Move;
                     op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)(code.Code - (Code.Ldarg_0));
                     break;
                 case Code.Newarr:
                     op.Register1 = (short)(baseRegIdx - 1);
@@ -357,9 +358,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Conv_U2:
                 case Code.Conv_U4:
                 case Code.Conv_U8:
+                    op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    break;
                 case Code.Box:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Pop:
                     return;

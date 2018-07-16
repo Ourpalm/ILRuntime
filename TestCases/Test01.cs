@@ -48,12 +48,13 @@ namespace TestCases
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
+            int cnt = 0;
             for (int i = 0; i < 1000000; i++)
             {
-                Add(1, 2);
+                cnt += Add(i, 2);
             }
             sw.Stop();
-            Console.WriteLine(string.Format("cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+            Console.WriteLine(string.Format("cps:{0:0}, result={1}", (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
         }
 
         public static int UnitTest_PerformanceSimple()
