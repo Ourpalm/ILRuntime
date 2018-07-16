@@ -58,55 +58,87 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             List<OpCodeR> res = new List<OpCodeR>();
             Dictionary<int, int> jumpTargets = new Dictionary<int, int>();
             int bIdx = 0;
+            HashSet<int> inlinedBranches = new HashSet<int>();
             foreach(var b in blocks)
             {
                 jumpTargets[bIdx++] = res.Count;
-                for(int idx = 0; idx < b.FinalInstructions.Count; idx++)
+                bool isInline = false;
+                int inlineOffset = 0;
+                for (int idx = 0; idx < b.FinalInstructions.Count; idx++)
                 {
                     if (b.CanRemove.Contains(idx))
                         continue;
-                    res.Add(b.FinalInstructions[idx]);
+                    var ins = b.FinalInstructions[idx];
+                    if (ins.Code == OpCodeREnum.InlineStart)
+                    {
+                        isInline = true;
+                        inlineOffset = res.Count;
+                    }
+                    else if (ins.Code == OpCodeREnum.InlineEnd)
+                    {
+                        isInline = false;
+                    }
+                    else
+                    {
+                        if (isInline)
+                        {
+                            if (IsBranching(ins.Code))
+                            {
+                                ins.Operand += inlineOffset;
+                                inlinedBranches.Add(res.Count);
+                            }
+                        }
+                        res.Add(ins);
+                    }
                 }
             }
             for(int i = 0; i < res.Count; i++)
             {
                 var op = res[i];
-                switch (op.Code)
+                if (IsBranching(op.Code) && !inlinedBranches.Contains(i))
                 {
-                    case OpCodeREnum.Br_S:
-                    case OpCodeREnum.Br:
-                    case OpCodeREnum.Brtrue:
-                    case OpCodeREnum.Brtrue_S:
-                    case OpCodeREnum.Brfalse:
-                    case OpCodeREnum.Brfalse_S:
-                    case OpCodeREnum.Blt:
-                    case OpCodeREnum.Blt_S:
-                    case OpCodeREnum.Blt_Un:
-                    case OpCodeREnum.Blt_Un_S:
-                    case OpCodeREnum.Ble:
-                    case OpCodeREnum.Ble_S:
-                    case OpCodeREnum.Ble_Un:
-                    case OpCodeREnum.Ble_Un_S:
-                    case OpCodeREnum.Bgt:
-                    case OpCodeREnum.Bgt_S:
-                    case OpCodeREnum.Bgt_Un:
-                    case OpCodeREnum.Bgt_Un_S:
-                    case OpCodeREnum.Bge:
-                    case OpCodeREnum.Bge_S:
-                    case OpCodeREnum.Bge_Un:
-                    case OpCodeREnum.Bge_Un_S:
-                    case OpCodeREnum.Beq:
-                    case OpCodeREnum.Beq_S:
-                    case OpCodeREnum.Bne_Un:
-                    case OpCodeREnum.Bne_Un_S:
-                        op.Operand = jumpTargets[op.Operand];
-                        res[i] = op;
-                        break;
+                    op.Operand = jumpTargets[op.Operand];
+                    res[i] = op;
                 }
             }
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
             return res.ToArray();
+        }
+
+        bool IsBranching(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Br_S:
+                case OpCodeREnum.Br:
+                case OpCodeREnum.Brtrue:
+                case OpCodeREnum.Brtrue_S:
+                case OpCodeREnum.Brfalse:
+                case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
+                    return true;
+            }
+            return false;
         }
 
         void Translate(List<OpCodeR> lst, Instruction ins, short locVarRegStart, ref short baseRegIdx)
@@ -194,7 +226,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Newobj:
                     {
                         baseRegIdx++;
-                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet);
+                        bool canInline;
+                        ILMethod toInline;
+                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
                         for (int i = pCnt - 1; i > 0; i--)
                         {
                             OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
@@ -209,17 +243,33 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Call:
                 case Code.Callvirt:
                     {
-                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet);
-                        for (int i = pCnt; i > 0; i--)
+                        bool canInline;
+                        ILMethod toInline;
+                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
+
+                        if (!canInline)
                         {
-                            OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
-                            op2.Code = OpCodes.OpCodeREnum.Push;
-                            op2.Register1 = (short)(baseRegIdx - i);
-                            lst.Add(op2);
+                            for (int i = pCnt; i > 0; i--)
+                            {
+                                OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
+                                op2.Code = OpCodes.OpCodeREnum.Push;
+                                op2.Register1 = (short)(baseRegIdx - i);
+                                lst.Add(op2);
+                            }
+
+                            baseRegIdx -= (short)pCnt;
+
+                            if (hasRet)
+                                op.Register1 = baseRegIdx++;
                         }
-                        baseRegIdx -= (short)pCnt;
-                        if (hasRet)
-                            op.Register1 = baseRegIdx++;
+                        else
+                        {
+                            baseRegIdx -= (short)pCnt;
+                            Optimizer.InlineMethod(lst, toInline, baseRegIdx, hasRet);
+                            if (hasRet)
+                                baseRegIdx++;
+                            return;
+                        }
                     }
                     break;
                 case Code.Stsfld:
@@ -375,11 +425,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
 
         
-        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn)
+        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline, out ILMethod toInline)
         {
             bool invalidToken;
             int pCnt = 0;
             var m = appdomain.GetMethod(token, declaringType, method, out invalidToken);
+            toInline = null;
+            canInline = false;
             if (m != null)
             {
                 if (invalidToken)
@@ -390,6 +442,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 if (!m.IsStatic)
                     pCnt++;
                 hasReturn = m.ReturnType != appdomain.VoidType;
+                if(m is ILMethod)
+                {
+                    if (((ILMethod)m).BodyRegister.Length <= Optimizer.MaximalInlineInstructionCount)
+                    {
+                        canInline = true;
+                        toInline = (ILMethod)m;
+                    }
+                }
             }
             else
             {

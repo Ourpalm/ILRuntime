@@ -888,5 +888,13 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         /// 将指定寄存器的值压入栈
         /// </summary>
         Push,
+        /// <summary>
+        /// 内联开始
+        /// </summary>
+        InlineStart,
+        /// <summary>
+        /// 内联结束
+        /// </summary>
+        InlineEnd,
     }
 }

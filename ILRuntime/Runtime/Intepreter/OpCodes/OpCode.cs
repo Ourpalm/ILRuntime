@@ -70,6 +70,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Move:
                     param = string.Format("r{0},r{1}", Register1, Register2);
                     break;
+                case OpCodeREnum.Box:
+                    param = string.Format("r{0},r{1},{2}", Register1, Register2, Operand);
+                    break;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
                 case OpCodeREnum.Add_Ovf_Un:

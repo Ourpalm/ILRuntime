@@ -82,6 +82,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Br_S:
                 case OpCodeREnum.Br:
                 case OpCodeREnum.Nop:
+                case OpCodeREnum.InlineStart:
+                case OpCodeREnum.InlineEnd:
                     return false;
                 case OpCodeREnum.Brtrue:
                 case OpCodeREnum.Brtrue_S:
@@ -236,6 +238,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Nop:
                 case OpCodeREnum.Ret:
                 case OpCodeREnum.Push:
+                case OpCodeREnum.InlineStart:
+                case OpCodeREnum.InlineEnd:
                     return false;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:

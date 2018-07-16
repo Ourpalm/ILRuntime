@@ -21,12 +21,24 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 var lst = b.FinalInstructions;
                 HashSet<int> canRemove = b.CanRemove;
                 HashSet<int> pendingFCP = b.PendingCP;
-
+                bool isInline = false;
                 for (int i = 0; i < lst.Count; i++)
                 {
                     if (canRemove.Contains(i))
                         continue;
                     OpCodeR X = lst[i];
+                    if(X.Code == OpCodeREnum.InlineStart)
+                    {
+                        isInline = true;
+                        continue;
+                    }
+                    if (X.Code == OpCodeREnum.InlineEnd)
+                    {
+                        isInline = false;
+                        continue;
+                    }
+                    if (isInline)
+                        continue;
                     if (X.Code == OpCodeREnum.Nop)
                     {
                         canRemove.Add(i);
@@ -54,7 +66,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
                             {
                                 bool replaced = false;
-                                if (ySrc > 0 && ySrc == xDst)
+                                if (ySrc >= 0 && ySrc == xDst)
                                 {
                                     if (postPropagation)
                                     {
@@ -65,7 +77,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     ReplaceOpcodeSource(ref Y, 0, xSrc);
                                     replaced = true;
                                 }
-                                if (ySrc2 > 0 && ySrc2 == xDst)
+                                if (ySrc2 >= 0 && ySrc2 == xDst)
                                 {
                                     if (postPropagation)
                                     {
@@ -76,7 +88,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     ReplaceOpcodeSource(ref Y, 1, xSrc);
                                     replaced = true;
                                 }
-                                if (ySrc3 > 0 && ySrc3 == xDst)
+                                if (ySrc3 >= 0 && ySrc3 == xDst)
                                 {
                                     if (postPropagation)
                                     {
