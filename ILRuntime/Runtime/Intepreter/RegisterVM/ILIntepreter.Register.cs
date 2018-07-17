@@ -741,7 +741,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         if (m.ReturnType != AppDomain.VoidType)
                                         {
-                                            esp = PopToRegister(ref info, ip->Register1, esp - 1);
+                                            esp = PopToRegister(ref info, ip->Register1, esp);
                                         }
                                     }
                                 }
@@ -903,7 +903,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                         }
                                     }
-                                    esp = PopToRegister(ref info, ip->Register1, esp - 1);
+                                    esp = PopToRegister(ref info, ip->Register1, esp);
                                 }
                                 break;
                             case OpCodeREnum.Box:
