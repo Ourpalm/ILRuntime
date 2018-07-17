@@ -166,6 +166,13 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     try
                     {
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                        if (ShouldBreak)
+                            Break();
+                        var insOffset = (int)(ip - ptr);
+                        frame.Address.Value = insOffset;
+                        AppDomain.DebugService.CheckShouldBreak(method, this, insOffset);
+#endif
                         code = ip->Code;
                         switch (code)
                         {
@@ -235,6 +242,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
 
                             case OpCodeREnum.Ldc_I4:
+                            case OpCodeREnum.Ldc_I4_S:
                                 reg1 = Add(r, ip->Register1);
                                 reg1->ObjectType = ObjectTypes.Integer;
                                 reg1->Value = ip->Operand;
@@ -359,6 +367,92 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg1 = Add(r, ip->Register1);
                                     CopyToStack(esp, reg1, mStack);
                                     esp++;
+                                }
+                                break;
+                            case OpCodeREnum.Ldloca:
+                            case OpCodeREnum.Ldloca_S:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+
+                                    reg2->ObjectType = ObjectTypes.StackObjectReference;
+                                    *(StackObject**)&reg2->Value = reg1;
+                                }
+                                break;
+                            case OpCodeREnum.Ldind_I:
+                            case OpCodeREnum.Ldind_I1:
+                            case OpCodeREnum.Ldind_I2:
+                            case OpCodeREnum.Ldind_I4:
+                            case OpCodeREnum.Ldind_U1:
+                            case OpCodeREnum.Ldind_U2:
+                            case OpCodeREnum.Ldind_U4:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    var val = GetObjectAndResolveReference(reg1);
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                //LoadFromFieldReference(instance, idx, reg2, mStack);
+                                                throw new NotImplementedException();
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                //LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+
+                                                throw new NotImplementedException();
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                reg2->ObjectType = ObjectTypes.Integer;
+                                                reg2->Value = val->Value;
+                                                reg2->ValueLow = 0;
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stind_I:
+                            case OpCodeREnum.Stind_I1:
+                            case OpCodeREnum.Stind_I2:
+                            case OpCodeREnum.Stind_I4:
+                            case OpCodeREnum.Stind_R4:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    var dst = GetObjectAndResolveReference(reg2);
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                //StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                                throw new NotImplementedException();
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                //StoreValueToArrayReference(dst, val, mStack[dst->Value].GetType().GetElementType(), mStack);
+                                                throw new NotImplementedException();
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->Value = reg1->Value;
+                                            }
+                                            break;
+                                    }
+                                    /*Free(esp - 1);
+                                    Free(esp - 1 - 1);
+                                    esp = esp - 1 - 1;*/
                                 }
                                 break;
                             #endregion
@@ -1201,7 +1295,8 @@ namespace ILRuntime.Runtime.Intepreter
 
             if (reg < argCnt + locCnt)
             {
-                StLocSub(val, dst, reg - argCnt, mStack);
+                var idx = info.LocalManagedBase + (reg - argCnt);
+                StLocSub(val, dst, idx, mStack);
             }
             else
             {

@@ -289,6 +289,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = (short)(locVarRegStart + 3);
                     op.Register2 = --baseRegIdx;
                     break;
+                case Code.Stloc_S:
+                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Register1 = (short)(locVarRegStart + ((VariableDefinition)ins.Operand).Index);
+                    op.Register2 = --baseRegIdx;
+                    break;
                 case Code.Ldloc_0:
                     op.Code = OpCodes.OpCodeREnum.Move;
                     op.Register1 = baseRegIdx++;
@@ -309,6 +314,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + 3);
                     break;
+                case Code.Ldloc:
+                case Code.Ldloc_S:
+                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)(locVarRegStart + ((VariableDefinition)ins.Operand).Index);
+                    break;
+                case Code.Ldloca:
+                case Code.Ldloca_S:
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)(locVarRegStart + ((VariableDefinition)ins.Operand).Index);
+                    break;
                 case Code.Ldarg_0:
                 case Code.Ldarg_1:
                 case Code.Ldarg_2:
@@ -326,6 +342,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Register1 = baseRegIdx++;
                     break;
+                case Code.Ldind_I:
+                case Code.Ldind_I2:
+                case Code.Ldind_I4:
+                case Code.Ldind_I8:
+                case Code.Ldind_R4:
+                case Code.Ldind_R8:
+                case Code.Ldind_U1:
+                case Code.Ldind_U2:
+                case Code.Ldind_U4:
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Register1 = baseRegIdx++;
+                    break;
                 case Code.Stelem_I:
                 case Code.Stelem_I1:
                 case Code.Stelem_I2:
@@ -339,6 +367,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = (short)(baseRegIdx - 2);
                     op.Register3 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 3;
+                    break;
+                case Code.Stind_I:
+                case Code.Stind_I1:
+                case Code.Stind_I2:
+                case Code.Stind_I4:
+                case Code.Stind_I8:
+                case Code.Stind_R4:
+                case Code.Stind_R8:                    
+                    op.Register1 = (short)(baseRegIdx - 2);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    baseRegIdx -= 2;
                     break;
                 case Code.Conv_I:
                 case Code.Conv_I1:
