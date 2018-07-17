@@ -248,9 +248,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 reg1->Value = ip->Operand;
                                 break;
                             case OpCodeREnum.Ldstr:
-                                PushObject(esp, mStack, AppDomain.GetString(ip->OperandLong));
-                                CopyToRegister(ref info, ip->Register1, esp);
-                                Free(esp);
+                                PushToRegister(ref info, ip->Register1, AppDomain.GetString(ip->OperandLong));
                                 break;
                             #endregion
 
