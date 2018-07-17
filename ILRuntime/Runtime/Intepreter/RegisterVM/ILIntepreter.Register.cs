@@ -741,10 +741,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         if (m.ReturnType != AppDomain.VoidType)
                                         {
-                                            var a = esp - 1;
-                                            CopyToRegister(ref info, ip->Register1, a);
-                                            Free(a);
-                                            esp = a;
+                                            esp = PopToRegister(ref info, ip->Register1, esp - 1);
                                         }
                                     }
                                 }
@@ -833,9 +830,6 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 
                                                 esp = PushObject(a, mStack, obj);//new constructedObj
-                                                CopyToRegister(ref info, ip->Register1, a);
-                                                Free(a);
-                                                esp = a;
                                             }
                                         }
                                         if (unhandledException)
@@ -906,13 +900,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     esp = Minus(esp, paramCount);
                                                     esp = PushObject(esp, mStack, result);//new constructedObj
                                                 }
-
-                                                esp--;
-                                                CopyToRegister(ref info, ip->Register1, esp);
-                                                Free(esp);
                                             }
                                         }
                                     }
+                                    esp = PopToRegister(ref info, ip->Register1, esp - 1);
                                 }
                                 break;
                             case OpCodeREnum.Box:
