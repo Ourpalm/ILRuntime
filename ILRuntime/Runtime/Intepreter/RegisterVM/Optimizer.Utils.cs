@@ -101,6 +101,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldlen:
+                case OpCodeREnum.Newarr:
                     r1 = op.Register2;
                     return true;
                 case OpCodeREnum.Stind_I:
@@ -189,6 +191,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     r1 = op.Register2;
                     r2 = op.Register3;
                     return true;
+                case OpCodeREnum.Stelem_I:
+                case OpCodeREnum.Stelem_I1:
+                case OpCodeREnum.Stelem_I2:
+                case OpCodeREnum.Stelem_I4:
+                case OpCodeREnum.Stelem_I8:
+                case OpCodeREnum.Stelem_R4:
+                case OpCodeREnum.Stelem_R8:
+                case OpCodeREnum.Stelem_Ref:
+                    r1 = op.Register1;
+                    r2 = op.Register2;
+                    r3 = op.Register3;
+                    return true;
                 case OpCodeREnum.Ret:
                     if (hasReturn)
                     {
@@ -273,6 +287,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldlen:
+                case OpCodeREnum.Newarr:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Br_S:
@@ -313,6 +329,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_I8:
                 case OpCodeREnum.Stind_R4:
                 case OpCodeREnum.Stind_R8:
+                case OpCodeREnum.Stelem_I:
+                case OpCodeREnum.Stelem_I1:
+                case OpCodeREnum.Stelem_I2:
+                case OpCodeREnum.Stelem_I4:
+                case OpCodeREnum.Stelem_I8:
+                case OpCodeREnum.Stelem_R4:
+                case OpCodeREnum.Stelem_R8:
+                case OpCodeREnum.Stelem_Ref:
                     return false;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
@@ -387,6 +411,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldlen:
+                case OpCodeREnum.Newarr:
                     op.Register2 = src;
                     break;
 
@@ -431,6 +457,30 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.Register2 = src;
                             break;
                         case 1:
+                            op.Register3 = src;
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                    break;
+
+                case OpCodeREnum.Stelem_I:
+                case OpCodeREnum.Stelem_I1:
+                case OpCodeREnum.Stelem_I2:
+                case OpCodeREnum.Stelem_I4:
+                case OpCodeREnum.Stelem_I8:
+                case OpCodeREnum.Stelem_R4:
+                case OpCodeREnum.Stelem_R8:
+                case OpCodeREnum.Stelem_Ref:
+                    switch (idx)
+                    {
+                        case 0:
+                            op.Register1 = src;
+                            break;
+                        case 1:
+                            op.Register2 = src;
+                            break;
+                        case 2:
                             op.Register3 = src;
                             break;
                         default:
@@ -569,6 +619,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldlen:
+                case OpCodeREnum.Newarr:
                     op.Register1 = dst;
                     break;
                 case OpCodeREnum.Br_S:

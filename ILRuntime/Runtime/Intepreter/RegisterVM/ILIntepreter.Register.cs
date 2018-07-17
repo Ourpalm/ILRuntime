@@ -324,6 +324,37 @@ namespace ILRuntime.Runtime.Intepreter
                             #endregion
 
                             #region Conversion
+                            case OpCodeREnum.Conv_I4:
+                            case OpCodeREnum.Conv_I:
+                            case OpCodeREnum.Conv_Ovf_I:
+                            case OpCodeREnum.Conv_Ovf_I_Un:
+                            case OpCodeREnum.Conv_Ovf_I4:
+                            case OpCodeREnum.Conv_Ovf_I4_Un:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    int val;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val = (int)*(long*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            val = (int)*(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            val = (int)*(double*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            val = reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Integer;
+                                    reg2->Value = val;
+                                }
+                                break;
                             case OpCodeREnum.Conv_I8:
                             case OpCodeREnum.Conv_Ovf_I8:
                             case OpCodeREnum.Conv_Ovf_I8_Un:
@@ -1199,6 +1230,74 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             #endregion
 
+                            #region Array
+                            case OpCodeREnum.Newarr:
+                                {
+                                    reg2 = Add(r, ip->Register2);
+                                    var type = domain.GetType(ip->Operand);
+                                    object arr = null;
+                                    if (type != null)
+                                    {
+                                        if (type.TypeForCLR != typeof(ILTypeInstance))
+                                        {
+                                            if (type is CLRType)
+                                            {
+                                                arr = ((CLRType)type).CreateArrayInstance(reg2->Value);
+                                            }
+                                            else
+                                            {
+                                                arr = Array.CreateInstance(type.TypeForCLR, reg2->Value);
+                                            }
+
+                                            //Register Type
+                                            AppDomain.GetType(arr.GetType());
+                                        }
+                                        else
+                                        {
+                                            arr = new ILTypeInstance[reg2->Value];
+                                            ILTypeInstance[] ilArr = (ILTypeInstance[])arr;
+                                            if (type.IsValueType)
+                                            {
+                                                for (int i = 0; i < reg2->Value; i++)
+                                                {
+                                                    ilArr[i] = ((ILType)type).Instantiate(true);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    PushToRegister(ref info, ip->Register1, arr);
+                                }
+                                break;
+                            case OpCodeREnum.Stelem_I4:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    int[] arr = mStack[reg1->Value] as int[];
+                                    if (arr != null)
+                                    {
+                                        arr[reg2->Value] = reg3->Value;
+                                    }
+                                    else
+                                    {
+                                        uint[] arr2 = mStack[reg1->Value] as uint[];
+                                        arr2[reg2->Value] = (uint)reg3->Value;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldlen:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    Array arr = mStack[reg2->Value] as Array;
+
+                                    reg1->ObjectType = ObjectTypes.Integer;
+                                    reg1->Value = arr.Length;
+                                }
+                                break;
+                            #endregion
+
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
@@ -1305,10 +1404,26 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     var idx = info.LocalManagedBase + locCnt + (reg - argCnt - locCnt);
                     dst->Value = idx;
-                    var obj = mStack[val->Value];
+                    var obj = CheckAndCloneValueType(mStack[val->Value], domain);
                     mStack[idx] = obj;
                 }
             }
+        }
+
+        void PushToRegister(ref RegisterFrameInfo info, short reg, object obj)
+        {
+            var argCnt = info.ParameterCount;
+            var mStack = info.ManagedStack;
+            var locCnt = info.LocalCount;
+
+            if (reg < argCnt)
+                throw new NotImplementedException();
+            var dst = Add(info.RegisterStart, reg);
+
+            dst->ObjectType = ObjectTypes.Object;
+            var idx = info.LocalManagedBase + (reg - argCnt);
+            dst->Value = idx;
+            mStack[idx] = obj;
         }
 
         StackObject* PopToRegister(ref RegisterFrameInfo info, short reg, StackObject* esp)

@@ -51,10 +51,6 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public short Register4;
         [FieldOffset(12)]
         public int Operand2;
-        [FieldOffset(12)]
-        public short Register5;
-        [FieldOffset(14)]
-        public short Register6;
         [FieldOffset(16)]
         public int Operand3;
         [FieldOffset(12)]

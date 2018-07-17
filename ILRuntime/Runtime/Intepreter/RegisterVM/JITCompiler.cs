@@ -335,6 +335,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Newarr:
                     op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Dup:
@@ -412,6 +413,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Conv_U2:
                 case Code.Conv_U4:
                 case Code.Conv_U8:
+                case Code.Ldlen:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     break;
