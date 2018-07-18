@@ -11,6 +11,8 @@ namespace ILRuntime.Runtime.CLRBinding
     {
         internal static string GenerateMethodRegisterCode(this Type type, MethodInfo[] methods, HashSet<MethodBase> excludes)
         {
+            MethodInfo[] allMethods = type.GetMethods();
+            
             StringBuilder sb = new StringBuilder();
             int idx = 0;
             bool isMethodsGot = false;
@@ -103,7 +105,12 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     sb2.Append("}");
                     sb.AppendLine(string.Format("            args = new Type[]{0};", sb2));
-                    sb.AppendLine(string.Format("            method = methods.Where(t => t.Name.Equals(\"{0}\") && t.CheckMethodParams(args)).Single();", i.Name));
+
+                    // Check for a generic method with the same name
+                    if (allMethods.Any(m => m.Name.Equals(i.Name) && m.IsGenericMethod))
+                        sb.AppendLine(string.Format("            method = methods.Where(t => t.Name.Equals(\"{0}\") && t.CheckMethodParams(args)).Single();", i.Name));
+                    else
+                        sb.AppendLine(string.Format("            method = type.GetMethod(\"{0}\", flag, null, args, null);", i.Name));
                     sb.AppendLine(string.Format("            app.RegisterCLRMethodRedirection(method, {0}_{1});", i.Name, idx));
                 }
 
