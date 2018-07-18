@@ -84,6 +84,8 @@ namespace ILRuntime.Runtime.CLRBinding
                 }
                 else
                 {
+                    string clsName, realClsName;
+                    bool isByRef;
                     var param = i.GetParameters();
                     StringBuilder sb2 = new StringBuilder();
                     sb2.Append("{");
@@ -95,8 +97,6 @@ namespace ILRuntime.Runtime.CLRBinding
                         else
                             sb2.Append(", ");
                         sb2.Append("typeof(");
-                        string clsName, realClsName;
-                        bool isByRef;
                         j.ParameterType.GetClassName(out clsName, out realClsName, out isByRef);
                         sb2.Append(realClsName);
                         sb2.Append(")");
@@ -106,11 +106,16 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb2.Append("}");
                     sb.AppendLine(string.Format("            args = new Type[]{0};", sb2));
 
+                    i.ReturnType.GetClassName(out clsName, out realClsName, out isByRef);
+                    // Type conversions can have different return types
+                    if ((i.Name.Equals("op_Implicit") || i.Name.Equals("op_Explicit")) && allMethods.Count(m => m.Name.Equals(i.Name)) > 1)
+                        sb.AppendLine(string.Format("            method = methods.Where(t => t.Name.Equals(\"{0}\") && t.ReturnType == typeof({1}) && t.CheckMethodParams(args)).Single();", i.Name, realClsName));
                     // Check for a generic method with the same name
-                    if (allMethods.Any(m => m.Name.Equals(i.Name) && m.IsGenericMethod))
+                    else if (allMethods.Any(m => m.Name.Equals(i.Name) && m.IsGenericMethod))
                         sb.AppendLine(string.Format("            method = methods.Where(t => t.Name.Equals(\"{0}\") && t.CheckMethodParams(args)).Single();", i.Name));
                     else
                         sb.AppendLine(string.Format("            method = type.GetMethod(\"{0}\", flag, null, args, null);", i.Name));
+
                     sb.AppendLine(string.Format("            app.RegisterCLRMethodRedirection(method, {0}_{1});", i.Name, idx));
                 }
 
