@@ -1172,6 +1172,30 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
+        public int GetStaticFieldSizeInMemory(HashSet<object> traversed)
+        {
+            return staticInstance != null ? staticInstance.GetSizeInMemory(traversed) : 0;
+        }
+
+        public unsafe int GetMethodBodySizeInMemory()
+        {
+            int size = 0;
+            if(methods != null)
+            {
+                foreach(var i in methods)
+                {
+                    foreach(var j in i.Value)
+                    {
+                        if (j.HasBody)
+                        {
+                            size += j.Body.Length * sizeof(Runtime.Intepreter.OpCodes.OpCode);
+                        }
+                    }
+                }
+            }
+            return size;
+        }
+
         public override int GetHashCode()
         {
             if (hashCode == -1)
