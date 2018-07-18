@@ -251,6 +251,22 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        const int SizeOfILTypeInstance = 21;
+        public unsafe int GetSizeInMemory(HashSet<object> traversedObj)
+        {
+            traversedObj.Add(this);
+            var size = SizeOfILTypeInstance + sizeof(StackObject) * fields.Length;
+            size += managedObjs.Count * 4;
+            foreach (var i in managedObjs)
+            {
+                if (i is ILTypeInstance)
+                {
+                    size += ((ILTypeInstance)i).GetSizeInMemory(traversedObj);
+                }
+            }
+            return size;
+        }
+
         void InitializeFields(ILType type)
         {
             for (int i = 0; i < type.FieldTypes.Length; i++)
