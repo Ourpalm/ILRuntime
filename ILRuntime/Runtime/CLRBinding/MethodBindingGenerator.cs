@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Linq;
 using System.Text;
 using ILRuntime.Runtime.Enviorment;
+using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.CLRBinding
 {
@@ -114,9 +115,9 @@ namespace ILRuntime.Runtime.CLRBinding
                         needMethods = true;
                         sb.AppendLine(string.Format("            method = methods.Where(t => t.Name.Equals(\"{0}\") && t.ReturnType == typeof({1}) && t.CheckMethodParams(args)).Single();", i.Name, realClsName));
                     }
-                    else if (allMethods.Any(m => m.Name.Equals(i.Name) && m.IsGenericMethod))
+                    else if (allMethods.Any(m => m.IsGenericMethod && m.Name.Equals(i.Name) && m.CheckMethodParams(param)))
                     {
-                        // Check for a generic method with the same name
+                        // Check for a generic method with the same name and params
                         needMethods = true;
                         sb.AppendLine(string.Format("            method = methods.Where(t => t.Name.Equals(\"{0}\") && t.CheckMethodParams(args)).Single();", i.Name));
                     }else
