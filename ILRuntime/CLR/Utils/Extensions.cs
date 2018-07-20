@@ -279,7 +279,23 @@ namespace ILRuntime.CLR.Utils
             if (arr.Length != args.Length) return false;
             for (var i = 0; i < args.Length; i++)
             {
-                if (arr[i].ParameterType != args[i])
+                var t1 = arr[i].ParameterType;
+                var t2 = args[i];
+                if (t1 != t2 || t1.IsByRef != t2.IsByRef)
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool CheckMethodParams(this MethodInfo m, ParameterInfo[] args)
+        {
+            var arr = m.GetParameters();
+            if (arr.Length != args.Length) return false;
+            for (var i = 0; i < args.Length; i++)
+            {
+                var t1 = arr[i].ParameterType;
+                var t2 = args[i].ParameterType;
+                if (t1 != t2 || t1.IsByRef != t2.IsByRef)
                     return false;
             }
             return true;
