@@ -41,6 +41,15 @@ namespace ILRuntime.Runtime.Enviorment
                 throw new NotSupportedException();
         }
 
+        public void RegisterMethodDelegate()
+        {
+            DelegateMapNode node = new Enviorment.DelegateManager.DelegateMapNode();
+            node.Adapter = new MethodDelegateAdapter();
+            node.ParameterTypes = new Type[0];
+            methods.Add(node);
+            RegisterDelegateConvertor<Action>(defaultConverter);
+        }
+
         public void RegisterMethodDelegate<T1>()
         {
             DelegateMapNode node = new Enviorment.DelegateManager.DelegateMapNode();
