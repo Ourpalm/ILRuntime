@@ -366,5 +366,16 @@ namespace ILRuntime.Runtime.CLRBinding
                 sb.AppendLine(string.Format("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method{0});", isBox));
             }
         }
+
+        internal static bool HasByRefParam(this ParameterInfo[] param)
+        {
+            for (int j = param.Length; j > 0; j--)
+            {
+                var p = param[j - 1];
+                if (p.ParameterType.IsByRef)
+                    return true;
+            }
+            return false;
+        }
     }
 }

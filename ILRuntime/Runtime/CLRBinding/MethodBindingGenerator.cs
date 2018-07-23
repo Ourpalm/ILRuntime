@@ -130,17 +130,6 @@ namespace ILRuntime.Runtime.CLRBinding
             }
             return sb.ToString();
         }
-
-        static bool HasByRefParam(ParameterInfo[] param)
-        {
-            for (int j = param.Length; j > 0; j--)
-            {
-                var p = param[j - 1];
-                if (p.ParameterType.IsByRef)
-                    return true;
-            }
-            return false;
-        }
     
         internal static string GenerateMethodWraperCode(this Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes, List<Type> valueTypeBinders)
         {
@@ -165,7 +154,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb.AppendLine("            StackObject* ptr_of_this_method;");
                 sb.AppendLine(string.Format("            StackObject* __ret = ILIntepreter.Minus(__esp, {0});", paramCnt));
                 sb.AppendLine();
-                bool hasByRef = HasByRefParam(param);
+                bool hasByRef = param.HasByRefParam();
                 string shouldFreeParam = hasByRef ? "false" : "true";
                 for (int j = param.Length; j > 0; j--)
                 {
@@ -563,7 +552,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     else if(pt.IsValueType && !pt.IsPrimitive)
                     {
-
+                        sb.AppendLine("            __intp.FreeStackValueType(ptr_of_this_method);");
                     }
 
                     sb.AppendLine("            __intp.Free(ptr_of_this_method);");
