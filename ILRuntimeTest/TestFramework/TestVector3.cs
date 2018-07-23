@@ -56,6 +56,7 @@ namespace ILRuntimeTest.TestFramework
     public class TestVectorClass
     {
         public TestVector3 vector;
+        public TestVector3 Vector2 { get; set; } = TestVector3.One * 0.33f;
     }
 
     public struct TestVectorStruct

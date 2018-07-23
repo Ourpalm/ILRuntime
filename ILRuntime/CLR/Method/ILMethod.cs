@@ -199,6 +199,14 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public bool HasBody
+        {
+            get
+            {
+                return body != null;
+            }
+        }
+
         public int LocalVariableCount
         {
             get

@@ -217,5 +217,41 @@ namespace TestCases
                 Console.WriteLine(i);
             }
         }
+        class SystemType
+        {
+            public int value = 10;
+        }
+
+        class TestConstructor
+        {
+            int[] ArrayTest = null;
+            TestEnum[] ArrayTest2 = new TestEnum[9];
+            TestEnum[] ArrayTest3 = null;
+            SystemType ReferenceTest1 = null;
+            public void ArrayLengthTest()
+            {
+                if (ArrayTest == null)
+                    ArrayTest = new int[5];
+                Console.WriteLine(string.Format("Int array type {0}", ArrayTest.GetType().Name));
+                Console.WriteLine(string.Format("Int array length {0}", ArrayTest.Length));
+                if (ArrayTest2 == null)
+                    ArrayTest2 = new TestEnum[10];
+                Console.WriteLine(string.Format("Enum array type {0}", ArrayTest2.GetType().Name));
+                Console.WriteLine(string.Format("Enum array length {0}", ArrayTest2.Length));
+                if (ReferenceTest1 == null)
+                    ReferenceTest1 = new SystemType();
+                Console.WriteLine(string.Format("SystemType type {0}", ReferenceTest1.GetType().Name));
+                Console.WriteLine(string.Format("SystemType va {0}", ReferenceTest1.value));
+                if (ArrayTest3 == null)
+                    ArrayTest3 = new TestEnum[15];
+                Console.WriteLine(string.Format("Enum array type {0}", ArrayTest3.GetType().Name));
+                Console.WriteLine(string.Format("Enum array length {0}", ArrayTest3.Length));
+            }
+        }
+        public static void Test15()
+        {
+            TestConstructor test = new TestConstructor();
+            test.ArrayLengthTest();
+        }
     }
 }

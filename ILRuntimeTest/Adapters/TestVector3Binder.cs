@@ -74,6 +74,7 @@ namespace ILRuntimeTest.TestFramework
                 x2 = *(float*)&ILIntepreter.Minus(src, 1)->Value;
                 y2 = *(float*)&ILIntepreter.Minus(src, 2)->Value;
                 z2 = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+                intp.FreeStackValueType(ptrB);
             }
             else
             {
@@ -92,6 +93,8 @@ namespace ILRuntimeTest.TestFramework
                 x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
                 y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
                 z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+
+                intp.FreeStackValueType(ptrA);
             }
             else
             {
@@ -131,6 +134,7 @@ namespace ILRuntimeTest.TestFramework
                 x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
                 y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
                 z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+                intp.FreeStackValueType(ptr);
             }
             else
             {
