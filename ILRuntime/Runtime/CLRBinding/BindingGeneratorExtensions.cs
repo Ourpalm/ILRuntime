@@ -29,6 +29,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 return true;
             if (i.IsGenericMethodDefinition)
                 return true;
+            if (i.IsConstructor && type.IsAbstract)
+                return true;
+            if (i is MethodInfo && ((MethodInfo)i).ReturnType.IsByRef)
+                return true;
             //EventHandler is currently not supported
             var param = i.GetParameters();
             if (i.IsSpecialName)
@@ -39,9 +43,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 if (t[0] == "get" || t[0] == "set")
                 {
                     Type[] ts;
-                    if (t[1] == "Item")
+                    var cnt = t[0] == "set" ? param.Length - 1 : param.Length;
+
+                    if (cnt > 0)
                     {
-                        var cnt = t[0] == "set" ? param.Length - 1 : param.Length;
                         ts = new Type[cnt];
                         for (int j = 0; j < cnt; j++)
                         {
