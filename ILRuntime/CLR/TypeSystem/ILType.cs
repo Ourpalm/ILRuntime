@@ -327,6 +327,8 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
+                if (IsArray)
+                    return false;
                 if (isValueType == null)
                     isValueType = definition.IsValueType;
 
