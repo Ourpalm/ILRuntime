@@ -199,5 +199,17 @@ namespace TestCases
                 Console.WriteLine("4");
 
         }
+
+        public static void UnitTest_10032()
+        {
+            TestVectorClass VTest = new TestVectorClass();
+
+            TestVector3 value = VTest.vector;
+            value.Normalize();
+            VTest.vector.Normalize();
+            Console.WriteLine("Vector3BindingTest local Vector3 normalized = " + value);
+            Console.WriteLine("Vector3BindingTest Vector3 normalized = " + VTest.vector);
+
+        }
     }
 }

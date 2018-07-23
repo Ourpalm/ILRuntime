@@ -21,6 +21,14 @@ namespace ILRuntimeTest.TestFramework
 
         public static TestVector3 One2 { get { return new TestVector3(1, 1, 1); } }
 
+        public void Normalize()
+        {
+            float d = (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+            X = X / d;
+            Y = Y / d;
+            Z = Z / d;
+        }
+
         public static TestVector3 operator +(TestVector3 a, TestVector3 b)
         {
             TestVector3 res = new TestVector3();
@@ -55,7 +63,7 @@ namespace ILRuntimeTest.TestFramework
 
     public class TestVectorClass
     {
-        public TestVector3 vector;
+        public TestVector3 vector = new TestVector3(20f, 10f, 1f);
         public TestVector3 Vector2 { get; set; } = TestVector3.One * 0.33f;
     }
 

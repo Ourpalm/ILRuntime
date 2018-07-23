@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -34,6 +35,9 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3).MakeByRefType(), typeof(System.Single).MakeByRefType()};
             method = type.GetMethod("Test", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Test_3);
+            args = new Type[]{};
+            method = type.GetMethod("Normalize", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Normalize_4);
 
             field = type.GetField("One", flag);
             app.RegisterCLRFieldGetter(field, get_One_0);
@@ -311,6 +315,32 @@ namespace ILRuntime.Runtime.Generated
                         instance_of_arrayReference[ptr_of_this_method->ValueLow] = a;
                     }
                     break;
+            }
+
+            return __ret;
+        }
+
+        static StackObject* Normalize_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ILRuntimeTest.TestFramework.TestVector3 instance_of_this_method = new ILRuntimeTest.TestFramework.TestVector3();
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref instance_of_this_method, __intp, ptr_of_this_method, __mStack);
+            } else {
+                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+                instance_of_this_method = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            }
+
+            instance_of_this_method.Normalize();
+
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            } else {
+                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
             }
 
             return __ret;
