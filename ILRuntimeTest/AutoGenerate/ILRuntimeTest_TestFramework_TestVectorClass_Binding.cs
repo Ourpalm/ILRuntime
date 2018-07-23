@@ -70,7 +70,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ILRuntimeTest.TestFramework.TestVector3 @value = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @value, __intp, ptr_of_this_method, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @value, __intp, ptr_of_this_method, __mStack, true);
             } else {
                 @value = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
                 __intp.Free(ptr_of_this_method);
