@@ -182,5 +182,22 @@ namespace TestCases
 
             Console.WriteLine(vecCls.Vector2);
         }
+
+        public static void UnitTest_10031()
+        {
+            TestVector3 pos = TestVector3.One2;
+            float offsetX = pos.X - 0.1f;
+            float offsetY = pos.Y - 0.1f;//报错行数在这里
+            if (offsetX > 1)
+                Console.WriteLine("1");
+            else if (offsetX < -1)
+                Console.WriteLine("2");
+            //注释下面的代码就不会出错了
+            else if (offsetY > 1)
+                Console.WriteLine("3");
+            else if (offsetY < -1)
+                Console.WriteLine("4");
+
+        }
     }
 }

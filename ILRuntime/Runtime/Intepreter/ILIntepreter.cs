@@ -1972,8 +1972,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             fieldAddr = Minus(*(StackObject**)&objRef->Value, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
                                         }
+                                        StackObject valRef = *dst;
                                         dst->ObjectType = ObjectTypes.StackObjectReference;
                                         *(StackObject**)&dst->Value = fieldAddr;
+                                        FreeStackValueType(&valRef);
                                     }
                                     else
                                     {
@@ -4028,11 +4030,18 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Dup:
                                 {
                                     var obj = esp - 1;
-                                    *esp = *obj;
-                                    if (esp->ObjectType >= ObjectTypes.Object)
+                                    if (obj->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
-                                        esp->Value = mStack.Count;
-                                        mStack.Add(mStack[obj->Value]);
+                                        CloneStackValueType(obj, esp, mStack);
+                                    }
+                                    else
+                                    {
+                                        *esp = *obj;
+                                        if (esp->ObjectType >= ObjectTypes.Object)
+                                        {
+                                            esp->Value = mStack.Count;
+                                            mStack.Add(mStack[obj->Value]);
+                                        }
                                     }
                                     esp++;
                                 }
