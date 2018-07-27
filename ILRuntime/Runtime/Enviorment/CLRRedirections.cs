@@ -1059,7 +1059,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public static StackObject* EnumGetName(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = esp - 2;
+            var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
 
             var p = esp - 1;
