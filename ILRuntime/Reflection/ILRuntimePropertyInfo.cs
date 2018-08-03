@@ -217,15 +217,17 @@ namespace ILRuntime.Reflection
             var indexCnt = index != null ? index.Length : 0;
             if (getter.ParameterCount <= indexCnt)
             {
-                var ctx = appdomain.BeginInvoke(getter);
-                if (!IsStatic)
-                    ctx.PushObject(obj);
-                for (int i = 0; i < getter.ParameterCount; i++)
+                using (var ctx = appdomain.BeginInvoke(getter))
                 {
-                    ctx.PushObject(index[i], !getter.Parameters[i].IsPrimitive);
+                    if (!IsStatic)
+                        ctx.PushObject(obj);
+                    for (int i = 0; i < getter.ParameterCount; i++)
+                    {
+                        ctx.PushObject(index[i], !getter.Parameters[i].IsPrimitive);
+                    }
+                    ctx.Invoke();
+                    return ctx.ReadObject(getter.ReturnType.TypeForCLR);
                 }
-                ctx.Invoke();
-                return ctx.ReadObject<object>();
             }
             else
                 throw new ArgumentException("Index count mismatch");
@@ -236,15 +238,17 @@ namespace ILRuntime.Reflection
             var indexCnt = index != null ? index.Length : 0;
             if (setter.ParameterCount <= indexCnt + 1)
             {
-                var ctx = appdomain.BeginInvoke(setter);
-                if (!IsStatic)
-                    ctx.PushObject(obj);
-                for (int i = 0; i < setter.ParameterCount - 1; i++)
+                using (var ctx = appdomain.BeginInvoke(setter))
                 {
-                    ctx.PushObject(index[i], !setter.Parameters[i].IsPrimitive);
+                    if (!IsStatic)
+                        ctx.PushObject(obj);
+                    for (int i = 0; i < setter.ParameterCount - 1; i++)
+                    {
+                        ctx.PushObject(index[i], !setter.Parameters[i].IsPrimitive);
+                    }
+                    ctx.PushObject(value, !setter.Parameters[setter.ParameterCount - 1].IsPrimitive);
+                    ctx.Invoke();
                 }
-                ctx.PushObject(value, !setter.Parameters[setter.ParameterCount - 1].IsPrimitive);
-                ctx.Invoke();
             }
             else
                 throw new ArgumentException("Index count mismatch");

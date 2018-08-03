@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -33,6 +34,9 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("Reset", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Reset_3);
+            args = new Type[]{};
+            method = type.GetMethod("Restart", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Restart_4);
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
@@ -99,6 +103,21 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.Reset();
+
+            return __ret;
+        }
+
+        static StackObject* Restart_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Diagnostics.Stopwatch instance_of_this_method = (System.Diagnostics.Stopwatch)typeof(System.Diagnostics.Stopwatch).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            instance_of_this_method.Restart();
 
             return __ret;
         }

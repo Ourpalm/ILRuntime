@@ -93,7 +93,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (method == null)
                 throw new NullReferenceException();
-#if UNITY_EDITOR
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 
 #if UNITY_5_5_OR_NEWER
@@ -1766,7 +1766,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (!allowUnboundCLRMethod)
                                                         throw new NotSupportedException(cm.ToString() + " is not bound!");
 #endif
-#if UNITY_EDITOR
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
                                                     if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 
 #if UNITY_5_5_OR_NEWER
@@ -1776,7 +1776,7 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
 #endif
                                                     object result = cm.Invoke(this, esp, mStack);
-#if UNITY_EDITOR
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
                                                     if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
                                                         UnityEngine.Profiling.Profiler.EndSample();
@@ -1868,6 +1868,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                                     }
                                                                 }
                                                                 break;
+                                                            case ObjectTypes.ArrayReference:
+                                                                {
+                                                                    var arr = mStack[objRef->Value] as Array;
+                                                                    int idx = objRef->ValueLow;
+                                                                    arr.SetValue(obj, idx);
+                                                                }
+                                                                break;
                                                             case ObjectTypes.StaticFieldReference:
                                                                 {
                                                                     var it = AppDomain.GetType(objRef->Value);
@@ -1919,7 +1926,9 @@ namespace ILRuntime.Runtime.Intepreter
                                             dst = Minus(dst, (int)ip->TokenLong + 1);
                                         else
                                             dst = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
+                                        StackObject valRef = *ret;                                        
                                         CopyToStack(ret, dst, mStack);
+                                        FreeStackValueType(&valRef);
                                     }
                                     else
                                     {
@@ -1970,8 +1979,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             fieldAddr = Minus(*(StackObject**)&objRef->Value, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
                                         }
+                                        StackObject valRef = *dst;
                                         dst->ObjectType = ObjectTypes.StackObjectReference;
                                         *(StackObject**)&dst->Value = fieldAddr;
+                                        FreeStackValueType(&valRef);
                                     }
                                     else
                                     {
@@ -3386,7 +3397,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             esp = PushObject(esp - 1 - 1, mStack, val, true);
                                     }
                                     else
-                                        esp = PushObject(esp - 1 - 1, mStack, val, true);
+                                        esp = PushObject(esp - 1 - 1, mStack, val, !arr.GetType().GetElementType().IsPrimitive);
                                 }
                                 break;
                             case OpCodeEnum.Stelem_I1:
@@ -4026,11 +4037,18 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Dup:
                                 {
                                     var obj = esp - 1;
-                                    *esp = *obj;
-                                    if (esp->ObjectType >= ObjectTypes.Object)
+                                    if (obj->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
-                                        esp->Value = mStack.Count;
-                                        mStack.Add(mStack[obj->Value]);
+                                        CloneStackValueType(obj, esp, mStack);
+                                    }
+                                    else
+                                    {
+                                        *esp = *obj;
+                                        if (esp->ObjectType >= ObjectTypes.Object)
+                                        {
+                                            esp->Value = mStack.Count;
+                                            mStack.Add(mStack[obj->Value]);
+                                        }
                                     }
                                     esp++;
                                 }
@@ -4121,7 +4139,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                 }
             }
-#if UNITY_EDITOR
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
                 UnityEngine.Profiling.Profiler.EndSample();

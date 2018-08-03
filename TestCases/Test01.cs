@@ -105,6 +105,37 @@ namespace TestCases
 
             Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, arr.Length));
         }
+        public static void UnitTest_Performance4()
+        {
+            Func<int, float, short, double> func = (a, b, c) =>
+               {
+                   return a + b + c;
+               };
+            ILRuntimeTest.TestFramework.DelegateTest.DelegatePerformanceTest = (a, b, c) =>
+             {
+                 return a + b + c;
+             };
+            var func2 = ILRuntimeTest.TestFramework.DelegateTest.DelegatePerformanceTest;
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            for(int i = 0; i < 100000; i++)
+            {
+                func(1, 3.6f, 4);
+            }
+            sw.Stop();
+
+            Console.WriteLine(string.Format("Elapsed time:{0:0}ms", sw.ElapsedMilliseconds));
+
+            sw.Restart();
+            for (int i = 0; i < 100000; i++)
+            {
+                func2(1, 3.6f, 4);
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("Elapsed time2:{0:0}ms", sw.ElapsedMilliseconds));
+        }
+
         public static void UnitTest_Cls()
         {
             object obj = new object();
