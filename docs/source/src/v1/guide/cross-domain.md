@@ -128,3 +128,8 @@ order: 120
             }
         }
 ```
+
+因为跨域继承必须要注册适配器。 如果是热更DLL里面继承热更里面的类型，不需要任何注册。
+```csharp
+        appdomain.RegisterCrossBindingAdaptor(new ClassInheritanceAdaptor());
+```
