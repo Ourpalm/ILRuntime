@@ -211,5 +211,17 @@ namespace TestCases
             Console.WriteLine("Vector3BindingTest Vector3 normalized = " + VTest.vector);
 
         }
+
+        public static void UnitTest_10033()
+        {
+            TestVector3[] arr2 = new TestVector3[10];
+            arr2[0].X = 1243;
+
+            Vector3[] arr3 = new Vector3[10];
+            arr3[0].x = 3143;
+
+            Console.WriteLine(arr2[0].X);
+            Console.WriteLine(arr3[0].x);
+        }
     }
 }
