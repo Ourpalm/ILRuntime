@@ -670,7 +670,6 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 *dst = *val;
                                                 dst->ObjectType = ObjectTypes.Long;
-                                                dst->ValueLow = 0;
                                             }
                                             break;
                                     }
