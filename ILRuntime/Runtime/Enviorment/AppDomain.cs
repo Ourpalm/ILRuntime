@@ -747,12 +747,15 @@ namespace ILRuntime.Runtime.Enviorment
                     if (t != null)
                     {
                         res = t.MakeArrayType(at.Rank);
-                        if (res is ILType)
+                        if (!_ref.ContainsGenericParameter)
                         {
-                            ///Unify the TypeReference
-                            ((ILType)res).TypeReference = _ref;
+                            if (res is ILType)
+                            {
+                                ///Unify the TypeReference
+                                ((ILType)res).TypeReference = _ref;
+                            }
+                            mapTypeToken[hash] = res;
                         }
-                        mapTypeToken[hash] = res;
                         if (!string.IsNullOrEmpty(res.FullName))
                             mapType[res.FullName] = res;
                         return res;
@@ -1117,7 +1120,6 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 methodname = _ref.Name;
                 var typeDef = _ref.DeclaringType;
-
                 type = GetType(typeDef, contextType, contextMethod);
                 if (type == null)
                     throw new KeyNotFoundException("Cannot find type:" + typename);
