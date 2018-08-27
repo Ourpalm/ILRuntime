@@ -18,7 +18,7 @@ namespace ILRuntimeTest
 {
     public partial class TestMainForm : Form
     {
-        ILRuntime.Runtime.Enviorment.AppDomain _app;
+        public static ILRuntime.Runtime.Enviorment.AppDomain _app;
         private Assembly _assembly;
         private List<TestResultInfo> _resList = new List<TestResultInfo>();
         private List<BaseTestUnit> _testUnitList = new List<BaseTestUnit>();

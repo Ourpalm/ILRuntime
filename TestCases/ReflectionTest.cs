@@ -321,5 +321,42 @@ namespace TestCases
                 i.SetValue(o, 333, new object[] { 123, 345L, 678 });
             }
         }
+
+        public static void ReflectionTest12()
+        {
+            var types = ILRuntimeTest.TestMainForm._app.LoadedTypes.ToArray();
+            for (int i = 0; i < types.Length; i++)
+            {
+                Type type = types[i].Value.ReflectionType;
+
+                //if (type.BaseType != null && (type.BaseType == typeof(Attribute) || type.BaseType.Name == "Attribute"))
+                //    continue;
+
+                //if (type.BaseType != null && type.BaseType.Name == "Void")
+                //    continue;
+
+                object[] attrs = type.GetCustomAttributes(typeof(TestAttribute), false);
+            }
+
+        }
+
+        public static void ReflectionTest13()
+        {
+            object[] attrs = typeof(TestController).GetCustomAttributes(typeof(ObjectEventAttribute), false);
+            //结果attrs的Length > 0 , 这是错误的结果吧
+            Console.WriteLine(attrs.Length);
+
+        }
+
+        [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+        public class ObjectEventAttribute : Attribute
+        {
+        }
+
+        [Test]
+        public sealed class TestController
+        {
+            public static TestController instance = new TestController();
+        }
     }
 }

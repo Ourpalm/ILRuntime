@@ -69,6 +69,10 @@
       <Project>{e6dd179d-fa31-4425-bde1-9dd0be0a9be1}</Project>
       <Name>ILRuntimeTest</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ILRuntime\ILRuntime.csproj">
+      <Project>{79ef2f29-89d1-4097-986c-5e4eefe0fa33}</Project>
+      <Name>ILRuntime</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LitJson\LitJson.csproj">
       <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
       <Name>LitJson</Name>

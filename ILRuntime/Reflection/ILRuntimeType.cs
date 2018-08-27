@@ -30,6 +30,12 @@ namespace ILRuntime.Reflection
 
         void InitializeCustomAttribute()
         {
+            if(type.TypeDefinition == null)
+            {
+                customAttributes = new object[0];
+                attributeTypes = new Type[0];
+                return;
+            }
             customAttributes = new object[type.TypeDefinition.CustomAttributes.Count];
             attributeTypes = new Type[customAttributes.Length];
             for (int i = 0; i < type.TypeDefinition.CustomAttributes.Count; i++)
@@ -198,7 +204,7 @@ namespace ILRuntime.Reflection
             List<object> res = new List<object>();
             for(int i = 0; i < customAttributes.Length; i++)
             {
-                if (attributeTypes[i].Equals(attributeType))
+                if (attributeTypes[i].Equals((object)attributeType))
                     res.Add(customAttributes[i]);
             }
             return res.ToArray();
