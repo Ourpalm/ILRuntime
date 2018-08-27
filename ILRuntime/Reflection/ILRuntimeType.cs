@@ -59,6 +59,11 @@ namespace ILRuntime.Reflection
 
         void InitializeProperties()
         {
+            if (type.TypeDefinition == null)
+            {
+                properties = new ILRuntimePropertyInfo[0];
+                return;
+            }
             int cnt = type.TypeDefinition.HasProperties ? type.TypeDefinition.Properties.Count : 0;
             properties = new ILRuntimePropertyInfo[cnt];
             for (int i = 0; i < cnt; i++)
@@ -383,6 +388,10 @@ namespace ILRuntime.Reflection
         protected override TypeAttributes GetAttributeFlagsImpl()
         {
             TypeAttributes res = TypeAttributes.Public;
+            if (type.TypeDefinition == null)
+            {
+                return TypeAttributes.Class;
+            }
             if (type.TypeDefinition.IsAbstract)
                 res |= TypeAttributes.Abstract;
             if (!type.IsValueType)

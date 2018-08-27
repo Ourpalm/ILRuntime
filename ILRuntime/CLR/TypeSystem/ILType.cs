@@ -428,7 +428,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return definition.IsEnum;
+                return definition != null ? definition.IsEnum : false;
             }
         }
 

@@ -223,12 +223,20 @@ namespace ILRuntime.Runtime.Intepreter
                         StackObject* esp = &ptr[index];
                         if (value != null)
                         {
-                            if (value.GetType().IsPrimitive)
+                            var vt = value.GetType();
+                            if (vt.IsPrimitive)
                             {
                                 ILIntepreter.UnboxObject(esp, value, managedObjs, type.AppDomain);
                             }
+                            else if (vt.IsEnum)
+                            {
+                                esp->ObjectType = ObjectTypes.Integer;
+                                esp->Value = Convert.ToInt32(value);
+                                esp->ValueLow = 0;
+                            }
                             else
                             {
+                                
                                 esp->ObjectType = ObjectTypes.Object;
                                 esp->Value = index;
                                 managedObjs[index] = value;
