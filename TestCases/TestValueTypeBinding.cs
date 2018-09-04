@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ILRuntimeTest.TestFramework;
 
 namespace TestCases
@@ -222,6 +223,17 @@ namespace TestCases
 
             Console.WriteLine(arr2[0].X);
             Console.WriteLine(arr3[0].x);
+        }
+
+        public static void UnitTest_10034()
+        {
+            Dictionary<UInt32, TestValueTypeBinding> testDic = new Dictionary<uint, TestValueTypeBinding>();
+            testDic.Add(1, new TestValueTypeBinding());
+            testDic.Add(2, new TestValueTypeBinding());
+            foreach (var item in testDic)
+            {
+                Console.WriteLine(string.Format("dic item {0}", item.Key));
+            }
         }
     }
 }

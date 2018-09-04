@@ -10,6 +10,7 @@ namespace ILRuntime.Runtime.Generated
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3> s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = null;
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct> s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = null;
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2> s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = null;
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<System.Collections.Generic.KeyValuePair<System.UInt32, ILRuntime.Runtime.Intepreter.ILTypeInstance>> s_System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding_Binder = null;
 
         /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
@@ -45,6 +46,10 @@ namespace ILRuntime.Runtime.Generated
             System_Reflection_FieldInfo_Binding.Register(app);
             System_Exception_Binding.Register(app);
             System_Reflection_PropertyInfo_Binding.Register(app);
+            ILRuntimeTest_TestMainForm_Binding.Register(app);
+            ILRuntime_Runtime_Enviorment_AppDomain_Binding.Register(app);
+            System_Collections_Generic_KeyValuePair_2_String_IType_Binding.Register(app);
+            ILRuntime_CLR_TypeSystem_IType_Binding.Register(app);
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_ClassInheritanceTest2Adaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass2_Binding.Register(app);
@@ -62,6 +67,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
             System_Byte_Binding.Register(app);
+            System_Char_Binding.Register(app);
             System_IO_File_Binding.Register(app);
             System_IO_FileStream_Binding.Register(app);
             System_IO_Stream_Binding.Register(app);
@@ -105,6 +111,9 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.Register(app);
             System_DateTime_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorClass_Binding.Register(app);
+            System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding.Register(app);
+            System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding_Enumerator_Binding.Register(app);
+            System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Object_Object_Binding.Register(app);
             System_IComparable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
@@ -117,6 +126,8 @@ namespace ILRuntime.Runtime.Generated
             s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct>;
             __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVectorStruct2));
             s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2>;
+            __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(System.Collections.Generic.KeyValuePair<System.UInt32, ILRuntime.Runtime.Intepreter.ILTypeInstance>));
+            s_System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<System.Collections.Generic.KeyValuePair<System.UInt32, ILRuntime.Runtime.Intepreter.ILTypeInstance>>;
         }
 
         /// <summary>
@@ -127,6 +138,7 @@ namespace ILRuntime.Runtime.Generated
             s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = null;
             s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = null;
             s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = null;
+            s_System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding_Binder = null;
         }
     }
 }

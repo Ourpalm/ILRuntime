@@ -49,7 +49,7 @@ namespace ILRuntimeTest.TestFramework
             method = type.GetMethod("op_Multiply", flag, null, args, null);
             appdomain.RegisterCLRMethodRedirection(method, Vector3_Multiply);
 
-            args = new Type[] {  };
+            args = new Type[] { };
             method = type.GetMethod("get_One2", flag, null, args, null);
             appdomain.RegisterCLRMethodRedirection(method, Vector3_One2);
         }
@@ -192,7 +192,7 @@ namespace ILRuntimeTest.TestFramework
                 }
                 else
                 {
-                    
+
                 }
             }
             return ret;
@@ -245,6 +245,37 @@ namespace ILRuntimeTest.TestFramework
             AssignFromStack(ref ins.A, v, mStack);
             v = ILIntepreter.Minus(ptr, 2);
             AssignFromStack(ref ins.Vector, v, mStack);
+        }
+    }
+
+    public unsafe class KeyValuePairUInt32ILTypeInstanceBinder : ValueTypeBinder<KeyValuePair<UInt32, ILTypeInstance>>
+    {
+        public override unsafe void AssignFromStack(ref KeyValuePair<UInt32, ILTypeInstance> ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            var key = *(UInt32*)&v->Value;
+            v = ILIntepreter.Minus(ptr, 2);
+            object val = mStack[v->Value];
+            ins = new KeyValuePair<uint, ILTypeInstance>(key, (ILTypeInstance)val);
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref KeyValuePair<UInt32, ILTypeInstance> ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            *(UInt32*)&v->Value = ins.Key;
+            v = ILIntepreter.Minus(ptr, 2);
+            mStack[v->Value] = ins.Value;
+        }
+        public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+        {
+            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+            MethodBase method;
+            Type[] args;
+            Type type = typeof(KeyValuePair<UInt32, ILTypeInstance>);
+            args = new Type[] { typeof(UInt32), typeof(ILTypeInstance) };
+            method = type.GetConstructor(flag, null, args, null);
+            //appdomain.RegisterCLRMethodRedirection(method, NewKV);
+            //_appdomain_ = appdomain;
         }
     }
 }

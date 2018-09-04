@@ -33,6 +33,7 @@ namespace ILRuntimeTest.TestFramework
             app.RegisterValueTypeBinder(typeof(TestVector3), new TestVector3Binder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct), new TestVectorStructBinder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct2), new TestVectorStruct2Binder());
+            app.RegisterValueTypeBinder(typeof(System.Collections.Generic.KeyValuePair<uint, ILRuntime.Runtime.Intepreter.ILTypeInstance>), new KeyValuePairUInt32ILTypeInstanceBinder());
 
             // delegate register 
 

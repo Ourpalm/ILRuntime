@@ -4168,11 +4168,19 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        bool CanCastTo(StackObject* src, StackObject* dst)
+        {
+            var sType = AppDomain.GetType(src->Value);
+            var dType = AppDomain.GetType(dst->Value);
+
+            return sType.CanAssignTo(dType);
+        }
+
         void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
         {
             StackObject* descriptor = *(StackObject**)&src->Value;
             StackObject* dstDescriptor = *(StackObject**)&dst->Value;
-            if (descriptor->Value != dstDescriptor->Value)
+            if (!CanCastTo(descriptor, dstDescriptor))
                 throw new InvalidCastException();
             int cnt = descriptor->ValueLow;
             for(int i = 0; i < cnt; i++)
