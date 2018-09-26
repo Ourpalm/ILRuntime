@@ -348,6 +348,44 @@ namespace TestCases
 
         }
 
+        public static void ReflectionTest14()
+        {
+            TestTypeAssignableFrom(typeof(PlayerInfo));
+        }
+
+        private static void TestTypeAssignableFrom(Type targetType)
+        {
+            foreach (System.Reflection.PropertyInfo property in targetType.GetProperties())
+            {
+                if (!property.CanWrite)
+                {
+                    continue;
+                }
+                Console.WriteLine(property.Name + "|" + typeof(System.Collections.ICollection).IsAssignableFrom(property.PropertyType));
+            }
+
+            foreach (System.Reflection.FieldInfo field in targetType.GetFields())
+            {
+                Console.WriteLine(field.Name + "|" + typeof(System.Collections.ICollection).IsAssignableFrom(field.FieldType));
+            }
+        }
+
+
+        class PlayerInfo
+        {
+            public string[] tags_F;
+
+            public Detail[] Details_F;
+
+            public string[] tags_P { get; set; }
+
+            public Detail[] Details_P { get; set; }
+        }
+
+        class Detail
+        {
+        }
+
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
         public class ObjectEventAttribute : Attribute
         {

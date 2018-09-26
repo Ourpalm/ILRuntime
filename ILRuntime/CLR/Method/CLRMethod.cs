@@ -268,7 +268,9 @@ namespace ILRuntime.CLR.Method
 
                 if (!def.IsStatic)
                 {
-                    instance = declaringType.TypeForCLR.CheckCLRTypes(StackObject.ToObject((Minus(esp, paramCount + 1)), appdomain, mStack));
+                    instance = StackObject.ToObject((Minus(esp, paramCount + 1)), appdomain, mStack);
+                    if (!(instance is Reflection.ILRuntimeWrapperType))
+                        instance = declaringType.TypeForCLR.CheckCLRTypes(instance);
                     if (declaringType.IsValueType)
                         instance = ILIntepreter.CheckAndCloneValueType(instance, appdomain);
                     if (instance == null)

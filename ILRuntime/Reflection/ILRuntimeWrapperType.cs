@@ -172,6 +172,14 @@ namespace ILRuntime.Reflection
             return type.GetHashCode();
         }
 
+        public override bool IsAssignableFrom(Type c)
+        {
+            if (c is ILRuntimeWrapperType)
+                c = ((ILRuntimeWrapperType)c).RealType;
+            if (c is ILRuntimeType)
+                c = ((ILRuntimeType)c).ILType.TypeForCLR;
+            return et.IsAssignableFrom(c);
+        }
         public override Type GetNestedType(string name, BindingFlags bindingAttr)
         {
             return et.GetNestedType(name, bindingAttr);

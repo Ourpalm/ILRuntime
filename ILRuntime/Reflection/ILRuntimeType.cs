@@ -215,6 +215,22 @@ namespace ILRuntime.Reflection
             return res.ToArray();
         }
 
+        public override bool IsAssignableFrom(Type c)
+        {
+            IType type;
+            if (c is ILRuntimeWrapperType)
+            {
+                type = ((ILRuntimeWrapperType)c).CLRType;
+            }
+            else if (c is ILRuntimeType)
+            {
+                type = ((ILRuntimeType)c).ILType;
+            }
+            else
+                type = ILType.AppDomain.GetType(c);
+            return type.CanAssignTo(ILType);
+        }
+
         public override Type GetElementType()
         {
             if (type.IsArray)
