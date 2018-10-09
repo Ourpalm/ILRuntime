@@ -161,6 +161,7 @@
     <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Threading_Tasks_Task_Binding.cs" />
     <Compile Include="AutoGenerate\System_Type_Binding.cs" />
+    <Compile Include="TestBase\GenericExtensions.cs" />
     <Compile Include="TestFramework\TestCLRAttribute.cs" />
     <Compile Include="TestFramework\TestVector3.cs" />
     <Compile Include="TestFramework\TestCLREnum.cs" />
