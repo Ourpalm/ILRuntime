@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using LitJson;
 using ILRuntimeTest.TestFramework;
+using ILRuntimeTest.TestBase;
 
 namespace TestCases
 {
@@ -316,5 +317,13 @@ namespace TestCases
         {
             func(a[0]);
         }
+
+        public static void GenericExtensionMethodTest()
+        {
+            var ec = new ExtensionClass();
+            ec.ExtensionMethod(null);
+        }
     }
+
+
 }
