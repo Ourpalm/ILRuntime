@@ -110,6 +110,23 @@ namespace ILRuntimeTest.TestFramework
 
             // LitJson register
             LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(app);
+
+            app.DelegateManager.RegisterMethodDelegate<System.Object>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Object>();
+            app.DelegateManager.RegisterMethodDelegate<System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Int32>();
+            app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task>();
+            app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task<System.Int32>>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task<System.Int32>>();
+
         }
     }
 }
