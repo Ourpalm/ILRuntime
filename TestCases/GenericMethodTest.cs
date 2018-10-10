@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using LitJson;
 using ILRuntimeTest.TestFramework;
 using ILRuntimeTest.TestBase;
@@ -318,12 +319,129 @@ namespace TestCases
             func(a[0]);
         }
 
-        public static void GenericExtensionMethodTest()
+        public static void GenericExtensionMethod1Test1()
         {
-            var ec = new ExtensionClass();
-            ec.ExtensionMethod(null);
+            new ExtensionClass().Method1(v => { });
+        }
+
+        public static void GenericExtensionMethod1Test2()
+        {
+            new ExtensionClass().Method1((i, v) => { });
+        }
+
+        public static void GenericExtensionMethod2Test1()
+        {
+            new ExtensionClass().Method2(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test2()
+        {
+            new ExtensionClass().Method2((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod2Test3()
+        {
+            new ExtensionClass().Method2<ArgumentException>(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test4()
+        {
+            new ExtensionClass().Method2<ArgumentException>((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod2Test5()
+        {
+            new ExtensionClass<int>().Method2(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test6()
+        {
+            new ExtensionClass<int>().Method2((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod2Test7()
+        {
+            new ExtensionClass<int>().Method2<int, ArgumentException>(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test8()
+        {
+            new ExtensionClass<int>().Method2<int, ArgumentException>((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod3Test1()
+        {
+            new ExtensionClass().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test2()
+        {
+            new ExtensionClass<int>().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test3()
+        {
+            new SubExtensionClass().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test4()
+        {
+            new SubExtensionClass<int>().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test5()
+        {
+            new ExtensionClass().Method3(new ArgumentException());
+        }
+
+        public static void GenericExtensionMethod3Test6()
+        {
+            new ExtensionClass<int>().Method3(new ArgumentException());
+        }
+
+        public static void GenericExtensionMethod3Test7()
+        {
+            new SubExtensionClass<int>().Method3(new ArgumentException());
+        }
+
+        public static void GenericStaticMethodTest1()
+        {
+            StaticGenericMethods.StaticMethod(() => { });
+        }
+
+        public static void GenericStaticMethodTest2()
+        {
+            StaticGenericMethods.StaticMethod(i => { });
+        }
+
+        public static void GenericStaticMethodTest3()
+        {
+            StaticGenericMethods.StaticMethod(() => 1);
+        }
+
+        public static void GenericStaticMethodTest4()
+        {
+            StaticGenericMethods.StaticMethod(i => 1);
+        }
+        
+        public static void GenericStaticMethodTest5()
+        {
+            StaticGenericMethods.StaticMethod(async () => await Task.Delay(1));
+        }
+
+        public static void GenericStaticMethodTest6()
+        {
+            StaticGenericMethods.StaticMethod(async i => await Task.Delay(1));
+        }
+
+        public static void GenericStaticMethodTest7()
+        {
+            StaticGenericMethods.StaticMethod(async () => await Task.FromResult(1));
+        }
+
+        public static void GenericStaticMethodTest8()
+        {
+            StaticGenericMethods.StaticMethod(async i => await Task.FromResult(1));
         }
     }
-
-
 }
