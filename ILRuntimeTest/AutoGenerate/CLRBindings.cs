@@ -23,10 +23,13 @@ namespace ILRuntime.Runtime.Generated
             System_Console_Binding.Register(app);
             System_Type_Binding.Register(app);
             System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.Register(app);
+            System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Int32_Binding.Register(app);
             System_Threading_Tasks_Task_Binding.Register(app);
             System_Runtime_CompilerServices_TaskAwaiter_Binding.Register(app);
             System_Threading_Tasks_Task_1_Int32_Binding.Register(app);
             System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.Register(app);
+            System_Exception_Binding.Register(app);
+            System_Collections_IDictionary_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Binding.Register(app);
             System_Linq_Enumerable_Binding.Register(app);
             System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.Register(app);
@@ -35,6 +38,13 @@ namespace ILRuntime.Runtime.Generated
             System_Int32_Binding.Register(app);
             System_Object_Array_Binding.Register(app);
             System_Action_1_Int32_Binding.Register(app);
+            ILRuntimeTest_TestBase_ExtensionClass_Binding.Register(app);
+            ILRuntimeTest_TestBase_GenericExtensions_Binding.Register(app);
+            ILRuntimeTest_TestBase_ExtensionClass_1_Int32_Binding.Register(app);
+            ILRuntimeTest_TestBase_SubExtensionClass_Binding.Register(app);
+            ILRuntimeTest_TestBase_SubExtensionClass_1_Int32_Binding.Register(app);
+            System_ArgumentException_Binding.Register(app);
+            ILRuntimeTest_TestBase_StaticGenericMethods_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.Register(app);
             LitJson_JsonMapper_Binding.Register(app);
             System_Collections_Generic_List_1_ILTypeInstance_Binding.Register(app);
@@ -44,12 +54,12 @@ namespace ILRuntime.Runtime.Generated
             System_Reflection_MethodBase_Binding.Register(app);
             System_Reflection_MemberInfo_Binding.Register(app);
             System_Reflection_FieldInfo_Binding.Register(app);
-            System_Exception_Binding.Register(app);
             System_Reflection_PropertyInfo_Binding.Register(app);
             ILRuntimeTest_TestMainForm_Binding.Register(app);
             ILRuntime_Runtime_Enviorment_AppDomain_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_IType_Binding.Register(app);
             ILRuntime_CLR_TypeSystem_IType_Binding.Register(app);
+            System_Boolean_Binding.Register(app);
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_ClassInheritanceTest2Adaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass2_Binding.Register(app);
@@ -61,7 +71,6 @@ namespace ILRuntime.Runtime.Generated
             System_Action_3_Int32_String_String_Binding.Register(app);
             ILRuntimeTest_TestFramework_BaseClassTest_Binding.Register(app);
             System_Action_1_String_Binding.Register(app);
-            System_Boolean_Binding.Register(app);
             System_Action_Binding.Register(app);
             System_Math_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
@@ -105,7 +114,6 @@ namespace ILRuntime.Runtime.Generated
             System_NotSupportedException_Binding.Register(app);
             System_Collections_Generic_List_1_ILTypeInstance_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Type_Int32_Binding.Register(app);
-            System_Collections_IDictionary_Binding.Register(app);
             System_NotImplementedException_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.Register(app);
