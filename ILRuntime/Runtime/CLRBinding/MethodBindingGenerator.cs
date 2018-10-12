@@ -154,7 +154,7 @@ namespace ILRuntime.Runtime.CLRBinding
             return sb.ToString();
         }
     
-        internal static string GenerateMethodWraperCode(this Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes, List<Type> valueTypeBinders)
+        internal static string GenerateMethodWraperCode(this Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes, List<Type> valueTypeBinders, Enviorment.AppDomain domain)
         {
             StringBuilder sb = new StringBuilder();
             bool isMultiArr = type.IsArray && type.GetArrayRank() > 1;
@@ -627,13 +627,13 @@ namespace ILRuntime.Runtime.CLRBinding
 
                         sb.AppendLine("            } else {");
 
-                        i.ReturnType.GetReturnValueCode(sb);
+                        i.ReturnType.GetReturnValueCode(sb, domain);
 
                         sb.AppendLine("            }");
                     }
                     else
                     {
-                        i.ReturnType.GetReturnValueCode(sb);
+                        i.ReturnType.GetReturnValueCode(sb, domain);
                     }
                 }
                 else

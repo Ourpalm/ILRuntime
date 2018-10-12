@@ -277,7 +277,7 @@ namespace ILRuntime.Runtime.CLRBinding
             }
         }
 
-        internal static void GetReturnValueCode(this Type type, StringBuilder sb)
+        internal static void GetReturnValueCode(this Type type, StringBuilder sb, Enviorment.AppDomain domain)
         {
             if (type.IsPrimitive)
             {
@@ -353,7 +353,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     isBox = ", true";
                 else
                     isBox = "";
-                if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
+                if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance) && (domain == null || domain.CrossBindingAdaptors.ContainsKey(type)))
                 {
                     sb.Append(@"            object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)

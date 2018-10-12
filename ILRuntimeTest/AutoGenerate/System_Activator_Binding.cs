@@ -117,11 +117,6 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Activator.CreateInstance(@type, @args);
 
-            object obj_result_of_this_method = result_of_this_method;
-            if(obj_result_of_this_method is CrossBindingAdaptorType)
-            {    
-                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance, true);
-            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method, true);
         }
 
@@ -138,11 +133,6 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Activator.CreateInstance(@type);
 
-            object obj_result_of_this_method = result_of_this_method;
-            if(obj_result_of_this_method is CrossBindingAdaptorType)
-            {    
-                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance, true);
-            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method, true);
         }
 
@@ -154,11 +144,6 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Activator.CreateInstance<ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor>();
 
-            object obj_result_of_this_method = result_of_this_method;
-            if(obj_result_of_this_method is CrossBindingAdaptorType)
-            {    
-                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
-            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
@@ -170,11 +155,6 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Activator.CreateInstance<System.Object>();
 
-            object obj_result_of_this_method = result_of_this_method;
-            if(obj_result_of_this_method is CrossBindingAdaptorType)
-            {    
-                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance, true);
-            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method, true);
         }
 
