@@ -215,7 +215,7 @@ namespace ILRuntimeTest
                     string fullName = ilType.FullName;
                     //Console.WriteLine("call the method:{0},return type {1},params count{2}", fullName + "." + methodInfo.Name, methodInfo.ReturnType, methodInfo.GetParameters().Length);
                     //目前只支持无参数，无返回值测试
-                    if (methodInfo.ParameterCount == 0 && methodInfo.IsStatic)
+                    if (methodInfo.ParameterCount == 0 && methodInfo.IsStatic && ((ILRuntime.CLR.Method.ILMethod)methodInfo).Definition.IsPublic)
                     {
                         var testUnit = new StaticTestUnit();
                         testUnit.Init(_app, fullName, methodInfo.Name);

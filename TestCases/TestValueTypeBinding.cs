@@ -235,5 +235,14 @@ namespace TestCases
                 Console.WriteLine(string.Format("dic item {0}", item.Key));
             }
         }
+
+        public static void UnitTest_10035()
+        {
+            TestVector3[] FuncBtnsPos1 = new TestVector3[3] { TestVector3.One, TestVector3.One, TestVector3.One };
+            foreach(var i in FuncBtnsPos1)
+            {
+                Console.WriteLine(i.ToString());
+            }
+        }
     }
 }

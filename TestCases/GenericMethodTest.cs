@@ -232,7 +232,7 @@ namespace TestCases
             }
         }
 
-        public static T CreateInterface<T>() where T : IDisposer
+        static T CreateInterface<T>() where T : IDisposer
         {
             var type = typeof(TestInterface);
             var result = Activator.CreateInstance(type);
@@ -240,7 +240,7 @@ namespace TestCases
         }
 
 
-        public static T Fetch<T>() where T : IDisposer
+        static T Fetch<T>() where T : IDisposer
         {
             var t = CreateInterface<T>();
             //          ((IDisposer)t).Id = 111; // ??
@@ -317,6 +317,17 @@ namespace TestCases
         static void GenericMethodTest12Sub<T>(T[] a, Action<T> func)
         {
             func(a[0]);
+        }
+
+        public static void GenericMethodTest13()
+        {
+            GenericMethodTest13Sub<int>();
+        }
+
+        static void GenericMethodTest13Sub<T>()
+        {
+            var t = typeof(T[]);
+            Console.WriteLine(t.ToString());
         }
 
         public static void GenericExtensionMethod1Test1()
