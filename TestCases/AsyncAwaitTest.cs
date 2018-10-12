@@ -50,6 +50,43 @@ namespace TestCases
             Console.WriteLine($"TestRunSub1 complete");
         }
 
+        public static async Task<int> TestRun2()
+        {
+            try
+            {
+                return await Task.Run(async () =>
+                {
+                    Console.WriteLine("Start");
+                    await Task.Delay(0);
+                    Console.WriteLine("End");
+                    return 0;
+                });
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine($"{e.Message}\n{e.Data["StackTrace"]}\n{e.ToString()}");
+                throw e;
+            }
+        }
+
+        public static async Task<int> TestRun3()
+        {
+            try
+            {
+                return await Task.Run(async () =>
+                {
+                    Console.WriteLine("Start");
+                    await Task.Delay(0);
+                    Console.WriteLine("End");
+                    return 0;
+                });
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine($"{e.Message}\n{e.Data["StackTrace"]}\n{e.ToString()}");
+                throw e;
+            }
+        }
 
         class AsyncAwaitTest1
         {
