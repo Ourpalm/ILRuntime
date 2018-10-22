@@ -14,7 +14,7 @@ namespace ILRuntime.CLR.TypeSystem
     public class CLRType : IType
     {
         Type clrType;
-        bool isPrimitive, isValueType;
+        bool isPrimitive, isValueType, isEnum;
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
@@ -95,6 +95,7 @@ namespace ILRuntime.CLR.TypeSystem
             this.clrType = clrType;
             this.appdomain = appdomain;
             isPrimitive = clrType.IsPrimitive;
+            isEnum = clrType.IsEnum;
             isValueType = clrType.IsValueType;
             isDelegate = clrType.BaseType == typeof(MulticastDelegate);
         }
@@ -209,6 +210,14 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return isPrimitive;
+            }
+        }
+
+        public bool IsEnum
+        {
+            get
+            {
+                return isEnum;
             }
         }
         public string FullName

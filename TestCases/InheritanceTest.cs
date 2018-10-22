@@ -149,6 +149,12 @@ namespace TestCases
             Console.WriteLine(c1 == null);
         }
 
+        public static void InheritanceTest11()
+        {
+            SubParent sub = new SubParent();
+            sub.Test();
+        }
+
         class TestCls5 : TestClass2
         {
             public override float AbMethod2(int arg1)
@@ -325,12 +331,19 @@ namespace TestCases
 
     public class Parent
     {
-
+        public virtual void Test()
+        {
+            Console.WriteLine("Parent.test");
+        }
     }
 
     public class SubParent: Parent
     {
-
+        public override void Test()
+        {
+            base.Test();
+            Console.WriteLine("SubParent.test");
+        }
     }
 
     public class Child2 : SubParent
