@@ -457,10 +457,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 hasReturn = m.ReturnType != appdomain.VoidType;
                 if(m is ILMethod)
                 {
-                    if (((ILMethod)m).BodyRegister.Length <= Optimizer.MaximalInlineInstructionCount)
+                    if (!m.IsConstructor && !((ILMethod)m).IsVirtual)
                     {
-                        canInline = true;
-                        toInline = (ILMethod)m;
+                        var body = ((ILMethod)m).BodyRegister;
+                        if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)
+                        {
+                            canInline = true;
+                            toInline = (ILMethod)m;
+                        }
                     }
                 }
             }

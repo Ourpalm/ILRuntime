@@ -234,6 +234,14 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public bool IsVirtual
+        {
+            get
+            {
+                return def.IsVirtual;
+            }
+        }
+
         public bool IsDelegateInvoke
         {
             get
