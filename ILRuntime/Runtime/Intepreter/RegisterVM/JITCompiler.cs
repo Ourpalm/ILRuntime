@@ -414,6 +414,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = (short)(baseRegIdx - 1);
                     break;
                 case Code.Ldfld:
+                case Code.Ldflda:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);

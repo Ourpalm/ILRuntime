@@ -898,6 +898,40 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Ldflda:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        var ft = domain.GetType((int)(ip->OperandLong >> 32));
+                                        StackObject* fieldAddr;
+                                        if (ft is ILType)
+                                        {
+                                            fieldAddr = Minus(*(StackObject**)&objRef->Value, (int)ip->OperandLong + 1);
+                                        }
+                                        else
+                                        {
+                                            fieldAddr = Minus(*(StackObject**)&objRef->Value, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        }
+                                        reg1->ObjectType = ObjectTypes.StackObjectReference;
+                                        *(StackObject**)&reg1->Value = fieldAddr;
+                                    }
+                                    else
+                                    {
+                                        object obj = RetriveObject(objRef, mStack);
+                                        if (obj != null)
+                                        {
+                                            AssignToRegister(ref info, ip->Register1, obj);
+                                            reg1->ObjectType = ObjectTypes.FieldReference;
+                                            reg1->ValueLow = (int)ip->OperandLong;
+                                        }
+                                        else
+                                            throw new NullReferenceException();
+                                    }
+                                }
+                                break;
                             #endregion
 
                             #region Initialization & Instantiation
