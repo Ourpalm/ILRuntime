@@ -87,6 +87,11 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Box:
                     param = string.Format("r{0},r{1},{2}", Register1, Register2, Operand);
                     break;
+
+                case OpCodeREnum.Stfld:
+                case OpCodeREnum.Ldfld:
+                    param = string.Format("r{0},r{1},0x{2:X8}", Register1, Register2, OperandLong);
+                    break;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
                 case OpCodeREnum.Add_Ovf_Un:

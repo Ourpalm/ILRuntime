@@ -238,7 +238,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                     break;
                 case Code.Stsfld:
-                case Code.Stfld:
                     op.Register1 = --baseRegIdx;
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
                     break;
@@ -343,18 +342,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Register1 = baseRegIdx++;
                     break;
-                case Code.Ldind_I:
-                case Code.Ldind_I2:
-                case Code.Ldind_I4:
-                case Code.Ldind_I8:
-                case Code.Ldind_R4:
-                case Code.Ldind_R8:
-                case Code.Ldind_U1:
-                case Code.Ldind_U2:
-                case Code.Ldind_U4:
-                    op.Register2 = (short)(baseRegIdx - 1);
-                    op.Register1 = baseRegIdx++;
-                    break;
                 case Code.Stelem_I:
                 case Code.Stelem_I1:
                 case Code.Stelem_I2:
@@ -375,7 +362,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Stind_I4:
                 case Code.Stind_I8:
                 case Code.Stind_R4:
-                case Code.Stind_R8:                    
+                case Code.Stind_R8:
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 2;
@@ -414,8 +401,28 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Conv_U4:
                 case Code.Conv_U8:
                 case Code.Ldlen:
+                case Code.Ldind_I:
+                case Code.Ldind_I2:
+                case Code.Ldind_I4:
+                case Code.Ldind_I8:
+                case Code.Ldind_R4:
+                case Code.Ldind_R8:
+                case Code.Ldind_U1:
+                case Code.Ldind_U2:
+                case Code.Ldind_U4:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
+                    break;
+                case Code.Ldfld:
+                    op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+                    break;
+                case Code.Stfld:
+                    op.Register1 = (short)(baseRegIdx - 2);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+                    baseRegIdx -= 2;
                     break;
                 case Code.Box:
                     op.Register1 = (short)(baseRegIdx - 1);

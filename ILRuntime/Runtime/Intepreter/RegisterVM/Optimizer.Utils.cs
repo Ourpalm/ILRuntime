@@ -103,6 +103,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
+                case OpCodeREnum.Ldfld:
                     r1 = op.Register2;
                     return true;
                 case OpCodeREnum.Stind_I:
@@ -112,6 +113,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_I8:
                 case OpCodeREnum.Stind_R4:
                 case OpCodeREnum.Stind_R8:
+                case OpCodeREnum.Stfld:
                     r1 = op.Register1;
                     r2 = op.Register2;
                     return true;
@@ -289,6 +291,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
+                case OpCodeREnum.Ldfld:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Br_S:
@@ -337,6 +340,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
                 case OpCodeREnum.Stelem_Ref:
+                case OpCodeREnum.Stfld:
                     return false;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
@@ -413,6 +417,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
+                case OpCodeREnum.Ldfld:
                     op.Register2 = src;
                     break;
 
@@ -423,6 +428,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_I8:
                 case OpCodeREnum.Stind_R4:
                 case OpCodeREnum.Stind_R8:
+                case OpCodeREnum.Stfld:
                     switch (idx)
                     {
                         case 0:
@@ -621,6 +627,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
+                case OpCodeREnum.Ldfld:
                     op.Register1 = dst;
                     break;
                 case OpCodeREnum.Br_S:
