@@ -96,7 +96,10 @@ namespace ILRuntime.Runtime.Enviorment
             if (cnt != paramCnt)
                 throw new ArgumentException("Argument count mismatch");
             bool unhandledException;
-            esp = intp.Execute(method, esp, out unhandledException);
+            if (domain.EnableRegisterVM)
+                esp = intp.ExecuteR(method, esp, out unhandledException);
+            else
+                esp = intp.Execute(method, esp, out unhandledException);
             esp--;
         }
 

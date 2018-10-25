@@ -250,6 +250,20 @@ namespace ILRuntime.Runtime.Intepreter
                                 reg1->ObjectType = ObjectTypes.Integer;
                                 reg1->Value = ip->Operand;
                                 break;
+                            case OpCodeREnum.Ldc_R4:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    *(float*)(&reg1->Value) = ip->OperandFloat;
+                                    reg1->ObjectType = ObjectTypes.Float;
+                                }
+                                break;
+                            case OpCodeREnum.Ldc_R8:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    *(double*)(&reg1->Value) = ip->OperandDouble;
+                                    reg1->ObjectType = ObjectTypes.Double;
+                                }
+                                break;
                             case OpCodeREnum.Ldstr:
                                 AssignToRegister(ref info, ip->Register1, AppDomain.GetString(ip->OperandLong));
                                 break;
@@ -392,6 +406,95 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     reg2->ObjectType = ObjectTypes.Long;
                                     *(long*)(&reg2->Value) = val;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_R4:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    float val;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val = (float)*(long*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            ip++;
+                                            continue;
+                                        case ObjectTypes.Double:
+                                            val = (float)*(double*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            val = reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Float;
+                                    *(float*)&reg2->Value = val;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_R8:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    double val;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val = (double)*(long*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            val = *(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            val = reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            ip++;
+                                            continue;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Double;
+                                    *(double*)&reg2->Value = val;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_R_Un:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    bool isDouble = false;
+                                    float val = 0;
+                                    double val2 = 0;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            val2 = (double)*(ulong*)&reg1->Value;
+                                            isDouble = true;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            ip++;
+                                            continue;
+                                        case ObjectTypes.Integer:
+                                            val = (uint)reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            ip++;
+                                            continue;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (isDouble)
+                                    {
+                                        reg2->ObjectType = ObjectTypes.Double;
+                                        *(double*)&reg2->Value = val2;
+                                    }
+                                    else
+                                    {
+                                        reg2->ObjectType = ObjectTypes.Float;
+                                        *(float*)&reg2->Value = val;
+                                    }
                                 }
                                 break;
                             #endregion
