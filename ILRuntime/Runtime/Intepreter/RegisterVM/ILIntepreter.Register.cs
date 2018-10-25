@@ -267,6 +267,10 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldstr:
                                 AssignToRegister(ref info, ip->Register1, AppDomain.GetString(ip->OperandLong));
                                 break;
+                            case OpCodeREnum.Ldnull:
+                                reg1 = Add(r, ip->Register1);
+                                WriteNull(reg1);
+                                break;
                             #endregion
 
                             #region Althemetics
@@ -598,6 +602,42 @@ namespace ILRuntime.Runtime.Intepreter
                                     /*Free(esp - 1);
                                     Free(esp - 1 - 1);
                                     esp = esp - 1 - 1;*/
+                                }
+                                break;
+                            case OpCodeREnum.Ldtoken:
+                                {
+                                    switch (ip->Operand)
+                                    {
+                                        case 0:
+                                            {
+                                                IType type = AppDomain.GetType((int)(ip->OperandLong >> 32));
+                                                if (type != null)
+                                                {
+                                                    if (type is ILType)
+                                                    {
+                                                        ILType t = type as ILType;
+
+                                                        t.StaticInstance.CopyToRegister((int)ip->OperandLong,ref info, ip->Register1);
+                                                    }
+                                                    else
+                                                        throw new NotImplementedException();
+                                                }
+                                            }
+                                            break;
+                                        case 1:
+                                            {
+                                                IType type = AppDomain.GetType((int)ip->OperandLong);
+                                                if (type != null)
+                                                {
+                                                    AssignToRegister(ref info, ip->Register1, type.ReflectionType);
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
                                 }
                                 break;
                             #endregion
@@ -1475,9 +1515,146 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PopToRegister(ref info, ip->Register1, esp);
                                 }
                                 break;
+
+                            case OpCodeREnum.Isinst:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    var type = domain.GetType(ip->Operand);
+                                    if (type != null)
+                                    {
+                                        objRef = GetObjectAndResolveReference(reg2);
+                                        if (objRef->ObjectType <= ObjectTypes.Double)
+                                        {
+                                            var tclr = type.TypeForCLR;
+                                            switch (objRef->ObjectType)
+                                            {
+                                                case ObjectTypes.Integer:
+                                                    {
+                                                        if (tclr != typeof(int) && tclr != typeof(bool) && tclr != typeof(short) && tclr != typeof(byte) && tclr != typeof(ushort) && tclr != typeof(uint))
+                                                        {
+                                                            WriteNull(reg1);
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Long:
+                                                    {
+                                                        if (tclr != typeof(long) && tclr != typeof(ulong))
+                                                        {
+                                                            WriteNull(reg1);
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Float:
+                                                    {
+                                                        if (tclr != typeof(float))
+                                                        {
+                                                            WriteNull(reg1);
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Double:
+                                                    {
+                                                        if (tclr != typeof(double))
+                                                        {
+                                                            WriteNull(reg1);
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.Null:
+                                                    WriteNull(reg1);
+                                                    break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var obj = RetriveObject(objRef, mStack);
+
+                                            if (obj != null)
+                                            {
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    if (((ILTypeInstance)obj).CanAssignTo(type))
+                                                    {
+                                                        AssignToRegister(ref info, ip->Register1, obj);
+                                                    }
+                                                    else
+                                                    {
+                                                        WriteNull(reg1);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
+                                                    {
+                                                        AssignToRegister(ref info, ip->Register1, obj, true);
+                                                    }
+                                                    else
+                                                    {
+                                                        WriteNull(reg1);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                WriteNull(reg1);
+                                            }
+                                        }
+                                    }
+                                    else
+                                        throw new NullReferenceException();
+                                }
+                                break;
                             #endregion
 
                             #region Compare
+                            case OpCodeREnum.Ceq:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    bool res = false;
+                                    if (reg1->ObjectType == reg2->ObjectType)
+                                    {
+                                        switch (reg1->ObjectType)
+                                        {
+                                            case ObjectTypes.Integer:
+                                            case ObjectTypes.Float:
+                                                res = reg1->Value == reg2->Value;
+                                                break;
+                                            case ObjectTypes.Object:
+                                                res = mStack[reg1->Value] == mStack[reg2->Value];
+                                                break;
+                                            case ObjectTypes.FieldReference:
+                                                res = mStack[reg1->Value] == mStack[reg2->Value] && reg1->ValueLow == reg2->ValueLow;
+                                                break;
+                                            case ObjectTypes.Null:
+                                                res = true;
+                                                break;
+                                            default:
+                                                res = reg1->Value == reg2->Value && reg1->ValueLow == reg2->ValueLow;
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        switch (reg1->ObjectType)
+                                        {
+                                            case ObjectTypes.Object:
+                                                res = mStack[reg1->Value] == null && reg2->ObjectType == ObjectTypes.Null;
+                                                break;
+                                            case ObjectTypes.Null:
+                                                res = reg1->ObjectType == ObjectTypes.Object && mStack[reg2->Value] == null;
+                                                break;
+                                        }
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+
+                                }
+                                break;
                             case OpCodeREnum.Clt:
                                 {
                                     reg1 = Add(r, ip->Register2);
@@ -1497,6 +1674,99 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Double:
                                             res = *(double*)&reg1->Value < *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
+                            case OpCodeREnum.Clt_Un:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = (uint)reg1->Value < (uint)reg2->Value && reg2->ObjectType != ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = (ulong)*(long*)&reg1->Value < (ulong)*(long*)&reg2->Value && reg2->ObjectType != ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value < *(float*)&reg2->Value && reg2->ObjectType != ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value < *(double*)&reg2->Value && reg2->ObjectType != ObjectTypes.Null;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
+                            case OpCodeREnum.Cgt:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = reg1->Value > reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&reg1->Value > *(long*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value > *(float*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value > *(double*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
+                            case OpCodeREnum.Cgt_Un:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = ((uint)reg1->Value > (uint)reg2->Value) || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = (ulong)*(long*)&reg1->Value > (ulong)*(long*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value > *(float*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value > *(double*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            res = mStack[reg1->Value] != null && reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        case ObjectTypes.Null:
+                                            res = false;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -1577,6 +1847,12 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             #endregion
 
+                            case OpCodeREnum.Throw:
+                                {
+                                    var obj = GetObjectAndResolveReference(Add(r, ip->Register1));
+                                    var ex = mStack[obj->Value] as Exception;
+                                    throw ex;
+                                }
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
@@ -1765,7 +2041,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
             {
-                PushNull(dst);
+                WriteNull(dst);
             }
         }
 

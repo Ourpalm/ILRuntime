@@ -245,6 +245,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     if (hasReturn)
                         op.Register1 = --baseRegIdx;
                     break;
+                case Code.Throw:
+                    op.Register1 = --baseRegIdx;
+                    break;
                 case Code.Add:
                 case Code.Add_Ovf:
                 case Code.Add_Ovf_Un:
@@ -426,9 +429,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     baseRegIdx -= 2;
                     break;
                 case Code.Box:
+                case Code.Isinst:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
+                    break;
+                case Code.Ldtoken:
+                    op.Register1 = baseRegIdx++;
+                    if (token is FieldReference)
+                    {
+                        op.Operand = 0;
+                        op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+                    }
+                    else if (token is TypeReference)
+                    {
+                        op.Operand = 1;
+                        op.OperandLong = method.GetTypeTokenHashCode(token);
+                    }
+                    else
+                        throw new NotImplementedException();
                     break;
                 case Code.Pop:
                     return;
