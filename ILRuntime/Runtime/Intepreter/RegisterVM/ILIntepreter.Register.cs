@@ -1075,6 +1075,62 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Stsfld:
+                                {
+                                    IType type = AppDomain.GetType((int)(ip->OperandLong >> 32));
+                                    if (type != null)
+                                    {
+                                        reg1 = Add(r, ip->Register1);
+                                        if (type is ILType)
+                                        {
+                                            ILType t = type as ILType;
+                                            t.StaticInstance.AssignFromStack((int)ip->OperandLong, reg1, AppDomain, mStack);
+                                        }
+                                        else
+                                        {
+                                            CLRType t = type as CLRType;
+                                            int idx = (int)ip->OperandLong;
+                                            var f = t.GetField(idx);
+                                            t.SetStaticFieldValue(idx, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(reg1, domain, mStack), domain)));
+                                        }
+                                    }
+                                    else
+                                        throw new TypeLoadException();
+                                }
+                                break;
+                            case OpCodeREnum.Ldsfld:
+                                {
+                                    IType type = AppDomain.GetType((int)(ip->OperandLong >> 32));
+                                    if (type != null)
+                                    {
+                                        if (type is ILType)
+                                        {
+                                            ILType t = type as ILType;
+                                            t.StaticInstance.CopyToRegister((int)ip->OperandLong,ref info, ip->Register1);
+                                        }
+                                        else
+                                        {
+                                            CLRType t = type as CLRType;
+                                            int idx = (int)ip->OperandLong;
+                                            var f = t.GetField(idx);
+                                            var val = t.GetFieldValue(idx, null);
+                                            if (val is CrossBindingAdaptorType)
+                                                val = ((CrossBindingAdaptorType)val).ILInstance;
+                                            AssignToRegister(ref info, ip->Register1, val, f.FieldType == typeof(object));
+                                        }
+                                    }
+                                    else
+                                        throw new TypeLoadException();
+                                }
+                                break;
+                            case OpCodeREnum.Ldsflda:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg1->ObjectType = ObjectTypes.StaticFieldReference;
+                                    reg1->Value = (int)(ip->OperandLong >> 32); 
+                                    reg1->ValueLow = (int)(ip->OperandLong);
+                                }
+                                break;
                             #endregion
 
                             #region Initialization & Instantiation

@@ -454,6 +454,7 @@ namespace TestCases
         {
             var obj = new AA();
             ClassInheritanceTest.staticField = obj;
+            ClassInheritanceTest.staticField.Dispose();
         }
     }
 

@@ -142,6 +142,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Newobj:
                 case OpCodeREnum.Ldtoken:
+                case OpCodeREnum.Ldsfld:
+                case OpCodeREnum.Ldsflda:
                     return false;
                 case OpCodeREnum.Br_S:
                 case OpCodeREnum.Br:
@@ -155,6 +157,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brfalse_S:
                 case OpCodeREnum.Push:
                 case OpCodeREnum.Throw:
+                case OpCodeREnum.Stsfld:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Blt:
@@ -303,6 +306,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldflda:
                 case OpCodeREnum.Ldtoken:
                 case OpCodeREnum.Isinst:
+                case OpCodeREnum.Ldsfld:
+                case OpCodeREnum.Ldsflda:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Br_S:
@@ -352,6 +357,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_R8:
                 case OpCodeREnum.Stelem_Ref:
                 case OpCodeREnum.Stfld:
+                case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Throw:
                     return false;
                 case OpCodeREnum.Add:
@@ -515,6 +521,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brfalse_S:
                 case OpCodeREnum.Push:
                 case OpCodeREnum.Throw:
+                case OpCodeREnum.Stsfld:
                     op.Register1 = src;
                     break;
                 case OpCodeREnum.Blt:
@@ -648,6 +655,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
                 case OpCodeREnum.Ldflda:
+                case OpCodeREnum.Ldsfld:
+                case OpCodeREnum.Ldsflda:
                 case OpCodeREnum.Ldtoken:
                 case OpCodeREnum.Isinst:
                     op.Register1 = dst;

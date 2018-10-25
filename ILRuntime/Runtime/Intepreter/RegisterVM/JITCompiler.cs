@@ -237,6 +237,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                     }
                     break;
+                case Code.Ldsfld:
+                case Code.Ldsflda:
+                    op.Register1 = baseRegIdx++;
+                    op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+                    break;
                 case Code.Stsfld:
                     op.Register1 = --baseRegIdx;
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
