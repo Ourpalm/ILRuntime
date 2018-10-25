@@ -429,6 +429,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     baseRegIdx -= 2;
                     break;
                 case Code.Box:
+                case Code.Unbox:
+                case Code.Unbox_Any:
                 case Code.Isinst:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);

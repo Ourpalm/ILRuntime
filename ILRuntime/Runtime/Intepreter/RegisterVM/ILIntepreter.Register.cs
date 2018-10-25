@@ -1515,7 +1515,140 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PopToRegister(ref info, ip->Register1, esp);
                                 }
                                 break;
+                            case OpCodeREnum.Unbox:
+                            case OpCodeREnum.Unbox_Any:
+                                {
+                                    objRef = Add(r, ip->Register2);
+                                    if (objRef->ObjectType == ObjectTypes.Object)
+                                    {
+                                        object obj = mStack[objRef->Value];
+                                        if (obj != null)
+                                        {
+                                            var t = domain.GetType(ip->Operand);
+                                            if (t != null)
+                                            {
+                                                var type = t.TypeForCLR;
+                                                bool isEnumObj = obj is ILEnumTypeInstance;
+                                                if ((t is CLRType) && type.IsPrimitive && !isEnumObj)
+                                                {
+                                                    reg1 = Add(r, ip->Register1);
+                                                    if (type == typeof(int))
+                                                    {
+                                                        int val = obj.ToInt32();
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(bool))
+                                                    {
+                                                        bool val = (bool)obj;
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        reg1->Value = val ? 1 : 0;
+                                                    }
+                                                    else if (type == typeof(short))
+                                                    {
+                                                        short val = obj.ToInt16();
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(long))
+                                                    {
+                                                        long val = obj.ToInt64();
+                                                        reg1->ObjectType = ObjectTypes.Long;
+                                                        *(long*)&reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(float))
+                                                    {
+                                                        float val = obj.ToFloat();
+                                                        reg1->ObjectType = ObjectTypes.Float;
+                                                        *(float*)&reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(byte))
+                                                    {
+                                                        byte val = (byte)obj;
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(double))
+                                                    {
+                                                        double val = obj.ToDouble();
+                                                        reg1->ObjectType = ObjectTypes.Double;
+                                                        *(double*)&reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(char))
+                                                    {
+                                                        char val = (char)obj;
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        *(char*)&reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(uint))
+                                                    {
+                                                        uint val = (uint)obj;
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        reg1->Value = (int)val;
+                                                    }
+                                                    else if (type == typeof(ushort))
+                                                    {
+                                                        ushort val = (ushort)obj;
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(ulong))
+                                                    {
+                                                        ulong val = (ulong)obj;
+                                                        reg1->ObjectType = ObjectTypes.Long;
+                                                        *(ulong*)&reg1->Value = val;
+                                                    }
+                                                    else if (type == typeof(sbyte))
+                                                    {
+                                                        sbyte val = (sbyte)obj;
+                                                        reg1->ObjectType = ObjectTypes.Integer;
+                                                        reg1->Value = val;
+                                                    }
+                                                    else
+                                                        throw new NotImplementedException();
+                                                }
+                                                else if (t.IsValueType)
+                                                {
+                                                    if (obj is ILTypeInstance)
+                                                    {
+                                                        var res = ((ILTypeInstance)obj);
+                                                        if (res is ILEnumTypeInstance)
+                                                        {
+                                                            res.CopyToRegister(0, ref info, ip->Register1);
+                                                        }
+                                                        else
+                                                        {
+                                                            if (res.Boxed)
+                                                            {
+                                                                res = res.Clone();
+                                                                res.Boxed = false;
+                                                            }
+                                                            AssignToRegister(ref info, ip->Register1, res);
+                                                        }
+                                                    }
+                                                    else
+                                                        AssignToRegister(ref info, ip->Register1, obj);
 
+                                                }
+                                                else
+                                                {
+                                                    AssignToRegister(ref info, ip->Register1, obj);
+                                                }
+                                            }
+                                            else
+                                                throw new TypeLoadException();
+                                        }
+                                        else
+                                            throw new NullReferenceException();
+                                    }
+                                    else if (objRef->ObjectType < ObjectTypes.StackObjectReference)
+                                    {
+                                        //Nothing to do with primitive types
+                                    }
+                                    else
+                                        throw new InvalidCastException();
+                                }
+                                break;
                             case OpCodeREnum.Isinst:
                                 {
                                     reg1 = Add(r, ip->Register1);

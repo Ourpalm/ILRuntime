@@ -90,6 +90,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Conv_U4:
                 case OpCodeREnum.Conv_U8:
                 case OpCodeREnum.Box:
+                case OpCodeREnum.Unbox:
+                case OpCodeREnum.Unbox_Any:
                 case OpCodeREnum.Ldind_I:
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
@@ -262,6 +264,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Conv_U4:
                 case OpCodeREnum.Conv_U8:
                 case OpCodeREnum.Box:
+                case OpCodeREnum.Unbox:
+                case OpCodeREnum.Unbox_Any:
                 case OpCodeREnum.Ldc_I4_0:
                 case OpCodeREnum.Ldc_I4_1:
                 case OpCodeREnum.Ldc_I4_2:
@@ -412,6 +416,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Conv_U4:
                 case OpCodeREnum.Conv_U8:
                 case OpCodeREnum.Box:
+                case OpCodeREnum.Unbox:
+                case OpCodeREnum.Unbox_Any:
                 case OpCodeREnum.Ldind_I:
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
@@ -622,6 +628,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Conv_U4:
                 case OpCodeREnum.Conv_U8:
                 case OpCodeREnum.Box:
+                case OpCodeREnum.Unbox:
+                case OpCodeREnum.Unbox_Any:
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Newobj:
