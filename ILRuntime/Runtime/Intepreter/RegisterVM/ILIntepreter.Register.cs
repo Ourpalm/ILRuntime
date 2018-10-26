@@ -1231,7 +1231,6 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             if (cm.DeclearingType.IsDelegate)
                                             {
-                                                throw new NotImplementedException();
                                                 objRef = GetObjectAndResolveReference(esp - 1 - 1);
                                                 var mi = (IMethod)mStack[(esp - 1)->Value];
                                                 object ins;
@@ -1792,6 +1791,37 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                         throw new NullReferenceException();
+                                }
+                                break;
+
+                            case OpCodeREnum.Ldftn:
+                                {
+                                    IMethod m = domain.GetMethod(ip->Operand);
+                                    AssignToRegister(ref info, ip->Register1, m);
+                                }
+                                break;
+                            case OpCodeREnum.Ldvirtftn:
+                                {
+                                    IMethod m = domain.GetMethod(ip->Operand);
+                                    objRef = Add(r, ip->Register2);
+                                    if (m is ILMethod)
+                                    {
+                                        ILMethod ilm = (ILMethod)m;
+
+                                        var obj = mStack[objRef->Value];
+                                        m = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                    }
+                                    else
+                                    {
+                                        var obj = mStack[objRef->Value];
+                                        if (obj is ILTypeInstance)
+                                            m = ((ILTypeInstance)obj).Type.GetVirtualMethod(m);
+                                        else if (obj is CrossBindingAdaptorType)
+                                        {
+                                            m = ((CrossBindingAdaptorType)obj).ILInstance.Type.BaseType.GetVirtualMethod(m);
+                                        }
+                                    }
+                                    AssignToRegister(ref info, ip->Register1, m);
                                 }
                                 break;
                             #endregion

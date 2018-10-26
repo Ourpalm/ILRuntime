@@ -40,14 +40,27 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             short baseRegStart = baseRegIdx;
 
             var blocks = CodeBasicBlock.BuildBasicBlocks(body, out entryMapping);
+
             foreach(var i in blocks)
             {
                 var lst = i.FinalInstructions;
                 baseRegIdx = baseRegStart;
+                if (i.PreviousBlocks.Count > 0)
+                {
+                    foreach (var j in i.PreviousBlocks)
+                    {
+                        if (j.EndRegister >= 0)
+                        {
+                            baseRegIdx = j.EndRegister;
+                            break;
+                        }
+                    }
+                }
                 foreach (var ins in i.Instructions)
                 {
                     Translate(lst, ins, locVarRegStart, ref baseRegIdx);
                 }
+                i.EndRegister = baseRegIdx;
             }
 
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
@@ -190,11 +203,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Newobj:
                     {
-                        baseRegIdx++;
                         bool canInline;
                         ILMethod toInline;
                         var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
-                        for (int i = pCnt - 1; i > 0; i--)
+                        for (int i = pCnt; i > 0; i--)
                         {
                             OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
                             op2.Code = OpCodes.OpCodeREnum.Push;
@@ -275,6 +287,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     baseRegIdx--;
                     break;
                 case Code.Nop:
+                case Code.Castclass:
                     break;
                 case Code.Stloc_0:
                     op.Code = OpCodes.OpCodeREnum.Move;
@@ -456,7 +469,26 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     else
                         throw new NotImplementedException();
                     break;
+                case Code.Ldftn:
+                    {
+                        op.Register1 = baseRegIdx++;
+                        bool hasReturn, canInline;
+                        ILMethod toInline;
+                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline);
+                    }
+                    break;
+
+                case Code.Ldvirtftn:
+                    {
+                        op.Register1 = (short)(baseRegIdx - 1);
+                        op.Register2 = (short)(baseRegIdx - 1);
+                        bool hasReturn, canInline;
+                        ILMethod toInline;
+                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline);
+                    }
+                    break;
                 case Code.Pop:
+                    baseRegIdx--;
                     return;
                 default:
                     throw new NotImplementedException();
@@ -479,7 +511,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 else
                     op.Operand = token.GetHashCode();
                 pCnt = m.ParameterCount;
-                if (!m.IsStatic)
+                if (!m.IsStatic && op.Code != OpCodeREnum.Newobj)
                     pCnt++;
                 hasReturn = m.ReturnType != appdomain.VoidType;
                 if(m is ILMethod)

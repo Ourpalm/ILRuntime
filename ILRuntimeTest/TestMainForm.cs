@@ -75,6 +75,7 @@ namespace ILRuntimeTest
 
             if (_testUnitList.Count <= 0)
                 return;
+            _app.EnableRegisterVM = cbEnableRegVM.Checked;
             _resList.Clear();
             foreach (var unit in _testUnitList)
             {
@@ -82,6 +83,7 @@ namespace ILRuntimeTest
                 _resList.Add(unit.CheckResult());
             }
 
+            _app.EnableRegisterVM = false;
             listView1.Items.Clear();
             StringBuilder sb = new StringBuilder();
             foreach (var resInfo in _resList)

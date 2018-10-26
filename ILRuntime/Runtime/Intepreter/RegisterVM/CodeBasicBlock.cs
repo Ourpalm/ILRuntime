@@ -20,6 +20,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         HashSet<int> pendingCP = new HashSet<int>();
         HashSet<CodeBasicBlock> prevBlocks = new HashSet<CodeBasicBlock>();
         HashSet<CodeBasicBlock> nextBlocks = new HashSet<CodeBasicBlock>();
+        short endRegister = -1;
         Instruction entry;
         public List<Instruction> Instructions { get { return instructions; } }
 
@@ -32,6 +33,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public HashSet<CodeBasicBlock> PreviousBlocks { get { return prevBlocks; } }
 
         public HashSet<CodeBasicBlock> NextBlocks { get { return nextBlocks; } }
+
+        public short EndRegister
+        {
+            get
+            { return endRegister; }
+            set
+            {
+                endRegister = value;
+            }
+        }
 
         public void AddInstruction(Instruction op)
         {
