@@ -660,7 +660,11 @@ namespace ILRuntime.Runtime.Intepreter
                 intp.CopyToStack(esp, Minus(ebp, i), mStack);
                 esp++;
             }
-            var ret = intp.Execute(method, esp, out unhandled);
+            StackObject* ret;
+            if (appdomain.EnableRegisterVM)
+                ret = intp.ExecuteR(method, esp, out unhandled);
+            else
+                ret = intp.Execute(method, esp, out unhandled);
             if (next != null)
             {
                 if (method.ReturnType != appdomain.VoidType)
