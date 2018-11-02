@@ -20,7 +20,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             {
                 var lst = b.FinalInstructions;
                 HashSet<int> canRemove = b.CanRemove;
-                HashSet<int> pendingBCP = b.PendingCP;
+                //HashSet<int> pendingBCP = b.PendingCP;
                 bool isInline = false;
 
                 for (int i = lst.Count - 1; i >= 0; i--)
@@ -101,14 +101,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             }
                         }
 
-                        if (!ended)
+                        /*if (!ended)
                         {
                             if (xDst < stackRegisterBegin)
                             {
                                 pendingBCP.Add(i);
                                 throw new NotImplementedException();
                             }
-                        }
+                        }*/
                     }
                 }
             }
