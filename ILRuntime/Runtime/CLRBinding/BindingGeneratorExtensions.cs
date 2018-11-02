@@ -353,15 +353,24 @@ namespace ILRuntime.Runtime.CLRBinding
                     isBox = ", true";
                 else
                     isBox = "";
-                if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance) && (domain == null || domain.CrossBindingAdaptors.ContainsKey(type)))
+                if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
                 {
-                    sb.Append(@"            object obj_result_of_this_method = result_of_this_method;
+                    if(domain == null || domain.CrossBindingAdaptors.ContainsKey(type))
+                    {
+                        sb.Append(@"            object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
             {    
                 return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance");
-                    sb.Append(isBox);
-                    sb.AppendLine(@");
+                        sb.Append(isBox);
+                        sb.AppendLine(@");
             }");
+                    }
+                    else if (typeof(CrossBindingAdaptorType).IsAssignableFrom(type))
+                    {
+                        sb.AppendLine(string.Format("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method.ILInstance{0});", isBox));
+                        return;
+                    }
+                    
                 }
                 sb.AppendLine(string.Format("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method{0});", isBox));
             }
