@@ -28,6 +28,33 @@ namespace TestCases
             Enum1bbb,
             Enum2bbb,
         }
+
+        enum TestEnum4 : ushort
+        {
+            零 = 0,
+            One = 1,
+            佰 = 100
+        }
+
+        enum TestEnumUint : uint
+        {
+            Zero = 0,
+            UOne = 1,
+            Max = uint.MaxValue
+        }
+
+        enum TestEnumInt:int
+        {
+            Min  = int.MinValue,
+            Max = int.MaxValue
+        }
+
+        enum TestEnumSByte : sbyte
+        {
+            Min = sbyte.MinValue,
+            Max = sbyte.MaxValue
+        }
+
         static TestEnum b = TestEnum.Enum2;
 
         public static string Test01()
@@ -153,6 +180,78 @@ namespace TestCases
             {
                 throw new Exception($"Different string value: {valueDirectly} vs. {valueToString}");
             }
+        }
+
+        public static void Test12()
+        {
+            var arr = Enum.GetValues(typeof(TestEnum));
+            foreach (var i in arr)
+            {
+                Console.WriteLine(i.ToString());
+            }
+        }
+
+        public static void Test13()
+        {
+            var emmm = TestEnum2.Enum3234;
+            Console.WriteLine(emmm.ToString());
+
+            var one = TestEnum4.One;
+            Console.WriteLine(one);
+
+            var hundred = TestEnum4.佰;
+            Console.WriteLine(hundred);
+            Console.WriteLine(hundred.ToString());
+
+            var UOne = TestEnumUint.Max;
+            Console.WriteLine(UOne);
+
+            Console.WriteLine(TestEnumSByte.Max);
+        }
+
+        public static void Test14()
+        {
+            var arr = Enum.GetNames(typeof(TestEnum));
+            foreach (var i in arr)
+            {
+                Console.WriteLine(i);
+            }
+        }
+        class SystemType
+        {
+            public int value = 10;
+        }
+
+        class TestConstructor
+        {
+            int[] ArrayTest = null;
+            TestEnum[] ArrayTest2 = new TestEnum[9];
+            TestEnum[] ArrayTest3 = null;
+            SystemType ReferenceTest1 = null;
+            public void ArrayLengthTest()
+            {
+                if (ArrayTest == null)
+                    ArrayTest = new int[5];
+                Console.WriteLine(string.Format("Int array type {0}", ArrayTest.GetType().Name));
+                Console.WriteLine(string.Format("Int array length {0}", ArrayTest.Length));
+                if (ArrayTest2 == null)
+                    ArrayTest2 = new TestEnum[10];
+                Console.WriteLine(string.Format("Enum array type {0}", ArrayTest2.GetType().Name));
+                Console.WriteLine(string.Format("Enum array length {0}", ArrayTest2.Length));
+                if (ReferenceTest1 == null)
+                    ReferenceTest1 = new SystemType();
+                Console.WriteLine(string.Format("SystemType type {0}", ReferenceTest1.GetType().Name));
+                Console.WriteLine(string.Format("SystemType va {0}", ReferenceTest1.value));
+                if (ArrayTest3 == null)
+                    ArrayTest3 = new TestEnum[15];
+                Console.WriteLine(string.Format("Enum array type {0}", ArrayTest3.GetType().Name));
+                Console.WriteLine(string.Format("Enum array length {0}", ArrayTest3.Length));
+            }
+        }
+        public static void Test15()
+        {
+            TestConstructor test = new TestConstructor();
+            test.ArrayLengthTest();
         }
     }
 }

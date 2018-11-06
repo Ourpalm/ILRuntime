@@ -14,12 +14,15 @@ namespace ILRuntimeTest.TestFramework
                 return;
             }
 
-			// adaptor register 
-                        
-			app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
-			app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
-			app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
-			app.RegisterCrossBindingAdaptor(new TestClass3Adaptor());
+            ILRuntime.Runtime.Enviorment.PrimitiveConverter<ILRuntimeTest.TestFramework.TestCLREnum>.ToInteger = (a) => (int)a;
+            ILRuntime.Runtime.Enviorment.PrimitiveConverter<ILRuntimeTest.TestFramework.TestCLREnum>.FromInteger = (a) => (ILRuntimeTest.TestFramework.TestCLREnum)a;
+
+            // adaptor register 
+
+            app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
+            app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
+            app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
+            app.RegisterCrossBindingAdaptor(new TestClass3Adaptor());
             app.RegisterCrossBindingAdaptor(new TestClass4Adaptor());
             app.RegisterCrossBindingAdaptor(new IDisposableClassInheritanceAdaptor());
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTest2Adaptor());
@@ -30,22 +33,36 @@ namespace ILRuntimeTest.TestFramework
             app.RegisterValueTypeBinder(typeof(TestVector3), new TestVector3Binder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct), new TestVectorStructBinder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct2), new TestVectorStruct2Binder());
+            app.RegisterValueTypeBinder(typeof(System.Collections.Generic.KeyValuePair<uint, ILRuntime.Runtime.Intepreter.ILTypeInstance>), new KeyValuePairUInt32ILTypeInstanceBinder());
 
             // delegate register 
 
             app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Boolean>();
-			
-			app.DelegateManager.RegisterMethodDelegate<System.Int32>();
-			
-			app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Int32>();
-			
-			app.DelegateManager.RegisterMethodDelegate<System.Int32,System.String,System.String>();
-			
-			app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.BaseClassTest>();
+            
+            app.DelegateManager.RegisterMethodDelegate<System.Int32>();
+            
+            app.DelegateManager.RegisterFunctionDelegate<System.Int32,System.Int32>();
+            
+            app.DelegateManager.RegisterMethodDelegate<System.Int32,System.String,System.String>();
+            
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.BaseClassTest>();
 
             app.DelegateManager.RegisterFunctionDelegate<System.Int32>();
-            // delegate convertor
 
+            app.DelegateManager.RegisterFunctionDelegate<System.Int32, System.Single, System.Int16, System.Double>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Boolean>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.TestCLREnum>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestFramework.TestCLREnum>();
+
+
+            // delegate convertor
+            app.DelegateManager.RegisterDelegateConvertor<System.Predicate<ILRuntime.Runtime.Intepreter.ILTypeInstance>>((act) =>
+            {
+                return new System.Predicate<ILRuntime.Runtime.Intepreter.ILTypeInstance>((obj) =>
+                {
+                    return ((Func<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Boolean>)act)(obj);
+                });
+            });
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.IntDelegate>((action) =>
             {
                 return new ILRuntimeTest.TestFramework.IntDelegate((a) =>
@@ -93,6 +110,23 @@ namespace ILRuntimeTest.TestFramework
 
             // LitJson register
             LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(app);
+
+            app.DelegateManager.RegisterMethodDelegate<System.Object>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Object>();
+            app.DelegateManager.RegisterMethodDelegate<System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>();
+            app.DelegateManager.RegisterMethodDelegate<System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Int32>();
+            app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task>();
+            app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task<System.Int32>>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task<System.Int32>>();
+
         }
     }
 }

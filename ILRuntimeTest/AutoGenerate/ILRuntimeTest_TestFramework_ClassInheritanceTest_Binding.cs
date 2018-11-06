@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -34,6 +35,9 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.InterfaceTest)};
             method = type.GetMethod("Test3", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Test3_3);
+            args = new Type[]{typeof(System.Int64).MakeByRefType()};
+            method = type.GetMethod("TestLongRef", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TestLongRef_4);
 
             field = type.GetField("TestVal2", flag);
             app.RegisterCLRFieldGetter(field, get_TestVal2_0);
@@ -104,6 +108,67 @@ namespace ILRuntime.Runtime.Generated
 
             ILRuntimeTest.TestFramework.ClassInheritanceTest.Test3(@ins);
 
+            return __ret;
+        }
+
+        static StackObject* TestLongRef_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int64 @i = __intp.RetriveInt64(ptr_of_this_method, __mStack);
+
+
+            ILRuntimeTest.TestFramework.ClassInheritanceTest.TestLongRef(ref @i);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
+                        ___dst->ObjectType = ObjectTypes.Long;
+                        *(long*)&___dst->Value = @i;
+                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = @i;
+                        }
+                        else
+                        {
+                            var ___type = __domain.GetType(___obj.GetType()) as CLRType;
+                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, @i);
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var ___type = __domain.GetType(ptr_of_this_method->Value);
+                        if(___type is ILType)
+                        {
+                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = @i;
+                        }
+                        else
+                        {
+                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, @i);
+                        }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int64[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = @i;
+                    }
+                    break;
+            }
+
+            __intp.Free(ptr_of_this_method);
             return __ret;
         }
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TestCases
 {
-   
+
     public class RefOutTest
     {
         static class Check
@@ -280,6 +280,36 @@ namespace TestCases
             }
             else
                 throw new Exception();
+        }
+
+        class LongHolder
+        {
+            public long lv;
+        }
+
+        public static void UnitTest_LongRefTest()
+        {
+            long stackof = 4200000000L;
+            long stackl = 24;
+            var heapLong = new LongHolder();
+            ILRuntimeTest.TestFramework.ClassInheritanceTest.TestLongRef(ref stackof);//无论代码是否binding，输出TestLongRef:-94967296
+            ILRuntimeTest.TestFramework.ClassInheritanceTest.TestLongRef(ref stackl);//无论代码是否binding，输出TestLongRef:24
+            ILRuntimeTest.TestFramework.ClassInheritanceTest.TestLongRef(ref heapLong.lv);//若代码binding，输出TestLongRef:4（或者其他莫名的值），否则输出TestLongRef:0，换成ref int也一样，class对象的话没测试过。
+        }
+
+        public static void UnitTest_LongRefTest2()
+        {
+            long test = 1;
+            UnitTest_LongRefTest2Sub(ref test);
+
+            Console.WriteLine(string.Format("{0:X8}", test));
+        }
+        private static void UnitTest_LongRefTest2Sub(ref long mask)
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                mask |= (long)1 << i;
+            }
         }
     }
 }

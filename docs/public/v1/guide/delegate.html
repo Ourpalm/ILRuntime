@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V1.3</button>
+        <button class="hiden-in-phone">V1.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -28,7 +28,6 @@
                 </form>
             </li!-->
             <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/use.html" class="nav-link-li">使用案例</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -57,14 +56,6 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
-            </li>
-        
-            
-            
-            
-            
-            <li>
-                <p><a href="/ILRuntime/public/v1/guide/use.html" class="sidebar-link">商业案例</a></p>
             </li>
         
             
@@ -172,21 +163,21 @@
 <blockquote>
 <p>同一个参数组合的委托，只需要注册一次即可，例如：</p>
 </blockquote>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">SomeDelegate</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">float</span> b</span>)</span>;</div><div class="line"></div><div class="line">Action&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt; act;</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">SomeDelegate</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">float</span> b</span>)</span>;</span><br><span class="line"></span><br><span class="line">Action&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt; act;</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>这两个委托都只需要注册一个适配器即可。 注册方法如下</p>
 </blockquote>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">appDomain.DelegateManager.RegisterMethodDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;();</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appDomain.DelegateManager.RegisterMethodDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;();</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>如果是带返回类型的委托，例如：</p>
 </blockquote>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">delegate</span> <span class="keyword">bool</span> <span class="title">SomeFunction</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">float</span> b</span>)</span>;</div><div class="line"></div><div class="line">Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt; act;</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">delegate</span> <span class="keyword">bool</span> <span class="title">SomeFunction</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">float</span> b</span>)</span>;</span><br><span class="line"></span><br><span class="line">Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt; act;</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>需要按照以下方式注册</p>
 </blockquote>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">appDomain.DelegateManager.RegisterFunctionDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;();</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appDomain.DelegateManager.RegisterFunctionDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;();</span><br></pre></td></tr></table></figure>
 <h3 id="委托转换器（DelegateConvertor）"><a href="#委托转换器（DelegateConvertor）" class="headerlink" title="委托转换器（DelegateConvertor）"></a><strong>委托转换器（DelegateConvertor）</strong></h3><p>ILRuntime内部是使用Action,以及Func这两个系统自带委托类型来生成的委托实例，所以如果你需要将一个<code>不是Action或者Func类型</code>的委托实例传到ILRuntime外部使用的话，除了委托适配器，还需要额外写一个转换器，将Action和Func转换成你真正需要的那个委托类型。</p>
-<p>比如上面例子中的SomeFunction类型的委托，其所需的Convertor应如下实现：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><div class="line">app.DelegateManager.RegisterDelegateConvertor&lt;SomeFunction&gt;((action) =&gt;</div><div class="line">&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> SomeFunction((a, b) =&gt;</div><div class="line">    &#123;</div><div class="line">       <span class="keyword">return</span> ((Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;)action)(a, b);</div><div class="line">    &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>比如上面例子中的SomeFunction类型的委托，其所需的Convertor应如下实现：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">app.DelegateManager.RegisterDelegateConvertor&lt;SomeFunction&gt;((action) =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> SomeFunction((a, b) =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">       <span class="keyword">return</span> ((Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;)action)(a, b);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
 <h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a><strong>建议</strong></h3><p>为了避免不必要的麻烦，以及后期热更出现问题，建议项目遵循以下几点：</p>
 <ul>
 <li>尽量<code>避免不必要的</code>跨域委托调用</li>

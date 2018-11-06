@@ -139,7 +139,7 @@ namespace ILRuntimeDebugEngine.AD7
                         SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
 
                         bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
-                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);                        
+                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
                         string methodName = null;
                         if (method != null)
                             methodName = ((MethodDeclarationSyntax)method).Identifier.Text;
@@ -164,9 +164,9 @@ namespace ILRuntimeDebugEngine.AD7
                         string className = GetClassName(method);
 
                         var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
-                        string nsname = ns.Name.ToString();
+                        string nsname = ns != null ? ns.Name.ToString() : null;
 
-                        string name = string.Format("{0}.{1}", nsname, className);
+                        string name = ns != null ? string.Format("{0}.{1}", nsname, className) : className;
 
                         bindRequest = new CSBindBreakpoint();
                         bindRequest.BreakpointHashCode = this.GetHashCode();
@@ -183,6 +183,7 @@ namespace ILRuntimeDebugEngine.AD7
             }
             catch(Exception ex)
             {
+                System.Windows.Forms.MessageBox.Show(ex.ToString(), "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 System.Diagnostics.Debug.WriteLine(ex.ToString());
             }
             return false;

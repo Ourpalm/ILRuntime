@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -22,15 +23,21 @@ namespace ILRuntime.Runtime.Generated
             FieldInfo field;
             Type[] args;
             Type type = typeof(ILRuntimeTest.TestFramework.TestVector3);
+            args = new Type[]{};
+            method = type.GetMethod("get_One2", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, get_One2_0);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3), typeof(ILRuntimeTest.TestFramework.TestVector3)};
             method = type.GetMethod("op_Addition", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, op_Addition_0);
+            app.RegisterCLRMethodRedirection(method, op_Addition_1);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3), typeof(System.Single)};
             method = type.GetMethod("op_Multiply", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, op_Multiply_1);
+            app.RegisterCLRMethodRedirection(method, op_Multiply_2);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3).MakeByRefType(), typeof(System.Single).MakeByRefType()};
             method = type.GetMethod("Test", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Test_2);
+            app.RegisterCLRMethodRedirection(method, Test_3);
+            args = new Type[]{};
+            method = type.GetMethod("Normalize", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Normalize_4);
 
             field = type.GetField("One", flag);
             app.RegisterCLRFieldGetter(field, get_One_0);
@@ -102,7 +109,23 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
-        static StackObject* op_Addition_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_One2_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+
+
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestVector3.One2;
+
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
+        }
+
+        static StackObject* op_Addition_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -111,7 +134,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             ILRuntimeTest.TestFramework.TestVector3 @b = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                @b = ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @b, __intp, ptr_of_this_method, __mStack, true);
             } else {
                 @b = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
                 __intp.Free(ptr_of_this_method);
@@ -120,7 +143,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ILRuntimeTest.TestFramework.TestVector3 @a = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                @a = ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @a, __intp, ptr_of_this_method, __mStack, true);
             } else {
                 @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
                 __intp.Free(ptr_of_this_method);
@@ -137,7 +160,7 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
-        static StackObject* op_Multiply_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* op_Multiply_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -149,7 +172,7 @@ namespace ILRuntime.Runtime.Generated
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ILRuntimeTest.TestFramework.TestVector3 @a = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                @a = ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @a, __intp, ptr_of_this_method, __mStack, true);
             } else {
                 @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
                 __intp.Free(ptr_of_this_method);
@@ -166,36 +189,34 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
-        static StackObject* Test_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Test_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 3);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Single @b = *(float*)&ptr_of_this_method->Value;
+            System.Single @b = __intp.RetriveFloat(ptr_of_this_method, __mStack);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            ILRuntimeTest.TestFramework.TestVector3 @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestVector3 @a = new ILRuntimeTest.TestFramework.TestVector3();
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @a, __intp, ptr_of_this_method, __mStack, false);
+            } else {
+                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+                @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            }
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
             ILRuntimeTest.TestFramework.TestVector3 instance_of_this_method = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                instance_of_this_method = ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue (__intp, ptr_of_this_method, __mStack);
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref instance_of_this_method, __intp, ptr_of_this_method, __mStack, false);
             } else {
                 ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
                 instance_of_this_method = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             }
 
             instance_of_this_method.Test(out @a, out @b);
-
-            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            } else {
-                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-            }
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             switch(ptr_of_this_method->ObjectType)
@@ -204,7 +225,7 @@ namespace ILRuntime.Runtime.Generated
                     {
                         var ___dst = *(StackObject**)&ptr_of_this_method->Value;
                         ___dst->ObjectType = ObjectTypes.Float;
-                        *(float*)&___dst->Value = b;
+                        *(float*)&___dst->Value = @b;
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -212,12 +233,12 @@ namespace ILRuntime.Runtime.Generated
                         var ___obj = __mStack[ptr_of_this_method->Value];
                         if(___obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = b;
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = @b;
                         }
                         else
                         {
                             var ___type = __domain.GetType(___obj.GetType()) as CLRType;
-                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, b);
+                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, @b);
                         }
                     }
                     break;
@@ -226,29 +247,33 @@ namespace ILRuntime.Runtime.Generated
                         var ___type = __domain.GetType(ptr_of_this_method->Value);
                         if(___type is ILType)
                         {
-                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = b;
+                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = @b;
                         }
                         else
                         {
-                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, b);
+                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, @b);
                         }
                     }
                     break;
                  case ObjectTypes.ArrayReference:
                     {
                         var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Single[];
-                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = b;
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = @b;
                     }
                     break;
             }
 
+            __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.StackObjectReference:
                     {
                         var ___dst = *(StackObject**)&ptr_of_this_method->Value;
-                        object ___obj = a;
+                if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                        ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref a);
+                } else {
+                        object ___obj = @a;
                         if (___dst->ObjectType >= ObjectTypes.Object)
                         {
                             if (___obj is CrossBindingAdaptorType)
@@ -259,6 +284,7 @@ namespace ILRuntime.Runtime.Generated
                         {
                             ILIntepreter.UnboxObject(___dst, ___obj, __mStack, __domain);
                         }
+                }
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -266,12 +292,12 @@ namespace ILRuntime.Runtime.Generated
                         var ___obj = __mStack[ptr_of_this_method->Value];
                         if(___obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = a;
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = @a;
                         }
                         else
                         {
                             var ___type = __domain.GetType(___obj.GetType()) as CLRType;
-                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, a);
+                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, @a);
                         }
                     }
                     break;
@@ -280,22 +306,59 @@ namespace ILRuntime.Runtime.Generated
                         var ___type = __domain.GetType(ptr_of_this_method->Value);
                         if(___type is ILType)
                         {
-                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = a;
+                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = @a;
                         }
                         else
                         {
-                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, a);
+                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, @a);
                         }
                     }
                     break;
                  case ObjectTypes.ArrayReference:
                     {
                         var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ILRuntimeTest.TestFramework.TestVector3[];
-                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = a;
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = @a;
                     }
                     break;
             }
 
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            } else {
+                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            }
+
+            __intp.Free(ptr_of_this_method);
+            return __ret;
+        }
+
+        static StackObject* Normalize_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ILRuntimeTest.TestFramework.TestVector3 instance_of_this_method = new ILRuntimeTest.TestFramework.TestVector3();
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref instance_of_this_method, __intp, ptr_of_this_method, __mStack, false);
+            } else {
+                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
+                instance_of_this_method = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            }
+
+            instance_of_this_method.Normalize();
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.WriteBackValue(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            } else {
+                WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
+            }
+
+            __intp.Free(ptr_of_this_method);
             return __ret;
         }
 

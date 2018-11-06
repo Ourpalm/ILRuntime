@@ -450,8 +450,11 @@ namespace LitJson
                 if (value_type is ILRuntime.Reflection.ILRuntimeType)
                     instance = ((ILRuntime.Reflection.ILRuntimeType)value_type).ILType.Instantiate();
                 else
+                {
+                    if (value_type is ILRuntime.Reflection.ILRuntimeWrapperType)
+                        value_type = ((ILRuntime.Reflection.ILRuntimeWrapperType)value_type).RealType;
                     instance = Activator.CreateInstance(value_type);
-                
+                }
                 while (true) {
                     reader.Read ();
 

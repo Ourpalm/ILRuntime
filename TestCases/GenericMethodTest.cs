@@ -454,7 +454,6 @@ namespace TestCases
         {
             StaticGenericMethods.StaticMethod(async i => await Task.FromResult(1));
         }
-
         public static void GenericStaticMethodTest9()
         {           
             GenericStaticMethodTest_9("","",(MethodTest9_A[] arr) => {
