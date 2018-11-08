@@ -388,7 +388,13 @@ namespace LitJson
 
                 // Maybe it's an enum
                 if (vt.IsEnum)
-                    return Enum.ToObject (vt, reader.Value);
+                {
+                    if (reader.Token == JsonToken.String)
+                    {
+                        return Enum.Parse(value_type, reader.Value as string);
+                    }
+                    return Enum.ToObject(vt, reader.Value);
+                }
 
                 // Try using an implicit conversion operator
                 MethodInfo conv_op = GetConvOp (vt, json_type);
@@ -397,6 +403,10 @@ namespace LitJson
                     return conv_op.Invoke (null,
                                            new object[] { reader.Value });
 
+                if(vt == typeof(float) && json_type == typeof(double))
+                {
+                    return (float)(double)reader.Value;
+                }
                 // No luck
                 throw new JsonException (String.Format (
                         "Can't assign value '{0}' (type {1}) to type {2}",
@@ -760,6 +770,11 @@ namespace LitJson
                 return;
             }
 
+            if (obj is Single)
+            {
+                writer.Write((float)obj);
+                return;
+            }
             if (obj is Int32) {
                 writer.Write ((int) obj);
                 return;
@@ -778,7 +793,7 @@ namespace LitJson
             if (obj is Array) {
                 writer.WriteArrayStart ();
 
-                foreach (object elem in (Array) obj)
+                foreach (var elem in (Array)obj)
                     WriteValue (elem, writer, writer_is_private, depth + 1);
 
                 writer.WriteArrayEnd ();
@@ -857,8 +872,10 @@ namespace LitJson
             writer.WriteObjectStart ();
             foreach (PropertyMetadata p_data in props) {
                 if (p_data.IsField) {
+                    FieldInfo p_info = (FieldInfo)p_data.Info;
+                    if ((p_info.Attributes & FieldAttributes.Static) > 0) { continue; }
                     writer.WritePropertyName (p_data.Info.Name);
-                    WriteValue (((FieldInfo) p_data.Info).GetValue (obj),
+                    WriteValue (p_info.GetValue (obj),
                                 writer, writer_is_private, depth + 1);
                 }
                 else {
