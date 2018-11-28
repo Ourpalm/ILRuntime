@@ -382,7 +382,7 @@ namespace ILRuntime.Runtime.CLRBinding
             if (!res)
             {
                 var baseType = type.BaseType;
-                if(baseType != typeof(object))
+                if (baseType != null && baseType != typeof(object))
                 {
                     res = CheckAssignableToCrossBindingAdapters(domain, baseType);
                 }

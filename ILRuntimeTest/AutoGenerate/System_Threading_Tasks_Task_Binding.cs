@@ -117,6 +117,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.Run<System.Int32>(@function);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
@@ -132,6 +137,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.Delay(@millisecondsDelay);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
@@ -148,6 +158,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.Run<System.Int32>(@function);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
@@ -163,6 +178,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.FromResult<System.Int32>(@result);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 

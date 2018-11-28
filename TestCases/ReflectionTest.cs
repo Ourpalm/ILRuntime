@@ -353,6 +353,19 @@ namespace TestCases
             TestTypeAssignableFrom(typeof(PlayerInfo));
         }
 
+        class Ron<T>
+        {
+            public T Value { get; set; }
+        }
+        public static void ReflectionTest15()
+        {
+            Type t = typeof(Ron<>);
+            Console.WriteLine("t Type ==> " + t);
+            Type constructed = t.MakeGenericType(new Type[] { typeof(string) });
+            Ron<string> ins = Activator.CreateInstance(constructed, new object[] { "Test Success" }) as Ron<string>;
+            ins.Value = "OK";
+            Console.WriteLine(ins.Value);
+        }
         private static void TestTypeAssignableFrom(Type targetType)
         {
             foreach (System.Reflection.PropertyInfo property in targetType.GetProperties())
