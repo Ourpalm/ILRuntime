@@ -542,6 +542,8 @@ namespace ILRuntime.Runtime.Enviorment
                     mapTypeToken[bt.GetHashCode()] = bt;
                     if (bt is CLRType)
                     {
+                        clrTypeMapping[bt.TypeForCLR] = bt;
+
                         //It still make sense for CLRType, since CLR uses [T] for generics instead of <T>
                         StringBuilder sb = new StringBuilder();
                         sb.Append(baseType);
@@ -565,6 +567,8 @@ namespace ILRuntime.Runtime.Enviorment
                 if (isArray)
                 {
                     bt = bt.MakeArrayType(1);
+                    if (bt is CLRType)
+                        clrTypeMapping[bt.TypeForCLR] = bt;
                     mapType[bt.FullName] = bt;
                     mapTypeToken[bt.GetHashCode()] = bt;
                     if (!isByRef)
@@ -577,6 +581,8 @@ namespace ILRuntime.Runtime.Enviorment
                 if (isByRef)
                 {
                     res = bt.MakeByRefType();
+                    if (bt is CLRType)
+                        clrTypeMapping[bt.TypeForCLR] = bt;
                     mapType[fullname] = res;
                     mapType[res.FullName] = res;
                     mapTypeToken[res.GetHashCode()] = res;
