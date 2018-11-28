@@ -138,6 +138,10 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.EnumGetName);
                 }
+                if (i.Name == "ToObject" && i.GetParameters()[1].ParameterType == typeof(int))
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.EnumToObject);
+                }
             }
             mi = typeof(System.Type).GetMethod("GetTypeFromHandle");
             RegisterCLRMethodRedirection(mi, CLRRedirections.GetTypeFromHandle);
