@@ -40,6 +40,14 @@ namespace TestCases
     {
         public float abc;
     }
+    public struct TestStruct
+    {
+        public int ID;
+    }
+    class TestStaticClass
+    {
+        public static TestStruct sss = new TestStruct();
+    }
     public struct Vector3
     {
 

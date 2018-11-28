@@ -3080,6 +3080,22 @@ namespace ILRuntime.Runtime.Intepreter
                                                             throw new NullReferenceException();
                                                     }
                                                     break;
+                                                case ObjectTypes.StaticFieldReference:
+                                                    {
+                                                        var t = AppDomain.GetType(objRef->Value);
+                                                        int idx = objRef->ValueLow;
+                                                        if (t is ILType)
+                                                        {
+                                                            var tar = ((ILType)t).StaticInstance[idx] as ILTypeInstance;
+                                                            if (tar != null)
+                                                                tar.Clear();
+                                                            else
+                                                                throw new NotSupportedException();
+                                                        }
+                                                        else
+                                                            throw new NotSupportedException();
+                                                    }
+                                                    break;
                                                 default:
                                                     throw new NotImplementedException();
                                             }
