@@ -70,7 +70,7 @@ IEnumerator LoadILRuntime()
     while (!www.isDone)
         yield return null;
     if (!string.IsNullOrEmpty(www.error))
-        D.error(www.error);
+        Debug.LogError(www.error);
     byte[] dll = www.bytes;
     www.Dispose();
 #if UNITY_ANDROID
@@ -81,7 +81,7 @@ IEnumerator LoadILRuntime()
     while (!www.isDone)
         yield return null;
     if (!string.IsNullOrEmpty(www.error))
-        D.error(www.error);
+        Debug.LogError(www.error);
     byte[] pdb = www.bytes;
     using (System.IO.MemoryStream fs = new MemoryStream(dll))
     {
