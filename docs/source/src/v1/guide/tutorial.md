@@ -111,9 +111,9 @@ ILRuntime提供了一个支持Visual Studio2015和Visual Studio 2017的调试插
 **使用方法如下：**
 
 - 安装ILRuntime调试插件，并重新启动VS2015或VS2017
-- 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
+- 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器,一定要确保dll和pdb都加载完毕再调用此接口。
 - 用VisualStudio打开热更DLL项目
-- 点击菜单中的Debug->Attach to ILRuntime按钮
+- 点击菜单中的Debug->Attach to ILRuntime按钮。注意,不是“附加Unity调试程序”
 - 在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口
 - 点击Attach按钮后，即可像UnityVS一样下断点调试
 
