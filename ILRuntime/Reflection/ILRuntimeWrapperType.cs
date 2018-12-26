@@ -180,6 +180,12 @@ namespace ILRuntime.Reflection
                 c = ((ILRuntimeType)c).ILType.TypeForCLR;
             return et.IsAssignableFrom(c);
         }
+
+        public override bool IsInstanceOfType(object o)
+        {
+            return o != null && IsAssignableFrom(o.GetType());
+        }
+
         public override Type GetNestedType(string name, BindingFlags bindingAttr)
         {
             return et.GetNestedType(name, bindingAttr);
