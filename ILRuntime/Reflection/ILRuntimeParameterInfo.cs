@@ -24,5 +24,13 @@ namespace ILRuntime.Reflection
                 return type.ReflectionType;
             }
         }
+
+        public override string Name
+        {
+            get
+            {
+                return type.FullName;
+            }
+        }
     }
 }
