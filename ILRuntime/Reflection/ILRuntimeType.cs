@@ -252,7 +252,13 @@ namespace ILRuntime.Reflection
 
         public override bool IsInstanceOfType(object o)
         {
-            return o != null && IsAssignableFrom(o.GetType());
+            if (o == null)
+            {
+                return false;
+            }
+
+            var instance = o as ILTypeInstance;
+            return IsAssignableFrom(instance != null ? instance.Type.ReflectionType : o.GetType());
         }
 
         public override Type GetElementType()
