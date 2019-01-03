@@ -473,5 +473,28 @@ namespace TestCases
         {
             TestMethod<int>(null);
         }
+
+
+        class ClassA<T>
+        {
+        }
+        class ClassB<TT>
+        {
+            public void TestMethod(out ClassA<TT> enter)
+            {
+                enter = null;
+            }
+        }
+
+        public static void GenericStaticMethodTest11()
+        {
+            ClassB<int> a = new ClassB<int>();
+            ClassB<string> b = new ClassB<string>();
+
+            ClassA<int> aa = new ClassA<int>();
+            ClassA<string> bb = new ClassA<string>();
+            a.TestMethod(out aa);
+            b.TestMethod(out bb);
+        }
     }
 }
