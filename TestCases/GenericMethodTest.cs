@@ -466,5 +466,12 @@ namespace TestCases
         {
             
         }
+        static void TestMethod<T>(Action<GenericClass<T>> enter)
+        {
+        }
+        public static void GenericStaticMethodTest10()
+        {
+            TestMethod<int>(null);
+        }
     }
 }
