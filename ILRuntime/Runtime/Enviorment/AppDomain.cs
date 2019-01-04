@@ -409,7 +409,6 @@ namespace ILRuntime.Runtime.Enviorment
                 doubleType = GetType("System.Double");
                 objectType = GetType("System.Object");
             }
-            module.AssemblyResolver.ResolveFailure += AssemblyResolver_ResolveFailure;
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             debugService.NotifyModuleLoaded(module.Name);
 #endif
@@ -423,20 +422,6 @@ namespace ILRuntime.Runtime.Enviorment
         public void AddReferenceBytes(string name, byte[] content)
         {
             references[name] = content;
-        }
-
-        private AssemblyDefinition AssemblyResolver_ResolveFailure(object sender, AssemblyNameReference reference)
-        {
-            byte[] content;
-            if (references.TryGetValue(reference.Name, out content))
-            {
-                using (System.IO.MemoryStream ms = new System.IO.MemoryStream(content))
-                {
-                    return AssemblyDefinition.ReadAssembly(ms);
-                }
-            }
-            else
-                return null;
         }
 
         public void RegisterCLRMethodRedirection(MethodBase mi, CLRRedirectionDelegate func)

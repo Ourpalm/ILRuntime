@@ -158,13 +158,14 @@ namespace ILRuntime.CLR.Method
 
         Mono.Cecil.Cil.SequencePoint GetValidSequence(int startIdx, int dir)
         {
-            var cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx]);
+            var seqMapping = def.DebugInformation.GetSequencePointMapping();
+            var cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx], seqMapping);
             while (cur != null && cur.StartLine == 0x0feefee)
             {
                 startIdx += dir;
                 if (startIdx >= 0 && startIdx < def.Body.Instructions.Count)
                 {
-                    cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx]);
+                    cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx], seqMapping);
                 }
                 else
                     break;

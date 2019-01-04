@@ -133,9 +133,9 @@ namespace ILRuntimeTest
                         Mono.Cecil.Cil.ISymbolReaderProvider symbolReaderProvider = null;
                         if (pdbPath.EndsWith (".pdb")) {
                             symbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider ();
-                        } else if (pdbPath.EndsWith (".mdb")) {
+                        }/* else if (pdbPath.EndsWith (".mdb")) {
                             symbolReaderProvider = new Mono.Cecil.Mdb.MdbReaderProvider ();
-                        }
+                        }*/
 
                         _app.LoadAssembly(fs, fs2, symbolReaderProvider);
                         _isLoadAssembly = true;
