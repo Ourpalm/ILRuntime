@@ -468,10 +468,16 @@ namespace TestCases
         }
         static void TestMethod<T>(Action<GenericClass<T>> enter)
         {
+            GenericClass<T> ins = new GenericClass<T>();
+            enter(ins);
+
         }
         public static void GenericStaticMethodTest10()
         {
-            TestMethod<int>(null);
+            TestMethod<int>((ins) =>
+            {
+                Console.WriteLine(ins.t);
+            });
         }
 
 
