@@ -552,9 +552,9 @@ namespace ILRuntime.Runtime.Enviorment
                         {
                             if (i > 0)
                                 sb.Append(",");
-                            if (genericParams[i].Contains(","))
+                            /*if (genericParams[i].Contains(","))
                                 sb.Append(genericParams[i].Substring(0, genericParams[i].IndexOf(',')));
-                            else
+                            else*/
                                 sb.Append(genericParams[i]);
                         }
                         sb.Append('>');
@@ -662,7 +662,7 @@ namespace ILRuntime.Runtime.Enviorment
                                 name = name.Substring(1, name.Length - 2);
                             if (!string.IsNullOrEmpty(name))
                                 genericParams.Add(name);
-                            else
+                            else if (!string.IsNullOrEmpty(name))
                             {
                                 if (!isArray)
                                 {
@@ -672,6 +672,11 @@ namespace ILRuntime.Runtime.Enviorment
                                 {
                                     baseType += "[]";
                                 }
+                            }
+                            else
+                            {
+                                sb.Append("<>");
+                                continue;
                             }
                             sb.Length = 0;
                             continue;

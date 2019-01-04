@@ -53,8 +53,11 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Boolean>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.TestCLREnum>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestFramework.TestCLREnum>();
-
-
+            app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>>();
+            app.DelegateManager.RegisterFunctionDelegate<System.Byte, System.Boolean>();
+            app.DelegateManager.RegisterFunctionDelegate<System.Byte, System.Byte>();
+            app.DelegateManager.RegisterFunctionDelegate<System.Linq.IGrouping<System.Byte, System.Byte>, ILRuntime.Runtime.Intepreter.ILTypeInstance>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>();
             // delegate convertor
             app.DelegateManager.RegisterDelegateConvertor<System.Predicate<ILRuntime.Runtime.Intepreter.ILTypeInstance>>((act) =>
             {
