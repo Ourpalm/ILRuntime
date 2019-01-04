@@ -490,7 +490,7 @@ namespace ILRuntime.CLR.TypeSystem
                 interfaces = new IType[definition.Interfaces.Count];
                 for (int i = 0; i < interfaces.Length; i++)
                 {
-                    interfaces[i] = appdomain.GetType(definition.Interfaces[i], this, null);
+                    interfaces[i] = appdomain.GetType(definition.Interfaces[i].InterfaceType, this, null);
                     //only one clrInterface is valid
                     if (interfaces[i] is CLRType && firstCLRInterface == null)
                     {

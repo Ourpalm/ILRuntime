@@ -364,6 +364,7 @@ namespace ILRuntime.Runtime.Enviorment
         /// <param name="stream">Assembly Stream</param>
         /// <param name="symbol">symbol Stream</param>
         /// <param name="symbolReader">symbol 读取器</param>
+        /// <param name="inMemory">是否完整读入内存</param>
         public void LoadAssembly(System.IO.Stream stream, System.IO.Stream symbol, ISymbolReaderProvider symbolReader)
         {
             var module = ModuleDefinition.ReadModule(stream); //从MONO中加载模块

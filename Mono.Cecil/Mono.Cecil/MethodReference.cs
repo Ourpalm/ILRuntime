@@ -16,8 +16,9 @@ using Mono.Collections.Generic;
 namespace Mono.Cecil {
 
 	public class MethodReference : MemberReference, IMethodSignature, IGenericParameterProvider, IGenericContext {
-
-		internal ParameterDefinitionCollection parameters;
+        int hashCode = -1;
+        static int instance_id;
+        internal ParameterDefinitionCollection parameters;
 		MethodReturnType return_type;
 
 		bool has_this;
@@ -135,7 +136,14 @@ namespace Mono.Cecil {
 			}
 		}
 
-		internal MethodReference ()
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+            return hashCode;
+        }
+
+        internal MethodReference ()
 		{
 			this.return_type = new MethodReturnType (this);
 			this.token = new MetadataToken (TokenType.MemberRef);

@@ -53,7 +53,9 @@ namespace Mono.Cecil {
 
 		string @namespace;
 		bool value_type;
-		internal IMetadataScope scope;
+        int hashCode = -1;
+        static int instance_id;
+        internal IMetadataScope scope;
 		internal ModuleDefinition module;
 
 		internal ElementType etype = ElementType.None;
@@ -100,7 +102,14 @@ namespace Mono.Cecil {
 			}
 		}
 
-		internal new TypeReferenceProjection WindowsRuntimeProjection {
+        public override int GetHashCode()
+        {
+            if (hashCode == -1)
+                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+            return hashCode;
+        }
+
+        internal new TypeReferenceProjection WindowsRuntimeProjection {
 			get { return (TypeReferenceProjection) projection; }
 			set { projection = value; }
 		}
