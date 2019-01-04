@@ -130,7 +130,8 @@ namespace ILRuntime.Runtime.Debugger
                 arg--;
             if (arg->ObjectType == ObjectTypes.StackObjectReference)
             {
-                arg = *(StackObject**)&arg->Value;
+                var addr = *(long*)&arg->Value;
+                arg = (StackObject*)addr;
             }
             ILTypeInstance instance = arg->ObjectType != ObjectTypes.Null ? intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance : null;
             if (instance == null)
@@ -1004,7 +1005,7 @@ namespace ILRuntime.Runtime.Debugger
                 if (i < esp)
                 {
                     if (i->ObjectType == ObjectTypes.ValueTypeObjectReference)
-                        VisitValueTypeReference(*(StackObject**)&i->Value, leakVObj);
+                        VisitValueTypeReference(ILIntepreter.ResolveReference(i), leakVObj);
                 }
                 if (isLocal)
                 {
@@ -1061,13 +1062,13 @@ namespace ILRuntime.Runtime.Debugger
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        sb.Append(string.Format("Value:0x{0:X8}", (long)*(StackObject**)&esp->Value));
+                        sb.Append(string.Format("Value:0x{0:X8}", (long)ILIntepreter.ResolveReference(esp)));
                     }
                     break;
                 case ObjectTypes.ValueTypeObjectReference:
                     {
                         object obj = null;
-                        var dst = *(StackObject**)&esp->Value;
+                        var dst = ILIntepreter.ResolveReference(esp);
                         if (dst > valueTypeEnd)
                             obj = StackObject.ToObject(esp, domain, mStack);
                         if (obj != null)
@@ -1075,7 +1076,7 @@ namespace ILRuntime.Runtime.Debugger
 
                         text += string.Format("({0})", domain.GetType(dst->Value));
                     }
-                    sb.Append(string.Format("Value:0x{0:X8} Text:{1} ", (long)*(StackObject**)&esp->Value, text));
+                    sb.Append(string.Format("Value:0x{0:X8} Text:{1} ", (long)ILIntepreter.ResolveReference(esp), text));
                     break;
                 default:
                     {
@@ -1104,7 +1105,7 @@ namespace ILRuntime.Runtime.Debugger
                 var ptr = Minus(esp, i + 1);
                 if (ptr->ObjectType == ObjectTypes.ValueTypeObjectReference)
                 {
-                    VisitValueTypeReference(*(StackObject**)&ptr->Value, leak);
+                    VisitValueTypeReference(ILIntepreter.ResolveReference(ptr), leak);
                 }
             }
         }

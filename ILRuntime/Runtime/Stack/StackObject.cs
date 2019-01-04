@@ -89,11 +89,11 @@ namespace ILRuntime.Runtime.Stack
                     }
                 case ObjectTypes.StackObjectReference:
                     {
-                        return ToObject((*(StackObject**)&esp->Value), appdomain, mStack);
+                        return ToObject((ILIntepreter.ResolveReference(esp)), appdomain, mStack);
                     }
                 case ObjectTypes.ValueTypeObjectReference:
                     {
-                        StackObject* dst = *(StackObject**)&esp->Value;
+                        StackObject* dst = ILIntepreter.ResolveReference(esp);
                         IType type = appdomain.GetType(dst->Value);
                         if (type is ILType)
                         {
