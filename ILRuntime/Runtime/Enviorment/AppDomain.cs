@@ -732,7 +732,7 @@ namespace ILRuntime.Runtime.Enviorment
                 if (_ref.IsByReference)
                 {
                     var et = _ref.GetElementType();
-                    bool valid = !et.IsGenericParameter;
+                    bool valid = !et.ContainsGenericParameter;
                     var t = GetType(et, contextType, contextMethod);
                     if (t != null)
                     {
@@ -743,9 +743,11 @@ namespace ILRuntime.Runtime.Enviorment
                             ((ILType)res).TypeReference = _ref;
                         }
                         if (valid)
+                        {
                             mapTypeToken[hash] = res;
-                        if (!string.IsNullOrEmpty(res.FullName))
-                            mapType[res.FullName] = res;
+                            if (!string.IsNullOrEmpty(res.FullName))
+                                mapType[res.FullName] = res;
+                        }
                         return res;
                     }
                     return null;
