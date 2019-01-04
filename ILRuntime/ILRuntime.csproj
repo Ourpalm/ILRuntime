@@ -35,6 +35,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Dependencies\Mono.Cecil.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -114,12 +117,6 @@
     <Compile Include="Runtime\Stack\RuntimeStack.cs" />
     <Compile Include="Runtime\Stack\StackFrame.cs" />
     <Compile Include="Runtime\Stack\StackObject.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Mono.Cecil\Mono.Cecil.csproj">
-      <Project>{d68133bd-1e63-496e-9ede-4fbdbf77b486}</Project>
-      <Name>Mono.Cecil</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
