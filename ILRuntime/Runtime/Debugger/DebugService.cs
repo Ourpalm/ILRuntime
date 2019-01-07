@@ -388,7 +388,7 @@ namespace ILRuntime.Runtime.Debugger
             StackFrame[] frames = intp.Stack.Frames.ToArray();
             Mono.Cecil.Cil.Instruction ins = null;
             ILMethod m;
-            StackFrameInfo[] frameInfos = new StackFrameInfo[frames.Length];
+            List<StackFrameInfo> frameInfos = new List<StackFrameInfo>();
 
             for (int j = 0; j < frames.Length; j++)
             {
@@ -409,6 +409,8 @@ namespace ILRuntime.Runtime.Debugger
                         info.EndLine = seq.EndLine - 1;
                         info.EndColumn = seq.EndColumn - 1;
                     }
+                    else
+                        continue;
                 }
                 StackFrame topFrame = f;
                 m = topFrame.Method;
@@ -460,9 +462,9 @@ namespace ILRuntime.Runtime.Debugger
                     vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
                     info.LocalVariables[i] = vinfo;
                 }
-                frameInfos[j] = info;
+                frameInfos.Add(info);
             }
-            return frameInfos;
+            return frameInfos.ToArray();
         }
 
         internal unsafe VariableInfo[] EnumChildren(int threadHashCode, VariableReference parent)

@@ -260,6 +260,40 @@ namespace ILRuntime.Runtime.Debugger
                 clientSocket.Send(type, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
+        bool CheckCompilerGeneratedStateMachine(ILMethod ilm, Enviorment.AppDomain domain,int startLine, out ILMethod found)
+        {
+            var mDef = ilm.Definition;
+            Mono.Cecil.CustomAttribute ca = null;
+            found = null;
+            foreach (var attr in mDef.CustomAttributes)
+            {
+                switch (attr.AttributeType.FullName)
+                {
+                    case "System.Runtime.CompilerServices.AsyncStateMachineAttribute":
+                    case "System.Runtime.CompilerServices.IteratorStateMachineAttribute":
+                        ca = attr;
+                        break;
+
+                }
+            }
+            if (ca != null)
+            {
+                if (ca.ConstructorArguments.Count > 0)
+                {
+                    var smType = domain.GetType(ca.ConstructorArguments[0].Value, null, null);
+                    if (smType != null)
+                    {
+                        ilm = smType.GetMethod("MoveNext", 0, true) as ILMethod;
+                        if (ilm != null && ilm.StartLine <= (startLine + 1) && ilm.EndLine >= (startLine + 1))
+                        {
+                            found = ilm;
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
         void TryBindBreakpoint(CSBindBreakpoint msg)
         {
             var domain = ds.AppDomain;
@@ -284,6 +318,10 @@ namespace ILRuntime.Runtime.Debugger
                                     if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
                                     {
                                         found = ilm;
+                                        break;
+                                    }
+                                    else if (CheckCompilerGeneratedStateMachine(ilm, domain, msg.StartLine, out found))
+                                    {
                                         break;
                                     }
                                 }
@@ -341,6 +379,10 @@ namespace ILRuntime.Runtime.Debugger
                                     if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
                                     {
                                         found = ilm;
+                                        break;
+                                    }
+                                    else if(CheckCompilerGeneratedStateMachine(ilm, domain, msg.StartLine, out found))
+                                    {
                                         break;
                                     }
                                 }
