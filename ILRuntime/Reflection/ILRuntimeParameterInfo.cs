@@ -12,10 +12,13 @@ namespace ILRuntime.Reflection
     public class ILRuntimeParameterInfo : ParameterInfo
     {
         IType type;
+        MethodBase method;
 
-        public ILRuntimeParameterInfo(IType type)
+        public ILRuntimeParameterInfo(IType type, MethodBase method)
         {
             this.type = type;
+            this.method = method;
+            this.MemberImpl = method;
         }
         public override Type ParameterType
         {

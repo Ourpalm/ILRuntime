@@ -20,7 +20,7 @@ namespace ILRuntime.Reflection
             parameters = new ILRuntimeParameterInfo[m.ParameterCount];
             for(int i = 0; i < m.ParameterCount; i++)
             {
-                parameters[i] = new ILRuntimeParameterInfo(m.Parameters[i]);
+                parameters[i] = new ILRuntimeParameterInfo(m.Parameters[i], this);
             }
         }
 
