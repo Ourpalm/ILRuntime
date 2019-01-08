@@ -514,6 +514,13 @@ namespace ILRuntime.Reflection
                 if (i.Name == name)
                     return i;
             }
+            if ((bindingAttr & BindingFlags.DeclaredOnly) != BindingFlags.DeclaredOnly)
+            {
+                if (BaseType != null && BaseType is ILRuntimeWrapperType)
+                {
+                    return BaseType.GetProperty(name, bindingAttr);
+                }
+            }
             return null;
         }
 

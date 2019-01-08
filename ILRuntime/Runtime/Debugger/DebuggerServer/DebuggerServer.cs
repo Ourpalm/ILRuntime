@@ -174,7 +174,8 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             info = VariableInfo.GetException(ex);
                         }
-                        SendSCResolveVariableResult(info);
+                        if (info.Type != VariableTypes.Pending)
+                            SendSCResolveVariableResult(info);
                     }
                     break;
                 case DebugMessageType.CSResolveIndexAccess:
@@ -194,7 +195,8 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             info = VariableInfo.GetException(ex);
                         }
-                        SendSCResolveVariableResult(info);
+                        if (info.Type != VariableTypes.Pending)
+                            SendSCResolveVariableResult(info);
                     }
                     break;
                 case DebugMessageType.CSEnumChildren:
@@ -211,7 +213,8 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             info = new VariableInfo[] { VariableInfo.GetException(ex) };
                         }
-                        SendSCEnumChildrenResult(info);
+                        if (info != null)
+                            SendSCEnumChildrenResult(info);
                     }
                     break;
             }
@@ -436,27 +439,33 @@ namespace ILRuntime.Runtime.Debugger
             DoSend(DebugMessageType.SCStepComplete);
         }
 
-        void SendSCResolveVariableResult(VariableInfo info)
+        internal void SendSCResolveVariableResult(VariableInfo info)
         {
-            sendStream.Position = 0;
-            WriteVariableInfo(info);
-            DoSend(DebugMessageType.SCResolveVariableResult);
+            lock (this)
+            {
+                sendStream.Position = 0;
+                WriteVariableInfo(info);
+                DoSend(DebugMessageType.SCResolveVariableResult);
+            }
         }
 
-        void SendSCEnumChildrenResult(VariableInfo[] info)
+        internal void SendSCEnumChildrenResult(VariableInfo[] info)
         {
-            sendStream.Position = 0;
-            if (info != null)
+            lock (this)
             {
-                bw.Write(info.Length);
-                for (int i = 0; i < info.Length; i++)
+                sendStream.Position = 0;
+                if (info != null)
                 {
-                    WriteVariableInfo(info[i]);
+                    bw.Write(info.Length);
+                    for (int i = 0; i < info.Length; i++)
+                    {
+                        WriteVariableInfo(info[i]);
+                    }
                 }
+                else
+                    bw.Write(0);
+                DoSend(DebugMessageType.SCEnumChildrenResult);
             }
-            else
-                bw.Write(0);
-            DoSend(DebugMessageType.SCEnumChildrenResult);
         }
 
         void WriteStackFrames(KeyValuePair<int, StackFrameInfo[]>[] info)

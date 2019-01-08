@@ -28,6 +28,7 @@ namespace ILRuntime.Runtime.Intepreter
         public StackObject* LastStepFrameBase { get; set; }
         public int LastStepInstructionIndex { get; set; }
         StackObject* ValueTypeBasePointer;
+        bool mainthreadLock;
         public ILIntepreter(Enviorment.AppDomain domain)
         {
             this.domain = domain;
@@ -44,6 +45,18 @@ namespace ILRuntime.Runtime.Intepreter
         {
             //Clear old debug state
             ClearDebugState();
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+            if(domain.UnityMainThreadID == Thread.CurrentThread.ManagedThreadId)
+            {
+                mainthreadLock = true;
+                while (mainthreadLock)
+                {
+                    domain.DebugService.ResolvePendingRequests();
+                    Thread.Sleep(10);
+                }
+                return;
+            }
+#endif
             lock (_lockObj)
             {
                 Monitor.Wait(_lockObj);
@@ -52,6 +65,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         public void Resume()
         {
+            mainthreadLock = false;
             lock (_lockObj)
                 Monitor.Pulse(_lockObj);
         }

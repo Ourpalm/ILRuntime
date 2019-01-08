@@ -154,7 +154,7 @@ namespace ILRuntime.Reflection
 
         protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
         {
-            return et.GetProperty(name, bindingAttr, binder, returnType, types, modifiers);
+            return et.GetProperty(name, bindingAttr);
         }
 
         public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)

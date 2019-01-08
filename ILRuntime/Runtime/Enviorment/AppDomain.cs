@@ -60,6 +60,10 @@ namespace ILRuntime.Runtime.Enviorment
 
 #if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
         public int UnityMainThreadID { get; set; }
+        public bool IsNotUnityMainThread()
+        {
+            return UnityMainThreadID != 0 && (UnityMainThreadID != System.Threading.Thread.CurrentThread.ManagedThreadId);
+        }
 #endif
         public unsafe AppDomain()
         {

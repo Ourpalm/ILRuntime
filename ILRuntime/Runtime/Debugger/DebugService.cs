@@ -20,6 +20,9 @@ namespace ILRuntime.Runtime.Debugger
         Runtime.Enviorment.AppDomain domain;
         Dictionary<int, LinkedList<BreakpointInfo>> activeBreakpoints = new Dictionary<int, LinkedList<BreakpointInfo>>();
         Dictionary<int, BreakpointInfo> breakpointMapping = new Dictionary<int, BreakpointInfo>();
+        Queue<KeyValuePair<int, VariableReference>> pendingReferences = new Queue<KeyValuePair<int, VariableReference>>();
+        Queue<KeyValuePair<int, VariableReference>> pendingEnuming = new Queue<KeyValuePair<int, VariableReference>>();
+        Queue<KeyValuePair<int, KeyValuePair<VariableReference, VariableReference>>> pendingIndexing = new Queue<KeyValuePair<int, KeyValuePair<VariableReference, VariableReference>>>();
         AutoResetEvent evt = new AutoResetEvent(false);
         
         public Action<string> OnBreakPoint;
@@ -472,6 +475,16 @@ namespace ILRuntime.Runtime.Debugger
             ILIntepreter intepreter;
             if (AppDomain.Intepreters.TryGetValue(threadHashCode, out intepreter))
             {
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+                if (domain.IsNotUnityMainThread())
+                {
+                    lock (pendingEnuming)
+                    {
+                        pendingEnuming.Enqueue(new KeyValuePair<int, VariableReference>(threadHashCode, parent));
+                    }
+                    return null;
+                }
+#endif
                 object obj;
                 var info = ResolveVariable(threadHashCode, parent, out obj);
                 if (obj != null)
@@ -654,6 +667,8 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     if (i.GetIndexParameters().Length > 0)
                         continue;
+                    if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                        continue;
                     var val = i.GetValue(obj, null);
                     VariableInfo info = VariableInfo.FromObject(val);
                     info.Type = VariableTypes.PropertyReference;
@@ -682,6 +697,17 @@ namespace ILRuntime.Runtime.Debugger
             res = null;
             if (AppDomain.Intepreters.TryGetValue(threadHashCode, out intepreter))
             {
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+                if (domain.IsNotUnityMainThread())
+                {
+                    lock (pendingIndexing)
+                    {
+                        pendingIndexing.Enqueue(new KeyValuePair<int, KeyValuePair<VariableReference, VariableReference>>(threadHashCode, new KeyValuePair<VariableReference, VariableReference>(body, idx)));
+                    }
+                    res = null;
+                    return new VariableInfo() { Type = VariableTypes.Pending };
+                }
+#endif
                 object obj;
                 var info = ResolveVariable(threadHashCode, body, out obj);
                 if (obj != null)
@@ -768,6 +794,63 @@ namespace ILRuntime.Runtime.Debugger
                 return VariableInfo.NullReferenceExeption;
         }
 
+        internal void ResolvePendingRequests()
+        {
+            lock (pendingReferences)
+            {
+                while (pendingReferences.Count > 0)
+                {
+                    VariableInfo info;
+                    var r = pendingReferences.Dequeue();
+                    try
+                    {
+                        object res;
+                        info = ResolveVariable(r.Key, r.Value, out res);
+                    }
+                    catch (Exception ex)
+                    {
+                        info = VariableInfo.GetException(ex);
+                    }
+                    server.SendSCResolveVariableResult(info);
+                }
+            }
+            lock (pendingEnuming)
+            {
+                while (pendingEnuming.Count > 0)
+                {
+                    VariableInfo[] info;
+                    var r = pendingEnuming.Dequeue();
+                    try
+                    {
+                        info = EnumChildren(r.Key, r.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        info = new VariableInfo[] { VariableInfo.GetException(ex) };
+                    }
+                    server.SendSCEnumChildrenResult(info);
+                }
+            }
+            lock (pendingIndexing)
+            {
+                while (pendingIndexing.Count > 0)
+                {
+                    VariableInfo info;
+                    var r = pendingIndexing.Dequeue();
+                    try
+                    {
+                        object res;
+                        info = ResolveIndexAccess(r.Key, r.Value.Key, r.Value.Value, out res);
+                    }
+                    catch (Exception ex)
+                    {
+                        info = VariableInfo.GetException(ex);
+                    }
+                    server.SendSCResolveVariableResult(info);
+                }
+            }
+        }
+
         internal unsafe VariableInfo ResolveVariable(int threadHashCode, VariableReference variable, out object res)
         {
             ILIntepreter intepreter;
@@ -776,6 +859,17 @@ namespace ILRuntime.Runtime.Debugger
             {
                 if (variable != null)
                 {
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+                    if (domain.IsNotUnityMainThread())
+                    {
+                        lock (pendingReferences)
+                        {
+                            pendingReferences.Enqueue(new KeyValuePair<int, VariableReference>(threadHashCode, variable));
+                        }
+                        res = null;
+                        return new VariableInfo() { Type = VariableTypes.Pending };
+                    }
+#endif
                     switch (variable.Type)
                     {
                         case VariableTypes.Normal:
@@ -999,6 +1093,9 @@ namespace ILRuntime.Runtime.Debugger
         {
             activeBreakpoints.Clear();
             breakpointMapping.Clear();
+            pendingEnuming.Clear();
+            pendingReferences.Clear();
+            pendingIndexing.Clear();
             foreach (var j in AppDomain.Intepreters)
             {
                 j.Value.ClearDebugState();
