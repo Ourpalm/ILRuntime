@@ -13,26 +13,21 @@ namespace ILRuntime.Reflection
     {
         IType type;
         MethodBase method;
+        Mono.Cecil.ParameterDefinition definition;
 
-        public ILRuntimeParameterInfo(IType type, MethodBase method)
+        public ILRuntimeParameterInfo(Mono.Cecil.ParameterDefinition definition, IType type, MethodBase method)
         {
             this.type = type;
             this.method = method;
             this.MemberImpl = method;
+            this.definition = definition;
+            NameImpl = definition.Name;
         }
         public override Type ParameterType
         {
             get
             {
                 return type.ReflectionType;
-            }
-        }
-
-        public override string Name
-        {
-            get
-            {
-                return type.FullName;
             }
         }
     }
