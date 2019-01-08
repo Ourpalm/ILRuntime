@@ -817,7 +817,26 @@ namespace ILRuntime.Runtime.Debugger
                                     {
                                         var addr = Minus(frame.LocalVarPointer, m.ParameterCount + 1);
                                         var v = StackObject.ToObject(addr, intepreter.AppDomain, intepreter.Stack.ManagedStack);
-                                        return ResolveMember(v, variable.Name, out res);
+                                        var result = ResolveMember(v, variable.Name, out res);
+                                        if (result.Type == VariableTypes.NotFound)
+                                        {
+                                            ILTypeInstance ins = v as ILTypeInstance;
+                                            if (ins != null)
+                                            {
+                                                var ilType = ins.Type.ReflectionType;
+                                                var fields = ilType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                                                foreach (var f in fields)
+                                                {
+                                                    if (f.Name.Contains("_this"))
+                                                    {
+                                                        result = ResolveMember(f.GetValue(v), variable.Name, out res);
+                                                        if (result.Type != VariableTypes.NotFound)
+                                                            return result;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        return result;
                                     }
                                     else
                                     {
@@ -900,22 +919,44 @@ namespace ILRuntime.Runtime.Debugger
             }
             else
             {
-                var pi = type.GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (pi != null)
+                var fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                string match = string.Format("<{0}>", name);
+                foreach (var f in fields)
                 {
-                    res = pi.GetValue(obj, null);
-                    VariableInfo info = VariableInfo.FromObject(res);
+                    if (f.Name.Contains(match))
+                    {
+                        res = f.GetValue(obj);
+                        VariableInfo info = VariableInfo.FromObject(res);
 
-                    info.Address = 0;
-                    info.Name = name;
-                    info.Type = VariableTypes.PropertyReference;
-                    info.TypeName = pi.PropertyType.FullName;
-                    info.IsPrivate = pi.GetGetMethod(true).IsPrivate;
-                    info.IsProtected = pi.GetGetMethod(true).IsFamily;
-                    info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
-                    return info;
+                        info.Address = 0;
+                        info.Name = name;
+                        info.Type = VariableTypes.FieldReference;
+                        info.TypeName = f.FieldType.FullName;
+                        info.IsPrivate = f.IsPrivate;
+                        info.IsProtected = f.IsFamily;
+                        info.Expandable = res != null && !f.FieldType.IsPrimitive;
+
+                        return info;
+                    }
                 }
             }
+
+            var pi = type.GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (pi != null)
+            {
+                res = pi.GetValue(obj, null);
+                VariableInfo info = VariableInfo.FromObject(res);
+
+                info.Address = 0;
+                info.Name = name;
+                info.Type = VariableTypes.PropertyReference;
+                info.TypeName = pi.PropertyType.FullName;
+                info.IsPrivate = pi.GetGetMethod(true).IsPrivate;
+                info.IsProtected = pi.GetGetMethod(true).IsFamily;
+                info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
+                return info;
+            }
+
             return VariableInfo.GetCannotFind(name);
         }
 
