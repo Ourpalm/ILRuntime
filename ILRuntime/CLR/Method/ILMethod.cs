@@ -529,7 +529,7 @@ namespace ILRuntime.CLR.Method
             {
                 TypeReference _ref = ((TypeReference)token);
                 if (_ref.IsArray)
-                    return CheckHasGenericParamter(_ref.GetElementType());
+                    return CheckHasGenericParamter(((ArrayType)_ref).ElementType);
                 if (_ref.IsGenericParameter)
                     return true;
                 if (_ref.IsGenericInstance)
@@ -577,16 +577,16 @@ namespace ILRuntime.CLR.Method
                 bool isArray = false;
                 int rank = 1;
                 TypeReference pt = i.ParameterType;
-                if (i.ParameterType.IsByReference)
+                if (pt.IsByReference)
                 {
                     isByRef = true;
-                    pt = pt.GetElementType();
+                    pt = ((ByReferenceType)pt).ElementType;
                 }
-                if (i.ParameterType.IsArray)
+                if (pt.IsArray)
                 {
                     isArray = true;
                     rank = ((ArrayType)pt).Rank;
-                    pt = pt.GetElementType();
+                    pt = ((ArrayType)pt).ElementType;
                 }
                 if (pt.IsGenericParameter)
                 {
@@ -609,14 +609,14 @@ namespace ILRuntime.CLR.Method
                         else
                             throw new NotSupportedException("Cannot find Generic Parameter " + pt.Name + " in " + def.FullName);
                     }
-
-                    if (isByRef)
-                        type = type.MakeByRefType();
-                    if (isArray)
-                        type = type.MakeArrayType(rank);
                 }
                 else
-                    type = appdomain.GetType(i.ParameterType, declaringType, this);
+                    type = appdomain.GetType(pt, declaringType, this);
+
+                if (isByRef)
+                    type = type.MakeByRefType();
+                if (isArray)
+                    type = type.MakeArrayType(rank);
                 parameters.Add(type);
             }
         }

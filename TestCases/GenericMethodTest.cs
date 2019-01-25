@@ -502,5 +502,10 @@ namespace TestCases
             a.TestMethod(out aa);
             b.TestMethod(out bb);
         }
+
+        public static void GenericStaticMethodTest12()
+        {
+            ILRuntimeTest.TestBase.StaticGenericMethods.Method("");
+        }
     }
 }

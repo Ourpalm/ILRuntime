@@ -726,7 +726,7 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 if (_ref.IsByReference)
                 {
-                    var et = _ref.GetElementType();
+                    var et = ((ByReferenceType)_ref).ElementType;
                     bool valid = !et.ContainsGenericParameter;
                     var t = GetType(et, contextType, contextMethod);
                     if (t != null)
@@ -750,7 +750,7 @@ namespace ILRuntime.Runtime.Enviorment
                 if (_ref.IsArray)
                 {
                     ArrayType at = (ArrayType)_ref;
-                    var t = GetType(_ref.GetElementType(), contextType, contextMethod);
+                    var t = GetType(at.ElementType, contextType, contextMethod);
                     if (t != null)
                     {
                         res = t.MakeArrayType(at.Rank);

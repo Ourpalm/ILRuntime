@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ILRuntime.Other;
 
@@ -38,5 +39,9 @@ namespace ILRuntimeTest.TestBase
         public static void StaticMethod(Func<ExtensionClass, Task> func) { }
         public static void StaticMethod<TValue>(Func<Task<TValue>> func) { }
         public static void StaticMethod<TValue>(Func<ExtensionClass, Task<TValue>> func) { }
+        public static void Method(string name, params KeyValuePair<string, string[]>[] panels)
+        {
+            Console.WriteLine("进来了");
+        }
     }
 }
