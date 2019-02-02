@@ -39,6 +39,7 @@ namespace ILRuntime.CLR.TypeSystem
         List<ILType> genericInstances;
         bool isDelegate;
         ILRuntimeType reflectionType;
+        ILType genericDefinition;
         IType firstCLRBaseType, firstCLRInterface;
         int hashCode = -1;
         static int instance_id = 0x10000000;
@@ -299,6 +300,11 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 return genericArguments != null;
             }
+        }
+
+        public ILType GetGenericDefinition()
+        {
+            return genericDefinition;
         }
         public KeyValuePair<string, IType>[] GenericArguments
         {
@@ -1117,6 +1123,7 @@ namespace ILRuntime.CLR.TypeSystem
                     return i;
             }
             var res = new ILType(definition, appdomain);
+            res.genericDefinition = this;
             res.genericArguments = genericArguments;
 
             genericInstances.Add(res);
