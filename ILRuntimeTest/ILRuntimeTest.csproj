@@ -41,6 +41,15 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Dependencies\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>..\Dependencies\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\Dependencies\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -83,6 +92,7 @@
     <Compile Include="AutoGenerate\ILRuntime_CLR_TypeSystem_IType_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntime_Runtime_Enviorment_AppDomain_Binding.cs" />
     <Compile Include="AutoGenerate\LitJson_JsonMapper_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_1_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_3_Int32_String_String_Binding.cs" />
@@ -128,6 +138,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_String_Binding_Enumerator_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Task_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_IDictionary_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_IEnumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Console_Binding.cs" />
@@ -149,6 +160,7 @@
     <Compile Include="AutoGenerate\System_IO_FileStream_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_File_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_Stream_Binding.cs" />
+    <Compile Include="AutoGenerate\System_IO_TextReader_Binding.cs" />
     <Compile Include="AutoGenerate\System_Linq_Enumerable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Math_Binding.cs" />
     <Compile Include="AutoGenerate\System_NotImplementedException_Binding.cs" />
@@ -161,12 +173,18 @@
     <Compile Include="AutoGenerate\System_Reflection_MethodBase_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_PropertyInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_List_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncVoidMethodBuilder_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_List_1_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_Binding.cs" />
     <Compile Include="AutoGenerate\System_Single_Binding.cs" />
     <Compile Include="AutoGenerate\System_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_List_1_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Threading_Tasks_Task_Binding.cs" />
     <Compile Include="AutoGenerate\System_Type_Binding.cs" />
     <Compile Include="TestFramework\GenericExtensions.cs" />
@@ -224,18 +242,6 @@
     <ProjectReference Include="..\LitJson\LitJson.csproj">
       <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
       <Name>LitJson</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.20\Mono.Cecil.20.csproj">
-      <Project>{d3785d8b-4d85-4546-8763-47fc848c13e0}</Project>
-      <Name>Mono.Cecil.20</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Pdb\Mono.Cecil.Pdb.csproj">
-      <Project>{cea7a85f-2523-4ad0-8296-6e8e0a2e6df7}</Project>
-      <Name>Mono.Cecil.Pdb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Mdb\Mono.Cecil.Mdb.csproj">
-      <Project>{86F36240-E07C-4840-9C8B-9CD94C03EC62}</Project>
-      <Name>Mono.Cecil.Mdb</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -88,6 +88,40 @@ namespace TestCases
             }
         }
 
+        /*public static async void TestRun4()
+        {
+            List<Task> tasks = new List<Task>();
+            for (int i = 1; i <= 3; ++i)
+            {
+                string path = $"{i}.txt";
+                Console.WriteLine(path);
+                if (!System.IO.File.Exists(path))
+                    System.IO.File.CreateText(path);
+                Task task = Task.Run(async () =>
+                {
+                    return await readText(path);
+                });
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks);
+        }
+
+        private static async Task<List<string>> readText(string path)
+        {
+            Console.WriteLine(path);
+            List<string> lines = new List<string>();
+            using (System.IO.StreamReader reader = System.IO.File.OpenText(path))
+            {
+                string line;
+                while (null != (line = await reader.ReadLineAsync()))
+                {
+                    lines.Add(line);
+                }
+            }
+
+            return lines;
+        }*/
+
         class AsyncAwaitTest1
         {
             public string a;

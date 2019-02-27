@@ -20,6 +20,7 @@ namespace ILRuntimeTest
     {
         public static ILRuntime.Runtime.Enviorment.AppDomain _app;
         private Assembly _assembly;
+        FileStream fs, fs2;
         private List<TestResultInfo> _resList = new List<TestResultInfo>();
         private List<BaseTestUnit> _testUnitList = new List<BaseTestUnit>();
 
@@ -103,6 +104,10 @@ namespace ILRuntimeTest
 
         private void OnBtnLoad(object sender, EventArgs e)
         {
+            if (fs != null)
+                fs.Close();
+            if (fs2 != null)
+                fs2.Close();
             if (txtPath.Text == "")
             {
                 if (OD.ShowDialog() == DialogResult.OK)
@@ -118,7 +123,7 @@ namespace ILRuntimeTest
 
             try
             {
-                using (FileStream fs = new FileStream(txtPath.Text, FileMode.Open, FileAccess.Read))
+                fs = new FileStream(txtPath.Text, FileMode.Open, FileAccess.Read);
                 {
                     var path = Path.GetDirectoryName(txtPath.Text);
                     var name = Path.GetFileNameWithoutExtension(txtPath.Text);
@@ -128,14 +133,14 @@ namespace ILRuntimeTest
                         pdbPath = Path.Combine(path, name) + ".mdb";
                     }
 
-                    using (var fs2 = new System.IO.FileStream(pdbPath, FileMode.Open))
+                    fs2 = new System.IO.FileStream(pdbPath, FileMode.Open);
                     {
                         Mono.Cecil.Cil.ISymbolReaderProvider symbolReaderProvider = null;
                         if (pdbPath.EndsWith (".pdb")) {
                             symbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider ();
-                        } else if (pdbPath.EndsWith (".mdb")) {
+                        }/* else if (pdbPath.EndsWith (".mdb")) {
                             symbolReaderProvider = new Mono.Cecil.Mdb.MdbReaderProvider ();
-                        }
+                        }*/
 
                         _app.LoadAssembly(fs, fs2, symbolReaderProvider);
                         _isLoadAssembly = true;

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">net_4_0_Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <BuildDirectory Condition=" '$(BuildDirectory)' == '' ">$(MSBuildThisFileDirectory)</BuildDirectory>
+    <FileAlignment>512</FileAlignment>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputType>Library</OutputType>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\cecil.snk</AssemblyOriginatorKeyFile>
+    <OutputType>Library</OutputType>
+    <OutputPath>$(BuildDirectory)\bin\$(Configuration)\</OutputPath>
+    <MSBuildCSharpTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</MSBuildCSharpTargets>
+    <NetStandard Condition=" $(Configuration.StartsWith('netstandard')) Or '$(NuGetRestoreTargets)' != '' ">true</NetStandard>
+    <NetStandard Condition=" '$(NetStandard)' == '' ">false</NetStandard>
+    <IsTestProject Condition=" '$(IsTestProject)' == '' ">false</IsTestProject>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(Configuration.Contains('Debug')) ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(Configuration.Contains('Release')) ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(Configuration.Contains('ReadOnly')) ">
+    <DefineConstants>$(DefineConstants);READ_ONLY;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(Configuration.StartsWith('net_3_5')) ">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <DefineConstants>$(DefineConstants);NET_3_5;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(Configuration.StartsWith('net_4_0')) ">
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <DefineConstants>$(DefineConstants);NET_4_0;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(Configuration.StartsWith('net_462_')) ">
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <DefineConstants>$(DefineConstants);NET_4_0;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(NetStandard)">
+    <TargetFramework Condition="$(IsTestProject)">netcoreapp2.0</TargetFramework>
+    <TargetFramework Condition="!$(IsTestProject)">netstandard1.3</TargetFramework>
+  </PropertyGroup>
+  <Import Project="NetStandard.props" Condition="$(NetStandard)" />
+  <!-- Shared References -->
+  <ItemGroup Condition="!$(NetStandard)">
+    <Reference Include="System.Core" />
+    <Reference Include="System" />
+  </ItemGroup>
+  <!-- The following keeps Visual Studio happy; let's keep Visual Studio happy -->
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_3_5_Debug' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_3_5_Debug_ReadOnly' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_3_5_Release' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_3_5_Release_ReadOnly' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_4_0_Debug' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_4_0_Debug_ReadOnly' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_4_0_Release' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_4_0_Release_ReadOnly' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_462_Debug' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_462_Debug_ReadOnly' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_462_Release' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'net_462_Release_ReadOnly' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'netstandard_Debug' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'netstandard_Debug_ReadOnly' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'netstandard_Release' "/>
+  <PropertyGroup Condition=" '$(Configuration)' == 'netstandard_Release_ReadOnly' "/>
+  <!-- This optional import allows products that distribute Cecil to tweak settings that will affect its 
+       build, without having to fork the project unnecessarily. The Mono.Cecil.overrides file is a plain 
+       MSBuild file with additional properties, and can exist anywhere upwards from the current Cecil repo 
+       clone path, making it very flexible even if the project is submoduled. 
+  -->
+  <PropertyGroup>
+    <CecilOverrides Condition="'$(CecilOverrides)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), Mono.Cecil.overrides))\Mono.Cecil.overrides</CecilOverrides>
+  </PropertyGroup>  
+  <Import Project="$(CecilOverrides)" Condition="Exists('$(CecilOverrides)')" />
+  
+  <!-- This is an example of a custom override file -->
+  <!--
+	<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	  <PropertyGroup>
+		<AssemblyName>$(AssemblyName.Replace('Mono', 'MyCompany'))</AssemblyName>
+		<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)MyCompany.snk</AssemblyOriginatorKeyFile>
+	  </PropertyGroup>
+		<ItemGroup>
+			<Compile Include="$(MSBuildThisFileDirectory)MyCompany.AssemblyInfo.cs" />
+		</ItemGroup>
+	</Project>
+	
+	The additional AssemblyInfo.cs added to the Compile group provides the InternalsVisibleTo so that 
+	the Mdb/Pdb projects can compile successfully:
+	
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+[assembly: InternalsVisibleTo ("MyCompany.Cecil.Pdb, PublicKey=....")]
+[assembly: InternalsVisibleTo ("MyCompany.Cecil.Mdb, PublicKey=...")]
+[assembly: InternalsVisibleTo ("MyCompany.Cecil.Rocks, PublicKey=...")]
+[assembly: InternalsVisibleTo ("MyCompany.Cecil.Tests, PublicKey=...")]	
+  -->
+</Project>

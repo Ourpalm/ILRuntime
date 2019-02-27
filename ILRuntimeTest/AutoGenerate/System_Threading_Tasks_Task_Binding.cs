@@ -70,6 +70,23 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
             }
+            args = new Type[]{typeof(System.Collections.Generic.List<System.String>)};
+            if (genericMethods.TryGetValue("Run", out lst))
+            {
+                foreach(var m in lst)
+                {
+                    if(m.MatchGenericParameters(args, typeof(System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>), typeof(System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>>)))
+                    {
+                        method = m.MakeGenericMethod(args);
+                        app.RegisterCLRMethodRedirection(method, Run_4);
+
+                        break;
+                    }
+                }
+            }
+            args = new Type[]{typeof(System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)};
+            method = type.GetMethod("WhenAll", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WhenAll_5);
             args = new Type[]{typeof(System.Int32)};
             if (genericMethods.TryGetValue("FromResult", out lst))
             {
@@ -78,7 +95,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Threading.Tasks.Task<System.Int32>), typeof(System.Int32)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, FromResult_4);
+                        app.RegisterCLRMethodRedirection(method, FromResult_6);
 
                         break;
                     }
@@ -117,6 +134,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.Run<System.Int32>(@function);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
@@ -132,6 +154,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.Delay(@millisecondsDelay);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
@@ -148,10 +175,57 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.Run<System.Int32>(@function);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* FromResult_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Run_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>> @function = (System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>>)typeof(System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+
+            var result_of_this_method = System.Threading.Tasks.Task.Run<System.Collections.Generic.List<System.String>>(@function);
+
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static StackObject* WhenAll_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task> @tasks = (System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)typeof(System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+
+            var result_of_this_method = System.Threading.Tasks.Task.WhenAll(@tasks);
+
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static StackObject* FromResult_6(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -163,6 +237,11 @@ namespace ILRuntime.Runtime.Generated
 
             var result_of_this_method = System.Threading.Tasks.Task.FromResult<System.Int32>(@result);
 
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 

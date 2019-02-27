@@ -128,7 +128,7 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
+                        var ___dst = ILIntepreter.ResolveReference(ptr_of_this_method);
                         ___dst->ObjectType = ObjectTypes.Long;
                         *(long*)&___dst->Value = @i;
                     }
