@@ -10,12 +10,12 @@
 using System;
 using System.Runtime.InteropServices;
 
-using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Collections.Generic;
 
 #if !READ_ONLY
 
-namespace Mono.Cecil.Pdb
+namespace ILRuntime.Mono.Cecil.Pdb
 {
 	internal class SymWriter
 	{

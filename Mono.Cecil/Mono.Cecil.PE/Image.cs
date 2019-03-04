@@ -11,13 +11,13 @@
 using System;
 using System.IO;
 
-using Mono.Cecil.Cil;
-using Mono.Cecil.Metadata;
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Metadata;
+using ILRuntime.Mono.Collections.Generic;
 
 using RVA = System.UInt32;
 
-namespace Mono.Cecil.PE {
+namespace ILRuntime.Mono.Cecil.PE {
 
 	sealed class Image : IDisposable {
 

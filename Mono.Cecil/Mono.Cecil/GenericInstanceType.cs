@@ -11,11 +11,11 @@
 using System;
 using System.Text;
 
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 
-using MD = Mono.Cecil.Metadata;
+using MD = ILRuntime.Mono.Cecil.Metadata;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public sealed class GenericInstanceType : TypeSpecification, IGenericInstance, IGenericContext {
 

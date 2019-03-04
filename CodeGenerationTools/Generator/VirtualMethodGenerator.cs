@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CodeGenerationTools.Generator.Base;
-using Mono.Cecil;
+using ILRuntime.Mono.Cecil;
 
 namespace CodeGenerationTools.Generator
 {

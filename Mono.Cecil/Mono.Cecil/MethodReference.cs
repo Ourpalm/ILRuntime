@@ -11,9 +11,9 @@
 using System;
 using System.Text;
 
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public class MethodReference : MemberReference, IMethodSignature, IGenericParameterProvider, IGenericContext {
         int hashCode = -1;

@@ -10,12 +10,12 @@
 
 using System;
 using System.Collections.Generic;
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 using SR = System.Reflection;
 
-using Mono.Cecil.Metadata;
+using ILRuntime.Mono.Cecil.Metadata;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 #if !READ_ONLY
 

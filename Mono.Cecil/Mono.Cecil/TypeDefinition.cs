@@ -10,10 +10,10 @@
 
 using System;
 
-using Mono.Cecil.Metadata;
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Cecil.Metadata;
+using ILRuntime.Mono.Collections.Generic;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public sealed class TypeDefinition : TypeReference, IMemberDefinition, ISecurityDeclarationProvider {
 

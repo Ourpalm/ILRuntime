@@ -11,11 +11,11 @@
 using System;
 using System.Collections.Generic;
 
-using Mono.Cecil.Cil;
-using Mono.Cecil.Metadata;
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Metadata;
+using ILRuntime.Mono.Collections.Generic;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	struct Range {
 		public uint Start;

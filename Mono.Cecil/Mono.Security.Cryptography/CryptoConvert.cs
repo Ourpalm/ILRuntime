@@ -34,7 +34,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace Mono.Security.Cryptography {
+namespace ILRuntime.Mono.Security.Cryptography {
 
 	static class CryptoConvert {
 

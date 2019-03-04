@@ -9,9 +9,9 @@
 //
 
 using System;
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 
-namespace Mono {
+namespace ILRuntime.Mono {
 
 	static class Empty<T> {
 
@@ -27,7 +27,7 @@ namespace Mono {
 	}
 }
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 

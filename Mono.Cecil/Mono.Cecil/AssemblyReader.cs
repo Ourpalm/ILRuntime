@@ -14,14 +14,14 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-using Mono.Collections.Generic;
-using Mono.Cecil.Cil;
-using Mono.Cecil.Metadata;
-using Mono.Cecil.PE;
+using ILRuntime.Mono.Collections.Generic;
+using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Metadata;
+using ILRuntime.Mono.Cecil.PE;
 
 using RVA = System.UInt32;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	abstract class ModuleReader {
 

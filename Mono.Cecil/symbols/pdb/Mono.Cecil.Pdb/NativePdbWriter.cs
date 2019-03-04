@@ -14,13 +14,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Mono.Cecil.Cil;
-using Mono.Cecil.PE;
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.PE;
+using ILRuntime.Mono.Collections.Generic;
 
 #if !READ_ONLY
 
-namespace Mono.Cecil.Pdb {
+namespace ILRuntime.Mono.Cecil.Pdb {
 
 	public class NativePdbWriter : ISymbolWriter, IMetadataSymbolWriter {
 

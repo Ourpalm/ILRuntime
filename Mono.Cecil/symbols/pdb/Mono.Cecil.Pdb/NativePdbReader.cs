@@ -12,13 +12,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 
 using Microsoft.Cci.Pdb;
 
-using Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Cil;
 
-namespace Mono.Cecil.Pdb {
+namespace ILRuntime.Mono.Cecil.Pdb {
 
 	public class NativePdbReader : ISymbolReader {
 
