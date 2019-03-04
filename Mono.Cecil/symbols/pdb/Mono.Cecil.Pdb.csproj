@@ -2,8 +2,8 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{63E6915C-7EA4-4D76-AB28-0D7191EEA626}</ProjectGuid>
-    <RootNamespace>Mono.Cecil.Pdb</RootNamespace>
-    <AssemblyName>Mono.Cecil.Pdb</AssemblyName>
+    <RootNamespace>ILRuntime.Mono.Cecil.Pdb</RootNamespace>
+    <AssemblyName>ILRuntime.Mono.Cecil.Pdb</AssemblyName>
     <NoWarn>0649</NoWarn>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
