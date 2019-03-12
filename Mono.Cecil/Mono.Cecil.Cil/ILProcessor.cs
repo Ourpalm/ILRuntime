@@ -10,9 +10,9 @@
 
 using System;
 
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 
-namespace Mono.Cecil.Cil {
+namespace ILRuntime.Mono.Cecil.Cil {
 
 	public sealed class ILProcessor {
 

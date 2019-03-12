@@ -9,9 +9,9 @@
 //
 
 using System;
-using Mono.Cecil.PE;
+using ILRuntime.Mono.Cecil.PE;
 
-namespace Mono.Cecil.Metadata {
+namespace ILRuntime.Mono.Cecil.Metadata {
 
 	enum Table : byte {
 		Module = 0x00,

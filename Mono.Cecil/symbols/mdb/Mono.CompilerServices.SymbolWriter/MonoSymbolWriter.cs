@@ -36,7 +36,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Mono.CompilerServices.SymbolWriter
+namespace ILRuntime.Mono.CompilerServices.SymbolWriter
 {
 	public class MonoSymbolWriter
 	{

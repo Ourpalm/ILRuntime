@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Collections.Generic;
 #endif
 
-namespace Mono {
+namespace ILRuntime.Mono {
 
 #if NET_CORE
 	enum TypeCode {

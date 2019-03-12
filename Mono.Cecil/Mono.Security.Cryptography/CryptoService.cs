@@ -18,11 +18,11 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Runtime.Serialization;
 
-using Mono.Security.Cryptography;
+using ILRuntime.Mono.Security.Cryptography;
 
-using Mono.Cecil.PE;
+using ILRuntime.Mono.Cecil.PE;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	// Most of this code has been adapted
 	// from Jeroen Frijters' fantastic work

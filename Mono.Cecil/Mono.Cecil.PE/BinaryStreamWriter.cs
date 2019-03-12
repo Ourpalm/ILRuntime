@@ -13,7 +13,7 @@ using System.IO;
 
 #if !READ_ONLY
 
-namespace Mono.Cecil.PE {
+namespace ILRuntime.Mono.Cecil.PE {
 
 	class BinaryStreamWriter : BinaryWriter {
 

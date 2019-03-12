@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using CodeGenerationTools.Generator.Base;
-using Mono.Cecil;
+using ILRuntime.Mono.Cecil;
 
 namespace CodeGenerationTools.Generator
 {

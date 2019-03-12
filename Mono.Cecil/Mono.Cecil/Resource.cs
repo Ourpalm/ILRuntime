@@ -8,7 +8,7 @@
 // Licensed under the MIT/X11 license.
 //
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public enum ResourceType {
 		Linked,

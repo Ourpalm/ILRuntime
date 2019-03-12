@@ -14,7 +14,7 @@ using System;
 
 using RVA = System.UInt32;
 
-namespace Mono.Cecil.PE {
+namespace ILRuntime.Mono.Cecil.PE {
 
 	enum TextSegment {
 		ImportAddressTable,

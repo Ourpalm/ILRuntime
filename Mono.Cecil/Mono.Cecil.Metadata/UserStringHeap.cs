@@ -8,7 +8,7 @@
 // Licensed under the MIT/X11 license.
 //
 
-namespace Mono.Cecil.Metadata {
+namespace ILRuntime.Mono.Cecil.Metadata {
 
 	sealed class UserStringHeap : StringHeap {
 
