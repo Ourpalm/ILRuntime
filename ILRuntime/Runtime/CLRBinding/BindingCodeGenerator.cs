@@ -321,6 +321,8 @@ namespace ILRuntime.Runtime.Generated
         {");
                 foreach (var i in clsNames)
                 {
+                    if (i.Contains("UnityEditor"))
+                        continue;
                     sb.Append("            ");
                     sb.Append(i);
                     sb.AppendLine(".Register(app);");
@@ -730,6 +732,8 @@ namespace ILRuntime.Runtime.Generated
 
                     foreach (var i in valueTypeBinders)
                     {
+                        if (i.Name.Contains("UnityEditor"))
+                            continue;
                         string clsName, realClsName;
                         bool isByRef;
                         i.GetClassName(out clsName, out realClsName, out isByRef);
@@ -749,6 +753,8 @@ namespace ILRuntime.Runtime.Generated
                 {
                     foreach (var i in clsNames)
                     {
+                        if (i.Contains("UnityEditor"))
+                            continue;
                         sb.Append("            ");
                         sb.Append(i);
                         sb.AppendLine(".Register(app);");
