@@ -41,14 +41,14 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\Dependencies\Mono.Cecil.dll</HintPath>
+    <Reference Include="ILRuntim.Mono.Cecil">
+      <HintPath>..\Dependencies\ILRuntim.Mono.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>..\Dependencies\Mono.Cecil.Mdb.dll</HintPath>
+    <Reference Include="ILRuntime.Mono.Cecil.Mdb">
+      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.Mdb.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>..\Dependencies\Mono.Cecil.Pdb.dll</HintPath>
+    <Reference Include="ILRuntime.Mono.Cecil.Pdb">
+      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
