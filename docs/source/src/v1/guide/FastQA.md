@@ -15,7 +15,13 @@ order: 1030
 - Unity2018.3以上需要用最新ilruntime。
 - V1.4已过时，示例工程内的版本已过时，当前最新版本为[master]分支。
 
-## 打包
+## 编辑器内出现错误
+
+### 运行出现报错ObjectDisposedException: Cannot access a closed Stream
+
+- 加载dll的流被关闭了。新版要求流不能关闭，也不能用using写法。
+
+## 打包后出现问题
 
 ### 用mono打包的时候，ILRuntime相关的功能都正常，改用IL2Cpp之后，注册的所有委托都不执行了？
 
