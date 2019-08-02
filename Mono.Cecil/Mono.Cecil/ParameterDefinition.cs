@@ -8,9 +8,9 @@
 // Licensed under the MIT/X11 license.
 //
 
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public sealed class ParameterDefinition : ParameterReference, ICustomAttributeProvider, IConstantProvider, IMarshalInfoProvider {
 

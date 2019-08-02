@@ -37,7 +37,7 @@ using System.Collections;
 using System.IO;
 using System.Diagnostics.SymbolStore;
 
-namespace ILRuntime.Mono.CompilerServices.SymbolWriter
+namespace Mono.CompilerServices.SymbolWriter
 {
 	public class SymbolWriterImpl: ISymbolWriter
 	{

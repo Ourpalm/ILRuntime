@@ -9,12 +9,12 @@
 //
 
 using System;
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 
 using RVA = System.UInt32;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public sealed class MethodDefinition : MethodReference, IMemberDefinition, ISecurityDeclarationProvider, ICustomDebugInformationProvider {
 

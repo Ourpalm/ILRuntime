@@ -8,21 +8,17 @@
 // Licensed under the MIT/X11 license.
 //
 
-#if !READ_ONLY
-
-#if !NET_CORE
-
 using System;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Runtime.Serialization;
 
-using ILRuntime.Mono.Security.Cryptography;
+using Mono.Security.Cryptography;
 
-using ILRuntime.Mono.Cecil.PE;
+using Mono.Cecil.PE;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	// Most of this code has been adapted
 	// from Jeroen Frijters' fantastic work
@@ -106,19 +102,47 @@ namespace ILRuntime.Mono.Cecil {
 			if (!File.Exists (file))
 				return Empty<byte>.Array;
 
+			using (var stream = new FileStream (file, FileMode.Open, FileAccess.Read, FileShare.Read))
+				return ComputeHash (stream);
+		}
+
+		public static byte [] ComputeHash (Stream stream)
+		{
 			const int buffer_size = 8192;
 
 			var sha1 = new SHA1Managed ();
+			var buffer = new byte [buffer_size];
 
-			using (var stream = new FileStream (file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+			using (var crypto_stream = new CryptoStream (Stream.Null, sha1, CryptoStreamMode.Write))
+				CopyStreamChunk (stream, crypto_stream, buffer, (int) stream.Length);
 
-				var buffer = new byte [buffer_size];
+			return sha1.Hash;
+		}
 
-				using (var crypto_stream = new CryptoStream (Stream.Null, sha1, CryptoStreamMode.Write))
-					CopyStreamChunk (stream, crypto_stream, buffer, (int) stream.Length);
+		public static byte [] ComputeHash (params ByteBuffer [] buffers)
+		{
+			var sha1 = new SHA1Managed ();
+
+			using (var crypto_stream = new CryptoStream (Stream.Null, sha1, CryptoStreamMode.Write)) {
+				for (int i = 0; i < buffers.Length; i++) {
+					crypto_stream.Write (buffers [0].buffer, 0, buffers [0].length);
+				}
 			}
 
 			return sha1.Hash;
+		}
+
+		public static Guid ComputeGuid (byte [] hash)
+		{
+			// From corefx/src/System.Reflection.Metadata/src/System/Reflection/Metadata/BlobContentId.cs
+			var guid = new byte [16];
+			Buffer.BlockCopy (hash, 0, guid, 0, 16);
+
+			// modify the guid data so it decodes to the form of a "random" guid ala rfc4122
+			guid [7] = (byte) ((guid [7] & 0x0f) | (4 << 4));
+			guid [8] = (byte) ((guid [8] & 0x3f) | (2 << 6));
+
+			return new Guid (guid);
 		}
 	}
 
@@ -152,7 +176,3 @@ namespace ILRuntime.Mono.Cecil {
 		}
 	}
 }
-
-#endif
-
-#endif

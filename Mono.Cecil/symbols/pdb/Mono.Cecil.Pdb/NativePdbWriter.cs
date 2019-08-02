@@ -14,26 +14,24 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Cecil.PE;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Cecil.Cil;
+using Mono.Cecil.PE;
+using Mono.Collections.Generic;
 
-#if !READ_ONLY
+namespace Mono.Cecil.Pdb {
 
-namespace ILRuntime.Mono.Cecil.Pdb {
-
-	public class NativePdbWriter : ISymbolWriter, IMetadataSymbolWriter {
+	public class NativePdbWriter : ISymbolWriter {
 
 		readonly ModuleDefinition module;
+		readonly MetadataBuilder metadata;
 		readonly SymWriter writer;
 		readonly Dictionary<string, SymDocumentWriter> documents;
 		readonly Dictionary<ImportDebugInformation, MetadataToken> import_info_to_parent;
 
-		MetadataBuilder metadata;
-
 		internal NativePdbWriter (ModuleDefinition module, SymWriter writer)
 		{
 			this.module = module;
+			this.metadata = module.metadata_builder;
 			this.writer = writer;
 			this.documents = new Dictionary<string, SymDocumentWriter> ();
 			this.import_info_to_parent = new Dictionary<ImportDebugInformation, MetadataToken> ();
@@ -73,15 +71,6 @@ namespace ILRuntime.Mono.Cecil.Pdb {
 			DefineCustomMetadata (info, import_parent);
 
 			writer.CloseMethod ();
-		}
-
-		void IMetadataSymbolWriter.SetMetadata (MetadataBuilder metadata)
-		{
-			this.metadata = metadata;
-		}
-
-		void IMetadataSymbolWriter.WriteModule ()
-		{
 		}
 
 		void DefineCustomMetadata (MethodDebugInformation info, MetadataToken import_parent)
@@ -371,5 +360,3 @@ namespace ILRuntime.Mono.Cecil.Pdb {
 		}
 	}
 }
-
-#endif

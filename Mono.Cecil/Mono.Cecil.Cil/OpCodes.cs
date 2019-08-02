@@ -8,7 +8,7 @@
 // Licensed under the MIT/X11 license.
 //
 
-namespace ILRuntime.Mono.Cecil.Cil {
+namespace Mono.Cecil.Cil {
 
 	public static class OpCodes {
 

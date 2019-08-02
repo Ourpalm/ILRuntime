@@ -12,11 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Collections.Generic;
-using ILRuntime.Mono.CompilerServices.SymbolWriter;
+using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
+using Mono.CompilerServices.SymbolWriter;
 
-namespace ILRuntime.Mono.Cecil.Mdb {
+namespace Mono.Cecil.Mdb {
 
 	public sealed class MdbReaderProvider : ISymbolReaderProvider {
 
@@ -50,12 +50,10 @@ namespace ILRuntime.Mono.Cecil.Mdb {
 			this.documents = new Dictionary<string, Document> ();
 		}
 
-#if !READ_ONLY
 		public ISymbolWriterProvider GetWriterProvider ()
 		{
 			return new MdbWriterProvider ();
 		}
-#endif
 
 		public bool ProcessDebugHeader (ImageDebugHeader header)
 		{

@@ -68,7 +68,7 @@ using System.IO;
 // changing the file format.
 //
 
-namespace ILRuntime.Mono.CompilerServices.SymbolWriter
+namespace Mono.CompilerServices.SymbolWriter
 {
 	public class OffsetTable
 	{

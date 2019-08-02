@@ -11,9 +11,9 @@
 using System;
 using System.Threading;
 
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil.Cil {
+namespace Mono.Cecil.Cil {
 
 	public sealed class MethodBody {
 

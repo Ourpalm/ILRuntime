@@ -14,11 +14,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using SR = System.Reflection;
 
-using ILRuntime.Mono.Collections.Generic;
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Cecil.PE;
+using Mono.Collections.Generic;
+using Mono.Cecil.Cil;
+using Mono.Cecil.PE;
 
-namespace ILRuntime.Mono.Cecil.Cil {
+namespace Mono.Cecil.Cil {
 
 	[StructLayout (LayoutKind.Sequential)]
 	public struct ImageDebugDirectory {
@@ -750,9 +750,8 @@ namespace ILRuntime.Mono.Cecil.Cil {
 	}
 
 	public interface ISymbolReader : IDisposable {
-#if !READ_ONLY
+
 		ISymbolWriterProvider GetWriterProvider ();
-#endif
 		bool ProcessDebugHeader (ImageDebugHeader header);
 		MethodDebugInformation Read (MethodDefinition method);
 	}
@@ -938,12 +937,16 @@ namespace ILRuntime.Mono.Cecil.Cil {
 
 			var suffix = GetSymbolNamespace (kind);
 
-			var cecil_name = typeof (SymbolProvider).Assembly ().GetName ();
+			var cecil_name = typeof (SymbolProvider).Assembly.GetName ();
 
 			var name = new SR.AssemblyName {
 				Name = cecil_name.Name + "." + suffix,
 				Version = cecil_name.Version,
+#if NET_CORE
+				CultureName = cecil_name.CultureName,
+#else
 				CultureInfo = cecil_name.CultureInfo,
+#endif
 			};
 
 			name.SetPublicKeyToken (cecil_name.GetPublicKeyToken ());
@@ -1007,8 +1010,6 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 	}
 
-#if !READ_ONLY
-
 	public interface ISymbolWriter : IDisposable {
 
 		ISymbolReaderProvider GetReaderProvider ();
@@ -1041,11 +1042,9 @@ namespace ILRuntime.Mono.Cecil.Cil {
 			throw new NotSupportedException ();
 		}
 	}
-
-#endif
 }
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	static partial class Mixin {
 

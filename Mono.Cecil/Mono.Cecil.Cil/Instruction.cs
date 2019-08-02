@@ -11,7 +11,7 @@
 using System;
 using System.Text;
 
-namespace ILRuntime.Mono.Cecil.Cil {
+namespace Mono.Cecil.Cil {
 
 	public sealed class Instruction {
 

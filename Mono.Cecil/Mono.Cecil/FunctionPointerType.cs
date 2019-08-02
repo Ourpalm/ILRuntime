@@ -10,10 +10,10 @@
 
 using System;
 using System.Text;
-using ILRuntime.Mono.Collections.Generic;
-using MD = ILRuntime.Mono.Cecil.Metadata;
+using Mono.Collections.Generic;
+using MD = Mono.Cecil.Metadata;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public sealed class FunctionPointerType : TypeSpecification, IMethodSignature {
 

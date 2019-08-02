@@ -1,0 +1,8 @@
+* text=auto
+
+.md text
+.cs text
+
+.sln text=crlf
+.*proj text=crlf
+.settings text=crlf

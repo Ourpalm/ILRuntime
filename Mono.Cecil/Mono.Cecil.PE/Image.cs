@@ -11,13 +11,13 @@
 using System;
 using System.IO;
 
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Cecil.Metadata;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Cecil.Cil;
+using Mono.Cecil.Metadata;
+using Mono.Collections.Generic;
 
 using RVA = System.UInt32;
 
-namespace ILRuntime.Mono.Cecil.PE {
+namespace Mono.Cecil.PE {
 
 	sealed class Image : IDisposable {
 
@@ -29,6 +29,8 @@ namespace ILRuntime.Mono.Cecil.PE {
 		public TargetArchitecture Architecture;
 		public ModuleCharacteristics Characteristics;
 		public ushort LinkerVersion;
+		public ushort SubSystemMajor;
+		public ushort SubSystemMinor;
 
 		public ImageDebugHeader DebugHeader;
 

@@ -9,9 +9,7 @@
 
 using System;
 
-#if !READ_ONLY
-
-namespace ILRuntime.Mono.Cecil.Pdb
+namespace Mono.Cecil.Pdb
 {
 	internal class SymDocumentWriter
 	{
@@ -28,5 +26,3 @@ namespace ILRuntime.Mono.Cecil.Pdb
 		}
 	}
 }
-
-#endif

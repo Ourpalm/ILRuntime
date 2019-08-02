@@ -10,12 +10,12 @@
 
 using System;
 
-using ILRuntime.Mono.Cecil.PE;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Cecil.PE;
+using Mono.Collections.Generic;
 
 using RVA = System.UInt32;
 
-namespace ILRuntime.Mono.Cecil.Cil {
+namespace Mono.Cecil.Cil {
 
 	sealed class CodeReader : BinaryStreamReader {
 
@@ -471,8 +471,6 @@ namespace ILRuntime.Mono.Cecil.Cil {
 				ReadScopes (scope.scopes);
 		}
 
-#if !READ_ONLY
-
 		public ByteBuffer PatchRawMethodBody (MethodDefinition method, CodeWriter writer, out int code_size, out MetadataToken local_var_token)
 		{
 			var position = MoveTo (method);
@@ -664,8 +662,5 @@ namespace ILRuntime.Mono.Cecil.Cil {
 				}
 			}
 		}
-
-#endif
-
 	}
 }

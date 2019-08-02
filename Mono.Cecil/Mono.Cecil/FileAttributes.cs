@@ -8,7 +8,7 @@
 // Licensed under the MIT/X11 license.
 //
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	enum FileAttributes : uint {
 		ContainsMetaData	= 0x0000,	// This is not a resource file

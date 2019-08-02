@@ -11,7 +11,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public class DefaultAssemblyResolver : BaseAssemblyResolver {
 

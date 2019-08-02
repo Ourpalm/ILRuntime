@@ -11,7 +11,7 @@
 using System;
 using System.IO;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public sealed class EmbeddedResource : Resource {
 

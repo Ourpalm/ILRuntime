@@ -10,7 +10,7 @@
 
 using System;
 
-namespace ILRuntime.Mono {
+namespace Mono {
 
 	static class Disposable {
 

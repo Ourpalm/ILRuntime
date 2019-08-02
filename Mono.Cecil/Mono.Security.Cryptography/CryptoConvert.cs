@@ -27,14 +27,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#if !READ_ONLY
-
-#if !NET_CORE
-
 using System;
 using System.Security.Cryptography;
 
-namespace ILRuntime.Mono.Security.Cryptography {
+namespace Mono.Security.Cryptography {
 
 	static class CryptoConvert {
 
@@ -246,8 +242,3 @@ namespace ILRuntime.Mono.Security.Cryptography {
 		}
 	}
 }
-
-#endif
-
-#endif
-

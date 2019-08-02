@@ -11,11 +11,11 @@
 using System;
 using System.Collections.Generic;
 
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Cecil.Metadata;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Cecil.Cil;
+using Mono.Cecil.Metadata;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	struct Range {
 		public uint Start;
@@ -56,7 +56,7 @@ namespace ILRuntime.Mono.Cecil {
 		internal Dictionary<uint, Row<MethodSemanticsAttributes, MetadataToken>> Semantics;
 		internal Dictionary<uint, Row<PInvokeAttributes, uint, uint>> PInvokes;
 		internal Dictionary<MetadataToken, Range []> GenericParameters;
-		internal Dictionary<uint, Collection<MetadataToken>> GenericConstraints;
+		internal Dictionary<uint, Collection<Row<uint, MetadataToken>>> GenericConstraints;
 
 		internal Document [] Documents;
 		internal Dictionary<uint, Collection<Row<uint, Range, Range, uint, uint, uint>>> LocalScopes;
@@ -149,7 +149,7 @@ namespace ILRuntime.Mono.Cecil {
 			if (Semantics != null) Semantics = new Dictionary<uint, Row<MethodSemanticsAttributes, MetadataToken>> (capacity: 0);
 			if (PInvokes != null) PInvokes = new Dictionary<uint, Row<PInvokeAttributes, uint, uint>> (capacity: 0);
 			if (GenericParameters != null) GenericParameters = new Dictionary<MetadataToken, Range []> (capacity: 0);
-			if (GenericConstraints != null) GenericConstraints = new Dictionary<uint, Collection<MetadataToken>> (capacity: 0);
+			if (GenericConstraints != null) GenericConstraints = new Dictionary<uint, Collection<Row<uint, MetadataToken>>> (capacity: 0);
 
 			Documents = Empty<Document>.Array;
 			ImportScopes = Empty<ImportDebugInformation>.Array;
@@ -335,12 +335,12 @@ namespace ILRuntime.Mono.Cecil {
 			SecurityDeclarations.Remove (owner.MetadataToken);
 		}
 
-		public bool TryGetGenericConstraintMapping (GenericParameter generic_parameter, out Collection<MetadataToken> mapping)
+		public bool TryGetGenericConstraintMapping (GenericParameter generic_parameter, out Collection<Row<uint, MetadataToken>> mapping)
 		{
 			return GenericConstraints.TryGetValue (generic_parameter.token.RID, out mapping);
 		}
 
-		public void SetGenericConstraintMapping (uint gp_rid, Collection<MetadataToken> mapping)
+		public void SetGenericConstraintMapping (uint gp_rid, Collection<Row<uint, MetadataToken>> mapping)
 		{
 			GenericConstraints [gp_rid] = mapping;
 		}

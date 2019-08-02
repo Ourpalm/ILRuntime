@@ -11,9 +11,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	sealed class MemberReferenceProjection {
 

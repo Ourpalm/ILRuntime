@@ -10,9 +10,9 @@
 
 using System;
 using System.Diagnostics;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public struct CustomAttributeArgument {
 

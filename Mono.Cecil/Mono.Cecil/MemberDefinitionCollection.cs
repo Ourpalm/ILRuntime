@@ -10,9 +10,9 @@
 
 using System;
 
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	sealed class MemberDefinitionCollection<T> : Collection<T> where T : IMemberDefinition {
 

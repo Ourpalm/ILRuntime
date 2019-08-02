@@ -34,7 +34,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ILRuntime.Mono.CompilerServices.SymbolWriter
+namespace Mono.CompilerServices.SymbolWriter
 {
 	public class MonoSymbolFileException : Exception
 	{

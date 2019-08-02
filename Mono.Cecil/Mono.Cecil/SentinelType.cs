@@ -10,9 +10,9 @@
 
 using System;
 
-using MD = ILRuntime.Mono.Cecil.Metadata;
+using MD = Mono.Cecil.Metadata;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public sealed class SentinelType : TypeSpecification {
 

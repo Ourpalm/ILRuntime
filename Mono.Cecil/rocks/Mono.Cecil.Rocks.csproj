@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
+    <DefineConstants>$(DefineConstants);INSIDE_ROCKS</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Cecil.csproj">
+      <Name>Mono.Cecil</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\ProjectInfo.cs" />
+    <Compile Include="Mono.Cecil.Rocks\*.cs" />
+  </ItemGroup>
+</Project>

@@ -11,13 +11,13 @@
 using System;
 using System.IO;
 
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Cecil.Metadata;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Cecil.Cil;
+using Mono.Cecil.Metadata;
+using Mono.Collections.Generic;
 
 using RVA = System.UInt32;
 
-namespace ILRuntime.Mono.Cecil.PE {
+namespace Mono.Cecil.PE {
 
 	sealed class ImageReader : BinaryStreamReader {
 
@@ -81,8 +81,8 @@ namespace ILRuntime.Mono.Cecil.PE {
 			// Characteristics		2
 			ushort characteristics = ReadUInt16 ();
 
-			ushort subsystem, dll_characteristics, linker_version;
-			ReadOptionalHeaders (out subsystem, out dll_characteristics, out linker_version);
+			ushort subsystem, dll_characteristics;
+			ReadOptionalHeaders (out subsystem, out dll_characteristics);
 			ReadSections (sections);
 			ReadCLIHeader ();
 			ReadMetadata ();
@@ -90,7 +90,6 @@ namespace ILRuntime.Mono.Cecil.PE {
 
 			image.Kind = GetModuleKind (characteristics, subsystem);
 			image.Characteristics = (ModuleCharacteristics) dll_characteristics;
-			image.LinkerVersion = linker_version;
 		}
 
 		TargetArchitecture ReadArchitecture ()
@@ -109,7 +108,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 			return ModuleKind.Console;
 		}
 
-		void ReadOptionalHeaders (out ushort subsystem, out ushort dll_characteristics, out ushort linker)
+		void ReadOptionalHeaders (out ushort subsystem, out ushort dll_characteristics)
 		{
 			// - PEOptionalHeader
 			//   - StandardFieldsHeader
@@ -119,7 +118,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 
 			//						pe32 || pe64
 
-			linker = ReadUInt16 ();
+			image.LinkerVersion = ReadUInt16 ();
 			// CodeSize				4
 			// InitializedDataSize	4
 			// UninitializedDataSize4
@@ -138,11 +137,16 @@ namespace ILRuntime.Mono.Cecil.PE {
 			// UserMinor			2
 			// SubSysMajor			2
 			// SubSysMinor			2
+			Advance(44);
+
+			image.SubSystemMajor = ReadUInt16 ();
+			image.SubSystemMinor = ReadUInt16 ();
+
 			// Reserved				4
 			// ImageSize			4
 			// HeaderSize			4
 			// FileChecksum			4
-			Advance (64);
+			Advance (16);
 
 			// SubSystem			2
 			subsystem = ReadUInt16 ();
@@ -346,7 +350,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 					PointerToRawData = ReadInt32 (),
 				};
 
-				if (directory.AddressOfRawData == 0) {
+				if (directory.PointerToRawData == 0) {
 					entries [i] = new ImageDebugHeaderEntry (directory, Empty<byte>.Array);
 					continue;
 				}

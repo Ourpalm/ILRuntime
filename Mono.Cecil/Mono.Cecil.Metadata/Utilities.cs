@@ -10,9 +10,9 @@
 
 using System;
 
-using ILRuntime.Mono.Cecil.Metadata;
+using Mono.Cecil.Metadata;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	static partial class Mixin {
 
@@ -300,7 +300,6 @@ namespace ILRuntime.Mono.Cecil {
 			return MetadataToken.Zero;
 		}
 
-#if !READ_ONLY
 		public static uint CompressMetadataToken (this CodedIndex self, MetadataToken token)
 		{
 			uint ret = 0;
@@ -561,7 +560,6 @@ namespace ILRuntime.Mono.Cecil {
 		exit:
 			throw new ArgumentException ();
 		}
-#endif
 
 		public static int GetSize (this CodedIndex self, Func<Table, int> counter)
 		{

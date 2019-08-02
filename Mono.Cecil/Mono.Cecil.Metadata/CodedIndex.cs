@@ -8,7 +8,7 @@
 // Licensed under the MIT/X11 license.
 //
 
-namespace ILRuntime.Mono.Cecil.Metadata {
+namespace Mono.Cecil.Metadata {
 
 	enum CodedIndex {
 		TypeDefOrRef,

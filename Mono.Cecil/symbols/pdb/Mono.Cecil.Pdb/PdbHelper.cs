@@ -11,9 +11,9 @@
 using System;
 using System.IO;
 
-using ILRuntime.Mono.Cecil.Cil;
+using Mono.Cecil.Cil;
 
-namespace ILRuntime.Mono.Cecil.Pdb {
+namespace Mono.Cecil.Pdb {
 
 	public sealed class NativePdbReaderProvider : ISymbolReaderProvider {
 
@@ -64,8 +64,6 @@ namespace ILRuntime.Mono.Cecil.Pdb {
 				: new NativePdbReaderProvider ().GetSymbolReader (module, symbolStream);
 		}
 	}
-
-#if !READ_ONLY
 
 	public sealed class NativePdbWriterProvider : ISymbolWriterProvider {
 
@@ -125,6 +123,4 @@ namespace ILRuntime.Mono.Cecil.Pdb {
 			return new NativePdbWriterProvider ().GetSymbolWriter (module, symbolStream);
 		}
 	}
-
-#endif
 }

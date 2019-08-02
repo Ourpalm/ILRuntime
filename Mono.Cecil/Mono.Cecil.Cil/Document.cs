@@ -10,7 +10,7 @@
 
 using System;
 
-namespace ILRuntime.Mono.Cecil.Cil {
+namespace Mono.Cecil.Cil {
 
 	public enum DocumentType {
 		Other,

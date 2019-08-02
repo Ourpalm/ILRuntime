@@ -10,9 +10,9 @@
 
 using System;
 
-using ILRuntime.Mono.Cecil.Metadata;
+using Mono.Cecil.Metadata;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public abstract class TypeSystem {
 

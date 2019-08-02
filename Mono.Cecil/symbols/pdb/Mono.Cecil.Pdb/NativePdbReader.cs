@@ -12,13 +12,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Collections.Generic;
 
 using Microsoft.Cci.Pdb;
 
-using ILRuntime.Mono.Cecil.Cil;
+using Mono.Cecil.Cil;
 
-namespace ILRuntime.Mono.Cecil.Pdb {
+namespace Mono.Cecil.Pdb {
 
 	public class NativePdbReader : ISymbolReader {
 
@@ -35,12 +35,11 @@ namespace ILRuntime.Mono.Cecil.Pdb {
 			this.pdb_file = file;
 		}
 
-#if !READ_ONLY
 		public ISymbolWriterProvider GetWriterProvider ()
 		{
 			return new NativePdbWriterProvider ();
 		}
-#endif
+
 		/*
 		uint Magic = 0x53445352;
 		Guid Signature;

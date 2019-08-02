@@ -12,13 +12,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using ILRuntime.Mono.Cecil.Cil;
-using ILRuntime.Mono.Collections.Generic;
-using ILRuntime.Mono.CompilerServices.SymbolWriter;
+using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
+using Mono.CompilerServices.SymbolWriter;
 
-namespace ILRuntime.Mono.Cecil.Mdb {
+namespace Mono.Cecil.Mdb {
 
-#if !READ_ONLY
 	public sealed class MdbWriterProvider : ISymbolWriterProvider {
 
 		public ISymbolWriter GetSymbolWriter (ModuleDefinition module, string fileName)
@@ -211,5 +210,4 @@ namespace ILRuntime.Mono.Cecil.Mdb {
 			}
 		}
 	}
-#endif
 }

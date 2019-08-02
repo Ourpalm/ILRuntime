@@ -12,9 +12,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using ILRuntime.Mono.Cecil;
+using Mono.Cecil;
 
-namespace ILRuntime.Mono.Collections.Generic {
+namespace Mono.Collections.Generic {
 
 	public class Collection<T> : IList<T>, IList {
 

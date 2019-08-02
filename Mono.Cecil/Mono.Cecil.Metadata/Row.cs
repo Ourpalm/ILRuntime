@@ -10,7 +10,7 @@
 
 using System.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil.Metadata {
+namespace Mono.Cecil.Metadata {
 
 	struct Row<T1, T2> {
 		internal T1 Col1;

@@ -10,10 +10,10 @@
 
 using System;
 
-using ILRuntime.Mono.Cecil.Metadata;
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Cecil.Metadata;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public enum MetadataType : byte {
 		Void = ElementType.Void,
@@ -53,9 +53,7 @@ namespace ILRuntime.Mono.Cecil {
 
 		string @namespace;
 		bool value_type;
-        int hashCode = -1;
-        static int instance_id;
-        internal IMetadataScope scope;
+		internal IMetadataScope scope;
 		internal ModuleDefinition module;
 
 		internal ElementType etype = ElementType.None;
@@ -102,14 +100,7 @@ namespace ILRuntime.Mono.Cecil {
 			}
 		}
 
-        public override int GetHashCode()
-        {
-            if (hashCode == -1)
-                hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
-            return hashCode;
-        }
-
-        internal new TypeReferenceProjection WindowsRuntimeProjection {
+		internal new TypeReferenceProjection WindowsRuntimeProjection {
 			get { return (TypeReferenceProjection) projection; }
 			set { projection = value; }
 		}

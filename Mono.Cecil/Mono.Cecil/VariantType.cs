@@ -8,7 +8,7 @@
 // Licensed under the MIT/X11 license.
 //
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	public enum VariantType {
 		None = 0,
@@ -29,6 +29,8 @@ namespace ILRuntime.Mono.Cecil {
 		UI1 = 17,
 		UI2 = 18,
 		UI4 = 19,
+		I8 = 20,
+		UI8 = 21,
 		Int = 22,
 		UInt = 23
 	}

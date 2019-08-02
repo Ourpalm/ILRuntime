@@ -11,11 +11,11 @@
 using System;
 using System.Collections.Generic;
 
-using ILRuntime.Mono.Cecil.Metadata;
+using Mono.Cecil.Metadata;
 
-using ILRuntime.Mono.Collections.Generic;
+using Mono.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil {
+namespace Mono.Cecil {
 
 	using Slot = Row<string, string>;
 

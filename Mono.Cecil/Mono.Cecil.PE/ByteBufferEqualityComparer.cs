@@ -11,7 +11,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ILRuntime.Mono.Cecil.PE {
+namespace Mono.Cecil.PE {
 
 	sealed class ByteBufferEqualityComparer : IEqualityComparer<ByteBuffer> {
 
