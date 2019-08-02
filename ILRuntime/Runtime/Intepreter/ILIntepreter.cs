@@ -28,7 +28,9 @@ namespace ILRuntime.Runtime.Intepreter
         public StackObject* LastStepFrameBase { get; set; }
         public int LastStepInstructionIndex { get; set; }
         StackObject* ValueTypeBasePointer;
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
         bool mainthreadLock;
+#endif
         public ILIntepreter(Enviorment.AppDomain domain)
         {
             this.domain = domain;
@@ -65,7 +67,9 @@ namespace ILRuntime.Runtime.Intepreter
 
         public void Resume()
         {
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
             mainthreadLock = false;
+#endif
             lock (_lockObj)
                 Monitor.Pulse(_lockObj);
         }
@@ -246,7 +250,7 @@ namespace ILRuntime.Runtime.Intepreter
                         code = ip->Code;
                         switch (code)
                         {
-                            #region Arguments and Local Variable
+#region Arguments and Local Variable
                             case OpCodeEnum.Ldarg_0:
                                 CopyToStack(esp, arg, mStack);
                                 esp++;
@@ -541,9 +545,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = esp - 1 - 1;
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Load Constants
+#region Load Constants
                             case OpCodeEnum.Ldc_I4_M1:
                                 esp->Value = -1;
                                 esp->ObjectType = ObjectTypes.Integer;
@@ -920,9 +924,9 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Ldstr:
                                 esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenLong));
                                 break;
-                            #endregion
+#endregion
 
-                            #region Althemetics
+#region Althemetics
                             case OpCodeEnum.Add:
                                 {
                                     b = esp - 1;
@@ -1241,9 +1245,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Control Flows
+#region Control Flows
                             case OpCodeEnum.Ret:
                                 returned = true;
                                 break;
@@ -1828,9 +1832,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region FieldOperation
+#region FieldOperation
                             case OpCodeEnum.Stfld:
                                 {
                                     objRef = GetObjectAndResolveReference(esp - 1 - 1);
@@ -2158,9 +2162,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PushObject(objRef, mStack, m);
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Compare
+#region Compare
                             case OpCodeEnum.Ceq:
                                 {
                                     StackObject* obj1 = esp - 1 - 1;
@@ -2327,9 +2331,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp = PushZero(esp - 1 - 1);
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Initialization & Instantiation
+#region Initialization & Instantiation
                             case OpCodeEnum.Newobj:
                                 {
                                     IMethod m = domain.GetMethod(ip->TokenInteger);
@@ -3277,9 +3281,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Array
+#region Array
                             case OpCodeEnum.Newarr:
                                 {
                                     var cnt = (esp - 1);
@@ -3748,9 +3752,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Conversion
+#region Conversion
                             case OpCodeEnum.Conv_U1:
                             case OpCodeEnum.Conv_Ovf_U1:
                             case OpCodeEnum.Conv_Ovf_U1_Un:
@@ -4050,9 +4054,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
-                            #endregion
+#endregion
 
-                            #region Stack operation
+#region Stack operation
                             case OpCodeEnum.Pop:
                                 {
                                     Free(esp - 1);
@@ -4078,7 +4082,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
-                            #endregion
+#endregion
 
                             case OpCodeEnum.Throw:
                                 {

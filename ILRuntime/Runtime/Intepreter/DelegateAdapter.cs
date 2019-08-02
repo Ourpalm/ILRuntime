@@ -1028,6 +1028,11 @@ namespace ILRuntime.Runtime.Intepreter
             return method.ToString();
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public Delegate GetConvertor(Type type)
         {
             if (converters == null)

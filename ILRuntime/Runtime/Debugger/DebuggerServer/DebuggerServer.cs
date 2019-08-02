@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Debugger.Protocol;
+using System.Net;
 
 namespace ILRuntime.Runtime.Debugger
 {
@@ -44,7 +45,7 @@ namespace ILRuntime.Runtime.Debugger
             mainLoop = new Thread(new ThreadStart(this.NetworkLoop));
             mainLoop.Start();
 
-            this.listener = new TcpListener(port);
+            this.listener = new TcpListener(IPAddress.Any, port);
             try { listener.Start(); }
             catch
             {

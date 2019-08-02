@@ -41,15 +41,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ILRuntim.Mono.Cecil">
-      <HintPath>..\Dependencies\ILRuntim.Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="ILRuntime.Mono.Cecil.Mdb">
-      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="ILRuntime.Mono.Cecil.Pdb">
-      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -242,6 +233,14 @@
     <ProjectReference Include="..\LitJson\LitJson.csproj">
       <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
       <Name>LitJson</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Cecil\Mono.Cecil.csproj">
+      <Project>{66a8daa0-5510-4fbf-9c43-6cf910803d4d}</Project>
+      <Name>Mono.Cecil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Cecil\symbols\pdb\Mono.Cecil.Pdb.csproj">
+      <Project>{a0d1ea49-765d-46a9-91d4-99c185d93895}</Project>
+      <Name>Mono.Cecil.Pdb</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -301,7 +301,7 @@ namespace TestCases
             test3.TestVirtual();
             Console.WriteLine(string.Format("A={0},B={1}", test3.A, test3.B));      
             test = test3 as B;
-            if (test == null)
+            if (test != null)
             {
                 Console.WriteLine(string.Format("A={0},B={1}", test.A, test.B));            
             }

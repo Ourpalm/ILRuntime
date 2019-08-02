@@ -841,7 +841,7 @@ namespace ILRuntime.Runtime.Enviorment
                 ret = intp.Execute(ilmethod, esp, out unhandled);
                 ILRuntimeMethodInfo imi = (ILRuntimeMethodInfo)instance;
                 var rt = imi.ReturnType;
-                if (rt != domain.VoidType)
+                if (rt != typeof(void))
                 {
                     var res = ret - 1;
                     if (res->ObjectType < ObjectTypes.Object)

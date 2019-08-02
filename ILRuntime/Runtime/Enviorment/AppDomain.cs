@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using ILRuntime.Mono.Cecil;
+using Mono.Cecil;
 using System.Reflection;
-using ILRuntime.Mono.Cecil.Cil;
+using Mono.Cecil.Cil;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;

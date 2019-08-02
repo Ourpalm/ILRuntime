@@ -223,6 +223,15 @@ namespace ILRuntime.Runtime.Stack
                 *esp = Null;
             }
         }
+
+        public override bool Equals(object o)
+        {
+            return base.Equals(o);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
     public enum ObjectTypes

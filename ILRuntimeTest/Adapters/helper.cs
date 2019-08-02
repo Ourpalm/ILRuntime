@@ -1,9 +1,14 @@
 
+using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Utils;
+using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Stack;
 using System;
+using System.Collections.Generic;
 
 namespace ILRuntimeTest.TestFramework
 {
-    class ILRuntimeHelper
+    unsafe class ILRuntimeHelper
     {
         // manual register
         public static void Init(ILRuntime.Runtime.Enviorment.AppDomain app)
@@ -130,6 +135,31 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task<System.Int32>>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task<System.Int32>>();
 
+            var intArr2 = typeof(int[,]);
+            var addr = intArr2.GetMethod("Address", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            app.RegisterCLRMethodRedirection(addr, Address);
+        }
+
+        static StackObject* Address(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 y = ptr_of_this_method->Value;
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Int32 x = ptr_of_this_method->Value;
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            int[,] arr = (int[,])typeof(int[,]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = arr[x, y];
+
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
     }
 }

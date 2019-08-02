@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-using ILRuntime.Mono.Cecil;
+using Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Debugger;
