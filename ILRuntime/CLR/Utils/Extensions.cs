@@ -253,6 +253,12 @@ namespace ILRuntime.CLR.Utils
             }
             else if ((typeFlags & TypeFlags.IsEnum) != 0)
             {
+                //Add By LiYu 20190621 Begin
+                if (pt.GetType() == typeof(ILRuntime.Reflection.ILRuntimeType))
+                {
+                    return obj;
+                }
+                //Add By LiYu 20190621 End
                 return Enum.ToObject(pt, obj);
             }
             else if (obj is ILTypeInstance)

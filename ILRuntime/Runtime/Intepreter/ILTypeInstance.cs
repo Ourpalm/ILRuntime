@@ -479,6 +479,13 @@ namespace ILRuntime.Runtime.Intepreter
                         var vt = domain.GetType(dst->Value);
                         if(vt is ILType)
                         {
+							//Add By LiYu 2019.07.12 B	
+                            if (vt.IsEnum)
+                            {
+                                AssignFromStack(esp, domain, managedStack);
+								break;
+                            }
+							//Add By LiYu 2019.07.12 E	
                             var ins = managedObjs[fieldIdx];
                             if (ins == null)
                                 throw new NullReferenceException();

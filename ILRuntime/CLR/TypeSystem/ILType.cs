@@ -748,6 +748,17 @@ namespace ILRuntime.CLR.TypeSystem
                             {
                                 if (param[j] != i.Parameters[j])
                                 {
+									//Add By Yu.Li 2019.07.04 B
+                                    var pl = param[j].IsByRef ? param[j].ElementType : param[j];
+                                    var pr = i.Parameters[j].IsByRef ? i.Parameters[j].ElementType : i.Parameters[j];
+                                    if (pl.FullName == pr.FullName
+                                        && pl.IsArray == pr.IsArray
+                                        && pl.IsByRef == pr.IsByRef
+                                        && pl.IsEnum == pr.IsEnum)
+                                    {
+                                        continue;
+                                    }
+									//Add By Yu.Li 2019.07.04 E
                                     match = false;
                                     break;
                                 }

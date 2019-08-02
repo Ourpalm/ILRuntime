@@ -250,7 +250,7 @@ namespace ILRuntime.Runtime.Intepreter
                         code = ip->Code;
                         switch (code)
                         {
-#region Arguments and Local Variable
+                            #region Arguments and Local Variable
                             case OpCodeEnum.Ldarg_0:
                                 CopyToStack(esp, arg, mStack);
                                 esp++;
@@ -545,9 +545,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = esp - 1 - 1;
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region Load Constants
+                            #region Load Constants
                             case OpCodeEnum.Ldc_I4_M1:
                                 esp->Value = -1;
                                 esp->ObjectType = ObjectTypes.Integer;
@@ -784,6 +784,23 @@ namespace ILRuntime.Runtime.Intepreter
                                                 LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
                                             }
                                             break;
+										//Add By LiYu 2019.07.04 B
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(val->Value);
+                                                int idx = val->ValueLow;
+                                                if (t is ILType)
+                                                {
+                                                    ((ILType)t).StaticInstance.PushToStack(idx, val, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    obj = ((CLRType)t).GetFieldValue(idx, null);
+                                                    PushObject(val, mStack, obj);
+                                                }
+                                            }
+                                            break;
+										//Add By LiYu 2019.07.04 E	
                                         default:
                                             {
                                                 dst->ObjectType = ObjectTypes.Object;
@@ -924,9 +941,9 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Ldstr:
                                 esp = PushObject(esp, mStack, AppDomain.GetString(ip->TokenLong));
                                 break;
-#endregion
+                            #endregion
 
-#region Althemetics
+                            #region Althemetics
                             case OpCodeEnum.Add:
                                 {
                                     b = esp - 1;
@@ -1245,9 +1262,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region Control Flows
+                            #region Control Flows
                             case OpCodeEnum.Ret:
                                 returned = true;
                                 break;
@@ -1832,9 +1849,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region FieldOperation
+                            #region FieldOperation
                             case OpCodeEnum.Stfld:
                                 {
                                     objRef = GetObjectAndResolveReference(esp - 1 - 1);
@@ -2162,9 +2179,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PushObject(objRef, mStack, m);
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region Compare
+                            #region Compare
                             case OpCodeEnum.Ceq:
                                 {
                                     StackObject* obj1 = esp - 1 - 1;
@@ -2331,9 +2348,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp = PushZero(esp - 1 - 1);
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region Initialization & Instantiation
+                            #region Initialization & Instantiation
                             case OpCodeEnum.Newobj:
                                 {
                                     IMethod m = domain.GetMethod(ip->TokenInteger);
@@ -3281,9 +3298,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region Array
+                            #region Array
                             case OpCodeEnum.Newarr:
                                 {
                                     var cnt = (esp - 1);
@@ -3424,7 +3441,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (obj is ILTypeInstance)
                                     {
                                         ILTypeInstance ins = (ILTypeInstance)obj;
-                                        if (ins.Type.IsValueType && !ins.Boxed)
+										//Mod LiYu 2019.07.04
+										if (ins.Type != null && ins.Type.IsValueType && !ins.Boxed)
+                                        //if (ins.Type.IsValueType && !ins.Boxed)
                                         {
                                             AllocValueType(arrRef, ins.Type);
                                             dst = ILIntepreter.ResolveReference(arrRef);
@@ -3752,9 +3771,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region Conversion
+                            #region Conversion
                             case OpCodeEnum.Conv_U1:
                             case OpCodeEnum.Conv_Ovf_U1:
                             case OpCodeEnum.Conv_Ovf_U1_Un:
@@ -4054,9 +4073,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
-#endregion
+                            #endregion
 
-#region Stack operation
+                            #region Stack operation
                             case OpCodeEnum.Pop:
                                 {
                                     Free(esp - 1);
