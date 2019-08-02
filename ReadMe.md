@@ -11,3 +11,5 @@ ILRuntime
 [Unity Demo Project, Unity示例工程](https://github.com/Ourpalm/ILRuntimeU3D/)
 
 QQ群：512079820
+
+git remote add il_origin https://github.com/Ourpalm/ILRuntime.git

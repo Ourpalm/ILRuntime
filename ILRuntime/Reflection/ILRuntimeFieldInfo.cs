@@ -169,7 +169,7 @@ namespace ILRuntime.Reflection
         {
             unsafe
             {
-                StackObject esp;
+                //StackObject esp;
                 ILTypeInstance ins;
                 if (isStatic)
                 {
@@ -206,7 +206,7 @@ namespace ILRuntime.Reflection
         {
             unsafe
             {
-                StackObject esp;
+                //StackObject esp;
                 if (value is CrossBindingAdaptorType)
                     value = ((CrossBindingAdaptorType)value).ILInstance;
                 ILTypeInstance ins;

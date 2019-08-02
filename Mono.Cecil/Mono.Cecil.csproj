@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ProjectInfo.cs" />
+    <Compile Include="Mono\*.cs" />
+    <Compile Include="Mono.Cecil\*.cs" />
+    <Compile Include="Mono.Cecil.Cil\*.cs" />
+    <Compile Include="Mono.Cecil.Metadata\*.cs" />
+    <Compile Include="Mono.Cecil.PE\*.cs" />
+    <Compile Include="Mono.Collections.Generic\*.cs" />
+    <Compile Include="Mono.Security.Cryptography\*.cs" />
+  </ItemGroup>
+</Project>

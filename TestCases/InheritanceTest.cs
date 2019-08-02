@@ -130,6 +130,31 @@ namespace TestCases
                 throw new Exception("Error");
             }
         }
+
+        public static void InheritanceTest10()
+        {
+            List<Parent> list = new List<Parent>();
+            Child2 c1 = new Child2();
+            SubParent c2 = new Child3();
+            list.Add(new Child2());
+            list.Add(new Child3());
+
+            list.RemoveAll((c) => c is Child2);
+
+            if (list.Count != 1)
+                throw new Exception("Error");
+            c1 = (Child2)c2;
+            Console.WriteLine(c1.ToString());
+            c1 = c2 as Child2;
+            Console.WriteLine(c1 == null);
+        }
+
+        public static void InheritanceTest11()
+        {
+            SubParent sub = new SubParent();
+            sub.Test();
+        }
+
         class TestCls5 : TestClass2
         {
             public override float AbMethod2(int arg1)
@@ -305,6 +330,28 @@ namespace TestCases
     }
 
     public class Parent
+    {
+        public virtual void Test()
+        {
+            Console.WriteLine("Parent.test");
+        }
+    }
+
+    public class SubParent: Parent
+    {
+        public override void Test()
+        {
+            base.Test();
+            Console.WriteLine("SubParent.test");
+        }
+    }
+
+    public class Child2 : SubParent
+    {
+
+    }
+
+    public class Child3 : SubParent
     {
 
     }

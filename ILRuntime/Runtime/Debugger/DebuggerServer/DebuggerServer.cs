@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Debugger.Protocol;
+using System.Net;
 
 namespace ILRuntime.Runtime.Debugger
 {
@@ -44,7 +45,7 @@ namespace ILRuntime.Runtime.Debugger
             mainLoop = new Thread(new ThreadStart(this.NetworkLoop));
             mainLoop.Start();
 
-            this.listener = new TcpListener(port);
+            this.listener = new TcpListener(IPAddress.Any, port);
             try { listener.Start(); }
             catch
             {
@@ -174,7 +175,8 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             info = VariableInfo.GetException(ex);
                         }
-                        SendSCResolveVariableResult(info);
+                        if (info.Type != VariableTypes.Pending)
+                            SendSCResolveVariableResult(info);
                     }
                     break;
                 case DebugMessageType.CSResolveIndexAccess:
@@ -194,7 +196,8 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             info = VariableInfo.GetException(ex);
                         }
-                        SendSCResolveVariableResult(info);
+                        if (info.Type != VariableTypes.Pending)
+                            SendSCResolveVariableResult(info);
                     }
                     break;
                 case DebugMessageType.CSEnumChildren:
@@ -211,7 +214,8 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             info = new VariableInfo[] { VariableInfo.GetException(ex) };
                         }
-                        SendSCEnumChildrenResult(info);
+                        if (info != null)
+                            SendSCEnumChildrenResult(info);
                     }
                     break;
             }
@@ -260,6 +264,40 @@ namespace ILRuntime.Runtime.Debugger
                 clientSocket.Send(type, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
+        bool CheckCompilerGeneratedStateMachine(ILMethod ilm, Enviorment.AppDomain domain,int startLine, out ILMethod found)
+        {
+            var mDef = ilm.Definition;
+            Mono.Cecil.CustomAttribute ca = null;
+            found = null;
+            foreach (var attr in mDef.CustomAttributes)
+            {
+                switch (attr.AttributeType.FullName)
+                {
+                    case "System.Runtime.CompilerServices.AsyncStateMachineAttribute":
+                    case "System.Runtime.CompilerServices.IteratorStateMachineAttribute":
+                        ca = attr;
+                        break;
+
+                }
+            }
+            if (ca != null)
+            {
+                if (ca.ConstructorArguments.Count > 0)
+                {
+                    var smType = domain.GetType(ca.ConstructorArguments[0].Value, null, null);
+                    if (smType != null)
+                    {
+                        ilm = smType.GetMethod("MoveNext", 0, true) as ILMethod;
+                        if (ilm != null && ilm.StartLine <= (startLine + 1) && ilm.EndLine >= (startLine + 1))
+                        {
+                            found = ilm;
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
         void TryBindBreakpoint(CSBindBreakpoint msg)
         {
             var domain = ds.AppDomain;
@@ -284,6 +322,10 @@ namespace ILRuntime.Runtime.Debugger
                                     if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
                                     {
                                         found = ilm;
+                                        break;
+                                    }
+                                    else if (CheckCompilerGeneratedStateMachine(ilm, domain, msg.StartLine, out found))
+                                    {
                                         break;
                                     }
                                 }
@@ -343,6 +385,10 @@ namespace ILRuntime.Runtime.Debugger
                                         found = ilm;
                                         break;
                                     }
+                                    else if(CheckCompilerGeneratedStateMachine(ilm, domain, msg.StartLine, out found))
+                                    {
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -394,27 +440,33 @@ namespace ILRuntime.Runtime.Debugger
             DoSend(DebugMessageType.SCStepComplete);
         }
 
-        void SendSCResolveVariableResult(VariableInfo info)
+        internal void SendSCResolveVariableResult(VariableInfo info)
         {
-            sendStream.Position = 0;
-            WriteVariableInfo(info);
-            DoSend(DebugMessageType.SCResolveVariableResult);
+            lock (this)
+            {
+                sendStream.Position = 0;
+                WriteVariableInfo(info);
+                DoSend(DebugMessageType.SCResolveVariableResult);
+            }
         }
 
-        void SendSCEnumChildrenResult(VariableInfo[] info)
+        internal void SendSCEnumChildrenResult(VariableInfo[] info)
         {
-            sendStream.Position = 0;
-            if (info != null)
+            lock (this)
             {
-                bw.Write(info.Length);
-                for (int i = 0; i < info.Length; i++)
+                sendStream.Position = 0;
+                if (info != null)
                 {
-                    WriteVariableInfo(info[i]);
+                    bw.Write(info.Length);
+                    for (int i = 0; i < info.Length; i++)
+                    {
+                        WriteVariableInfo(info[i]);
+                    }
                 }
+                else
+                    bw.Write(0);
+                DoSend(DebugMessageType.SCEnumChildrenResult);
             }
-            else
-                bw.Write(0);
-            DoSend(DebugMessageType.SCEnumChildrenResult);
         }
 
         void WriteStackFrames(KeyValuePair<int, StackFrameInfo[]>[] info)

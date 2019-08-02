@@ -72,5 +72,12 @@ namespace TestCases
 
             Console.WriteLine(pos[0, 1, 1]);
         }
+
+        public static void ArrayTest07()
+        {
+            int[,] a = new int[2, 3];
+            a[0, 0] = 1; //ios il2cpp ipad test: invocation exception
+            a[0, 0].ToString(); //unityeditor crash on windows pc test
+        }
     }
 }

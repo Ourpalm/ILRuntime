@@ -142,5 +142,27 @@ namespace TestCases
             }
         }
 
+
+        class MyClass
+        {
+            public ILRuntimeTest.TestFramework.TestCLREnum myEnum;
+        }
+        public static void JsonTest6()
+        {
+            MyClass myClass = new MyClass();
+            myClass.myEnum = ILRuntimeTest.TestFramework.TestCLREnum.Test2;
+
+            string json = LitJson.JsonMapper.ToJson(myClass);
+
+            MyClass myNewClass = LitJson.JsonMapper.ToObject<MyClass>(json);
+            if (myNewClass.myEnum == ILRuntimeTest.TestFramework.TestCLREnum.Test2)
+            {
+                Console.WriteLine("Ok");
+            }
+            else
+            {
+                Console.WriteLine("Fail");
+            }
+        }
     }
 }

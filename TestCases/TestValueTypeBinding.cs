@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ILRuntimeTest.TestFramework;
 
 namespace TestCases
@@ -172,6 +173,76 @@ namespace TestCases
         static void UnitTest_10029Sub2(out TestVector3 v3)
         {
             v3 = TestVector3.One2;//
+        }
+
+        static TestVectorClass vecCls = new TestVectorClass();
+
+        public static void UnitTest_10030()
+        {
+            vecCls.Vector2 += TestVector3.One2 * (0.456f - vecCls.Vector2.Y * 2);//这样会有
+
+            Console.WriteLine(vecCls.Vector2);
+        }
+
+        public static void UnitTest_10031()
+        {
+            TestVector3 pos = TestVector3.One2;
+            float offsetX = pos.X - 0.1f;
+            float offsetY = pos.Y - 0.1f;//报错行数在这里
+            if (offsetX > 1)
+                Console.WriteLine("1");
+            else if (offsetX < -1)
+                Console.WriteLine("2");
+            //注释下面的代码就不会出错了
+            else if (offsetY > 1)
+                Console.WriteLine("3");
+            else if (offsetY < -1)
+                Console.WriteLine("4");
+
+        }
+
+        public static void UnitTest_10032()
+        {
+            TestVectorClass VTest = new TestVectorClass();
+
+            TestVector3 value = VTest.vector;
+            value.Normalize();
+            VTest.vector.Normalize();
+            Console.WriteLine("Vector3BindingTest local Vector3 normalized = " + value);
+            Console.WriteLine("Vector3BindingTest Vector3 normalized = " + VTest.vector);
+
+        }
+
+        public static void UnitTest_10033()
+        {
+            TestVector3[] arr2 = new TestVector3[10];
+            arr2[0].X = 1243;
+
+            Vector3[] arr3 = new Vector3[10];
+            arr3[0].x = 3143;
+
+            Console.WriteLine(arr2[0].X);
+            Console.WriteLine(arr3[0].x);
+        }
+
+        public static void UnitTest_10034()
+        {
+            Dictionary<UInt32, TestValueTypeBinding> testDic = new Dictionary<uint, TestValueTypeBinding>();
+            testDic.Add(1, new TestValueTypeBinding());
+            testDic.Add(2, new TestValueTypeBinding());
+            foreach (var item in testDic)
+            {
+                Console.WriteLine(string.Format("dic item {0}", item.Key));
+            }
+        }
+
+        public static void UnitTest_10035()
+        {
+            TestVector3[] FuncBtnsPos1 = new TestVector3[3] { TestVector3.One, TestVector3.One, TestVector3.One };
+            foreach(var i in FuncBtnsPos1)
+            {
+                Console.WriteLine(i.ToString());
+            }
         }
     }
 }

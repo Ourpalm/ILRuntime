@@ -1,0 +1,38 @@
+trigger:
+- master
+
+pr:
+- master
+
+jobs:
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - script: |
+      dotnet build -c Debug Mono.Cecil.sln
+    displayName: 'Build'
+  - script: |
+      dotnet test --no-build -c Debug -f netcoreapp2.1 Mono.Cecil.sln
+    displayName: 'Test .NET Core'
+  - task: NuGetToolInstaller@0
+    displayName: 'Install nuget'
+  - task: NuGetCommand@2
+    inputs:
+      command: 'custom'
+      arguments: 'install NUnit.Console -Version 3.9.0 -OutputDirectory ./packages'
+    displayName: 'Get NUnit.Console'
+  - script: |
+      mono ./packages/NUnit.ConsoleRunner.3.9.0/tools/nunit3-console.exe ./Mono.Cecil.nunit
+    displayName: 'Test .NET 4.0 using Mono'
+
+- job: Windows
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - script: |
+      dotnet build -c Debug Mono.Cecil.sln
+    displayName: 'Build'
+  - script: |
+      dotnet test --no-build -c Debug Mono.Cecil.sln
+    displayName: 'Test'
