@@ -114,7 +114,18 @@ namespace ILRuntime.Reflection
 
         protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
         {
-            return et.GetMethod(name, bindingAttr, binder, callConvention, types, modifiers);
+            //Mod By LiYu 2019.04.17
+            MethodInfo method;
+            if (types == null)
+            {
+                method = et.GetMethod(name, bindingAttr);
+            }
+            else
+            {
+                method = et.GetMethod(name, bindingAttr, binder, callConvention, types, modifiers);
+            }
+            return method;
+            //Mod End
         }
 
         public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
@@ -234,7 +245,9 @@ namespace ILRuntime.Reflection
 
         public override bool IsGenericType
         {
-            get { return et.IsGenericType; }
+			//Mod By LiYu2018/10/24 修复Protobuf-net
+			//get { return et.IsGenericType; }
+            get { return et.IsGenericType && et.IsGenericTypeDefinition; }
         }
 
         public override bool IsGenericTypeDefinition

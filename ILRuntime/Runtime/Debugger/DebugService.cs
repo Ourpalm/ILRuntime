@@ -940,6 +940,12 @@ namespace ILRuntime.Runtime.Debugger
                                     }
                                     else
                                     {
+										//Add By LiYu 2019.7.12 B
+                                        var type = m.DeclearingType.ReflectionType;
+                                        var result = ResolveMemberStatic(type, variable.Name, out res);
+                                        if (result.Type != VariableTypes.NotFound)
+											return result;
+										//Add By LiYu 2019.7.12 E	
                                         return VariableInfo.GetCannotFind(variable.Name);
                                     }
                                 }
@@ -1059,7 +1065,69 @@ namespace ILRuntime.Runtime.Debugger
 
             return VariableInfo.GetCannotFind(name);
         }
+		//Add By LiYu 2019.7.12 B
+        VariableInfo ResolveMemberStatic(Type type, string name, out object res)
+        {
+            res = null;
+            var fi = type.GetField(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (fi != null)
+            {
+                res = fi.GetValue(null);
+                VariableInfo info = VariableInfo.FromObject(res);
 
+                info.Address = 0;
+                info.Name = name;
+                info.Type = VariableTypes.FieldReference;
+                info.TypeName = fi.FieldType.FullName;
+                info.IsPrivate = fi.IsPrivate;
+                info.IsProtected = fi.IsFamily;
+                info.Expandable = res != null && !fi.FieldType.IsPrimitive;
+
+                return info;
+            }
+            else
+            {
+                var fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                string match = string.Format("<{0}>", name);
+                foreach (var f in fields)
+                {
+                    if (f.Name.Contains(match))
+                    {
+                        res = f.GetValue(null);
+                        VariableInfo info = VariableInfo.FromObject(res);
+
+                        info.Address = 0;
+                        info.Name = name;
+                        info.Type = VariableTypes.FieldReference;
+                        info.TypeName = f.FieldType.FullName;
+                        info.IsPrivate = f.IsPrivate;
+                        info.IsProtected = f.IsFamily;
+                        info.Expandable = res != null && !f.FieldType.IsPrimitive;
+
+                        return info;
+                    }
+                }
+            }
+
+            var pi = type.GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (pi != null)
+            {
+                res = pi.GetValue(null, null);
+                VariableInfo info = VariableInfo.FromObject(res);
+
+                info.Address = 0;
+                info.Name = name;
+                info.Type = VariableTypes.PropertyReference;
+                info.TypeName = pi.PropertyType.FullName;
+                info.IsPrivate = pi.GetGetMethod(true).IsPrivate;
+                info.IsProtected = pi.GetGetMethod(true).IsFamily;
+                info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
+                return info;
+            }
+
+            return VariableInfo.GetCannotFind(name);
+        }
+		//Add By LiYu 2019.7.12 E
         unsafe bool GetValueExpandable(StackObject* esp, IList<object> mStack)
         {
             if (esp->ObjectType < ObjectTypes.Object)

@@ -53,8 +53,9 @@ namespace ILRuntime.Reflection
                 }
             }
         }
-
-        internal ILMethod ILMethod { get { return method; } }
+		//Mod By LiYu 2019.07.02
+		public ILMethod ILMethod { get { return method; } }
+        //internal ILMethod ILMethod { get { return method; } }
         public override MethodAttributes Attributes
         {
             get

@@ -86,24 +86,62 @@ namespace ILRuntime.Runtime.Enviorment
             var p = esp - 1 - 1;
             var t = mStack[p->Value] as Type;
             var p2 = esp - 1;
-            var t2 = mStack[p2->Value] as Object[];
+			//Mod By LiYu2018/10/24
+            //var t2 = mStack[p2->Value] as Object[];
+            //intp.Free(p);
+            //if (t != null)
+            //{
+            //    for (int i = 0; i < t2.Length; i++)
+            //    {
+            //        if (t2[i] == null)
+            //        {
+            //            throw new ArgumentNullException();
+            //        }
+            //    }
+			//
+            //    if (t is ILRuntimeType)
+            //    {
+            //        return ILIntepreter.PushObject(p, mStack, ((ILRuntimeType)t).ILType.Instantiate(t2));
+            //    }
+            //    else
+            //        return ILIntepreter.PushObject(p, mStack, Activator.CreateInstance(t, t2));
+            //}
+            //else
+            //    return ILIntepreter.PushNull(p);
+
+            var param = StackObject.ToObject(p2, intp.AppDomain, mStack);
             intp.Free(p);
             if (t != null)
             {
-                for (int i = 0; i < t2.Length; i++)
+                if (param is Object[])
                 {
-                    if (t2[i] == null)
-                    {
-                        throw new ArgumentNullException();
-                    }
-                }
+                    var t2 = param as Object[];
 
-                if (t is ILRuntimeType)
-                {
-                    return ILIntepreter.PushObject(p, mStack, ((ILRuntimeType)t).ILType.Instantiate(t2));
+                    for (int i = 0; i < t2.Length; i++)
+                    {
+                        if (t2[i] == null)
+                        {
+                            throw new ArgumentNullException();
+                        }
+                    }
+
+                    if (t is ILRuntimeType)
+                    {
+                        return ILIntepreter.PushObject(p, mStack, ((ILRuntimeType)t).ILType.Instantiate(t2));
+                    }
+                    else
+                        return ILIntepreter.PushObject(p, mStack, Activator.CreateInstance(t, t2));
                 }
                 else
-                    return ILIntepreter.PushObject(p, mStack, Activator.CreateInstance(t, t2));
+                {
+                    var b = (int)(param) == 1;
+                    if (t is ILRuntimeType)
+                    {
+                        return ILIntepreter.PushObject(p, mStack, ((ILRuntimeType)t).ILType.Instantiate());
+                    }
+                    else
+                        return ILIntepreter.PushObject(p, mStack, Activator.CreateInstance(t, b));
+                }
             }
             else
                 return ILIntepreter.PushNull(p);

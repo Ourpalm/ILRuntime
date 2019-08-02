@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\BlackUnsafeHelper.cs" />
     <Compile Include="CLR\Method\CLRMethod.cs" />
     <Compile Include="CLR\Method\ExceptionHandler.cs" />
     <Compile Include="CLR\Method\ILMethod.cs" />

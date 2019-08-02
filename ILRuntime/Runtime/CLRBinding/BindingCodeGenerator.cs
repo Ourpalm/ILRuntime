@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Other;
+//Add By LiYu 2019.07.02
+using ILRuntime.Helper;
 
 namespace ILRuntime.Runtime.CLRBinding
 {
@@ -50,6 +52,8 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
 using ILRuntime.CLR.Utils;
+//Add By LiYu 2019.07.02
+using System.Linq;
 
 namespace ILRuntime.Runtime.Generated
 {
@@ -68,6 +72,13 @@ namespace ILRuntime.Runtime.Generated
 
                     bool needMethods;
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                    //Mod By LiYu2018/10/24
+					if (clsName == "System_Single_Binding") //修复Single IsFinite 找不到
+                    {
+                        methods = methods.Where(m => !(m.Name == "IsFinite")).ToArray();
+                    }
+					//Add By LiYu 2019.07.02
+                    methods = methods.Where(m => !m.IsBlack() && !m.IsUnsafe()).ToArray();
                     FieldInfo[] fields = i.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string registerMethodCode = i.GenerateMethodRegisterCode(methods, excludeMethods, out needMethods);
                     string registerFieldCode = i.GenerateFieldRegisterCode(fields, excludeFields);
@@ -164,6 +175,20 @@ namespace ILRuntime.Runtime.Generated
                 System.IO.Directory.CreateDirectory(outputPath);
             Dictionary<Type, CLRBindingGenerateInfo> infos = new Dictionary<Type, CLRBindingGenerateInfo>(new ByReferenceKeyComparer<Type>());
             CrawlAppdomain(domain, infos);
+
+            //Add By LiYu 2019.07.10 B
+            infos = infos.Values.Where(info =>
+            {
+                if(info.Type.Name.Contains("Tuple"))
+                {
+#if UNITY_5_5_OR_NEWER
+                    UnityEngine.Debug.LogErrorFormat("Please remove {0}, it will case unknown error runtime.", info.Type);
+#endif
+                    return false;
+                }
+                return true;
+            }).ToDictionary(info => info.Type);
+			//Add By LiYu 2019.07.10 E
             string[] oldFiles = System.IO.Directory.GetFiles(outputPath, "*.cs");
             foreach (var i in oldFiles)
             {
@@ -239,6 +264,13 @@ namespace ILRuntime.Runtime.Generated
 
                     bool needMethods;
                     MethodInfo[] methods = info.Value.Methods.ToArray();
+                    //Mod By LiYu2018/10/24
+                    if (clsName == "System_Single_Binding") //修复Single IsFinite 找不到
+                    {
+                        methods = methods.Where(m => !(m.Name == "IsFinite")).ToArray();
+                    }
+                    //Add By LiYu 2019.07.02
+                    methods = methods.Where(m => !m.IsBlack() && !m.IsUnsafe()).ToArray();
                     FieldInfo[] fields = info.Value.Fields.ToArray();
                     string registerMethodCode = i.GenerateMethodRegisterCode(methods, excludeMethods, out needMethods);
                     string registerFieldCode = fields.Length > 0 ? i.GenerateFieldRegisterCode(fields, excludeFields) : null;
