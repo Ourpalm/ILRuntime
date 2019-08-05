@@ -180,6 +180,13 @@ namespace ILRuntime.Runtime.Intepreter
                         switch (code)
                         {
                             #region Load Constants
+                            case OpCodeREnum.Ldc_I4_M1:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg1->ObjectType = ObjectTypes.Integer;
+                                    reg1->Value = -1;
+                                }
+                                break;
                             case OpCodeREnum.Ldc_I4_0:
                                 {
                                     reg1 = Add(r, ip->Register1);
@@ -769,6 +776,28 @@ namespace ILRuntime.Runtime.Intepreter
                                         continue;
                                     }
 
+                                }
+                                break;
+                            case OpCodeREnum.Leave_S:
+                                {
+                                    if (method.ExceptionHandler != null)
+                                    {
+                                        ExceptionHandler eh = null;
+
+                                        int addr = ip->Operand;
+                                        var sql = from e in method.ExceptionHandler
+                                                  where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                  select e;
+                                        eh = sql.FirstOrDefault();
+                                        if (eh != null)
+                                        {
+                                            finallyEndAddress = ip->Operand;
+                                            ip = ptr + eh.HandlerStart;
+                                            continue;
+                                        }
+                                    }
+                                    ip = ptr + ip->Operand;
+                                    continue;
                                 }
                                 break;
                             case OpCodeREnum.Call:
@@ -1704,6 +1733,145 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new InvalidCastException();
                                 }
                                 break;
+                            case OpCodeREnum.Initobj:
+                                {
+                                    objRef = GetObjectAndResolveReference(esp - 1);
+                                    var type = domain.GetType(ip->Operand);
+                                    if (type is ILType)
+                                    {
+                                        ILType it = (ILType)type;
+                                        if (it.IsValueType)
+                                        {
+                                            switch (objRef->ObjectType)
+                                            {
+                                                case ObjectTypes.Null:
+                                                    throw new NullReferenceException();
+                                                case ObjectTypes.ValueTypeObjectReference:
+                                                    stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
+                                                    break;
+                                                case ObjectTypes.Object:
+                                                    {
+                                                        var obj = mStack[objRef->Value];
+                                                        if (obj != null)
+                                                        {
+                                                            if (obj is ILTypeInstance)
+                                                            {
+                                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                                instance.Clear();
+                                                            }
+                                                            else
+                                                                throw new NotSupportedException();
+                                                        }
+                                                        else
+                                                            throw new NullReferenceException();
+                                                    }
+                                                    break;
+                                                case ObjectTypes.ArrayReference:
+                                                    {
+                                                        var arr = mStack[objRef->Value] as Array;
+                                                        var idx = objRef->ValueLow;
+                                                        var obj = arr.GetValue(idx);
+                                                        if (obj == null)
+                                                            arr.SetValue(it.Instantiate(), idx);
+                                                        else
+                                                        {
+                                                            if (obj is ILTypeInstance)
+                                                            {
+                                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                                instance.Clear();
+                                                            }
+                                                            else
+                                                                throw new NotImplementedException();
+                                                        }
+                                                    }
+                                                    break;
+                                                case ObjectTypes.FieldReference:
+                                                    {
+                                                        var obj = mStack[objRef->Value];
+                                                        if (obj != null)
+                                                        {
+                                                            if (obj is ILTypeInstance)
+                                                            {
+                                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                                var tar = instance[objRef->ValueLow] as ILTypeInstance;
+                                                                if (tar != null)
+                                                                    tar.Clear();
+                                                                else
+                                                                    throw new NotSupportedException();
+                                                            }
+                                                            else
+                                                                throw new NotSupportedException();
+                                                        }
+                                                        else
+                                                            throw new NullReferenceException();
+                                                    }
+                                                    break;
+                                                case ObjectTypes.StaticFieldReference:
+                                                    {
+                                                        var t = AppDomain.GetType(objRef->Value);
+                                                        int idx = objRef->ValueLow;
+                                                        if (t is ILType)
+                                                        {
+                                                            var tar = ((ILType)t).StaticInstance[idx] as ILTypeInstance;
+                                                            if (tar != null)
+                                                                tar.Clear();
+                                                            else
+                                                                throw new NotSupportedException();
+                                                        }
+                                                        else
+                                                            throw new NotSupportedException();
+                                                    }
+                                                    break;
+                                                default:
+                                                    throw new NotImplementedException();
+                                            }
+
+                                            Free(esp - 1);
+                                            esp--;
+                                        }
+                                        else
+                                        {
+                                            PushNull(esp);
+                                            switch (objRef->ObjectType)
+                                            {
+                                                case ObjectTypes.StaticFieldReference:
+                                                    {
+                                                        var t = AppDomain.GetType(objRef->Value) as ILType;
+                                                        t.StaticInstance.AssignFromStack(objRef->ValueLow, esp, AppDomain, mStack);
+                                                    }
+                                                    break;
+                                                case ObjectTypes.FieldReference:
+                                                    {
+                                                        var instance = mStack[objRef->Value] as ILTypeInstance;
+                                                        instance.AssignFromStack(objRef->ValueLow, esp, AppDomain, mStack);
+                                                        Free(esp - 1);
+                                                        esp--;
+                                                    }
+                                                    break;
+                                                default:
+                                                    {
+                                                        if (objRef->ObjectType >= ObjectTypes.Object)
+                                                            mStack[objRef->Value] = null;
+                                                        else
+                                                            PushNull(objRef);
+                                                    }
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        {
+                                            stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
+                                        }
+                                        else if (type.IsPrimitive)
+                                            StackObject.Initialized(objRef, type);
+                                        Free(esp - 1);
+                                        esp--;
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Isinst:
                                 {
                                     reg1 = Add(r, ip->Register1);
@@ -2036,6 +2204,86 @@ namespace ILRuntime.Runtime.Intepreter
                                     AssignToRegister(ref info, ip->Register1, arr);
                                 }
                                 break;
+                            case OpCodeREnum.Stelem_Ref:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+                                    Array arr = mStack[reg1->Value] as Array;
+                                    if (arr is object[])
+                                    {
+                                        switch (reg3->ObjectType)
+                                        {
+                                            case ObjectTypes.Null:
+                                                arr.SetValue(null, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Object:
+                                                ArraySetValue(arr, mStack[reg3->Value], reg2->Value);
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                arr.SetValue(reg3->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Long:
+                                                arr.SetValue(*(long*)&reg3->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Float:
+                                                arr.SetValue(*(float*)&reg3->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Double:
+                                                arr.SetValue(*(double*)&reg3->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.ValueTypeObjectReference:
+                                                ArraySetValue(arr, StackObject.ToObject(reg3, domain, mStack), reg2->Value);
+                                                FreeStackValueType(esp - 1);
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        switch (reg3->ObjectType)
+                                        {
+                                            case ObjectTypes.Object:
+                                                ArraySetValue(arr, mStack[reg3->Value], reg2->Value);
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                {
+                                                    StoreIntValueToArray(arr, reg3, reg2);
+                                                }
+                                                break;
+                                            case ObjectTypes.Long:
+                                                {
+                                                    if (arr is long[])
+                                                    {
+                                                        ((long[])arr)[reg2->Value] = *(long*)&reg3->Value;
+                                                    }
+                                                    else
+                                                    {
+                                                        ((ulong[])arr)[reg2->Value] = *(ulong*)&reg3->Value;
+                                                    }
+                                                }
+                                                break;
+                                            case ObjectTypes.Float:
+                                                {
+                                                    ((float[])arr)[reg2->Value] = *(float*)&reg3->Value;
+                                                }
+                                                break;
+                                            case ObjectTypes.Double:
+                                                {
+                                                    ((double[])arr)[reg2->Value] = *(double*)&reg3->Value;
+                                                }
+                                                break;
+                                            case ObjectTypes.ValueTypeObjectReference:
+                                                ArraySetValue(arr, StackObject.ToObject(reg3, domain, mStack), reg2->Value);
+                                                FreeStackValueType(esp - 1);
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Stelem_I4:
                                 {
                                     reg1 = Add(r, ip->Register1);
@@ -2106,7 +2354,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
                                     else
                                         ex.Data["ThisInfo"] = "";
-                                    ex.Data["StackTrace"] = debugger.GetStackTrance(this);
+                                    ex.Data["StackTrace"] = debugger.GetStackTrace(this);
                                     ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
                                 }
                                 //Clear call stack

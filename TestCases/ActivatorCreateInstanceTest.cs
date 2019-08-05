@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace TestCases
 {
@@ -32,6 +33,13 @@ namespace TestCases
     {
         public static void ActivatorCreateInstanceWithArgsTest()
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            for(int i = 0; i < 100000; ++i)
+            {
+
+            }
+            Console.WriteLine(stopwatch.ElapsedMilliseconds);
             ActivatorCreateInstanceTestClass inst = Activator.CreateInstance<ActivatorCreateInstanceTestClass>();
             Console.WriteLine($"Create without args: {inst}");
 

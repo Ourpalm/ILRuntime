@@ -353,6 +353,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(code.Code - (Code.Ldarg_0));
                     break;
+                case Code.Ldarg_S:
+                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)(locVarRegStart + ((ParameterDefinition)ins.Operand).Index);
+                    break;
                 case Code.Newarr:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
@@ -454,6 +459,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
+                case Code.Initobj:
+                    op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    break;
                 case Code.Ldtoken:
                     op.Register1 = baseRegIdx++;
                     if (token is FieldReference)
@@ -491,7 +501,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     baseRegIdx--;
                     return;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(code.Code.ToString());
             }
             lst.Add(op);
         }
@@ -516,7 +526,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 hasReturn = m.ReturnType != appdomain.VoidType;
                 if(m is ILMethod)
                 {
-                    if (!m.IsConstructor && !((ILMethod)m).IsVirtual)
+                    if (!m.IsConstructor && !((ILMethod)m).IsVirtual && ((ILMethod)m).Jitted)
                     {
                         var body = ((ILMethod)m).BodyRegister;
                         if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)

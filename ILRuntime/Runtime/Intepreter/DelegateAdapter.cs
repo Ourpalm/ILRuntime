@@ -906,7 +906,7 @@ namespace ILRuntime.Runtime.Intepreter
                 esp++;
             }
             StackObject* ret;
-            if (appdomain.EnableRegisterVM)
+            if (appdomain.EnableRegisterVM && method.Jitted)
                 ret = intp.ExecuteR(method, esp, out unhandled);
             else
                 ret = intp.Execute(method, esp, out unhandled);

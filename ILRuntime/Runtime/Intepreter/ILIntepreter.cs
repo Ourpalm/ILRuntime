@@ -97,7 +97,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             esp = PushParameters(method, esp, p);
             bool unhandledException;
-            if (AppDomain.EnableRegisterVM)
+            if (AppDomain.EnableRegisterVM && method.Jitted)
                 esp = ExecuteR(method, esp, out unhandledException);
             else
                 esp = Execute(method, esp, out unhandledException);

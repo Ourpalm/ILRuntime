@@ -225,8 +225,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                     else
                         return false;
+                case OpCodeREnum.Initobj:
+                    return false;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(op.Code.ToString());
             }
         }
 
@@ -384,8 +386,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ceq:
                     r1 = op.Register1;
                     return true;
+                case OpCodeREnum.Initobj:
+                    return false;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(op.Code.ToString());
             }
         }
 

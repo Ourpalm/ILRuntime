@@ -217,6 +217,24 @@ namespace ILRuntime.CLR.Method
                 return body != null;
             }
         }
+        enum JitState
+        {
+            None = 0,
+            Succ = 1,
+            Failed = 2,
+        }
+        JitState jitted = JitState.None;
+        public bool Jitted
+        {
+            get
+            {
+                if(jitted == JitState.None)
+                {
+                    InitCodeBody();
+                }
+                return jitted == JitState.Succ;
+            }
+        }
 
         public int LocalVariableCount
         {
@@ -296,20 +314,33 @@ namespace ILRuntime.CLR.Method
                 InitCodeBody();
         }
 
+        bool initedCodeBody = false;
         void InitCodeBody()
         {
+            if (initedCodeBody) return;
+            initedCodeBody = true;
             if (def.HasBody)
             {
                 localVarCnt = def.Body.Variables.Count;
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
                 
-                if (appdomain.EnableRegisterVM)
+                if (appdomain.EnableRegisterVM && def.Body.ExceptionHandlers.Count == 0)
                 {
-                    Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
-                    bodyRegister = jit.Compile(out stackRegisterCnt);
+                    try
+                    {
+                        jitted = JitState.Succ;
+                        Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
+                        bodyRegister = jit.Compile(out stackRegisterCnt);
+                    }catch(Exception e)
+                    {
+                        jitted = JitState.Failed;
+                        Console.WriteLine(e);
+                        InitStackCodeBody(addr);
+                    }
                 }
                 else
                 {
+                    jitted = JitState.Failed;
                     InitStackCodeBody(addr);
                 }
 
