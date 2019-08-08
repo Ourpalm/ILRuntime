@@ -64,8 +64,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
-            Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
-            Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
+            //Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
+            //Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
 
             
             List<OpCodeR> res = new List<OpCodeR>();

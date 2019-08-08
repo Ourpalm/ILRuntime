@@ -234,6 +234,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         static bool GetOpcodeDestRegister(ref OpCodes.OpCodeR op, out short r1)
         {
+            bool reference;
+            return GetOpcodeDestRegister(ref op, out r1, out reference);
+        }
+        static bool GetOpcodeDestRegister(ref OpCodes.OpCodeR op, out short r1, out bool reference)
+        {
             r1 = -1;
             switch (op.Code)
             {
@@ -316,6 +321,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldftn:
                 case OpCodeREnum.Ldvirtftn:
                     r1 = op.Register1;
+                    reference = false;
                     return true;
                 case OpCodeREnum.Br_S:
                 case OpCodeREnum.Br:
@@ -348,6 +354,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Push:
                 case OpCodeREnum.InlineStart:
                 case OpCodeREnum.InlineEnd:
+                    reference = false;
+                    return false;
                 case OpCodeREnum.Stind_I:
                 case OpCodeREnum.Stind_I1:
                 case OpCodeREnum.Stind_I2:
@@ -365,8 +373,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_Ref:
                 case OpCodeREnum.Stfld:
                 case OpCodeREnum.Stsfld:
+                    r1 = op.Register1;
+                    reference = true;
+                    return false;
                 case OpCodeREnum.Throw:
                 case OpCodeREnum.Castclass:
+                    reference = false;
                     return false;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
@@ -385,8 +397,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Cgt_Un:
                 case OpCodeREnum.Ceq:
                     r1 = op.Register1;
+                    reference = false;
                     return true;
                 case OpCodeREnum.Initobj:
+                    reference = false;
                     return false;
                 default:
                     throw new NotImplementedException(op.Code.ToString());
@@ -703,6 +717,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Nop:
                 case OpCodeREnum.Ret:
                 case OpCodeREnum.Push:
+                    break;
+                case OpCodeREnum.Stind_I:
+                case OpCodeREnum.Stind_I1:
+                case OpCodeREnum.Stind_I2:
+                case OpCodeREnum.Stind_I4:
+                case OpCodeREnum.Stind_I8:
+                case OpCodeREnum.Stind_R4:
+                case OpCodeREnum.Stind_R8:
+                case OpCodeREnum.Stelem_I:
+                case OpCodeREnum.Stelem_I1:
+                case OpCodeREnum.Stelem_I2:
+                case OpCodeREnum.Stelem_I4:
+                case OpCodeREnum.Stelem_I8:
+                case OpCodeREnum.Stelem_R4:
+                case OpCodeREnum.Stelem_R8:
+                case OpCodeREnum.Stelem_Ref:
+                case OpCodeREnum.Stfld:
+                case OpCodeREnum.Stsfld:
+                    op.Register1 = dst;
                     break;
                 default:
                     throw new NotImplementedException();

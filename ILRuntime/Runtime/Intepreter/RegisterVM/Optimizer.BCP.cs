@@ -58,25 +58,28 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         //Only deal with stack->local
                         if (xSrc < stackRegisterBegin || xDst >= stackRegisterBegin)
                             continue;
-                        bool ended = false;
+                        //bool ended = false;
                         for (int j = i - 1; j >= 0; j--)
                         {
+                            if (canRemove.Contains(j))
+                                continue;
                             OpCodeR Y = lst[j];
 
                             short yDst;
-                            if (GetOpcodeDestRegister(ref Y, out yDst))
+                            bool reference;
+                            if (GetOpcodeDestRegister(ref Y, out yDst,out reference))
                             {
                                 if (xSrc == yDst)
                                 {
                                     ReplaceOpcodeDest(ref Y, xDst);
                                     canRemove.Add(i);
-                                    ended = true;
+                                    //ended = true;
                                     lst[j] = Y;
                                     break;
                                 }
                                 if (xDst == yDst)
                                 {
-                                    ended = true;
+                                    //ended = true;
                                     break;
                                 }
                             }
@@ -85,18 +88,28 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             {
                                 if (ySrc >= 0 && ySrc == xDst)
                                 {
-                                    ended = true;
+                                    //ended = true;
                                     break;
                                 }
                                 if (ySrc2 >= 0 && ySrc2 == xDst)
                                 {
-                                    ended = true;
+                                    //ended = true;
                                     break;
                                 }
                                 if (ySrc3 >= 0 && ySrc3 == xDst)
                                 {
-                                    ended = true;
+                                    //ended = true;
                                     break;
+                                }
+                            }
+                            if (reference)
+                            {
+                                if (xSrc == yDst)
+                                {
+                                    ReplaceOpcodeDest(ref Y, xDst);
+                                    canRemove.Add(i);
+                                    //ended = true;
+                                    lst[j] = Y;
                                 }
                             }
                         }

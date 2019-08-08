@@ -5026,6 +5026,9 @@ namespace ILRuntime.Runtime.Intepreter
             return esp;
         }
 
+#if NET_4_6 || NET_STANDARD_2_0
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public void CopyToStack(StackObject* dst, StackObject* src, IList<object> mStack)
         {
             *dst = *src;
