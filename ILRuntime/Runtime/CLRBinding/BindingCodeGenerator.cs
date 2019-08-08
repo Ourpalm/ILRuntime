@@ -40,6 +40,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     StringBuilder sb = new StringBuilder();
                     sb.Append(@"using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -94,7 +95,7 @@ namespace ILRuntime.Runtime.Generated
                         sb.AppendLine(methodDef);
                     if (hasFieldCode)
                         sb.AppendLine(fieldDef);
-                    if (hasMethodCode || hasFieldCode || hasCtorCode)
+                    if (hasMethodCode || hasCtorCode)
                         sb.AppendLine(argsDef);
                     if (hasMethodCode || hasFieldCode || hasValueTypeCode || hasMiscCode || hasCtorCode)
                         sb.AppendLine(typeDef);
@@ -270,7 +271,7 @@ namespace ILRuntime.Runtime.Generated
                         sb.AppendLine(methodDef);
                     if (hasFieldCode)
                         sb.AppendLine(fieldDef);
-                    if (hasMethodCode || hasFieldCode || hasCtorCode)
+                    if (hasMethodCode || hasCtorCode)
                         sb.AppendLine(argsDef);
                     if (hasMethodCode || hasFieldCode || hasValueTypeCode || hasMiscCode || hasCtorCode)
                         sb.AppendLine(typeDef);
@@ -755,7 +756,7 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
 
-                if (valueTypeBinders != null)
+                if (valueTypeBinders != null && valueTypeBinders.Count>0)
                 {
                     sb.AppendLine();
 
