@@ -360,6 +360,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + ((VariableDefinition)ins.Operand).Index);
                     break;
+                case Code.Ldarga:
+                case Code.Ldarga_S:
+                case Code.Starg:
+                case Code.Starg_S:
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)(((ParameterDefinition)ins.Operand).Index);
+                    break;
                 case Code.Ldarg_0:
                 case Code.Ldarg_1:
                 case Code.Ldarg_2:
@@ -368,6 +375,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(code.Code - (Code.Ldarg_0));
                     break;
+                case Code.Ldarg:
                 case Code.Ldarg_S:
                     op.Code = OpCodes.OpCodeREnum.Move;
                     op.Register1 = baseRegIdx++;
@@ -409,8 +417,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldelem_R8:
                 case Code.Ldelem_Ref:
                 case Code.Ldelem_Any:
+                case Code.Ldelema:
                     op.Register1 = (short)(baseRegIdx - 2);
-                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 2);
+                    op.Register3 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 1;
                     break;
                 case Code.Stind_I:
@@ -420,6 +430,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Stind_I8:
                 case Code.Stind_R4:
                 case Code.Stind_R8:
+                case Code.Stind_Ref:
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 2;

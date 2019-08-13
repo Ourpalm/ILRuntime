@@ -357,7 +357,7 @@ namespace ILRuntime.Runtime.Stack
             if (endAddr == valueTypePtr)
                 valueTypePtr = ILIntepreter.ResolveReference(esp);
             else
-                throw new NotSupportedException();
+                return;
             if (start != int.MaxValue)
             {
                 if (end == managedStack.Count - 1)

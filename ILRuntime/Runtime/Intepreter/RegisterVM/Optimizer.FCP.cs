@@ -46,9 +46,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                     if (X.Code == OpCodeREnum.Move)
                     {
-                        short xSrc, xSrc2, xSrc3, xDst;
-                        GetOpcodeSourceRegister(ref X, hasReturn, out xSrc, out xSrc2, out xSrc3);
-                        GetOpcodeDestRegister(ref X, out xDst);
+                        short xSrc, xDst;
+                        if (true)
+                        {
+                            short xSrc2, xSrc3;
+                            GetOpcodeSourceRegister(ref X, hasReturn, out xSrc2, out xSrc, out xSrc3);
+                            GetOpcodeDestRegister(ref X, out xDst);
+                        }
                         if (xDst == xSrc)
                         {
                             canRemove.Add(i);

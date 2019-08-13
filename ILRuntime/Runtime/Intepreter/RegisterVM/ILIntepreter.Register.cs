@@ -324,21 +324,24 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
-                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) - *((long*)&reg3->Value);
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) - *((long*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Integer:
-                                            reg3->Value = reg1->Value - reg3->Value;
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value - reg2->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) - *((float*)&reg3->Value);
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) - *((float*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) - *((double*)&reg3->Value);
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) - *((double*)&reg2->Value);
                                             break;
                                         default:
                                             throw new NotImplementedException();
                                     }
-                                    esp++;
                                 }
                                 break;
                             case OpCodeREnum.Mul:
@@ -349,15 +352,19 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg3->Value) = *((long*)&reg1->Value) * *((long*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value * reg2->Value;
                                             break;
                                         case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
                                             *((float*)&reg3->Value) = *((float*)&reg1->Value) * *((float*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
                                             *((double*)&reg3->Value) = *((double*)&reg1->Value) * *((double*)&reg2->Value);
                                             break;
                                         default:
@@ -421,15 +428,19 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg3->Value) = *((long*)&reg1->Value) % *((long*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value % reg2->Value;
                                             break;
                                         case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
                                             *(float*)&reg3->Value = *(float*)&reg1->Value % *(float*)&reg2->Value;
                                             break;
                                         case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
                                             *(double*)&reg3->Value = *(double*)&reg1->Value % *(double*)&reg2->Value;
                                             break;
                                         default:
@@ -445,9 +456,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((ulong*)&reg3->Value) = *((ulong*)&reg1->Value) % *((ulong*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = (int)((uint)reg1->Value % (uint)reg2->Value);
                                             break;
                                         default:
@@ -463,9 +476,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg3->Value) = *((long*)&reg1->Value) ^ *((long*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value ^ reg2->Value;
                                             break;
                                         default:
@@ -481,9 +496,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg3->Value) = *((long*)&reg1->Value) & *((long*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value & reg2->Value;
                                             break;
                                         default:
@@ -499,9 +516,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg3->Value) = *((long*)&reg1->Value) | *((long*)&reg2->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value | reg2->Value;
                                             break;
                                         default:
@@ -518,9 +537,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg3->Value) = *((long*)&reg1->Value) << bits;
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value << bits;
                                             break;
                                         default:
@@ -537,9 +558,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg3->Value) = *((long*)&reg1->Value) >> bits;
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value >> bits;
                                             break;
                                         default:
@@ -556,9 +579,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
                                             *((ulong*)&reg3->Value) = *((ulong*)&reg1->Value) >> bits;
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
                                             *(uint*)&reg3->Value = (uint)reg1->Value >> bits;
                                             break;
                                         default:
@@ -573,9 +598,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg2->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg2->Value) = ~*((long*)&reg1->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg2->ObjectType = ObjectTypes.Integer;
                                             reg2->Value = ~reg1->Value;
                                             break;
                                         default:
@@ -590,15 +617,19 @@ namespace ILRuntime.Runtime.Intepreter
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
+                                            reg2->ObjectType = ObjectTypes.Long;
                                             *((long*)&reg2->Value) = -*((long*)&reg1->Value);
                                             break;
                                         case ObjectTypes.Integer:
+                                            reg2->ObjectType = ObjectTypes.Integer;
                                             reg2->Value = -reg1->Value;
                                             break;
                                         case ObjectTypes.Float:
+                                            reg2->ObjectType = ObjectTypes.Float;
                                             *((float*)&reg2->Value) = -*((float*)&reg1->Value);
                                             break;
                                         case ObjectTypes.Double:
+                                            reg2->ObjectType = ObjectTypes.Double;
                                             *((double*)&reg2->Value) = -*((double*)&reg1->Value);
                                             break;
                                         default:
@@ -948,6 +979,65 @@ namespace ILRuntime.Runtime.Intepreter
 
                                     reg2->ObjectType = ObjectTypes.StackObjectReference;
                                     *(long*)&reg2->Value = (long)reg1;
+                                }
+                                break;
+                            case OpCodeREnum.Ldarga:
+                            case OpCodeREnum.Ldarga_S:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+
+                                    reg2->ObjectType = ObjectTypes.StackObjectReference;
+                                    *(long*)&reg2->Value = (long)reg1;
+                                }
+                                break;
+                            case OpCodeREnum.Starg:
+                            case OpCodeREnum.Starg_S:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+
+                                    int idx = reg1->Value;
+                                    bool isObj = reg1->ObjectType >= ObjectTypes.Object;
+                                    if (reg2->ObjectType >= ObjectTypes.Object)
+                                    {
+                                        if (reg1->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        {
+                                            var dst = ILIntepreter.ResolveReference(reg1);
+                                            CopyValueTypeToStack(dst, mStack[reg2->Value], mStack);
+                                        }
+                                        else
+                                        {
+                                            reg1->ObjectType = reg2->ObjectType;
+                                            mStack[reg1->Value] = mStack[reg2->Value];
+                                            reg1->ValueLow = reg2->ValueLow;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (reg1->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        {
+                                            if (reg2->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                            {
+                                                CopyStackValueType(reg2, reg1, mStack);
+                                                //FreeStackValueType(reg2);
+                                            }
+                                            else
+                                                throw new NotSupportedException();
+                                        }
+                                        else
+                                        {
+                                            *reg1 = *reg2;
+                                            if (isObj)
+                                            {
+                                                reg1->Value = idx;
+                                                if (reg2->ObjectType == ObjectTypes.Null)
+                                                {
+                                                    mStack[reg1->Value] = null;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                                 break;
                             case OpCodeREnum.Ldind_I:
@@ -1898,6 +1988,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                                     binder.CopyValueTypeToStack(obj, dst, mStack);
                                                                 }
                                                                 break;
+                                                            case ObjectTypes.ArrayReference:
+                                                                {
+                                                                    var arr = mStack[objRef->Value] as Array;
+                                                                    var idx = objRef->ValueLow;
+                                                                    arr.SetValue(obj, idx);
+                                                                }
+                                                                break;
                                                             default:
                                                                 throw new NotImplementedException();
                                                         }
@@ -2479,6 +2576,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     object ins = ((CLRType)vt).ValueTypeBinder.ToObject(dst, mStack);
                                                     //FreeStackValueType(objRef);
                                                     PushObject(reg1, mStack, ins, true);
+                                                }
+                                                else
+                                                {
+                                                    CopyToStack(reg1, reg2, mStack);
                                                 }
                                                 //nothing to do for CLR type boxing
                                             }
@@ -3196,8 +3297,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I1:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
                                     int val = 0;
                                     bool[] arr = mStack[reg1->Value] as bool[];
                                     if (arr != null)
@@ -3208,14 +3310,15 @@ namespace ILRuntime.Runtime.Intepreter
                                         val = arr2[reg2->Value];
                                     }
 
-                                    reg1->ObjectType = ObjectTypes.Integer;
-                                    reg1->Value = val;
+                                    reg3->ObjectType = ObjectTypes.Integer;
+                                    reg3->Value = val;
                                 }
                                 break;
                             case OpCodeREnum.Ldelem_U1:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
                                     int val = 0;
 
                                     byte[] arr = mStack[reg1->Value] as byte[];
@@ -3226,8 +3329,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         bool[] arr2 = mStack[reg1->Value] as bool[];
                                         val = arr2[reg2->Value] ? 1 : 0;
                                     }
-                                    reg1->ObjectType = ObjectTypes.Integer;
-                                    reg1->Value = val;
+                                    reg3->ObjectType = ObjectTypes.Integer;
+                                    reg3->Value = val;
                                 }
                                 break;
                             case OpCodeREnum.Stelem_I2:
@@ -3258,8 +3361,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I2:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
                                     int val = 0;
 
                                     short[] arr = mStack[reg1->Value] as short[];
@@ -3272,14 +3376,15 @@ namespace ILRuntime.Runtime.Intepreter
                                         char[] arr2 = mStack[reg1->Value] as char[];
                                         val = arr2[reg2->Value];
                                     }
-                                    reg1->ObjectType = ObjectTypes.Integer;
-                                    reg1->Value = val;
+                                    reg3->ObjectType = ObjectTypes.Integer;
+                                    reg3->Value = val;
                                 }
                                 break;
                             case OpCodeREnum.Ldelem_U2:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
                                     int val = 0;
 
                                     ushort[] arr = mStack[reg1->Value] as ushort[];
@@ -3292,8 +3397,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         char[] arr2 = mStack[reg1->Value] as char[];
                                         val = arr2[reg2->Value];
                                     }
-                                    reg1->ObjectType = ObjectTypes.Integer;
-                                    reg1->Value = val;
+                                    reg3->ObjectType = ObjectTypes.Integer;
+                                    reg3->Value = val;
                                 }
                                 break;
                             case OpCodeREnum.Stelem_I4:
@@ -3316,23 +3421,25 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
 
                                     int[] arr = mStack[reg1->Value] as int[];
-                                    reg1->ObjectType = ObjectTypes.Integer;
-                                    reg1->Value = arr[reg2->Value];
+                                    reg3->ObjectType = ObjectTypes.Integer;
+                                    reg3->Value = arr[reg2->Value];
                                 }
                                 break;
                             case OpCodeREnum.Ldelem_U4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
 
                                     uint[] arr = mStack[reg1->Value] as uint[];
 
-                                    reg1->ObjectType = ObjectTypes.Integer;
-                                    reg1->Value = (int)arr[reg2->Value];
+                                    reg3->ObjectType = ObjectTypes.Integer;
+                                    reg3->Value = (int)arr[reg2->Value];
                                 }
                                 break;
                             case OpCodeREnum.Stelem_I8:
@@ -3355,8 +3462,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
 
                                     long[] arr = mStack[reg1->Value] as long[];
                                     long longVal;
@@ -3368,8 +3476,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         longVal = (long)arr2[reg2->Value];
                                     }
 
-                                    reg1->ObjectType = ObjectTypes.Long;
-                                    *(long*)&reg1->Value = longVal;
+                                    reg3->ObjectType = ObjectTypes.Long;
+                                    *(long*)&reg3->Value = longVal;
                                 }
                                 break;
                             case OpCodeREnum.Stelem_R4:
@@ -3384,13 +3492,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_R4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
 
                                     float[] arr = mStack[reg1->Value] as float[];
 
-                                    reg1->ObjectType = ObjectTypes.Float;
-                                    *(float*)&reg1->Value = arr[reg2->Value];
+                                    reg3->ObjectType = ObjectTypes.Float;
+                                    *(float*)&reg3->Value = arr[reg2->Value];
                                 }
                                 break;
                             case OpCodeREnum.Stelem_R8:
@@ -3405,20 +3514,22 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_R8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
 
                                     double[] arr = mStack[reg1->Value] as double[];
 
-                                    reg1->ObjectType = ObjectTypes.Double;
-                                    *(double*)&reg1->Value = arr[reg2->Value];
+                                    reg3->ObjectType = ObjectTypes.Double;
+                                    *(double*)&reg3->Value = arr[reg2->Value];
                                 }
                                 break;
                             case OpCodeREnum.Ldelem_Ref:
                             case OpCodeREnum.Ldelem_Any:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
 
                                     Array arr = mStack[reg1->Value] as Array;
                                     var obj = arr.GetValue(reg2->Value);
@@ -3432,15 +3543,15 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (ins.Type != null && ins.Type.IsValueType && !ins.Boxed)
                                         //if (ins.Type.IsValueType && !ins.Boxed)
                                         {
-                                            AllocValueType(reg1, ins.Type);
-                                            var dst = ILIntepreter.ResolveReference(reg1);
+                                            AllocValueType(reg3, ins.Type);
+                                            var dst = ILIntepreter.ResolveReference(reg3);
                                             ins.CopyValueTypeToStack(dst, mStack);
                                         }
                                         else
-                                            PushObject(reg1, mStack, obj, true);
+                                            PushObject(reg3, mStack, obj, true);
                                     }
                                     else
-                                        PushObject(reg1, mStack, obj, !arr.GetType().GetElementType().IsPrimitive);
+                                        PushObject(reg3, mStack, obj, !arr.GetType().GetElementType().IsPrimitive);
                                 }
                                 break;
                             case OpCodeREnum.Ldlen:
@@ -3451,6 +3562,19 @@ namespace ILRuntime.Runtime.Intepreter
 
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = arr.Length;
+                                }
+                                break;
+                            case OpCodeREnum.Ldelema:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    var idx = reg2->Value;
+                                    Array arr = mStack[reg1->Value] as Array;
+                                    reg3->ObjectType = ObjectTypes.ArrayReference;
+                                    reg3->Value = mStack.Count;
+                                    mStack.Add(arr);
+                                    reg3->ValueLow = reg2->Value;
                                 }
                                 break;
                             #endregion

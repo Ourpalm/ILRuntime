@@ -204,6 +204,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
 #endif
                     break;
+                default:
+                    param = string.Format("r{0},r{1},r{2}", Register1, Register2, Register3);
+                    break;
             }
             return string.Format("{0} {1}", Code.ToString().ToLower().Replace('_', '.'), param);
         }
