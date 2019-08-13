@@ -125,6 +125,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             var code = ins.OpCode;
             var token = ins.Operand;
             op.Code = (OpCodeREnum)code.Code;
+            op.Register1 = -1;
+            op.Register2 = -1;
+            op.Register3 = -1;
+            op.Flag = 0;
             bool hasRet;
             switch (code.Code)
             {
@@ -237,7 +241,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             baseRegIdx -= (short)pCnt;
 
                             if (hasRet)
+                            {
                                 op.Register1 = baseRegIdx++;
+                                op.Flag = 1;
+                            }
                         }
                         else
                         {
@@ -276,6 +283,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Mul_Ovf_Un:
                 case Code.Div:
                 case Code.Div_Un:
+                case Code.Rem:
+                case Code.Rem_Un:
+                case Code.Xor:
+                case Code.And:
+                case Code.Or:
+                case Code.Shl:
+                case Code.Shr:
+                case Code.Shr_Un:
                 case Code.Clt:
                 case Code.Clt_Un:
                 case Code.Cgt:
@@ -382,6 +397,22 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register3 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 3;
                     break;
+                case Code.Ldelem_I1:
+                case Code.Ldelem_U1:
+                case Code.Ldelem_I2:
+                case Code.Ldelem_U2:
+                case Code.Ldelem_I4:
+                case Code.Ldelem_U4:
+                case Code.Ldelem_I8:
+                case Code.Ldelem_I:
+                case Code.Ldelem_R4:
+                case Code.Ldelem_R8:
+                case Code.Ldelem_Ref:
+                case Code.Ldelem_Any:
+                    op.Register1 = (short)(baseRegIdx - 2);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    baseRegIdx -= 1;
+                    break;
                 case Code.Stind_I:
                 case Code.Stind_I1:
                 case Code.Stind_I2:
@@ -436,6 +467,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldind_U1:
                 case Code.Ldind_U2:
                 case Code.Ldind_U4:
+                case Code.Not:
+                case Code.Neg:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     break;
@@ -449,7 +482,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
-                    baseRegIdx -= 2;
+                    baseRegIdx -= 1;
                     break;
                 case Code.Box:
                 case Code.Unbox:
@@ -463,6 +496,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
+                    baseRegIdx -= 1;
                     break;
                 case Code.Ldtoken:
                     op.Register1 = baseRegIdx++;
@@ -526,7 +560,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 hasReturn = m.ReturnType != appdomain.VoidType;
                 if(m is ILMethod)
                 {
-                    if (!m.IsConstructor && !((ILMethod)m).IsVirtual && ((ILMethod)m).Jitted)
+                    if (!m.IsConstructor && !((ILMethod)m).IsVirtual && ((ILMethod)m).Jitted && false)
                     {
                         var body = ((ILMethod)m).BodyRegister;
                         if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)
@@ -542,7 +576,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 //Cannot find method or the method is dummy
                 MethodReference _ref = (MethodReference)token;
                 pCnt = _ref.HasParameters ? _ref.Parameters.Count : 0;
-                if (_ref.HasThis)
+                if (_ref.HasThis && op.Code != OpCodeREnum.Newobj)
                     pCnt++;
                 op.OperandLong = pCnt;
                 hasReturn = false;

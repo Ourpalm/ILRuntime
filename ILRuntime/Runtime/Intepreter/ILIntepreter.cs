@@ -97,10 +97,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             esp = PushParameters(method, esp, p);
             bool unhandledException;
-            if (AppDomain.EnableRegisterVM && method.Jitted)
-                esp = ExecuteR(method, esp, out unhandledException);
-            else
-                esp = Execute(method, esp, out unhandledException);
+            esp = Execute(method, esp, out unhandledException);
             object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(StackObject.ToObject((esp - 1), domain, mStack)) : null;
             //ClearStack
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
@@ -111,6 +108,13 @@ namespace ILRuntime.Runtime.Intepreter
             return result;
         }
         internal StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
+        {
+            if (AppDomain.EnableRegisterVM && method.Jitted)
+                return ExecuteR(method, esp, out unhandledException);
+            else
+                return ExecuteS(method, esp, out unhandledException);
+        }
+        internal StackObject* ExecuteS(ILMethod method, StackObject* esp, out bool unhandledException)
         {
             if (method == null)
                 throw new NullReferenceException();
@@ -818,6 +822,33 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Stind_I1:
                             case OpCodeEnum.Stind_I2:
                             case OpCodeEnum.Stind_I4:
+                                {
+                                    dst = GetObjectAndResolveReference(esp - 1 - 1);
+                                    val = esp - 1;
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, mStack[dst->Value].GetType().GetElementType(), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Integer;
+                                            }
+                                            break;
+                                    }
+                                    Free(esp - 1);
+                                    Free(esp - 1 - 1);
+                                    esp = esp - 1 - 1;
+                                }
+                                break;
                             case OpCodeEnum.Stind_R4:
                                 {
                                     dst = GetObjectAndResolveReference(esp - 1 - 1);
@@ -836,7 +867,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         default:
                                             {
-                                                dst->Value = val->Value;
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Float;
                                             }
                                             break;
                                     }
@@ -863,8 +895,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         default:
                                             {
-                                                dst->Value = val->Value;
-                                                dst->ValueLow = val->ValueLow;
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Long;
                                             }
                                             break;
                                     }
@@ -892,8 +924,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         default:
                                             {
-                                                dst->Value = val->Value;
-                                                dst->ValueLow = val->ValueLow;
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Double;
                                             }
                                             break;
                                     }
@@ -2399,7 +2431,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            a = esp - m.ParameterCount;
+                                            a = Minus(esp, m.ParameterCount);
                                             obj = null;
                                             bool isValueType = type.IsValueType;
                                             if (isValueType)
@@ -5034,8 +5066,8 @@ namespace ILRuntime.Runtime.Intepreter
             *dst = *src;
             if (dst->ObjectType >= ObjectTypes.Object)
             {
-                dst->Value = mStack.Count;
                 var obj = mStack[src->Value];
+                dst->Value = mStack.Count;
                 mStack.Add(obj);
             }
         }
@@ -5181,7 +5213,13 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (sbyte)obj;
-            }            
+            }       
+            else if(obj == null)
+            {
+                esp->ObjectType = ObjectTypes.Null;
+                esp->Value = -1;
+                esp->ValueLow = 0;
+            }
             else
                 throw new NotImplementedException();
         }

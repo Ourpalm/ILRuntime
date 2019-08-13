@@ -42,20 +42,20 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         [FieldOffset(6)]
         public short Register2;
         [FieldOffset(8)]
-        public int Operand;
-        [FieldOffset(8)]
-        public float OperandFloat;
-        [FieldOffset(8)]
         public short Register3;
         [FieldOffset(10)]
-        public short Register4;
+        public short Flag;
         [FieldOffset(12)]
-        public int Operand2;
+        public int Operand;
+        [FieldOffset(12)]
+        public float OperandFloat;
         [FieldOffset(16)]
+        public int Operand2;
+        [FieldOffset(20)]
         public int Operand3;
-        [FieldOffset(12)]
+        [FieldOffset(16)]
         public long OperandLong;
-        [FieldOffset(12)]
+        [FieldOffset(16)]
         public double OperandDouble;
 
         public override string ToString()
@@ -85,7 +85,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     param = string.Format("r{0},r{1}", Register1, Register2);
                     break;
                 case OpCodeREnum.Box:
-                    param = string.Format("r{0},r{1},{2}", Register1, Register2, Operand);
+                    param = string.Format("r{0},r{1},{2}", Register1, Register2, ILRuntime.Runtime.Enviorment.AppDomain.CurrentDomain.GetType(Operand));
                     break;
 
                 case OpCodeREnum.Stfld:
@@ -129,10 +129,31 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Newobj:
+#if DEBUG
+                    param = string.Format("r{0}, {1}", Register1, ILRuntime.Runtime.Enviorment.AppDomain.CurrentDomain.GetMethod(Operand));
+#else
+                    param = string.Format("r{0}, {1}", Register1, Operand);
+#endif
+                    break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
-                case OpCodeREnum.Newobj:
-                    param = string.Format("r{0}, {1}", Register1, Operand);
+                    if (Flag == 0)
+                    {
+#if DEBUG
+                        param = string.Format("{0}", ILRuntime.Runtime.Enviorment.AppDomain.CurrentDomain.GetMethod(Operand));
+#else
+                        param = string.Format("{0}", Operand);
+#endif
+                    }
+                    else
+                    {
+#if DEBUG
+                        param = string.Format("r{0}, {1}", Register1, ILRuntime.Runtime.Enviorment.AppDomain.CurrentDomain.GetMethod(Operand));
+#else
+                        param = string.Format("r{0}, {1}", Register1, Operand);
+#endif
+                    }
                     break;
                 case OpCodeREnum.Blt:
                 case OpCodeREnum.Blt_S:
@@ -173,8 +194,15 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ldc_R8:
                     param = string.Format("r{0},{1}", Register1, OperandDouble);
                     break;
+                case OpCodeREnum.Initobj:
+                    param = string.Format("r{0}, r{1}", Register1, Register2);
+                    break;
                 case OpCodeREnum.Ldstr:
+#if DEBUG
+                    param = string.Format("r{0},0x{1:X}", Register1, ILRuntime.Runtime.Enviorment.AppDomain.CurrentDomain.GetString(OperandLong));
+#else
                     param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
+#endif
                     break;
             }
             return string.Format("{0} {1}", Code.ToString().ToLower().Replace('_', '.'), param);

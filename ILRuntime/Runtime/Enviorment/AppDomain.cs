@@ -65,10 +65,15 @@ namespace ILRuntime.Runtime.Enviorment
             return UnityMainThreadID != 0 && (UnityMainThreadID != System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
 #endif
-
+#if DEBUG
+        public static AppDomain CurrentDomain { get; private set; }
+#endif
         public bool EnableRegisterVM { get; set; }
         public unsafe AppDomain()
         {
+#if DEBUG
+            CurrentDomain = this;
+#endif
             AllowUnboundCLRMethod = true;
             InvocationContext.InitializeDefaultConverters();
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
@@ -723,6 +728,10 @@ namespace ILRuntime.Runtime.Enviorment
                     if (t == null && contextMethod != null && contextMethod is ILMethod)
                     {
                         t = ((ILMethod)contextMethod).FindGenericArgument(_ref.Name);
+                    }
+                    if (t != null)
+                    {
+                        mapTypeToken[t.GetHashCode()] = t;
                     }
                     return t;
                 }
