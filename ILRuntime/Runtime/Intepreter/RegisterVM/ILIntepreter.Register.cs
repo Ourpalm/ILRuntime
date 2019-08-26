@@ -971,6 +971,147 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeREnum.Ldobj:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var t = AppDomain.GetType(ip->Operand);
+                                                var obj = mStack[reg1->Value];
+                                                var idx = reg1->ValueLow;
+                                                //Free(objRef);
+                                                LoadFromArrayReference(obj, idx, reg2, t, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.StackObjectReference:
+                                            {
+                                                var objRef2 = GetObjectAndResolveReference(reg1);
+                                                *reg2 = *objRef2;
+                                                if (reg2->ObjectType >= ObjectTypes.Object)
+                                                {
+                                                    reg2->Value = mStack.Count;
+                                                    mStack.Add(mStack[objRef2->Value]);
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var obj = mStack[reg1->Value];
+                                                int idx = reg1->ValueLow;
+                                                //Free(objRef);
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    ((ILTypeInstance)obj).PushToStack(idx, reg2, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var t = AppDomain.GetType(ip->Operand);
+                                                    obj = ((CLRType)t).GetFieldValue(idx, obj);
+                                                    PushObject(reg2, mStack, obj);
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(reg1->Value);
+                                                int idx = reg1->ValueLow;
+                                                //Free(objRef);
+                                                if (t is ILType)
+                                                {
+                                                    ((ILType)t).StaticInstance.PushToStack(idx, reg2, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var obj = ((CLRType)t).GetFieldValue(idx, null);
+                                                    PushObject(reg2, mStack, obj);
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stobj:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    switch (reg2->ObjectType)
+                                    {
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var t = AppDomain.GetType(ip->Operand);
+                                                StoreValueToArrayReference(reg2, reg1, t, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.StackObjectReference:
+                                            {
+                                                objRef = GetObjectAndResolveReference(reg2);
+                                                if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                                {
+                                                    switch (reg1->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Object:
+                                                            var dst = ILIntepreter.ResolveReference(objRef);
+                                                            CopyValueTypeToStack(dst, mStack[reg1->Value], mStack);
+                                                            break;
+                                                        case ObjectTypes.ValueTypeObjectReference:
+                                                            CopyStackValueType(reg1, objRef, mStack);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (reg1->ObjectType >= ObjectTypes.Object)
+                                                    {
+                                                        mStack[objRef->Value] = mStack[reg1->Value];
+                                                        objRef->ValueLow = reg1->ValueLow;
+                                                    }
+                                                    else
+                                                    {
+                                                        *objRef = *reg1;
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var obj = mStack[reg2->Value];
+                                                int idx = reg2->ValueLow;
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    ((ILTypeInstance)obj).AssignFromStack(idx, reg1, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var t = AppDomain.GetType(ip->Operand);
+                                                    ((CLRType)t).SetFieldValue(idx, ref obj, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(reg1, AppDomain, mStack)));
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(reg2->Value);
+                                                if (t is ILType)
+                                                {
+                                                    ((ILType)t).StaticInstance.AssignFromStack(reg2->ValueLow, reg1, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    ((CLRType)t).SetStaticFieldValue(reg2->ValueLow, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(reg1, AppDomain, mStack)));
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Ldloca:
                             case OpCodeREnum.Ldloca_S:
                                 {
@@ -1312,6 +1453,55 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 *reg2 = *val;
                                                 reg2->ObjectType = ObjectTypes.Double;
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldind_Ref:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[reg1->Value];
+                                                var idx = reg1->ValueLow;
+                                                //Free(dst);
+                                                LoadFromFieldReference(instance, idx, reg2, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[reg1->Value];
+                                                var idx = reg1->ValueLow;
+                                                //Free(dst);
+                                                LoadFromArrayReference(instance, idx, reg2, instance.GetType().GetElementType(), mStack);
+                                            }
+                                            break;
+                                        //Add By LiYu 2019.07.04 B
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(reg1->Value);
+                                                int idx = reg1->ValueLow;
+                                                if (t is ILType)
+                                                {
+                                                    ((ILType)t).StaticInstance.PushToStack(idx, reg2, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var obj = ((CLRType)t).GetFieldValue(idx, null);
+                                                    PushObject(reg2, mStack, obj);
+                                                }
+                                            }
+                                            break;
+                                        //Add By LiYu 2019.07.04 E	
+                                        default:
+                                            {
+                                                reg2->ObjectType = ObjectTypes.Object;
+                                                reg2->Value = mStack.Count;
+                                                mStack.Add(mStack[reg1->Value]);
                                             }
                                             break;
                                     }
@@ -2307,12 +2497,10 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Constrained:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
                                     var type = domain.GetType(ip->Operand);
                                     var m = domain.GetMethod(ip->Operand2);
                                     var pCnt = m.ParameterCount;
-                                    objRef = Minus(reg2, pCnt);
+                                    objRef = Minus(esp, pCnt + 1);
                                     var insIdx = mStack.Count;
                                     if (objRef->ObjectType < ObjectTypes.Object)
                                     {
@@ -2320,7 +2508,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         //move parameters
                                         for (int i = 0; i < pCnt; i++)
                                         {
-                                            var pPtr = Minus(reg2, i);
+                                            var pPtr = Minus(esp, i + 1);
                                             if (pPtr->ObjectType >= ObjectTypes.Object)
                                             {
                                                 var oldVal = pPtr->Value;
@@ -3326,6 +3514,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeREnum.Stelem_Ref:
+                            case OpCodeREnum.Stelem_Any:
                                 {
                                     reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2);

@@ -89,6 +89,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Conv_U2:
                 case OpCodeREnum.Conv_U4:
                 case OpCodeREnum.Conv_U8:
+                case OpCodeREnum.Ldobj:
                 case OpCodeREnum.Box:
                 case OpCodeREnum.Unbox:
                 case OpCodeREnum.Unbox_Any:
@@ -96,8 +97,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
                 case OpCodeREnum.Ldind_I4:
+                case OpCodeREnum.Ldind_I8:
                 case OpCodeREnum.Ldind_R4:
                 case OpCodeREnum.Ldind_R8:
+                case OpCodeREnum.Ldind_Ref:
                 case OpCodeREnum.Ldind_U1:
                 case OpCodeREnum.Ldind_U2:
                 case OpCodeREnum.Ldind_U4:
@@ -126,6 +129,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_R8:
                 case OpCodeREnum.Stind_Ref:
                 case OpCodeREnum.Stfld:
+                case OpCodeREnum.Stobj:
                     r1 = op.Register1;
                     r2 = op.Register2;
                     return true;
@@ -228,6 +232,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
                 case OpCodeREnum.Stelem_Ref:
+                case OpCodeREnum.Stelem_Any:
                     r1 = op.Register1;
                     r2 = op.Register2;
                     r3 = op.Register3;
@@ -261,9 +266,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     r2 = op.Register2;
                     return true;
                 case OpCodeREnum.Constrained:
-                    r1 = op.Register1;
-                    r2 = op.Register2;
-                    return true;
+                    return false;
                 default:
                     throw new NotImplementedException(op.Code.ToString());
             }
@@ -313,6 +316,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Conv_U2:
                 case OpCodeREnum.Conv_U4:
                 case OpCodeREnum.Conv_U8:
+                case OpCodeREnum.Ldobj:
                 case OpCodeREnum.Box:
                 case OpCodeREnum.Unbox:
                 case OpCodeREnum.Unbox_Any:
@@ -338,8 +342,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
                 case OpCodeREnum.Ldind_I4:
+                case OpCodeREnum.Ldind_I8:
                 case OpCodeREnum.Ldind_R4:
                 case OpCodeREnum.Ldind_R8:
+                case OpCodeREnum.Ldind_Ref:
                 case OpCodeREnum.Ldind_U1:
                 case OpCodeREnum.Ldind_U2:
                 case OpCodeREnum.Ldind_U4:
@@ -418,8 +424,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
                 case OpCodeREnum.Stelem_Ref:
+                case OpCodeREnum.Stelem_Any:
                 case OpCodeREnum.Stfld:
                 case OpCodeREnum.Stsfld:
+                case OpCodeREnum.Stobj:
                     r1 = op.Register1;
                     reference = true;
                     return false;
@@ -475,8 +483,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     reference = false;
                     return true;
                 case OpCodeREnum.Constrained:
-                    r1 = op.Register1;
-                    reference = true;
+                    reference = false;
                     return false;
                 default:
                     throw new NotImplementedException(op.Code.ToString());

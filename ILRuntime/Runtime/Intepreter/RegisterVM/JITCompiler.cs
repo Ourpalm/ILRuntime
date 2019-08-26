@@ -228,6 +228,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         ILMethod toInline;
                         var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
 
+                        bool Constrained = false;
                         if (lst.Count > 0 && op.Code == OpCodeREnum.Callvirt)
                         {
                             var lop = lst[lst.Count - 1];
@@ -235,17 +236,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             {
                                 lop.Operand2 = op.Operand;
                                 lst[lst.Count - 1] = lop;
+                                Constrained = true;
                             }
                         }
 
-                        if (!canInline)
+                        if (!canInline || Constrained)
                         {
                             for (int i = pCnt; i > 0; i--)
                             {
                                 OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
                                 op2.Code = OpCodes.OpCodeREnum.Push;
                                 op2.Register1 = (short)(baseRegIdx - i);
-                                lst.Add(op2);
+                                if (Constrained)
+                                {
+                                    lst.Insert(lst.Count - 1, op2);
+                                }
+                                else
+                                {
+                                    lst.Add(op2);
+                                }
                             }
 
                             baseRegIdx -= (short)pCnt;
@@ -485,6 +494,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldind_I8:
                 case Code.Ldind_R4:
                 case Code.Ldind_R8:
+                case Code.Ldind_Ref:
                 case Code.Ldind_U1:
                 case Code.Ldind_U2:
                 case Code.Ldind_U4:
@@ -509,13 +519,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Unbox:
                 case Code.Unbox_Any:
                 case Code.Isinst:
+                case Code.Ldobj:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
-                case Code.Constrained:
-                    op.Register1 = (short)(baseRegIdx - 1);
+                case Code.Stobj:
+                    op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    baseRegIdx -= 1;
+                    break;
+                case Code.Constrained:
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Initobj:
