@@ -1462,6 +1462,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     reg1 = Add(r, ip->Register2);
                                     reg2 = Add(r, ip->Register1);
+                                    reg1 = GetObjectAndResolveReference(reg1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.FieldReference:
