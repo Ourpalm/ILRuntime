@@ -2305,6 +2305,142 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp = PopToRegister(ref info, ip->Register1, esp);
                                 }
                                 break;
+                            case OpCodeREnum.Constrained:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    var type = domain.GetType(ip->Operand);
+                                    var m = domain.GetMethod(ip->Operand2);
+                                    var pCnt = m.ParameterCount;
+                                    objRef = Minus(reg2, pCnt);
+                                    var insIdx = mStack.Count;
+                                    if (objRef->ObjectType < ObjectTypes.Object)
+                                    {
+                                        bool moved = false;
+                                        //move parameters
+                                        for (int i = 0; i < pCnt; i++)
+                                        {
+                                            var pPtr = Minus(reg2, i);
+                                            if (pPtr->ObjectType >= ObjectTypes.Object)
+                                            {
+                                                var oldVal = pPtr->Value;
+                                                insIdx--;
+                                                if (!moved)
+                                                {
+                                                    pPtr->Value = mStack.Count;
+                                                    mStack.Add(mStack[oldVal]);
+                                                    mStack[oldVal] = null;
+                                                    moved = true;
+                                                }
+                                                else
+                                                {
+                                                    mStack[oldVal + 1] = mStack[oldVal];
+                                                    mStack[oldVal] = null;
+                                                    pPtr->Value = oldVal + 1;
+                                                }
+                                            }
+                                        }
+                                        if (!moved)
+                                        {
+                                            mStack.Add(null);
+                                        }
+                                    }
+                                    else
+                                        insIdx = objRef->Value;
+                                    var objRef2 = GetObjectAndResolveReference(objRef);
+                                    if (type != null)
+                                    {
+                                        if (type is ILType)
+                                        {
+                                            var t = (ILType)type;
+                                            if (t.IsEnum)
+                                            {
+                                                ILEnumTypeInstance ins = new ILEnumTypeInstance(t);
+                                                switch (objRef2->ObjectType)
+                                                {
+                                                    case ObjectTypes.FieldReference:
+                                                        {
+                                                            var owner = mStack[objRef2->Value] as ILTypeInstance;
+                                                            int idx = objRef2->ValueLow;
+                                                            //Free(objRef);
+                                                            owner.PushToStack(idx, objRef, AppDomain, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    case ObjectTypes.StaticFieldReference:
+                                                        {
+                                                            var st = AppDomain.GetType(objRef2->Value) as ILType;
+                                                            int idx = objRef2->ValueLow;
+                                                            //Free(objRef);
+                                                            st.StaticInstance.PushToStack(idx, objRef, AppDomain, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    case ObjectTypes.ArrayReference:
+                                                        {
+                                                            var arr = mStack[objRef2->Value];
+                                                            var idx = objRef2->ValueLow;
+                                                            //Free(objRef);
+                                                            LoadFromArrayReference(arr, idx, objRef, t, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    default:
+                                                        ins.AssignFromStack(0, objRef2, AppDomain, mStack);
+                                                        ins.Boxed = true;
+                                                        break;
+                                                }
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = ins;
+
+                                                //esp = PushObject(esp - 1, mStack, ins);
+                                            }
+                                            else
+                                            {
+                                                object res = RetriveObject(objRef2, mStack);
+                                                //Free(objRef);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = res;
+                                                //esp = PushObject(objRef, mStack, res, true);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var tt = type.TypeForCLR;
+                                            if (tt.IsEnum)
+                                            {
+                                                mStack[insIdx] = Enum.ToObject(tt, StackObject.ToObject(objRef2, AppDomain, mStack));
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                //esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)), true);
+                                            }
+                                            else if (tt.IsPrimitive)
+                                            {
+                                                mStack[insIdx] = tt.CheckCLRTypes(StackObject.ToObject(objRef2, AppDomain, mStack));
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                //esp = PushObject(esp - 1, mStack, tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack)));
+                                            }
+                                            else
+                                            {
+                                                object res = RetriveObject(objRef2, mStack);
+                                                //Free(objRef);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = res;
+                                                //esp = PushObject(objRef, mStack, res, true);
+                                            }
+                                        }
+                                    }
+                                    else
+                                        throw new NullReferenceException();
+                                }
+                                break;
                             case OpCodeREnum.Box:
                                 {
                                     reg1 = Add(r, ip->Register1);

@@ -260,6 +260,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     r1 = op.Register1;
                     r2 = op.Register2;
                     return true;
+                case OpCodeREnum.Constrained:
+                    r1 = op.Register1;
+                    r2 = op.Register2;
+                    return true;
                 default:
                     throw new NotImplementedException(op.Code.ToString());
             }
@@ -470,6 +474,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     r1 = op.Register1;
                     reference = false;
                     return true;
+                case OpCodeREnum.Constrained:
+                    r1 = op.Register1;
+                    reference = true;
+                    return false;
                 default:
                     throw new NotImplementedException(op.Code.ToString());
             }

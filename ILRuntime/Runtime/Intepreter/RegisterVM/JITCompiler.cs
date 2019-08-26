@@ -228,6 +228,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         ILMethod toInline;
                         var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
 
+                        if (lst.Count > 0 && op.Code == OpCodeREnum.Callvirt)
+                        {
+                            var lop = lst[lst.Count - 1];
+                            if (lop.Code == OpCodeREnum.Constrained)
+                            {
+                                lop.Operand2 = op.Operand;
+                                lst[lst.Count - 1] = lop;
+                            }
+                        }
+
                         if (!canInline)
                         {
                             for (int i = pCnt; i > 0; i--)
@@ -499,6 +509,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Unbox:
                 case Code.Unbox_Any:
                 case Code.Isinst:
+                    op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    break;
+                case Code.Constrained:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
