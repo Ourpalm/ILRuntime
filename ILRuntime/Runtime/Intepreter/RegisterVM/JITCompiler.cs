@@ -335,6 +335,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Nop:
                 case Code.Castclass:
+                case Code.Readonly:
                     break;
                 case Code.Stloc_0:
                     op.Code = OpCodes.OpCodeREnum.Move;

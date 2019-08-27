@@ -3921,6 +3921,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     throw ex;
                                 }
                             case OpCodeREnum.Nop:
+                            case OpCodeREnum.Readonly:
                                 break;
                             case OpCodeREnum.Switch:
                                 reg1 = Add(r, ip->Register1);
