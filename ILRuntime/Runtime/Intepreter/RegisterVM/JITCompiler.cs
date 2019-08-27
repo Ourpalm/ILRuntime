@@ -105,7 +105,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                 }
             }
-            for(int i = 0; i < res.Count; i++)
+            for (int i = 0; i < res.Count; i++)
             {
                 var op = res[i];
                 if (Optimizer.IsBranching(op.Code) && !inlinedBranches.Contains(i))
@@ -114,6 +114,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     res[i] = op;
                 }
             }
+
+            var jumptables = method.JumpTablesRegister;
+            var keys = new List<int>(jumptables.Keys);
+            foreach (var key in keys)
+            {
+                var val = jumptables[key];
+                for (int i = 0; i < val.Length; ++i)
+                {
+                    val[i] = jumpTargets[val[i]];
+                }
+                jumptables[key] = val;
+            }
+
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
             return res.ToArray();
@@ -575,6 +588,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Pop:
                     baseRegIdx--;
                     return;
+                case Code.Switch:
+                    {
+                        int hashCode = token.GetHashCode();
+                        var jumptables = method.JumpTablesRegister;
+                        if (!jumptables.ContainsKey(hashCode))
+                        {
+                            var e = token as Mono.Cecil.Cil.Instruction[];
+                            int[] addrs = new int[e.Length];
+                            for (int i = 0; i < e.Length; i++)
+                            {
+                                addrs[i] = entryMapping[e[i]];
+                            }
+                            jumptables[hashCode] = addrs;
+                        }
+                        op.Register1 = (short)(baseRegIdx - 1);
+                        baseRegIdx -= 1;
+                        op.Operand = hashCode;
+                    }
+                    break;
                 default:
                     throw new NotImplementedException(code.Code.ToString());
             }

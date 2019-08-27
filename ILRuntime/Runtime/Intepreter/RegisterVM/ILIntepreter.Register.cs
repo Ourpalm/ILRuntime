@@ -3922,6 +3922,16 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                             case OpCodeREnum.Nop:
                                 break;
+                            case OpCodeREnum.Switch:
+                                reg1 = Add(r, ip->Register1);
+                                var intVal = reg1->Value;
+                                var table = method.JumpTablesRegister[ip->Operand];
+                                if (intVal >= 0 && intVal < table.Length)
+                                {
+                                    ip = ptr + table[intVal];
+                                    continue;
+                                }
+                                break;
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }

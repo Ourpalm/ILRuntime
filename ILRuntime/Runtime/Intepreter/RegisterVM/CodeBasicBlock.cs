@@ -92,18 +92,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 {
                     if (cur.entry != null)
                     {
-                        if (i.OpCode.OperandType == OperandType.InlineBrTarget || i.OpCode.OperandType == OperandType.ShortInlineBrTarget)
+                        /*if (i.OpCode.OperandType == OperandType.InlineBrTarget || i.OpCode.OperandType == OperandType.ShortInlineBrTarget)
                         {
-                            if (cur.entry != (Instruction)i.Operand)
+                            //if (cur.entry != (Instruction)i.Operand)
                             {
                                 entryMapping[cur.entry] = res.Count - 1;
                                 cur = new CodeBasicBlock();
                                 res.Add(cur);
                             }
                         }
-                        else
+                        else*/
                         {
-                            if (cur.entry != (Instruction)i.Operand)
+                            //if (cur.entry != (Instruction)i.Operand)
                             {
                                 entryMapping[cur.entry] = res.Count - 1;
                                 cur = new CodeBasicBlock();

@@ -268,6 +268,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     return true;
                 case OpCodeREnum.Constrained:
                     return false;
+                case OpCodeREnum.Switch:
+                    r1 = op.Register1;
+                    return true;
                 default:
                     throw new NotImplementedException(op.Code.ToString());
             }
@@ -485,6 +488,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     reference = false;
                     return true;
                 case OpCodeREnum.Constrained:
+                    reference = false;
+                    return false;
+                case OpCodeREnum.Switch:
                     reference = false;
                     return false;
                 default:

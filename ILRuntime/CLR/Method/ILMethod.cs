@@ -24,6 +24,7 @@ namespace ILRuntime.CLR.Method
         KeyValuePair<string, IType>[] genericParameters;
         IType[] genericArguments;
         Dictionary<int, int[]> jumptables;
+        Dictionary<int, int[]> jumptablesRegister;
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
         ILRuntimeConstructorInfo reflectionCtorInfo;
@@ -35,6 +36,8 @@ namespace ILRuntime.CLR.Method
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
+
+        public Dictionary<int, int[]> JumpTablesRegister { get { if (jumptablesRegister == null) { jumptablesRegister = new Dictionary<int, int[]>(); } return jumptablesRegister; } }
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
 
