@@ -406,7 +406,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Dup:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Register1 = baseRegIdx++;
                     break;
@@ -513,7 +513,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
-                    baseRegIdx -= 1;
+                    baseRegIdx -= 2;
                     break;
                 case Code.Box:
                 case Code.Unbox:

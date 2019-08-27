@@ -93,9 +93,17 @@ namespace ILRuntime.Runtime.Intepreter
             info.ParameterCount = paramCnt;
             info.RegisterStart = r;
             info.ManagedStack = mStack;
+
             //Managed Stack reserved for local variable
             for (int i = 0; i < locCnt; i++)
             {
+                mStack.Add(null);
+            }
+
+            for (int i = 0; i < stackRegCnt; i++)
+            {
+                var loc = Add(stackRegStart, i);
+                *loc = StackObject.Null;
                 mStack.Add(null);
             }
 
@@ -148,12 +156,6 @@ namespace ILRuntime.Runtime.Intepreter
                         loc->Value = locBase + i;
                     }
                 }
-            }
-            for (int i = 0; i < stackRegCnt; i++)
-            {
-                var loc = Add(stackRegStart, i);
-                *loc = StackObject.Null;
-                mStack.Add(null);
             }
             var bp = stack.ValueTypeStackPointer;
             ValueTypeBasePointer = bp;
@@ -3552,7 +3554,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             case ObjectTypes.ValueTypeObjectReference:
                                                 ArraySetValue(arr, StackObject.ToObject(reg3, domain, mStack), reg2->Value);
-                                                FreeStackValueType(esp - 1);
+                                                //FreeStackValueType(esp - 1);
                                                 break;
                                             default:
                                                 throw new NotImplementedException();
@@ -3594,7 +3596,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 break;
                                             case ObjectTypes.ValueTypeObjectReference:
                                                 ArraySetValue(arr, StackObject.ToObject(reg3, domain, mStack), reg2->Value);
-                                                FreeStackValueType(esp - 1);
+                                                //FreeStackValueType(esp - 1);
                                                 break;
                                             default:
                                                 throw new NotImplementedException();
