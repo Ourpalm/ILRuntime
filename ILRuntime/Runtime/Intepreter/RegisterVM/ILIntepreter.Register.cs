@@ -971,6 +971,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp++;
                                 }
                                 break;
+                            case OpCodeREnum.MoveRef:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    CopyToStack(reg2, reg1, mStack);
+                                }
+                                break;
                             case OpCodeREnum.Ldobj:
                                 {
                                     reg1 = Add(r, ip->Register2);

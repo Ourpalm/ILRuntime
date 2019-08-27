@@ -349,28 +349,28 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = --baseRegIdx;
                     break;
                 case Code.Ldloc_0:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = locVarRegStart;
                     break;
                 case Code.Ldloc_1:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + 1);
                     break;
                 case Code.Ldloc_2:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + 2);
                     break;
                 case Code.Ldloc_3:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + 3);
                     break;
                 case Code.Ldloc:
                 case Code.Ldloc_S:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + ((VariableDefinition)ins.Operand).Index);
                     break;

@@ -56,6 +56,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             switch (op.Code)
             {
                 case OpCodeREnum.Move:
+                case OpCodeREnum.MoveRef:
                 case OpCodeREnum.Conv_I:
                 case OpCodeREnum.Conv_I1:
                 case OpCodeREnum.Conv_I2:
@@ -282,7 +283,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             r1 = -1;
             switch (op.Code)
             {
-                case OpCodes.OpCodeREnum.Move:
+                case OpCodeREnum.Move:
+                case OpCodeREnum.MoveRef:
                 case OpCodeREnum.Conv_I:
                 case OpCodeREnum.Conv_I1:
                 case OpCodeREnum.Conv_I2:

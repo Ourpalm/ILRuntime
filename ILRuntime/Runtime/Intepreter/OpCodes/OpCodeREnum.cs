@@ -896,5 +896,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         /// 内联结束
         /// </summary>
         InlineEnd,
+        /// <summary>
+        /// 复制寄存器的值
+        /// </summary>
+        MoveRef,
     }
 }

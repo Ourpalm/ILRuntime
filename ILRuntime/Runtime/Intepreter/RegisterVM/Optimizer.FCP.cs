@@ -44,7 +44,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         canRemove.Add(i);
                         continue;
                     }
-                    if (X.Code == OpCodeREnum.Move)
+                    if (X.Code == OpCodeREnum.Move && false)
                     {
                         short xSrc, xDst;
                         if (true)
