@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using LitJson;
 using ILRuntimeTest.TestFramework;
+using ILRuntimeTest.TestBase;
 
 namespace TestCases
 {
@@ -230,7 +232,7 @@ namespace TestCases
             }
         }
 
-        public static T CreateInterface<T>() where T : IDisposer
+        static T CreateInterface<T>() where T : IDisposer
         {
             var type = typeof(TestInterface);
             var result = Activator.CreateInstance(type);
@@ -238,7 +240,7 @@ namespace TestCases
         }
 
 
-        public static T Fetch<T>() where T : IDisposer
+        static T Fetch<T>() where T : IDisposer
         {
             var t = CreateInterface<T>();
             //          ((IDisposer)t).Id = 111; // ??
@@ -302,6 +304,208 @@ namespace TestCases
             bind.Data = 100;
 
             Console.WriteLine("bind.data = " + bind.data);
+        }
+
+        public static void GenericMethodTest12()
+        {
+            GenericMethodTest12Sub(new int[] { 3 }, k => {
+                k = k + 2;//error;
+                k = k << 2;//error;
+            });
+        }
+
+        static void GenericMethodTest12Sub<T>(T[] a, Action<T> func)
+        {
+            func(a[0]);
+        }
+
+        public static void GenericMethodTest13()
+        {
+            GenericMethodTest13Sub<int>();
+        }
+
+        static void GenericMethodTest13Sub<T>()
+        {
+            var t = typeof(T[]);
+            Console.WriteLine(t.ToString());
+        }
+
+        public static void GenericExtensionMethod1Test1()
+        {
+            new ExtensionClass().Method1(v => { });
+        }
+
+        public static void GenericExtensionMethod1Test2()
+        {
+            new ExtensionClass().Method1((i, v) => { });
+        }
+
+        public static void GenericExtensionMethod2Test1()
+        {
+            new ExtensionClass().Method2(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test2()
+        {
+            new ExtensionClass().Method2((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod2Test3()
+        {
+            new ExtensionClass().Method2<ArgumentException>(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test4()
+        {
+            new ExtensionClass().Method2<ArgumentException>((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod2Test5()
+        {
+            new ExtensionClass<int>().Method2(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test6()
+        {
+            new ExtensionClass<int>().Method2((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod2Test7()
+        {
+            new ExtensionClass<int>().Method2<int, ArgumentException>(e => { });
+        }
+
+        public static void GenericExtensionMethod2Test8()
+        {
+            new ExtensionClass<int>().Method2<int, ArgumentException>((i, e) => { });
+        }
+
+        public static void GenericExtensionMethod3Test1()
+        {
+            new ExtensionClass().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test2()
+        {
+            new ExtensionClass<int>().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test3()
+        {
+            new SubExtensionClass().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test4()
+        {
+            new SubExtensionClass<int>().Method3(null);
+        }
+
+        public static void GenericExtensionMethod3Test5()
+        {
+            new ExtensionClass().Method3(new ArgumentException());
+        }
+
+        public static void GenericExtensionMethod3Test6()
+        {
+            new ExtensionClass<int>().Method3(new ArgumentException());
+        }
+
+        public static void GenericExtensionMethod3Test7()
+        {
+            new SubExtensionClass<int>().Method3(new ArgumentException());
+        }
+
+        public static void GenericStaticMethodTest1()
+        {
+            StaticGenericMethods.StaticMethod(() => { });
+        }
+
+        public static void GenericStaticMethodTest2()
+        {
+            StaticGenericMethods.StaticMethod(i => { });
+        }
+
+        public static void GenericStaticMethodTest3()
+        {
+            StaticGenericMethods.StaticMethod(() => 1);
+        }
+
+        public static void GenericStaticMethodTest4()
+        {
+            StaticGenericMethods.StaticMethod(i => 1);
+        }
+        
+        public static void GenericStaticMethodTest5()
+        {
+            StaticGenericMethods.StaticMethod(async () => await Task.Delay(1));
+        }
+
+        public static void GenericStaticMethodTest6()
+        {
+            StaticGenericMethods.StaticMethod(async i => await Task.Delay(1));
+        }
+
+        public static void GenericStaticMethodTest7()
+        {
+            StaticGenericMethods.StaticMethod(async () => await Task.FromResult(1));
+        }
+
+        public static void GenericStaticMethodTest8()
+        {
+            StaticGenericMethods.StaticMethod(async i => await Task.FromResult(1));
+        }
+        public static void GenericStaticMethodTest9()
+        {           
+            GenericStaticMethodTest_9("","",(MethodTest9_A[] arr) => {
+
+            });
+        }
+
+        class MethodTest9_A { };
+        public static void GenericStaticMethodTest_9<T>(string bundle, string assetname, Action<T[]> callback)
+        {
+            
+        }
+        static void TestMethod<T>(Action<GenericClass<T>> enter)
+        {
+            GenericClass<T> ins = new GenericClass<T>();
+            enter(ins);
+
+        }
+        public static void GenericStaticMethodTest10()
+        {
+            TestMethod<int>((ins) =>
+            {
+                Console.WriteLine(ins.t);
+            });
+        }
+
+
+        class ClassA<T>
+        {
+        }
+        class ClassB<TT>
+        {
+            public void TestMethod(out ClassA<TT> enter)
+            {
+                enter = null;
+            }
+        }
+
+        public static void GenericStaticMethodTest11()
+        {
+            ClassB<int> a = new ClassB<int>();
+            ClassB<string> b = new ClassB<string>();
+
+            ClassA<int> aa = new ClassA<int>();
+            ClassA<string> bb = new ClassA<string>();
+            a.TestMethod(out aa);
+            b.TestMethod(out bb);
+        }
+
+        public static void GenericStaticMethodTest12()
+        {
+            ILRuntimeTest.TestBase.StaticGenericMethods.Method("");
         }
     }
 }

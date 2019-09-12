@@ -64,8 +64,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
-            Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
-            Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
+            //Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
+            //Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
 
             
             List<OpCodeR> res = new List<OpCodeR>();
@@ -105,7 +105,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                 }
             }
-            for(int i = 0; i < res.Count; i++)
+            for (int i = 0; i < res.Count; i++)
             {
                 var op = res[i];
                 if (Optimizer.IsBranching(op.Code) && !inlinedBranches.Contains(i))
@@ -114,6 +114,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     res[i] = op;
                 }
             }
+
+            var jumptables = method.JumpTablesRegister;
+            var keys = new List<int>(jumptables.Keys);
+            foreach (var key in keys)
+            {
+                var val = jumptables[key];
+                for (int i = 0; i < val.Length; ++i)
+                {
+                    val[i] = jumpTargets[val[i]];
+                }
+                jumptables[key] = val;
+            }
+
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
             return res.ToArray();
@@ -125,6 +138,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             var code = ins.OpCode;
             var token = ins.Operand;
             op.Code = (OpCodeREnum)code.Code;
+            op.Register1 = -1;
+            op.Register2 = -1;
+            op.Register3 = -1;
+            op.Flag = 0;
             bool hasRet;
             switch (code.Code)
             {
@@ -224,20 +241,42 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         ILMethod toInline;
                         var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
 
-                        if (!canInline)
+                        bool Constrained = false;
+                        if (lst.Count > 0 && op.Code == OpCodeREnum.Callvirt)
+                        {
+                            var lop = lst[lst.Count - 1];
+                            if (lop.Code == OpCodeREnum.Constrained)
+                            {
+                                lop.Operand2 = op.Operand;
+                                lst[lst.Count - 1] = lop;
+                                Constrained = true;
+                            }
+                        }
+
+                        if (!canInline || Constrained)
                         {
                             for (int i = pCnt; i > 0; i--)
                             {
                                 OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
                                 op2.Code = OpCodes.OpCodeREnum.Push;
                                 op2.Register1 = (short)(baseRegIdx - i);
-                                lst.Add(op2);
+                                if (Constrained)
+                                {
+                                    lst.Insert(lst.Count - 1, op2);
+                                }
+                                else
+                                {
+                                    lst.Add(op2);
+                                }
                             }
 
                             baseRegIdx -= (short)pCnt;
 
                             if (hasRet)
+                            {
                                 op.Register1 = baseRegIdx++;
+                                op.Flag = 1;
+                            }
                         }
                         else
                         {
@@ -276,6 +315,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Mul_Ovf_Un:
                 case Code.Div:
                 case Code.Div_Un:
+                case Code.Rem:
+                case Code.Rem_Un:
+                case Code.Xor:
+                case Code.And:
+                case Code.Or:
+                case Code.Shl:
+                case Code.Shr:
+                case Code.Shr_Un:
                 case Code.Clt:
                 case Code.Clt_Un:
                 case Code.Cgt:
@@ -288,6 +335,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Nop:
                 case Code.Castclass:
+                case Code.Readonly:
                     break;
                 case Code.Stloc_0:
                     op.Code = OpCodes.OpCodeREnum.Move;
@@ -315,28 +363,28 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = --baseRegIdx;
                     break;
                 case Code.Ldloc_0:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = locVarRegStart;
                     break;
                 case Code.Ldloc_1:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + 1);
                     break;
                 case Code.Ldloc_2:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + 2);
                     break;
                 case Code.Ldloc_3:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + 3);
                     break;
                 case Code.Ldloc:
                 case Code.Ldloc_S:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + ((VariableDefinition)ins.Operand).Index);
                     break;
@@ -344,6 +392,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldloca_S:
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(locVarRegStart + ((VariableDefinition)ins.Operand).Index);
+                    break;
+                case Code.Ldarga:
+                case Code.Ldarga_S:
+                case Code.Starg:
+                case Code.Starg_S:
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)(((ParameterDefinition)ins.Operand).Index);
                     break;
                 case Code.Ldarg_0:
                 case Code.Ldarg_1:
@@ -353,13 +408,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(code.Code - (Code.Ldarg_0));
                     break;
+                case Code.Ldarg:
+                case Code.Ldarg_S:
+                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)(locVarRegStart + ((ParameterDefinition)ins.Operand).Index);
+                    break;
                 case Code.Newarr:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Dup:
-                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Code = OpCodes.OpCodeREnum.MoveRef;
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Register1 = baseRegIdx++;
                     break;
@@ -377,6 +438,24 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register3 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 3;
                     break;
+                case Code.Ldelem_I1:
+                case Code.Ldelem_U1:
+                case Code.Ldelem_I2:
+                case Code.Ldelem_U2:
+                case Code.Ldelem_I4:
+                case Code.Ldelem_U4:
+                case Code.Ldelem_I8:
+                case Code.Ldelem_I:
+                case Code.Ldelem_R4:
+                case Code.Ldelem_R8:
+                case Code.Ldelem_Ref:
+                case Code.Ldelem_Any:
+                case Code.Ldelema:
+                    op.Register1 = (short)(baseRegIdx - 2);
+                    op.Register2 = (short)(baseRegIdx - 2);
+                    op.Register3 = (short)(baseRegIdx - 1);
+                    baseRegIdx -= 1;
+                    break;
                 case Code.Stind_I:
                 case Code.Stind_I1:
                 case Code.Stind_I2:
@@ -384,6 +463,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Stind_I8:
                 case Code.Stind_R4:
                 case Code.Stind_R8:
+                case Code.Stind_Ref:
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 2;
@@ -428,9 +508,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldind_I8:
                 case Code.Ldind_R4:
                 case Code.Ldind_R8:
+                case Code.Ldind_Ref:
                 case Code.Ldind_U1:
                 case Code.Ldind_U2:
                 case Code.Ldind_U4:
+                case Code.Not:
+                case Code.Neg:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     break;
@@ -450,9 +533,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Unbox:
                 case Code.Unbox_Any:
                 case Code.Isinst:
+                case Code.Ldobj:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);
+                    break;
+                case Code.Stobj:
+                    op.Register1 = (short)(baseRegIdx - 2);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    baseRegIdx -= 1;
+                    break;
+                case Code.Constrained:
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    break;
+                case Code.Initobj:
+                    op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    baseRegIdx -= 1;
                     break;
                 case Code.Ldtoken:
                     op.Register1 = baseRegIdx++;
@@ -490,8 +589,27 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Pop:
                     baseRegIdx--;
                     return;
+                case Code.Switch:
+                    {
+                        int hashCode = token.GetHashCode();
+                        var jumptables = method.JumpTablesRegister;
+                        if (!jumptables.ContainsKey(hashCode))
+                        {
+                            var e = token as Mono.Cecil.Cil.Instruction[];
+                            int[] addrs = new int[e.Length];
+                            for (int i = 0; i < e.Length; i++)
+                            {
+                                addrs[i] = entryMapping[e[i]];
+                            }
+                            jumptables[hashCode] = addrs;
+                        }
+                        op.Register1 = (short)(baseRegIdx - 1);
+                        baseRegIdx -= 1;
+                        op.Operand = hashCode;
+                    }
+                    break;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(code.Code.ToString());
             }
             lst.Add(op);
         }
@@ -516,7 +634,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 hasReturn = m.ReturnType != appdomain.VoidType;
                 if(m is ILMethod)
                 {
-                    if (!m.IsConstructor && !((ILMethod)m).IsVirtual)
+                    if (!m.IsConstructor && !((ILMethod)m).IsVirtual && ((ILMethod)m).Jitted && false)
                     {
                         var body = ((ILMethod)m).BodyRegister;
                         if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)
@@ -532,7 +650,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 //Cannot find method or the method is dummy
                 MethodReference _ref = (MethodReference)token;
                 pCnt = _ref.HasParameters ? _ref.Parameters.Count : 0;
-                if (_ref.HasThis)
+                if (_ref.HasThis && op.Code != OpCodeREnum.Newobj)
                     pCnt++;
                 op.OperandLong = pCnt;
                 hasReturn = false;

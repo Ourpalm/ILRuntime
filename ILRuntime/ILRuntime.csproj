@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ILRuntime</RootNamespace>
     <AssemblyName>ILRuntime</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_4_6</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -28,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET_4_6</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\BlackUnsafeHelper.cs" />
     <Compile Include="CLR\Method\CLRMethod.cs" />
     <Compile Include="CLR\Method\ExceptionHandler.cs" />
     <Compile Include="CLR\Method\ILMethod.cs" />
@@ -125,20 +126,15 @@
     <Compile Include="Runtime\Stack\StackObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Mono.Cecil.20\Mono.Cecil.20.csproj">
-      <Project>{d3785d8b-4d85-4546-8763-47fc848c13e0}</Project>
-      <Name>Mono.Cecil.20</Name>
+    <ProjectReference Include="..\Mono.Cecil\Mono.Cecil.csproj">
+      <Project>{66a8daa0-5510-4fbf-9c43-6cf910803d4d}</Project>
+      <Name>Mono.Cecil</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Mdb\Mono.Cecil.Mdb.csproj">
-      <Project>{86f36240-e07c-4840-9c8b-9cd94c03ec62}</Project>
-      <Name>Mono.Cecil.Mdb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Pdb\Mono.Cecil.Pdb.csproj">
-      <Project>{cea7a85f-2523-4ad0-8296-6e8e0a2e6df7}</Project>
+    <ProjectReference Include="..\Mono.Cecil\symbols\pdb\Mono.Cecil.Pdb.csproj">
+      <Project>{a0d1ea49-765d-46a9-91d4-99c185d93895}</Project>
       <Name>Mono.Cecil.Pdb</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

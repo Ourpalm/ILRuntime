@@ -24,6 +24,7 @@ namespace ILRuntime.CLR.Method
         KeyValuePair<string, IType>[] genericParameters;
         IType[] genericArguments;
         Dictionary<int, int[]> jumptables;
+        Dictionary<int, int[]> jumptablesRegister;
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
         ILRuntimeConstructorInfo reflectionCtorInfo;
@@ -35,6 +36,8 @@ namespace ILRuntime.CLR.Method
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
+
+        public Dictionary<int, int[]> JumpTablesRegister { get { if (jumptablesRegister == null) { jumptablesRegister = new Dictionary<int, int[]>(); } return jumptablesRegister; } }
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
 
@@ -159,13 +162,14 @@ namespace ILRuntime.CLR.Method
 
         Mono.Cecil.Cil.SequencePoint GetValidSequence(int startIdx, int dir)
         {
-            var cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx]);
+            var seqMapping = def.DebugInformation.GetSequencePointMapping();
+            var cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx], seqMapping);
             while (cur != null && cur.StartLine == 0x0feefee)
             {
                 startIdx += dir;
                 if (startIdx >= 0 && startIdx < def.Body.Instructions.Count)
                 {
-                    cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx]);
+                    cur = DebugService.FindSequencePoint(def.Body.Instructions[startIdx], seqMapping);
                 }
                 else
                     break;
@@ -207,6 +211,31 @@ namespace ILRuntime.CLR.Method
                 if (bodyRegister == null)
                     InitCodeBody();
                 return bodyRegister;
+			}
+		}
+        public bool HasBody
+        {
+            get
+            {
+                return body != null;
+            }
+        }
+        enum JitState
+        {
+            None = 0,
+            Succ = 1,
+            Failed = 2,
+        }
+        JitState jitted = JitState.None;
+        public bool Jitted
+        {
+            get
+            {
+                if(jitted == JitState.None)
+                {
+                    InitCodeBody();
+                }
+                return jitted == JitState.Succ;
             }
         }
 
@@ -281,20 +310,40 @@ namespace ILRuntime.CLR.Method
             get;
             private set;
         }
+
+        public void Prewarm()
+        {
+            if (body == null)
+                InitCodeBody();
+        }
+
+        bool initedCodeBody = false;
         void InitCodeBody()
         {
+            if (initedCodeBody) return;
+            initedCodeBody = true;
             if (def.HasBody)
             {
                 localVarCnt = def.Body.Variables.Count;
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
                 
-                if (appdomain.EnableRegisterVM)
+                if (appdomain.EnableRegisterVM && def.Body.ExceptionHandlers.Count == 0)
                 {
-                    Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
-                    bodyRegister = jit.Compile(out stackRegisterCnt);
+                    try
+                    {
+                        jitted = JitState.Succ;
+                        Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
+                        bodyRegister = jit.Compile(out stackRegisterCnt);
+                    }catch(Exception e)
+                    {
+                        jitted = JitState.Failed;
+                        Console.WriteLine(e);
+                        InitStackCodeBody(addr);
+                    }
                 }
                 else
                 {
+                    jitted = JitState.Failed;
                     InitStackCodeBody(addr);
                 }
 
@@ -575,6 +624,8 @@ namespace ILRuntime.CLR.Method
             if (token is TypeReference)
             {
                 TypeReference _ref = ((TypeReference)token);
+                if (_ref.IsArray)
+                    return CheckHasGenericParamter(((ArrayType)_ref).ElementType);
                 if (_ref.IsGenericParameter)
                     return true;
                 if (_ref.IsGenericInstance)
@@ -622,16 +673,16 @@ namespace ILRuntime.CLR.Method
                 bool isArray = false;
                 int rank = 1;
                 TypeReference pt = i.ParameterType;
-                if (i.ParameterType.IsByReference)
+                if (pt.IsByReference)
                 {
                     isByRef = true;
-                    pt = pt.GetElementType();
+                    pt = ((ByReferenceType)pt).ElementType;
                 }
-                if (i.ParameterType.IsArray)
+                if (pt.IsArray)
                 {
                     isArray = true;
                     rank = ((ArrayType)pt).Rank;
-                    pt = pt.GetElementType();
+                    pt = ((ArrayType)pt).ElementType;
                 }
                 if (pt.IsGenericParameter)
                 {
@@ -654,14 +705,15 @@ namespace ILRuntime.CLR.Method
                         else
                             throw new NotSupportedException("Cannot find Generic Parameter " + pt.Name + " in " + def.FullName);
                     }
-
-                    if (isByRef)
-                        type = type.MakeByRefType();
-                    if (isArray)
-                        type = type.MakeArrayType(rank);
                 }
                 else
-                    type = appdomain.GetType(i.ParameterType, declaringType, this);
+                    type = appdomain.GetType(pt, declaringType, this);
+
+                if (isArray)
+                    type = type.MakeArrayType(rank);
+
+                if (isByRef)
+                    type = type.MakeByRefType();
                 parameters.Add(type);
             }
         }

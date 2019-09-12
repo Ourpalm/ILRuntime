@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Other;
+//Add By LiYu 2019.07.02
+using ILRuntime.Helper;
 
 namespace ILRuntime.Runtime.CLRBinding
 {
@@ -50,6 +52,8 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
 using ILRuntime.CLR.Utils;
+//Add By LiYu 2019.07.02
+using System.Linq;
 
 namespace ILRuntime.Runtime.Generated
 {
@@ -61,20 +65,29 @@ namespace ILRuntime.Runtime.Generated
 ");
                     string flagDef = "            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;";
                     string methodDef = "            MethodBase method;";
+                    string methodsDef = "            MethodInfo[] methods = type.GetMethods(flag).Where(t => !t.IsGenericMethod).ToArray();";
                     string fieldDef = "            FieldInfo field;";
                     string argsDef = "            Type[] args;";
                     string typeDef = string.Format("            Type type = typeof({0});", realClsName);
 
+                    bool needMethods;
                     MethodInfo[] methods = i.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                    //Mod By LiYu2018/10/24
+					if (clsName == "System_Single_Binding") //修复Single IsFinite 找不到
+                    {
+                        methods = methods.Where(m => !(m.Name == "IsFinite")).ToArray();
+                    }
+					//Add By LiYu 2019.07.02
+                    methods = methods.Where(m => !m.IsBlack() && !m.IsUnsafe()).ToArray();
                     FieldInfo[] fields = i.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
-                    string registerMethodCode = i.GenerateMethodRegisterCode(methods, excludeMethods);
+                    string registerMethodCode = i.GenerateMethodRegisterCode(methods, excludeMethods, out needMethods);
                     string registerFieldCode = i.GenerateFieldRegisterCode(fields, excludeFields);
                     string registerValueTypeCode = i.GenerateValueTypeRegisterCode(realClsName);
                     string registerMiscCode = i.GenerateMiscRegisterCode(realClsName, true, true);
                     string commonCode = i.GenerateCommonCode(realClsName);
                     ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
                     string ctorRegisterCode = i.GenerateConstructorRegisterCode(ctors, excludeMethods);
-                    string methodWraperCode = i.GenerateMethodWraperCode(methods, realClsName, excludeMethods, valueTypeBinders);
+                    string methodWraperCode = i.GenerateMethodWraperCode(methods, realClsName, excludeMethods, valueTypeBinders, null);
                     string fieldWraperCode = i.GenerateFieldWraperCode(fields, realClsName, excludeFields);
                     string cloneWraperCode = i.GenerateCloneWraperCode(fields, realClsName);
                     string ctorWraperCode = i.GenerateConstructorWraperCode(ctors, realClsName, excludeMethods, valueTypeBinders);
@@ -96,6 +109,8 @@ namespace ILRuntime.Runtime.Generated
                         sb.AppendLine(argsDef);
                     if (hasMethodCode || hasFieldCode || hasValueTypeCode || hasMiscCode || hasCtorCode)
                         sb.AppendLine(typeDef);
+                    if (needMethods)
+                        sb.AppendLine(methodsDef);
 
 
                     sb.AppendLine(registerMethodCode);
@@ -160,6 +175,20 @@ namespace ILRuntime.Runtime.Generated
                 System.IO.Directory.CreateDirectory(outputPath);
             Dictionary<Type, CLRBindingGenerateInfo> infos = new Dictionary<Type, CLRBindingGenerateInfo>(new ByReferenceKeyComparer<Type>());
             CrawlAppdomain(domain, infos);
+
+            //Add By LiYu 2019.07.10 B
+            infos = infos.Values.Where(info =>
+            {
+                if(info.Type.Name.Contains("Tuple"))
+                {
+#if UNITY_5_5_OR_NEWER
+                    UnityEngine.Debug.LogErrorFormat("Please remove {0}, it will case unknown error runtime.", info.Type);
+#endif
+                    return false;
+                }
+                return true;
+            }).ToDictionary(info => info.Type);
+			//Add By LiYu 2019.07.10 E
             string[] oldFiles = System.IO.Directory.GetFiles(outputPath, "*.cs");
             foreach (var i in oldFiles)
             {
@@ -179,8 +208,10 @@ namespace ILRuntime.Runtime.Generated
                 if (!info.Value.NeedGenerate)
                     continue;
                 Type i = info.Value.Type;
-                if (i.BaseType == typeof(MulticastDelegate))
-                    continue;
+
+                //CLR binding for delegate is important for cross domain invocation,so it should be generated
+                //if (i.BaseType == typeof(MulticastDelegate))
+                //    continue;
 
                 string clsName, realClsName;
                 bool isByRef;
@@ -204,6 +235,7 @@ namespace ILRuntime.Runtime.Generated
                     StringBuilder sb = new StringBuilder();
                     sb.Append(@"using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -225,20 +257,29 @@ namespace ILRuntime.Runtime.Generated
 ");
                     string flagDef =    "            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;";
                     string methodDef =  "            MethodBase method;";
+                    string methodsDef = "            MethodInfo[] methods = type.GetMethods(flag).Where(t => !t.IsGenericMethod).ToArray();";
                     string fieldDef =   "            FieldInfo field;";
                     string argsDef =    "            Type[] args;";
                     string typeDef = string.Format("            Type type = typeof({0});", realClsName);
 
+                    bool needMethods;
                     MethodInfo[] methods = info.Value.Methods.ToArray();
+                    //Mod By LiYu2018/10/24
+                    if (clsName == "System_Single_Binding") //修复Single IsFinite 找不到
+                    {
+                        methods = methods.Where(m => !(m.Name == "IsFinite")).ToArray();
+                    }
+                    //Add By LiYu 2019.07.02
+                    methods = methods.Where(m => !m.IsBlack() && !m.IsUnsafe()).ToArray();
                     FieldInfo[] fields = info.Value.Fields.ToArray();
-                    string registerMethodCode = i.GenerateMethodRegisterCode(methods, excludeMethods);
+                    string registerMethodCode = i.GenerateMethodRegisterCode(methods, excludeMethods, out needMethods);
                     string registerFieldCode = fields.Length > 0 ? i.GenerateFieldRegisterCode(fields, excludeFields) : null;
                     string registerValueTypeCode = info.Value.ValueTypeNeeded ? i.GenerateValueTypeRegisterCode(realClsName) : null;
                     string registerMiscCode = i.GenerateMiscRegisterCode(realClsName, info.Value.DefaultInstanceNeeded, info.Value.ArrayNeeded);
                     string commonCode = i.GenerateCommonCode(realClsName);
                     ConstructorInfo[] ctors = info.Value.Constructors.ToArray();
                     string ctorRegisterCode = i.GenerateConstructorRegisterCode(ctors, excludeMethods);
-                    string methodWraperCode = i.GenerateMethodWraperCode(methods, realClsName, excludeMethods, valueTypeBinders);
+                    string methodWraperCode = i.GenerateMethodWraperCode(methods, realClsName, excludeMethods, valueTypeBinders, domain);
                     string fieldWraperCode = fields.Length > 0 ? i.GenerateFieldWraperCode(fields, realClsName, excludeFields) : null;
                     string cloneWraperCode = null;
                     if (info.Value.ValueTypeNeeded)
@@ -265,6 +306,8 @@ namespace ILRuntime.Runtime.Generated
                         sb.AppendLine(argsDef);
                     if (hasMethodCode || hasFieldCode || hasValueTypeCode || hasMiscCode || hasCtorCode)
                         sb.AppendLine(typeDef);
+                    if (needMethods)
+                        sb.AppendLine(methodsDef);
 
                     sb.AppendLine(registerMethodCode);
                     if (fields.Length > 0)
@@ -364,7 +407,8 @@ namespace ILRuntime.Runtime.Generated
                     var methods = type.GetMethods().ToList();
                     foreach (var i in ((CLR.TypeSystem.ILType)type).GetConstructors())
                         methods.Add(i);
-
+                    if (((CLR.TypeSystem.ILType)type).GetStaticConstroctor() != null)
+                        methods.Add(((CLR.TypeSystem.ILType)type).GetStaticConstroctor());
                     foreach (var j in methods)
                     {
                         CLR.Method.ILMethod method = j as CLR.Method.ILMethod;

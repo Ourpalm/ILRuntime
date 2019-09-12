@@ -60,10 +60,18 @@
     <Compile Include="Adapters\TestClass2Adaptor.cs" />
     <Compile Include="Adapters\TestClass3Adaptor.cs" />
     <Compile Include="Adapters\TestClass4Adaptor.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_ExtensionClass_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_ExtensionClass_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_GenericExtensions_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_StaticGenericMethods_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_SubExtensionClass_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_SubExtensionClass_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_BaseClassTest_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_C_t.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_DelegateTest_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate2_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass2_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass3_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestStruct_Binding.cs" />
@@ -71,11 +79,21 @@
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorClass_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorStruct_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestMainForm_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntime_CLR_TypeSystem_IType_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntime_Runtime_Enviorment_AppDomain_Binding.cs" />
     <Compile Include="AutoGenerate\LitJson_JsonMapper_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_1_ILTypeInstance_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_1_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_3_Int32_String_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Action_Binding.cs" />
     <Compile Include="AutoGenerate\System_Activator_Binding.cs" />
+    <Compile Include="AutoGenerate\System_ArgumentException_Binding.cs" />
     <Compile Include="AutoGenerate\System_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Boolean_Binding.cs" />
     <Compile Include="AutoGenerate\System_Byte_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Char_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_ILTypeInstance_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_ClassIn_t.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.cs" />
@@ -84,6 +102,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int64_Int64_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Object_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_ILTypeInstance_Binding.cs" />
@@ -91,9 +110,13 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Type_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding_Enumerator__t.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_IEnumerator_1_KeyValuePair_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_String_IType_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTes_t.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_TestClass3Adaptor_B_t.cs" />
@@ -106,6 +129,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_String_Binding_Enumerator_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Task_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_IDictionary_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_IEnumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Console_Binding.cs" />
@@ -115,6 +139,8 @@
     <Compile Include="AutoGenerate\System_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_Enum_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Func_2_Int32_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Func_4_Int32_Single_Int16_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_IComparable_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_IDisposable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Int32_Array2_Binding.cs" />
@@ -125,6 +151,7 @@
     <Compile Include="AutoGenerate\System_IO_FileStream_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_File_Binding.cs" />
     <Compile Include="AutoGenerate\System_IO_Stream_Binding.cs" />
+    <Compile Include="AutoGenerate\System_IO_TextReader_Binding.cs" />
     <Compile Include="AutoGenerate\System_Linq_Enumerable_Binding.cs" />
     <Compile Include="AutoGenerate\System_Math_Binding.cs" />
     <Compile Include="AutoGenerate\System_NotImplementedException_Binding.cs" />
@@ -136,14 +163,22 @@
     <Compile Include="AutoGenerate\System_Reflection_MemberInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_MethodBase_Binding.cs" />
     <Compile Include="AutoGenerate\System_Reflection_PropertyInfo_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_List_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncVoidMethodBuilder_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_List_1_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_Binding.cs" />
     <Compile Include="AutoGenerate\System_Single_Binding.cs" />
     <Compile Include="AutoGenerate\System_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_List_1_String_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Threading_Tasks_Task_1_String_Binding.cs" />
     <Compile Include="AutoGenerate\System_Threading_Tasks_Task_Binding.cs" />
     <Compile Include="AutoGenerate\System_Type_Binding.cs" />
+    <Compile Include="TestFramework\GenericExtensions.cs" />
     <Compile Include="TestFramework\TestCLRAttribute.cs" />
     <Compile Include="TestFramework\TestVector3.cs" />
     <Compile Include="TestFramework\TestCLREnum.cs" />
@@ -199,17 +234,13 @@
       <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
       <Name>LitJson</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.20\Mono.Cecil.20.csproj">
-      <Project>{d3785d8b-4d85-4546-8763-47fc848c13e0}</Project>
-      <Name>Mono.Cecil.20</Name>
+    <ProjectReference Include="..\Mono.Cecil\Mono.Cecil.csproj">
+      <Project>{66a8daa0-5510-4fbf-9c43-6cf910803d4d}</Project>
+      <Name>Mono.Cecil</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Pdb\Mono.Cecil.Pdb.csproj">
-      <Project>{cea7a85f-2523-4ad0-8296-6e8e0a2e6df7}</Project>
+    <ProjectReference Include="..\Mono.Cecil\symbols\pdb\Mono.Cecil.Pdb.csproj">
+      <Project>{a0d1ea49-765d-46a9-91d4-99c185d93895}</Project>
       <Name>Mono.Cecil.Pdb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mono.Cecil.Mdb\Mono.Cecil.Mdb.csproj">
-      <Project>{86F36240-E07C-4840-9C8B-9CD94C03EC62}</Project>
-      <Name>Mono.Cecil.Mdb</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

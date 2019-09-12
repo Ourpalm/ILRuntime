@@ -125,5 +125,30 @@ namespace TestCases
             Console.WriteLine("contains int:" + l.Contains(1));
             Console.WriteLine("contains byte:" + l.Contains((byte)1));
         }
+        
+        public static void Test05()
+        {
+            IsBombOrHulu(new byte[] { 1, 1, 3, 3, 5, 6, 7, 8, 9 }, false, false);
+
+        }
+        const int StarCard = 0x41;
+        public static bool IsBombOrHulu(byte[] sortedCards, bool crazy, bool hasStarCard)
+        {
+            var groupList =
+                (from p in sortedCards
+                 where p != StarCard
+                 group p by p
+                    into g
+                 select new { Card = GetCardNum(g.Key), Count = g.Count() }).OrderBy(p => p.Count).ToArray();
+            foreach(var i in groupList)
+            {
+                Console.WriteLine($"{i.Card},{i.Count}");
+            }
+            return true;
+        }
+        public static int GetCardNum(byte card)
+        {
+            return card & 0x0F;
+        }
     }
 }

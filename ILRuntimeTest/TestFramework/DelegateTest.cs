@@ -33,6 +33,29 @@ namespace ILRuntimeTest.TestFramework
         public static Int2Delegate2 IntDelegateTestReturn1;
         public static IntFloatDelegate2 IntDelegateTestReturn2;
         public static Action<BaseClassTest> GenericDelegateTest;
+        public static Func<int, float, short, double> DelegatePerformanceTest;
+        public static Action<TestCLREnum> EnumDelegateTest;
+        public static Func<TestCLREnum> EnumDelegateTest2;
+
+        public static void TestEnumDelegate()
+        {
+            EnumDelegateTest(TestCLREnum.Test1);
+            EnumDelegateTest(TestCLREnum.Test2);
+            EnumDelegateTest(TestCLREnum.Test3);
+        }
+
+        public static void TestEnumDelegate2()
+        {
+            var e = EnumDelegateTest2();
+            switch (e)
+            {
+                case TestCLREnum.Test2:
+                    Console.WriteLine("Test2");
+                    break;
+                default:
+                    throw new Exception("Shouldn't be here");
+            }
+        }
     }
 
     public class GenericClassTest<T> : BaseClassTest

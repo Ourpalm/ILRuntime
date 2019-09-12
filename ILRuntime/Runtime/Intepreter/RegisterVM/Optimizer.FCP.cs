@@ -44,11 +44,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         canRemove.Add(i);
                         continue;
                     }
-                    if (X.Code == OpCodeREnum.Move)
+                    if (X.Code == OpCodeREnum.Move && false)
                     {
-                        short xSrc, xSrc2, xSrc3, xDst;
-                        GetOpcodeSourceRegister(ref X, hasReturn, out xSrc, out xSrc2, out xSrc3);
-                        GetOpcodeDestRegister(ref X, out xDst);
+                        short xSrc, xDst;
+                        if (true)
+                        {
+                            short xSrc2, xSrc3;
+                            GetOpcodeSourceRegister(ref X, hasReturn, out xSrc2, out xSrc, out xSrc3);
+                            GetOpcodeDestRegister(ref X, out xDst);
+                        }
                         if (xDst == xSrc)
                         {
                             canRemove.Add(i);
@@ -59,18 +63,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             continue;
                         bool postPropagation = false;
                         bool ended = false;
-                        bool propagationInline = false;
+                        //bool propagationInline = false;
                         for (int j = i + 1; j < lst.Count; j++)
                         {
                             OpCodeR Y = lst[j];
-                            if (Y.Code == OpCodeREnum.InlineStart)
-                                propagationInline = true;
-                            else if (Y.Code == OpCodeREnum.InlineEnd)
-                            {
-                                propagationInline = false;
-                                if (ended)
-                                    break;
-                            }
+                            //if (Y.Code == OpCodeREnum.InlineStart)
+                            //    propagationInline = true;
+                            //else if (Y.Code == OpCodeREnum.InlineEnd)
+                            //{
+                            //    propagationInline = false;
+                            //    if (ended)
+                            //        break;
+                            //}
                             short ySrc, ySrc2, ySrc3;
                             if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
                             {
@@ -124,8 +128,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     postPropagation = false;
                                     canRemove.Add(i);
                                     ended = true;
-                                    if (!propagationInline)
-                                        break;
+                                    //if (!propagationInline)
+                                    break;
                                 }
                             }
 

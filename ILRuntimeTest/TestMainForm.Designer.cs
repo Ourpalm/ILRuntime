@@ -37,6 +37,11 @@
             this.btnRunSelect = new System.Windows.Forms.Button();
             this.btnGenerateBinding = new System.Windows.Forms.Button();
             this.cbEnableRegVM = new System.Windows.Forms.CheckBox();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // OD
@@ -57,11 +62,10 @@
             // 
             // listView1
             // 
-            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.listView1.Location = new System.Drawing.Point(12, 12);
+            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(664, 143);
+            this.listView1.Size = new System.Drawing.Size(664, 157);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
@@ -70,10 +74,11 @@
             this.tbLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbLog.Location = new System.Drawing.Point(12, 161);
+            this.tbLog.Location = new System.Drawing.Point(0, 2);
             this.tbLog.Multiline = true;
             this.tbLog.Name = "tbLog";
             this.tbLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+
             this.tbLog.Size = new System.Drawing.Size(664, 213);
             this.tbLog.TabIndex = 2;
             // 
@@ -110,6 +115,7 @@
             // 
             // btnGenerateBinding
             // 
+            this.btnGenerateBinding.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGenerateBinding.Location = new System.Drawing.Point(581, 380);
             this.btnGenerateBinding.Name = "btnGenerateBinding";
             this.btnGenerateBinding.Size = new System.Drawing.Size(84, 29);
@@ -118,6 +124,7 @@
             this.btnGenerateBinding.UseVisualStyleBackColor = true;
             this.btnGenerateBinding.Click += new System.EventHandler(this.btnGenerateBinding_Click);
             // 
+
             // cbEnableRegVM
             // 
             this.cbEnableRegVM.AutoSize = true;
@@ -127,6 +134,26 @@
             this.cbEnableRegVM.TabIndex = 7;
             this.cbEnableRegVM.Text = "Enable Register VM";
             this.cbEnableRegVM.UseVisualStyleBackColor = true;
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Location = new System.Drawing.Point(12, 12);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.listView1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.tbLog);
+            this.splitContainer1.Size = new System.Drawing.Size(664, 355);
+            this.splitContainer1.SplitterDistance = 157;
+            this.splitContainer1.TabIndex = 7;
+
             // 
             // TestMainForm
             // 
@@ -138,13 +165,17 @@
             this.Controls.Add(this.btnRunSelect);
             this.Controls.Add(this.txtPath);
             this.Controls.Add(this.btnLoad);
-            this.Controls.Add(this.tbLog);
-            this.Controls.Add(this.listView1);
             this.Controls.Add(this.btnRun);
+            this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "TestMainForm";
             this.Text = "TestAll";
             this.Load += new System.EventHandler(this.OnFormLoaded);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -161,6 +192,6 @@
         private System.Windows.Forms.Button btnRunSelect;
         private System.Windows.Forms.Button btnGenerateBinding;
         private System.Windows.Forms.CheckBox cbEnableRegVM;
+        private System.Windows.Forms.SplitContainer splitContainer1;
     }
 }
-

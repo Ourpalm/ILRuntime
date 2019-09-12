@@ -114,7 +114,18 @@ namespace ILRuntime.Reflection
 
         protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
         {
-            return et.GetMethod(name, bindingAttr, binder, callConvention, types, modifiers);
+            //Mod By LiYu 2019.04.17
+            MethodInfo method;
+            if (types == null)
+            {
+                method = et.GetMethod(name, bindingAttr);
+            }
+            else
+            {
+                method = et.GetMethod(name, bindingAttr, binder, callConvention, types, modifiers);
+            }
+            return method;
+            //Mod End
         }
 
         public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
@@ -154,7 +165,7 @@ namespace ILRuntime.Reflection
 
         protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
         {
-            return et.GetProperty(name, bindingAttr, binder, returnType, types, modifiers);
+            return et.GetProperty(name, bindingAttr);
         }
 
         public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
@@ -170,6 +181,26 @@ namespace ILRuntime.Reflection
         public override int GetHashCode()
         {
             return type.GetHashCode();
+        }
+
+        public override bool IsAssignableFrom(Type c)
+        {
+            if (c is ILRuntimeWrapperType)
+                c = ((ILRuntimeWrapperType)c).RealType;
+            if (c is ILRuntimeType)
+                c = ((ILRuntimeType)c).ILType.TypeForCLR;
+            return et.IsAssignableFrom(c);
+        }
+
+        public override bool IsInstanceOfType(object o)
+        {
+            if (o == null)
+            {
+                return false;
+            }
+
+            var instance = o as ILTypeInstance;
+            return IsAssignableFrom(instance != null ? instance.Type.ReflectionType : o.GetType());
         }
 
         public override Type GetNestedType(string name, BindingFlags bindingAttr)
@@ -212,6 +243,33 @@ namespace ILRuntime.Reflection
             return et.IsCOMObject;
         }
 
+        public override bool IsGenericType
+        {
+			//Mod By LiYu2018/10/24 修复Protobuf-net
+			//get { return et.IsGenericType; }
+            get { return et.IsGenericType && et.IsGenericTypeDefinition; }
+        }
+
+        public override bool IsGenericTypeDefinition
+        {
+            get
+            {
+                return et.IsGenericTypeDefinition;
+            }
+        }
+
+        public override Type GetGenericTypeDefinition()
+        {
+            return et.GetGenericTypeDefinition();
+        }
+
+        public override bool IsGenericParameter
+        {
+            get
+            {
+                return et.IsGenericParameter;
+            }
+        }
         public override Type GetElementType()
         {
             return et.GetElementType();

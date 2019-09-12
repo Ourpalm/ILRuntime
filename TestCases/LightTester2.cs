@@ -86,5 +86,12 @@ namespace TestCases
         {
             ab[1] = true;
         }
+
+        public static void UnitTest_2005()
+        {
+            string str = "12345";
+            char c = str[1];
+            Console.WriteLine(c);
+        }
     }
 }
