@@ -226,6 +226,26 @@ namespace TestCases
                 Console.WriteLine(item);
             }
         }
+
+        public static void Test17()
+        {
+            /*Dictionary<TestEnum, int> dic = new Dictionary<TestEnum, int>();
+            dic[TestEnum.Enum2] = 123;
+            int res;
+            if (dic.TryGetValue(TestEnum.Enum2, out res))
+            {
+                Console.WriteLine(res);
+            }*/
+
+            //下面这个用例跑不过
+            Dictionary<string, TestEnum> dic2 = new Dictionary<string, TestEnum>();
+            dic2["abc"] = TestEnum.Enum1;
+            TestEnum e;
+            if (dic2.TryGetValue("abc", out e))
+            {
+                Console.WriteLine(e);
+            }
+        }
         class SystemType
         {
             public int value = 10;
