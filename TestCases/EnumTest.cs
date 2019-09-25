@@ -217,6 +217,15 @@ namespace TestCases
                 Console.WriteLine(i);
             }
         }
+
+        public static void Test16()
+        {
+            TestEnum[] eTests = (TestEnum[])System.Enum.GetValues(typeof(TestEnum));
+            foreach (var item in eTests)
+            {
+                Console.WriteLine(item);
+            }
+        }
         class SystemType
         {
             public int value = 10;
