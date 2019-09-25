@@ -244,6 +244,19 @@ namespace TestCases
 
         }
 
+        public static void UnitTest_RefTest3()
+        {
+           //下面这里跑不过
+            var arr = new int[3];
+            Func(ref arr);
+            Console.WriteLine(arr[1]);
+        }
+
+        static void Func(ref int[] arr)
+        {
+            arr[1] = 2;
+        }
+
 
         public static void UnitTest_OutTest()
         {
