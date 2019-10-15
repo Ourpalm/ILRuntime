@@ -138,7 +138,7 @@ namespace TestCases
     {
         class MyClass
         {
-            MyStruct stru = new MyStruct();            
+            MyStruct stru = new MyStruct();
         }
         struct MyStruct
         {
@@ -167,6 +167,22 @@ namespace TestCases
 
             Console.WriteLine(s.e + " " + s.i);
             Console.WriteLine(b.e + " " + b.i);
+        }
+
+        public struct Number
+        {
+            public static readonly Number maxValue = new Number(Double.MaxValue);
+            public static readonly Number minValue = new Number(Double.MinValue);
+            public double val;
+            public Number(double val)
+            {
+                this.val = val;
+            }
+        }
+
+        public static void StructTest4()
+        {
+            Console.WriteLine(Number.minValue.val);
         }
     }
 }

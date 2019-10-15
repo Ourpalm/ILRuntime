@@ -14,11 +14,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using SR = System.Reflection;
 
-using Mono.Collections.Generic;
-using Mono.Cecil.Cil;
-using Mono.Cecil.PE;
+using ILRuntime.Mono.Collections.Generic;
+using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.PE;
 
-namespace Mono.Cecil.Cil {
+namespace ILRuntime.Mono.Cecil.Cil {
 
 	[StructLayout (LayoutKind.Sequential)]
 	public struct ImageDebugDirectory {
@@ -1045,7 +1045,7 @@ namespace Mono.Cecil.Cil {
 #endif
 }
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 

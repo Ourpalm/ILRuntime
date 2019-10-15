@@ -8,9 +8,9 @@
 // Licensed under the MIT/X11 license.
 //
 
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public sealed class EventDefinition : EventReference, IMemberDefinition {
 

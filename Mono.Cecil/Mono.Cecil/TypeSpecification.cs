@@ -10,9 +10,9 @@
 
 using System;
 
-using Mono.Cecil.Metadata;
+using ILRuntime.Mono.Cecil.Metadata;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public abstract class TypeSpecification : TypeReference {
 

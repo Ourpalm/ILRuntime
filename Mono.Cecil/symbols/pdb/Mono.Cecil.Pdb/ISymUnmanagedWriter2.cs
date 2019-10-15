@@ -11,11 +11,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
-using Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Cil;
 
 #if !READ_ONLY
 
-namespace Mono.Cecil.Pdb {
+namespace ILRuntime.Mono.Cecil.Pdb {
 
 	[Guid ("0B97726E-9E6D-4f05-9A26-424022093CAA")]
 	[InterfaceType (ComInterfaceType.InterfaceIsIUnknown)]

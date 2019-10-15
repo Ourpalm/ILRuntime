@@ -13,12 +13,12 @@ using System.IO;
 
 #if !READ_ONLY
 
-using Mono.Cecil.Cil;
-using Mono.Cecil.Metadata;
+using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Metadata;
 
 using RVA = System.UInt32;
 
-namespace Mono.Cecil.PE {
+namespace ILRuntime.Mono.Cecil.PE {
 
 	sealed class ImageWriter : BinaryStreamWriter {
 

@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Mono.Cecil.Metadata {
+namespace ILRuntime.Mono.Cecil.Metadata {
 
 	sealed class BlobHeap : Heap {
 

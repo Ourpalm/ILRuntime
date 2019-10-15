@@ -6,8 +6,8 @@ using System.Reflection;
 using System.Windows.Forms;
 using CodeGenerationTools.Generator;
 using ILRuntime.Other;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil;
+using ILRuntime.Mono.Cecil.Cil;
 
 
 namespace CodeGenerationTools

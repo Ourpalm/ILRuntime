@@ -10,9 +10,9 @@
 
 using System.Threading;
 
-using Mono.Collections.Generic;
+using ILRuntime.Mono.Collections.Generic;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public sealed class MethodReturnType : IConstantProvider, ICustomAttributeProvider, IMarshalInfoProvider {
 

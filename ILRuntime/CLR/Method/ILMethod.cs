@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-using Mono.Cecil;
+using ILRuntime.Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Debugger;
@@ -613,10 +613,10 @@ namespace ILRuntime.CLR.Method
                 else
                     type = appdomain.GetType(pt, declaringType, this);
 
-                if (isByRef)
-                    type = type.MakeByRefType();
                 if (isArray)
                     type = type.MakeArrayType(rank);
+                if (isByRef)
+                    type = type.MakeByRefType();
                 parameters.Add(type);
             }
         }

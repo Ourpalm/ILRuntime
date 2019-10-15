@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}</ProjectGuid>
-    <RootNamespace>Mono.Cecil.Mdb</RootNamespace>
-    <AssemblyName>Mono.Cecil.Mdb</AssemblyName>
+    <RootNamespace>ILRuntime.Mono.Cecil.Mdb</RootNamespace>
+    <AssemblyName>ILRuntime.Mono.Cecil.Mdb</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Mono.Cecil.csproj">

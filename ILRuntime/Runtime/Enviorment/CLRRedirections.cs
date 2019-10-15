@@ -10,6 +10,7 @@ using ILRuntime.CLR.Utils;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
+using System.Collections;
 
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -1007,23 +1008,36 @@ namespace ILRuntime.Runtime.Enviorment
             if (t is ILRuntimeType)
             {
                 ILType it = ((ILRuntimeType)t).ILType;
-                List<ILTypeInstance> res = new List<ILTypeInstance>();
+                object res;
+                //List<ILTypeInstance> res = new List<ILTypeInstance>();
                 if (it.IsEnum)
                 {
+                    IList list = null;
+                    bool islong = false;
                     var fields = it.TypeDefinition.Fields;
                     for (int i = 0; i < fields.Count; i++)
                     {
                         var f = fields[i];
                         if (f.IsStatic)
                         {
-                            ILEnumTypeInstance ins = new ILEnumTypeInstance(it);
-                            ins[0] = f.Constant;
-                            ins.Boxed = true;
-
-                            res.Add(ins);
+                            if(list == null)
+                            {
+                                if (f.Constant is long)
+                                {
+                                    list = new List<long>();
+                                    islong = true;
+                                }
+                                else
+                                    list = new List<int>();
+                            }
+                            list.Add(f.Constant);
                         }
                     }
-                    return ILIntepreter.PushObject(ret, mStack, res.ToArray(), true);
+                    if (islong)
+                        res = ((List<long>)list).ToArray();
+                    else
+                        res = ((List<int>)list).ToArray();
+                    return ILIntepreter.PushObject(ret, mStack, res, true);
                 }
                 else
                     throw new Exception(string.Format("{0} is not Enum", t.FullName));

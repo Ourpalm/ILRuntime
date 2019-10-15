@@ -31,7 +31,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mono.CompilerServices.SymbolWriter
+namespace ILRuntime.Mono.CompilerServices.SymbolWriter
 {
 	public class SourceMethodBuilder
 	{

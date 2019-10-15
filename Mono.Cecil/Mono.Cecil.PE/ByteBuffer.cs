@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Mono.Cecil.PE {
+namespace ILRuntime.Mono.Cecil.PE {
 
 	class ByteBuffer {
 

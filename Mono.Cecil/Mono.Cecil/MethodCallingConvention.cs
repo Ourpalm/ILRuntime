@@ -8,7 +8,7 @@
 // Licensed under the MIT/X11 license.
 //
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public enum MethodCallingConvention : byte {
 		Default		= 0x0,

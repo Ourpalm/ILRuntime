@@ -10,9 +10,9 @@
 
 using System;
 
-using MD = Mono.Cecil.Metadata;
+using MD = ILRuntime.Mono.Cecil.Metadata;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	public interface IModifierType {
 		TypeReference ModifierType { get; }

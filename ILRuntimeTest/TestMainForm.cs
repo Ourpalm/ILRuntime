@@ -135,9 +135,9 @@ namespace ILRuntimeTest
 
                     fs2 = new System.IO.FileStream(pdbPath, FileMode.Open);
                     {
-                        Mono.Cecil.Cil.ISymbolReaderProvider symbolReaderProvider = null;
+                        ILRuntime.Mono.Cecil.Cil.ISymbolReaderProvider symbolReaderProvider = null;
                         if (pdbPath.EndsWith (".pdb")) {
-                            symbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider ();
+                            symbolReaderProvider = new ILRuntime.Mono.Cecil.Pdb.PdbReaderProvider ();
                         }/* else if (pdbPath.EndsWith (".mdb")) {
                             symbolReaderProvider = new Mono.Cecil.Mdb.MdbReaderProvider ();
                         }*/

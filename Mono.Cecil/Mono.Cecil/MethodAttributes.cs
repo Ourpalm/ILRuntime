@@ -10,7 +10,7 @@
 
 using System;
 
-namespace Mono.Cecil {
+namespace ILRuntime.Mono.Cecil {
 
 	[Flags]
 	public enum MethodAttributes : ushort {

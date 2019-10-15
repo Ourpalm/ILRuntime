@@ -11,9 +11,9 @@
 using System;
 using System.IO;
 
-using Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Cil;
 
-namespace Mono.Cecil.Pdb {
+namespace ILRuntime.Mono.Cecil.Pdb {
 
 	public sealed class NativePdbReaderProvider : ISymbolReaderProvider {
 

@@ -11,7 +11,7 @@ using System;
 
 #if !READ_ONLY
 
-namespace Mono.Cecil.Pdb
+namespace ILRuntime.Mono.Cecil.Pdb
 {
 	internal class SymDocumentWriter
 	{
