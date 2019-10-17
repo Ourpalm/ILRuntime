@@ -11,9 +11,9 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     public class BindingCodeGenerator
     {
-        
-        public static void GenerateBindingCode(List<Type> types, string outputPath, 
-                                               HashSet<MethodBase> excludeMethods = null, HashSet<FieldInfo> excludeFields = null, 
+
+        public static void GenerateBindingCode(List<Type> types, string outputPath,
+                                               HashSet<MethodBase> excludeMethods = null, HashSet<FieldInfo> excludeFields = null,
                                                List<Type> valueTypeBinders = null, List<Type> delegateTypes = null)
         {
             if (!System.IO.Directory.Exists(outputPath))
@@ -34,7 +34,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     continue;
                 i.GetClassName(out clsName, out realClsName, out isByRef);
                 clsNames.Add(clsName);
-                
+
                 using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/" + clsName + ".cs", false, new UTF8Encoding(false)))
                 {
                     StringBuilder sb = new StringBuilder();
@@ -155,7 +155,7 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
-        public static void GenerateBindingCode(ILRuntime.Runtime.Enviorment.AppDomain domain, string outputPath, 
+        public static void GenerateBindingCode(ILRuntime.Runtime.Enviorment.AppDomain domain, string outputPath,
                                                List<Type> valueTypeBinders = null, List<Type> delegateTypes = null)
         {
             if (domain == null)
@@ -196,7 +196,7 @@ namespace ILRuntime.Runtime.Generated
                 if (clsNames.Contains(clsName))
                     clsName = clsName + "_t";
                 clsNames.Add(clsName);
-                
+
                 string oFileName = outputPath + "/" + clsName;
                 int len = Math.Min(oFileName.Length, 100);
                 if (len < oFileName.Length)
@@ -230,11 +230,11 @@ namespace ILRuntime.Runtime.Generated
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
 ");
-                    string flagDef =    "            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;";
-                    string methodDef =  "            MethodBase method;";
+                    string flagDef = "            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;";
+                    string methodDef = "            MethodBase method;";
                     string methodsDef = "            MethodInfo[] methods = type.GetMethods(flag).Where(t => !t.IsGenericMethod).ToArray();";
-                    string fieldDef =   "            FieldInfo field;";
-                    string argsDef =    "            Type[] args;";
+                    string fieldDef = "            FieldInfo field;";
+                    string argsDef = "            Type[] args;";
                     string typeDef = string.Format("            Type type = typeof({0});", realClsName);
 
                     bool needMethods;
@@ -321,7 +321,7 @@ namespace ILRuntime.Runtime.Generated
         {");
                 foreach (var i in clsNames)
                 {
-                    if (i.Contains("UnityEditor"))
+                    if (i.Contains("UnityEditor") || i.Contains("Android"))
                         continue;
                     sb.Append("            ");
                     sb.Append(i);
@@ -420,7 +420,7 @@ namespace ILRuntime.Runtime.Generated
                                     case Intepreter.OpCodes.OpCodeEnum.Stsfld:
                                         {
                                             var t = domain.GetType((int)(ins.TokenLong >> 32)) as CLR.TypeSystem.CLRType;
-                                            if(t != null)
+                                            if (t != null)
                                             {
                                                 var fi = t.GetField((int)ins.TokenLong);
                                                 if (fi != null && fi.IsPublic)
@@ -431,7 +431,7 @@ namespace ILRuntime.Runtime.Generated
                                                         info = CreateNewBindingInfo(t.TypeForCLR);
                                                         infos[t.TypeForCLR] = info;
                                                     }
-                                                    if(ins.Code == Intepreter.OpCodes.OpCodeEnum.Stfld || ins.Code == Intepreter.OpCodes.OpCodeEnum.Stsfld)
+                                                    if (ins.Code == Intepreter.OpCodes.OpCodeEnum.Stfld || ins.Code == Intepreter.OpCodes.OpCodeEnum.Stsfld)
                                                     {
                                                         if (t.IsValueType)
                                                         {
@@ -470,7 +470,7 @@ namespace ILRuntime.Runtime.Generated
                                     case Intepreter.OpCodes.OpCodeEnum.Newarr:
                                         {
                                             var t = domain.GetType(ins.TokenInteger) as CLR.TypeSystem.CLRType;
-                                            if(t != null)
+                                            if (t != null)
                                             {
                                                 CLRBindingGenerateInfo info;
                                                 if (!infos.TryGetValue(t.TypeForCLR, out info))
@@ -713,7 +713,7 @@ namespace ILRuntime.Runtime.Generated
         {
             if (!System.IO.Directory.Exists(outputPath))
                 System.IO.Directory.CreateDirectory(outputPath);
-            
+
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, new UTF8Encoding(false)))
             {
                 StringBuilder sb = new StringBuilder();
@@ -732,7 +732,7 @@ namespace ILRuntime.Runtime.Generated
 
                     foreach (var i in valueTypeBinders)
                     {
-                        if (i.Name.Contains("UnityEditor"))
+                        if (i.Name.Contains("UnityEditor") || i.Name.Contains("Android"))
                             continue;
                         string clsName, realClsName;
                         bool isByRef;
@@ -753,7 +753,7 @@ namespace ILRuntime.Runtime.Generated
                 {
                     foreach (var i in clsNames)
                     {
-                        if (i.Contains("UnityEditor"))
+                        if (i.Contains("UnityEditor") || i.Contains("Android"))
                             continue;
                         sb.Append("            ");
                         sb.Append(i);
