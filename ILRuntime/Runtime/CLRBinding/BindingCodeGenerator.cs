@@ -321,7 +321,7 @@ namespace ILRuntime.Runtime.Generated
         {");
                 foreach (var i in clsNames)
                 {
-                    if (i.Contains("UnityEditor") || i.Contains("Android"))
+                    if (i.Contains("UnityEditor") || i.Contains("AndroidJava"))
                         continue;
                     sb.Append("            ");
                     sb.Append(i);
@@ -732,7 +732,7 @@ namespace ILRuntime.Runtime.Generated
 
                     foreach (var i in valueTypeBinders)
                     {
-                        if (i.Name.Contains("UnityEditor") || i.Name.Contains("Android"))
+                        if (i.Name.Contains("UnityEditor") || i.Name.Contains("AndroidJava"))
                             continue;
                         string clsName, realClsName;
                         bool isByRef;
@@ -753,7 +753,7 @@ namespace ILRuntime.Runtime.Generated
                 {
                     foreach (var i in clsNames)
                     {
-                        if (i.Contains("UnityEditor") || i.Contains("Android"))
+                        if (i.Contains("UnityEditor") || i.Contains("AndroidJava"))
                             continue;
                         sb.Append("            ");
                         sb.Append(i);
