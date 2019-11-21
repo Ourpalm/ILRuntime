@@ -104,6 +104,9 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
             }
+            args = new Type[]{typeof(System.String), typeof(System.Collections.Generic.KeyValuePair<System.String, System.String[]>[])};
+            method = type.GetMethod("Method", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Method_8);
 
 
         }
@@ -233,6 +236,26 @@ namespace ILRuntime.Runtime.Generated
 
 
             ILRuntimeTest.TestBase.StaticGenericMethods.StaticMethod<System.Int32>(@func);
+
+            return __ret;
+        }
+
+        static StackObject* Method_8(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Collections.Generic.KeyValuePair<System.String, System.String[]>[] @panels = (System.Collections.Generic.KeyValuePair<System.String, System.String[]>[])typeof(System.Collections.Generic.KeyValuePair<System.String, System.String[]>[]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.String @name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+
+            ILRuntimeTest.TestBase.StaticGenericMethods.Method(@name, @panels);
 
             return __ret;
         }
