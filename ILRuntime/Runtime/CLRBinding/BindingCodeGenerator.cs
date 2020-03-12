@@ -196,13 +196,21 @@ namespace ILRuntime.Runtime.Generated
                 if (clsNames.Contains(clsName))
                     clsName = clsName + "_t";
                 clsNames.Add(clsName);
-                
-                string oFileName = outputPath + "/" + clsName;
-                int len = Math.Min(oFileName.Length, 100);
-                if (len < oFileName.Length)
-                    oFileName = oFileName.Substring(0, len) + "_t";
+
+                //File path length limit
+                string oriFileName = outputPath + "/" + clsName;
+                int len = Math.Min(oriFileName.Length, 100);
+                if (len < oriFileName.Length)
+                    oriFileName = oriFileName.Substring(0, len);
+
+                int extraNameIndex = 0;
+                string oFileName = oriFileName + "_t" + extraNameIndex;
                 while (files.Contains(oFileName))
-                    oFileName = oFileName + "_t";
+                {
+                    extraNameIndex++;
+                    oFileName = oriFileName + "_t" + extraNameIndex;
+                }
+
                 files.Add(oFileName);
                 oFileName = oFileName + ".cs";
                 using (System.IO.StreamWriter sw = new System.IO.StreamWriter(oFileName, false, new UTF8Encoding(false)))
