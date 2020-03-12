@@ -317,7 +317,7 @@ namespace TestCases
             var p = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);//error
             foreach (var i in p)
             {
-                Console.WriteLine(i.GetValue(o, new object[] { 1, 2L ,3333}));
+                Console.WriteLine(i.GetValue(o, new object[] { 1, 2L, 3333 }));
                 i.SetValue(o, 333, new object[] { 123, 345L, 678 });
             }
         }
@@ -408,6 +408,35 @@ namespace TestCases
         public sealed class TestController
         {
             public static TestController instance = new TestController();
+        }
+
+        public static void ReflectionTest16()
+        {
+            MethodInfo info = typeof(ReflectionTest).GetMethod(nameof(ReflectionTest16Sub), BindingFlags.NonPublic | BindingFlags.Static);
+            info.Invoke(null, new object[] { null });
+            info.Invoke(null, new object[] { null });
+        }
+
+        public static void ReflectionTest17()
+        {
+            MethodInfo info = typeof(ReflectionTest).GetMethod(nameof(ReflectionTest17Sub), BindingFlags.NonPublic | BindingFlags.Static);
+            int cnt = 0;
+            cnt += (int)info.Invoke(null, new object[] { null });
+            cnt += (int)info.Invoke(null, new object[] { null });
+
+            Console.WriteLine(cnt);
+            if (cnt != 40)
+                throw new Exception("Wrong result");
+        }
+
+        static void ReflectionTest16Sub(TestCases.TestCls t)
+        {
+            Console.WriteLine("OK");
+        }
+
+        static int ReflectionTest17Sub()
+        {
+            return 20;
         }
     }
 }

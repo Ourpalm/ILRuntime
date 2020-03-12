@@ -829,35 +829,31 @@ namespace ILRuntime.Runtime.Enviorment
                     esp = ILIntepreter.PushObject(ret, mStack, obj);
                 else
                     esp = ret;
+                var ilmethod = ((ILRuntimeMethodInfo)instance).ILMethod;
                 if (p != null)
                 {
                     object[] arr = (object[])p;
-                    foreach (var i in arr)
+                    for(int i = 0; i < ilmethod.ParameterCount; i++)
                     {
-                        esp = ILIntepreter.PushObject(esp, mStack, CheckCrossBindingAdapter(i));
+                        esp = ILIntepreter.PushObject(esp, mStack, CheckCrossBindingAdapter(arr[i]));
                     }
                 }
                 bool unhandled;
-                var ilmethod = ((ILRuntimeMethodInfo)instance).ILMethod;
                 ret = intp.Execute(ilmethod, esp, out unhandled);
                 ILRuntimeMethodInfo imi = (ILRuntimeMethodInfo)instance;
-                var rt = imi.ReturnType;
+                var rt = imi.ILMethod.ReturnType;
                 if (rt != domain.VoidType)
                 {
                     var res = ret - 1;
                     if (res->ObjectType < ObjectTypes.Object)
                     {
-                        if (rt is ILRuntimeWrapperType)
-                            rt = ((ILRuntimeWrapperType)rt).CLRType.TypeForCLR;
-                        if (rt is ILRuntimeType)
-                            rt = ((ILRuntimeType)rt).ILType.TypeForCLR;
-                        return ILIntepreter.PushObject(res, mStack, rt.CheckCLRTypes(StackObject.ToObject(res, domain, mStack)), true);
+                        return ILIntepreter.PushObject(res, mStack, rt.TypeForCLR.CheckCLRTypes(StackObject.ToObject(res, domain, mStack)), true);
                     }
                     else
                         return ret;
                 }
                 else
-                    return ret;
+                    return ILIntepreter.PushNull(ret);
             }
             else
                 return ILIntepreter.PushObject(ret, mStack, ((MethodInfo)instance).Invoke(obj, (object[])p));
