@@ -264,11 +264,12 @@ namespace ILRuntimeTest
             using (FileStream fs = new FileStream(txtPath.Text, FileMode.Open, FileAccess.Read))
             {
                 domain.LoadAssembly(fs);
+
+                //Crossbind Adapter is needed to generate the correct binding code
+                ILRuntimeHelper.Init(domain);
+                string outputPath = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "AutoGenerate"; // "..\\..\\AutoGenerate"
+                ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, outputPath);
             }
-            //Crossbind Adapter is needed to generate the correct binding code
-            ILRuntimeHelper.Init(domain);
-            string outputPath = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "AutoGenerate"; // "..\\..\\AutoGenerate"
-            ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, outputPath);
         }
     }
 }
