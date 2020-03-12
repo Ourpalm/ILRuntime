@@ -246,6 +246,18 @@ namespace TestCases
                 Console.WriteLine(e);
             }
         }
+
+        public static void Test18()
+        {
+            var a = TestEnum.Enum2;
+            Test18Sub(0x123456789, out a);
+            Console.WriteLine(a);
+        }
+
+        static void Test18Sub(ulong val, out TestEnum e)
+        {
+            e = (TestEnum)val;
+        }
         class SystemType
         {
             public int value = 10;

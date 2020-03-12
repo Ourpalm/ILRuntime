@@ -17,6 +17,7 @@ namespace ILRuntime.CLR.TypeSystem
         TypeReference typeRef;
         TypeDefinition definition;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
+        bool staticConstructorCalled;
         ILMethod staticConstructor;
         List<ILMethod> constructors;
         IType[] fieldTypes;
@@ -127,6 +128,14 @@ namespace ILRuntime.CLR.TypeSystem
                     InitializeFields();
                 if (methods == null)
                     InitializeMethods();
+                if (staticInstance != null && !staticConstructorCalled)
+                {
+                    staticConstructorCalled = true;
+                    if (staticConstructor != null && (!TypeReference.HasGenericParameters || IsGenericInstance))
+                    {
+                        appdomain.Invoke(staticConstructor, null, null);
+                    }
+                }
                 return staticInstance;
             }
         }
@@ -676,11 +685,6 @@ namespace ILRuntime.CLR.TypeSystem
                     var m = new ILMethod(i, this, appdomain);
                     lst.Add(m);
                 }
-            }
-
-            if (staticConstructor != null && (!TypeReference.HasGenericParameters || IsGenericInstance))
-            {
-                appdomain.Invoke(staticConstructor, null, null);
             }
         }
 
