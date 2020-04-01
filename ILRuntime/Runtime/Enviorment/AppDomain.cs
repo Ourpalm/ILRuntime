@@ -1267,7 +1267,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal long CacheString(object token)
         {
-            long oriHash = token.GetHashCode();
+            long oriHash = token.GetHashCode() & 0xFFFFFFFF;
             long hashCode = oriHash;
             string str = (string)token;
             lock (mapString)
