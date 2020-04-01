@@ -55,6 +55,11 @@ namespace TestCases
             Max = sbyte.MaxValue
         }
 
+        enum TestEnumEmpty
+        {
+
+        }
+
         static TestEnum b = TestEnum.Enum2;
 
         public static string Test01()
@@ -258,6 +263,12 @@ namespace TestCases
         {
             e = (TestEnum)val;
         }
+
+        public static void Test19()
+        {
+            Console.WriteLine(Enum.GetValues(typeof(TestEnumEmpty)).Length);
+        }
+
         class SystemType
         {
             public int value = 10;

@@ -1032,7 +1032,12 @@ namespace ILRuntime.Runtime.Enviorment
                     if (islong)
                         res = ((List<long>)list).ToArray();
                     else
-                        res = ((List<int>)list).ToArray();
+                    {
+                        if (list == null)
+                            res = new int[0];
+                        else
+                            res = ((List<int>)list).ToArray();
+                    }
                     return ILIntepreter.PushObject(ret, mStack, res, true);
                 }
                 else

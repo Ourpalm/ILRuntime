@@ -155,6 +155,20 @@ namespace TestCases
             sub.Test();
         }
 
+        static void InheritanceTest12Sub()
+        {
+            Console.WriteLine("OK");
+        }
+
+        public static void InheritanceTest12()
+        {
+            for(int i = 0; i < 5; i++)
+            {
+                System.Type t = typeof(InheritanceTest);
+                t.GetMethod("InheritanceTest12Sub", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, null);
+            }
+        }
+
         class TestCls5 : TestClass2
         {
             public override float AbMethod2(int arg1)
