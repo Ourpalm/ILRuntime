@@ -722,6 +722,11 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         t = ((ILMethod)contextMethod).FindGenericArgument(_ref.Name);
                     }
+                    if (t != null)
+                    {
+                        mapTypeToken[t.GetHashCode()] = t;
+                        mapType[t.FullName] = t;
+                    }
                     return t;
                 }
                 if (_ref.IsByReference)

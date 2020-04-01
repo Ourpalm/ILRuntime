@@ -507,5 +507,15 @@ namespace TestCases
         {
             ILRuntimeTest.TestBase.StaticGenericMethods.Method("");
         }
+
+        public static void GenericStaticMethodTest13()
+        {
+            GenericStaticMethodTest13Sub<int[]>();
+        }
+        static void GenericStaticMethodTest13Sub<T>()
+        {
+            var t = typeof(T);//出错
+            Console.WriteLine(t);
+        }
     }
 }
