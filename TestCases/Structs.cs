@@ -184,5 +184,16 @@ namespace TestCases
         {
             Console.WriteLine(Number.minValue.val);
         }
+
+        struct EnumTestStruct
+        {
+            public ILRuntimeTest.TestFramework.TestCLREnum value;
+        }
+
+        public static void StructTest5()
+        {
+            EnumTestStruct val = new EnumTestStruct();
+            Console.WriteLine(val.value);
+        }
     }
 }
