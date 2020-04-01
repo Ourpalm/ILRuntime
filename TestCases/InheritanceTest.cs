@@ -201,6 +201,30 @@ namespace TestCases
             }
         }
 
+        public static void InheritanceTest13()
+        {
+            new TestClass().TestMethod();
+        }
+
+        public interface IData { }
+
+        public class Data : IData { }
+
+        public abstract class Test<T> where T : class, IData
+        {
+            public T Data { get; protected set; }
+
+            public void TestMethod()
+            {
+                Data = null;//此处赋值为null会出现异常, 非null不会发生异常
+                Console.WriteLine(Data);
+            }
+        }
+
+        public class TestClass : Test<Data>
+        {
+        }
+
         class TestCls5 : TestClass2
         {
             public override float AbMethod2(int arg1)

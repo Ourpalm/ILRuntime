@@ -3119,13 +3119,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                 default:
                                                     throw new NotImplementedException();
                                             }
-
-                                            Free(esp - 1);
-                                            esp--;
                                         }
                                         else
                                         {
-                                            PushNull(esp);
+                                            //PushNull(esp);
                                             switch (objRef->ObjectType)
                                             {
                                                 case ObjectTypes.StaticFieldReference:
@@ -3161,9 +3158,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else if(type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
-                                        Free(esp - 1);
-                                        esp--;
                                     }
+
+                                    Free(esp - 1);
+                                    esp--;
                                 }
                                 break;
                             case OpCodeEnum.Isinst:
