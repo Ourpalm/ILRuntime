@@ -55,6 +55,14 @@ namespace TestCases
             Max = sbyte.MaxValue
         }
 
+        enum TestEnumFlag
+        {
+            Feature1 = 1,
+            Feature2 = 2,
+            Feature3 = 4,
+            Feature4 = 8,
+        }
+
         enum TestEnumEmpty
         {
 
@@ -267,6 +275,19 @@ namespace TestCases
         public static void Test19()
         {
             Console.WriteLine(Enum.GetValues(typeof(TestEnumEmpty)).Length);
+        }
+
+        public static void Test20()
+        {
+            TestEnumFlag flag = TestEnumFlag.Feature1 | TestEnumFlag.Feature3;
+            var res = flag.HasFlag(TestEnumFlag.Feature3);
+            Console.WriteLine(res);
+            if (!res)
+                throw new Exception();
+            res = flag.HasFlag(TestEnumFlag.Feature2);
+            Console.WriteLine(res);
+            if (res)
+                throw new Exception();
         }
 
         class SystemType

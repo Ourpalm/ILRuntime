@@ -1165,5 +1165,35 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return ILIntepreter.PushObject(ret, mStack, Enum.GetName(t, val), true);
         }
+
+        public static StackObject* EnumHasFlag(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = esp - 1 - 1;
+            AppDomain domain = intp.AppDomain;
+
+            var p = esp - 1;
+            object val = StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            p = esp - 1 - 1;
+            object ins = StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            bool res = false;
+            if(ins is ILEnumTypeInstance enumIns)
+            {
+                int num = enumIns.Fields[0].Value;
+                int valNum = ((ILEnumTypeInstance)val).Fields[0].Value;
+                res = (num & valNum) == valNum;
+            }
+            else
+            {
+                res = ((Enum)ins).HasFlag((Enum)val);
+            }
+            if (res)
+                return ILIntepreter.PushOne(ret);
+            else
+                return ILIntepreter.PushZero(ret);
+        }
     }
 }
