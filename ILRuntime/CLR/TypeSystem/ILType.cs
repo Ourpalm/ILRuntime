@@ -447,7 +447,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        string fullName;
+        string fullName, fullNameForNested;
         public string FullName
         {
             get
@@ -473,6 +473,12 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     else
                         fullName = typeRef.FullName;
+                    if (typeRef.IsNested)
+                    {
+                        fullNameForNested = fullName.Replace("/", ".");
+                    }
+                    else
+                        fullNameForNested = fullName;
                 }
                 return fullName;
             }
@@ -706,7 +712,12 @@ namespace ILRuntime.CLR.TypeSystem
             var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
             if (m == null && method.DeclearingType.IsInterface)
             {
-                m = GetMethod(string.Format("{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+                if(method.DeclearingType is ILType iltype)
+                {
+                    m = GetMethod(string.Format("{0}.{1}", iltype.fullNameForNested, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+                }
+                else
+                    m = GetMethod(string.Format("{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
             }
 
             if (m == null)

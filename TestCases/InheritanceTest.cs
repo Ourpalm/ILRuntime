@@ -12,9 +12,33 @@ namespace TestCases
         void TestAbstract();
         void TestField();
     }
-
     public class InheritanceTest
     {
+        interface ITest
+        {
+            void TestMethod();
+        }
+
+        public class TestA : ITest
+        {
+            void ITest.TestMethod()//显式实现接口方法
+            {
+                Console.WriteLine("方法A");
+            }
+        }
+
+        public class TestB : ITest
+        {
+            void ITest.TestMethod()//显式实现接口方法
+            {
+                Console.WriteLine("方法A");
+            }
+
+            public void TestMethod()
+            {
+                Console.WriteLine("方法B");
+            }
+        }
         public static void InheritanceTest01()
         {
             TestCls cls = new TestCls();
@@ -53,6 +77,14 @@ namespace TestCases
             cls3.TestAbstract();
             ((InterfaceTest2)cls3).TestVirtual();
             cls3.TestField();
+        }
+
+        public static void InheritanceTest_Interface2()
+        {
+            ITest b = new TestB();
+            b.TestMethod();//此处输入结果为 方法B
+            ITest a = new TestA();
+            a.TestMethod();//发生异常
         }
 
         static void Test01Sub(ClassInheritanceTest cls)
