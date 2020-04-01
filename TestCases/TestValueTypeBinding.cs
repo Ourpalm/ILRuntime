@@ -244,5 +244,44 @@ namespace TestCases
                 Console.WriteLine(i.ToString());
             }
         }
+
+        static TestVector3NoBinding m_curPos;
+
+        public static void UnitTest_10036()
+        {
+            TestVector3NoBinding rawPos = new TestVector3NoBinding(1, 2, 3);
+            TestVector3NoBinding tmpPos = rawPos;
+            m_curPos = rawPos;
+            Console.WriteLine("before raw:" + rawPos + " tmp:" + tmpPos + " cur:" + m_curPos);
+            ChangePosY(tmpPos);
+            ChangePosY(m_curPos);
+            Console.WriteLine("after raw:" + rawPos + " tmp:" + tmpPos + " cur:" + m_curPos);
+            if (tmpPos.y == 0 || m_curPos.y == 0)
+                throw new AccessViolationException();
+        }
+
+        static TestVector3 m_curPos2;
+        public static void UnitTest_10037()
+        {
+            TestVector3 rawPos = new TestVector3(1, 2, 3);
+            TestVector3 tmpPos = rawPos;
+            m_curPos2 = rawPos;
+            Console.WriteLine("before raw:" + rawPos + " tmp:" + tmpPos + " cur:" + m_curPos2);
+            ChangePosY2(tmpPos);
+            ChangePosY2(m_curPos2);
+            Console.WriteLine("after raw:" + rawPos + " tmp:" + tmpPos + " cur:" + m_curPos2);
+            if (tmpPos.Y == 0 || m_curPos2.Y == 0)
+                throw new AccessViolationException();
+        }
+
+        static void ChangePosY(TestVector3NoBinding pos)
+        {
+            pos.y = 0;
+        }
+
+        static void ChangePosY2(TestVector3 pos)
+        {
+            pos.Y = 0;
+        }
     }
 }

@@ -160,6 +160,9 @@ namespace ILRuntime.Runtime.Intepreter
                     case ObjectTypes.Object:
                     case ObjectTypes.FieldReference:
                     case ObjectTypes.ArrayReference:
+                        {
+                            mStack[a->Value] = CheckAndCloneValueType(mStack[a->Value], AppDomain);
+                        }
                         frame.ManagedStackBase--;
                         break;
                 }
