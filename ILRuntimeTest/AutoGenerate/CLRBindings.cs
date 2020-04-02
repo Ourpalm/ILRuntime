@@ -126,7 +126,10 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestVector3NoBinding_Binding.Register(app);
+            System_AccessViolationException_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Object_Object_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestCLREnumClass_Binding.Register(app);
             System_IComparable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);

@@ -76,7 +76,7 @@
     <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_SubExtensionClass_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestBase_SubExtensionClass_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_BaseClassTest_Binding.cs" />
-    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_C_t.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_C.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_DelegateTest_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_IntDelegate2_Binding.cs" />
@@ -84,7 +84,9 @@
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass2_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass3_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestClass4_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestCLREnumClass_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestStruct_Binding.cs" />
+    <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVector3NoBinding_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVector3_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorClass_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntimeTest_TestFramework_TestVectorStruct2_Binding.cs" />
@@ -93,6 +95,7 @@
     <Compile Include="AutoGenerate\ILRuntime_CLR_TypeSystem_IType_Binding.cs" />
     <Compile Include="AutoGenerate\ILRuntime_Runtime_Enviorment_AppDomain_Binding.cs" />
     <Compile Include="AutoGenerate\LitJson_JsonMapper_Binding.cs" />
+    <Compile Include="AutoGenerate\System_AccessViolationException_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_1_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Action_1_String_Binding.cs" />
@@ -105,10 +108,10 @@
     <Compile Include="AutoGenerate\System_Byte_Binding.cs" />
     <Compile Include="AutoGenerate\System_Char_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_ILTypeInstance_Int32_Binding.cs" />
-    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_ClassIn_t.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_ClassIn.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.cs" />
-    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollect_t.cs" />
-    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollect_t_t.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollect.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollect_t1.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.cs" />
@@ -122,7 +125,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_String_Object_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Type_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding.cs" />
-    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding_Enumerator__t.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_UInt32_ILTypeInstance_Binding_Enumerator_.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_EqualityComparer_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_IEnumerator_1_KeyValuePair_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_Int32_Int32_Binding.cs" />
@@ -130,8 +133,8 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_String_IType_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.cs" />
-    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTes_t.cs" />
-    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_TestClass3Adaptor_B_t.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTes.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_TestClass3Adaptor_B.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILTypeInstance_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_ILTypeInstance_Binding_Enumerator_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_List_1_Int32_Array_Binding.cs" />

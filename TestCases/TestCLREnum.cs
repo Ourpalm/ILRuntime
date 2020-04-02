@@ -53,5 +53,21 @@ namespace TestCases
             Console.WriteLine(dict.ContainsValue(MyEnum9.AAA));
 
         }
+        static ILRuntimeTest.TestFramework.TestCLREnum clrEnumTestField = ILRuntimeTest.TestFramework.TestCLREnum.Test2;
+        public static void Test06()
+        {
+            var res = ILRuntimeTest.TestFramework.TestCLREnumClass.Test == ILRuntimeTest.TestFramework.TestCLREnum.Test2;
+            Console.WriteLine(res);
+            if (!res)
+                throw new Exception();
+            res = ILRuntimeTest.TestFramework.TestCLREnumClass.Test2 == ILRuntimeTest.TestFramework.TestCLREnum.Test3;
+            Console.WriteLine(res);
+            if (!res)
+                throw new Exception();
+            res = clrEnumTestField == ILRuntimeTest.TestFramework.TestCLREnum.Test2;
+            Console.WriteLine(res);
+            if (!res)
+                throw new Exception();
+        }
     }
 }

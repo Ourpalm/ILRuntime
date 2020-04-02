@@ -53,15 +53,15 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("GetEnumerator", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, GetEnumerator_1);
-            args = new Type[]{typeof(System.Type), typeof(System.Int32)};
-            method = type.GetMethod("CreateInstance", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, CreateInstance_2);
-            args = new Type[]{typeof(System.Object), typeof(System.Int32)};
-            method = type.GetMethod("SetValue", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, SetValue_3);
             args = new Type[]{};
             method = type.GetMethod("get_Length", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_Length_4);
+            app.RegisterCLRMethodRedirection(method, get_Length_2);
+            args = new Type[]{typeof(System.Type), typeof(System.Int32)};
+            method = type.GetMethod("CreateInstance", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, CreateInstance_3);
+            args = new Type[]{typeof(System.Object), typeof(System.Int32)};
+            method = type.GetMethod("SetValue", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, SetValue_4);
             args = new Type[]{typeof(System.Byte)};
             if (genericMethods.TryGetValue("IndexOf", out lst))
             {
@@ -135,7 +135,24 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* CreateInstance_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_Length_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Array instance_of_this_method = (System.Array)typeof(System.Array).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = instance_of_this_method.Length;
+
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
+        }
+
+        static StackObject* CreateInstance_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -154,7 +171,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* SetValue_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* SetValue_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -174,23 +191,6 @@ namespace ILRuntime.Runtime.Generated
             instance_of_this_method.SetValue(@value, @index);
 
             return __ret;
-        }
-
-        static StackObject* get_Length_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Array instance_of_this_method = (System.Array)typeof(System.Array).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-            var result_of_this_method = instance_of_this_method.Length;
-
-            __ret->ObjectType = ObjectTypes.Integer;
-            __ret->Value = result_of_this_method;
-            return __ret + 1;
         }
 
         static StackObject* IndexOf_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)

@@ -204,7 +204,7 @@ namespace ILRuntime.Runtime.Generated
                     oriFileName = oriFileName.Substring(0, len);
 
                 int extraNameIndex = 0;
-                string oFileName = oriFileName + "_t" + extraNameIndex;
+                string oFileName = oriFileName;
                 while (files.Contains(oFileName))
                 {
                     extraNameIndex++;
