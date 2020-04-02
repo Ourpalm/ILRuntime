@@ -30,6 +30,7 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("Test", flag);
             app.RegisterCLRFieldGetter(field, get_Test_0);
             app.RegisterCLRFieldSetter(field, set_Test_0);
+            app.RegisterCLRFieldBinding(field, CopyToStack_Test_0, AssignFromStack_Test_0);
 
 
         }
@@ -51,10 +52,26 @@ namespace ILRuntime.Runtime.Generated
         {
             return ILRuntimeTest.TestFramework.TestCLREnumClass.Test;
         }
+
+        static StackObject* CopyToStack_Test_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestCLREnumClass.Test;
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
         static void set_Test_0(ref object o, object v)
         {
             ILRuntimeTest.TestFramework.TestCLREnumClass.Test = (ILRuntimeTest.TestFramework.TestCLREnum)v;
         }
+
+        static StackObject* AssignFromStack_Test_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            ILRuntimeTest.TestFramework.TestCLREnum @Test = (ILRuntimeTest.TestFramework.TestCLREnum)typeof(ILRuntimeTest.TestFramework.TestCLREnum).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestCLREnumClass.Test = @Test;
+            return ptr_of_this_method;
+        }
+
 
 
     }

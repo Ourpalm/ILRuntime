@@ -25,6 +25,8 @@ namespace TestCases
             TestVector3.One.X += vec.X;
 
             Console.WriteLine(TestVector3.One.ToString());
+            if (TestVector3.One.X == 1)
+                throw new Exception();
         }
 
         public static void Test02()

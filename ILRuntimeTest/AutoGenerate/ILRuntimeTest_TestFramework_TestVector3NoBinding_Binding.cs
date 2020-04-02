@@ -27,6 +27,7 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("y", flag);
             app.RegisterCLRFieldGetter(field, get_y_0);
             app.RegisterCLRFieldSetter(field, set_y_0);
+            app.RegisterCLRFieldBinding(field, CopyToStack_y_0, AssignFromStack_y_0);
 
             app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);
 
@@ -89,13 +90,32 @@ namespace ILRuntime.Runtime.Generated
         {
             return ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).y;
         }
+
+        static StackObject* CopyToStack_y_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).y;
+            __ret->ObjectType = ObjectTypes.Float;
+            *(float*)&__ret->Value = result_of_this_method;
+            return __ret + 1;
+        }
+
         static void set_y_0(ref object o, object v)
         {
-            var h = GCHandle.Alloc(o, GCHandleType.Pinned);
-            ILRuntimeTest.TestFramework.TestVector3NoBinding* p = (ILRuntimeTest.TestFramework.TestVector3NoBinding *)(void *)h.AddrOfPinnedObject();
-            p->y = (System.Single)v;
-            h.Free();
+            ILRuntimeTest.TestFramework.TestVector3NoBinding ins =(ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
+            ins.y = (System.Single)v;
+            o = ins;
         }
+
+        static StackObject* AssignFromStack_y_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            System.Single @y = *(float*)&ptr_of_this_method->Value;
+            ILRuntimeTest.TestFramework.TestVector3NoBinding ins =(ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
+            ins.y = @y;
+            o = ins;
+            return ptr_of_this_method;
+        }
+
 
         static object PerformMemberwiseClone(ref object o)
         {

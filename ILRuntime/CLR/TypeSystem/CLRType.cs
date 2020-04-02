@@ -8,10 +8,11 @@ using ILRuntime.Mono.Cecil;
 using ILRuntime.CLR.Method;
 using ILRuntime.Reflection;
 using ILRuntime.Runtime.Enviorment;
+using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.CLR.TypeSystem
 {
-    public class CLRType : IType
+    public unsafe class CLRType : IType
     {
         Type clrType;
         bool isPrimitive, isValueType, isEnum;
@@ -24,6 +25,8 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
         Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
+        Dictionary<int, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>> fieldBindingCache;
+
         Dictionary<int, int> fieldIdxMapping;
         IType[] orderedFieldTypes;
 
@@ -349,6 +352,22 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
+        public bool CopyFieldToStack(int hash, object target, Runtime.Intepreter.ILIntepreter intp, ref StackObject* esp, IList<object> mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldBindingCache == null)
+                return false;
+            var binding = GetFieldBinding(hash);
+            if (binding.Key != null)
+            {
+                esp = binding.Key(ref target, intp, esp, mStack);
+                return true;
+            }
+            else
+                return false;
+        }
+
         public void SetStaticFieldValue(int hash, object value)
         {
             if (fieldMapping == null)
@@ -386,6 +405,18 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 fieldInfo.SetValue(target, value);
             }
+        }
+
+        KeyValuePair<CLRFieldBindingDelegate,CLRFieldBindingDelegate> GetFieldBinding(int hash)
+        {
+            var dic = fieldBindingCache;
+            KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate> res;
+            if (dic != null && dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetFieldBinding(hash);
+            else
+                return default(KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>);
         }
 
         private CLRFieldGetterDelegate GetFieldGetter(int hash)
@@ -516,6 +547,13 @@ namespace ILRuntime.CLR.TypeSystem
                 {
                     if (fieldSetterCache == null) fieldSetterCache = new Dictionary<int, CLRFieldSetterDelegate>();
                     fieldSetterCache[hashCode] = setter;
+                }
+
+                KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate> binding;
+                if(AppDomain.FieldBindingMap.TryGetValue(i, out binding))
+                {
+                    if (fieldBindingCache == null) fieldBindingCache = new Dictionary<int, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>>();
+                    fieldBindingCache[hashCode] = binding;
                 }
             }
             if (orderedFieldTypes != null)
