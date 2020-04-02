@@ -221,9 +221,14 @@ namespace ILRuntime.Runtime.Stack
             }
             else if (type.IsEnum)
             {
-                esp->ObjectType = ObjectTypes.Integer;
-                esp->Value = 0;
-                esp->ValueLow = 0;
+                if(type is ILType ilType)
+                {
+                    Initialized(esp, ilType.FieldTypes[0]);
+                }
+                else
+                {
+                    Initialized(esp, ((CLRType)type).OrderedFieldTypes[0]);
+                }
             }
             else
             {

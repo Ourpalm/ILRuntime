@@ -5,6 +5,44 @@ using System.Text;
 
 namespace TestCases
 {
+    public struct Fixed64Vector3
+    {
+        public Fixed64 x;
+        public Fixed64 y;
+        public Fixed64 z;
+
+        public static readonly Fixed64Vector3 Zero3;
+
+        public Fixed64Vector3(int x, int y, int z)
+        {
+            this.x = new Fixed64(x);
+            this.y = new Fixed64(y);
+            this.z = new Fixed64(z);
+        }
+
+        static Fixed64Vector3()
+        {
+            Zero3 = new Fixed64Vector3(0, 0, 0);
+        }
+    }
+
+
+    public struct Fixed64
+    {
+        private long m_rawValue;
+
+        public static readonly Fixed64 Zero;
+
+        public Fixed64(long value)
+        {
+            m_rawValue = value;
+        }
+
+        static Fixed64()
+        {
+            Zero = new Fixed64(0);
+        }
+    }
     public class Color32
     {
         public Color32(byte r, byte g, byte b, byte a)

@@ -481,6 +481,9 @@ namespace ILRuntime.CLR.TypeSystem
             if (hasValueTypeBinder)
             {
                 fieldIdxMapping = new Dictionary<int, int>();
+            }
+            if (hasValueTypeBinder || isEnum)
+            {
                 orderedFieldTypes = new IType[fields.Length];
             }
             foreach (var i in fields)
@@ -492,10 +495,13 @@ namespace ILRuntime.CLR.TypeSystem
                     fieldMapping[i.Name] = hashCode;
                     fieldInfoCache[hashCode] = i;
                 }
-                if (hasValueTypeBinder && !i.IsStatic)
+                if ((hasValueTypeBinder || isEnum) && !i.IsStatic)
                 {
                     orderedFieldTypes[idx] = appdomain.GetType(i.FieldType);
-                    fieldIdxMapping[hashCode] = idx++;
+                    if (hasValueTypeBinder)
+                        fieldIdxMapping[hashCode] = idx++;
+                    else
+                        idx++;
                 }
 
                 CLRFieldGetterDelegate getter;
@@ -511,6 +517,10 @@ namespace ILRuntime.CLR.TypeSystem
                     if (fieldSetterCache == null) fieldSetterCache = new Dictionary<int, CLRFieldSetterDelegate>();
                     fieldSetterCache[hashCode] = setter;
                 }
+            }
+            if (orderedFieldTypes != null)
+            {
+                Array.Resize(ref orderedFieldTypes, idx);
             }
         }
         public int GetFieldIndex(object token)
