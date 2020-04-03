@@ -119,6 +119,24 @@ namespace ILRuntime.Runtime.Stack
             int mStackBase = frame.ManagedStackBase;
             if (method.HasThis)
                 ret--;
+            for (StackObject* ptr = ret; ptr < frame.LocalVarPointer; ptr++)
+            {
+                if (ptr->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                {
+                    var addr = ILIntepreter.ResolveReference(ptr);
+                    int start = int.MaxValue;
+                    int end = int.MaxValue;
+                    var tmp = addr;
+                    CountValueTypeManaged(ptr, ref start, ref end, &tmp);
+
+                    if (addr > frame.ValueTypeBasePointer)
+                    {
+                        frame.ValueTypeBasePointer = addr;
+                    }
+                    if (start < mStackBase)
+                        mStackBase = start;
+                }
+            }
             if(method.ReturnType != intepreter.AppDomain.VoidType)
             {
                 *ret = *returnVal;
@@ -147,11 +165,11 @@ namespace ILRuntime.Runtime.Stack
 
         public void RelocateValueTypeAndFreeAfterDst(StackObject* src, StackObject* dst)
         {
+            var objRef2 = dst;
             dst = ILIntepreter.ResolveReference(dst);
             int start = int.MaxValue;
             int end = int.MaxValue;
-            var objRef2 = dst;
-            CountValueTypeManaged(dst, ref start, ref end, &objRef2);
+            CountValueTypeManaged(objRef2, ref start, ref end, &objRef2);
             RelocateValueType(src, ref dst, ref start);
             ValueTypeStackPointer = dst;
             if (start <= end)
