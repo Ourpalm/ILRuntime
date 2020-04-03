@@ -57,7 +57,7 @@ namespace ILRuntime.Runtime.Stack
             {
                 return valueTypePtr;
             }
-            set
+            private set
             {
                 if (value > ValueTypeStackBase)
                     throw new StackOverflowException();
@@ -145,7 +145,20 @@ namespace ILRuntime.Runtime.Stack
             return ret;
         }
 
-        public void RelocateValueType(StackObject* src, ref StackObject* dst, ref int mStackBase)
+        public void RelocateValueTypeAndFreeAfterDst(StackObject* src, StackObject* dst)
+        {
+            dst = ILIntepreter.ResolveReference(dst);
+            int start = int.MaxValue;
+            int end = int.MaxValue;
+            var objRef2 = dst;
+            CountValueTypeManaged(dst, ref start, ref end, &objRef2);
+            RelocateValueType(src, ref dst, ref start);
+            ValueTypeStackPointer = dst;
+            if (start <= end)
+                RemoveManagedStackRange(start, end);
+        }
+
+        void RelocateValueType(StackObject* src, ref StackObject* dst, ref int mStackBase)
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
             if (descriptor > dst)
@@ -351,7 +364,7 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public void RemoveManagedStackRange(int start, int end)
+        void RemoveManagedStackRange(int start, int end)
         {
             if (start != int.MaxValue)
             {
@@ -384,7 +397,7 @@ namespace ILRuntime.Runtime.Stack
             RemoveManagedStackRange(start, end);
         }
 
-        public void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)
+        void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(esp);
             int cnt = descriptor->ValueLow;

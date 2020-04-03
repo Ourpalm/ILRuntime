@@ -1965,14 +1965,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             val = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
                                         if (val->ObjectType == ObjectTypes.ValueTypeObjectReference && ret->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                         {
-                                            int start = int.MaxValue;
-                                            int end = int.MaxValue;
-                                            objRef2 = dst;
-                                            stack.CountValueTypeManaged(ret, ref start, ref end, &objRef2);
-                                            stack.RelocateValueType(val, ref dst, ref start);
-                                            stack.ValueTypeStackPointer = dst;
-                                            if (start <= end)
-                                                stack.RemoveManagedStackRange(start, end);
+                                            stack.RelocateValueTypeAndFreeAfterDst(val, ret);
                                         }
                                         else
                                         {
