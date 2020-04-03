@@ -137,7 +137,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             unhandledException = false;
             StackObject* objRef, objRef2, dst, val, a, b, arrRef;
-            object obj;
+            object obj = null;
             IType type;
             Type clrType;
             int intVal;
@@ -155,7 +155,7 @@ namespace ILRuntime.Runtime.Intepreter
                         mStack.Add(null);
                         break;
                     case ObjectTypes.ValueTypeObjectReference:
-                        CloneStackValueType(a, a, mStack);
+                        //CloneStackValueType(a, a, mStack);
                         break;
                     case ObjectTypes.Object:
                     case ObjectTypes.FieldReference:
@@ -1960,12 +1960,43 @@ namespace ILRuntime.Runtime.Intepreter
                                         dst = ILIntepreter.ResolveReference(objRef);
                                         var ft = domain.GetType(dst->Value);
                                         if (ft is ILType)
-                                            dst = Minus(dst, (int)ip->TokenLong + 1);
+                                            val = Minus(dst, (int)ip->TokenLong + 1);
                                         else
-                                            dst = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
-                                        StackObject valRef = *ret;                                        
-                                        CopyToStack(ret, dst, mStack);
-                                        FreeStackValueType(&valRef);
+                                            val = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->TokenLong] + 1);
+                                        if (val->ObjectType == ObjectTypes.ValueTypeObjectReference && ret->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        {
+                                            int start = int.MaxValue;
+                                            int end = int.MaxValue;
+                                            objRef2 = dst;
+                                            stack.CountValueTypeManaged(ret, ref start, ref end, &objRef2);
+                                            stack.RelocateValueType(val, ref dst, ref start);
+                                            stack.ValueTypeStackPointer = dst;
+                                            if (start <= end)
+                                                stack.RemoveManagedStackRange(start, end);
+                                        }
+                                        else
+                                        {
+                                            StackObject valRef;
+                                            if (val->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                            {
+                                                Free(ret);
+                                                CopyToStack(ret, val, mStack);
+                                            }
+                                            else
+                                            {
+                                                valRef = *val;
+                                                if (val->ObjectType >= ObjectTypes.Object)
+                                                    obj = mStack[val->Value];
+                                                //CopyToStack(ret, dst, mStack);
+                                                Free(ret);
+                                                if (valRef.ObjectType >= ObjectTypes.Object)
+                                                {
+                                                    valRef.Value = mStack.Count;
+                                                    mStack.Add(obj);
+                                                }
+                                                *ret = valRef;
+                                            }
+                                        }
                                     }
                                     else
                                     {
@@ -4206,8 +4237,6 @@ namespace ILRuntime.Runtime.Intepreter
         void CloneStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
-            if (src == dst)
-                FreeStackValueType(src);
             stack.AllocValueType(dst, AppDomain.GetType(descriptor->Value));
             StackObject* dstDescriptor = ILIntepreter.ResolveReference(dst);
             int cnt = descriptor->ValueLow;
@@ -5083,12 +5112,22 @@ namespace ILRuntime.Runtime.Intepreter
 
         public void CopyToStack(StackObject* dst, StackObject* src, IList<object> mStack)
         {
-            *dst = *src;
-            if (dst->ObjectType >= ObjectTypes.Object)
+            if (src->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
-                dst->Value = mStack.Count;
-                var obj = mStack[src->Value];
-                mStack.Add(obj);
+                var descriptor = ResolveReference(src);
+                var t = domain.GetType(descriptor->Value);
+                AllocValueType(dst, t);
+                CopyStackValueType(src, dst, mStack);
+            }
+            else
+            {
+                *dst = *src;
+                if (dst->ObjectType >= ObjectTypes.Object)
+                {
+                    dst->Value = mStack.Count;
+                    var obj = mStack[src->Value];
+                    mStack.Add(obj);
+                }
             }
         }
 
@@ -5298,11 +5337,18 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
         public void Free(StackObject* esp)
         {
-            if (esp->ObjectType >= ObjectTypes.Object)
+            switch (esp->ObjectType)
             {
-                var mStack = stack.ManagedStack;
-                if (esp->Value == mStack.Count - 1)
-                    mStack.RemoveAt(esp->Value);
+                case ObjectTypes.Object:
+                case ObjectTypes.FieldReference:
+                case ObjectTypes.ArrayReference:
+                    var mStack = stack.ManagedStack;
+                    if (esp->Value == mStack.Count - 1)
+                        mStack.RemoveAt(esp->Value);
+                    break;
+                case ObjectTypes.ValueTypeObjectReference:
+                    FreeStackValueType(esp);
+                    break;
             }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             esp->ObjectType = ObjectTypes.Null;
@@ -5317,6 +5363,7 @@ namespace ILRuntime.Runtime.Intepreter
                 var addr = ILIntepreter.ResolveReference(esp);
                 if (addr <= ValueTypeBasePointer)//Only Stack allocation after base pointer should be freed, local variable are freed automatically
                     stack.FreeValueTypeObject(esp);
+                esp->ObjectType = ObjectTypes.Null;
             }
         }
 

@@ -57,6 +57,12 @@ namespace ILRuntime.Runtime.Stack
             {
                 return valueTypePtr;
             }
+            set
+            {
+                if (value > ValueTypeStackBase)
+                    throw new StackOverflowException();
+                valueTypePtr = value;
+            }
         }
 
         public StackObject* ValueTypeStackBase
@@ -139,7 +145,7 @@ namespace ILRuntime.Runtime.Stack
             return ret;
         }
 
-        void RelocateValueType(StackObject* src, ref StackObject* dst, ref int mStackBase)
+        public void RelocateValueType(StackObject* src, ref StackObject* dst, ref int mStackBase)
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
             if (descriptor > dst)
@@ -345,19 +351,8 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public void FreeValueTypeObject(StackObject* esp)
+        public void RemoveManagedStackRange(int start, int end)
         {
-            if (esp->ObjectType != ObjectTypes.ValueTypeObjectReference)
-                return;
-            int start = int.MaxValue;
-            int end = int.MinValue;
-            StackObject* endAddr;
-            CountValueTypeManaged(esp, ref start, ref end, &endAddr);
-
-            if (endAddr == valueTypePtr)
-                valueTypePtr = ILIntepreter.ResolveReference(esp);
-            else
-                throw new NotSupportedException();
             if (start != int.MaxValue)
             {
                 if (end == managedStack.Count - 1)
@@ -373,7 +368,23 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)
+        public void FreeValueTypeObject(StackObject* esp)
+        {
+            if (esp->ObjectType != ObjectTypes.ValueTypeObjectReference)
+                return;
+            int start = int.MaxValue;
+            int end = int.MinValue;
+            StackObject* endAddr;
+            CountValueTypeManaged(esp, ref start, ref end, &endAddr);
+
+            if (endAddr == valueTypePtr)
+                valueTypePtr = ILIntepreter.ResolveReference(esp);
+            else
+                throw new NotSupportedException();
+            RemoveManagedStackRange(start, end);
+        }
+
+        public void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(esp);
             int cnt = descriptor->ValueLow;
