@@ -50,18 +50,14 @@ namespace ILRuntime.Runtime.Generated
 
         static void set_Struct_0(ref object o, object v)
         {
-            ILRuntimeTest.TestFramework.TestClass3 ins =(ILRuntimeTest.TestFramework.TestClass3)o;
-            ins.Struct = (ILRuntimeTest.TestFramework.TestStruct)v;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.TestClass3)o).Struct = (ILRuntimeTest.TestFramework.TestStruct)v;
         }
 
         static StackObject* AssignFromStack_Struct_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             ILRuntimeTest.TestFramework.TestStruct @Struct = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            ILRuntimeTest.TestFramework.TestClass3 ins =(ILRuntimeTest.TestFramework.TestClass3)o;
-            ins.Struct = @Struct;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.TestClass3)o).Struct = @Struct;
             return ptr_of_this_method;
         }
 

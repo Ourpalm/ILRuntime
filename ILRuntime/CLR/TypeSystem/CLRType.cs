@@ -368,6 +368,22 @@ namespace ILRuntime.CLR.TypeSystem
                 return false;
         }
 
+        public bool AssignFieldFromStack(int hash, ref object target, Runtime.Intepreter.ILIntepreter intp, StackObject* esp, IList<object> mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldBindingCache == null)
+                return false;
+            var binding = GetFieldBinding(hash);
+            if (binding.Value != null)
+            {
+                esp = binding.Value(ref target, intp, esp, mStack);
+                return true;
+            }
+            else
+                return false;
+        }
+
         public void SetStaticFieldValue(int hash, object value)
         {
             if (fieldMapping == null)

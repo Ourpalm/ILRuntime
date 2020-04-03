@@ -437,7 +437,7 @@ namespace ILRuntime.Runtime.Generated
                                                         info = CreateNewBindingInfo(t.TypeForCLR);
                                                         infos[t.TypeForCLR] = info;
                                                     }
-                                                    if(ins.Code == Intepreter.OpCodes.OpCodeEnum.Stfld || ins.Code == Intepreter.OpCodes.OpCodeEnum.Stsfld)
+                                                    if (ins.Code == Intepreter.OpCodes.OpCodeEnum.Stfld || ins.Code == Intepreter.OpCodes.OpCodeEnum.Stsfld)
                                                     {
                                                         if (t.IsValueType)
                                                         {
@@ -445,8 +445,7 @@ namespace ILRuntime.Runtime.Generated
                                                             info.DefaultInstanceNeeded = true;
                                                         }
                                                     }
-                                                    if (t.TypeForCLR.CheckCanPinn() || !t.IsValueType)
-                                                        info.Fields.Add(fi);
+                                                    info.Fields.Add(fi);
                                                 }
                                             }
                                         }

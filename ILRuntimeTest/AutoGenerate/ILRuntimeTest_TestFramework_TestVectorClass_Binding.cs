@@ -105,9 +105,7 @@ namespace ILRuntime.Runtime.Generated
 
         static void set_vector_0(ref object o, object v)
         {
-            ILRuntimeTest.TestFramework.TestVectorClass ins =(ILRuntimeTest.TestFramework.TestVectorClass)o;
-            ins.vector = (ILRuntimeTest.TestFramework.TestVector3)v;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.TestVectorClass)o).vector = (ILRuntimeTest.TestFramework.TestVector3)v;
         }
 
         static StackObject* AssignFromStack_vector_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
@@ -119,9 +117,7 @@ namespace ILRuntime.Runtime.Generated
             } else {
                 @vector = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             }
-            ILRuntimeTest.TestFramework.TestVectorClass ins =(ILRuntimeTest.TestFramework.TestVectorClass)o;
-            ins.vector = @vector;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.TestVectorClass)o).vector = @vector;
             return ptr_of_this_method;
         }
 

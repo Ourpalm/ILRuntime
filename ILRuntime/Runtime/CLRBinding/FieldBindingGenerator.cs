@@ -107,9 +107,14 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     else
                     {
-                        sb.AppendLine(string.Format("            {0} ins =({0})o;", typeClsName));
-                        sb.AppendLine(string.Format("            ins.{0} = ({1})v;", i.Name, realClsName));
-                        sb.AppendLine("            o = ins;");
+                        if (type.IsValueType)
+                        {
+                            sb.AppendLine(string.Format("            {0} ins =({0})o;", typeClsName));
+                            sb.AppendLine(string.Format("            ins.{0} = ({1})v;", i.Name, realClsName));
+                            sb.AppendLine("            o = ins;");
+                        }
+                        else
+                            sb.AppendLine(string.Format("            (({0})o).{1} = ({2})v;", typeClsName, i.Name, realClsName));
                     }
                     sb.AppendLine("        }");
                     sb.AppendLine();
@@ -123,9 +128,16 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     else
                     {
-                        sb.AppendLine(string.Format("            {0} ins =({0})o;", typeClsName));
-                        sb.AppendLine(string.Format("            ins.{0} = @{0};", i.Name));
-                        sb.AppendLine("            o = ins;");
+                        if (type.IsValueType)
+                        {
+                            sb.AppendLine(string.Format("            {0} ins =({0})o;", typeClsName));
+                            sb.AppendLine(string.Format("            ins.{0} = @{0};", i.Name));
+                            sb.AppendLine("            o = ins;");
+                        }
+                        else
+                        {
+                            sb.AppendLine(string.Format("            (({0})o).{1} = @{1};", typeClsName, i.Name));
+                        }
                     }
                     sb.AppendLine("            return ptr_of_this_method;");
                     sb.AppendLine("        }");

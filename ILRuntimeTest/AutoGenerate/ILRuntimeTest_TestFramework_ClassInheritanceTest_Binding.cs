@@ -190,18 +190,14 @@ namespace ILRuntime.Runtime.Generated
 
         static void set_TestVal2_0(ref object o, object v)
         {
-            ILRuntimeTest.TestFramework.ClassInheritanceTest ins =(ILRuntimeTest.TestFramework.ClassInheritanceTest)o;
-            ins.TestVal2 = (System.Int32)v;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2 = (System.Int32)v;
         }
 
         static StackObject* AssignFromStack_TestVal2_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Int32 @TestVal2 = ptr_of_this_method->Value;
-            ILRuntimeTest.TestFramework.ClassInheritanceTest ins =(ILRuntimeTest.TestFramework.ClassInheritanceTest)o;
-            ins.TestVal2 = @TestVal2;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2 = @TestVal2;
             return ptr_of_this_method;
         }
 

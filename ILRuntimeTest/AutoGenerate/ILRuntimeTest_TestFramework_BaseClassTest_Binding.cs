@@ -63,18 +63,14 @@ namespace ILRuntime.Runtime.Generated
 
         static void set_testField_0(ref object o, object v)
         {
-            ILRuntimeTest.TestFramework.BaseClassTest ins =(ILRuntimeTest.TestFramework.BaseClassTest)o;
-            ins.testField = (System.Boolean)v;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField = (System.Boolean)v;
         }
 
         static StackObject* AssignFromStack_testField_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Boolean @testField = ptr_of_this_method->Value == 1;
-            ILRuntimeTest.TestFramework.BaseClassTest ins =(ILRuntimeTest.TestFramework.BaseClassTest)o;
-            ins.testField = @testField;
-            o = ins;
+            ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField = @testField;
             return ptr_of_this_method;
         }
 
