@@ -3175,7 +3175,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            //PushNull(esp);
+                                            PushNull(esp);
                                             switch (objRef->ObjectType)
                                             {
                                                 case ObjectTypes.StaticFieldReference:
