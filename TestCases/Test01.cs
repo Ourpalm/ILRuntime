@@ -82,13 +82,25 @@ namespace TestCases
             sw.Reset();
             sw.Start();
             cnt = 0;
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 FuncCallResult(ref cnt, i);
             }
             sw.Stop();
 
             Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, cnt));
+
+            PerfTest test = new PerfTest();
+            sw.Reset();
+            sw.Start();
+            cnt = 0;
+            for (int i = 0; i < 1000000; i++)
+            {
+                test.FuncCallResult(ref cnt, i);
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, cnt));
+
         }
 
         public static void UnitTest_Performance3()
@@ -210,6 +222,13 @@ namespace TestCases
             cls.B = "ok";
         }
 
+        class PerfTest
+        {
+            public void FuncCallResult(ref int cnt, int i)
+            {
+                cnt++;
+            }
+        }
         static void FuncCallResult(ref int cnt, int i)
         {
             cnt++;
