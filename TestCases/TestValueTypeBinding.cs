@@ -285,5 +285,15 @@ namespace TestCases
         {
             pos.Y = 0;
         }
+
+        public static void UnitTest_10038()
+        {
+            TestVector3NoBinding rawPos = TestVector3NoBinding.zero;
+            rawPos.y = 1122333;
+
+            Console.WriteLine(rawPos.y);
+            if(rawPos.y != 1122333)
+                throw new AccessViolationException();
+        }
     }
 }

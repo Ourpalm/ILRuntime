@@ -1893,6 +1893,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         switch (objRef->ObjectType)
                                                         {
                                                             case ObjectTypes.Object:
+                                                                mStack[objRef->Value] = obj;
                                                                 break;
                                                             case ObjectTypes.FieldReference:
                                                                 {

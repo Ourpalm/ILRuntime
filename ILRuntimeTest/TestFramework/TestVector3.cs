@@ -10,6 +10,10 @@ namespace ILRuntimeTest.TestFramework
     {
         public float x, y, z;
 
+        static TestVector3NoBinding mZero = new TestVector3NoBinding(0, 0, 0);
+
+        public static TestVector3NoBinding zero => mZero;
+
         public TestVector3NoBinding(float x, float y, float z)
         {
             this.x = x;

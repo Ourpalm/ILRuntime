@@ -77,6 +77,7 @@ namespace ILRuntime.Runtime.Generated
             System_Math_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
+            System_Single_Binding.Register(app);
             System_Byte_Binding.Register(app);
             System_Char_Binding.Register(app);
             System_IO_File_Binding.Register(app);
@@ -94,7 +95,6 @@ namespace ILRuntime.Runtime.Generated
             System_Int32_Array3_Binding.Register(app);
             System_Int32_Array2_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass4_Binding.Register(app);
-            System_Single_Binding.Register(app);
             System_Nullable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.Register(app);
