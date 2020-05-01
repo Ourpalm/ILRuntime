@@ -66,6 +66,30 @@ namespace ILRuntimeTest.TestFramework
                 else
                     return mVMethod2.Invoke(instance);
             }
+            IMethod mVMethod3;
+            bool invoking;
+            public override void VMethod3(ref int arg)
+            {
+                if(mVMethod3 == null)
+                {
+                    mVMethod3 = instance.Type.GetMethod("VMethod3");
+                }
+                if (mVMethod3 != null && !invoking)
+                {
+                    invoking = true;
+                    using(var ctx = appdomain.BeginInvoke(mVMethod3))
+                    {
+                        ctx.PushInteger(arg);//byref
+                        ctx.PushObject(instance);
+                        ctx.PushReference(0);
+                        ctx.Invoke();
+                        arg = ctx.ReadInteger(0);
+                    }
+                    invoking = false;
+                }
+                else
+                    base.VMethod3(ref arg);
+            }
 
             protected override void AbMethod1()
             {

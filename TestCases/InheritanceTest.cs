@@ -132,6 +132,11 @@ namespace TestCases
             TestClass2 cls = new TestCls5();
             Console.WriteLine(cls.VMethod2());
             Console.WriteLine(cls.AbMethod2(122));
+            int val = 0;
+            cls.VMethod3(ref val);
+            if (val != 11)
+                throw new Exception();
+            Console.WriteLine(val);
         }
 
         public static void InheritanceTest08()
@@ -228,6 +233,11 @@ namespace TestCases
 
         class TestCls5 : TestClass2
         {
+            public override void VMethod3(ref int arg)
+            {
+                base.VMethod3(ref arg);
+                arg += 10;
+            }
             public override bool VMethod2()
             {
                 return base.VMethod2();

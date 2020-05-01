@@ -97,6 +97,7 @@ namespace ILRuntime.Runtime.Enviorment
     }
     public unsafe struct InvocationContext : IDisposable
     {
+        StackObject* ebp;
         StackObject* esp;
         AppDomain domain;
         ILIntepreter intp;
@@ -189,6 +190,7 @@ namespace ILRuntime.Runtime.Enviorment
             var stack = intp.Stack;
             mStack = stack.ManagedStack;
             esp = stack.StackBase;
+            ebp = esp;
             stack.ResetValueTypePointer();
 
             this.domain = intp.AppDomain;
@@ -270,6 +272,14 @@ namespace ILRuntime.Runtime.Enviorment
             paramCnt++;
         }
 
+        public void PushReference(int index)
+        {
+            var dst = ILIntepreter.Add(ebp, index);
+            esp->ObjectType = ObjectTypes.StackObjectReference;
+            *(long*)&esp->Value = (long)dst;
+            esp++;
+        }
+
         internal void PushParameter<T>(InvocationTypes type, T val)
         {
             switch (type)
@@ -336,6 +346,12 @@ namespace ILRuntime.Runtime.Enviorment
             CheckReturnValue();
             return esp->Value;
         }
+
+        public int ReadInteger(int index)
+        {
+            var esp = ILIntepreter.Add(ebp, index);
+            return esp->Value;
+        }
         public T ReadInteger<T>()
         {
             return PrimitiveConverter<T>.CheckAndInvokeFromInteger(ReadInteger());
@@ -346,7 +362,11 @@ namespace ILRuntime.Runtime.Enviorment
             CheckReturnValue();
             return *(long*)&esp->Value;
         }
-
+        public long ReadLong(int index)
+        {
+            var esp = ILIntepreter.Add(ebp, index);
+            return *(long*)&esp->Value;
+        }
         public T ReadLong<T>()
         {
             return PrimitiveConverter<T>.CheckAndInvokeFromLong(ReadLong());
@@ -355,6 +375,12 @@ namespace ILRuntime.Runtime.Enviorment
         public float ReadFloat()
         {
             CheckReturnValue();
+            return *(float*)&esp->Value;
+        }
+
+        public float ReadFloat(int index)
+        {
+            var esp = ILIntepreter.Add(ebp, index);
             return *(float*)&esp->Value;
         }
 
@@ -368,7 +394,11 @@ namespace ILRuntime.Runtime.Enviorment
             CheckReturnValue();
             return *(double*)&esp->Value;
         }
-
+        public double ReaDouble(int index)
+        {
+            var esp = ILIntepreter.Add(ebp, index);
+            return *(double*)&esp->Value;
+        }
         public T ReadDouble<T>()
         {
             return PrimitiveConverter<T>.CheckAndInvokeFromDouble(ReadDouble());
@@ -377,6 +407,11 @@ namespace ILRuntime.Runtime.Enviorment
         public bool ReadBool()
         {
             CheckReturnValue();
+            return esp->Value == 1;
+        }
+        public bool ReadBool(int index)
+        {
+            var esp = ILIntepreter.Add(ebp, index);
             return esp->Value == 1;
         }
 
@@ -390,6 +425,11 @@ namespace ILRuntime.Runtime.Enviorment
         {
             CheckReturnValue();
             return type.CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
+        }
+        public T ReadLong<T>(int index)
+        {
+            var esp = ILIntepreter.Add(ebp, index);
+            return (T)typeof(T).CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
         }
 
         public void Dispose()
