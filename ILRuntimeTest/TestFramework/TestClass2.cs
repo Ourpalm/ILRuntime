@@ -20,7 +20,7 @@ namespace ILRuntimeTest.TestFramework
 
         }
 
-        protected virtual bool VMethod2()
+        public virtual bool VMethod2()
         {
             return false;
         }

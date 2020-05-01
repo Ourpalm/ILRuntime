@@ -690,10 +690,14 @@ namespace ILRuntime.Runtime.Enviorment
             Name = name;
         }
 
-        public bool Invoking { get { return invoking; } set { invoking = value; } }
-
         protected virtual Type[] Parameters { get { return null; } }
         protected virtual Type ReturnType { get { return null; } }
+
+        public bool CheckShouldInvokeBase(ILTypeInstance ins)
+        {
+            EnsureMethod(ins);
+            return method == null || invoking;
+        }
 
         protected void EnsureMethod(ILTypeInstance ins)
         {
@@ -727,35 +731,6 @@ namespace ILRuntime.Runtime.Enviorment
                 domain.Invoke(method, instance, null);
                 invoking = false;
             }
-        }
-    }
-    public abstract class CrossBindingAdaptorTypeBase : CrossBindingAdaptorType
-    {
-        ILTypeInstance instance;
-        AppDomain appdomain;
-
-        public ILTypeInstance ILInstance => instance;
-
-        public CrossBindingAdaptorTypeBase()
-        {
-
-        }
-
-        public CrossBindingAdaptorTypeBase(AppDomain appdomain, ILTypeInstance instance)
-        {
-            this.appdomain = appdomain;
-            this.instance = instance;
-        }
-
-        public override string ToString()
-        {
-            var toString = instance.Type.ToStringMethod;
-            if (toString == null || toString is ILMethod)
-            {
-                return instance.ToString();
-            }
-            else
-                return instance.Type.FullName;
         }
     }
 }

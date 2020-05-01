@@ -130,6 +130,7 @@ namespace TestCases
         public static void InheritanceTest07()
         {
             TestClass2 cls = new TestCls5();
+            Console.WriteLine(cls.VMethod2());
             Console.WriteLine(cls.AbMethod2(122));
         }
 
@@ -227,6 +228,10 @@ namespace TestCases
 
         class TestCls5 : TestClass2
         {
+            public override bool VMethod2()
+            {
+                return base.VMethod2();
+            }
             public override float AbMethod2(int arg1)
             {
                 return arg1 + 1.2f;

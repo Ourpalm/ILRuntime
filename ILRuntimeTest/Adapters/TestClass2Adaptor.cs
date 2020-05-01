@@ -7,6 +7,10 @@ namespace ILRuntimeTest.TestFramework
 {   
     public class TestClass2Adaptor : CrossBindingAdaptor
     {
+        static CrossBindingMethodInfo mVMethod1 = new CrossBindingMethodInfo("VMethod1");
+        static CrossBindingFunctionInfo<bool> mVMethod2 = new CrossBindingFunctionInfo<bool>("VMethod2");
+        static CrossBindingMethodInfo mAMethod1 = new CrossBindingMethodInfo("AbMethod1");
+        static CrossBindingFunctionInfo<int, float> mAMethod2 = new CrossBindingFunctionInfo<int, float>("AbMethod2");
         public override Type BaseCLRType
         {
             get
@@ -47,82 +51,31 @@ namespace ILRuntimeTest.TestFramework
             public ILTypeInstance ILInstance { get { return instance; } }
 
             
-            IMethod mVMethod1;
-            bool isVMethod1Invoking = false;
-
             public override void VMethod1()
             {
-                if (mVMethod1 == null)
-                {
-                    mVMethod1 = instance.Type.GetMethod("VMethod1", 0);
-                }
-                if (mVMethod1 != null && !isVMethod1Invoking)
-                {
-                    isVMethod1Invoking = true;
-                    appdomain.Invoke(mVMethod1, instance );
-                    isVMethod1Invoking = false;
-                }
-                else
+                if (mVMethod1.CheckShouldInvokeBase(instance))
                     base.VMethod1();
-            }
-
-            IMethod mVMethod2;
-            bool isVMethod2Invoking = false;
-
-            protected override Boolean VMethod2()
-            {
-                if (mVMethod2 == null)
-                {
-                    mVMethod2 = instance.Type.GetMethod("VMethod2", 0);
-                }
-
-                if (mVMethod2 != null && !isVMethod2Invoking)
-                {
-                    isVMethod2Invoking = true;
-                    var res = (Boolean)appdomain.Invoke(mVMethod2, instance );
-                    isVMethod2Invoking = false;
-                    return res;
-                }
                 else
-                    return (Boolean)base.VMethod2();
+                    mVMethod1.Invoke(instance);
             }
 
-            IMethod mAbMethod1;
+            public override Boolean VMethod2()
+            {
+                if (mVMethod2.CheckShouldInvokeBase(instance))
+                    return base.VMethod2();
+                else
+                    return mVMethod2.Invoke(instance);
+            }
+
             protected override void AbMethod1()
             {
-                if(mAbMethod1 == null)
-                {
-                    mAbMethod1 = instance.Type.GetMethod("AbMethod1", 0);
-                }
-                if (mAbMethod1 != null)
-                    appdomain.Invoke(mAbMethod1, instance );
+                mAMethod1.Invoke(instance);
             }
 
-            IMethod mAbMethod2;
             public override Single AbMethod2(Int32 arg1)
             {
-                if(mAbMethod2 == null)
-                {
-                    mAbMethod2 = instance.Type.GetMethod("AbMethod2", 1);
-                }
-
-                if (mAbMethod2 != null)
-                {
-                    using(var ctx = appdomain.BeginInvoke(mAbMethod2))
-                    {
-                        ctx.PushObject(instance);
-                        ctx.PushInteger(arg1);
-                        ctx.Invoke();
-                        return ctx.ReadFloat();
-                    }                    
-                }
-                
-                return 0;
+                return mAMethod2.Invoke(instance, arg1);
             }
-
-
-
-            
             
             public override string ToString()
             {
