@@ -141,13 +141,16 @@ namespace TestCases
 
         public static void InheritanceTest08()
         {
-            AABase obj = new AABase();
-            obj.R = 1;
-            obj.R2 = 2;
+            using (AABase obj = new AABase())
+            {
+                obj.R = 1;
+                obj.R2 = 2;
 
-            var m = typeof(InheritanceTest).GetMethod("InheritanceTest08_Sub");
+                var m = typeof(InheritanceTest).GetMethod("InheritanceTest08_Sub");
 
-            m.Invoke(null, new object[] { obj });
+                m.Invoke(null, new object[] { obj });
+
+            }
         }
 
         static void InheritanceTest08_Sub(AABase obj)

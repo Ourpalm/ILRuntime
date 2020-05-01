@@ -711,9 +711,15 @@ namespace ILRuntime.Runtime.Enviorment
                 if (Parameters != null)
                 {
                     param = new List<IType>();
-                    foreach(var i in Parameters)
+                    foreach (var i in Parameters)
                     {
-                        param.Add(domain.GetType(i));
+                        if (i.IsByRef)
+                        {
+                            var type = domain.GetType(i.GetElementType());
+                            param.Add(type.MakeByRefType());
+                        }
+                        else
+                            param.Add(domain.GetType(i));
                     }
                 }
                 if (ReturnType != null)

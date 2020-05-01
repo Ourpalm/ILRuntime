@@ -245,6 +245,14 @@ namespace ILRuntimeTest
             btnRunSelect.Enabled = _selectItemArgs != null;
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(TestClass2), "ILRuntimeTest");
+            MessageBox.Show(msg);
+            msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(IDisposable), "ILRuntimeTest");
+            MessageBox.Show(msg);
+        }
+
         private void btnGenerateBinding_Click(object sender, EventArgs e)
         {
             /*List<Type> types = new List<Type>();
