@@ -833,7 +833,7 @@ namespace ILRuntime.Runtime.Enviorment
                 if (p != null)
                 {
                     object[] arr = (object[])p;
-                    for(int i = 0; i < ilmethod.ParameterCount; i++)
+                    for (int i = 0; i < ilmethod.ParameterCount; i++)
                     {
                         esp = ILIntepreter.PushObject(esp, mStack, CheckCrossBindingAdapter(arr[i]));
                     }
@@ -966,9 +966,9 @@ namespace ILRuntime.Runtime.Enviorment
                             else
                             {
                                 int val;
-                                if(int.TryParse(name, out val))
+                                if (int.TryParse(name, out val))
                                 {
-                                    if((int)f.Constant == val)
+                                    if ((int)f.Constant == val)
                                     {
                                         ILEnumTypeInstance ins = new ILEnumTypeInstance(it);
                                         ins[0] = f.Constant;
@@ -1016,7 +1016,7 @@ namespace ILRuntime.Runtime.Enviorment
                         var f = fields[i];
                         if (f.IsStatic)
                         {
-                            if(list == null)
+                            if (list == null)
                             {
                                 if (f.Constant is long)
                                 {
@@ -1102,7 +1102,7 @@ namespace ILRuntime.Runtime.Enviorment
             if (t is ILRuntimeType)
             {
                 ILType it = ((ILRuntimeType)t).ILType;
-                
+
                 List<string> res = new List<string>();
                 if (it.IsEnum)
                 {
@@ -1165,7 +1165,7 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return ILIntepreter.PushObject(ret, mStack, Enum.GetName(t, val), true);
         }
-
+#if NET_4_6 || NET_STANDARD_2_0
         public static StackObject* EnumHasFlag(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
@@ -1195,5 +1195,6 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return ILIntepreter.PushZero(ret);
         }
+#endif
     }
 }
