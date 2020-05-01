@@ -426,7 +426,7 @@ namespace ILRuntime.Runtime.Enviorment
             CheckReturnValue();
             return type.CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
         }
-        public T ReadLong<T>(int index)
+        public T ReadObject<T>(int index)
         {
             var esp = ILIntepreter.Add(ebp, index);
             return (T)typeof(T).CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
