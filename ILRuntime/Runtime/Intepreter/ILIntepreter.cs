@@ -169,7 +169,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
 
             stack.PushFrame(ref frame);
-            
+
             int locBase = mStack.Count;
             //Managed Stack reserved for local variable
             for (int i = 0; i < method.LocalVariableCount; i++)
@@ -1773,7 +1773,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         if (obj == null)
                                                             throw new NullReferenceException();
                                                         ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
-                                                    }                                                    
+                                                    }
                                                 }
                                                 esp = Execute(ilm, esp, out unhandledException);
                                                 ValueTypeBasePointer = bp;
@@ -2042,7 +2042,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         StackObject* fieldAddr;
                                         if (ft is ILType)
                                         {
-                                            fieldAddr = Minus(ILIntepreter.ResolveReference(objRef), (int)ip->TokenLong + 1);                                            
+                                            fieldAddr = Minus(ILIntepreter.ResolveReference(objRef), (int)ip->TokenLong + 1);
                                         }
                                         else
                                         {
@@ -2050,7 +2050,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         StackObject valRef = *dst;
                                         dst->ObjectType = ObjectTypes.StackObjectReference;
-                                        *(long*)&dst->Value = (long) fieldAddr;
+                                        *(long*)&dst->Value = (long)fieldAddr;
                                         FreeStackValueType(&valRef);
                                     }
                                     else
@@ -2438,7 +2438,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 stack.AllocValueType(esp, type);
                                                 objRef = esp + 1;
                                                 objRef->ObjectType = ObjectTypes.StackObjectReference;
-                                                *(long*)&objRef->Value = (long)esp; 
+                                                *(long*)&objRef->Value = (long)esp;
                                                 objRef++;
                                             }
                                             else
@@ -2930,7 +2930,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else
                                             {
-                                                if(objRef->ObjectType== ObjectTypes.ValueTypeObjectReference)
+                                                if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                                 {
                                                     dst = ILIntepreter.ResolveReference(objRef);
                                                     var vt = domain.GetType(dst->Value);
@@ -3210,7 +3210,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
                                         }
-                                        else if(type.IsPrimitive)
+                                        else if (type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
                                     }
 
@@ -3233,7 +3233,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 case ObjectTypes.Integer:
                                                     {
-                                                        if (tclr != typeof(int) && tclr != typeof(bool) && tclr != typeof(short) && tclr != typeof(byte) && tclr != typeof(ushort) && tclr !=typeof(uint))
+                                                        if (tclr != typeof(int) && tclr != typeof(bool) && tclr != typeof(short) && tclr != typeof(byte) && tclr != typeof(ushort) && tclr != typeof(uint))
                                                         {
                                                             oriRef->ObjectType = ObjectTypes.Null;
                                                             oriRef->Value = -1;
@@ -3360,7 +3360,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ILTypeInstance[] ilArr = (ILTypeInstance[])arr;
                                             if (type.IsValueType)
                                             {
-                                                for(int i = 0; i < cnt->Value; i++)
+                                                for (int i = 0; i < cnt->Value; i++)
                                                 {
                                                     ilArr[i] = ((ILType)type).Instantiate(true);
                                                 }
@@ -4240,7 +4240,7 @@ namespace ILRuntime.Runtime.Intepreter
             stack.AllocValueType(dst, AppDomain.GetType(descriptor->Value));
             StackObject* dstDescriptor = ILIntepreter.ResolveReference(dst);
             int cnt = descriptor->ValueLow;
-            for(int i = 0; i < cnt; i++)
+            for (int i = 0; i < cnt; i++)
             {
                 StackObject* val = Minus(descriptor, i + 1);
                 CopyToValueTypeField(dstDescriptor, i, val, mStack);
@@ -4262,7 +4262,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (!CanCastTo(descriptor, dstDescriptor))
                 throw new InvalidCastException();
             int cnt = descriptor->ValueLow;
-            for(int i = 0; i < cnt; i++)
+            for (int i = 0; i < cnt; i++)
             {
                 StackObject* srcVal = Minus(descriptor, i + 1);
                 StackObject* dstVal = Minus(dstDescriptor, i + 1);
@@ -4285,7 +4285,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void CopyValueTypeToStack(StackObject*dst, object ins, IList<object> mStack)
+        void CopyValueTypeToStack(StackObject* dst, object ins, IList<object> mStack)
         {
             if (ins is ILTypeInstance)
             {
@@ -4328,7 +4328,7 @@ namespace ILRuntime.Runtime.Intepreter
                         }
                         else
                         {
-                            mStack[dst->Value] = CheckAndCloneValueType(mStack[val->Value], domain);                            
+                            mStack[dst->Value] = CheckAndCloneValueType(mStack[val->Value], domain);
                         }
                     }
                     break;
@@ -4374,7 +4374,7 @@ namespace ILRuntime.Runtime.Intepreter
                             var ct = domain.GetType(dst->Value) as CLRType;
                             var binder = ct.ValueTypeBinder;
                             binder.CopyValueTypeToStack(obj, dst, mStack);
-                        }                            
+                        }
                     }
                     else
                     {
@@ -4422,7 +4422,7 @@ namespace ILRuntime.Runtime.Intepreter
                         else
                         {
                             var t = AppDomain.GetType(obj.GetType());
-                            obj = ((CLRType) t).GetFieldValue(idx, obj);
+                            obj = ((CLRType)t).GetFieldValue(idx, obj);
                         }
                     }
                     break;
@@ -5275,7 +5275,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (sbyte)obj;
-            }            
+            }
             else
                 throw new NotImplementedException();
         }
@@ -5313,7 +5313,14 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
             {
-                return PushNull(esp);
+                if (isBox)
+                {
+                    esp->ObjectType = ObjectTypes.Object;
+                    esp->Value = mStack.Count;
+                    mStack.Add(obj);
+                }
+                else
+                    return PushNull(esp);
             }
             return esp + 1;
         }
