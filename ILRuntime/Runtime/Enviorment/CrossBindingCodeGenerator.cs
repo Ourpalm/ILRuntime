@@ -7,17 +7,27 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
 using System.Reflection;
 using System.Data.SqlTypes;
+using System.Threading;
 
 namespace ILRuntime.Runtime.Enviorment
 {
     public class CrossBindingCodeGenerator
     {
+        class PropertyGenerateInfo
+        {
+            public string Name;
+            public Type ReturnType;
+            public string GetterBody;
+            public string SettingBody;
+            public string Modifier;
+            public string OverrideString;
+        }
         public static string GenerateCrossBindingAdapterCode(Type baseType, string nameSpace)
         {
             StringBuilder sb = new StringBuilder();
             MethodInfo[] methods = baseType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             List<MethodInfo> virtMethods = new List<MethodInfo>();
-            foreach(var i in methods)
+            foreach (var i in methods)
             {
                 if (i.IsVirtual || i.IsAbstract || baseType.IsInterface)
                     virtMethods.Add(i);
@@ -102,10 +112,39 @@ namespace ");
         static void GenerateCrossBindingMethodBody(StringBuilder sb, List<MethodInfo> virtMethods)
         {
             int index = 0;
+            Dictionary<string, PropertyGenerateInfo> pendingProperties = new Dictionary<string, PropertyGenerateInfo>();
             foreach (var i in virtMethods)
             {
                 if (ShouldSkip(i))
                     continue;
+                bool isProperty = i.IsSpecialName && (i.Name.StartsWith("get_") || i.Name.StartsWith("set_"));
+                PropertyGenerateInfo pInfo = null;
+                bool isGetter = false;
+                StringBuilder oriBuilder = null;
+                if (isProperty)
+                {
+                    string pName = i.Name.Substring(4);
+                    isGetter = i.Name.StartsWith("get_");
+                    oriBuilder = sb;
+                    sb = new StringBuilder();
+                    if (!pendingProperties.TryGetValue(pName, out pInfo))
+                    {
+                        pInfo = new PropertyGenerateInfo();
+                        pInfo.Name = pName;
+                        pendingProperties[pName] = pInfo;
+                    }
+                    if (pInfo.ReturnType == null)
+                    {
+                        if (isGetter)
+                        {
+                            pInfo.ReturnType = i.ReturnType;
+                        }
+                        else
+                        {
+                            pInfo.ReturnType = i.GetParameters()[0].ParameterType;
+                        }
+                    }
+                }
                 var param = i.GetParameters();
                 string modifier = i.IsFamily ? "protected" : "public";
                 string overrideStr = i.DeclaringType.IsInterface ? "" : "override ";
@@ -119,15 +158,34 @@ namespace ");
                 }
                 else
                     realClsName = "void";
-
-                sb.Append(string.Format("            {0} {3}{1} {2}(", modifier, realClsName, i.Name, overrideStr));
-                GetParameterDefinition(sb, param, true);
-                sb.AppendLine(@")
+                if (!isProperty)
+                {
+                    sb.Append(string.Format("            {0} {3}{1} {2}(", modifier, realClsName, i.Name, overrideStr));
+                    GetParameterDefinition(sb, param, true);
+                    sb.AppendLine(@")
             {");
+                }
+                else
+                {
+                    pInfo.Modifier = modifier;
+                    pInfo.OverrideString = overrideStr;
+                }
                 if (!i.IsAbstract)
                 {
                     sb.AppendLine(string.Format("                if (m{0}_{1}.CheckShouldInvokeBase(this.instance))", i.Name, index));
-                    sb.AppendLine(string.Format("                    {2}base.{0}({1});", i.Name, GetParameterName(param, true), returnString));
+                    if (isProperty)
+                    {
+                        if (isGetter)
+                        {
+                            sb.AppendLine(string.Format("                    return base.{0};", i.Name.Substring(4)));
+                        }
+                        else
+                        {
+                            sb.AppendLine(string.Format("                    base.{0} = value;", i.Name.Substring(4)));
+                        }
+                    }
+                    else
+                        sb.AppendLine(string.Format("                    {2}base.{0}({1});", i.Name, GetParameterName(param, true), returnString));
                     sb.AppendLine("                else");
                     sb.AppendLine(string.Format("                    {3}m{0}_{1}.Invoke(this.instance{2});", i.Name, index, GetParameterName(param, false), returnString));
                 }
@@ -135,9 +193,52 @@ namespace ");
                 {
                     sb.AppendLine(string.Format("                {3}m{0}_{1}.Invoke(this.instance{2});", i.Name, index, GetParameterName(param, false), returnString));
                 }
+                if (isProperty)
+                {
+                    if (isGetter)
+                    {
+                        pInfo.GetterBody = sb.ToString();
+                    }
+                    else
+                    {
+                        pInfo.SettingBody = sb.ToString();
+                    }
+                    sb = oriBuilder;
+                }
+                else
+                {
+                    sb.AppendLine("            }");
+                    sb.AppendLine();
+                }
+                index++;
+            }
+
+            foreach (var i in pendingProperties)
+            {
+                var pInfo = i.Value;
+                string clsName, realClsName;
+                bool isByRef;
+                pInfo.ReturnType.GetClassName(out clsName, out realClsName, out isByRef, true);
+                sb.AppendLine(string.Format("            {0} {3}{1} {2}", pInfo.Modifier, realClsName, pInfo.Name, pInfo.OverrideString));
+                sb.AppendLine("            {");
+                if (!string.IsNullOrEmpty(pInfo.GetterBody))
+                {
+                    sb.AppendLine("            get");
+                    sb.AppendLine("            {");
+                    sb.AppendLine(pInfo.GetterBody);
+                    sb.AppendLine("            }");
+
+                }
+                if (!string.IsNullOrEmpty(pInfo.SettingBody))
+                {
+                    sb.AppendLine("            set");
+                    sb.AppendLine("            {");
+                    sb.AppendLine(pInfo.SettingBody);
+                    sb.AppendLine("            }");
+
+                }
                 sb.AppendLine("            }");
                 sb.AppendLine();
-                index++;
             }
         }
 
@@ -184,7 +285,7 @@ namespace ");
         {
             StringBuilder sb = new StringBuilder();
             bool first = true;
-            foreach(var i in param)
+            foreach (var i in param)
             {
                 if (!first)
                     sb.Append(", ");
@@ -195,7 +296,7 @@ namespace ");
                 i.ParameterType.GetClassName(out clsName, out realClsName, out isByRef, true);
                 sb.Append(realClsName);
             }
-            if(returnType != typeof(void))
+            if (returnType != typeof(void))
             {
                 if (!first)
                     sb.Append(", ");
@@ -242,7 +343,7 @@ namespace ");
         {
             if (param.Length > 5)
                 return true;
-            foreach(var i in param)
+            foreach (var i in param)
             {
                 if (i.IsOut || i.ParameterType.IsByRef)
                     return true;
@@ -253,7 +354,7 @@ namespace ");
         static string GetParameterName(ParameterInfo[] param, bool first)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             foreach (var p in param)
             {
                 if (!first)
