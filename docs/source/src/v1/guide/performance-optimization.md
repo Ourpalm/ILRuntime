@@ -53,3 +53,18 @@ void Update()
 ```
 
 通过缓存IMethod实例以及参数列表数组，可以做到这个Update操作不会产生任何额外的GC Alloc，并且以最高的性能来执行
+
+如果需要传递的参数或返回值中包含int, float等基础类型，那使用上面的方法依然无法消除GC Alloc，为了更高效率的调用，ILRuntime提供了InvocationContext这种调用方式，需要按照如下方式调用
+```csharp
+int result = 0;
+using(var ctx = appdomain.BeginInvoke(m))
+{
+    //依次将参数压入栈，如果为成员方法，第一个参数固定为对象实例
+    ctx.PushObject(this);
+	ctx.PushInteger(123);
+	//开始调用
+	ctx.Invoke();
+	//调用完毕后使用对应的Read方法获取返回值
+	result = ctx.ReadInteger();
+}
+```
