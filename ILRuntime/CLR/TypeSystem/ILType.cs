@@ -477,16 +477,21 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     else
                         fullName = typeRef.FullName;
-                    if (typeRef.IsNested)
-                    {
-                        fullNameForNested = fullName.Replace("/", ".");
-                    }
-                    else
-                        fullNameForNested = fullName;
                 }
                 return fullName;
             }
         }
+
+        public string FullNameForNested
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(fullNameForNested))
+                    fullNameForNested = typeRef.IsNested ? FullName.Replace("/", ".") : FullName;
+                return fullNameForNested;
+            }
+        }
+
         public string Name
         {
             get
@@ -713,15 +718,19 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
-            var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
-            if (m == null && method.DeclearingType.IsInterface)
+            IMethod m = null;
+            if (method.DeclearingType.IsInterface)
             {
-                if(method.DeclearingType is ILType iltype)
+                if (method.DeclearingType is ILType iltype)
                 {
-                    m = GetMethod(string.Format("{0}.{1}", iltype.fullNameForNested, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+                    m = GetMethod(string.Format("{0}.{1}", iltype.FullNameForNested, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
                 }
                 else
                     m = GetMethod(string.Format("{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+            }
+            if(m == null)
+            {
+                m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
             }
 
             if (m == null)
