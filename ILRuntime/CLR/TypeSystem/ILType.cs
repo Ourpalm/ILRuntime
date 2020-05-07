@@ -716,8 +716,9 @@ namespace ILRuntime.CLR.TypeSystem
             var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
             if (m == null && method.DeclearingType.IsInterface)
             {
-                if(method.DeclearingType is ILType iltype)
+                if(method.DeclearingType is ILType)
                 {
+                    ILType iltype = (ILType)method.DeclearingType;
                     m = GetMethod(string.Format("{0}.{1}", iltype.fullNameForNested, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
                 }
                 else
