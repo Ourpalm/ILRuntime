@@ -6,7 +6,6 @@ using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
 using System.Reflection;
-using System.Data.SqlTypes;
 using System.Threading;
 
 namespace ILRuntime.Runtime.Enviorment
