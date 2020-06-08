@@ -49,6 +49,21 @@ namespace TestCases
             });
             Console.WriteLine($"TestRunSub1 complete");
         }
+        public async static Task TestRun4()
+        {
+            Console.WriteLine("Load 1");
+            await TestLoad("Load 1 complete");
+            Console.WriteLine("Load 2");
+            await TestLoad("Load 2 complete");
+            Console.WriteLine("Load 3");
+            await TestLoad("Load 3 complete");
+
+        }
+        static async Task TestLoad(string msg)
+        {
+            await Task.Delay(1000);
+            Console.WriteLine(msg);
+        }
 
         public static async Task<int> TestRun2()
         {
