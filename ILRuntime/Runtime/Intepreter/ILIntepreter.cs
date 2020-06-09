@@ -161,7 +161,8 @@ namespace ILRuntime.Runtime.Intepreter
                     case ObjectTypes.FieldReference:
                     case ObjectTypes.ArrayReference:
                         {
-                            mStack[a->Value] = CheckAndCloneValueType(mStack[a->Value], AppDomain);
+                            if (i > 0 || !method.HasThis)//this instance should not be cloned
+                                mStack[a->Value] = CheckAndCloneValueType(mStack[a->Value], AppDomain);
                         }
                         frame.ManagedStackBase--;
                         break;
