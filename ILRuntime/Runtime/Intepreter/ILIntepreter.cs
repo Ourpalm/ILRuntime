@@ -134,6 +134,13 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 arg--;
                 paramCnt++;
+/// 为确保性能，暂时先确保开发的时候，安全检查完备。
+/// 当然手机端运行时可能会出现为空的类对象可正常调用成员函数，导致成员函数里面访问成员变量报错时可能使得根据Log跟踪BUG时方向错误。
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                var thisObj = RetriveObject(arg, mStack);
+                if (thisObj == null)
+                    throw new NullReferenceException();
+#endif
             }
             unhandledException = false;
             StackObject* objRef, objRef2, dst, val, a, b, arrRef;
