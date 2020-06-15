@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -30,30 +31,36 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_2);
-            args = new Type[]{typeof(System.Int64)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_3);
-            args = new Type[]{typeof(System.Boolean)};
-            method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_4);
-            args = new Type[]{typeof(System.String)};
-            method = type.GetMethod("Write", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Write_5);
             args = new Type[]{typeof(System.Object)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WriteLine_6);
+            app.RegisterCLRMethodRedirection(method, WriteLine_3);
+            args = new Type[]{typeof(System.Int64)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_4);
+            args = new Type[]{typeof(System.Boolean)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_5);
+            args = new Type[]{typeof(System.String)};
+            method = type.GetMethod("Write", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, Write_6);
             args = new Type[]{typeof(System.Single)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_7);
-            args = new Type[]{typeof(System.UInt32)};
+            args = new Type[]{typeof(System.Char)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_8);
-            args = new Type[]{typeof(System.UInt64)};
+            args = new Type[]{typeof(System.UInt32)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_9);
-            args = new Type[]{typeof(System.String), typeof(System.Object[])};
+            args = new Type[]{typeof(System.UInt64)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_10);
+            args = new Type[]{typeof(System.String), typeof(System.Object[])};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_11);
+            args = new Type[]{typeof(System.Double)};
+            method = type.GetMethod("WriteLine", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, WriteLine_12);
 
 
         }
@@ -117,7 +124,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int64 @value = *(long*)&ptr_of_this_method->Value;
+            System.Object @value = (System.Object)typeof(System.Object).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
 
             System.Console.WriteLine(@value);
@@ -132,6 +140,21 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int64 @value = *(long*)&ptr_of_this_method->Value;
+
+
+            System.Console.WriteLine(@value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             System.Boolean @value = ptr_of_this_method->Value == 1;
 
 
@@ -140,7 +163,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Write_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Write_6(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -152,22 +175,6 @@ namespace ILRuntime.Runtime.Generated
 
 
             System.Console.Write(@value);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_6(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object @value = (System.Object)typeof(System.Object).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-
-            System.Console.WriteLine(@value);
 
             return __ret;
         }
@@ -194,7 +201,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.UInt32 @value = (uint)ptr_of_this_method->Value;
+            System.Char @value = (char)ptr_of_this_method->Value;
 
 
             System.Console.WriteLine(@value);
@@ -209,7 +216,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.UInt64 @value = *(ulong*)&ptr_of_this_method->Value;
+            System.UInt32 @value = (uint)ptr_of_this_method->Value;
 
 
             System.Console.WriteLine(@value);
@@ -218,6 +225,21 @@ namespace ILRuntime.Runtime.Generated
         }
 
         static StackObject* WriteLine_10(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.UInt64 @value = *(ulong*)&ptr_of_this_method->Value;
+
+
+            System.Console.WriteLine(@value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_11(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -233,6 +255,21 @@ namespace ILRuntime.Runtime.Generated
 
 
             System.Console.WriteLine(@format, @arg);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_12(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Double @value = *(double*)&ptr_of_this_method->Value;
+
+
+            System.Console.WriteLine(@value);
 
             return __ret;
         }

@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-using Mono.Cecil;
+using ILRuntime.Mono.Cecil;
 using ILRuntime.CLR.Method;
 using ILRuntime.Reflection;
 using ILRuntime.Runtime.Enviorment;
+using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.CLR.TypeSystem
 {
-    public class CLRType : IType
+    public unsafe class CLRType : IType
     {
         Type clrType;
-        bool isPrimitive, isValueType;
+        bool isPrimitive, isValueType, isEnum;
         Dictionary<string, List<CLRMethod>> methods;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         List<CLRMethod> constructors;
@@ -24,6 +25,8 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, FieldInfo> fieldInfoCache;
         Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
         Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
+        Dictionary<int, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>> fieldBindingCache;
+
         Dictionary<int, int> fieldIdxMapping;
         IType[] orderedFieldTypes;
 
@@ -95,6 +98,7 @@ namespace ILRuntime.CLR.TypeSystem
             this.clrType = clrType;
             this.appdomain = appdomain;
             isPrimitive = clrType.IsPrimitive;
+            isEnum = clrType.IsEnum;
             isValueType = clrType.IsValueType;
             isDelegate = clrType.BaseType == typeof(MulticastDelegate);
         }
@@ -121,6 +125,16 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
+                if (genericArguments != null)
+                {
+                    foreach(var i in genericArguments)
+                    {
+                        if(i.Value is ILType && i.Value.HasGenericParameter)
+                        {
+                            return true;
+                        }
+                    }
+                }
                 return clrType.ContainsGenericParameters;
             }
         }
@@ -209,6 +223,14 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return isPrimitive;
+            }
+        }
+
+        public bool IsEnum
+        {
+            get
+            {
+                return isEnum;
             }
         }
         public string FullName
@@ -330,6 +352,38 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
+        public bool CopyFieldToStack(int hash, object target, Runtime.Intepreter.ILIntepreter intp, ref StackObject* esp, IList<object> mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldBindingCache == null)
+                return false;
+            var binding = GetFieldBinding(hash);
+            if (binding.Key != null)
+            {
+                esp = binding.Key(ref target, intp, esp, mStack);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool AssignFieldFromStack(int hash, ref object target, Runtime.Intepreter.ILIntepreter intp, StackObject* esp, IList<object> mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldBindingCache == null)
+                return false;
+            var binding = GetFieldBinding(hash);
+            if (binding.Value != null)
+            {
+                esp = binding.Value(ref target, intp, esp, mStack);
+                return true;
+            }
+            else
+                return false;
+        }
+
         public void SetStaticFieldValue(int hash, object value)
         {
             if (fieldMapping == null)
@@ -367,6 +421,18 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 fieldInfo.SetValue(target, value);
             }
+        }
+
+        KeyValuePair<CLRFieldBindingDelegate,CLRFieldBindingDelegate> GetFieldBinding(int hash)
+        {
+            var dic = fieldBindingCache;
+            KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate> res;
+            if (dic != null && dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetFieldBinding(hash);
+            else
+                return default(KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>);
         }
 
         private CLRFieldGetterDelegate GetFieldGetter(int hash)
@@ -462,6 +528,9 @@ namespace ILRuntime.CLR.TypeSystem
             if (hasValueTypeBinder)
             {
                 fieldIdxMapping = new Dictionary<int, int>();
+            }
+            if (hasValueTypeBinder || isEnum)
+            {
                 orderedFieldTypes = new IType[fields.Length];
             }
             foreach (var i in fields)
@@ -473,10 +542,13 @@ namespace ILRuntime.CLR.TypeSystem
                     fieldMapping[i.Name] = hashCode;
                     fieldInfoCache[hashCode] = i;
                 }
-                if (hasValueTypeBinder && !i.IsStatic)
+                if ((hasValueTypeBinder || isEnum) && !i.IsStatic)
                 {
                     orderedFieldTypes[idx] = appdomain.GetType(i.FieldType);
-                    fieldIdxMapping[hashCode] = idx++;
+                    if (hasValueTypeBinder)
+                        fieldIdxMapping[hashCode] = idx++;
+                    else
+                        idx++;
                 }
 
                 CLRFieldGetterDelegate getter;
@@ -492,6 +564,17 @@ namespace ILRuntime.CLR.TypeSystem
                     if (fieldSetterCache == null) fieldSetterCache = new Dictionary<int, CLRFieldSetterDelegate>();
                     fieldSetterCache[hashCode] = setter;
                 }
+
+                KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate> binding;
+                if(AppDomain.FieldBindingMap.TryGetValue(i, out binding))
+                {
+                    if (fieldBindingCache == null) fieldBindingCache = new Dictionary<int, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>>();
+                    fieldBindingCache[hashCode] = binding;
+                }
+            }
+            if (orderedFieldTypes != null)
+            {
+                Array.Resize(ref orderedFieldTypes, idx);
             }
         }
         public int GetFieldIndex(object token)
@@ -541,6 +624,72 @@ namespace ILRuntime.CLR.TypeSystem
             return null;
         }
 
+        bool MatchGenericParameters(Type[] args, Type type, Type q, IType[] genericArguments)
+        {
+            if (type.IsGenericParameter)
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] == type)
+                    {
+                        return q == genericArguments[i].TypeForCLR;
+                    }
+                }
+                throw new NotSupportedException();
+            }
+            else
+            {
+                if (type.IsArray)
+                {
+                    if (q.IsArray)
+                    {
+                        return MatchGenericParameters(args, type.GetElementType(), q.GetElementType(), genericArguments);
+                    }
+                    else
+                        return false;
+                }
+                else if (type.IsByRef)
+                {
+                    if (q.IsByRef)
+                    {
+                        return MatchGenericParameters(args, type.GetElementType(), q.GetElementType(), genericArguments);
+                    }
+                    else
+                        return false;
+                }
+                else if (type.IsGenericType)
+                {
+                    if (q.IsGenericType)
+                    {
+                        var t1 = type.GetGenericTypeDefinition();
+                        var t2 = type.GetGenericTypeDefinition();
+                        if (t1 == t2)
+                        {
+                            var argA = type.GetGenericArguments();
+                            var argB = q.GetGenericArguments();
+                            if (argA.Length == argB.Length)
+                            {
+                                for (int i = 0; i < argA.Length; i++)
+                                {
+                                    if (!MatchGenericParameters(args, argA[i], argB[i], genericArguments))
+                                        return false;
+                                }
+                                return true;
+                            }
+                            else
+                                return false;
+                        }
+                        else
+                            return false;
+                    }
+                    else
+                        return false;
+                }
+                else
+                    return type == q;
+            }
+        }
+
         public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null, bool declaredOnly = false)
         {
             if (methods == null)
@@ -564,7 +713,13 @@ namespace ILRuntime.CLR.TypeSystem
                                 if (i.Parameters[j].HasGenericParameter)
                                 {
                                     //TODO should match the generic parameters;
-                                    continue;
+                                    if (!MatchGenericParameters(i.GenericArgumentsCLR, i.ParametersCLR[j].ParameterType, q, genericArguments))
+                                    {
+                                        match = false;
+                                        break;
+                                    }
+                                    else
+                                        continue;
                                 }
                                 if (q != p)
                                 {
@@ -588,6 +743,8 @@ namespace ILRuntime.CLR.TypeSystem
                                 else
                                     match = i.GenericArguments.Length == genericArguments.Length;
                             }
+                            if (!match)
+                                continue;
                             for (int j = 0; j < param.Count; j++)
                             {
                                 var typeA = param[j].TypeForCLR.IsByRef ? param[j].TypeForCLR.GetElementType() : param[j].TypeForCLR;

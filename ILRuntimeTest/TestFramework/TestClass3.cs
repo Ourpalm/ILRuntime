@@ -23,6 +23,11 @@ namespace ILRuntimeTest.TestFramework
             a = 1;
             b = 2;
         }
+
+        public void TestArrayOut(out TestStruct[] arr)
+        {
+            arr = new TestStruct[10];
+        }
     }
 
     public struct TestStruct

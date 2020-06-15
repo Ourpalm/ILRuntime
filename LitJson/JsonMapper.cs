@@ -431,6 +431,7 @@ namespace LitJson
                     if (item == null && reader.Token == JsonToken.ArrayEnd)
                         break;
                     var rt = elem_type is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)elem_type).RealType : elem_type;
+                    rt = elem_type is ILRuntime.Reflection.ILRuntimeType ? ((ILRuntime.Reflection.ILRuntimeType)elem_type).ILType.TypeForCLR : elem_type;
                     item = rt.CheckCLRTypes(item);
                     list.Add (item);
                 }
@@ -450,8 +451,11 @@ namespace LitJson
                 if (value_type is ILRuntime.Reflection.ILRuntimeType)
                     instance = ((ILRuntime.Reflection.ILRuntimeType)value_type).ILType.Instantiate();
                 else
+                {
+                    if (value_type is ILRuntime.Reflection.ILRuntimeWrapperType)
+                        value_type = ((ILRuntime.Reflection.ILRuntimeWrapperType)value_type).RealType;
                     instance = Activator.CreateInstance(value_type);
-                
+                }
                 while (true) {
                     reader.Read ();
 

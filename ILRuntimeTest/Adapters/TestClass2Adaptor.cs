@@ -3,15 +3,62 @@ using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 
-namespace ILRuntimeTest.TestFramework
-{   
-    public class TestClass2Adaptor : CrossBindingAdaptor
+namespace ILRuntimeTest
+{
+    public class TestClass2Adapter : CrossBindingAdaptor
     {
+        static CrossBindingMethodInfo mVMethod1_0 = new CrossBindingMethodInfo("VMethod1");
+        static CrossBindingFunctionInfo<System.Boolean> mVMethod2_1 = new CrossBindingFunctionInfo<System.Boolean>("VMethod2");
+        class VMethod3_2Info : CrossBindingMethodInfo
+        {
+            static Type[] pTypes = new Type[] { typeof(System.Int32).MakeByRefType() };
+
+            public VMethod3_2Info()
+                : base("VMethod3")
+            {
+
+            }
+
+            protected override Type ReturnType { get { return null; } }
+
+            protected override Type[] Parameters { get { return pTypes; } }
+            public void Invoke(ILTypeInstance instance, ref System.Int32 arg)
+            {
+                EnsureMethod(instance);
+                if (method != null)
+                {
+                    invoking = true;
+                    try
+                    {
+                        using (var ctx = domain.BeginInvoke(method))
+                        {
+                            ctx.PushObject(arg);
+                            ctx.PushObject(instance);
+                            ctx.PushReference(0);
+                            ctx.Invoke();
+                            arg = ctx.ReadObject<System.Int32>(0);
+                        }
+                    }
+                    finally
+                    {
+                        invoking = false;
+                    }
+                }
+            }
+
+            public override void Invoke(ILTypeInstance instance)
+            {
+                throw new NotSupportedException();
+            }
+        }
+        static VMethod3_2Info mVMethod3_2 = new VMethod3_2Info();
+        static CrossBindingMethodInfo mAbMethod1_3 = new CrossBindingMethodInfo("AbMethod1");
+        static CrossBindingFunctionInfo<System.Int32, System.Single> mAbMethod2_4 = new CrossBindingFunctionInfo<System.Int32, System.Single>("AbMethod2");
         public override Type BaseCLRType
         {
             get
             {
-                return typeof(TestClass2);
+                return typeof(ILRuntimeTest.TestFramework.TestClass2);
             }
         }
 
@@ -19,26 +66,26 @@ namespace ILRuntimeTest.TestFramework
         {
             get
             {
-                return typeof(Adaptor);
+                return typeof(Adapter);
             }
         }
 
         public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
         {
-            return new Adaptor(appdomain, instance);
+            return new Adapter(appdomain, instance);
         }
 
-        internal class Adaptor : TestClass2, CrossBindingAdaptorType
+        public class Adapter : ILRuntimeTest.TestFramework.TestClass2, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
 
-            public Adaptor()
+            public Adapter()
             {
 
             }
 
-            public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+            public Adapter(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
             {
                 this.appdomain = appdomain;
                 this.instance = instance;
@@ -46,84 +93,40 @@ namespace ILRuntimeTest.TestFramework
 
             public ILTypeInstance ILInstance { get { return instance; } }
 
-            
-            IMethod mVMethod1;
-            bool isVMethod1Invoking = false;
-
             public override void VMethod1()
             {
-                if (mVMethod1 == null)
-                {
-                    mVMethod1 = instance.Type.GetMethod("VMethod1", 0);
-                }
-                if (mVMethod1 != null && !isVMethod1Invoking)
-                {
-                    isVMethod1Invoking = true;
-                    appdomain.Invoke(mVMethod1, instance );
-                    isVMethod1Invoking = false;
-                }
-                else
+                if (mVMethod1_0.CheckShouldInvokeBase(this.instance))
                     base.VMethod1();
-            }
-
-            IMethod mVMethod2;
-            bool isVMethod2Invoking = false;
-
-            protected override Boolean VMethod2()
-            {
-                if (mVMethod2 == null)
-                {
-                    mVMethod2 = instance.Type.GetMethod("VMethod2", 0);
-                }
-
-                if (mVMethod2 != null && !isVMethod2Invoking)
-                {
-                    isVMethod2Invoking = true;
-                    var res = (Boolean)appdomain.Invoke(mVMethod2, instance );
-                    isVMethod2Invoking = false;
-                    return res;
-                }
                 else
-                    return (Boolean)base.VMethod2();
+                    mVMethod1_0.Invoke(this.instance);
             }
 
-            IMethod mAbMethod1;
+            public override System.Boolean VMethod2()
+            {
+                if (mVMethod2_1.CheckShouldInvokeBase(this.instance))
+                    return base.VMethod2();
+                else
+                    return mVMethod2_1.Invoke(this.instance);
+            }
+
+            public override void VMethod3(ref System.Int32 arg)
+            {
+                if (mVMethod3_2.CheckShouldInvokeBase(this.instance))
+                    base.VMethod3(ref arg);
+                else
+                    mVMethod3_2.Invoke(this.instance, ref arg);
+            }
+
             protected override void AbMethod1()
             {
-                if(mAbMethod1 == null)
-                {
-                    mAbMethod1 = instance.Type.GetMethod("AbMethod1", 0);
-                }
-                if (mAbMethod1 != null)
-                    appdomain.Invoke(mAbMethod1, instance );
+                mAbMethod1_3.Invoke(this.instance);
             }
 
-            IMethod mAbMethod2;
-            public override Single AbMethod2(Int32 arg1)
+            public override System.Single AbMethod2(System.Int32 arg1)
             {
-                if(mAbMethod2 == null)
-                {
-                    mAbMethod2 = instance.Type.GetMethod("AbMethod2", 1);
-                }
-
-                if (mAbMethod2 != null)
-                {
-                    using(var ctx = appdomain.BeginInvoke(mAbMethod2))
-                    {
-                        ctx.PushObject(instance);
-                        ctx.PushInteger(arg1);
-                        ctx.Invoke();
-                        return ctx.ReadFloat();
-                    }                    
-                }
-                
-                return 0;
+                return mAbMethod2_4.Invoke(this.instance, arg1);
             }
 
-
-
-            
-            
             public override string ToString()
             {
                 IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
@@ -138,13 +141,14 @@ namespace ILRuntimeTest.TestFramework
         }
     }
 
-    public class IDisposableClassInheritanceAdaptor : CrossBindingAdaptor
+    public class IDisposableAdapter : CrossBindingAdaptor
     {
+        static CrossBindingMethodInfo mDispose_0 = new CrossBindingMethodInfo("Dispose");
         public override Type BaseCLRType
         {
             get
             {
-                return typeof(IDisposable);
+                return typeof(System.IDisposable);
             }
         }
 
@@ -152,64 +156,49 @@ namespace ILRuntimeTest.TestFramework
         {
             get
             {
-                return typeof(IDisposableAdaptor);
+                return typeof(Adapter);
             }
         }
 
         public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
         {
-            return new IDisposableAdaptor(appdomain, instance);
+            return new Adapter(appdomain, instance);
         }
 
-        public class IDisposableAdaptor : IDisposable, CrossBindingAdaptorType
+        public class Adapter : System.IDisposable, CrossBindingAdaptorType
         {
-            private ILTypeInstance instance;
-            private ILRuntime.Runtime.Enviorment.AppDomain appDomain;
+            ILTypeInstance instance;
+            ILRuntime.Runtime.Enviorment.AppDomain appdomain;
 
-            private IMethod iDisposable;
-            private readonly object[] param0 = new object[0];
-
-            public IDisposableAdaptor()
+            public Adapter()
             {
+
             }
 
-            public IDisposableAdaptor(ILRuntime.Runtime.Enviorment.AppDomain appDomain, ILTypeInstance instance)
+            public Adapter(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
             {
-                this.appDomain = appDomain;
+                this.appdomain = appdomain;
                 this.instance = instance;
             }
 
-            public ILTypeInstance ILInstance
-            {
-                get
-                {
-                    return instance;
-                }
-            }
+            public ILTypeInstance ILInstance { get { return instance; } }
 
             public void Dispose()
             {
-                if (this.iDisposable == null)
-                {
-                    this.iDisposable = instance.Type.GetMethod("Dispose");
-                }
-                this.appDomain.Invoke(this.iDisposable, instance, this.param0);
+                mDispose_0.Invoke(this.instance);
             }
 
             public override string ToString()
             {
-                IMethod m = this.appDomain.ObjectType.GetMethod("ToString", 0);
+                IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
                 m = instance.Type.GetVirtualMethod(m);
                 if (m == null || m is ILMethod)
                 {
                     return instance.ToString();
                 }
-
-                return instance.Type.FullName;
+                else
+                    return instance.Type.FullName;
             }
-
-
         }
     }
-
 }

@@ -29,6 +29,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 return true;
             if (i.IsGenericMethodDefinition)
                 return true;
+            if (i.IsConstructor && type.IsAbstract)
+                return true;
+            if (i is MethodInfo && ((MethodInfo)i).ReturnType.IsByRef)
+                return true;
             //EventHandler is currently not supported
             var param = i.GetParameters();
             if (i.IsSpecialName)
@@ -39,9 +43,10 @@ namespace ILRuntime.Runtime.CLRBinding
                 if (t[0] == "get" || t[0] == "set")
                 {
                     Type[] ts;
-                    if (t[1] == "Item")
+                    var cnt = t[0] == "set" ? param.Length - 1 : param.Length;
+
+                    if (cnt > 0)
                     {
-                        var cnt = t[0] == "set" ? param.Length - 1 : param.Length;
                         ts = new Type[cnt];
                         for (int j = 0; j < cnt; j++)
                         {
@@ -92,6 +97,95 @@ namespace ILRuntime.Runtime.CLRBinding
                 {
                     sb.Append("@");
                     sb.Append(j.Name);
+                }
+            }
+        }
+
+        internal static void AppendArgumentCode(this Type p, StringBuilder sb, int idx, string name, List<Type> valueTypeBinders, bool isMultiArr, bool hasByRef, bool needFree)
+        {
+            string clsName, realClsName;
+            bool isByRef;
+            p.GetClassName(out clsName, out realClsName, out isByRef);
+            var pt = p.IsByRef ? p.GetElementType() : p;
+            string shouldFreeParam = hasByRef ? "false" : "true";
+
+            if (pt.IsValueType && !pt.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(pt))
+            {
+                if (isMultiArr)
+                    sb.AppendLine(string.Format("            {0} a{1} = new {0}();", realClsName, idx));
+                else
+                    sb.AppendLine(string.Format("            {0} @{1} = new {0}();", realClsName, name));
+
+                sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
+
+                if (isMultiArr)
+                    sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue(ref a{0}, __intp, ptr_of_this_method, __mStack, {2});", idx, clsName, shouldFreeParam));
+                else
+                    sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue(ref @{0}, __intp, ptr_of_this_method, __mStack, {2});", name, clsName, shouldFreeParam));
+
+                sb.AppendLine("            } else {");
+
+                if (isByRef)
+                    sb.AppendLine("                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
+                if (isMultiArr)
+                    sb.AppendLine(string.Format("                a{0} = {1};", idx, p.GetRetrieveValueCode(realClsName)));
+                else
+                    sb.AppendLine(string.Format("                @{0} = {1};", name, p.GetRetrieveValueCode(realClsName)));
+                if (!hasByRef && needFree)
+                    sb.AppendLine("                __intp.Free(ptr_of_this_method);");
+
+                sb.AppendLine("            }");
+            }
+            else
+            {
+                if (isByRef)
+                {
+                    if (p.GetElementType().IsPrimitive)
+                    {
+                        if (pt == typeof(int) || pt == typeof(uint) || pt == typeof(short) || pt == typeof(ushort) || pt == typeof(byte) || pt == typeof(sbyte) || pt == typeof(char))
+                        {
+                            if (pt == typeof(int))
+                                sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt32(ptr_of_this_method, __mStack);", realClsName, name));
+                            else
+                                sb.AppendLine(string.Format("            {0} @{1} = ({0})__intp.RetriveInt32(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(long) || pt == typeof(ulong))
+                        {
+                            if (pt == typeof(long))
+                                sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt64(ptr_of_this_method, __mStack);", realClsName, name));
+                            else
+                                sb.AppendLine(string.Format("            {0} @{1} = ({0})__intp.RetriveInt64(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(float))
+                        {
+                            sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveFloat(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(double))
+                        {
+                            sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveDouble(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(bool))
+                        {
+                            sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt32(ptr_of_this_method, __mStack) == 1;", realClsName, name));
+                        }
+                        else
+                            throw new NotSupportedException();
+                    }
+                    else
+                    {
+                        sb.AppendLine(string.Format("            {0} @{1} = ({0})typeof({0}).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));", realClsName, name));
+                    }
+
+                }
+                else
+                {
+                    if (isMultiArr)
+                        sb.AppendLine(string.Format("            {0} a{1} = {2};", realClsName, idx, p.GetRetrieveValueCode(realClsName)));
+                    else
+                        sb.AppendLine(string.Format("            {0} @{1} = {2};", realClsName, name, p.GetRetrieveValueCode(realClsName)));
+                    if (!hasByRef && !p.IsPrimitive && needFree)
+                        sb.AppendLine("            __intp.Free(ptr_of_this_method);");
+
                 }
             }
         }
@@ -166,73 +260,73 @@ namespace ILRuntime.Runtime.CLRBinding
                 if (type == typeof(int))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = " + paramName);
+                    sb.Append("                        ___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(long))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Long;");
-                    sb.Append("                        *(long*)&___dst->Value = " + paramName);
+                    sb.Append("                        *(long*)&___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(short))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = " + paramName);
+                    sb.Append("                        ___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(bool))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = " + paramName + " ? 1 : 0;");
+                    sb.Append("                        ___dst->Value = @" + paramName + " ? 1 : 0;");
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(ushort))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = " + paramName);
+                    sb.Append("                        ___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(float))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Float;");
-                    sb.Append("                        *(float*)&___dst->Value = " + paramName);
+                    sb.Append("                        *(float*)&___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(double))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Double;");
-                    sb.Append("                        *(double*)&___dst->Value = " + paramName);
+                    sb.Append("                        *(double*)&___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(byte))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = " + paramName);
+                    sb.Append("                        ___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(sbyte))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = " + paramName);
+                    sb.Append("                        ___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(uint))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = (int)" + paramName);
+                    sb.Append("                        ___dst->Value = (int)@" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(char))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
-                    sb.Append("                        ___dst->Value = (int)" + paramName);
+                    sb.Append("                        ___dst->Value = (int)@" + paramName);
                     sb.AppendLine(";");
                 }
                 else if (type == typeof(ulong))
                 {
                     sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Long;");
-                    sb.Append("                        *(ulong*)&___dst->Value = " + paramName);
+                    sb.Append("                        *(ulong*)&___dst->Value = @" + paramName);
                     sb.AppendLine(";");
                 }
                 else
@@ -240,7 +334,7 @@ namespace ILRuntime.Runtime.CLRBinding
             }
             else
             {
-                sb.Append(@"                        object ___obj = ");
+                sb.Append(@"                        object ___obj = @");
                 sb.Append(paramName);
                 sb.AppendLine(";");
                 sb.AppendLine(@"                        if (___dst->ObjectType >= ObjectTypes.Object)
@@ -272,7 +366,7 @@ namespace ILRuntime.Runtime.CLRBinding
             }
         }
 
-        internal static void GetReturnValueCode(this Type type, StringBuilder sb)
+        internal static void GetReturnValueCode(this Type type, StringBuilder sb, Enviorment.AppDomain domain)
         {
             if (type.IsPrimitive)
             {
@@ -350,16 +444,62 @@ namespace ILRuntime.Runtime.CLRBinding
                     isBox = "";
                 if (!type.IsSealed && type != typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance))
                 {
-                    sb.Append(@"            object obj_result_of_this_method = result_of_this_method;
+                    if(domain == null || CheckAssignableToCrossBindingAdapters(domain, type))
+                    {
+                        sb.Append(@"            object obj_result_of_this_method = result_of_this_method;
             if(obj_result_of_this_method is CrossBindingAdaptorType)
             {    
                 return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance");
-                    sb.Append(isBox);
-                    sb.AppendLine(@");
+                        sb.Append(isBox);
+                        sb.AppendLine(@");
             }");
+                    }
+                    else if (typeof(CrossBindingAdaptorType).IsAssignableFrom(type))
+                    {
+                        sb.AppendLine(string.Format("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method.ILInstance{0});", isBox));
+                        return;
+                    }
+                    
                 }
                 sb.AppendLine(string.Format("            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method{0});", isBox));
             }
+        }
+
+        static bool CheckAssignableToCrossBindingAdapters(Enviorment.AppDomain domain, Type type)
+        {
+            if (type == typeof(object))
+                return true;
+            bool res = domain.CrossBindingAdaptors.ContainsKey(type);
+            if (!res)
+            {
+                var baseType = type.BaseType;
+                if (baseType != null && baseType != typeof(object))
+                {
+                    res = CheckAssignableToCrossBindingAdapters(domain, baseType);
+                }
+            }
+            if (!res)
+            {
+                var interfaces = type.GetInterfaces();
+                foreach(var i in interfaces)
+                {
+                    res = CheckAssignableToCrossBindingAdapters(domain, i);
+                    if (res)
+                        break;
+                }
+            }
+            return res;
+        }
+
+        internal static bool HasByRefParam(this ParameterInfo[] param)
+        {
+            for (int j = param.Length; j > 0; j--)
+            {
+                var p = param[j - 1];
+                if (p.ParameterType.IsByRef)
+                    return true;
+            }
+            return false;
         }
     }
 }

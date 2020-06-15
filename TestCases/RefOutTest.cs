@@ -244,6 +244,19 @@ namespace TestCases
 
         }
 
+        public static void UnitTest_RefTest3()
+        {
+           //下面这里跑不过
+            var arr = new int[3];
+            Func(ref arr);
+            Console.WriteLine(arr[1]);
+        }
+
+        static void Func(ref int[] arr)
+        {
+            arr[1] = 2;
+        }
+
 
         public static void UnitTest_OutTest()
         {
@@ -297,5 +310,19 @@ namespace TestCases
             ILRuntimeTest.TestFramework.ClassInheritanceTest.TestLongRef(ref heapLong.lv);//若代码binding，输出TestLongRef:4（或者其他莫名的值），否则输出TestLongRef:0，换成ref int也一样，class对象的话没测试过。
         }
 
+        public static void UnitTest_LongRefTest2()
+        {
+            long test = 1;
+            UnitTest_LongRefTest2Sub(ref test);
+
+            Console.WriteLine(string.Format("{0:X8}", test));
+        }
+        private static void UnitTest_LongRefTest2Sub(ref long mask)
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                mask |= (long)1 << i;
+            }
+        }
     }
 }

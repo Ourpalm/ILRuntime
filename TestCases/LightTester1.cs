@@ -330,5 +330,19 @@ namespace TestCases
             Console.WriteLine(speedUp);
             Console.WriteLine(speedUp2);
         }
+
+        public static void UnitTest_1011()
+        {
+            long value = 0;
+            value = value + 0xffffffff;
+            Console.WriteLine(value);
+        }
+
+        public static void UnitTest_1012()
+        {
+            object och = 'd';
+            char ch1 = (char)och;
+            Console.WriteLine("test1:" + (int)ch1 + " " + ch1);
+        }
     }
 }

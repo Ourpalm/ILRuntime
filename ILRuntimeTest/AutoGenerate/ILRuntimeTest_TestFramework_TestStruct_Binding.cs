@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -19,6 +20,7 @@ namespace ILRuntime.Runtime.Generated
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
+            FieldInfo field;
             Type[] args;
             Type type = typeof(ILRuntimeTest.TestFramework.TestStruct);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct).MakeByRefType()};
@@ -30,6 +32,15 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct)};
             method = type.GetMethod("DoTest2", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, DoTest2_2);
+
+            field = type.GetField("value", flag);
+            app.RegisterCLRFieldGetter(field, get_value_0);
+            app.RegisterCLRFieldSetter(field, set_value_0);
+            app.RegisterCLRFieldBinding(field, CopyToStack_value_0, AssignFromStack_value_0);
+            field = type.GetField("instance", flag);
+            app.RegisterCLRFieldGetter(field, get_instance_1);
+            app.RegisterCLRFieldSetter(field, set_instance_1);
+            app.RegisterCLRFieldBinding(field, CopyToStack_instance_1, AssignFromStack_instance_1);
 
             app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);
 
@@ -101,8 +112,8 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
-                        object ___obj = a;
+                        var ___dst = ILIntepreter.ResolveReference(ptr_of_this_method);
+                        object ___obj = @a;
                         if (___dst->ObjectType >= ObjectTypes.Object)
                         {
                             if (___obj is CrossBindingAdaptorType)
@@ -120,12 +131,12 @@ namespace ILRuntime.Runtime.Generated
                         var ___obj = __mStack[ptr_of_this_method->Value];
                         if(___obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = a;
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = @a;
                         }
                         else
                         {
                             var ___type = __domain.GetType(___obj.GetType()) as CLRType;
-                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, a);
+                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, @a);
                         }
                     }
                     break;
@@ -134,22 +145,23 @@ namespace ILRuntime.Runtime.Generated
                         var ___type = __domain.GetType(ptr_of_this_method->Value);
                         if(___type is ILType)
                         {
-                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = a;
+                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = @a;
                         }
                         else
                         {
-                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, a);
+                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, @a);
                         }
                     }
                     break;
                  case ObjectTypes.ArrayReference:
                     {
                         var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ILRuntimeTest.TestFramework.TestStruct[];
-                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = a;
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = @a;
                     }
                     break;
             }
 
+            __intp.Free(ptr_of_this_method);
             return __ret;
         }
 
@@ -170,9 +182,9 @@ namespace ILRuntime.Runtime.Generated
             {
                 case ObjectTypes.StackObjectReference:
                     {
-                        var ___dst = *(StackObject**)&ptr_of_this_method->Value;
+                        var ___dst = ILIntepreter.ResolveReference(ptr_of_this_method);
                         ___dst->ObjectType = ObjectTypes.Integer;
-                        ___dst->Value = a;
+                        ___dst->Value = @a;
                     }
                     break;
                 case ObjectTypes.FieldReference:
@@ -180,12 +192,12 @@ namespace ILRuntime.Runtime.Generated
                         var ___obj = __mStack[ptr_of_this_method->Value];
                         if(___obj is ILTypeInstance)
                         {
-                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = a;
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = @a;
                         }
                         else
                         {
                             var ___type = __domain.GetType(___obj.GetType()) as CLRType;
-                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, a);
+                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, @a);
                         }
                     }
                     break;
@@ -194,22 +206,23 @@ namespace ILRuntime.Runtime.Generated
                         var ___type = __domain.GetType(ptr_of_this_method->Value);
                         if(___type is ILType)
                         {
-                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = a;
+                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = @a;
                         }
                         else
                         {
-                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, a);
+                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, @a);
                         }
                     }
                     break;
                  case ObjectTypes.ArrayReference:
                     {
                         var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.Int32[];
-                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = a;
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = @a;
                     }
                     break;
             }
 
+            __intp.Free(ptr_of_this_method);
             return __ret;
         }
 
@@ -227,6 +240,61 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.TestStruct.DoTest2(@aaa);
 
             return __ret;
+        }
+
+
+        static object get_value_0(ref object o)
+        {
+            return ((ILRuntimeTest.TestFramework.TestStruct)o).value;
+        }
+
+        static StackObject* CopyToStack_value_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ((ILRuntimeTest.TestFramework.TestStruct)o).value;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
+        }
+
+        static void set_value_0(ref object o, object v)
+        {
+            ILRuntimeTest.TestFramework.TestStruct ins =(ILRuntimeTest.TestFramework.TestStruct)o;
+            ins.value = (System.Int32)v;
+            o = ins;
+        }
+
+        static StackObject* AssignFromStack_value_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            System.Int32 @value = ptr_of_this_method->Value;
+            ILRuntimeTest.TestFramework.TestStruct ins =(ILRuntimeTest.TestFramework.TestStruct)o;
+            ins.value = @value;
+            o = ins;
+            return ptr_of_this_method;
+        }
+
+        static object get_instance_1(ref object o)
+        {
+            return ILRuntimeTest.TestFramework.TestStruct.instance;
+        }
+
+        static StackObject* CopyToStack_instance_1(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestStruct.instance;
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static void set_instance_1(ref object o, object v)
+        {
+            ILRuntimeTest.TestFramework.TestStruct.instance = (ILRuntimeTest.TestFramework.TestStruct)v;
+        }
+
+        static StackObject* AssignFromStack_instance_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            ILRuntimeTest.TestFramework.TestStruct @instance = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestStruct.instance = @instance;
+            return ptr_of_this_method;
         }
 
 

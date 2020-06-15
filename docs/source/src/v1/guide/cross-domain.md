@@ -10,38 +10,18 @@ order: 120
 方法如下：
 
 ```csharp
-    //你想在DLL中继承的那个类
-    public abstract class ClassInheritanceTest
+public class TestClass2Adapter : CrossBindingAdaptor
     {
-        public abstract void TestAbstract();
-        public virtual void TestVirtual(ClassInheritanceTest a)
-        {
-            
-        }
-    }
-
-    //这个类就是继承适配器类
-    public class ClassInheritanceAdaptor : CrossBindingAdaptor
-    {
+	    //定义访问方法的方法信息
+        static CrossBindingMethodInfo mVMethod1_0 = new CrossBindingMethodInfo("VMethod1");
+        static CrossBindingFunctionInfo<System.Boolean> mVMethod2_1 = new CrossBindingFunctionInfo<System.Boolean>("VMethod2");
+        static CrossBindingMethodInfo mAbMethod1_3 = new CrossBindingMethodInfo("AbMethod1");
+        static CrossBindingFunctionInfo<System.Int32, System.Single> mAbMethod2_4 = new CrossBindingFunctionInfo<System.Int32, System.Single>("AbMethod2");
         public override Type BaseCLRType
         {
             get
             {
-			    //如果你是想一个类实现多个Unity主工程的接口，这里需要return null;
-                return typeof(ClassInheritanceTest);//这是你想继承的那个类
-            }
-        }
-		
-        public override Type[] BaseCLRTypes
-        {
-            get
-            {
-                //跨域继承只能有1个Adapter，因此应该尽量避免一个类同时实现多个外部接口，
-                //ILRuntime虽然支持同时实现多个接口，但是一定要小心这种用法，使用不当很容易造成不可预期的问题
-                //日常开发如果需要实现多个DLL外部接口，请在Unity这边先做一个基类实现那些个接口，然后继承那个基类
-				//如需一个Adapter实现多个接口，请用下面这行
-                //return new Type[] { typeof(IEnumerator<object>), typeof(IEnumerator), typeof(IDisposable) };
-				return null;
+                return typeof(ILRuntimeTest.TestFramework.TestClass2);//这里是你想继承的类型
             }
         }
 
@@ -49,70 +29,59 @@ order: 120
         {
             get
             {
-                return typeof(Adaptor);//这是实际的适配器类
+                return typeof(Adapter);
             }
         }
 
         public override object CreateCLRInstance(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
         {
-            return new Adaptor(appdomain, instance);//创建一个新的实例
+            return new Adapter(appdomain, instance);
         }
 
-        //实际的适配器类需要继承你想继承的那个类，并且实现CrossBindingAdaptorType接口
-        class Adaptor : ClassInheritanceTest,CrossBindingAdaptorType
+        public class Adapter : ILRuntimeTest.TestFramework.TestClass2, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
-            IMethod mTestAbstract;
-			bool mTestAbstractGot;
-            IMethod mTestVirtual;
-			bool mTestVirtualGot;
-            bool isTestVirtualInvoking = false;
-			//缓存这个数组来避免调用时的GC Alloc
-			object[] param1 = new object[1];
 
-            public Adaptor()
+            //必须要提供一个无参数的构造函数
+            public Adapter()
             {
 
             }
 
-            public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+            public Adapter(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
             {
                 this.appdomain = appdomain;
                 this.instance = instance;
             }
 
             public ILTypeInstance ILInstance { get { return instance; } }
-            
-			//你需要重写所有你希望在热更脚本里面重写的方法，并且将控制权转到脚本里去
-            public override void TestAbstract()
+
+            //下面将所有虚函数都重载一遍，并中转到热更内
+            public override void VMethod1()
             {
-                if(!mTestAbstractGot)
-                {
-                    mTestAbstract = instance.Type.GetMethod("TestAbstract", 0);
-					mTestAbstractGot = true;
-                }
-                if (mTestAbstract != null)
-                    appdomain.Invoke(mTestAbstract, instance, null);//没有参数建议显式传递null为参数列表，否则会自动new object[0]导致GC Alloc
+                if (mVMethod1_0.CheckShouldInvokeBase(this.instance))
+                    base.VMethod1();
+                else
+                    mVMethod1_0.Invoke(this.instance);
             }
 
-            public override void TestVirtual(ClassInheritanceTest a)
+            public override System.Boolean VMethod2()
             {
-                if (!mTestVirtualGot)
-                {
-                    mTestVirtual = instance.Type.GetMethod("TestVirtual", 1);
-					mTestVirtualGot = true;
-                }
-				//对于虚函数而言，必须设定一个标识位来确定是否当前已经在调用中，否则如果脚本类中调用base.TestVirtual()就会造成无限循环，最终导致爆栈
-                if (mTestVirtual != null && !isTestVirtualInvoking)
-                {
-                    isTestVirtualInvoking = true;
-					param1[0] = a;
-                    appdomain.Invoke(mTestVirtual, instance, this.param1);
-                    isTestVirtualInvoking = false;
-                }
+                if (mVMethod2_1.CheckShouldInvokeBase(this.instance))
+                    return base.VMethod2();
                 else
-                    base.TestVirtual(a);
+                    return mVMethod2_1.Invoke(this.instance);
+            }
+
+            protected override void AbMethod1()
+            {
+                mAbMethod1_3.Invoke(this.instance);
+            }
+
+            public override System.Single AbMethod2(System.Int32 arg1)
+            {
+                return mAbMethod2_4.Invoke(this.instance, arg1);
             }
 
             public override string ToString()
@@ -127,4 +96,10 @@ order: 120
                     return instance.Type.FullName;
             }
         }
+    }
+```
+
+因为跨域继承必须要注册适配器。 如果是热更DLL里面继承热更里面的类型，不需要任何注册。
+```csharp
+        appdomain.RegisterCrossBindingAdaptor(new ClassInheritanceAdaptor());
 ```

@@ -49,7 +49,7 @@ namespace ILRuntimeTest.TestFramework
             method = type.GetMethod("op_Multiply", flag, null, args, null);
             appdomain.RegisterCLRMethodRedirection(method, Vector3_Multiply);
 
-            args = new Type[] {  };
+            args = new Type[] { };
             method = type.GetMethod("get_One2", flag, null, args, null);
             appdomain.RegisterCLRMethodRedirection(method, Vector3_One2);
         }
@@ -70,10 +70,11 @@ namespace ILRuntimeTest.TestFramework
             float x, y, z, x2, y2, z2;
             if (b->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
-                var src = *(StackObject**)&b->Value;
+                var src = ILIntepreter.ResolveReference(b);
                 x2 = *(float*)&ILIntepreter.Minus(src, 1)->Value;
                 y2 = *(float*)&ILIntepreter.Minus(src, 2)->Value;
                 z2 = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+                intp.FreeStackValueType(ptrB);
             }
             else
             {
@@ -88,10 +89,12 @@ namespace ILRuntimeTest.TestFramework
             var a = ILIntepreter.GetObjectAndResolveReference(ptrA);
             if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
-                var src = *(StackObject**)&a->Value;
+                var src = ILIntepreter.ResolveReference(a);
                 x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
                 y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
                 z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+
+                intp.FreeStackValueType(ptrA);
             }
             else
             {
@@ -103,7 +106,7 @@ namespace ILRuntimeTest.TestFramework
             }
 
             intp.AllocValueType(ret, CLRType);
-            var dst = *((StackObject**)&ret->Value);
+            var dst = ILIntepreter.ResolveReference(ret);
 
             *(float*)&ILIntepreter.Minus(dst, 1)->Value = x + x2;
             *(float*)&ILIntepreter.Minus(dst, 2)->Value = y + y2;
@@ -127,10 +130,11 @@ namespace ILRuntimeTest.TestFramework
             var a = ILIntepreter.GetObjectAndResolveReference(ptr);
             if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
-                var src = *(StackObject**)&a->Value;
+                var src = ILIntepreter.ResolveReference(a);
                 x = *(float*)&ILIntepreter.Minus(src, 1)->Value;
                 y = *(float*)&ILIntepreter.Minus(src, 2)->Value;
                 z = *(float*)&ILIntepreter.Minus(src, 3)->Value;
+                intp.FreeStackValueType(ptr);
             }
             else
             {
@@ -142,7 +146,7 @@ namespace ILRuntimeTest.TestFramework
             }
 
             intp.AllocValueType(ret, CLRType);
-            var dst = *((StackObject**)&ret->Value);
+            var dst = ILIntepreter.ResolveReference(ret);
 
             *(float*)&ILIntepreter.Minus(dst, 1)->Value = x * val;
             *(float*)&ILIntepreter.Minus(dst, 2)->Value = y * val;
@@ -171,9 +175,9 @@ namespace ILRuntimeTest.TestFramework
             {
                 ret = ILIntepreter.Minus(esp, 4);
                 var instance = ILIntepreter.GetObjectAndResolveReference(ret);
-                if (instance->ObjectType == ObjectTypes.StackObjectReference)
+                if (instance->ObjectType == ObjectTypes.ValueTypeObjectReference)
                 {
-                    var dst = *(StackObject**)&instance->Value;
+                    var dst = ILIntepreter.ResolveReference(instance);
                     var f = ILIntepreter.Minus(dst, 1);
                     var v = ILIntepreter.Minus(esp, 3);
                     *f = *v;
@@ -188,7 +192,7 @@ namespace ILRuntimeTest.TestFramework
                 }
                 else
                 {
-                    
+
                 }
             }
             return ret;
@@ -197,7 +201,7 @@ namespace ILRuntimeTest.TestFramework
         public void PushVector3(ref TestVector3 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
         {
             intp.AllocValueType(ptr, CLRType);
-            var dst = *((StackObject**)&ptr->Value);
+            var dst = ILIntepreter.ResolveReference(ptr);
             CopyValueTypeToStack(ref vec, dst, mStack);
         }
     }
@@ -241,6 +245,37 @@ namespace ILRuntimeTest.TestFramework
             AssignFromStack(ref ins.A, v, mStack);
             v = ILIntepreter.Minus(ptr, 2);
             AssignFromStack(ref ins.Vector, v, mStack);
+        }
+    }
+
+    public unsafe class KeyValuePairUInt32ILTypeInstanceBinder : ValueTypeBinder<KeyValuePair<UInt32, ILTypeInstance>>
+    {
+        public override unsafe void AssignFromStack(ref KeyValuePair<UInt32, ILTypeInstance> ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            var key = *(UInt32*)&v->Value;
+            v = ILIntepreter.Minus(ptr, 2);
+            object val = mStack[v->Value];
+            ins = new KeyValuePair<uint, ILTypeInstance>(key, (ILTypeInstance)val);
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref KeyValuePair<UInt32, ILTypeInstance> ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            *(UInt32*)&v->Value = ins.Key;
+            v = ILIntepreter.Minus(ptr, 2);
+            mStack[v->Value] = ins.Value;
+        }
+        public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+        {
+            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+            MethodBase method;
+            Type[] args;
+            Type type = typeof(KeyValuePair<UInt32, ILTypeInstance>);
+            args = new Type[] { typeof(UInt32), typeof(ILTypeInstance) };
+            method = type.GetConstructor(flag, null, args, null);
+            //appdomain.RegisterCLRMethodRedirection(method, NewKV);
+            //_appdomain_ = appdomain;
         }
     }
 }
