@@ -67,7 +67,7 @@
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(809, 157);
+            this.listView1.Size = new System.Drawing.Size(809, 149);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
@@ -80,7 +80,7 @@
             this.tbLog.Multiline = true;
             this.tbLog.Name = "tbLog";
             this.tbLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbLog.Size = new System.Drawing.Size(809, 192);
+            this.tbLog.Size = new System.Drawing.Size(813, 182);
             this.tbLog.TabIndex = 2;
             // 
             // btnLoad
@@ -127,13 +127,14 @@
             // 
             // cbEnableRegVM
             // 
-            this.cbEnableRegVM.AutoSize = true;
-            this.cbEnableRegVM.Location = new System.Drawing.Point(12, 387);
+            this.cbEnableRegVM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cbEnableRegVM.Location = new System.Drawing.Point(12, 386);
             this.cbEnableRegVM.Name = "cbEnableRegVM";
             this.cbEnableRegVM.Size = new System.Drawing.Size(132, 16);
             this.cbEnableRegVM.TabIndex = 7;
             this.cbEnableRegVM.Text = "Enable Register VM";
             this.cbEnableRegVM.UseVisualStyleBackColor = true;
+            // 
             // splitContainer1
             // 
             this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -151,7 +152,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tbLog);
             this.splitContainer1.Size = new System.Drawing.Size(809, 355);
-            this.splitContainer1.SplitterDistance = 157;
+            this.splitContainer1.SplitterDistance = 149;
             this.splitContainer1.TabIndex = 7;
             // 
             // btnTestCrossBind
@@ -176,6 +177,7 @@
             this.Controls.Add(this.txtPath);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.btnRun);
+            this.Controls.Add(this.cbEnableRegVM);
             this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "TestMainForm";
