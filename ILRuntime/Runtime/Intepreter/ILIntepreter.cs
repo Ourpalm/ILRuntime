@@ -4900,10 +4900,11 @@ namespace ILRuntime.Runtime.Intepreter
             else
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
-                if (!t.AssignFieldFromStack(idx, ref obj, this, val, mStack))
+                //It's impossible to garantee this field reference is a direct reference, it'll cause problem if it's not
+                //if (!t.AssignFieldFromStack(idx, ref obj, this, val, mStack))
                 {
                     var v = obj.GetType().CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, AppDomain, mStack), AppDomain));
-                    t.SetFieldValue(idx, ref obj, v);
+                    t.SetFieldValue(idx, ref obj, v, true);
                 }
             }
         }

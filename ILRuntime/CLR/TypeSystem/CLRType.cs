@@ -404,18 +404,20 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public unsafe void SetFieldValue(int hash, ref object target, object value)
+        public unsafe void SetFieldValue(int hash, ref object target, object value, bool directSet = false)
         {
             if (fieldMapping == null)
                 InitializeFields();
 
-            var setter = GetFieldSetter(hash);
-            if (setter != null)
+            if (!directSet)
             {
-                setter(ref target, value);
-                return;
+                var setter = GetFieldSetter(hash);
+                if (setter != null)
+                {
+                    setter(ref target, value);
+                    return;
+                }
             }
-
             var fieldInfo = GetField(hash);
             if (fieldInfo != null)
             {

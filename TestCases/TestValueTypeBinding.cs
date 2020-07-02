@@ -329,5 +329,39 @@ namespace TestCases
                     throw new Exception();
             }
         }
+
+        public static void UnitTest_10040()
+        {
+            TestVector3 dot = new TestVector3();
+            dot.X = 10;
+            dot.Y = 10;
+
+            for (int i = 0; i < 50; i++)
+            {
+                dot.X++;
+            }
+
+            Console.WriteLine("dot.X == " + dot.X);
+            if (dot.X != 60)
+                throw new AccessViolationException();
+
+        }
+
+        public static void UnitTest_10041()
+        {
+            TestVector3NoBinding dot = new TestVector3NoBinding();
+            dot.x = 10;
+            dot.x = 10;
+
+            for (int i = 0; i < 50; i++)
+            {
+                dot.x++;
+            }
+
+            Console.WriteLine("dot.X == " + dot.x);
+            if (dot.x != 60)
+                throw new AccessViolationException();
+
+        }
     }
 }

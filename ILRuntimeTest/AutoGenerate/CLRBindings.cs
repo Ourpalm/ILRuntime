@@ -65,6 +65,7 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_List_1_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_ClassInheritanceTest2Adaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass2_Binding.Register(app);
+            System_IDisposable_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_DelegateTest_Binding.Register(app);
             ILRuntimeTest_TestFramework_IntDelegate_Binding.Register(app);
@@ -83,7 +84,6 @@ namespace ILRuntime.Runtime.Generated
             System_IO_File_Binding.Register(app);
             System_IO_FileStream_Binding.Register(app);
             System_IO_Stream_Binding.Register(app);
-            System_IDisposable_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.Register(app);
             System_Enum_Binding.Register(app);
             System_Collections_IEnumerator_Binding.Register(app);
