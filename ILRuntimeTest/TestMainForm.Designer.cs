@@ -67,7 +67,7 @@
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(809, 149);
+            this.listView1.Size = new System.Drawing.Size(809, 114);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
@@ -80,7 +80,7 @@
             this.tbLog.Multiline = true;
             this.tbLog.Name = "tbLog";
             this.tbLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbLog.Size = new System.Drawing.Size(813, 182);
+            this.tbLog.Size = new System.Drawing.Size(806, 232);
             this.tbLog.TabIndex = 2;
             // 
             // btnLoad
@@ -98,9 +98,9 @@
             // 
             this.txtPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPath.Location = new System.Drawing.Point(12, 422);
+            this.txtPath.Location = new System.Drawing.Point(150, 384);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(374, 21);
+            this.txtPath.Size = new System.Drawing.Size(236, 21);
             this.txtPath.TabIndex = 4;
             // 
             // btnRunSelect
@@ -152,7 +152,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tbLog);
             this.splitContainer1.Size = new System.Drawing.Size(809, 355);
-            this.splitContainer1.SplitterDistance = 149;
+            this.splitContainer1.SplitterDistance = 114;
             this.splitContainer1.TabIndex = 7;
             // 
             // btnTestCrossBind
