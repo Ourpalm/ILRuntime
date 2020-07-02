@@ -295,5 +295,39 @@ namespace TestCases
             if(rawPos.y != 1122333)
                 throw new AccessViolationException();
         }
+
+        public static void UnitTest_10039()
+        {
+            Test10039 obj = new Test10039();
+            obj.Test();
+        }
+
+        class Test10039
+        {
+            TestVector3 m;
+            TestVector3NoBinding m2;
+            public void Test()
+            {
+                m = new TestVector3();
+                m2 = TestVector3NoBinding.zero;
+                UnitTest_10039Sub(m);
+                UnitTest_10039Sub2(m2);
+            }
+            void UnitTest_10039Sub(TestVector3 arg)
+            {
+                arg = TestVector3.One2;
+
+                if (arg.X != 1)
+                    throw new Exception();
+            }
+
+            void UnitTest_10039Sub2(TestVector3NoBinding arg)
+            {
+                arg = TestVector3NoBinding.one;
+
+                if (arg.x != 1)
+                    throw new Exception();
+            }
+        }
     }
 }

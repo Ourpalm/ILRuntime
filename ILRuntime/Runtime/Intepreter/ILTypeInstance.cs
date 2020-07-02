@@ -7,6 +7,8 @@ using ILRuntime.CLR.Utils;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
+using ILRuntime.Runtime.Enviorment;
+
 namespace ILRuntime.Runtime.Intepreter
 {
     public class ILTypeStaticInstance : ILTypeInstance
@@ -361,15 +363,17 @@ namespace ILRuntime.Runtime.Intepreter
             esp->ValueLow = fieldIdx;
         }
 
-        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack)
+        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, ILIntepreter intp, IList<object> managedStack)
         {
             if (fieldIdx < fields.Length && fieldIdx >= 0)
-                PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
+            {
+                PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack, intp);
+            }
             else
             {
                 if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
-                    CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
+                    CLRType clrType = intp.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
                     //if(!clrType.CopyFieldToStack(fieldIdx, clrInstance,))
                     ILIntepreter.PushObject(esp, managedStack, clrType.GetFieldValue(fieldIdx, clrInstance));
                 }
@@ -378,14 +382,29 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, IList<object> managedStack)
+        unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, IList<object> managedStack, ILIntepreter intp)
         {
-            *esp = field;
             if (field.ObjectType >= ObjectTypes.Object)
             {
+                var obj = managedObjs[fieldIdx];
+                if (obj != null)
+                {
+                    var ot = obj.GetType();
+                    ValueTypeBinder binder;
+                    if (ot.IsValueType && type.AppDomain.ValueTypeBinders.TryGetValue(ot, out binder))
+                    {
+                        intp.AllocValueType(esp, binder.CLRType);
+                        var dst = ILIntepreter.ResolveReference(esp);
+                        binder.CopyValueTypeToStack(obj, dst, managedStack);
+                        return;
+                    }
+                }
+                *esp = field;
                 esp->Value = managedStack.Count;
                 managedStack.Add(managedObjs[fieldIdx]);
             }
+            else
+                *esp = field;
         }
 
         internal unsafe void CopyValueTypeToStack(StackObject* ptr, IList<object> mStack)
