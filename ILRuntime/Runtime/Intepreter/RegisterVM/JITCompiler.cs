@@ -353,6 +353,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)(code.Code - (Code.Ldarg_0));
                     break;
+                case Code.Ldarg_S:
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)((ParameterDefinition)ins.Operand).Index;
+                    if (def.HasThis)
+                    {
+                        op.Register2++;
+                    }
+                    break;
                 case Code.Newarr:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
