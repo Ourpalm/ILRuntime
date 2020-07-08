@@ -2154,6 +2154,17 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Ldelem_I4:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    int[] arr = mStack[reg2->Value] as int[];
+                                    reg1->ObjectType = ObjectTypes.Integer;
+                                    reg1->Value = arr[reg3->Value];
+                                }
+                                break;
                             case OpCodeREnum.Ldlen:
                                 {
                                     reg1 = Add(r, ip->Register1);
