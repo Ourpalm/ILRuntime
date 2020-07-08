@@ -20,8 +20,9 @@ namespace TestCases
             int[] aa = new int[] { 1, 2, 3, 4, 5 };
 
             uint index = 2;
-            int i = aa[index]; //throw exception here
-
+            int i = 10;
+            i = aa[index];
+            Console.WriteLine("i {0}", i);
         }
 
         public static void ArrayTest03()
@@ -85,6 +86,36 @@ namespace TestCases
             ILRuntimeTest.TestFramework.TestClass4 cls = new ILRuntimeTest.TestFramework.TestClass4();
             cls.TestArrayOut(out var arr);
             Console.WriteLine(arr.Length);
+        }
+
+        static int[] sa = new int[] { 1, 2, 3, 4, 5 };
+        public static void ArrayTest08()
+        {
+            uint index = 2;
+            int i = sa[index]; //throw exception here
+            Console.WriteLine(i);
+        }
+
+        public static void ArrayTest09()
+        {
+            uint[] aa = new uint[] { 1, 2, 3, 4, 5 };
+            uint index = 2;
+            uint i = aa[index]; //throw exception here
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest10()
+        {
+            short[] aa = new short[] { 1, 2, 3, 4, 5 };
+            uint index = 2;
+            short i = aa[index]; //throw exception here
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest11()
+        {
+            char[] aa = new char[] { 'a', 'b', 'c', 'd' };
+            uint index = 2;
+            char i = aa[index]; //throw exception here
+            Console.WriteLine(i);
         }
     }
 }
