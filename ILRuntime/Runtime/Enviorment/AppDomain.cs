@@ -1262,13 +1262,9 @@ namespace ILRuntime.Runtime.Enviorment
                 if (it.TypeReference.HasGenericParameters)
                 {
                     mapTypeToken[type.GetHashCode()] = it;
-                    res = ((long)type.GetHashCode() << 32) | (uint)idx;
-                }
-                else
-                {
-                    res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
                 }
 
+                res = ((long)type.GetHashCode() << 32) | (uint)idx;
                 return res;
             }
             else
