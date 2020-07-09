@@ -283,7 +283,7 @@ namespace ILRuntime.Runtime.Stack
                 {
                     var it = t.OrderedFieldTypes[i] as CLRType;
                     StackObject* val = ILIntepreter.Minus(ptr, i + 1);
-                    if (it.IsPrimitive)
+                    if (it.IsPrimitive || it.IsEnum)
                         StackObject.Initialized(val, it);
                     else
                     {
