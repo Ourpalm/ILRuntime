@@ -113,10 +113,7 @@ namespace TestCases
         }
         public static void ArrayTest11()
         {
-            long[] aa = new long[3];
-            aa[0] = -1;
-            aa[1] = 54;
-            aa[2] = 43742424878678;
+            long[] aa = new long[3] { -1, 54 , 43742424878678 };
             uint index = 2;
             long i = aa[index]; 
             Console.WriteLine(i);
@@ -130,9 +127,29 @@ namespace TestCases
         }
         public static void ArrayTest13()
         {
-            char[] aa = new char[] { 'a', 'b', 'c', 'd' };
+            //char[] aa = new char[] {'a', 'b', 'c', 'd', 'e' }; //data is error ; ldtoken
+            char[] aa = new char[5];
+            aa[0] = 'a';
+            aa[1] = 'b';
+            aa[2] = 'c';
+            aa[3] = 'd';
+            aa[4] = 'e';
             uint index = 2;
-            char i = aa[index]; //throw exception here
+            char i = aa[index]; //元数据
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest14()
+        {
+            float[] aa = new float[] { 1.5f, float.MaxValue, 10.0f, 0.54587122115f };
+            uint index = 3;
+            float i = aa[index];
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest15()
+        {
+            double[] aa = new double[] { 1.5f, float.MaxValue, 10.0f, 0.54587122115f };
+            uint index = 3;
+            double i = aa[index];
             Console.WriteLine(i);
         }
     }
