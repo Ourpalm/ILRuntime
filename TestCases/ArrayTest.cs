@@ -127,13 +127,7 @@ namespace TestCases
         }
         public static void ArrayTest13()
         {
-            //char[] aa = new char[] {'a', 'b', 'c', 'd', 'e' }; //data is error ; ldtoken
-            char[] aa = new char[5];
-            aa[0] = 'a';
-            aa[1] = 'b';
-            aa[2] = 'c';
-            aa[3] = 'd';
-            aa[4] = 'e';
+            char[] aa = new char[] {'a', 'b', 'c', 'd'}; //data is error ; ldtoken
             uint index = 2;
             char i = aa[index]; //元数据
             Console.WriteLine(i);
