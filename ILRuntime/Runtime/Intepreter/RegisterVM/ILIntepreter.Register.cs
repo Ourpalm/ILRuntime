@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -2167,6 +2167,21 @@ namespace ILRuntime.Runtime.Intepreter
 
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = arr.Length;
+                                }
+                                break;
+                            case OpCodeREnum.Ldelema:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    Array arr = mStack[reg2->Value] as Array;
+                                    var idx = reg3->Value;
+
+                                    reg1->ObjectType = ObjectTypes.ArrayReference;
+                                    reg1->Value = mStack.Count;
+                                    mStack.Add(arr);
+                                    reg1->ValueLow = idx;
                                 }
                                 break;
                             case OpCodeREnum.Ldelem_I1:

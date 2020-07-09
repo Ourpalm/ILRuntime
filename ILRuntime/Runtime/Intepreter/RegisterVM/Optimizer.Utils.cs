@@ -103,6 +103,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldarg_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
@@ -312,6 +313,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldarg_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
@@ -459,6 +461,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldarg_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
@@ -684,6 +687,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldarg_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
