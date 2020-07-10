@@ -21,6 +21,7 @@ namespace TestCases
 
             uint index = 2;
             int i = 10;
+            aa[index] = 20;
             i = aa[index];
             Console.WriteLine("i {0}", i);
         }
@@ -92,29 +93,57 @@ namespace TestCases
         public static void ArrayTest08()
         {
             uint index = 2;
-            int i = sa[index]; //throw exception here
+            int i = sa[index]; 
             Console.WriteLine(i);
         }
 
         public static void ArrayTest09()
         {
-            uint[] aa = new uint[] { 1, 2, 3, 4, 5 };
-            uint index = 2;
-            uint i = aa[index]; //throw exception here
+            int[] aa = new int[] { 1, 2, 3, 4, 5 };
+            int index = 2;
+            int i = aa[index];
             Console.WriteLine(i);
         }
         public static void ArrayTest10()
         {
-            short[] aa = new short[] { 1, 2, 3, 4, 5 };
+            ushort[] aa = new ushort[] { 1, 2, 65535, 4, 5 };
             uint index = 2;
-            short i = aa[index]; //throw exception here
+            ushort i = aa[index]; 
             Console.WriteLine(i);
         }
         public static void ArrayTest11()
         {
-            char[] aa = new char[] { 'a', 'b', 'c', 'd' };
+            long[] aa = new long[3] { -1, 54 , 43742424878678 };
             uint index = 2;
-            char i = aa[index]; //throw exception here
+            long i = aa[index]; 
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest12()
+        {
+            byte[] aa = new byte[] { 7, 16, 32 };
+            uint index = 2;
+            byte i = aa[index]; 
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest13()
+        {
+            char[] aa = new char[] {'a', 'b', 'c', 'd'}; //data is error ; ldtoken
+            uint index = 2;
+            char i = aa[index]; //元数据
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest14()
+        {
+            float[] aa = new float[] { 1.5f, float.MaxValue, 10.0f, 0.54587122115f };
+            uint index = 3;
+            float i = aa[index];
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest15()
+        {
+            double[] aa = new double[] { 1.5f, float.MaxValue, 10.0f, 0.54587122115f };
+            uint index = 3;
+            double i = aa[index];
             Console.WriteLine(i);
         }
     }

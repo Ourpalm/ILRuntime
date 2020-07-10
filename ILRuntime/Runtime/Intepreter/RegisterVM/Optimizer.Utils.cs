@@ -203,7 +203,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Cgt:
                 case OpCodeREnum.Cgt_Un:
                 case OpCodeREnum.Ceq:
+                case OpCodeREnum.Ldelem_I1:
+                case OpCodeREnum.Ldelem_U1:
+                case OpCodeREnum.Ldelem_I2:
+                case OpCodeREnum.Ldelem_U2:
                 case OpCodeREnum.Ldelem_I4:
+                case OpCodeREnum.Ldelem_U4:
+                case OpCodeREnum.Ldelem_I8:
+                case OpCodeREnum.Ldelem_R4:
+                case OpCodeREnum.Ldelem_R8:
                     r1 = op.Register2;
                     r2 = op.Register3;
                     return true;
@@ -316,7 +324,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldsflda:
                 case OpCodeREnum.Ldftn:
                 case OpCodeREnum.Ldvirtftn:
+                case OpCodeREnum.Ldelem_I1:
+                case OpCodeREnum.Ldelem_U1:
+                case OpCodeREnum.Ldelem_I2:
+                case OpCodeREnum.Ldelem_U2:
                 case OpCodeREnum.Ldelem_I4:
+                case OpCodeREnum.Ldelem_U4:
+                case OpCodeREnum.Ldelem_I8:
+                case OpCodeREnum.Ldelem_R4:
+                case OpCodeREnum.Ldelem_R8:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Br_S:
@@ -491,7 +507,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Cgt:
                 case OpCodeREnum.Cgt_Un:
                 case OpCodeREnum.Ceq:
+                case OpCodeREnum.Ldelem_I1:
+                case OpCodeREnum.Ldelem_U1:
+                case OpCodeREnum.Ldelem_I2:
+                case OpCodeREnum.Ldelem_U2:
                 case OpCodeREnum.Ldelem_I4:
+                case OpCodeREnum.Ldelem_U4:
+                case OpCodeREnum.Ldelem_I8:
+                case OpCodeREnum.Ldelem_R4:
+                case OpCodeREnum.Ldelem_R8:
                     switch (idx)
                     {
                         case 0:
@@ -504,7 +528,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             throw new NotSupportedException();
                     }
                     break;
-
                 case OpCodeREnum.Stelem_I:
                 case OpCodeREnum.Stelem_I1:
                 case OpCodeREnum.Stelem_I2:
@@ -675,7 +698,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldftn:
                 case OpCodeREnum.Ldvirtftn:
                 case OpCodeREnum.Isinst:
+                case OpCodeREnum.Ldelem_I1:
+                case OpCodeREnum.Ldelem_U1:
+                case OpCodeREnum.Ldelem_I2:
+                case OpCodeREnum.Ldelem_U2:
                 case OpCodeREnum.Ldelem_I4:
+                case OpCodeREnum.Ldelem_U4:
+                case OpCodeREnum.Ldelem_I8:
+                case OpCodeREnum.Ldelem_R4:
+                case OpCodeREnum.Ldelem_R8:
                     op.Register1 = dst;
                     break;
                 case OpCodeREnum.Br_S:

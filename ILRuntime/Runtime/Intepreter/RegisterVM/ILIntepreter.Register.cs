@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -177,6 +177,7 @@ namespace ILRuntime.Runtime.Intepreter
                         AppDomain.DebugService.CheckShouldBreak(method, this, insOffset);
 #endif
                         code = ip->Code;
+
                         switch (code)
                         {
                             #region Arguments and Local Variable
@@ -271,6 +272,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg1 = Add(r, ip->Register1);
                                     *(float*)(&reg1->Value) = ip->OperandFloat;
                                     reg1->ObjectType = ObjectTypes.Float;
+                                }
+                                break;
+                            case OpCodeREnum.Ldc_I8:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    *(long*)(&reg1->Value) = ip->OperandLong;
+                                    reg1->ObjectType = ObjectTypes.Long;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_R8:
@@ -2136,6 +2144,58 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Stelem_I1:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    byte[] arr = mStack[reg1->Value] as byte[];
+                                    if (arr != null)
+                                    {
+                                        arr[reg2->Value] = (byte)reg3->Value;
+                                    }
+                                    else
+                                    {
+                                        bool[] arr2 = mStack[reg1->Value] as bool[];
+                                        if (arr2 != null)
+                                        {
+                                            arr2[reg2->Value] = reg3->Value == 1;
+                                        }
+                                        else
+                                        {
+                                            sbyte[] arr3 = mStack[reg1->Value] as sbyte[];
+                                            arr3[reg2->Value] = (sbyte)reg3->Value;
+                                        }
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stelem_I2:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    short[] arr = mStack[reg1->Value] as short[];
+                                    if (arr != null)
+                                    {
+                                        arr[reg2->Value] = (short)reg3->Value;
+                                    }
+                                    else
+                                    {
+                                        ushort[] arr2 = mStack[reg1->Value] as ushort[];
+                                        if(arr2 != null)
+                                        {
+                                            arr2[reg2->Value] = (ushort)reg3->Value;
+                                        }
+                                        else
+                                        {
+                                            char[] arr3 = mStack[reg1->Value] as char[];
+                                            arr3[reg2->Value] = (char)reg3->Value;
+                                        }
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Stelem_I4:
                                 {
                                     reg1 = Add(r, ip->Register1);
@@ -2154,6 +2214,149 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Stelem_R4:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    float[] arr = mStack[reg1->Value] as float[];
+                                    arr[reg2->Value] = *(float*)reg3->Value;
+                                }
+                                break;
+                            case OpCodeREnum.Stelem_I8:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    long[] arr = mStack[reg1->Value] as long[];
+                                    if (arr != null)
+                                    {
+                                        arr[reg2->Value] = *(long*)&reg3->Value;
+                                    }
+                                    else
+                                    {
+                                        ulong[] arr2 = mStack[reg1->Value] as ulong[];
+                                        arr2[reg2->Value] = *(ulong*)&reg3->Value;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stelem_R8:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    double[] arr = mStack[reg1->Value] as double[];
+                                    arr[reg2->Value] = *(double*)reg3->Value;
+                                }
+                                break;
+                            case OpCodeREnum.Ldlen:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    Array arr = mStack[reg2->Value] as Array;
+
+                                    reg1->ObjectType = ObjectTypes.Integer;
+                                    reg1->Value = arr.Length;
+                                }
+                                break;
+                            case OpCodeREnum.Ldelema:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    Array arr = mStack[reg2->Value] as Array;
+                                    var idx = reg3->Value;
+
+                                    reg1->ObjectType = ObjectTypes.ArrayReference;
+                                    reg1->Value = mStack.Count;
+                                    mStack.Add(arr);
+                                    reg1->ValueLow = idx;
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_I1:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    bool[] arr = mStack[reg2->Value] as bool[];
+                                    if (arr != null)
+                                    {
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr[reg3->Value] ? 1 : 0;
+                                    }
+                                    else
+                                    {
+                                        sbyte[] arr2 = mStack[reg2->Value] as sbyte[];
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr2[reg3->Value];
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_U1:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    byte[] arr = mStack[reg2->Value] as byte[];
+                                    if (arr != null)
+                                    {
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr[reg3->Value];
+                                    }
+                                    else
+                                    {
+                                        bool[] arr2 = mStack[reg2->Value] as bool[];
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr2[reg3->Value] ? 1 : 0;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_I2:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    short[] arr = mStack[reg2->Value] as short[];
+                                    if (arr != null)
+                                    {
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr[reg3->Value];
+                                    }
+                                    else
+                                    {
+                                        char[] arr2 = mStack[reg2->Value] as char[];
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr2[reg3->Value];
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_U2:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    ushort[] arr = mStack[reg2->Value] as ushort[];
+                                    if (arr != null)
+                                    {
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr[reg3->Value];
+                                    }
+                                    else
+                                    {
+                                        char[] arr2 = mStack[reg2->Value] as char[];
+                                        reg1->ObjectType = ObjectTypes.Integer;
+                                        reg1->Value = arr2[reg3->Value];
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Ldelem_I4:
                                 {
                                     reg1 = Add(r, ip->Register1);
@@ -2165,14 +2368,57 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg1->Value = arr[reg3->Value];
                                 }
                                 break;
-                            case OpCodeREnum.Ldlen:
+                            case OpCodeREnum.Ldelem_U4:
                                 {
                                     reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2);
-                                    Array arr = mStack[reg2->Value] as Array;
+                                    reg3 = Add(r, ip->Register3);
 
+                                    uint[] arr = mStack[reg2->Value] as uint[];
                                     reg1->ObjectType = ObjectTypes.Integer;
-                                    reg1->Value = arr.Length;
+                                    reg1->Value = (int)arr[reg3->Value];
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_I8:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    long[] arr = mStack[reg2->Value] as long[];
+                                    if(arr != null)
+                                    {
+                                        reg1->ObjectType = ObjectTypes.Long;
+                                        *(long*)(&reg1->Value) = arr[reg3->Value];
+                                    }
+                                    else
+                                    {
+                                        ulong[] arr2 = mStack[reg2->Value] as ulong[];
+                                        reg1->ObjectType = ObjectTypes.Long;
+                                        *(ulong*)(&reg1->Value) = arr2[reg3->Value];
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_R4:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    float[] arr = mStack[reg2->Value] as float[];
+                                    reg1->ObjectType = ObjectTypes.Float;
+                                    *(float*)&reg1->Value = arr[reg3->Value];
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_R8:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+
+                                    double[] arr = mStack[reg2->Value] as double[];
+                                    reg1->ObjectType = ObjectTypes.Double;
+                                    *(double*)&reg1->Value = arr[reg3->Value];
                                 }
                                 break;
                             #endregion
