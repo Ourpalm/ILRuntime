@@ -180,6 +180,15 @@ namespace ILRuntime.Runtime.Intepreter
 
                         switch (code)
                         {
+                            #region Arguments and Local Variable
+                            case OpCodeREnum.Ldarg:
+                            case OpCodeREnum.Ldarg_S:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    CopyToRegister(ref info, ip->Register1, reg1);
+                                }
+                                break;
+                            #endregion
                             #region Load Constants
                             case OpCodeREnum.Ldc_I4_M1:
                                 {
@@ -2049,6 +2058,90 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                     }
                                     AssignToRegister(ref info, ip->Register1, arr);
+                                }
+                                break;
+                            case OpCodeREnum.Stelem_Ref:
+                            case OpCodeREnum.Stelem_Any:
+                                {
+                                    reg1 = Add(r, ip->Register3);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register1);
+
+                                    var val = GetObjectAndResolveReference(reg1);
+                                    Array arr = mStack[reg3->Value] as Array;
+
+                                    if (arr is object[])
+                                    {
+                                        switch (val->ObjectType)
+                                        {
+                                            case ObjectTypes.Null:
+                                                arr.SetValue(null, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Object:
+                                                ArraySetValue(arr, mStack[val->Value], reg2->Value);
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                arr.SetValue(val->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Long:
+                                                arr.SetValue(*(long*)&val->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Float:
+                                                arr.SetValue(*(float*)&val->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.Double:
+                                                arr.SetValue(*(double*)&val->Value, reg2->Value);
+                                                break;
+                                            case ObjectTypes.ValueTypeObjectReference:
+                                                ArraySetValue(arr, StackObject.ToObject(val, domain, mStack), reg2->Value);
+                                                FreeStackValueType(esp - 1);
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        switch (val->ObjectType)
+                                        {
+                                            case ObjectTypes.Object:
+                                                ArraySetValue(arr, mStack[val->Value], reg2->Value);
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                {
+                                                    StoreIntValueToArray(arr, val, reg2);
+                                                }
+                                                break;
+                                            case ObjectTypes.Long:
+                                                {
+                                                    if (arr is long[])
+                                                    {
+                                                        ((long[])arr)[reg2->Value] = *(long*)&val->Value;
+                                                    }
+                                                    else
+                                                    {
+                                                        ((ulong[])arr)[reg2->Value] = *(ulong*)&val->Value;
+                                                    }
+                                                }
+                                                break;
+                                            case ObjectTypes.Float:
+                                                {
+                                                    ((float[])arr)[reg2->Value] = *(float*)&val->Value;
+                                                }
+                                                break;
+                                            case ObjectTypes.Double:
+                                                {
+                                                    ((double[])arr)[reg2->Value] = *(double*)&val->Value;
+                                                }
+                                                break;
+                                            case ObjectTypes.ValueTypeObjectReference:
+                                                ArraySetValue(arr, StackObject.ToObject(val, domain, mStack), reg2->Value);
+                                                FreeStackValueType(esp - 1);
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
                                 }
                                 break;
                             case OpCodeREnum.Stelem_I1:
