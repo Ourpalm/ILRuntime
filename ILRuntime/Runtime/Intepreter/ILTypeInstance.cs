@@ -233,7 +233,7 @@ namespace ILRuntime.Runtime.Intepreter
                             else if (vt.IsEnum)
                             {
                                 esp->ObjectType = ObjectTypes.Integer;
-                                esp->Value = Convert.ToInt32(value);
+                                esp->Value = value.ToInt32();
                                 esp->ValueLow = 0;
                             }
                             else

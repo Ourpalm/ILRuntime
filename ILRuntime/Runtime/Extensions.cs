@@ -165,7 +165,7 @@ namespace ILRuntime.Runtime
                 return (int)(ushort)obj;
             if (obj is sbyte)
                 return (int)(sbyte)obj;
-            throw new InvalidCastException();
+            return Convert.ToInt32(obj);
         }
         public static long ToInt64(this object obj)
         {
