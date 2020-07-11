@@ -28,6 +28,7 @@ namespace ILRuntime.Runtime.Intepreter
         public StackObject* LastStepFrameBase { get; set; }
         public int LastStepInstructionIndex { get; set; }
         StackObject* ValueTypeBasePointer;
+#pragma warning disable CS0414
         bool mainthreadLock;
         public ILIntepreter(Enviorment.AppDomain domain)
         {
@@ -144,7 +145,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             unhandledException = false;
             StackObject* objRef, objRef2, dst, val, a, b, arrRef;
-            object obj = null, objVal = null;
+            object obj = null;
             IType type;
             Type clrType;
             int intVal;

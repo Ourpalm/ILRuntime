@@ -927,6 +927,11 @@ namespace ILRuntime.Runtime.Intepreter
             return Delegate == dele;
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override string ToString()
         {
             return method.ToString();

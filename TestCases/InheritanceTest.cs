@@ -469,7 +469,7 @@ namespace TestCases
 
     class AA : AABase
     {
-        public void AA1()
+        public new void AA1()
         {
             Console.WriteLine("AA1");
         }

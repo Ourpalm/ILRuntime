@@ -10,6 +10,7 @@ using ILRuntime.Runtime.Debugger.Protocol;
 
 namespace ILRuntime.Runtime.Debugger
 {
+#pragma warning disable
     public class DebuggerServer
     {
         public const int Version = 2;
