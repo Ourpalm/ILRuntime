@@ -346,7 +346,7 @@ namespace ILRuntime.Runtime.Generated
             GenerateBindingInitializeScript(clsNames, valueTypeBinders, outputPath);
         }
 
-        internal static void CrawlAppdomain(ILRuntime.Runtime.Enviorment.AppDomain domain, Dictionary<Type, CLRBindingGenerateInfo> infos)
+        static void PrewarmDomain(ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             var arr = domain.LoadedTypes.Values.ToArray();
             //Prewarm
@@ -373,7 +373,14 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
             }
-            arr = domain.LoadedTypes.Values.ToArray();
+        }
+        internal static void CrawlAppdomain(ILRuntime.Runtime.Enviorment.AppDomain domain, Dictionary<Type, CLRBindingGenerateInfo> infos)
+        {
+            //Prewarm
+            PrewarmDomain(domain);
+            //Prewarm twice to ensure GenericMethods are prewarmed properly
+            PrewarmDomain(domain);
+            var arr = domain.LoadedTypes.Values.ToArray();
             foreach (var type in arr)
             {
                 if (type is CLR.TypeSystem.ILType)
