@@ -682,6 +682,7 @@ namespace ILRuntime.Runtime.Enviorment
         public string Name { get; private set; }
         protected AppDomain domain;
         protected IMethod method;
+        private IMethod baseMethod;
         private bool methodGot;
         protected bool invoking;
 
@@ -724,7 +725,14 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 if (ReturnType != null)
                     rt = domain.GetType(ReturnType);
-                method = ilType.GetMethod(Name, param, null, rt);
+                if (ilType.FirstCLRBaseType != null)
+                    baseMethod = ilType.FirstCLRBaseType.GetMethod(Name, param, null, rt);
+                if (baseMethod == null)
+                    method = ilType.GetMethod(Name, param, null, rt);
+            }
+            if (baseMethod != null)
+            {
+                method = ins.Type.GetVirtualMethod(baseMethod);
             }
         }
 
