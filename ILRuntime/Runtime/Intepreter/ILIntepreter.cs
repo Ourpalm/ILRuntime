@@ -3197,8 +3197,6 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         var instance = mStack[objRef->Value] as ILTypeInstance;
                                                         instance.AssignFromStack(objRef->ValueLow, esp, AppDomain, mStack);
-                                                        Free(esp - 1);
-                                                        esp--;
                                                     }
                                                     break;
                                                 default:

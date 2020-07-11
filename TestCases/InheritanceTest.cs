@@ -215,6 +215,14 @@ namespace TestCases
             new TestClass().TestMethod();
         }
 
+        public static void InheritanceTest14()
+        {
+            Data2 data = new Data2();
+
+            GenericInheritanceTestCls<Data2> instance = new GenericInheritanceTestCls<Data2>(data);
+            instance.TestVirtual();
+        }
+
         public interface IData { }
 
         public class Data : IData { }
@@ -253,6 +261,38 @@ namespace TestCases
             protected override void AbMethod1()
             {
                 
+            }
+        }
+        class BaseData
+        {
+            public string m_Message;
+        }
+
+        class Data2: BaseData
+        {
+            public Data2()
+            {
+                m_Message = "hello";
+            }
+        }
+        class GenericInheritanceTestCls<T> : ClassInheritanceTest where T : BaseData
+        {
+            protected T m_Data;     //泛型字段
+
+            public GenericInheritanceTestCls(T data)
+            {
+                m_Data = data;
+            }
+
+            public override void TestVirtual()
+            {
+                m_Data = null;          //这行可能把stack写坏了
+                TestAbstract();  //运行到这行会报错，解决方法有2个：1、将"m_Data = null;"这行注释掉。2、将"protected T m_Data;" 改为 "protected BaseData m_Data;"，去掉泛型字段
+
+            }
+            public override void TestAbstract()
+            {
+                Console.WriteLine("OK");
             }
         }
 
