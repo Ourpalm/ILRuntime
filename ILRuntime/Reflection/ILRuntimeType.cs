@@ -339,10 +339,14 @@ namespace ILRuntime.Reflection
 
         public override Type[] GetInterfaces()
         {
-            if (type.FirstCLRInterface != null)
-                return new Type[] { type.FirstCLRInterface.TypeForCLR };
-            else
-                return new Type[0];
+            var interfaces = new Type[type.Implements.Length];
+            for (int i = 0, length = type.Implements.Length; i < length; i++)
+            {
+                var t = type.Implements[i];
+                if (t != null)
+                    interfaces[i] = t.ReflectionType;
+            }
+            return interfaces;
         }
 
         public override MemberInfo[] GetMembers(BindingFlags bindingAttr)
