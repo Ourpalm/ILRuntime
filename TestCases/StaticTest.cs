@@ -20,6 +20,21 @@ namespace TestCases
         {
 
         }
+        public sealed class NormalClass
+        {
+            //public static int result;
+            public static void Create()
+            {
+                //result++;
+                Console.WriteLine("2");
+            }
+            static NormalClass()
+            {
+                //result++;
+                Console.WriteLine("1");
+            }
+        }
+        
 
         static Test_A Create_With_Reference()
         {
@@ -31,6 +46,14 @@ namespace TestCases
             Test_A a = Create_With_Reference();
             if (a.GetType() != typeof(Test_A))
                 throw new Exception($"{a.GetType()} != Test_A");
+        }
+
+        public static void UnitTest_StaticTest02()
+        {
+            NormalClass.Create();
+            //if (NormalClass.result != 2)
+            //    throw new Exception("result != 2");
+            //NormalClass.result = 0;
         }
     }
 }

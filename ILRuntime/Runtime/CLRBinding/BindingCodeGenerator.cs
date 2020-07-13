@@ -376,6 +376,7 @@ namespace ILRuntime.Runtime.Generated
         }
         internal static void CrawlAppdomain(ILRuntime.Runtime.Enviorment.AppDomain domain, Dictionary<Type, CLRBindingGenerateInfo> infos)
         {
+            domain.SuppressStaticConstructor = true;
             //Prewarm
             PrewarmDomain(domain);
             //Prewarm twice to ensure GenericMethods are prewarmed properly

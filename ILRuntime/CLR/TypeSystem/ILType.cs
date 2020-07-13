@@ -696,6 +696,15 @@ namespace ILRuntime.CLR.TypeSystem
                     lst.Add(m);
                 }
             }
+
+            if (!appdomain.SuppressStaticConstructor && !staticConstructorCalled)
+            {
+                staticConstructorCalled = true;
+                if (staticConstructor != null && (!TypeReference.HasGenericParameters || IsGenericInstance))
+                {
+                    appdomain.Invoke(staticConstructor, null, null);
+                }
+            }
         }
 
         public IMethod GetVirtualMethod(IMethod method)

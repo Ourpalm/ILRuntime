@@ -67,6 +67,8 @@ namespace ILRuntime.Runtime.Enviorment
             return UnityMainThreadID != 0 && (UnityMainThreadID != System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
 #endif
+        internal bool SuppressStaticConstructor { get; set; }
+
         public unsafe AppDomain()
         {
             AllowUnboundCLRMethod = true;
