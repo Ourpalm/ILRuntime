@@ -2466,6 +2466,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp++;
                                             }
                                             esp = Execute((ILMethod)m, esp, out unhandledException);
+                                            for (int i = m.ParameterCount - 1; i >= 0; i--)
+                                            {
+                                                Free(Add(a, i));
+                                            }
                                             ValueTypeBasePointer = bp;
                                             if (isValueType)
                                             {
