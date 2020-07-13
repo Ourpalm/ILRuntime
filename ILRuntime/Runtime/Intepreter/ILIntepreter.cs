@@ -189,7 +189,11 @@ namespace ILRuntime.Runtime.Intepreter
             for (int i = 0; i < method.LocalVariableCount; i++)
             {
                 var v = method.Variables[i];
-                bool isEnum = (v.VariableType is Mono.Cecil.TypeDefinition td) ? td.IsEnum : false;
+                bool isEnum = false;
+                if (v.VariableType is Mono.Cecil.TypeDefinition td)
+                {
+                    isEnum = ((Mono.Cecil.TypeDefinition)td).IsEnum;
+                }
                 if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive && !isEnum)
                 {
                     var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
