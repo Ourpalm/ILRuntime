@@ -394,7 +394,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T4>(),
             InvocationContext.GetInvocationType<T5>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T), typeof(T3), typeof(T4), typeof(T5) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5) };
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
 
@@ -456,7 +456,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T3>(),
             InvocationContext.GetInvocationType<T4>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T), typeof(T3), typeof(T4) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2), typeof(T3), typeof(T4) };
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2, T3 arg3, T4 arg4);
 
@@ -516,7 +516,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T2>(),
             InvocationContext.GetInvocationType<T3>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T), typeof(T3) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2), typeof(T3) };
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2, T3 arg3);
 
@@ -574,7 +574,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T>(),
             InvocationContext.GetInvocationType<T2>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2) };
 
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2);
