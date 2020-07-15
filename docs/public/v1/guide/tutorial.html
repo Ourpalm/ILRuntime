@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6</button>
+        <button class="hiden-in-phone">V1.6.3</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -164,7 +164,7 @@
     <h2 id="从零开始"><a href="#从零开始" class="headerlink" title="从零开始"></a>从零开始</h2><p>欢迎您选择ILRuntime ， 根据下面教程您可以快速的开始。</p>
 <h3 id="起步"><a href="#起步" class="headerlink" title="起步"></a>起步</h3><h4 id="在Unity2018以上版本中开始使用ILRuntime"><a href="#在Unity2018以上版本中开始使用ILRuntime" class="headerlink" title="在Unity2018以上版本中开始使用ILRuntime"></a><strong>在Unity2018以上版本中开始使用ILRuntime</strong></h4><p>ILRuntime1.6版新增了Package Manager发布，使用Unity2018以上版本可以直接通过Package Manager安装，具体方法如下</p>
 <blockquote>
-<p>如果你使用的是<code>中国特别版</code>Unity，那直接打开Package Manager即可找到ILRuntime<br>如果你使用的是<code>国际版</code>Unity，则需要按照以下步骤设置项目</p>
+<p>如果你使用的是<code>中国特别版</code>Unity，那直接打开Package Manager即可找到ILRuntime<br>如果你使用的是<code>国际版</code>Unity，或者无法在PackageManager中找到ILRuntime，则需要按照以下步骤设置项目</p>
 </blockquote>
 <p>首先需要在项目的Packages/manifest.json中，添加ILRuntime的源信息，在这个文件的dependencies节点前增加以下代码<br><figure class="highlight"><table><tr><td class="code"><pre><span class="line">"scopedRegistries": [</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"ILRuntime"</span>,</span><br><span class="line">    <span class="attr">"url"</span>: <span class="string">"https://registry.npmjs.org"</span>,</span><br><span class="line">    <span class="attr">"scopes"</span>: [</span><br><span class="line">      <span class="string">"com.ourpalm"</span></span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">],</span><br></pre></td></tr></table></figure></p>
 <p>然后通过Unity的<code>Window-&gt;Package Manager</code>菜单，打开Package Manager，将上部标签页选项选择为All Packages，Advanced里勾上Show Preview Packages，等待Unity加载完包信息，应该就能在左侧列表中找到ILRuntime，点击安装即可</p>
@@ -174,6 +174,9 @@
 <p>示例导入工程后有可能因为没开启unsafe导致编译报错，可以在PlayerSettings中勾选Allow unsafe code解决编译问题。</p>
 </blockquote>
 <p>在Assets\Samples\ILRuntime\1.6\Demo\HotFix_Project~目录中打开热更DLL的vs工程，直接编译，然后就可以正常运行ILRuntime的Demo示例了</p>
+<blockquote>
+<p>如果在进行以上配置后依然无法找到ILRuntime，可以按照下面<code>Unity3D的示例工程</code>的步骤手动安装ILRuntime</p>
+</blockquote>
 <h4 id="Unity3D的示例工程"><a href="#Unity3D的示例工程" class="headerlink" title="Unity3D的示例工程"></a><strong>Unity3D的示例工程</strong></h4><p>对于Unity2018以前的版本，你可以手动在<a href="https://github.com/Ourpalm/ILRuntimeU3D" target="_blank" rel="noopener">这里</a>下载到最新的Unity实例工程，该示例是在Unity2019下制作的。</p>
 <p>里面有2个工程，其中ILRuntimeDemo是Unity的主工程。实例都在这个工程当中的各个示例场景中，这个工程是在Unity2019下完成的，如果你使用的是其他版本的Unity，可能需要自己做一些修改。</p>
 <p>HotFix_Project是热更DLL工程，存在于<code>Assets\Samples\ILRuntime\1.6\Demo\HotFix_Project~</code>目录中，请用VS2015之类的C# IDE打开和进行编译，在编译前请确保至少打开过一次Unity的主工程，如果编译依然说找不到UnityEngine等dll，请手动重新指认一下</p>
