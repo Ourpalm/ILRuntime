@@ -29,7 +29,8 @@ namespace TestCases
         public static void ArrayTest03()
         {
             double[] propValueArr = new double[] { 0.5, 0.5 };
-            ArrayTest03Sub(propValueArr, 1, new ArrayTest03Cls(), 14);
+            Console.WriteLine("{0} ", propValueArr[0]);
+            //ArrayTest03Sub(propValueArr, 1, new ArrayTest03Cls(), 14);
         }
         public static void ArrayTestLong()
         {

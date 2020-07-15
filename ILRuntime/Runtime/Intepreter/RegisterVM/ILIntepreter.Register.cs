@@ -2221,7 +2221,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg3 = Add(r, ip->Register3);
 
                                     float[] arr = mStack[reg1->Value] as float[];
-                                    arr[reg2->Value] = *(float*)reg3->Value;
+                                    arr[reg2->Value] = *(float*)(&reg3->Value);
                                 }
                                 break;
                             case OpCodeREnum.Stelem_I8:
