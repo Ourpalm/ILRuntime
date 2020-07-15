@@ -363,5 +363,18 @@ namespace TestCases
                 throw new AccessViolationException();
 
         }
+
+        static TestVector3 GetVector3()
+        {
+            return new TestVector3(123, 123, 123);
+        }
+
+        static Func<TestVector3> GetVector3Func = GetVector3;
+        public static void UnitTest_10042()
+        {
+            TestVector3 pos = GetVector3Func?.Invoke() ?? TestVector3.One2;
+            if (pos.X != 123)
+                throw new Exception();
+        }
     }
 }
