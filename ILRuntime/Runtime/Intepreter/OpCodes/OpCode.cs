@@ -108,6 +108,11 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Cgt:
                 case OpCodeREnum.Cgt_Un:
                 case OpCodeREnum.Ceq:
+                case OpCodeREnum.Stelem_I1:
+                case OpCodeREnum.Stelem_I2:
+                case OpCodeREnum.Stelem_I4:
+                case OpCodeREnum.Stelem_R4:
+                case OpCodeREnum.Stelem_R8:
                     param = string.Format("r{0},r{1},r{2}", Register1, Register2, Register3);
                     break;
                 case OpCodeREnum.Ldc_I4_0:
@@ -175,6 +180,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     break;
                 case OpCodeREnum.Ldstr:
                     param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
+                    break;
+                case OpCodeREnum.Newarr:
+                    param = string.Format("r{0}, r{1}", Register1, Register2);
                     break;
             }
             return string.Format("{0} {1}", Code.ToString().ToLower().Replace('_', '.'), param);
