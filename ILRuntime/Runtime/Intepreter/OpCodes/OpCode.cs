@@ -179,6 +179,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     param = string.Format("r{0},{1}", Register1, OperandDouble);
                     break;
                 case OpCodeREnum.Ldstr:
+                case OpCodeREnum.Ldtoken:
                     param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
                     break;
                 case OpCodeREnum.Newarr:

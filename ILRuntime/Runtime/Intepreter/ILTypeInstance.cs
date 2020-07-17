@@ -31,6 +31,7 @@ namespace ILRuntime.Runtime.Intepreter
                     if (i.InitialValue != null && i.InitialValue.Length > 0)
                     {
                         fields[idx].ObjectType = ObjectTypes.Object;
+                        fields[idx].Value = idx;
                         managedObjs[idx] = i.InitialValue;
                     }
                     idx++;
