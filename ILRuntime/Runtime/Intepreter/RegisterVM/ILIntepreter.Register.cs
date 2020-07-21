@@ -2221,7 +2221,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg3 = Add(r, ip->Register3);
 
                                     float[] arr = mStack[reg1->Value] as float[];
-                                    arr[reg2->Value] = *(float*)reg3->Value;
+                                    arr[reg2->Value] = *(float*)(&reg3->Value);
                                 }
                                 break;
                             case OpCodeREnum.Stelem_I8:
@@ -2233,12 +2233,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     long[] arr = mStack[reg1->Value] as long[];
                                     if (arr != null)
                                     {
-                                        arr[reg2->Value] = *(long*)&reg3->Value;
+                                        arr[reg2->Value] = *(long*)(&reg3->Value);
                                     }
                                     else
                                     {
                                         ulong[] arr2 = mStack[reg1->Value] as ulong[];
-                                        arr2[reg2->Value] = *(ulong*)&reg3->Value;
+                                        arr2[reg2->Value] = *(ulong*)(&reg3->Value);
                                     }
                                 }
                                 break;
@@ -2249,7 +2249,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg3 = Add(r, ip->Register3);
 
                                     double[] arr = mStack[reg1->Value] as double[];
-                                    arr[reg2->Value] = *(double*)reg3->Value;
+                                    arr[reg2->Value] = *(double*)(&reg3->Value);
                                 }
                                 break;
                             case OpCodeREnum.Ldlen:
