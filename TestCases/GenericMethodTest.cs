@@ -330,6 +330,13 @@ namespace TestCases
             Console.WriteLine(t.ToString());
         }
 
+        public static void GenericMethodTest14()
+        {
+            Dictionary<int, List<int>> _notSelDict = new Dictionary<int, List<int>>();
+            var notSelGuids = _notSelDict.SelectMany(dict => dict.Value).ToList();
+            Console.WriteLine(notSelGuids.Count.ToString());
+        }
+
         public static void GenericExtensionMethod1Test1()
         {
             new ExtensionClass().Method1(v => { });
