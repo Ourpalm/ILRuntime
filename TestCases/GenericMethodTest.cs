@@ -9,6 +9,23 @@ using ILRuntimeTest.TestBase;
 
 namespace TestCases
 {
+
+    public static class TestGenericExtensionExtension
+    {
+        public class Test1<T>
+        {
+
+        }
+
+        public class Test2<T>
+        {
+
+        }
+        public static void CreateCollector<T>(this Test1<T> arg1, Test2<T>[] arg2)
+        {
+
+        }
+    }
     class GenericMethodTest
     {
         class GTest
@@ -421,6 +438,13 @@ namespace TestCases
         {
             new SubExtensionClass<int>().Method3(new ArgumentException());
         }
+
+        public static void GenericExtensionMethod3Test8()
+        {
+            var t1 = new TestGenericExtensionExtension.Test1<int>();
+            var t2 = new TestGenericExtensionExtension.Test2<int>[] { new TestGenericExtensionExtension.Test2<int>() };
+            t1.CreateCollector(t2);
+        }        
 
         public static void GenericStaticMethodTest1()
         {

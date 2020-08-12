@@ -844,12 +844,16 @@ namespace ILRuntime.CLR.TypeSystem
                     var p = i.Parameters[j];
                     if (p.IsByRef)
                         p = p.ElementType;
+                    if (p.IsArray)
+                        p = p.ElementType;
 
                     if (p.IsGenericParameter)
                         continue;
 
                     var p2 = param[j];
                     if (p2.IsByRef)
+                        p2 = p2.ElementType;
+                    if (p2.IsArray)
                         p2 = p2.ElementType;
                     if (p.HasGenericParameter)
                     {

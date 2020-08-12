@@ -410,6 +410,7 @@ namespace ILRuntime.Runtime.Enviorment
                     ILType type = new ILType(t, this);
 
                     mapType[t.FullName] = type;
+                    mapTypeToken[type.GetHashCode()] = type;
                     types.Add(type);
 
                 }
