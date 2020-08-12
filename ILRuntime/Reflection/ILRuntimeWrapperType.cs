@@ -172,6 +172,10 @@ namespace ILRuntime.Reflection
             return type.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return type.FullName;
+        }
         public override bool IsAssignableFrom(Type c)
         {
             if (c is ILRuntimeWrapperType)

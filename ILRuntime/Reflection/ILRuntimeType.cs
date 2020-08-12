@@ -569,6 +569,11 @@ namespace ILRuntime.Reflection
         {
             return false;
         }
+
+        public override string ToString()
+        {
+            return type.FullName;
+        }
         public override int GetHashCode()
         {
             return type.GetHashCode();
