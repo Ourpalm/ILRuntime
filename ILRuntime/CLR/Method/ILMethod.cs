@@ -512,14 +512,7 @@ namespace ILRuntime.CLR.Method
             }
             if (t != null)
             {
-                if (t is ILType)
-                {
-                    if (((ILType)t).TypeReference.HasGenericParameters)
-                        return t.GetHashCode();
-                    else
-                        return ((ILType)t).TypeReference.GetHashCode();
-                }
-                else if (isGenericParameter)
+                if (t is ILType || isGenericParameter)
                 {
                     return t.GetHashCode();
                 }

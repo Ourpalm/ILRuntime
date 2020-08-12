@@ -80,11 +80,30 @@ namespace TestCases
             a[0, 0].ToString(); //unityeditor crash on windows pc test
         }
 
+        public static void ArrayTest08()
+        {
+            GenericArrayTest<ArrayTest> cls = new ArrayTest.GenericArrayTest<ArrayTest>();
+            cls.Init();
+        }
+
         public static void ArrayBindTest()
         {
             ILRuntimeTest.TestFramework.TestClass4 cls = new ILRuntimeTest.TestFramework.TestClass4();
             cls.TestArrayOut(out var arr);
             Console.WriteLine(arr.Length);
+        }
+
+        class GenericArrayTest<T>
+        {
+            T[][] arr;
+            public void Init()
+            {
+                arr = new T[10][];
+                for(int i = 0; i < 10; i++)
+                {
+                    arr[i] = new T[20];
+                }
+            }
         }
     }
 }
