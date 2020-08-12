@@ -763,6 +763,7 @@ namespace ILRuntime.Runtime.Enviorment
                         if (valid)
                         {
                             mapTypeToken[hash] = res;
+                            mapTypeToken[res.GetHashCode()] = res;
                             if (!string.IsNullOrEmpty(res.FullName))
                                 mapType[res.FullName] = res;
                         }
@@ -786,10 +787,8 @@ namespace ILRuntime.Runtime.Enviorment
                             }
                             mapTypeToken[hash] = res;
                         }
-                        else
-                        {
-                            mapTypeToken[res.GetHashCode()] = res;
-                        }
+                        mapTypeToken[res.GetHashCode()] = res;
+
                         if (!string.IsNullOrEmpty(res.FullName))
                             mapType[res.FullName] = res;
                         return res;
