@@ -685,6 +685,7 @@ namespace ILRuntime.Runtime.Enviorment
         private IMethod baseMethod;
         private bool methodGot;
         protected bool invoking;
+        static List<IType> emptyParam = new List<IType>();
 
         public CrossBindingMethodInfo(string name)
         {
@@ -723,6 +724,8 @@ namespace ILRuntime.Runtime.Enviorment
                             param.Add(domain.GetType(i));
                     }
                 }
+                else
+                    param = emptyParam;
                 if (ReturnType != null)
                     rt = domain.GetType(ReturnType);
                 if (ilType.FirstCLRBaseType != null)

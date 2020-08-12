@@ -130,6 +130,7 @@ namespace TestCases
         public static void InheritanceTest07()
         {
             TestClass2 cls = new TestCls5();
+            cls.VMethod1();
             int val = 0;
             cls.VMethod3(ref val);
             if (val != 11)
