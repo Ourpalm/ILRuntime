@@ -16,7 +16,17 @@ order: 1030
 > 最新的发布版本为V1.6，Unity2018以上可通过Package Manager方式安装
 > V1.4已过时，示例工程内的版本已过时，当前最新版本为[master]分支。
 
-## 编辑器内出现错误
+## 编辑器内的常见问题
+
+### 我要怎么才能在Profiler里看见热更内的方法耗时情况呢？
+
+>- 在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用
+```csharp
+#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+        //由于Unity的Profiler接口只允许在主线程使用，为了避免出异常，需要告诉ILRuntime主线程的线程ID才能正确将函数运行耗时报告给Profiler
+        appdomain.UnityMainThreadID = System.Threading.Thread.CurrentThread.ManagedThreadId;
+#endif
+```
 
 ### 运行出现报错ObjectDisposedException: Cannot access a closed Stream
 

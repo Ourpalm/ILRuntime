@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.3</button>
+        <button class="hiden-in-phone">V1.6.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -161,7 +161,17 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-3"><a href="#V1-6-3" class="headerlink" title="V1.6.3"></a>V1.6.3</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-4"><a href="#V1-6-4" class="headerlink" title="V1.6.4"></a>V1.6.4</h3><ul>
+<li>修正一个使用委托返回经过值类型绑定过的值类型时造成的栈损坏问题</li>
+<li>修正一个自动生成跨域继承适配器代码时，无参数虚函数适配代码执行的报错</li>
+<li>修正一个自动生成跨域继承适配器代码对接口方法生成后，某些情况下导致StackOverflow无限递归的Bug</li>
+<li>修正Type.ToString结果和原生不一致的问题</li>
+<li>修正泛型嵌套数组T[][]字段初始化时的报错问题</li>
+<li>修正一个泛型方法匹配的Bug</li>
+<li>修正一个泛型数组作为参数时方法匹配的错误</li>
+<li>删掉一个C#7语法使用以提高兼容性</li>
+</ul>
+<h3 id="V1-6-3"><a href="#V1-6-3" class="headerlink" title="V1.6.3"></a>V1.6.3</h3><ul>
 <li>修复对泛型字段赋值导致栈损坏的Bug</li>
 <li>修复由跨域继承适配器代码生成器自动生成的代码，导致运行时进入错误的类方法的Bug</li>
 <li>修复一个在静态方法中实例化对象导致运行出错的Bug</li>

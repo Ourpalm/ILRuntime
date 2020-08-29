@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.3</button>
+        <button class="hiden-in-phone">V1.6.4</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -166,7 +166,13 @@
 <h2 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h2><blockquote>
 <p>Unity2018.3以上需要用最新ILruntime。<br>最新的发布版本为V1.6，Unity2018以上可通过Package Manager方式安装<br>V1.4已过时，示例工程内的版本已过时，当前最新版本为<a href="https://github.com/Ourpalm/ILRuntime" target="_blank" rel="noopener">master</a>分支。</p>
 </blockquote>
-<h2 id="编辑器内出现错误"><a href="#编辑器内出现错误" class="headerlink" title="编辑器内出现错误"></a>编辑器内出现错误</h2><h3 id="运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream"><a href="#运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream" class="headerlink" title="运行出现报错ObjectDisposedException: Cannot access a closed Stream"></a>运行出现报错ObjectDisposedException: Cannot access a closed Stream</h3><blockquote>
+<h2 id="编辑器内的常见问题"><a href="#编辑器内的常见问题" class="headerlink" title="编辑器内的常见问题"></a>编辑器内的常见问题</h2><h3 id="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"><a href="#我要怎么才能在Profiler里看见热更内的方法耗时情况呢？" class="headerlink" title="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"></a>我要怎么才能在Profiler里看见热更内的方法耗时情况呢？</h3><blockquote>
+<ul>
+<li>在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> DEBUG &amp;&amp; (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)</span></span><br><span class="line">        <span class="comment">//由于Unity的Profiler接口只允许在主线程使用，为了避免出异常，需要告诉ILRuntime主线程的线程ID才能正确将函数运行耗时报告给Profiler</span></span><br><span class="line">        appdomain.UnityMainThreadID = System.Threading.Thread.CurrentThread.ManagedThreadId;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<h3 id="运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream"><a href="#运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream" class="headerlink" title="运行出现报错ObjectDisposedException: Cannot access a closed Stream"></a>运行出现报错ObjectDisposedException: Cannot access a closed Stream</h3><blockquote>
 <p>加载dll的流被关闭了。新版要求流不能关闭，也不能用using写法。新的用法请参见Demo示例</p>
 </blockquote>
 <h3 id="运行时出现Cannot-find-Adaptor-for-xxxxxxxxx"><a href="#运行时出现Cannot-find-Adaptor-for-xxxxxxxxx" class="headerlink" title="运行时出现Cannot find Adaptor for: xxxxxxxxx"></a>运行时出现Cannot find Adaptor for: xxxxxxxxx</h3><blockquote>
