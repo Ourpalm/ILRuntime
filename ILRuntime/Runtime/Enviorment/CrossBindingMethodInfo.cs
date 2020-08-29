@@ -730,6 +730,8 @@ namespace ILRuntime.Runtime.Enviorment
                     rt = domain.GetType(ReturnType);
                 if (ilType.FirstCLRBaseType != null)
                     baseMethod = ilType.FirstCLRBaseType.GetMethod(Name, param, null, rt);
+                if (ilType.FirstCLRInterface != null)
+                    baseMethod = ilType.FirstCLRInterface.GetMethod(Name, param, null, rt);
                 if (baseMethod == null)
                     method = ilType.GetMethod(Name, param, null, rt);
             }

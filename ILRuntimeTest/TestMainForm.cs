@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
 using ILRuntime.CLR.TypeSystem;
@@ -249,7 +250,7 @@ namespace ILRuntimeTest
         {
             var msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(TestClass2), "ILRuntimeTest");
             MessageBox.Show(msg);
-            msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(IDisposable), "ILRuntimeTest");
+            msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(IAsyncStateMachine), "ILRuntimeTest");
             MessageBox.Show(msg);
         }
 
