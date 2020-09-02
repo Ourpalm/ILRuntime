@@ -190,9 +190,10 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 var v = method.Variables[i];
                 bool isEnum = false;
-                if (v.VariableType is Mono.Cecil.TypeDefinition td)
+                var td = v.VariableType as Mono.Cecil.TypeDefinition;
+                if (td != null)
                 {
-                    isEnum = ((Mono.Cecil.TypeDefinition)td).IsEnum;
+                    isEnum = td.IsEnum;
                 }
                 if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive && !isEnum)
                 {
