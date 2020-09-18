@@ -6,7 +6,6 @@ using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Other;
 using ILRuntime.Runtime.Intepreter;
-
 namespace ILRuntime.Runtime.Stack
 {
     unsafe class RuntimeStack : IDisposable
@@ -24,10 +23,10 @@ namespace ILRuntime.Runtime.Stack
         IList<object> managedStack = new UncheckedList<object>(32);
 #endif
 
-        Stack<StackFrame> frames = new Stack<StackFrame>();
+        UncheckedStack<StackFrame> frames = new UncheckedStack<StackFrame>();
         public const int MAXIMAL_STACK_OBJECTS = 1024 * 16;
 
-        public Stack<StackFrame> Frames { get { return frames; } }
+        public UncheckedStack<StackFrame> Frames { get { return frames; } }
         public RuntimeStack(ILIntepreter intepreter)
         {
             this.intepreter = intepreter;
@@ -82,10 +81,12 @@ namespace ILRuntime.Runtime.Stack
 
         public void InitializeFrame(ILMethod method, StackObject* esp, out StackFrame res)
         {
+#if DEBUG
             if (esp < pointer || esp >= endOfMemory)
                 throw new StackOverflowException();
             if (frames.Count > 0 && frames.Peek().BasePointer > esp)
                 throw new StackOverflowException();
+#endif
             res = new StackFrame();
             res.LocalVarPointer = esp;
             res.Method = method;
@@ -104,15 +105,19 @@ namespace ILRuntime.Runtime.Stack
         }
         public void PushFrame(ref StackFrame frame)
         {
-            frames.Push(frame);
+            frames.Push(ref frame);
         }
 
         public StackObject* PopFrame(ref StackFrame frame, StackObject* esp)
         {
+#if DEBUG
             if (frames.Count > 0 && frames.Peek().BasePointer == frame.BasePointer)
+#endif
                 frames.Pop();
+#if DEBUG
             else
                 throw new NotSupportedException();
+#endif
             StackObject* returnVal = esp - 1;
             var method = frame.Method;
             StackObject* ret = ILIntepreter.Minus(frame.LocalVarPointer, method.ParameterCount);
