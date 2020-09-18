@@ -114,6 +114,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollect_t1.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int32_List_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Int64_Int64_Array_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_Dictionary_2_Object_Object_Binding.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="AutoGenerate\System_Collections_Generic_EqualityComparer_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_IEnumerator_1_KeyValuePair_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_Int32_Int32_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_Int32_List_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_String_IType_Binding.cs" />
     <Compile Include="AutoGenerate\System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding.cs" />
@@ -153,6 +155,7 @@
     <Compile Include="AutoGenerate\System_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_Enum_Binding.cs" />
     <Compile Include="AutoGenerate\System_Exception_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Func_1_TestVector3_Binding.cs" />
     <Compile Include="AutoGenerate\System_Func_2_Int32_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Func_4_Int32_Single_Int16_Double_Binding.cs" />
     <Compile Include="AutoGenerate\System_IComparable_1_Int32_Binding.cs" />
@@ -179,6 +182,7 @@
     <Compile Include="AutoGenerate\System_Reflection_PropertyInfo_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.cs" />
+    <Compile Include="AutoGenerate\System_Runtime_CompilerServices_AsyncVoidMethodBuilder_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.cs" />
     <Compile Include="AutoGenerate\System_Runtime_CompilerServices_TaskAwaiter_Binding.cs" />
     <Compile Include="AutoGenerate\System_Single_Binding.cs" />

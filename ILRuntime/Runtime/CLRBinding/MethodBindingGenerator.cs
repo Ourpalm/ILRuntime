@@ -502,8 +502,11 @@ namespace ILRuntime.Runtime.CLRBinding
                 if (!i.IsStatic && ((type.IsValueType && !type.IsPrimitive) || hasByRef))//need to write back value type instance
                 {
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
-
-                    if (type.IsValueType && !type.IsPrimitive)
+                    bool noWriteback = false;
+#if NET_4_6 || NET_STANDARD_2_0
+                    noWriteback = type == typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder) && i.Name == "Start";
+#endif
+                    if (type.IsValueType && !type.IsPrimitive && !noWriteback)
                     {
                         if (valueTypeBinders != null && valueTypeBinders.Contains(type))
                         {

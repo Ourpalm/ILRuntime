@@ -14,19 +14,17 @@ using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class System_Action_1_Int32_Binding
+    unsafe class System_Func_1_TestVector3_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
             Type[] args;
-            Type type = typeof(System.Action<System.Int32>);
-            args = new Type[]{typeof(System.Int32)};
+            Type type = typeof(System.Func<ILRuntimeTest.TestFramework.TestVector3>);
+            args = new Type[]{};
             method = type.GetMethod("Invoke", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Invoke_0);
-
-            app.RegisterCLRCreateArrayInstance(type, s => new System.Action<System.Int32>[s]);
 
 
         }
@@ -36,18 +34,20 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int32 @obj = ptr_of_this_method->Value;
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            System.Action<System.Int32> instance_of_this_method = (System.Action<System.Int32>)typeof(System.Action<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Func<ILRuntimeTest.TestFramework.TestVector3> instance_of_this_method = (System.Func<ILRuntimeTest.TestFramework.TestVector3>)typeof(System.Func<ILRuntimeTest.TestFramework.TestVector3>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
             __intp.Free(ptr_of_this_method);
 
-            instance_of_this_method.Invoke(@obj);
+            var result_of_this_method = instance_of_this_method.Invoke();
 
-            return __ret;
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
         }
 
 
