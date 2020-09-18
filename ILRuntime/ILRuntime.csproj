@@ -57,7 +57,7 @@
     <Compile Include="Other\DelegateExportAttribute.cs" />
     <Compile Include="Other\NeedAdaptorAttribute.cs" />
     <Compile Include="Other\ThreadSafeDictionary.cs" />
-    <Compile Include="Other\ValueTypeStack.cs" />
+    <Compile Include="Other\UncheckedStack.cs" />
     <Compile Include="Other\UncheckedList.cs" />
     <Compile Include="Reflection\Extensions.cs" />
     <Compile Include="Reflection\ILRuntimeConstructorInfo.cs" />

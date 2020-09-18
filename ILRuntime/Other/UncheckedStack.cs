@@ -234,7 +234,6 @@ public void TrimExcess()
 
 	public ref T Pop()
 	{
-		_version++;
 		ref T result = ref _array[--_size];
 		return ref result;
 	}
@@ -248,7 +247,6 @@ public void TrimExcess()
 			_array = array;
 		}
 		_array[_size++] = item;
-		_version++;
 	}
 
 	public T[] ToArray()
