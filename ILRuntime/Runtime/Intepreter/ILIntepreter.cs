@@ -3228,6 +3228,17 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
                                         }
+                                        else if (objRef->ObjectType == ObjectTypes.FieldReference)
+                                        {
+                                            var instance = mStack[objRef->Value] as ILTypeInstance;
+                                            if (instance != null)
+                                            {
+                                                PushNull(esp);
+                                                instance.AssignFromStack(objRef->ValueLow, esp, AppDomain, mStack);
+                                            }
+                                            else
+                                                throw new NotImplementedException();
+                                        }
                                         else if (type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
                                     }

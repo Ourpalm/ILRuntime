@@ -344,5 +344,42 @@ namespace TestCases
             char ch1 = (char)och;
             Console.WriteLine("test1:" + (int)ch1 + " " + ch1);
         }
+
+        public static void UnitTest_1013()
+        {
+            var testClass = new TestClass<object>();
+            testClass.tValue = new object();
+            testClass.obj = new object();
+
+            // 清理异常
+            testClass.SetNull();
+            if (testClass.tValue != null)
+                throw new Exception();
+            testClass.Print();
+
+            // 清理正常
+            testClass.tValue = null;
+            testClass.obj = null;
+            testClass.Print();
+        }
+
+        public class TestClass<T> where T : class, new()
+        {
+            public T tValue;
+            public object obj;
+
+            public void SetNull()
+            {
+                tValue = null;    // 清理失败，不为空
+                obj = null;       // 能正常清理
+            }
+
+            public void Print()
+            {
+                Console.WriteLine(tValue);
+                Console.WriteLine(obj);
+            }
+        }
+
     }
 }
