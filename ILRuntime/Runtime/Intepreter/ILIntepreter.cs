@@ -192,14 +192,20 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 var v = method.Variables[i];
                 bool isEnum = false;
-                var td = v.VariableType as Mono.Cecil.TypeDefinition;
-                if (td != null)
+                var vt = v.VariableType;
+                IType t;
+                if (vt.IsGenericParameter)
                 {
-                    isEnum = td.IsEnum;
+                    t = method.FindGenericArgument(vt.Name);
                 }
-                if (v.VariableType.IsValueType && !v.VariableType.IsPrimitive && !isEnum)
+                else
                 {
-                    var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
+                    t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
+                }
+                isEnum = t.IsEnum;
+                
+                if (t.IsValueType && !t.IsPrimitive && !isEnum)
+                {
                     if (t is ILType)
                     {
                         //var obj = ((ILType)t).Instantiate(false);
@@ -230,9 +236,8 @@ namespace ILRuntime.Runtime.Intepreter
                 }
                 else
                 {
-                    if (v.VariableType.IsPrimitive || isEnum)
+                    if (t.IsPrimitive || isEnum)
                     {
-                        var t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
                         var loc = Add(v1, i);
                         StackObject.Initialized(loc, t);
                     }
@@ -3114,6 +3119,14 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 case ObjectTypes.Null:
                                                     throw new NullReferenceException();
+                                                case ObjectTypes.Integer:
+                                                case ObjectTypes.Float:
+                                                    objRef->Value = 0;
+                                                    break;
+                                                case ObjectTypes.Long:
+                                                case ObjectTypes.Double:
+                                                    *(long*)&objRef->Value = 0;
+                                                    break;
                                                 case ObjectTypes.ValueTypeObjectReference:
                                                     stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
                                                     break;

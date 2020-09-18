@@ -548,5 +548,16 @@ namespace TestCases
             var t = typeof(T);//出错
             Console.WriteLine(t);
         }
+
+        public static void GenericStaticMethodTest14()
+        {
+            var e2 = GenericStaticMethodTest14Sub<EnumTest.TestEnum>();
+            Console.WriteLine(e2);
+        }
+
+        static T GenericStaticMethodTest14Sub<T>()
+        {
+            return default(T);
+        }
     }
 }
