@@ -732,6 +732,17 @@ namespace ILRuntime.CLR.TypeSystem
                 }
                 else
                     m = GetMethod(string.Format("{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+
+                if (m == null)
+                {
+                    if (method.DeclearingType is ILType)
+                    {
+                        ILType iltype = (ILType)method.DeclearingType;
+                        m = GetMethod(string.Format("global::{0}.{1}", iltype.fullNameForNested, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+                    }
+                    else
+                        m = GetMethod(string.Format("global::{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+                }
             }
 
             if (m == null)
