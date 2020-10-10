@@ -363,6 +363,27 @@ namespace TestCases
             testClass.Print();
         }
 
+        public static void UnitTest_1014()
+        {
+            int a = 0;
+            UnitTest_1014Sub(ref a);
+            if (a != 1)
+                throw new Exception();
+        }
+
+        static void UnitTest_1014Sub(ref int a)
+        {
+            try
+            {
+                a = 2;
+                return;
+            }
+            finally
+            {
+                a = 1;
+            }
+        }
+
         public class TestClass<T> where T : class, new()
         {
             public T tValue;

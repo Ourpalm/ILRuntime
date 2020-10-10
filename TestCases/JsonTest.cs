@@ -168,5 +168,15 @@ namespace TestCases
                 Console.WriteLine("Fail");
             }
         }
+
+        public static void JsonTest7()
+        {
+            JsonTestEnum[] arr = new JsonTestEnum[] { JsonTestEnum.Test2, JsonTestEnum.Test3 };
+            string json = JsonMapper.ToJson(arr);
+
+            JsonTestEnum[] arr2 = JsonMapper.ToObject<JsonTestEnum[]>(json);
+            if (arr2[0] != JsonTestEnum.Test2)
+                throw new Exception();
+        }
     }
 }
