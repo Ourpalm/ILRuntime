@@ -9,6 +9,13 @@ namespace TestCases
 {
     public class EnumTest
     {
+        public enum TestEnum5
+        {
+            Enum1,
+            Enum2,
+            Enum4 = 0x12345789,
+        }
+
         public enum TestEnum : long
         {
             Enum1,
@@ -289,7 +296,29 @@ namespace TestCases
             if (res)
                 throw new Exception();
         }
+        public static void Test21()
+        {
+            bool res = false;
+            TestEnum5 b = (TestEnum5)Enum.ToObject(typeof(TestEnum5), 0x12345789);
+            switch (b)
+            {
+                case TestEnum5.Enum1:
+                    res = false;
+                    break;
+                case TestEnum5.Enum2:
+                    res = false;
+                    break;
+                case TestEnum5.Enum4:
+                    res = true;
+                    break;
+                default:
+                    res = false;
+                    break;
+            }
 
+            if (!res)
+                throw new Exception();
+        }
         class SystemType
         {
             public int value = 10;

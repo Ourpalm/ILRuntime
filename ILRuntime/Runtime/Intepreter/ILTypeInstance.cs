@@ -87,6 +87,11 @@ namespace ILRuntime.Runtime.Intepreter
                             if ((short)f.Constant == intVal)
                                 return f.Name;
                         }
+                        else if(f.Constant is long)
+                        {
+                            if ((long)f.Constant == longVal)
+                                return f.Name;
+                        }
                         else if (f.Constant is byte)
                         {
                             if ((byte)f.Constant == intVal)

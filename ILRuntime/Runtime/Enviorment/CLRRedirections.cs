@@ -1153,7 +1153,7 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     ILEnumTypeInstance ins = new ILEnumTypeInstance(it);
                     ins[0] = val;
-                    return ILIntepreter.PushObject(ret, mStack, ins.ToString(), true);
+                    return ILIntepreter.PushObject(ret, mStack, ins, true);
                 }
                 else
                     throw new Exception(string.Format("{0} is not Enum", t.FullName));
