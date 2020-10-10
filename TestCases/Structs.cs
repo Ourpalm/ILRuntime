@@ -233,5 +233,26 @@ namespace TestCases
             EnumTestStruct val = new EnumTestStruct();
             Console.WriteLine(val.value);
         }
+
+        private struct StructTest
+        {
+            public Object objAsset;
+            public string type;
+        }
+        public static void StructTest6()
+        {
+            Dictionary<string, StructTest> m_dictAsset = new Dictionary<string, StructTest>();
+            StructTest cube = new StructTest();
+            cube.type = "111";
+            m_dictAsset["123"] = cube;
+            cube.type = "123";
+            string strId = "123";
+            if (!m_dictAsset.TryGetValue(strId, out cube)) //注释：这句代码报错，提示错误InvalidCastException: Specified cast is not valid
+            {
+                throw new Exception();
+            }
+            if (cube.type != "111")
+                throw new Exception();
+        }
     }
 }

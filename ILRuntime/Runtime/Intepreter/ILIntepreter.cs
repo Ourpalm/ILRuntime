@@ -5244,6 +5244,8 @@ namespace ILRuntime.Runtime.Intepreter
                 var dst = ILIntepreter.ResolveReference(esp);
                 var vt = domain.GetType(dst->Value);
 
+                if (obj == null)//Nothing to do
+                    return;
                 if (obj is ILTypeInstance)
                 {
                     var ins = (ILTypeInstance)obj;
