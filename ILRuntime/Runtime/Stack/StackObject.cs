@@ -183,7 +183,10 @@ namespace ILRuntime.Runtime.Stack
                     }
                 }
                 else
+                {
                     esp = Null;
+                    mStack[idx] = null;
+                }
             }
         }
 

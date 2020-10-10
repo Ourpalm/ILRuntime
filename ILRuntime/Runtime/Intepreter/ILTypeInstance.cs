@@ -455,6 +455,17 @@ namespace ILRuntime.Runtime.Intepreter
             InitializeFields(type);
         }
 
+        internal void InitializeField(int fieldIdx)
+        {
+            if (fieldIdx < fields.Length && fieldIdx >= 0)
+            {
+                var ft = type.FieldTypes[fieldIdx];
+                StackObject.Initialized(ref fields[fieldIdx], fieldIdx, ft.TypeForCLR, ft, managedObjs);
+            }
+            else
+                throw new NotImplementedException();
+        }
+
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack)
         {
             if (fieldIdx < fields.Length && fieldIdx >= 0)
@@ -492,6 +503,7 @@ namespace ILRuntime.Runtime.Intepreter
                 case ObjectTypes.Object:
                 case ObjectTypes.ArrayReference:
                 case ObjectTypes.FieldReference:
+                    field.ObjectType = ObjectTypes.Object;
                     field.Value = fieldIdx;
                     managedObjs[fieldIdx] = ILIntepreter.CheckAndCloneValueType(managedStack[esp->Value], Type.AppDomain);
                     break;

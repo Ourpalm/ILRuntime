@@ -254,5 +254,23 @@ namespace TestCases
             if (cube.type != "111")
                 throw new Exception();
         }
+
+        class TestClass
+        {
+            public ILRuntimeTest.TestFramework.TestVector3 v21 = new ILRuntimeTest.TestFramework.TestVector3(111, 222, 333);
+            public ILRuntimeTest.TestFramework.TestVector3 v22 = new ILRuntimeTest.TestFramework.TestVector3();
+
+            public void Test()
+            {
+                v21.X = 123; //没问题
+                v22.X = 222; //有问题， 报空 NullRef
+            }
+        }
+
+        public static void StructTest7()
+        {
+            var cl = new TestClass();
+            cl.Test();
+        }
     }
 }
