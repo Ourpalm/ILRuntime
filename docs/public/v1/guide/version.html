@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.4</button>
+        <button class="hiden-in-phone">V1.6.5</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -161,7 +161,17 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-4"><a href="#V1-6-4" class="headerlink" title="V1.6.4"></a>V1.6.4</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-5"><a href="#V1-6-5" class="headerlink" title="V1.6.5"></a>V1.6.5</h3><ul>
+<li>提升了Release环境下（非Development Build）大约25%的执行效率</li>
+<li>修复了一个泛型类型中泛型变量无法置null的Bug</li>
+<li>修复一个default关键字作用于枚举或者值类型时报错的Bug</li>
+<li>修复一个导致带条件的await语句失效的Bug</li>
+<li>修复一个Enum.ToObject返回的Enum值不正确的Bug</li>
+<li>修复一个泛型方法中out到一个值类型报错的Bug</li>
+<li>修复一个由自动生成产生的跨域继承适配器，虚方法未被重载时不执行的Bug</li>
+<li>修复Litjson集成反序列化枚举数组时崩溃的Bug</li>
+</ul>
+<h3 id="V1-6-4"><a href="#V1-6-4" class="headerlink" title="V1.6.4"></a>V1.6.4</h3><ul>
 <li>修正一个使用委托返回经过值类型绑定过的值类型时造成的栈损坏问题</li>
 <li>修正一个自动生成跨域继承适配器代码时，无参数虚函数适配代码执行的报错</li>
 <li>修正一个自动生成跨域继承适配器代码对接口方法生成后，某些情况下导致StackOverflow无限递归的Bug</li>
