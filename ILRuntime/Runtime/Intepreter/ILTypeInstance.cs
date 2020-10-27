@@ -457,13 +457,21 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal void InitializeField(int fieldIdx)
         {
-            if (fieldIdx < fields.Length && fieldIdx >= 0)
+            int curStart = type.FieldStartIndex;
+            ILType curType = type;
+            while(curType != null)
             {
-                var ft = type.FieldTypes[fieldIdx];
-                StackObject.Initialized(ref fields[fieldIdx], fieldIdx, ft.TypeForCLR, ft, managedObjs);
+                int maxIdx = curType.FieldStartIndex + curType.FieldTypes.Length;
+                if (fieldIdx < maxIdx && fieldIdx >= curType.FieldStartIndex)
+                {
+                    var ft = curType.FieldTypes[fieldIdx - curType.FieldStartIndex];
+                    StackObject.Initialized(ref fields[fieldIdx], fieldIdx, ft.TypeForCLR, ft, managedObjs);
+                    return;
+                }
+                else
+                    curType = type.BaseType as ILType;
             }
-            else
-                throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, IList<object> managedStack)
