@@ -232,10 +232,9 @@ public void TrimExcess()
 		return _array[_size - 1];
 	}
 
-	public ref T Pop()
+	public T Pop()
 	{
-		ref T result = ref _array[--_size];
-		return ref result;
+		return _array[--_size];
 	}
 
 	public void Push(ref T item)
