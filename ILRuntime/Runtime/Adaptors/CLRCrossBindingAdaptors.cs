@@ -7,15 +7,15 @@ using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 
-namespace ILRuntime.Runtime.Adaptors
+namespace ILRuntime.Runtime.Adapters
 {
-    class AttributeAdaptor : CrossBindingAdaptor
+    public class AttributeAdapter : CrossBindingAdaptor
     {
         public override Type AdaptorType
         {
             get
             {
-                return typeof(Adaptor);
+                return typeof(Adapter);
             }
         }
 
@@ -29,10 +29,10 @@ namespace ILRuntime.Runtime.Adaptors
 
         public override object CreateCLRInstance(Enviorment.AppDomain appdomain, ILTypeInstance instance)
         {
-            return new Adaptor(appdomain, instance);
+            return new Adapter(appdomain, instance);
         }
 
-        class Adaptor : Attribute, CrossBindingAdaptorType
+        public class Adapter : Attribute, CrossBindingAdaptorType
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -40,7 +40,7 @@ namespace ILRuntime.Runtime.Adaptors
             bool isToStringGot;
             IMethod toString;
 
-            public Adaptor(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
+            public Adapter(ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance)
             {
                 this.appdomain = appdomain;
                 this.instance = instance;
