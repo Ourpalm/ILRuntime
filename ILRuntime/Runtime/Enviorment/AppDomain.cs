@@ -31,6 +31,12 @@ namespace ILRuntime.Runtime.Enviorment
         public int MethodBodySize;
         public int TotalSize;
     }
+
+    public struct PrewarmInfo
+    {
+        public string TypeName;
+        public string[] MethodNames;
+    }
     public class AppDomain
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
@@ -984,6 +990,31 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
+        /// <summary>
+        /// Prewarm all methods specified by the parameter
+        /// </summary>
+        /// <param name="info"></param>
+        public void Prewarm(PrewarmInfo[] info)
+        {
+            foreach(var i in info)
+            {
+                IType t = GetType(i.TypeName);
+                if (t == null || t is CLRType || i.MethodNames == null)
+                    continue;
+                var methods = t.GetMethods();
+                foreach (var mn in i.MethodNames)
+                {
+                    foreach(var j in methods)
+                    {
+                        ILMethod m = (ILMethod)j;
+                        if(m.Name == mn && m.GenericParameterCount == 0)
+                        {
+                            m.Prewarm();
+                        }
+                    }
+                }
+            }
+        }
         /// <summary>
         /// Invoke a method
         /// </summary>
