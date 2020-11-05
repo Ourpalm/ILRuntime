@@ -376,5 +376,37 @@ namespace TestCases
             if (pos.X != 123)
                 throw new Exception();
         }
+
+        public static void UnitTest_10043()
+        {
+            SubTestClass test = new SubTestClass();
+        }
+
+        public class TestBase
+        {
+            public int a;
+            public TestVector3 vec = new TestVector3();//”–Œ Ã‚
+
+            public TestBase()
+            {
+            }
+        }
+
+        public class TestClass : TestBase
+        {
+            private int b;
+
+            public TestClass()
+            {
+            }
+        }
+
+        public class SubTestClass : TestClass
+        {
+            int c;
+            public SubTestClass()
+            {
+            }
+        }
     }
 }

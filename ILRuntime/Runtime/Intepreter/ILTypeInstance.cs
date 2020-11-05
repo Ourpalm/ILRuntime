@@ -469,7 +469,7 @@ namespace ILRuntime.Runtime.Intepreter
                     return;
                 }
                 else
-                    curType = type.BaseType as ILType;
+                    curType = curType.BaseType as ILType;
             }
             throw new NotImplementedException();
         }
