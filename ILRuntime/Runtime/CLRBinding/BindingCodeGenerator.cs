@@ -773,7 +773,7 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
 
-                if (valueTypeBinders != null)
+                if (valueTypeBinders != null && valueTypeBinders.Count > 0)
                 {
                     sb.AppendLine();
 

@@ -86,6 +86,8 @@ namespace ILRuntime.Runtime.CLRBinding
                 var j = param[i];
                 if (j.IsOut && j.ParameterType.IsByRef)
                     sb.Append("out ");
+                else if (j.IsIn && j.ParameterType.IsByRef)
+                    sb.Append("in ");
                 else if (j.ParameterType.IsByRef)
                     sb.Append("ref ");
                 if (isMultiArr)
