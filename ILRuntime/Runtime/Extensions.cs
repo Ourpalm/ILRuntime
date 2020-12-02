@@ -71,7 +71,30 @@ namespace ILRuntime.Runtime
             else
             {
                 clsName = simpleClassName ? "" : (!string.IsNullOrEmpty(type.Namespace) ? type.Namespace.Replace(".", "_") + "_" : "");
-                realNamespace = !string.IsNullOrEmpty(type.Namespace) ? type.Namespace + "." : "global::";
+
+                if (string.IsNullOrEmpty(type.Namespace))
+                {
+                    if (type.IsArray)
+                    {
+                        var elementType = type.GetElementType();
+                        if (elementType.IsNested && elementType.DeclaringType != null)
+                        {
+                            realNamespace = elementType.Namespace + "." + elementType.DeclaringType.Name + ".";
+                        }
+                        else
+                        {
+                            realNamespace = elementType.Namespace + ".";
+                        }
+                    }
+                    else
+                    {
+                        realNamespace = "global::";
+                    }
+                }
+                else
+                {
+                    realNamespace = type.Namespace + ".";
+                }
             }
             clsName = clsName + type.Name.Replace(".", "_").Replace("`", "_").Replace("<", "_").Replace(">", "_");
             bool isGeneric = false;
