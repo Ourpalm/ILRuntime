@@ -157,6 +157,10 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.EnumHasFlag);
                 }
+                if(i.Name == "CompareTo")
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.EnumCompareTo);
+                }
 #endif
                 if (i.Name == "ToObject" && i.GetParameters()[1].ParameterType == typeof(int))
                 {

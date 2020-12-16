@@ -319,6 +319,15 @@ namespace TestCases
             if (!res)
                 throw new Exception();
         }
+
+        public static void Test22()
+        {
+            int res = 0;
+            TestEnum5 b = TestEnum5.Enum2;
+            res = b.CompareTo(TestEnum5.Enum4);
+            if (res >= 0)
+                throw new Exception();
+        }
         class SystemType
         {
             public int value = 10;
