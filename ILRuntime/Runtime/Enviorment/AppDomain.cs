@@ -66,7 +66,7 @@ namespace ILRuntime.Runtime.Enviorment
         /// </summary>
         public bool AllowUnboundCLRMethod { get; set; }
 
-#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+#if DEBUG && !NO_PROFILER
         public int UnityMainThreadID { get; set; }
         public bool IsNotUnityMainThread()
         {

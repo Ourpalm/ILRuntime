@@ -46,7 +46,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             //Clear old debug state
             ClearDebugState();
-#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+#if DEBUG && !NO_PROFILER
             if(domain.UnityMainThreadID == Thread.CurrentThread.ManagedThreadId)
             {
                 mainthreadLock = true;
@@ -110,7 +110,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method == null)
                 throw new NullReferenceException();
 #endif
-#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+#if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 
 #if UNITY_5_5_OR_NEWER
@@ -1827,7 +1827,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (!allowUnboundCLRMethod)
                                                         throw new NotSupportedException(cm.ToString() + " is not bound!");
 #endif
-#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+#if DEBUG && !NO_PROFILER
                                                     if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 
 #if UNITY_5_5_OR_NEWER
@@ -1837,7 +1837,7 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
 #endif
                                                     object result = cm.Invoke(this, esp, mStack);
-#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+#if DEBUG && !NO_PROFILER
                                                     if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
                                                         UnityEngine.Profiling.Profiler.EndSample();
@@ -4258,7 +4258,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                 }
             }
-#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+#if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
                 UnityEngine.Profiling.Profiler.EndSample();
