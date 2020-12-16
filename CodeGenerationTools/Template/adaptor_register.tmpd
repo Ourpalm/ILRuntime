@@ -1,2 +1,0 @@
-            
-			app.RegisterCrossBindingAdaptor(new {$TypeName}Adaptor());

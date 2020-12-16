@@ -30,6 +30,7 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("testField", flag);
             app.RegisterCLRFieldGetter(field, get_testField_0);
             app.RegisterCLRFieldSetter(field, set_testField_0);
+            app.RegisterCLRFieldBinding(field, CopyToStack_testField_0, AssignFromStack_testField_0);
 
 
         }
@@ -51,10 +52,28 @@ namespace ILRuntime.Runtime.Generated
         {
             return ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField;
         }
+
+        static StackObject* CopyToStack_testField_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
+        }
+
         static void set_testField_0(ref object o, object v)
         {
             ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField = (System.Boolean)v;
         }
+
+        static StackObject* AssignFromStack_testField_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            System.Boolean @testField = ptr_of_this_method->Value == 1;
+            ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField = @testField;
+            return ptr_of_this_method;
+        }
+
 
 
     }

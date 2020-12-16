@@ -421,6 +421,12 @@ namespace ILRuntime.CLR.Method
                         var m = appdomain.GetMethod(token, declaringType, this, out invalidToken);
                         if (m != null)
                         {
+                            if(code.Code == OpCodeEnum.Callvirt && m is ILMethod)
+                            {
+                                ILMethod ilm = (ILMethod)m;
+                                if (!ilm.def.IsAbstract && !ilm.def.IsVirtual && !ilm.DeclearingType.IsInterface)
+                                    code.Code = OpCodeEnum.Call;
+                            }
                             if (invalidToken)
                                 code.TokenInteger = m.GetHashCode();
                             else
@@ -506,14 +512,7 @@ namespace ILRuntime.CLR.Method
             }
             if (t != null)
             {
-                if (t is ILType)
-                {
-                    if (((ILType)t).TypeReference.HasGenericParameters)
-                        return t.GetHashCode();
-                    else
-                        return ((ILType)t).TypeReference.GetHashCode();
-                }
-                else if (isGenericParameter)
+                if (t is ILType || isGenericParameter)
                 {
                     return t.GetHashCode();
                 }

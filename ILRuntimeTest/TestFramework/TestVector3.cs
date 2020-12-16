@@ -5,7 +5,30 @@ using System.Text;
 using ILRuntime.Other;
 
 namespace ILRuntimeTest.TestFramework
-{   
+{
+    public struct TestVector3NoBinding
+    {
+        public float x, y, z;
+
+        static TestVector3NoBinding mZero = new TestVector3NoBinding(0, 0, 0);
+        static TestVector3NoBinding mOne = new TestVector3NoBinding(1, 1, 1);
+
+        public static TestVector3NoBinding zero => mZero;
+        public static TestVector3NoBinding one => mOne;
+
+        public TestVector3NoBinding(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        public override string ToString()
+        {
+            return $"({x},{y},{z})";
+        }
+    }
+
     public struct TestVector3
     {
         public float X, Y, Z;

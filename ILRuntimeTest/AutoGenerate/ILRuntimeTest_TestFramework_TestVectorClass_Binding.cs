@@ -33,6 +33,7 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("vector", flag);
             app.RegisterCLRFieldGetter(field, get_vector_0);
             app.RegisterCLRFieldSetter(field, set_vector_0);
+            app.RegisterCLRFieldBinding(field, CopyToStack_vector_0, AssignFromStack_vector_0);
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
@@ -90,10 +91,36 @@ namespace ILRuntime.Runtime.Generated
         {
             return ((ILRuntimeTest.TestFramework.TestVectorClass)o).vector;
         }
+
+        static StackObject* CopyToStack_vector_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ((ILRuntimeTest.TestFramework.TestVectorClass)o).vector;
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
+        }
+
         static void set_vector_0(ref object o, object v)
         {
             ((ILRuntimeTest.TestFramework.TestVectorClass)o).vector = (ILRuntimeTest.TestFramework.TestVector3)v;
         }
+
+        static StackObject* AssignFromStack_vector_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            ILRuntimeTest.TestFramework.TestVector3 @vector = new ILRuntimeTest.TestFramework.TestVector3();
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @vector, __intp, ptr_of_this_method, __mStack, true);
+            } else {
+                @vector = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            }
+            ((ILRuntimeTest.TestFramework.TestVectorClass)o).vector = @vector;
+            return ptr_of_this_method;
+        }
+
 
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {

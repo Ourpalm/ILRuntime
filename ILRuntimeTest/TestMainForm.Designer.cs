@@ -37,6 +37,7 @@
             this.btnRunSelect = new System.Windows.Forms.Button();
             this.btnGenerateBinding = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnTestCrossBind = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -50,7 +51,7 @@
             // btnRun
             // 
             this.btnRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRun.Location = new System.Drawing.Point(514, 380);
+            this.btnRun.Location = new System.Drawing.Point(574, 380);
             this.btnRun.Margin = new System.Windows.Forms.Padding(2);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(62, 29);
@@ -62,9 +63,10 @@
             // listView1
             // 
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(664, 157);
+            this.listView1.Size = new System.Drawing.Size(809, 157);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
@@ -77,13 +79,13 @@
             this.tbLog.Multiline = true;
             this.tbLog.Name = "tbLog";
             this.tbLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbLog.Size = new System.Drawing.Size(664, 192);
+            this.tbLog.Size = new System.Drawing.Size(809, 192);
             this.tbLog.TabIndex = 2;
             // 
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(332, 380);
+            this.btnLoad.Location = new System.Drawing.Point(392, 380);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(100, 29);
             this.btnLoad.TabIndex = 3;
@@ -97,13 +99,13 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPath.Location = new System.Drawing.Point(12, 385);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(314, 21);
+            this.txtPath.Size = new System.Drawing.Size(374, 21);
             this.txtPath.TabIndex = 4;
             // 
             // btnRunSelect
             // 
             this.btnRunSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRunSelect.Location = new System.Drawing.Point(438, 380);
+            this.btnRunSelect.Location = new System.Drawing.Point(498, 379);
             this.btnRunSelect.Name = "btnRunSelect";
             this.btnRunSelect.Size = new System.Drawing.Size(71, 29);
             this.btnRunSelect.TabIndex = 5;
@@ -114,7 +116,7 @@
             // btnGenerateBinding
             // 
             this.btnGenerateBinding.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnGenerateBinding.Location = new System.Drawing.Point(581, 380);
+            this.btnGenerateBinding.Location = new System.Drawing.Point(641, 380);
             this.btnGenerateBinding.Name = "btnGenerateBinding";
             this.btnGenerateBinding.Size = new System.Drawing.Size(84, 29);
             this.btnGenerateBinding.TabIndex = 6;
@@ -138,15 +140,27 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tbLog);
-            this.splitContainer1.Size = new System.Drawing.Size(664, 355);
+            this.splitContainer1.Size = new System.Drawing.Size(809, 355);
             this.splitContainer1.SplitterDistance = 157;
             this.splitContainer1.TabIndex = 7;
+            // 
+            // btnTestCrossBind
+            // 
+            this.btnTestCrossBind.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTestCrossBind.Location = new System.Drawing.Point(731, 380);
+            this.btnTestCrossBind.Name = "btnTestCrossBind";
+            this.btnTestCrossBind.Size = new System.Drawing.Size(98, 29);
+            this.btnTestCrossBind.TabIndex = 8;
+            this.btnTestCrossBind.Text = "CrossBind Gen";
+            this.btnTestCrossBind.UseVisualStyleBackColor = true;
+            this.btnTestCrossBind.Click += new System.EventHandler(this.button1_Click);
             // 
             // TestMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 420);
+            this.ClientSize = new System.Drawing.Size(833, 420);
+            this.Controls.Add(this.btnTestCrossBind);
             this.Controls.Add(this.btnGenerateBinding);
             this.Controls.Add(this.btnRunSelect);
             this.Controls.Add(this.txtPath);
@@ -178,5 +192,6 @@
         private System.Windows.Forms.Button btnRunSelect;
         private System.Windows.Forms.Button btnGenerateBinding;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Button btnTestCrossBind;
     }
 }

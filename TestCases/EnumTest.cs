@@ -9,6 +9,13 @@ namespace TestCases
 {
     public class EnumTest
     {
+        public enum TestEnum5
+        {
+            Enum1,
+            Enum2,
+            Enum4 = 0x12345789,
+        }
+
         public enum TestEnum : long
         {
             Enum1,
@@ -53,6 +60,19 @@ namespace TestCases
         {
             Min = sbyte.MinValue,
             Max = sbyte.MaxValue
+        }
+
+        enum TestEnumFlag
+        {
+            Feature1 = 1,
+            Feature2 = 2,
+            Feature3 = 4,
+            Feature4 = 8,
+        }
+
+        enum TestEnumEmpty
+        {
+
         }
 
         static TestEnum b = TestEnum.Enum2;
@@ -245,6 +265,70 @@ namespace TestCases
             {
                 Console.WriteLine(e);
             }
+        }
+
+        public static void Test18()
+        {
+            var a = TestEnum.Enum2;
+            Test18Sub(0x123456789, out a);
+            Console.WriteLine(a);
+        }
+
+        static void Test18Sub(ulong val, out TestEnum e)
+        {
+            e = (TestEnum)val;
+        }
+
+        public static void Test19()
+        {
+            Console.WriteLine(Enum.GetValues(typeof(TestEnumEmpty)).Length);
+        }
+
+        public static void Test20()
+        {
+            TestEnumFlag flag = TestEnumFlag.Feature1 | TestEnumFlag.Feature3;
+            var res = flag.HasFlag(TestEnumFlag.Feature3);
+            Console.WriteLine(res);
+            if (!res)
+                throw new Exception();
+            res = flag.HasFlag(TestEnumFlag.Feature2);
+            Console.WriteLine(res);
+            if (res)
+                throw new Exception();
+        }
+        public static void Test21()
+        {
+            bool res = false;
+            object obj = Enum.ToObject(typeof(TestEnum5), 0x12345789);
+            Console.WriteLine(obj);
+            TestEnum5 b = (TestEnum5)obj;
+            switch (b)
+            {
+                case TestEnum5.Enum1:
+                    res = false;
+                    break;
+                case TestEnum5.Enum2:
+                    res = false;
+                    break;
+                case TestEnum5.Enum4:
+                    res = true;
+                    break;
+                default:
+                    res = false;
+                    break;
+            }
+
+            if (!res)
+                throw new Exception();
+        }
+
+        public static void Test22()
+        {
+            int res = 0;
+            TestEnum5 b = TestEnum5.Enum2;
+            res = b.CompareTo(TestEnum5.Enum4);
+            if (res >= 0)
+                throw new Exception();
         }
         class SystemType
         {

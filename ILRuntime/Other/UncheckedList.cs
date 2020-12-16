@@ -199,7 +199,6 @@ namespace ILRuntime.Other
         {
             var array = _items;
             var size = _size;
-            _version++;
             if ((uint)size < (uint)array.Length)
             {
                 _size = size + 1;
@@ -776,11 +775,9 @@ namespace ILRuntime.Other
             {
                 Array.Copy(_items, index + 1, _items, index, _size - index);
             }
-            if (!typeof(T).IsValueType)
-            {
-                _items[_size] = default(T);
-            }
-            _version++;
+#if DEBUG
+            _items[_size] = default(T);
+#endif
         }
 
         // Removes a range of elements from this list.
@@ -796,11 +793,9 @@ namespace ILRuntime.Other
                     Array.Copy(_items, index + count, _items, index, _size - index);
                 }
 
-                _version++;
-                if (!typeof(T).IsValueType)
-                {
-                    Array.Clear(_items, _size, count);
-                }
+#if DEBUG
+                Array.Clear(_items, _size, count);
+#endif
             }
         }
 

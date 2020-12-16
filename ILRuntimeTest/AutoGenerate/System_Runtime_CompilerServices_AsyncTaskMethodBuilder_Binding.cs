@@ -224,8 +224,6 @@ namespace ILRuntime.Runtime.Generated
 
             __intp.Free(ptr_of_this_method);
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            WriteBackInstance(__domain, ptr_of_this_method, __mStack, ref instance_of_this_method);
-
             __intp.Free(ptr_of_this_method);
             return __ret;
         }

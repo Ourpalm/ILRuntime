@@ -175,7 +175,7 @@ namespace ILRuntimeTest.TestFramework
             {
                 ret = ILIntepreter.Minus(esp, 4);
                 var instance = ILIntepreter.GetObjectAndResolveReference(ret);
-                if (instance->ObjectType == ObjectTypes.StackObjectReference)
+                if (instance->ObjectType == ObjectTypes.ValueTypeObjectReference)
                 {
                     var dst = ILIntepreter.ResolveReference(instance);
                     var f = ILIntepreter.Minus(dst, 1);

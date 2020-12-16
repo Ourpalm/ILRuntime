@@ -38,8 +38,8 @@ namespace ILRuntime.Runtime.CLRBinding
             if (i.IsSpecialName)
             {
                 string[] t = i.Name.Split('_');
-                if (t[0] == "add" || t[0] == "remove")
-                    return true;
+                //if (t[0] == "add" || t[0] == "remove")
+                //    return true;
                 if (t[0] == "get" || t[0] == "set")
                 {
                     Type[] ts;
@@ -86,6 +86,8 @@ namespace ILRuntime.Runtime.CLRBinding
                 var j = param[i];
                 if (j.IsOut && j.ParameterType.IsByRef)
                     sb.Append("out ");
+                else if (j.IsIn && j.ParameterType.IsByRef)
+                    sb.Append("in ");
                 else if (j.ParameterType.IsByRef)
                     sb.Append("ref ");
                 if (isMultiArr)
@@ -97,6 +99,95 @@ namespace ILRuntime.Runtime.CLRBinding
                 {
                     sb.Append("@");
                     sb.Append(j.Name);
+                }
+            }
+        }
+
+        internal static void AppendArgumentCode(this Type p, StringBuilder sb, int idx, string name, List<Type> valueTypeBinders, bool isMultiArr, bool hasByRef, bool needFree)
+        {
+            string clsName, realClsName;
+            bool isByRef;
+            p.GetClassName(out clsName, out realClsName, out isByRef);
+            var pt = p.IsByRef ? p.GetElementType() : p;
+            string shouldFreeParam = hasByRef ? "false" : "true";
+
+            if (pt.IsValueType && !pt.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(pt))
+            {
+                if (isMultiArr)
+                    sb.AppendLine(string.Format("            {0} a{1} = new {0}();", realClsName, idx));
+                else
+                    sb.AppendLine(string.Format("            {0} @{1} = new {0}();", realClsName, name));
+
+                sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
+
+                if (isMultiArr)
+                    sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue(ref a{0}, __intp, ptr_of_this_method, __mStack, {2});", idx, clsName, shouldFreeParam));
+                else
+                    sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue(ref @{0}, __intp, ptr_of_this_method, __mStack, {2});", name, clsName, shouldFreeParam));
+
+                sb.AppendLine("            } else {");
+
+                if (isByRef)
+                    sb.AppendLine("                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
+                if (isMultiArr)
+                    sb.AppendLine(string.Format("                a{0} = {1};", idx, p.GetRetrieveValueCode(realClsName)));
+                else
+                    sb.AppendLine(string.Format("                @{0} = {1};", name, p.GetRetrieveValueCode(realClsName)));
+                if (!hasByRef && needFree)
+                    sb.AppendLine("                __intp.Free(ptr_of_this_method);");
+
+                sb.AppendLine("            }");
+            }
+            else
+            {
+                if (isByRef)
+                {
+                    if (p.GetElementType().IsPrimitive)
+                    {
+                        if (pt == typeof(int) || pt == typeof(uint) || pt == typeof(short) || pt == typeof(ushort) || pt == typeof(byte) || pt == typeof(sbyte) || pt == typeof(char))
+                        {
+                            if (pt == typeof(int))
+                                sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt32(ptr_of_this_method, __mStack);", realClsName, name));
+                            else
+                                sb.AppendLine(string.Format("            {0} @{1} = ({0})__intp.RetriveInt32(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(long) || pt == typeof(ulong))
+                        {
+                            if (pt == typeof(long))
+                                sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt64(ptr_of_this_method, __mStack);", realClsName, name));
+                            else
+                                sb.AppendLine(string.Format("            {0} @{1} = ({0})__intp.RetriveInt64(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(float))
+                        {
+                            sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveFloat(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(double))
+                        {
+                            sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveDouble(ptr_of_this_method, __mStack);", realClsName, name));
+                        }
+                        else if (pt == typeof(bool))
+                        {
+                            sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt32(ptr_of_this_method, __mStack) == 1;", realClsName, name));
+                        }
+                        else
+                            throw new NotSupportedException();
+                    }
+                    else
+                    {
+                        sb.AppendLine(string.Format("            {0} @{1} = ({0})typeof({0}).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));", realClsName, name));
+                    }
+
+                }
+                else
+                {
+                    if (isMultiArr)
+                        sb.AppendLine(string.Format("            {0} a{1} = {2};", realClsName, idx, p.GetRetrieveValueCode(realClsName)));
+                    else
+                        sb.AppendLine(string.Format("            {0} @{1} = {2};", realClsName, name, p.GetRetrieveValueCode(realClsName)));
+                    if (!hasByRef && !p.IsPrimitive && needFree)
+                        sb.AppendLine("            __intp.Free(ptr_of_this_method);");
+
                 }
             }
         }

@@ -5,6 +5,44 @@ using System.Text;
 
 namespace TestCases
 {
+    public struct Fixed64Vector3
+    {
+        public Fixed64 x;
+        public Fixed64 y;
+        public Fixed64 z;
+
+        public static readonly Fixed64Vector3 Zero3;
+
+        public Fixed64Vector3(int x, int y, int z)
+        {
+            this.x = new Fixed64(x);
+            this.y = new Fixed64(y);
+            this.z = new Fixed64(z);
+        }
+
+        static Fixed64Vector3()
+        {
+            Zero3 = new Fixed64Vector3(0, 0, 0);
+        }
+    }
+
+
+    public struct Fixed64
+    {
+        private long m_rawValue;
+
+        public static readonly Fixed64 Zero;
+
+        public Fixed64(long value)
+        {
+            m_rawValue = value;
+        }
+
+        static Fixed64()
+        {
+            Zero = new Fixed64(0);
+        }
+    }
     public class Color32
     {
         public Color32(byte r, byte g, byte b, byte a)
@@ -183,6 +221,56 @@ namespace TestCases
         public static void StructTest4()
         {
             Console.WriteLine(Number.minValue.val);
+        }
+
+        struct EnumTestStruct
+        {
+            public ILRuntimeTest.TestFramework.TestCLREnum value;
+        }
+
+        public static void StructTest5()
+        {
+            EnumTestStruct val = new EnumTestStruct();
+            Console.WriteLine(val.value);
+        }
+
+        private struct StructTest
+        {
+            public Object objAsset;
+            public string type;
+        }
+        public static void StructTest6()
+        {
+            Dictionary<string, StructTest> m_dictAsset = new Dictionary<string, StructTest>();
+            StructTest cube = new StructTest();
+            cube.type = "111";
+            m_dictAsset["123"] = cube;
+            cube.type = "123";
+            string strId = "123";
+            if (!m_dictAsset.TryGetValue(strId, out cube)) //注释：这句代码报错，提示错误InvalidCastException: Specified cast is not valid
+            {
+                throw new Exception();
+            }
+            if (cube.type != "111")
+                throw new Exception();
+        }
+
+        class TestClass
+        {
+            public ILRuntimeTest.TestFramework.TestVector3 v21 = new ILRuntimeTest.TestFramework.TestVector3(111, 222, 333);
+            public ILRuntimeTest.TestFramework.TestVector3 v22 = new ILRuntimeTest.TestFramework.TestVector3();
+
+            public void Test()
+            {
+                v21.X = 123; //没问题
+                v22.X = 222; //有问题， 报空 NullRef
+            }
+        }
+
+        public static void StructTest7()
+        {
+            var cl = new TestClass();
+            cl.Test();
         }
     }
 }

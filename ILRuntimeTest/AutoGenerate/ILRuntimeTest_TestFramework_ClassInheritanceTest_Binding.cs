@@ -42,9 +42,11 @@ namespace ILRuntime.Runtime.Generated
             field = type.GetField("TestVal2", flag);
             app.RegisterCLRFieldGetter(field, get_TestVal2_0);
             app.RegisterCLRFieldSetter(field, set_TestVal2_0);
+            app.RegisterCLRFieldBinding(field, CopyToStack_TestVal2_0, AssignFromStack_TestVal2_0);
             field = type.GetField("staticField", flag);
             app.RegisterCLRFieldGetter(field, get_staticField_1);
             app.RegisterCLRFieldSetter(field, set_staticField_1);
+            app.RegisterCLRFieldBinding(field, CopyToStack_staticField_1, AssignFromStack_staticField_1);
 
 
         }
@@ -177,18 +179,57 @@ namespace ILRuntime.Runtime.Generated
         {
             return ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2;
         }
+
+        static StackObject* CopyToStack_TestVal2_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2;
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
+        }
+
         static void set_TestVal2_0(ref object o, object v)
         {
             ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2 = (System.Int32)v;
         }
+
+        static StackObject* AssignFromStack_TestVal2_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            System.Int32 @TestVal2 = ptr_of_this_method->Value;
+            ((ILRuntimeTest.TestFramework.ClassInheritanceTest)o).TestVal2 = @TestVal2;
+            return ptr_of_this_method;
+        }
+
         static object get_staticField_1(ref object o)
         {
             return ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField;
         }
+
+        static StackObject* CopyToStack_staticField_1(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField;
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
         static void set_staticField_1(ref object o, object v)
         {
             ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField = (System.IDisposable)v;
         }
+
+        static StackObject* AssignFromStack_staticField_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            System.IDisposable @staticField = (System.IDisposable)typeof(System.IDisposable).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField = @staticField;
+            return ptr_of_this_method;
+        }
+
 
 
     }

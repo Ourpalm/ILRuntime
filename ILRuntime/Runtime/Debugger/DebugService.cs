@@ -4,7 +4,6 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Linq;
 
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
@@ -1148,7 +1147,14 @@ namespace ILRuntime.Runtime.Debugger
                     }
                 }
                 sb.Append(string.Format("(0x{0:X8}) Type:{1} ", (long)i, i->ObjectType));
-                GetStackObjectText(sb, i, mStack, valuePointerEnd);
+                try
+                {
+                    GetStackObjectText(sb, i, mStack, valuePointerEnd);
+                }
+                catch
+                {
+                    sb.Append(" Cannot Fetch Object Info");
+                }
                 if (i < esp)
                 {
                     if (i->ObjectType == ObjectTypes.ValueTypeObjectReference)
@@ -1216,11 +1222,17 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         object obj = null;
                         var dst = ILIntepreter.ResolveReference(esp);
-                        if (dst > valueTypeEnd)
-                            obj = StackObject.ToObject(esp, domain, mStack);
-                        if (obj != null)
-                            text = obj.ToString();
-
+                        try
+                        {
+                            if (dst > valueTypeEnd)
+                                obj = StackObject.ToObject(esp, domain, mStack);
+                            if (obj != null)
+                                text = obj.ToString();
+                        }
+                        catch
+                        {
+                            text = "Invalid Object";
+                        }
                         text += string.Format("({0})", domain.GetType(dst->Value));
                     }
                     sb.Append(string.Format("Value:0x{0:X8} Text:{1} ", (long)ILIntepreter.ResolveReference(esp), text));

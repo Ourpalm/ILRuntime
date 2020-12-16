@@ -6,7 +6,6 @@ using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Other;
 using ILRuntime.Runtime.Intepreter;
-
 namespace ILRuntime.Runtime.Stack
 {
     unsafe class RuntimeStack : IDisposable
@@ -24,10 +23,10 @@ namespace ILRuntime.Runtime.Stack
         IList<object> managedStack = new UncheckedList<object>(32);
 #endif
 
-        Stack<StackFrame> frames = new Stack<StackFrame>();
+        UncheckedStack<StackFrame> frames = new UncheckedStack<StackFrame>();
         public const int MAXIMAL_STACK_OBJECTS = 1024 * 16;
 
-        public Stack<StackFrame> Frames { get { return frames; } }
+        public UncheckedStack<StackFrame> Frames { get { return frames; } }
         public RuntimeStack(ILIntepreter intepreter)
         {
             this.intepreter = intepreter;
@@ -57,6 +56,12 @@ namespace ILRuntime.Runtime.Stack
             {
                 return valueTypePtr;
             }
+            private set
+            {
+                if (value > ValueTypeStackBase)
+                    throw new StackOverflowException();
+                valueTypePtr = value;
+            }
         }
 
         public StackObject* ValueTypeStackBase
@@ -76,10 +81,12 @@ namespace ILRuntime.Runtime.Stack
 
         public void InitializeFrame(ILMethod method, StackObject* esp, out StackFrame res)
         {
+#if DEBUG
             if (esp < pointer || esp >= endOfMemory)
                 throw new StackOverflowException();
             if (frames.Count > 0 && frames.Peek().BasePointer > esp)
                 throw new StackOverflowException();
+#endif
             res = new StackFrame();
             res.LocalVarPointer = esp;
             res.Method = method;
@@ -98,21 +105,43 @@ namespace ILRuntime.Runtime.Stack
         }
         public void PushFrame(ref StackFrame frame)
         {
-            frames.Push(frame);
+            frames.Push(ref frame);
         }
 
         public StackObject* PopFrame(ref StackFrame frame, StackObject* esp)
         {
+#if DEBUG
             if (frames.Count > 0 && frames.Peek().BasePointer == frame.BasePointer)
+#endif
                 frames.Pop();
+#if DEBUG
             else
                 throw new NotSupportedException();
+#endif
             StackObject* returnVal = esp - 1;
             var method = frame.Method;
             StackObject* ret = ILIntepreter.Minus(frame.LocalVarPointer, method.ParameterCount);
             int mStackBase = frame.ManagedStackBase;
             if (method.HasThis)
                 ret--;
+            for (StackObject* ptr = ret; ptr < frame.LocalVarPointer; ptr++)
+            {
+                if (ptr->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                {
+                    var addr = ILIntepreter.ResolveReference(ptr);
+                    int start = int.MaxValue;
+                    int end = int.MaxValue;
+                    var tmp = addr;
+                    CountValueTypeManaged(ptr, ref start, ref end, &tmp);
+
+                    if (addr > frame.ValueTypeBasePointer)
+                    {
+                        frame.ValueTypeBasePointer = addr;
+                    }
+                    if (start < mStackBase)
+                        mStackBase = start;
+                }
+            }
             if(method.ReturnType != intepreter.AppDomain.VoidType)
             {
                 *ret = *returnVal;
@@ -137,6 +166,19 @@ namespace ILRuntime.Runtime.Stack
 #endif
             valueTypePtr = frame.ValueTypeBasePointer;
             return ret;
+        }
+
+        public void RelocateValueTypeAndFreeAfterDst(StackObject* src, StackObject* dst)
+        {
+            var objRef2 = dst;
+            dst = ILIntepreter.ResolveReference(dst);
+            int start = int.MaxValue;
+            int end = int.MaxValue;
+            CountValueTypeManaged(objRef2, ref start, ref end, &objRef2);
+            RelocateValueType(src, ref dst, ref start);
+            ValueTypeStackPointer = dst;
+            if (start <= end)
+                RemoveManagedStackRange(start, end);
         }
 
         void RelocateValueType(StackObject* src, ref StackObject* dst, ref int mStackBase)
@@ -246,7 +288,7 @@ namespace ILRuntime.Runtime.Stack
                 {
                     var it = t.OrderedFieldTypes[i] as CLRType;
                     StackObject* val = ILIntepreter.Minus(ptr, i + 1);
-                    if (it.IsPrimitive)
+                    if (it.IsPrimitive || it.IsEnum)
                         StackObject.Initialized(val, it);
                     else
                     {
@@ -345,19 +387,8 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public void FreeValueTypeObject(StackObject* esp)
+        void RemoveManagedStackRange(int start, int end)
         {
-            if (esp->ObjectType != ObjectTypes.ValueTypeObjectReference)
-                return;
-            int start = int.MaxValue;
-            int end = int.MinValue;
-            StackObject* endAddr;
-            CountValueTypeManaged(esp, ref start, ref end, &endAddr);
-
-            if (endAddr == valueTypePtr)
-                valueTypePtr = ILIntepreter.ResolveReference(esp);
-            else
-                throw new NotSupportedException();
             if (start != int.MaxValue)
             {
                 if (end == managedStack.Count - 1)
@@ -371,6 +402,22 @@ namespace ILRuntime.Runtime.Stack
                 else
                     throw new NotSupportedException();
             }
+        }
+
+        public void FreeValueTypeObject(StackObject* esp)
+        {
+            if (esp->ObjectType != ObjectTypes.ValueTypeObjectReference)
+                return;
+            int start = int.MaxValue;
+            int end = int.MinValue;
+            StackObject* endAddr;
+            CountValueTypeManaged(esp, ref start, ref end, &endAddr);
+
+            if (endAddr == valueTypePtr)
+                valueTypePtr = ILIntepreter.ResolveReference(esp);
+            else
+                throw new NotSupportedException();
+            RemoveManagedStackRange(start, end);
         }
 
         void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)

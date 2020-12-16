@@ -82,13 +82,25 @@ namespace TestCases
             sw.Reset();
             sw.Start();
             cnt = 0;
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 FuncCallResult(ref cnt, i);
             }
             sw.Stop();
 
             Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, cnt));
+
+            PerfTest test = new PerfTest();
+            sw.Reset();
+            sw.Start();
+            cnt = 0;
+            for (int i = 0; i < 1000000; i++)
+            {
+                test.FuncCallResult(ref cnt, i);
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, cnt));
+
         }
 
         public static void UnitTest_Performance3()
@@ -104,6 +116,70 @@ namespace TestCases
             sw.Stop();
 
             Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, arr.Length));
+        }
+        public static void UnitTest_Performance5()
+        {
+            PerformanceTestCls obj = new PerformanceTestCls();
+            int cnt = 0;
+            int a = 0;
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1000000; i++)
+            {
+                a = obj.A;
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
+
+        public static void UnitTest_Performance6()
+        {
+            PerformanceTestCls obj = new PerformanceTestCls();
+            int cnt = 0;
+            int a = 0;
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1000000; i++)
+            {
+                obj.A = a;
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
+
+        public static void UnitTest_Performance7()
+        {
+            PerformanceTestCls obj = new PerformanceTestCls();
+            int cnt = 0;
+            int a = 0;
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1000000; i++)
+            {
+                a = obj.B;
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
+
+        public static void UnitTest_Performance8()
+        {
+            PerformanceTestCls obj = new PerformanceTestCls();
+            int cnt = 0;
+            int a = 0;
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1000000; i++)
+            {
+                obj.B = a;
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
+        class PerformanceTestCls
+        {
+            public int A = 1;
+            public int B { get; set; } = 2;
         }
         public static void UnitTest_Performance4()
         {
@@ -210,6 +286,13 @@ namespace TestCases
             cls.B = "ok";
         }
 
+        class PerfTest
+        {
+            public void FuncCallResult(ref int cnt, int i)
+            {
+                cnt++;
+            }
+        }
         static void FuncCallResult(ref int cnt, int i)
         {
             cnt++;

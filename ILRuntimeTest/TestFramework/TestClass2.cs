@@ -20,11 +20,15 @@ namespace ILRuntimeTest.TestFramework
 
         }
 
-        protected virtual bool VMethod2()
+        public virtual bool VMethod2()
         {
             return false;
         }
 
+        public virtual void VMethod3(ref int arg)
+        {
+            arg++;
+        }
         protected abstract void AbMethod1();
 
         public abstract float AbMethod2(int arg1);

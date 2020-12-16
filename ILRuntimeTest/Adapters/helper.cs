@@ -21,10 +21,10 @@ namespace ILRuntimeTest.TestFramework
 
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTestAdaptor());            
             app.RegisterCrossBindingAdaptor(new InterfaceTestAdaptor());            
-            app.RegisterCrossBindingAdaptor(new TestClass2Adaptor());            
+            app.RegisterCrossBindingAdaptor(new TestClass2Adapter());            
             app.RegisterCrossBindingAdaptor(new TestClass3Adaptor());
             app.RegisterCrossBindingAdaptor(new TestClass4Adaptor());
-            app.RegisterCrossBindingAdaptor(new IDisposableClassInheritanceAdaptor());
+            app.RegisterCrossBindingAdaptor(new IDisposableAdapter());
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTest2Adaptor());
             app.RegisterCrossBindingAdaptor(new IAsyncStateMachineClassInheritanceAdaptor());
 
@@ -48,7 +48,7 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.BaseClassTest>();
 
             app.DelegateManager.RegisterFunctionDelegate<System.Int32>();
-
+            app.DelegateManager.RegisterFunctionDelegate<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>, System.Collections.Generic.IEnumerable<System.Int32>>();
             app.DelegateManager.RegisterFunctionDelegate<System.Int32, System.Single, System.Int16, System.Double>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Boolean>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.TestCLREnum>();

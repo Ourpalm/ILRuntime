@@ -29,6 +29,7 @@ namespace TestCases
         {
             public long LongProp { get; set; }
             public List<JsonTestSubClass> SubClassList { get; set; }
+            public List<JsonTestEnum> SubClassEnumList { get; set; }
             public JsonTestSubClass[] ArrayProp { get; set; }
         }
 
@@ -78,6 +79,8 @@ namespace TestCases
             sub.SubClassList = new List<TestCases.JsonTest.JsonTestSubClass>();
             sub.SubClassList.Add(sub2);
             sub.SubClassList.Add(sub3);
+            sub.SubClassEnumList = new List<JsonTestEnum>();
+            sub.SubClassEnumList.Add(JsonTestEnum.Test2);
 
             cls.DicTest = new Dictionary<string, TestCases.JsonTest.JsonTestSubClass>();
             cls.DicTest["11111"] = sub;
@@ -92,6 +95,7 @@ namespace TestCases
             Console.WriteLine(cls2.SubClassProp.ArrayProp[1].LongProp);
             Console.WriteLine(cls2.SubClassProp.SubClassList[0].LongProp);
             Console.WriteLine(cls2.SubClassProp.SubClassList[1].LongProp);
+            Console.WriteLine(cls2.SubClassProp.SubClassEnumList[0]);
             Console.WriteLine(cls2.DicTest["11111"].LongProp);
             Console.WriteLine(cls2.DicTest2["111222"]);
 
@@ -163,6 +167,16 @@ namespace TestCases
             {
                 Console.WriteLine("Fail");
             }
+        }
+
+        public static void JsonTest7()
+        {
+            JsonTestEnum[] arr = new JsonTestEnum[] { JsonTestEnum.Test2, JsonTestEnum.Test3 };
+            string json = JsonMapper.ToJson(arr);
+
+            JsonTestEnum[] arr2 = JsonMapper.ToObject<JsonTestEnum[]>(json);
+            if (arr2[0] != JsonTestEnum.Test2)
+                throw new Exception();
         }
     }
 }

@@ -441,13 +441,16 @@ namespace LitJson
                     if (item == null && reader.Token == JsonToken.ArrayEnd)
                         break;
                     var rt = elem_type is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)elem_type).RealType : elem_type;
+                    rt = elem_type is ILRuntime.Reflection.ILRuntimeType ? ((ILRuntime.Reflection.ILRuntimeType)elem_type).ILType.TypeForCLR : elem_type;
                     item = rt.CheckCLRTypes(item);
                     list.Add (item);
                 }
 
                 if (t_data.IsArray) {
                     int n = list.Count;
-                    instance = Array.CreateInstance (elem_type, n);
+                    var rt = elem_type is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)elem_type).RealType : elem_type;
+                    rt = elem_type is ILRuntime.Reflection.ILRuntimeType ? ((ILRuntime.Reflection.ILRuntimeType)elem_type).ILType.TypeForCLR : elem_type;
+                    instance = Array.CreateInstance (rt, n);
 
                     for (int i = 0; i < n; i++)
                         ((Array) instance).SetValue (list[i], i);

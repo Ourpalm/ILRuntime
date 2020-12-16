@@ -23,8 +23,11 @@ namespace ILRuntime.Runtime.Generated
             Type[] args;
             Type type = typeof(System.Threading.Tasks.Task);
             args = new Type[]{};
+            method = type.GetMethod("get_CompletedTask", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, get_CompletedTask_0);
+            args = new Type[]{};
             method = type.GetMethod("GetAwaiter", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, GetAwaiter_0);
+            app.RegisterCLRMethodRedirection(method, GetAwaiter_1);
             Dictionary<string, List<MethodInfo>> genericMethods = new Dictionary<string, List<MethodInfo>>();
             List<MethodInfo> lst = null;                    
             foreach(var m in type.GetMethods())
@@ -47,7 +50,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Threading.Tasks.Task<System.Int32>), typeof(System.Func<System.Int32>)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, Run_1);
+                        app.RegisterCLRMethodRedirection(method, Run_2);
 
                         break;
                     }
@@ -55,7 +58,7 @@ namespace ILRuntime.Runtime.Generated
             }
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("Delay", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Delay_2);
+            app.RegisterCLRMethodRedirection(method, Delay_3);
             args = new Type[]{typeof(System.Int32)};
             if (genericMethods.TryGetValue("Run", out lst))
             {
@@ -64,29 +67,12 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Threading.Tasks.Task<System.Int32>), typeof(System.Func<System.Threading.Tasks.Task<System.Int32>>)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, Run_3);
-
-                        break;
-                    }
-                }
-            }
-            args = new Type[]{typeof(System.Collections.Generic.List<System.String>)};
-            if (genericMethods.TryGetValue("Run", out lst))
-            {
-                foreach(var m in lst)
-                {
-                    if(m.MatchGenericParameters(args, typeof(System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>), typeof(System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>>)))
-                    {
-                        method = m.MakeGenericMethod(args);
                         app.RegisterCLRMethodRedirection(method, Run_4);
 
                         break;
                     }
                 }
             }
-            args = new Type[]{typeof(System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)};
-            method = type.GetMethod("WhenAll", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, WhenAll_5);
             args = new Type[]{typeof(System.Int32)};
             if (genericMethods.TryGetValue("FromResult", out lst))
             {
@@ -95,7 +81,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Threading.Tasks.Task<System.Int32>), typeof(System.Int32)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, FromResult_6);
+                        app.RegisterCLRMethodRedirection(method, FromResult_5);
 
                         break;
                     }
@@ -106,7 +92,23 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
-        static StackObject* GetAwaiter_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* get_CompletedTask_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+
+
+            var result_of_this_method = System.Threading.Tasks.Task.CompletedTask;
+
+            object obj_result_of_this_method = result_of_this_method;
+            if(obj_result_of_this_method is CrossBindingAdaptorType)
+            {    
+                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
+            }
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static StackObject* GetAwaiter_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -121,7 +123,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Run_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Run_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -142,7 +144,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Delay_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Delay_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -162,7 +164,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Run_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Run_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -183,49 +185,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* Run_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>> @function = (System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>>)typeof(System.Func<System.Threading.Tasks.Task<System.Collections.Generic.List<System.String>>>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-
-            var result_of_this_method = System.Threading.Tasks.Task.Run<System.Collections.Generic.List<System.String>>(@function);
-
-            object obj_result_of_this_method = result_of_this_method;
-            if(obj_result_of_this_method is CrossBindingAdaptorType)
-            {    
-                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
-            }
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
-        }
-
-        static StackObject* WhenAll_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task> @tasks = (System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>)typeof(System.Collections.Generic.IEnumerable<System.Threading.Tasks.Task>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
-
-
-            var result_of_this_method = System.Threading.Tasks.Task.WhenAll(@tasks);
-
-            object obj_result_of_this_method = result_of_this_method;
-            if(obj_result_of_this_method is CrossBindingAdaptorType)
-            {    
-                return ILIntepreter.PushObject(__ret, __mStack, ((CrossBindingAdaptorType)obj_result_of_this_method).ILInstance);
-            }
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
-        }
-
-        static StackObject* FromResult_6(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* FromResult_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;

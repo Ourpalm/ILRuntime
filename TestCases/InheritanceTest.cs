@@ -12,9 +12,33 @@ namespace TestCases
         void TestAbstract();
         void TestField();
     }
-
     public class InheritanceTest
     {
+        interface ITest
+        {
+            void TestMethod();
+        }
+
+        public class TestA : ITest
+        {
+            void ITest.TestMethod()//显式实现接口方法
+            {
+                Console.WriteLine("方法A");
+            }
+        }
+
+        public class TestB : ITest
+        {
+            void ITest.TestMethod()//显式实现接口方法
+            {
+                Console.WriteLine("方法A");
+            }
+
+            public void TestMethod()
+            {
+                Console.WriteLine("方法B");
+            }
+        }
         public static void InheritanceTest01()
         {
             TestCls cls = new TestCls();
@@ -53,6 +77,14 @@ namespace TestCases
             cls3.TestAbstract();
             ((InterfaceTest2)cls3).TestVirtual();
             cls3.TestField();
+        }
+
+        public static void InheritanceTest_Interface2()
+        {
+            ITest b = new TestB();
+            b.TestMethod();//此处输入结果为 方法B
+            ITest a = new TestA();
+            a.TestMethod();//发生异常
         }
 
         static void Test01Sub(ClassInheritanceTest cls)
@@ -98,18 +130,37 @@ namespace TestCases
         public static void InheritanceTest07()
         {
             TestClass2 cls = new TestCls5();
-            Console.WriteLine(cls.AbMethod2(122));
+            cls.VMethod1();
+            int val = 0;
+            cls.VMethod3(ref val);
+            if (val != 11)
+                throw new Exception($"{val} != 11");
+            float val2 = cls.AbMethod2(val);
+            if (val2 != 12.2f)
+                throw new Exception($"{val2} != 12.1f");
+
+            cls = new TestCls6();
+            val = 0;
+            cls.VMethod3(ref val);
+            if (val != 21)
+                throw new Exception($"{val} != 21");
+            val2 = cls.AbMethod2(val);
+            if (val2 != 24.2f)
+                throw new Exception($"{val2} != 23.2f");
         }
 
         public static void InheritanceTest08()
         {
-            AABase obj = new AABase();
-            obj.R = 1;
-            obj.R2 = 2;
+            using (AABase obj = new AABase())
+            {
+                obj.R = 1;
+                obj.R2 = 2;
 
-            var m = typeof(InheritanceTest).GetMethod("InheritanceTest08_Sub");
+                var m = typeof(InheritanceTest).GetMethod("InheritanceTest08_Sub");
 
-            m.Invoke(null, new object[] { obj });
+                m.Invoke(null, new object[] { obj });
+
+            }
         }
 
         static void InheritanceTest08_Sub(AABase obj)
@@ -155,8 +206,73 @@ namespace TestCases
             sub.Test();
         }
 
+        static void InheritanceTest12Sub()
+        {
+            Console.WriteLine("OK");
+        }
+
+        public static void InheritanceTest12()
+        {
+            for(int i = 0; i < 5; i++)
+            {
+                System.Type t = typeof(InheritanceTest);
+                t.GetMethod("InheritanceTest12Sub", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, null);
+            }
+        }
+
+        public static void InheritanceTest13()
+        {
+            new TestClass().TestMethod();
+        }
+
+        public static void InheritanceTest14()
+        {
+            Data2 data = new Data2();
+
+            GenericInheritanceTestCls<Data2> instance = new GenericInheritanceTestCls<Data2>(data);
+            instance.TestVirtual();
+        }
+
+        public static void InheritanceTest15()
+        {
+            var cls = new TestCls7();
+            int val = 0;
+            cls.VMethod3(ref val);
+
+            if (val != 1)
+                throw new Exception();
+        }
+
+        public interface IData { }
+
+        public class Data : IData { }
+
+        public abstract class Test<T> where T : class, IData
+        {
+            public T Data { get; protected set; }
+
+            public void TestMethod()
+            {
+                Data = null;//此处赋值为null会出现异常, 非null不会发生异常
+                Console.WriteLine(Data);
+            }
+        }
+
+        public class TestClass : Test<Data>
+        {
+        }
+
         class TestCls5 : TestClass2
         {
+            public override void VMethod3(ref int arg)
+            {
+                base.VMethod3(ref arg);
+                arg += 10;
+            }
+            public override bool VMethod2()
+            {
+                return base.VMethod2();
+            }
             public override float AbMethod2(int arg1)
             {
                 return arg1 + 1.2f;
@@ -165,6 +281,73 @@ namespace TestCases
             protected override void AbMethod1()
             {
                 
+            }
+        }
+
+        class TestCls6 : TestClass2
+        {
+            public override void VMethod3(ref int arg)
+            {
+                base.VMethod3(ref arg);
+                arg += 20;
+            }
+            public override bool VMethod2()
+            {
+                return base.VMethod2();
+            }
+            public override float AbMethod2(int arg1)
+            {
+                return arg1 + 3.2f;
+            }
+
+            protected override void AbMethod1()
+            {
+
+            }
+        }
+
+        class TestCls7 : TestClass2
+        {
+            public override float AbMethod2(int arg1)
+            {
+                return arg1 + 1.2f;
+            }
+
+            protected override void AbMethod1()
+            {
+
+            }
+        }
+        class BaseData
+        {
+            public string m_Message;
+        }
+
+        class Data2: BaseData
+        {
+            public Data2()
+            {
+                m_Message = "hello";
+            }
+        }
+        class GenericInheritanceTestCls<T> : ClassInheritanceTest where T : BaseData
+        {
+            protected T m_Data;     //泛型字段
+
+            public GenericInheritanceTestCls(T data)
+            {
+                m_Data = data;
+            }
+
+            public override void TestVirtual()
+            {
+                m_Data = null;          //这行可能把stack写坏了
+                TestAbstract();  //运行到这行会报错，解决方法有2个：1、将"m_Data = null;"这行注释掉。2、将"protected T m_Data;" 改为 "protected BaseData m_Data;"，去掉泛型字段
+
+            }
+            public override void TestAbstract()
+            {
+                Console.WriteLine("OK");
             }
         }
 
@@ -310,7 +493,7 @@ namespace TestCases
 
     class AA : AABase
     {
-        public void AA1()
+        public new void AA1()
         {
             Console.WriteLine("AA1");
         }

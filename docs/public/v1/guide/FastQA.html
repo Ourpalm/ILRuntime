@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head><meta name="generator" content="Hexo 3.9.0">
+
+    <title>常见问题解答 — ILRuntime</title>
+    <meta charset="utf-8">
+    <meta name="description" content="ILRuntime">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
+    <script src="/ILRuntime/public/js/vue.js"></script>
+    <script src="/ILRuntime/public/js/jquery.js"></script>
+    </head>
+
+    <body>
+        
+            <nav class="nav">
+    <div class="border">
+        <img src="/ILRuntime/public/images/logo.png">
+        <button class="hiden-in-phone">V1.6.6</button>
+        <button id="btn-menu" class="hiden-in-pc">菜单</button>
+        <ul class="nav-link hiden-in-phone">
+            <!--li>
+                <form id="search-form">
+                    <input type="text" id="search-query" class="search-query">
+                </form>
+            </li!-->
+            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div id="container" class="container clear">
+    <section class="sidebar clearfix">
+    <ul>
+        
+            
+            
+                <li><h3>基础</h3></li>
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/index.html" class="sidebar-link">介绍</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/contribution.html" class="sidebar-link">贡献指南</a></p>
+            </li>
+        
+            
+            
+            
+                <li><h3>教程</h3></li>
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">ILRuntime中使用委托</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">ILRuntime中跨域继承</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">ILRuntime中的反射</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">CLR重定向</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">CLR绑定</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/litjson.html" class="sidebar-link">LitJson集成</a></p>
+            </li>
+        
+            
+            
+            
+            
+                <li><h3>其他</h3></li>
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包注意事项</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRuntime的性能优化</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRuntime的实现原理</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/FastQA.html" class="sidebar-link current">常见问题解答</a></p>
+            </li>
+        
+    </ul>
+</section>
+    <article class="clearfix">
+    <!--参考链接-->  
+<!--参考链接-->  
+<h2 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h2><blockquote>
+<p>Unity2018.3以上需要用最新ILruntime。<br>最新的发布版本为V1.6，Unity2018以上可通过Package Manager方式安装<br>V1.4已过时，示例工程内的版本已过时，当前最新版本为<a href="https://github.com/Ourpalm/ILRuntime" target="_blank" rel="noopener">master</a>分支。</p>
+</blockquote>
+<h2 id="编辑器内的常见问题"><a href="#编辑器内的常见问题" class="headerlink" title="编辑器内的常见问题"></a>编辑器内的常见问题</h2><h3 id="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"><a href="#我要怎么才能在Profiler里看见热更内的方法耗时情况呢？" class="headerlink" title="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"></a>我要怎么才能在Profiler里看见热更内的方法耗时情况呢？</h3><blockquote>
+<ul>
+<li>在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> DEBUG &amp;&amp; (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)</span></span><br><span class="line">        <span class="comment">//由于Unity的Profiler接口只允许在主线程使用，为了避免出异常，需要告诉ILRuntime主线程的线程ID才能正确将函数运行耗时报告给Profiler</span></span><br><span class="line">        appdomain.UnityMainThreadID = System.Threading.Thread.CurrentThread.ManagedThreadId;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<h3 id="运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream"><a href="#运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream" class="headerlink" title="运行出现报错ObjectDisposedException: Cannot access a closed Stream"></a>运行出现报错ObjectDisposedException: Cannot access a closed Stream</h3><blockquote>
+<p>加载dll的流被关闭了。新版要求流不能关闭，也不能用using写法。新的用法请参见Demo示例</p>
+</blockquote>
+<h3 id="运行时出现Cannot-find-Adaptor-for-xxxxxxxxx"><a href="#运行时出现Cannot-find-Adaptor-for-xxxxxxxxx" class="headerlink" title="运行时出现Cannot find Adaptor for: xxxxxxxxx"></a>运行时出现Cannot find Adaptor for: xxxxxxxxx</h3><blockquote>
+<p>热更当中跨域继承了xxxxxxx类型，但是没有注册对应的适配器</p>
+</blockquote>
+<h2 id="打包后出现问题"><a href="#打包后出现问题" class="headerlink" title="打包后出现问题"></a>打包后出现问题</h2><h3 id="用mono打包的时候，ILRuntime相关的功能都正常，改用IL2Cpp之后，注册的所有委托都不执行了？"><a href="#用mono打包的时候，ILRuntime相关的功能都正常，改用IL2Cpp之后，注册的所有委托都不执行了？" class="headerlink" title="用mono打包的时候，ILRuntime相关的功能都正常，改用IL2Cpp之后，注册的所有委托都不执行了？"></a>用mono打包的时候，ILRuntime相关的功能都正常，改用IL2Cpp之后，注册的所有委托都不执行了？</h3><blockquote>
+<ul>
+<li>注册委托只能写在主工程里，不能写在热更工程里。</li>
+<li>检查是否做了<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/bind.html">CLR自动分析绑定</a>。</li>
+</ul>
+</blockquote>
+<h3 id="ExecutionEngineException-Attempting-to-call-method-‘Scene-GetModule’-for-which-no-ahead-of-time-AOT-code-was-generated-电脑运行没问题，安卓上报这个错"><a href="#ExecutionEngineException-Attempting-to-call-method-‘Scene-GetModule’-for-which-no-ahead-of-time-AOT-code-was-generated-电脑运行没问题，安卓上报这个错" class="headerlink" title="ExecutionEngineException: Attempting to call method ‘Scene::GetModule’ for which no ahead of time (AOT) code was generated.电脑运行没问题，安卓上报这个错"></a>ExecutionEngineException: Attempting to call method ‘Scene::GetModule’ for which no ahead of time (AOT) code was generated.电脑运行没问题，安卓上报这个错</h3><blockquote>
+<ul>
+<li>检查是否做了<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/bind.html">CLR自动分析绑定</a>。</li>
+<li>CLRBindings.Initialize(appdomain); 要调用这一句，放在最后.是否漏了这句。</li>
+</ul>
+</blockquote>
+<h3 id="真机上调试或运行时出现随机闪退"><a href="#真机上调试或运行时出现随机闪退" class="headerlink" title="真机上调试或运行时出现随机闪退"></a>真机上调试或运行时出现随机闪退</h3><blockquote>
+<ul>
+<li>请确认XCode的编译选项中是否使用了Debug，由于iPhone的线程栈空间很小，调用层级稍微深一点就会出现爆栈，因此请使用Release选项编译XCode工程</li>
+</ul>
+</blockquote>
+<h2 id="使用ILRuntime后产生的性能问题"><a href="#使用ILRuntime后产生的性能问题" class="headerlink" title="使用ILRuntime后产生的性能问题"></a>使用ILRuntime后产生的性能问题</h2><h3 id="使用ILRuntime后产生的GC-Alloc比用之前大和很多啊，为什么"><a href="#使用ILRuntime后产生的GC-Alloc比用之前大和很多啊，为什么" class="headerlink" title="使用ILRuntime后产生的GC Alloc比用之前大和很多啊，为什么"></a>使用ILRuntime后产生的GC Alloc比用之前大和很多啊，为什么</h3><blockquote>
+<ul>
+<li>请先确保发包之前做过<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/bind.html">CLR自动分析绑定</a>，请一定要注意是自动分析，而不是手动给type列表进行绑定</li>
+<li>如果热更里的脚本使用了比较多的值类型局部变量如Vector3等，请确定是否注册了对应的<code>值类型绑定适配器</code></li>
+<li>是否在热更代码中使用了<code>foreach</code>，由于原理限制，在热更中使用foreach无法避免产生GC Alloc，请使用支持for循环的数据结构，或者用List等支持for遍历的结构辅助Dictionary等无法for遍历的结构</li>
+<li>在<code>编辑器</code>和<code>Development Build</code>的真机包，由于需要支持断点调试和报错打印行号，会有每个方法调用20字节的固定内存分配开销，如果需要分析实际GC Alloc，可在PlayerSettings中定义<code>DISABLE_ILRUNTIME_DEBUG</code>宏</li>
+</ul>
+</blockquote>
+<h3 id="使用ILRunitme后某个方法调用比之前慢了很多啊"><a href="#使用ILRunitme后某个方法调用比之前慢了很多啊" class="headerlink" title="使用ILRunitme后某个方法调用比之前慢了很多啊"></a>使用ILRunitme后某个方法调用比之前慢了很多啊</h3><blockquote>
+<ul>
+<li>请先确保发包之前做过<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/bind.html">CLR自动分析绑定</a>，请一定要注意是自动分析，而不是手动给type列表进行绑定， 没有CLR绑定的方法调用会慢几十倍</li>
+<li>请确保热更DLL是使用Release方式编译的，Debug编译的DLL会慢3-5倍</li>
+<li>请发布非Development Build真机包后再测试耗时，编辑器中和Development Build执行速度会比最终Release包慢几倍</li>
+<li>请确保注册了常使用的值类型的值类型绑定</li>
+<li>由于热更都是解译执行，所以执行效率跟直接执行天然就有20-100倍的差距，因此不大适合需要进行大量遍历计算的操作，可将耗时的工具方法放入主工程辅助</li>
+</ul>
+</blockquote>
+<h2 id="疑难杂症"><a href="#疑难杂症" class="headerlink" title="疑难杂症"></a>疑难杂症</h2>
+    <div class="footer">
+        发现错误？想参与编辑？ 
+        <a href="https://github.com/Ourpalm/ILRuntime/tree/master/docs/source/src/v1/guide/FastQA.md" target="_blank">
+            在 Github 上编辑此页！
+        </a>
+    </div>
+</article>
+
+<div class="sub-nav hiden-in-phone">
+    <dl id="sub-nav">
+        <dt>本文内容</dt>
+        <dd v-for="(ele, index) in sub_nav">
+           <a v-bind:href="ele.href">{{ ele.name }}</a>
+        </dd>
+    </dl>
+</div> 
+</div>
+
+<footer>
+    <div>
+        <p>© Copyright 2017 Ourpalm All Rights Reserved</p>
+        <p>掌趣科技2017</p>
+    </div>
+</footer>
+
+
+<script>
+var vm = new Vue({
+    el : '#container',
+    data: {
+        sub_nav : [ ]
+    },
+    created:function(){
+        var obj = [];
+        $("article h3").each(function(){
+            obj.push({name :  $(this).find("a").attr("title") , href : "#"+$(this).attr("id") });
+        });
+
+        this.sub_nav = obj;       
+    }
+});
+
+var isShow = false;
+$("nav").on("click","#btn-menu" , function(){
+
+    if(!isShow){
+        
+        if($(document).scrollTop() > $(".sidebar").height() - 100){
+
+            $('html, body').animate({scrollTop:0} , 300, "swing",function(){
+
+                $(".sidebar").fadeIn();
+                $(".container").animate({"left" : "15rem"}, 500,"swing");
+            });
+        }else{
+
+                $(".sidebar").fadeIn();
+                $(".container").animate({"left" : "15rem"}, 500,"swing");
+
+        }
+
+    }else{
+        $(".sidebar").fadeOut();
+        $(".container").animate({"left" : "0rem"}, 500,"swing");
+    }
+    isShow = !isShow;
+
+});
+
+$(".container").on("click" , "article" , function(){
+
+    if(isShow){
+        $(".sidebar").fadeOut();
+        $(".container").animate({"left" : "0rem"}, 500,"swing");
+        isShow = false;    
+    }
+
+});
+</script>
+        
+    </body>
+</html>

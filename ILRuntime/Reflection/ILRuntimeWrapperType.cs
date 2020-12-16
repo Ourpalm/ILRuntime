@@ -172,6 +172,10 @@ namespace ILRuntime.Reflection
             return type.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return type.FullName;
+        }
         public override bool IsAssignableFrom(Type c)
         {
             if (c is ILRuntimeWrapperType)
@@ -248,6 +252,11 @@ namespace ILRuntime.Reflection
         public override Type GetGenericTypeDefinition()
         {
             return et.GetGenericTypeDefinition();
+        }
+
+        public override Type[] GetGenericArguments()
+        {
+            return et.GetGenericArguments();
         }
 
         public override bool IsGenericParameter

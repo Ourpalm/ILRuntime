@@ -119,6 +119,38 @@ namespace TestCases
             }
         }
 
+        public class TestA
+        {
+            private static TestA _instance;
+            public static TestA Instance
+            {
+                get
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new TestA("testerror");
+                    }
+                    return _instance;
+                }
+            }
+
+            private string name = "";
+            public TestA(string name)
+            {
+                this.name = name;
+            }
+
+            public void TestCall(string name)
+            {
+                Console.WriteLine($"{this.name},{name}");
+            }
+        }
+
+        public static void TestStaticFieldInstance()
+        {
+            TestA.Instance.TestCall("error test");
+        }
+
         public static void MultiDimensionalArrayTest()
         {
             int[,] arr = new int[3, 4];

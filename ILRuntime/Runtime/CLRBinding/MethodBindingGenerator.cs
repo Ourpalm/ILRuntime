@@ -183,89 +183,7 @@ namespace ILRuntime.Runtime.CLRBinding
                 {
                     var p = param[j - 1];
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
-                    string clsName, realClsName;
-                    bool isByRef;
-                    p.ParameterType.GetClassName(out clsName, out realClsName, out isByRef);
-                    var pt = p.ParameterType.IsByRef ? p.ParameterType.GetElementType() : p.ParameterType;
-                    if (pt.IsValueType && !pt.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(pt))
-                    {
-                        if (isMultiArr)
-                            sb.AppendLine(string.Format("            {0} a{1} = new {0}();", realClsName, j));
-                        else
-                            sb.AppendLine(string.Format("            {0} @{1} = new {0}();", realClsName, p.Name));
-
-                        sb.AppendLine(string.Format("            if (ILRuntime.Runtime.Generated.CLRBindings.s_{0}_Binder != null) {{", clsName));
-
-                        if (isMultiArr)
-                            sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue(ref a{0}, __intp, ptr_of_this_method, __mStack, {2});", j, clsName, shouldFreeParam));
-                        else
-                            sb.AppendLine(string.Format("                ILRuntime.Runtime.Generated.CLRBindings.s_{1}_Binder.ParseValue(ref @{0}, __intp, ptr_of_this_method, __mStack, {2});", p.Name, clsName, shouldFreeParam));
-
-                        sb.AppendLine("            } else {");
-
-                        if (isByRef)
-                            sb.AppendLine("                ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
-                        if (isMultiArr)
-                            sb.AppendLine(string.Format("                a{0} = {1};", j, p.ParameterType.GetRetrieveValueCode(realClsName)));
-                        else
-                            sb.AppendLine(string.Format("                @{0} = {1};", p.Name, p.ParameterType.GetRetrieveValueCode(realClsName)));
-                        if (!hasByRef)
-                            sb.AppendLine("                __intp.Free(ptr_of_this_method);");
-
-                        sb.AppendLine("            }");
-                    }
-                    else
-                    {
-                        if (isByRef)
-                        {
-                            if (p.ParameterType.GetElementType().IsPrimitive)
-                            {
-                                if (pt == typeof(int) || pt == typeof(uint) || pt == typeof(short) || pt == typeof(ushort) || pt == typeof(byte) || pt == typeof(sbyte) || pt == typeof(char))
-                                {
-                                    if (pt == typeof(int))
-                                        sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt32(ptr_of_this_method, __mStack);", realClsName, p.Name));
-                                    else
-                                        sb.AppendLine(string.Format("            {0} @{1} = ({0})__intp.RetriveInt32(ptr_of_this_method, __mStack);", realClsName, p.Name));
-                                }
-                                else if (pt == typeof(long) || pt == typeof(ulong))
-                                {
-                                    if (pt == typeof(long))
-                                        sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt64(ptr_of_this_method, __mStack);", realClsName, p.Name));
-                                    else
-                                        sb.AppendLine(string.Format("            {0} @{1} = ({0})__intp.RetriveInt64(ptr_of_this_method, __mStack);", realClsName, p.Name));
-                                }
-                                else if (pt == typeof(float))
-                                {
-                                    sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveFloat(ptr_of_this_method, __mStack);", realClsName, p.Name));
-                                }
-                                else if (pt == typeof(double))
-                                {
-                                    sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveDouble(ptr_of_this_method, __mStack);", realClsName, p.Name));
-                                }
-                                else if (pt == typeof(bool))
-                                {
-                                    sb.AppendLine(string.Format("            {0} @{1} = __intp.RetriveInt32(ptr_of_this_method, __mStack) == 1;", realClsName, p.Name));
-                                }
-                                else
-                                    throw new NotSupportedException();
-                            }
-                            else
-                            {
-                                sb.AppendLine(string.Format("            {0} @{1} = ({0})typeof({0}).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));", realClsName, p.Name));
-                            }
-
-                        }
-                        else
-                        {
-                            if (isMultiArr)
-                                sb.AppendLine(string.Format("            {0} a{1} = {2};", realClsName, j, p.ParameterType.GetRetrieveValueCode(realClsName)));
-                            else
-                                sb.AppendLine(string.Format("            {0} @{1} = {2};", realClsName, p.Name, p.ParameterType.GetRetrieveValueCode(realClsName)));
-                            if (!hasByRef && !p.ParameterType.IsPrimitive)
-                                sb.AppendLine("            __intp.Free(ptr_of_this_method);");
-
-                        }
-                    }
+                    p.ParameterType.AppendArgumentCode(sb, j, p.Name, valueTypeBinders, isMultiArr, hasByRef, true);
                     sb.AppendLine();
                 }
                 if (!i.IsStatic)
@@ -415,6 +333,20 @@ namespace ILRuntime.Runtime.CLRBinding
                                     throw new NotImplementedException(i.Name);
                             }
                         }
+                        else if(propType == "add")
+                        {
+                            string clsName, realClsName;
+                            bool isByRef;
+                            i.DeclaringType.GetClassName(out clsName, out realClsName, out isByRef);
+                            sb.AppendLine(string.Format("{0}.{1} += {2};", realClsName, i.Name.Substring(4), param[0].Name));
+                        }
+                        else if (propType == "remove")
+                        {
+                            string clsName, realClsName;
+                            bool isByRef;
+                            i.DeclaringType.GetClassName(out clsName, out realClsName, out isByRef);
+                            sb.AppendLine(string.Format("{0}.{1} -= {2};", realClsName, i.Name.Substring(7), param[0].Name));
+                        }
                         else
                             throw new NotImplementedException();
                     }
@@ -454,6 +386,14 @@ namespace ILRuntime.Runtime.CLRBinding
                             }
                             else
                                 sb.AppendLine(string.Format("instance_of_this_method.{0} = {1};", t[1], param[0].Name));
+                        }
+                        else if (propType == "add")
+                        {
+                            sb.AppendLine(string.Format("instance_of_this_method.{0} += {1};", i.Name.Substring(4), param[0].Name));
+                        }
+                        else if (propType == "remove")
+                        {
+                            sb.AppendLine(string.Format("instance_of_this_method.{0} -= {1};", i.Name.Substring(7), param[0].Name));
                         }
                         else
                             throw new NotImplementedException();
@@ -584,8 +524,11 @@ namespace ILRuntime.Runtime.CLRBinding
                 if (!i.IsStatic && ((type.IsValueType && !type.IsPrimitive) || hasByRef))//need to write back value type instance
                 {
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
-
-                    if (type.IsValueType && !type.IsPrimitive)
+                    bool noWriteback = false;
+#if NET_4_6 || NET_STANDARD_2_0
+                    noWriteback = type == typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder) && i.Name == "Start";
+#endif
+                    if (type.IsValueType && !type.IsPrimitive && !noWriteback)
                     {
                         if (valueTypeBinders != null && valueTypeBinders.Contains(type))
                         {

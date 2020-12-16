@@ -19,6 +19,16 @@ namespace TestCases
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += cls.IntTest2;
 
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest(123);
+
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateEventTest += IntTest;
+            ILRuntimeTest.TestFramework.DelegateTest.TestEvent();
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateEventTest -= IntTest;
+
+            ILRuntimeTest.TestFramework.DelegateTest test = new ILRuntimeTest.TestFramework.DelegateTest();
+            test.IntDelegateEventTest2 += IntTest;
+            test.TestEvent2();
+            test.IntDelegateEventTest2 -= IntTest;
+
         }
 
         public static void DelegateTest02()
