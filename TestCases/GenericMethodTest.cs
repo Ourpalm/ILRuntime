@@ -354,6 +354,53 @@ namespace TestCases
             Console.WriteLine(notSelGuids.Count.ToString());
         }
 
+
+        class Creater<T>
+        {
+            public bool Test(T me, T other)
+            {
+                var idiot1 = me as Man;
+
+                var idiot2 = other as Man;
+                return idiot1.Test(idiot2);
+            }
+        }
+
+        class Man
+        {
+            int a;
+
+            public Man(int a)
+            {
+                this.a = a;
+            }
+
+            public bool Test(Man other) => a == other.a;
+        }
+
+        static void Test<T>(Creater<T> creater) where T : Man
+        {
+            var m1 = new Man(33);
+            var m2 = new Man(33);
+
+            T t1 = (T)m1;
+            T t2 = (T)m2;
+
+            //传入创建的create有问题
+            if (creater.Test(t1, t2))  // Exception NullReference
+                Console.WriteLine(true);
+            else
+                Console.WriteLine(false);
+        }
+
+        static Creater<T> TestCreate<T>() => new Creater<T>();
+
+        // 测试用例
+        public static void GenericMethodTest15()
+        {
+            var creater = TestCreate<Man>();
+            Test(creater);
+        }
         public static void GenericExtensionMethod1Test1()
         {
             new ExtensionClass().Method1(v => { });

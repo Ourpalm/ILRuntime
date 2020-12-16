@@ -545,7 +545,13 @@ namespace ILRuntime.Runtime.Enviorment
                     KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[genericParams.Count];
                     for (int i = 0; i < genericArguments.Length; i++)
                     {
-                        string key = "!" + i;
+                        string key = null;
+                        if(bt is ILType ilt)
+                        {
+                            key = ilt.TypeDefinition.GenericParameters[i].FullName;
+                        }
+                        else
+                            key = "!" + i;
                         IType val = GetType(genericParams[i]);
                         if (val == null)
                             return null;
