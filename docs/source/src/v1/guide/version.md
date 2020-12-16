@@ -5,6 +5,19 @@ order: 1
 ---
 
 ## 更新记录
+### V1.6.6
+- Appdomain.Prewarm接口加入预热指定方法的参数
+- AppDomain新增GetCurrentStackTrace接口获取当前调用栈，仅支持从热更中调用
+- 修改Profiler宏，以简化Unity平台上报Profiler数据
+- 修复一个基类包含值类型字段的类型报错的Bug
+- 修复热更中调用自定义Attribute后，自动分析绑定生成的代码编译不过的问题
+- 修复几个CLR自动分析绑定生成的代码出错的问题
+- 修复几个泛型方法匹配的Bug
+- 修复在基类实现接口的虚方法上有不必要开销的问题
+- 修复GetCustomAttributes接口当inherit为true时不包含基类Attribute的Bug
+- 修复CLR自动分析绑定无法自动生成event调用的绑定代码的问题
+- 修复在热更内调用Enum.CompareTo和Enum.ToObject的问题
+
 ### V1.6.5
 - 提升了Release环境下（非Development Build）大约25%的执行效率
 - 修复了一个泛型类型中泛型变量无法置null的Bug

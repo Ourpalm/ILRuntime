@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.5</button>
+        <button class="hiden-in-phone">V1.6.6</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -161,7 +161,20 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-5"><a href="#V1-6-5" class="headerlink" title="V1.6.5"></a>V1.6.5</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-6"><a href="#V1-6-6" class="headerlink" title="V1.6.6"></a>V1.6.6</h3><ul>
+<li>Appdomain.Prewarm接口加入预热指定方法的参数</li>
+<li>AppDomain新增GetCurrentStackTrace接口获取当前调用栈，仅支持从热更中调用</li>
+<li>修改Profiler宏，以简化Unity平台上报Profiler数据</li>
+<li>修复一个基类包含值类型字段的类型报错的Bug</li>
+<li>修复热更中调用自定义Attribute后，自动分析绑定生成的代码编译不过的问题</li>
+<li>修复几个CLR自动分析绑定生成的代码出错的问题</li>
+<li>修复几个泛型方法匹配的Bug</li>
+<li>修复在基类实现接口的虚方法上有不必要开销的问题</li>
+<li>修复GetCustomAttributes接口当inherit为true时不包含基类Attribute的Bug</li>
+<li>修复CLR自动分析绑定无法自动生成event调用的绑定代码的问题</li>
+<li>修复在热更内调用Enum.CompareTo和Enum.ToObject的问题</li>
+</ul>
+<h3 id="V1-6-5"><a href="#V1-6-5" class="headerlink" title="V1.6.5"></a>V1.6.5</h3><ul>
 <li>提升了Release环境下（非Development Build）大约25%的执行效率</li>
 <li>修复了一个泛型类型中泛型变量无法置null的Bug</li>
 <li>修复一个default关键字作用于枚举或者值类型时报错的Bug</li>
