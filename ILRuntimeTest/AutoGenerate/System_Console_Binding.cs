@@ -31,13 +31,13 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_2);
-            args = new Type[]{typeof(System.Object)};
+            args = new Type[]{typeof(System.Boolean)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_3);
-            args = new Type[]{typeof(System.Int64)};
+            args = new Type[]{typeof(System.Object)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_4);
-            args = new Type[]{typeof(System.Boolean)};
+            args = new Type[]{typeof(System.Int64)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_5);
             args = new Type[]{typeof(System.String)};
@@ -124,8 +124,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Object @value = (System.Object)typeof(System.Object).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
-            __intp.Free(ptr_of_this_method);
+            System.Boolean @value = ptr_of_this_method->Value == 1;
 
 
             System.Console.WriteLine(@value);
@@ -140,7 +139,8 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int64 @value = *(long*)&ptr_of_this_method->Value;
+            System.Object @value = (System.Object)typeof(System.Object).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            __intp.Free(ptr_of_this_method);
 
 
             System.Console.WriteLine(@value);
@@ -155,7 +155,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Boolean @value = ptr_of_this_method->Value == 1;
+            System.Int64 @value = *(long*)&ptr_of_this_method->Value;
 
 
             System.Console.WriteLine(@value);
