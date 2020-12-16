@@ -275,6 +275,28 @@ namespace TestCases
             return 0;
         }
 
+        class RefReturnTest
+        {
+            Vector3 vec;
+            public ref Vector3 GetRef()
+            {
+                return ref vec;
+            }
+
+            public void Test(float val)
+            {
+                if (vec.y != val)
+                    throw new Exception();
+            }
+        }
+        public static void UnitTest_RefReturn()
+        {
+            RefReturnTest obj = new RefReturnTest();
+            ref Vector3 r = ref obj.GetRef();
+            r.y = 123;
+            obj.Test(123);
+        }
+
         static T TestRef<T>(ref T obj) where T : SingletonTest, new()
         {
             obj.testFloat = 3;

@@ -204,7 +204,7 @@ namespace ILRuntime.Runtime.Intepreter
                 }
                 isEnum = t.IsEnum;
                 
-                if (t.IsValueType && !t.IsPrimitive && !isEnum)
+                if (!t.IsByRef && t.IsValueType && !t.IsPrimitive && !isEnum)
                 {
                     if (t is ILType)
                     {
