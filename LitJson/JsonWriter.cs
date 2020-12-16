@@ -261,9 +261,10 @@ namespace LitJson
                 }
 
                 // Default, turn into a \uXXXX sequence
-                IntToHex ((int) str[i], hex_seq);
-                writer.Write ("\\u");
-                writer.Write (hex_seq);
+                //IntToHex ((int) str[i], hex_seq);
+                //writer.Write ("\\u");
+                //writer.Write (hex_seq);
+                writer.Write(str[i]);
             }
 
             writer.Write ('"');

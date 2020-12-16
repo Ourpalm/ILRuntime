@@ -816,6 +816,7 @@ namespace LitJson
             if (obj is IDictionary) {
                 writer.WriteObjectStart ();
                 foreach (DictionaryEntry entry in (IDictionary) obj) {
+                    if(entry.Value == null) { continue; }
                     writer.WritePropertyName ((string) entry.Key);
                     WriteValue (entry.Value, writer, writer_is_private,
                                 depth + 1);
@@ -877,19 +878,25 @@ namespace LitJson
                 if (p_data.IsField) {
                     FieldInfo p_info = (FieldInfo)p_data.Info;
                     if ((p_info.Attributes & FieldAttributes.Static) > 0) { continue; }
+                    var valuetowrite = p_info.GetValue(obj);
+                    if(valuetowrite == null) { continue; }
+                    if (valuetowrite is Int32 && (int)valuetowrite==0) { continue; }
+                    if (valuetowrite is Single && (float)valuetowrite == 0) { continue; }
+                    if (valuetowrite is Double && (double)valuetowrite == 0) { continue; }
+                    if (valuetowrite is String && string.IsNullOrEmpty((string)valuetowrite)) { continue; }
                     writer.WritePropertyName (p_data.Info.Name);
-                    WriteValue (p_info.GetValue (obj),
+                    WriteValue (valuetowrite,
                                 writer, writer_is_private, depth + 1);
                 }
-                else {
-                    PropertyInfo p_info = (PropertyInfo) p_data.Info;
+                //else {
+                //    PropertyInfo p_info = (PropertyInfo) p_data.Info;
 
-                    if (p_info.CanRead) {
-                        writer.WritePropertyName (p_data.Info.Name);
-                        WriteValue (p_info.GetValue (obj, null),
-                                    writer, writer_is_private, depth + 1);
-                    }
-                }
+                //    if (p_info.CanRead) {
+                //        writer.WritePropertyName (p_data.Info.Name);
+                //        WriteValue (p_info.GetValue (obj, null),
+                //                    writer, writer_is_private, depth + 1);
+                //    }
+                //}
             }
             writer.WriteObjectEnd ();
         }
