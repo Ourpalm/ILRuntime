@@ -408,5 +408,29 @@ namespace TestCases
             {
             }
         }
+
+        class A<T>
+        {
+            T value = default;
+            public A(T value)
+            {
+                this.value = value;
+            }
+        }
+
+        class IntA : A<int>
+        {
+            public IntA(int value)
+                : base(value)
+            {
+
+            }
+        }
+
+        public static void UnitTest_10044()
+        {
+
+            IntA a = new IntA(100);
+        }
     }
 }
