@@ -682,7 +682,7 @@ namespace ILRuntime.Runtime.Enviorment
                                 name = name.Substring(1, name.Length - 2);
                             if (!string.IsNullOrEmpty(name))
                                 genericParams.Add(name);
-                            else if (!string.IsNullOrEmpty(name))
+                            else if (!string.IsNullOrEmpty(baseType))
                             {
                                 if (!isArray)
                                 {
@@ -695,7 +695,7 @@ namespace ILRuntime.Runtime.Enviorment
                             }
                             else
                             {
-                                sb.Append("[]");
+                                sb.Append("<>");
                                 continue;
                             }
                             sb.Length = 0;

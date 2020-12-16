@@ -206,7 +206,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return  typeRef.HasGenericParameters && genericArguments == null;
+                return typeRef.HasGenericParameters && genericArguments == null;
             }
         }
 
@@ -723,9 +723,15 @@ namespace ILRuntime.CLR.TypeSystem
             }
 
             var m = GetMethod(method.Name, method.Parameters, genericArguments, method.ReturnType, true);
+            if (m == null && BaseType != null)
+            {
+                m = BaseType.GetVirtualMethod(method);
+                if (m != null)
+                    return m;
+            }
             if (m == null && method.DeclearingType.IsInterface)
             {
-                if(method.DeclearingType is ILType)
+                if (method.DeclearingType is ILType)
                 {
                     ILType iltype = (ILType)method.DeclearingType;
                     m = GetMethod(string.Format("{0}.{1}", iltype.fullNameForNested, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
@@ -734,19 +740,11 @@ namespace ILRuntime.CLR.TypeSystem
                     m = GetMethod(string.Format("{0}.{1}", method.DeclearingType.FullName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
             }
 
-            if (m == null)
-            {
-                if (BaseType != null)
-                {
-                    return BaseType.GetVirtualMethod(method);
-                }
-                else
-                    return null;//BaseType == null means base type is Object or Enum
-            }
-            else if (m.IsGenericInstance == method.IsGenericInstance)
+            if (m == null || m.IsGenericInstance == method.IsGenericInstance)
                 return m;
             else
                 return method;
+
         }
 
         public IMethod GetMethod(string name, List<IType> param, IType[] genericArguments, IType returnType = null, bool declaredOnly = false)
