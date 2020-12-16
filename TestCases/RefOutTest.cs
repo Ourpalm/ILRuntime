@@ -13,7 +13,7 @@ namespace TestCases
             public static void Test<T>(T value)
             {
                 if (value == null)
-                    Console.WriteLine("null");
+                    throw new Exception("null");
             }
 
             public static void Test2<T>(T obj)

@@ -401,6 +401,12 @@ namespace TestCases
             var creater = TestCreate<Man>();
             Test(creater);
         }
+
+        public static void GenericMethodTest16()
+        {
+            var testa = new TestA<int>();
+            testa.TestStatic();  //输出了‘arr’ 然后报错  调用了泛型数组的方法，正常应该调用泛型接口的方法
+        }
         public static void GenericExtensionMethod1Test1()
         {
             new ExtensionClass().Method1(v => { });
@@ -605,6 +611,36 @@ namespace TestCases
         static T GenericStaticMethodTest14Sub<T>()
         {
             return default(T);
+        }
+    }
+
+
+
+    interface ITestA<T> //泛型接口
+    {
+        void Test();
+    }
+
+    class TestA<T> : ITestA<T>
+    {
+        public void Test()
+        {
+            Console.WriteLine("TestA impl");
+        }
+    }
+    static class TestStaticClassGenericMethod     //扩展方法静态类 两个方法同名
+    {
+        public static void TestStatic<T>(this T[] arr) //泛型数组
+        {
+            Console.WriteLine("arr");
+            Console.WriteLine(arr.Length);
+            throw new Exception("Wrong method");
+        }
+
+        public static void TestStatic<T>(this ITestA<T> test)//泛型接口
+        {
+            Console.WriteLine("ITestA");
+            test.Test();
         }
     }
 }

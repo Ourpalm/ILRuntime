@@ -842,19 +842,32 @@ namespace ILRuntime.CLR.TypeSystem
                 for (int j = 0; j < param.Count; j++)
                 {
                     var p = i.Parameters[j];
+                    if (p.IsGenericParameter)
+                        continue;
                     if (p.IsByRef)
                         p = p.ElementType;
                     if (p.IsArray)
                         p = p.ElementType;
-
-                    if (p.IsGenericParameter)
-                        continue;
 
                     var p2 = param[j];
                     if (p2.IsByRef)
                         p2 = p2.ElementType;
                     if (p2.IsArray)
                         p2 = p2.ElementType;
+
+                    if (p.IsGenericParameter)
+                    {
+                        if (i.Parameters[j].IsByRef == param[j].IsByRef && i.Parameters[j].IsArray == param[j].IsArray)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
+
                     if (p.HasGenericParameter)
                     {
                         if(p.Name != p2.Name)

@@ -695,7 +695,7 @@ namespace ILRuntime.Runtime.Enviorment
                             }
                             else
                             {
-                                sb.Append("<>");
+                                sb.Append("[]");
                                 continue;
                             }
                             sb.Length = 0;
