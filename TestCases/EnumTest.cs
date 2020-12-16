@@ -299,7 +299,9 @@ namespace TestCases
         public static void Test21()
         {
             bool res = false;
-            TestEnum5 b = (TestEnum5)Enum.ToObject(typeof(TestEnum5), 0x12345789);
+            object obj = Enum.ToObject(typeof(TestEnum5), 0x12345789);
+            Console.WriteLine(obj);
+            TestEnum5 b = (TestEnum5)obj;
             switch (b)
             {
                 case TestEnum5.Enum1:

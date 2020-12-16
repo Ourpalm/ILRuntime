@@ -51,6 +51,13 @@ namespace ILRuntime.Runtime.Intepreter
             fields = new StackObject[1];
         }
 
+        public override ILTypeInstance Clone()
+        {
+            ILEnumTypeInstance ins = new ILEnumTypeInstance(type);
+            ins.fields[0] = fields[0];
+            return ins;
+        }
+
         public override string ToString()
         {
             var fields = type.TypeDefinition.Fields;
@@ -636,13 +643,13 @@ namespace ILRuntime.Runtime.Intepreter
             return this.type.CanAssignTo(type);
         }
 
-        public ILTypeInstance Clone()
+        public virtual ILTypeInstance Clone()
         {
             ILTypeInstance ins = new ILTypeInstance(type);
             for (int i = 0; i < fields.Length; i++)
             {
                 ins.fields[i] = fields[i];
-                ins.managedObjs[i] = ILIntepreter.CheckAndCloneValueType(managedObjs[i],Type.AppDomain);
+                ins.managedObjs[i] = ILIntepreter.CheckAndCloneValueType(managedObjs[i], Type.AppDomain);
             }
             return ins;
         }
