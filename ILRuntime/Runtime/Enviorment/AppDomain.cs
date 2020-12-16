@@ -82,6 +82,8 @@ namespace ILRuntime.Runtime.Enviorment
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
+            mi = typeof(AppDomain).GetMethod("GetCurrentStackTrace");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.GetCurrentStackTrace);
             foreach (var i in typeof(System.Activator).GetMethods())
             {
                 if (i.Name == "CreateInstance" && i.IsGenericMethodDefinition)
@@ -231,6 +233,11 @@ namespace ILRuntime.Runtime.Enviorment
                     fs.Dispose();
                 }
             }
+        }
+
+        public string GetCurrentStackTrace()
+        {
+            throw new NotSupportedException("Cannot call this method from CLR side");
         }
 
 #if USE_MDB || USE_PDB

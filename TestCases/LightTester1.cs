@@ -384,6 +384,11 @@ namespace TestCases
             }
         }
 
+        public static void UnitTest_1015()
+        {
+            Console.WriteLine(ILRuntimeTest.TestMainForm._app.GetCurrentStackTrace());
+        }
+
         public class TestClass<T> where T : class, new()
         {
             public T tValue;

@@ -16,6 +16,13 @@ namespace ILRuntime.Runtime.Enviorment
 {
     unsafe static class CLRRedirections
     {
+        public static StackObject* GetCurrentStackTrace(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            StackObject* ret = esp - 1 - 1;
+            intp.Free(esp - 1);
+
+            return ILIntepreter.PushObject(ret, mStack, intp.AppDomain.DebugService.GetStackTrace(intp));
+        }
         public static StackObject* CreateInstance(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
             IType[] genericArguments = method.GenericArguments;
