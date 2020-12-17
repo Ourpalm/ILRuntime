@@ -96,7 +96,8 @@ namespace ILRuntime.CLR.Utils
             StringBuilder sb = new StringBuilder();
             List<string> ga;
             bool isArray;
-            Runtime.Enviorment.AppDomain.ParseGenericType(typename, out baseType, out ga, out isArray);
+            byte rank;
+            Runtime.Enviorment.AppDomain.ParseGenericType(typename, out baseType, out ga, out isArray, out rank);
             string baseTypeQualification = null;
             bool hasGA = ga != null && ga.Count > 0;
             if (baseType == argumentName)
@@ -143,7 +144,12 @@ namespace ILRuntime.CLR.Utils
                 sb.Append(']');
             }
             if (isArray)
-                sb.Append("[]");
+            {
+                sb.Append("[");
+                for (int i = 0; i < rank - 1; i++)
+                    sb.Append(",");
+                sb.Append("]");
+            }
             return sb.ToString();
         }
 
