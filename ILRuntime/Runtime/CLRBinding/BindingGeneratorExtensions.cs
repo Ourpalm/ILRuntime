@@ -247,7 +247,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     return "*(ulong*)&ptr_of_this_method->Value";
                 }
                 else
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(realClsName);
             }
             else
             {
@@ -433,7 +433,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb.AppendLine("            *(ulong*)&__ret->Value = result_of_this_method;");
                 }
                 else
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(type.FullName);
                 sb.AppendLine("            return __ret + 1;");
 
             }
