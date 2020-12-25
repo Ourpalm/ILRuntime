@@ -116,7 +116,8 @@ namespace ILRuntime.Runtime.Debugger
                     var seq = FindSequencePoint(ins, m.Definition.DebugInformation.GetSequencePointMapping());
                     if (seq != null)
                     {
-                        document = string.Format("{0}:Line {1}", seq.Document.Url, seq.StartLine);
+                        string path = seq.Document.Url.Replace("\\", "/");
+                        document = string.Format("(at {0}:{1})", path, seq.StartLine);
                     }
                 }
                 sb.AppendFormat("at {0} {1}\r\n", m, document);
