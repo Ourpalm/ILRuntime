@@ -178,5 +178,152 @@ namespace TestCases
             if (arr2[0] != JsonTestEnum.Test2)
                 throw new Exception();
         }
+
+        public class GenericTest<T>
+        {
+            public string name;
+            public List<T> data;
+
+            public override string ToString()
+            {
+                return $"name={name}, data=[{string.Join(", ", data)}]";
+            }
+        }
+
+        public class DataClass
+        {
+            public int code;
+            public string msg;
+            public override string ToString()
+            {
+                return $"code:{code}, msg:{msg}";
+            }
+        }
+        
+        public static void JsonTest8()
+        {
+            //T如果非热更，是可以的
+            Console.WriteLine("Generic Test where T in local");
+            GenericTest<int> g = new GenericTest<int>();
+            g.name = "intTest";
+            g.data = new List<int>()
+            {
+                0,1,2,3,4,5
+            };
+            js = JsonMapper.ToJson(g);
+            Console.WriteLine("js:\n" + js);
+            var gObj = JsonMapper.ToObject<GenericTest<int>>(js);
+            Console.WriteLine(gObj.ToString());
+            Console.WriteLine("====================");
+
+            //T如果热更，也是可以的
+            Console.WriteLine("Generic Test where T in hotfix");
+            GenericTest<DataClass> d = new GenericTest<DataClass>();
+            d.name = "dataClassTest";
+            d.data = new List<DataClass>()
+            {
+                new DataClass()
+                {
+                    code = 200,
+                    msg="测试200"
+                },
+                new DataClass()
+                {
+                    code = 404,
+                    msg="测试404"
+                }
+            };
+            js = JsonMapper.ToJson(d);
+            Console.WriteLine("js:\n" + js);
+            var gObj2 = JsonMapper.ToObject<GenericTest<DataClass>>(js);
+            Console.WriteLine(gObj2.ToString());
+            Console.WriteLine("====================");
+        }
+
+        public class TestJson
+        {
+            public EnumTest enumTest = EnumTest.c;
+
+            public List<EnumTest> enumTestList = new List<EnumTest>()
+            {
+                EnumTest.a,
+                EnumTest.b
+            };
+
+            public List<string> stringTestList = new List<string>()
+            {
+                "aaa","bbb","ccc"
+            };
+
+            public List<int> intTestList = new List<int>()
+            {
+            1,2,3
+            };
+
+            public List<double> doubleTestList = new List<double>()
+            {
+                1,2,3
+            };
+
+            public List<TestJsonSub> TestJsonSubList = new List<TestJsonSub>()
+            {
+                new TestJsonSub(){name = "sub a"},
+                new TestJsonSub(){name = "sub b"},
+            };
+
+
+            public Dictionary<EnumTest, double> enumDict = new Dictionary<EnumTest, double>()
+            {
+                {EnumTest.a,1.0},
+                {EnumTest.b,2.0},
+            };
+
+
+            public Dictionary<string, double> stringDict = new Dictionary<string, double>()
+            {
+                {"stra",1.0},
+                {"strb",2.0},
+            };
+
+            public override string ToString()
+            {
+                string s = $"{enumTest} \n";
+                foreach (var test in enumTestList)
+                {
+                    s += test + ",";
+                }
+                s += "\n";
+                foreach (var test in enumDict)
+                {
+                    s += test.Key + "=" + test.Value + " , ";
+                }
+                s += "\n";
+                foreach (var test in stringDict)
+                {
+                    s += test.Key + "=" + test.Value + " , ";
+                }
+                s += "\n";
+                foreach (var test in TestJsonSubList)
+                {
+                    s += test.name;
+                }
+                return s;
+            }
+        }
+
+        public static void JsonTest9()
+        {
+            //原本的不可以，改了后可以
+            Console.WriteLine("Enum/List/Dictionary Test");
+            TestJson t = new TestJson();
+            t.enumTestList.Add(EnumTest.c);
+            t.enumDict.Add(EnumTest.c, 99999.999);
+            var js = JsonMapper.ToJson(t);
+            Console.WriteLine("js:\n" + js);
+            var obj = JsonMapper.ToObject<TestJson>(js);
+            Console.WriteLine(obj.ToString());
+            Console.WriteLine("====================");
+        }
+
     }
 }
