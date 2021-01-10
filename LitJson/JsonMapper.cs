@@ -19,6 +19,7 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.Utils;
+using Object = System.Object;
 
 namespace LitJson
 {
@@ -431,83 +432,129 @@ namespace LitJson
                     if (item == null && reader.Token == JsonToken.ArrayEnd)
                         break;
                     var rt = elem_type is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)elem_type).RealType : elem_type;
-                    rt = elem_type is ILRuntime.Reflection.ILRuntimeType ? ((ILRuntime.Reflection.ILRuntimeType)elem_type).ILType.TypeForCLR : elem_type;
-                    item = rt.CheckCLRTypes(item);
-                    list.Add (item);
+                    if (elem_type is ILRuntime.Reflection.ILRuntimeType && ((ILRuntime.Reflection.ILRuntimeType)elem_type).ILType.IsEnum)
+                    {
+                        item = (int) item;
+                    }
+                    else
+                    {
+                        item = rt.CheckCLRTypes(item);            
+                    }
+                    list.Add (item);         
+                    
                 }
 
                 if (t_data.IsArray) {
                     int n = list.Count;
-                    var rt = elem_type is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)elem_type).RealType : elem_type;
-                    rt = elem_type is ILRuntime.Reflection.ILRuntimeType ? ((ILRuntime.Reflection.ILRuntimeType)elem_type).ILType.TypeForCLR : elem_type;
-                    instance = Array.CreateInstance (rt, n);
+                    instance = Array.CreateInstance (elem_type, n);
 
                     for (int i = 0; i < n; i++)
                         ((Array) instance).SetValue (list[i], i);
                 } else
                     instance = list;
 
-            } else if (reader.Token == JsonToken.ObjectStart) {
-                AddObjectMetadata (value_type);
+            } else if (reader.Token == JsonToken.ObjectStart)
+            {
+                AddObjectMetadata(value_type);
                 ObjectMetadata t_data = object_metadata[value_type];
                 if (value_type is ILRuntime.Reflection.ILRuntimeType)
-                    instance = ((ILRuntime.Reflection.ILRuntimeType)value_type).ILType.Instantiate();
+                    instance = ((ILRuntime.Reflection.ILRuntimeType) value_type).ILType.Instantiate();
                 else
-                {
-                    if (value_type is ILRuntime.Reflection.ILRuntimeWrapperType)
-                        value_type = ((ILRuntime.Reflection.ILRuntimeWrapperType)value_type).RealType;
                     instance = Activator.CreateInstance(value_type);
-                }
-                while (true) {
-                    reader.Read ();
+                bool isIntKey = t_data.IsDictionary && value_type.GetGenericArguments()[0] == typeof(int);
+                while (true)
+                {
+                    reader.Read();
 
                     if (reader.Token == JsonToken.ObjectEnd)
                         break;
 
-                    string property = (string) reader.Value;
+                    string key = (string) reader.Value;
 
-                    if (t_data.Properties.ContainsKey (property)) {
+                    if (t_data.Properties.ContainsKey(key))
+                    {
                         PropertyMetadata prop_data =
-                            t_data.Properties[property];
+                            t_data.Properties[key];
 
-                        if (prop_data.IsField) {
-                            ((FieldInfo) prop_data.Info).SetValue (
-                                instance, ReadValue (prop_data.Type, reader));
-                        } else {
+                        if (prop_data.IsField)
+                        {
+                            ((FieldInfo) prop_data.Info).SetValue(
+                                instance, ReadValue(prop_data.Type, reader));
+                        }
+                        else
+                        {
                             PropertyInfo p_info =
                                 (PropertyInfo) prop_data.Info;
 
                             if (p_info.CanWrite)
-                                p_info.SetValue (
+                                p_info.SetValue(
                                     instance,
-                                    ReadValue (prop_data.Type, reader),
+                                    ReadValue(prop_data.Type, reader),
                                     null);
                             else
-                                ReadValue (prop_data.Type, reader);
+                                ReadValue(prop_data.Type, reader);
                         }
 
-                    } else {
-                        if (! t_data.IsDictionary) {
+                    }
+                    else
+                    {
+                        if (!t_data.IsDictionary)
+                        {
 
-                            if (! reader.SkipNonMembers) {
-                                throw new JsonException (String.Format (
-                                        "The type {0} doesn't have the " +
-                                        "property '{1}'",
-                                        inst_type, property));
-                            } else {
-                                ReadSkip (reader);
+                            if (!reader.SkipNonMembers)
+                            {
+                                throw new JsonException(String.Format(
+                                    "The type {0} doesn't have the " +
+                                    "property '{1}'",
+                                    inst_type, key));
+                            }
+                            else
+                            {
+                                ReadSkip(reader);
                                 continue;
                             }
                         }
 
-                        var rt = t_data.ElementType is ILRuntime.Reflection.ILRuntimeWrapperType ? ((ILRuntime.Reflection.ILRuntimeWrapperType)t_data.ElementType).RealType : t_data.ElementType;
-                        ((IDictionary) instance).Add (
-                            property, rt.CheckCLRTypes(ReadValue (
-                                t_data.ElementType, reader)));
+                        var dict = ((IDictionary) instance);
+                        var elem_type = t_data.ElementType;
+                        object readValue = ReadValue(elem_type, reader);
+                        var rt = t_data.ElementType is ILRuntime.Reflection.ILRuntimeWrapperType
+                            ? ((ILRuntime.Reflection.ILRuntimeWrapperType) t_data.ElementType).RealType
+                            : t_data.ElementType;
+                        //value 是枚举的情况没处理,毕竟少
+                        if (isIntKey)
+                        {
+                            var dictValueType = value_type.GetGenericArguments()[1];
+                            IConvertible convertible = dictValueType as IConvertible;
+                            if (convertible == null)
+                            {
+                                //自定义类型扩展
+                                if (dictValueType == typeof(double)) //CheckCLRTypes() 没有double,也可以修改ilruntime源码实现
+                                {
+                                    var v = Convert.ChangeType(readValue.ToString(), dictValueType);
+                                    dict.Add(Convert.ToInt32(key), v);
+                                }
+                                else
+                                {
+                                    readValue = rt.CheckCLRTypes(readValue);
+                                    dict.Add(Convert.ToInt32(key), readValue);
+                                    // throw new JsonException (String.Format("The type {0} doesn't not support",dictValueType));
+                                }
+                            }
+                            else
+                            {
+                                var v = Convert.ChangeType(readValue, dictValueType);
+                                dict.Add(Convert.ToInt32(key), v);
+                            }
+                        }
+                        else
+                        {
+                            readValue = rt.CheckCLRTypes(readValue);
+                            dict.Add(key, readValue);
+                        }
                     }
 
                 }
-
             }
 
             return instance;
@@ -743,73 +790,7 @@ namespace LitJson
                 writer.Write (null);
                 return;
             }
-
-            if (obj is IJsonWrapper) {
-                if (writer_is_private)
-                    writer.TextWriter.Write (((IJsonWrapper) obj).ToJson ());
-                else
-                    ((IJsonWrapper) obj).ToJson (writer);
-
-                return;
-            }
-
-            if (obj is String) {
-                writer.Write ((string) obj);
-                return;
-            }
-
-            if (obj is Double) {
-                writer.Write ((double) obj);
-                return;
-            }
-
-            if (obj is Int32) {
-                writer.Write ((int) obj);
-                return;
-            }
-
-            if (obj is Boolean) {
-                writer.Write ((bool) obj);
-                return;
-            }
-
-            if (obj is Int64) {
-                writer.Write ((long) obj);
-                return;
-            }
-
-            if (obj is Array) {
-                writer.WriteArrayStart ();
-
-                foreach (object elem in (Array) obj)
-                    WriteValue (elem, writer, writer_is_private, depth + 1);
-
-                writer.WriteArrayEnd ();
-
-                return;
-            }
-
-            if (obj is IList) {
-                writer.WriteArrayStart ();
-                foreach (object elem in (IList) obj)
-                    WriteValue (elem, writer, writer_is_private, depth + 1);
-                writer.WriteArrayEnd ();
-
-                return;
-            }
-
-            if (obj is IDictionary) {
-                writer.WriteObjectStart ();
-                foreach (DictionaryEntry entry in (IDictionary) obj) {
-                    writer.WritePropertyName ((string) entry.Key);
-                    WriteValue (entry.Value, writer, writer_is_private,
-                                depth + 1);
-                }
-                writer.WriteObjectEnd ();
-
-                return;
-            }
-
+            
             Type obj_type;
             if (obj is ILRuntime.Runtime.Intepreter.ILTypeInstance)
             {
@@ -838,6 +819,74 @@ namespace LitJson
                 return;
             }
 
+
+            if (obj is IJsonWrapper) {
+                if (writer_is_private)
+                    writer.TextWriter.Write (((IJsonWrapper) obj).ToJson ());
+                else
+                    ((IJsonWrapper) obj).ToJson (writer);
+
+                return;
+            }
+
+            if (obj is String) {
+                writer.Write ((string) obj);
+                return;
+            }
+
+            if (obj is Double) {
+                writer.Write ((double) obj);
+                return;
+            }
+
+            if (obj is Int64) {
+                writer.Write ((long) obj);
+                return;
+            }
+            
+            if (obj is Int32) {
+                writer.Write ((int) obj);
+                return;
+            }
+
+            if (obj is Boolean) {
+                writer.Write ((bool) obj);
+                return;
+            }
+
+            if (obj is Array) {
+                writer.WriteArrayStart ();
+
+                foreach (object elem in (Array) obj)
+                    WriteValue (elem, writer, writer_is_private, depth + 1);
+
+                writer.WriteArrayEnd ();
+
+                return;
+            }
+
+            if (obj is IList) {
+                writer.WriteArrayStart ();
+                foreach (object elem in (IList) obj)
+                    WriteValue (elem, writer, writer_is_private, depth + 1);
+                writer.WriteArrayEnd ();
+
+                return;
+            }
+
+            if (obj is IDictionary) {
+                writer.WriteObjectStart ();
+                foreach (DictionaryEntry entry in (IDictionary) obj) {
+                    writer.WritePropertyName (entry.Key.ToString());
+                    WriteValue (entry.Value, writer, writer_is_private,
+                                depth + 1);
+                }
+                writer.WriteObjectEnd ();
+
+                return;
+            }
+
+            
             // Last option, let's see if it's an enum
             if (obj is Enum) {
                 Type e_type = Enum.GetUnderlyingType (obj_type);
