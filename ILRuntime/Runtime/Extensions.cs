@@ -13,11 +13,14 @@ namespace ILRuntime.Runtime
         {
             isByRef = type.IsByRef;
             int arrayRank = 1;
-            bool isArray = type.IsArray;
+            
             if (isByRef)
             {
                 type = type.GetElementType();
             }
+
+            bool isArray = type.IsArray;
+
             if (isArray)
             {
                 arrayRank = type.GetArrayRank();
