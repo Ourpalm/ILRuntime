@@ -323,8 +323,14 @@ using System.Reflection;
 
 namespace ILRuntime.Runtime.Generated
 {
-    class CLRBindings
+    partial class CLRBindings
     {
+
+        static CLRBindings()
+        {
+            InitializeAction = Initialize;
+        }
+
         /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
         /// </summary>
@@ -739,8 +745,14 @@ using System.Reflection;
 
 namespace ILRuntime.Runtime.Generated
 {
-    class CLRBindings
-    {");
+    partial class CLRBindings
+    {
+
+        static CLRBindings()
+        {
+            InitializeAction = Initialize;
+        }
+");
 
                 if (valueTypeBinders != null)
                 {
