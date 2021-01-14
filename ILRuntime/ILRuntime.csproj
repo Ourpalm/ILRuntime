@@ -69,6 +69,7 @@
     <Compile Include="Reflection\ILRuntimeType.cs" />
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
     <Compile Include="Runtime\CLRBinding\BindingGeneratorExtensions.cs" />
+    <Compile Include="Runtime\CLRBinding\CLRBindings.cs" />
     <Compile Include="Runtime\CLRBinding\CommonBindingGenerator.cs" />
     <Compile Include="Runtime\CLRBinding\ValueTypeBindingGenerator.cs" />
     <Compile Include="Runtime\CLRBinding\FieldBindingGenerator.cs" />
