@@ -230,8 +230,9 @@ namespace ILRuntime.CLR.Utils
 
             var typeFlags = GetTypeFlags(pt);
 
-            if ((typeFlags & TypeFlags.IsPrimitive) != 0 && pt != typeof(int))
+            if ((typeFlags & TypeFlags.IsPrimitive) != 0)
             {
+                if (pt == typeof(int)) return obj;
                 if (pt == typeof(bool) && !(obj is bool))
                 {
                     obj = (int)obj == 1;
