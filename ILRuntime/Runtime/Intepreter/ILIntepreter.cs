@@ -1726,7 +1726,8 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         int addr = ip->TokenInteger;
                                         var sql = from e in method.ExceptionHandler
-                                                  where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                  //where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                  where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally   // 如果调用 Fault 会导致协程函数 只执行一次
                                                   select e;
                                         eh = sql.FirstOrDefault();
                                         if (eh != null)
