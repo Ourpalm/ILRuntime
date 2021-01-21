@@ -7,11 +7,11 @@ using ILRuntime.CLR.Method;
 
 namespace ILRuntime.Runtime.Intepreter.OpCodes
 {
-  
+
     /// <summary>
     /// IL指令
     /// </summary>
-    struct OpCode
+    public struct OpCode
     {
         /// <summary>
         /// 当前指令

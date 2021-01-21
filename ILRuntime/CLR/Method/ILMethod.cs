@@ -190,7 +190,7 @@ namespace ILRuntime.CLR.Method
             return null;
         }
 
-        internal OpCode[] Body
+        public OpCode[] Body
         {
             get
             {

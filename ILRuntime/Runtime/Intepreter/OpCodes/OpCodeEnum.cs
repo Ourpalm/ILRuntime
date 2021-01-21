@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ILRuntime.Runtime.Intepreter.OpCodes
 {
-    enum OpCodeEnum
+    public enum OpCodeEnum
     {
         /// <summary>
         /// 如果修补操作码，则填充空间。尽管可能消耗处理周期，但未执行任何有意义的操作。
