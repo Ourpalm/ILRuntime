@@ -276,9 +276,10 @@ namespace ILRuntime.CLR.Utils
             }
             else if (obj is ILTypeInstance)
             {
-                var adapter = obj as IDelegateAdapter;
+                if (pt == typeof(ILTypeInstance)) return obj;
 
-                if (adapter != null && pt != typeof(ILTypeInstance))
+                var adapter = obj as IDelegateAdapter;
+                if (adapter != null)
                 {
                     return adapter.Delegate;
                 }
