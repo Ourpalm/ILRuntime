@@ -1821,9 +1821,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (!allowUnboundCLRMethod)
                                                         throw new NotSupportedException(cm.ToString() + " is not bound!");
 #endif
-                                                    AppDomain.BeginSample(cm.ToString());
+                                                    //AppDomain.BeginSample(cm.ToString()); // error: "Missing Profiler.EndSample (BeginSample and EndSample count must match)"
                                                     object result = cm.Invoke(this, esp, mStack);
-                                                    AppDomain.EndSample();
+                                                    //AppDomain.EndSample();
                                                     if (result is CrossBindingAdaptorType)
                                                         result = ((CrossBindingAdaptorType)result).ILInstance;
                                                     int paramCount = cm.ParameterCount;
