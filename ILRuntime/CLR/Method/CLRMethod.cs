@@ -314,7 +314,13 @@ namespace ILRuntime.CLR.Method
                     if (declaringType.IsValueType)
                         instance = ILIntepreter.CheckAndCloneValueType(instance, appdomain);
                     if (instance == null)
+                    {
+                        // 对于 System.Nullable<T> 和 null 判断时, 会调用 get_HasValue 方法
+                        // 这里, 可能是设计问题, 当该变量未赋值时, instance 为 null
+                        // 因此, 作为临时修复, 当 instance 为 null, 则直接返回 false
+                        if (declaringType.IsValueType && this.Name == "get_HasValue") return false;
                         throw new NullReferenceException();
+                    }
                 }
                 object res = null;
                 /*if (redirect != null)
