@@ -1438,5 +1438,32 @@ namespace ILRuntime.Runtime.Enviorment
             detail.Sort((a, b) => b.TotalSize - a.TotalSize);
             return size;
         }
+
+        [System.Diagnostics.Conditional("ENABLE_PROFILER")]
+        public void BeginSample(string name)
+        {
+#if DEBUG && !NO_PROFILER
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == UnityMainThreadID)
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.BeginSample(name);
+#else
+                UnityEngine.Profiler.BeginSample(name);
+#endif
+#endif
+        }
+
+        [System.Diagnostics.Conditional("ENABLE_PROFILER")]
+        public void EndSample()
+        {
+#if DEBUG && !NO_PROFILER
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == UnityMainThreadID)
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.EndSample();
+#else
+                UnityEngine.Profiler.EndSample();
+#endif
+#endif
+        }
+
     }
 }
