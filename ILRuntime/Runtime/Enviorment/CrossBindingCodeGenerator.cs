@@ -7,6 +7,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
 using System.Reflection;
 using System.Threading;
+using UnityEngine;
 
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -21,16 +22,12 @@ namespace ILRuntime.Runtime.Enviorment
             public string Modifier;
             public string OverrideString;
         }
+
         public static string GenerateCrossBindingAdapterCode(Type baseType, string nameSpace)
         {
             StringBuilder sb = new StringBuilder();
-            MethodInfo[] methods = baseType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             List<MethodInfo> virtMethods = new List<MethodInfo>();
-            foreach (var i in methods)
-            {
-                if (i.IsVirtual || i.IsAbstract || baseType.IsInterface)
-                    virtMethods.Add(i);
-            }
+            GetMethods(baseType, virtMethods);
             string clsName, realClsName;
             bool isByRef;
             baseType.GetClassName(out clsName, out realClsName, out isByRef, true);
@@ -100,11 +97,11 @@ namespace ");
                     return instance.ToString();
                 }
                 else
-                    return instance.Type.FullName;
-            }
-        }
-    }
-}");
+                    return instance.Type.FullName;");
+            sb.AppendLine("            }");
+            sb.AppendLine("        }");
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
             return sb.ToString();
         }
 
@@ -146,7 +143,7 @@ namespace ");
                 }
                 var param = i.GetParameters();
                 string modifier = i.IsFamily ? "protected" : "public";
-                string overrideStr = i.DeclaringType.IsInterface ? "" : "override ";
+                string overrideStr = i.DeclaringType.IsInterface ? "" : (i.IsFinal ? "new " : "override ");
                 string clsName, realClsName;
                 string returnString = "";
                 bool isByRef;
@@ -278,6 +275,11 @@ namespace ");
                 return info.GetParameters().Length == 0;
             if (info.Name == "Equals" && info.GetParameters().Length == 1 && info.GetParameters()[0].ParameterType == typeof(object))
                 return true;
+            if (info.IsAssembly || info.IsFamilyOrAssembly || info.IsPrivate)
+                return true;
+            if (info.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                return true;
+
             return false;
         }
         static string GetParametersString(ParameterInfo[] param, Type returnType)
@@ -426,7 +428,9 @@ namespace ");
             GetParameterDefinition(sb, param, false);
             sb.AppendLine(@")
             {
-                EnsureMethod(instance);
+                EnsureMethod(instance);");
+            GenInitParams(sb, param);
+            sb.AppendLine(@"
                 if (method != null)
                 {
                     invoking = true;");
@@ -491,6 +495,41 @@ namespace ");
             }
         }");
         }
+
+        static void GetMethods(Type type, List<MethodInfo> list)
+        {
+            if (type == null)
+                return;
+
+            MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (var i in methods)
+            {
+                if ((i.IsVirtual || i.IsAbstract || type.IsInterface)
+                    && !(type.IsInterface && list.Any(m => m.ToString() == i.ToString())))
+                    list.Add(i);
+            }
+
+            var interfaceArray = type.GetInterfaces();
+            if (interfaceArray != null)
+            {
+                for (int i = 0; i < interfaceArray.Length; ++i)
+                {
+                    GetMethods(interfaceArray[i], list);
+                }
+            }
+        }
+
+        static void GenInitParams(StringBuilder sb, ParameterInfo[] param)
+        {
+            foreach (var p in param)
+            {
+                if (p.IsOut)
+                {
+                    sb.AppendLine($"                    {p.Name} = default({p.ParameterType.GetElementType().FullName});");
+                }
+            }
+        }
+
         static string GetPushString(Type type, string argName)
         {
             if (type.IsPrimitive)
