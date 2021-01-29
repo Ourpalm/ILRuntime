@@ -3,8 +3,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 
-[assembly: CLSCompliant (true)]
-
 [assembly: AssemblyTitle ("LitJson")]
 [assembly: AssemblyDescription ("LitJSON library")]
 [assembly: AssemblyConfiguration ("")]

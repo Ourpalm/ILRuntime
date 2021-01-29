@@ -31,6 +31,12 @@ namespace ILRuntime.Runtime.Enviorment
         public int MethodBodySize;
         public int TotalSize;
     }
+
+    public struct PrewarmInfo
+    {
+        public string TypeName;
+        public string[] MethodNames;
+    }
     public class AppDomain
     {
         Queue<ILIntepreter> freeIntepreters = new Queue<ILIntepreter>();
@@ -60,13 +66,15 @@ namespace ILRuntime.Runtime.Enviorment
         /// </summary>
         public bool AllowUnboundCLRMethod { get; set; }
 
-#if DEBUG && (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)
+#if DEBUG && !NO_PROFILER
         public int UnityMainThreadID { get; set; }
         public bool IsNotUnityMainThread()
         {
             return UnityMainThreadID != 0 && (UnityMainThreadID != System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
 #endif
+        internal bool SuppressStaticConstructor { get; set; }
+
         public unsafe AppDomain()
         {
             AllowUnboundCLRMethod = true;
@@ -74,6 +82,8 @@ namespace ILRuntime.Runtime.Enviorment
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
+            mi = typeof(AppDomain).GetMethod("GetCurrentStackTrace");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.GetCurrentStackTrace);
             foreach (var i in typeof(System.Activator).GetMethods())
             {
                 if (i.Name == "CreateInstance" && i.IsGenericMethodDefinition)
@@ -149,6 +159,10 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.EnumHasFlag);
                 }
+                if(i.Name == "CompareTo")
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.EnumCompareTo);
+                }
 #endif
                 if (i.Name == "ToObject" && i.GetParameters()[1].ParameterType == typeof(int))
                 {
@@ -165,7 +179,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele;
             });
 
-            RegisterCrossBindingAdaptor(new Adaptors.AttributeAdaptor());
+            RegisterCrossBindingAdaptor(new Adapters.AttributeAdapter());
 
             debugService = new Debugger.DebugService(this);
         }
@@ -219,6 +233,11 @@ namespace ILRuntime.Runtime.Enviorment
                     fs.Dispose();
                 }
             }
+        }
+
+        public string GetCurrentStackTrace()
+        {
+            throw new NotSupportedException("Cannot call this method from CLR side");
         }
 
 #if USE_MDB || USE_PDB
@@ -408,6 +427,7 @@ namespace ILRuntime.Runtime.Enviorment
                     ILType type = new ILType(t, this);
 
                     mapType[t.FullName] = type;
+                    mapTypeToken[type.GetHashCode()] = type;
                     types.Add(type);
 
                 }
@@ -514,8 +534,8 @@ namespace ILRuntime.Runtime.Enviorment
             string baseType;
             List<string> genericParams;
             bool isArray;
-
-            ParseGenericType(fullname, out baseType, out genericParams, out isArray);
+            byte rank;
+            ParseGenericType(fullname, out baseType, out genericParams, out isArray, out rank);
 
 
             bool isByRef = baseType.EndsWith("&");
@@ -536,7 +556,13 @@ namespace ILRuntime.Runtime.Enviorment
                     KeyValuePair<string, IType>[] genericArguments = new KeyValuePair<string, IType>[genericParams.Count];
                     for (int i = 0; i < genericArguments.Length; i++)
                     {
-                        string key = "!" + i;
+                        string key = null;
+                        if (bt is ILType ilt)
+                        {
+                            key = ilt.TypeDefinition.GenericParameters[i].FullName;
+                        }
+                        else
+                            key = "!" + i;
                         IType val = GetType(genericParams[i]);
                         if (val == null)
                             return null;
@@ -560,7 +586,7 @@ namespace ILRuntime.Runtime.Enviorment
                             /*if (genericParams[i].Contains(","))
                                 sb.Append(genericParams[i].Substring(0, genericParams[i].IndexOf(',')));
                             else*/
-                                sb.Append(genericParams[i]);
+                            sb.Append(genericParams[i]);
                         }
                         sb.Append('>');
                         var asmName = sb.ToString();
@@ -571,7 +597,7 @@ namespace ILRuntime.Runtime.Enviorment
 
                 if (isArray)
                 {
-                    bt = bt.MakeArrayType(1);
+                    bt = bt.MakeArrayType(rank);
                     if (bt is CLRType)
                         clrTypeMapping[bt.TypeForCLR] = bt;
                     mapType[bt.FullName] = bt;
@@ -619,15 +645,17 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        internal static void ParseGenericType(string fullname, out string baseType, out List<string> genericParams, out bool isArray)
+        internal static void ParseGenericType(string fullname, out string baseType, out List<string> genericParams, out bool isArray, out byte rank)
         {
             StringBuilder sb = new StringBuilder();
             int depth = 0;
+            rank = 0;
             baseType = "";
             genericParams = null;
             if (fullname.Length > 2 && fullname.Substring(fullname.Length - 2) == "[]")
             {
                 fullname = fullname.Substring(0, fullname.Length - 2);
+                rank = 1;
                 isArray = true;
             }
             else
@@ -654,6 +682,8 @@ namespace ILRuntime.Runtime.Enviorment
                             name = name.Substring(1, name.Length - 2);
                         if (!string.IsNullOrEmpty(name))
                             genericParams.Add(name);
+                        else
+                            ++rank;
                         sb.Length = 0;
                         continue;
                     }
@@ -667,11 +697,12 @@ namespace ILRuntime.Runtime.Enviorment
                                 name = name.Substring(1, name.Length - 2);
                             if (!string.IsNullOrEmpty(name))
                                 genericParams.Add(name);
-                            else if (!string.IsNullOrEmpty(name))
+                            else if (!string.IsNullOrEmpty(baseType))
                             {
                                 if (!isArray)
                                 {
                                     isArray = true;
+                                    ++rank;
                                 }
                                 else
                                 {
@@ -760,6 +791,7 @@ namespace ILRuntime.Runtime.Enviorment
                         if (valid)
                         {
                             mapTypeToken[hash] = res;
+                            mapTypeToken[res.GetHashCode()] = res;
                             if (!string.IsNullOrEmpty(res.FullName))
                                 mapType[res.FullName] = res;
                         }
@@ -783,10 +815,8 @@ namespace ILRuntime.Runtime.Enviorment
                             }
                             mapTypeToken[hash] = res;
                         }
-                        else
-                        {
-                            mapTypeToken[res.GetHashCode()] = res;
-                        }
+                        mapTypeToken[res.GetHashCode()] = res;
+
                         if (!string.IsNullOrEmpty(res.FullName))
                             mapType[res.FullName] = res;
                         return res;
@@ -982,6 +1012,31 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
+        /// <summary>
+        /// Prewarm all methods specified by the parameter
+        /// </summary>
+        /// <param name="info"></param>
+        public void Prewarm(PrewarmInfo[] info)
+        {
+            foreach(var i in info)
+            {
+                IType t = GetType(i.TypeName);
+                if (t == null || t is CLRType || i.MethodNames == null)
+                    continue;
+                var methods = t.GetMethods();
+                foreach (var mn in i.MethodNames)
+                {
+                    foreach(var j in methods)
+                    {
+                        ILMethod m = (ILMethod)j;
+                        if(m.Name == mn && m.GenericParameterCount == 0)
+                        {
+                            m.Prewarm();
+                        }
+                    }
+                }
+            }
+        }
         /// <summary>
         /// Invoke a method
         /// </summary>
@@ -1262,13 +1317,9 @@ namespace ILRuntime.Runtime.Enviorment
                 if (it.TypeReference.HasGenericParameters)
                 {
                     mapTypeToken[type.GetHashCode()] = it;
-                    res = ((long)type.GetHashCode() << 32) | (uint)idx;
-                }
-                else
-                {
-                    res = ((long)it.TypeReference.GetHashCode() << 32) | (uint)idx;
                 }
 
+                res = ((long)type.GetHashCode() << 32) | (uint)idx;
                 return res;
             }
             else

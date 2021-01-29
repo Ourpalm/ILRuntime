@@ -842,8 +842,9 @@ namespace ILRuntime.Runtime.Intepreter
                         retSObj.Value = -1;
                         retSObj.ValueLow = 0;
                     }
+
+                    intp.Free(ret);
                 }
-                intp.Free(ret);
             }
             for (int i = 1; i <= paramCnt; i++)
             {
@@ -925,6 +926,11 @@ namespace ILRuntime.Runtime.Intepreter
         public virtual bool Equals(Delegate dele)
         {
             return Delegate == dele;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         public override string ToString()

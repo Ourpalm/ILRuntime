@@ -13,11 +13,14 @@ namespace ILRuntime.Runtime
         {
             isByRef = type.IsByRef;
             int arrayRank = 1;
-            bool isArray = type.IsArray;
+            
             if (isByRef)
             {
                 type = type.GetElementType();
             }
+
+            bool isArray = type.IsArray;
+
             if (isArray)
             {
                 arrayRank = type.GetArrayRank();
@@ -71,7 +74,30 @@ namespace ILRuntime.Runtime
             else
             {
                 clsName = simpleClassName ? "" : (!string.IsNullOrEmpty(type.Namespace) ? type.Namespace.Replace(".", "_") + "_" : "");
-                realNamespace = !string.IsNullOrEmpty(type.Namespace) ? type.Namespace + "." : "global::";
+
+                if (string.IsNullOrEmpty(type.Namespace))
+                {
+                    if (type.IsArray)
+                    {
+                        var elementType = type.GetElementType();
+                        if (elementType.IsNested && elementType.DeclaringType != null)
+                        {
+                            realNamespace = elementType.Namespace + "." + elementType.DeclaringType.Name + ".";
+                        }
+                        else
+                        {
+                            realNamespace = elementType.Namespace + ".";
+                        }
+                    }
+                    else
+                    {
+                        realNamespace = "global::";
+                    }
+                }
+                else
+                {
+                    realNamespace = type.Namespace + ".";
+                }
             }
             clsName = clsName + type.Name.Replace(".", "_").Replace("`", "_").Replace("<", "_").Replace(">", "_");
             bool isGeneric = false;
@@ -165,7 +191,7 @@ namespace ILRuntime.Runtime
                 return (int)(ushort)obj;
             if (obj is sbyte)
                 return (int)(sbyte)obj;
-            throw new InvalidCastException();
+            return Convert.ToInt32(obj);
         }
         public static long ToInt64(this object obj)
         {

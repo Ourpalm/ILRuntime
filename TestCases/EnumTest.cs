@@ -9,6 +9,13 @@ namespace TestCases
 {
     public class EnumTest
     {
+        public enum TestEnum5
+        {
+            Enum1,
+            Enum2,
+            Enum4 = 0x12345789,
+        }
+
         public enum TestEnum : long
         {
             Enum1,
@@ -289,7 +296,40 @@ namespace TestCases
             if (res)
                 throw new Exception();
         }
+        public static void Test21()
+        {
+            bool res = false;
+            object obj = Enum.ToObject(typeof(TestEnum5), 0x12345789);
+            Console.WriteLine(obj);
+            TestEnum5 b = (TestEnum5)obj;
+            switch (b)
+            {
+                case TestEnum5.Enum1:
+                    res = false;
+                    break;
+                case TestEnum5.Enum2:
+                    res = false;
+                    break;
+                case TestEnum5.Enum4:
+                    res = true;
+                    break;
+                default:
+                    res = false;
+                    break;
+            }
 
+            if (!res)
+                throw new Exception();
+        }
+
+        public static void Test22()
+        {
+            int res = 0;
+            TestEnum5 b = TestEnum5.Enum2;
+            res = b.CompareTo(TestEnum5.Enum4);
+            if (res >= 0)
+                throw new Exception();
+        }
         class SystemType
         {
             public int value = 10;

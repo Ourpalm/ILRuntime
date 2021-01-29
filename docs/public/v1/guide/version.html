@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6</button>
+        <button class="hiden-in-phone">V1.6.6</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -161,7 +161,59 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6"><a href="#V1-6" class="headerlink" title="V1.6"></a>V1.6</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-6"><a href="#V1-6-6" class="headerlink" title="V1.6.6"></a>V1.6.6</h3><ul>
+<li>Appdomain.Prewarm接口加入预热指定方法的参数</li>
+<li>AppDomain新增GetCurrentStackTrace接口获取当前调用栈，仅支持从热更中调用</li>
+<li>修改Profiler宏，以简化Unity平台上报Profiler数据</li>
+<li>修复一个基类包含值类型字段的类型报错的Bug</li>
+<li>修复热更中调用自定义Attribute后，自动分析绑定生成的代码编译不过的问题</li>
+<li>修复几个CLR自动分析绑定生成的代码出错的问题</li>
+<li>修复几个泛型方法匹配的Bug</li>
+<li>修复在基类实现接口的虚方法上有不必要开销的问题</li>
+<li>修复GetCustomAttributes接口当inherit为true时不包含基类Attribute的Bug</li>
+<li>修复CLR自动分析绑定无法自动生成event调用的绑定代码的问题</li>
+<li>修复在热更内调用Enum.CompareTo和Enum.ToObject的问题</li>
+</ul>
+<h3 id="V1-6-5"><a href="#V1-6-5" class="headerlink" title="V1.6.5"></a>V1.6.5</h3><ul>
+<li>提升了Release环境下（非Development Build）大约25%的执行效率</li>
+<li>修复了一个泛型类型中泛型变量无法置null的Bug</li>
+<li>修复一个default关键字作用于枚举或者值类型时报错的Bug</li>
+<li>修复一个导致带条件的await语句失效的Bug</li>
+<li>修复一个Enum.ToObject返回的Enum值不正确的Bug</li>
+<li>修复一个泛型方法中out到一个值类型报错的Bug</li>
+<li>修复一个由自动生成产生的跨域继承适配器，虚方法未被重载时不执行的Bug</li>
+<li>修复Litjson集成反序列化枚举数组时崩溃的Bug</li>
+</ul>
+<h3 id="V1-6-4"><a href="#V1-6-4" class="headerlink" title="V1.6.4"></a>V1.6.4</h3><ul>
+<li>修正一个使用委托返回经过值类型绑定过的值类型时造成的栈损坏问题</li>
+<li>修正一个自动生成跨域继承适配器代码时，无参数虚函数适配代码执行的报错</li>
+<li>修正一个自动生成跨域继承适配器代码对接口方法生成后，某些情况下导致StackOverflow无限递归的Bug</li>
+<li>修正Type.ToString结果和原生不一致的问题</li>
+<li>修正泛型嵌套数组T[][]字段初始化时的报错问题</li>
+<li>修正一个泛型方法匹配的Bug</li>
+<li>修正一个泛型数组作为参数时方法匹配的错误</li>
+<li>删掉一个C#7语法使用以提高兼容性</li>
+</ul>
+<h3 id="V1-6-3"><a href="#V1-6-3" class="headerlink" title="V1.6.3"></a>V1.6.3</h3><ul>
+<li>修复对泛型字段赋值导致栈损坏的Bug</li>
+<li>修复由跨域继承适配器代码生成器自动生成的代码，导致运行时进入错误的类方法的Bug</li>
+<li>修复一个在静态方法中实例化对象导致运行出错的Bug</li>
+<li>修复一个某些情况下静态构造函数没有执行的Bug</li>
+<li>修复一个加载多DLL，引用字段导致的运行时报错</li>
+<li>修复值类型绑定Enum字段分配内存时被意外装箱的Bug</li>
+<li>修复一个CLR自动分析绑定在某个特定情况下遗漏分析的Bug</li>
+<li>移除所有编译警告</li>
+<li>修复一个由于Unity的Bug导致的导入ILRuntime包时的报错</li>
+</ul>
+<h3 id="V1-6-2"><a href="#V1-6-2" class="headerlink" title="V1.6.2"></a>V1.6.2</h3><ul>
+<li>修正值类型部分情况下++, +=之类操作符失效的Bug</li>
+<li>修正将值类型成员变量传入方法，并在该方法里对这个参数赋值报错的Bug</li>
+<li>修复一个Async Await卡主的bug</li>
+</ul>
+<h3 id="V1-6-1"><a href="#V1-6-1" class="headerlink" title="V1.6.1"></a>V1.6.1</h3><ul>
+<li>去掉部分C#7的用法以增加unity2019以前版本的兼容性</li>
+</ul>
+<h3 id="V1-6"><a href="#V1-6" class="headerlink" title="V1.6"></a>V1.6</h3><ul>
 <li>增加了跨域继承适配器的工具类，简化适配器编写</li>
 <li>增加了跨域继承适配器的自动生成模版，做到半自动生成</li>
 <li>优化了热更存取主工程类字段的性能</li>

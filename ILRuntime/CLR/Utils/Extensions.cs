@@ -96,11 +96,13 @@ namespace ILRuntime.CLR.Utils
             StringBuilder sb = new StringBuilder();
             List<string> ga;
             bool isArray;
-            Runtime.Enviorment.AppDomain.ParseGenericType(typename, out baseType, out ga, out isArray);
+            byte rank;
+            Runtime.Enviorment.AppDomain.ParseGenericType(typename, out baseType, out ga, out isArray, out rank);
+            string baseTypeQualification = null;
             bool hasGA = ga != null && ga.Count > 0;
             if (baseType == argumentName)
             {
-                bool isAssemblyQualified = argumentName.Contains('=');
+                bool isAssemblyQualified = argumentName.Contains('=') || argumentType.Contains('=');
                 if (isGA && isAssemblyQualified)
                     sb.Append('[');
                 sb.Append(argumentType);
@@ -112,6 +114,12 @@ namespace ILRuntime.CLR.Utils
                 bool isAssemblyQualified = baseType.Contains('=');
                 if (isGA && !hasGA && isAssemblyQualified)
                     sb.Append('[');
+                else if (isAssemblyQualified)
+                {
+                    sb.Append('[');
+                    baseTypeQualification = baseType.Substring(baseType.IndexOf(','));
+                    baseType = baseType.Substring(0, baseType.IndexOf(','));                    
+                }
                 sb.Append(baseType);
                 if (isGA && !hasGA && isAssemblyQualified)
                     sb.Append(']');
@@ -130,8 +138,18 @@ namespace ILRuntime.CLR.Utils
                 }
                 sb.Append("]");
             }
+            if (!string.IsNullOrEmpty(baseTypeQualification))
+            {
+                sb.Append(baseTypeQualification);
+                sb.Append(']');
+            }
             if (isArray)
-                sb.Append("[]");
+            {
+                sb.Append("[");
+                for (int i = 0; i < rank - 1; i++)
+                    sb.Append(",");
+                sb.Append("]");
+            }
             return sb.ToString();
         }
 
@@ -212,8 +230,9 @@ namespace ILRuntime.CLR.Utils
 
             var typeFlags = GetTypeFlags(pt);
 
-            if ((typeFlags & TypeFlags.IsPrimitive) != 0 && pt != typeof(int))
+            if ((typeFlags & TypeFlags.IsPrimitive) != 0)
             {
+                if (pt == typeof(int)) return obj;
                 if (pt == typeof(bool) && !(obj is bool))
                 {
                     obj = (int)obj == 1;

@@ -13,7 +13,7 @@ namespace TestCases
             public static void Test<T>(T value)
             {
                 if (value == null)
-                    Console.WriteLine("null");
+                    throw new Exception("null");
             }
 
             public static void Test2<T>(T obj)
@@ -273,6 +273,28 @@ namespace TestCases
             dest = new TestCases.TestCls();
             dest.TestVal2 = 2;
             return 0;
+        }
+
+        class RefReturnTest
+        {
+            Vector3 vec;
+            public ref Vector3 GetRef()
+            {
+                return ref vec;
+            }
+
+            public void Test(float val)
+            {
+                if (vec.y != val)
+                    throw new Exception();
+            }
+        }
+        public static void UnitTest_RefReturn()
+        {
+            RefReturnTest obj = new RefReturnTest();
+            ref Vector3 r = ref obj.GetRef();
+            r.y = 123;
+            obj.Test(123);
         }
 
         static T TestRef<T>(ref T obj) where T : SingletonTest, new()

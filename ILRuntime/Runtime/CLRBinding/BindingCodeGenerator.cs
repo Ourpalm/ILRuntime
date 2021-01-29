@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -156,7 +156,8 @@ namespace ILRuntime.Runtime.Generated
         }
 
         public static void GenerateBindingCode(ILRuntime.Runtime.Enviorment.AppDomain domain, string outputPath, 
-                                               List<Type> valueTypeBinders = null, List<Type> delegateTypes = null)
+                                               List<Type> valueTypeBinders = null, List<Type> delegateTypes = null,
+                                               params string[] excludeFiles)
         {
             if (domain == null)
                 return;
@@ -193,6 +194,8 @@ namespace ILRuntime.Runtime.Generated
                 if (i.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
                     continue;
                 i.GetClassName(out clsName, out realClsName, out isByRef);
+                if (excludeFiles.Contains(clsName))
+                    continue;
                 if (clsNames.Contains(clsName))
                     clsName = clsName + "_t";
                 clsNames.Add(clsName);
@@ -346,7 +349,7 @@ namespace ILRuntime.Runtime.Generated
             GenerateBindingInitializeScript(clsNames, valueTypeBinders, outputPath);
         }
 
-        internal static void CrawlAppdomain(ILRuntime.Runtime.Enviorment.AppDomain domain, Dictionary<Type, CLRBindingGenerateInfo> infos)
+        static void PrewarmDomain(ILRuntime.Runtime.Enviorment.AppDomain domain)
         {
             var arr = domain.LoadedTypes.Values.ToArray();
             //Prewarm
@@ -373,7 +376,15 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
             }
-            arr = domain.LoadedTypes.Values.ToArray();
+        }
+        internal static void CrawlAppdomain(ILRuntime.Runtime.Enviorment.AppDomain domain, Dictionary<Type, CLRBindingGenerateInfo> infos)
+        {
+            domain.SuppressStaticConstructor = true;
+            //Prewarm
+            PrewarmDomain(domain);
+            //Prewarm twice to ensure GenericMethods are prewarmed properly
+            PrewarmDomain(domain);
+            var arr = domain.LoadedTypes.Values.ToArray();
             foreach (var type in arr)
             {
                 if (type is CLR.TypeSystem.ILType)
@@ -762,7 +773,7 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
 
-                if (valueTypeBinders != null)
+                if (valueTypeBinders != null && valueTypeBinders.Count > 0)
                 {
                     sb.AppendLine();
 

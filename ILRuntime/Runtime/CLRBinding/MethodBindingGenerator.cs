@@ -333,6 +333,20 @@ namespace ILRuntime.Runtime.CLRBinding
                                     throw new NotImplementedException(i.Name);
                             }
                         }
+                        else if(propType == "add")
+                        {
+                            string clsName, realClsName;
+                            bool isByRef;
+                            i.DeclaringType.GetClassName(out clsName, out realClsName, out isByRef);
+                            sb.AppendLine(string.Format("{0}.{1} += {2};", realClsName, i.Name.Substring(4), param[0].Name));
+                        }
+                        else if (propType == "remove")
+                        {
+                            string clsName, realClsName;
+                            bool isByRef;
+                            i.DeclaringType.GetClassName(out clsName, out realClsName, out isByRef);
+                            sb.AppendLine(string.Format("{0}.{1} -= {2};", realClsName, i.Name.Substring(7), param[0].Name));
+                        }
                         else
                             throw new NotImplementedException();
                     }
@@ -372,6 +386,14 @@ namespace ILRuntime.Runtime.CLRBinding
                             }
                             else
                                 sb.AppendLine(string.Format("instance_of_this_method.{0} = {1};", t[1], param[0].Name));
+                        }
+                        else if (propType == "add")
+                        {
+                            sb.AppendLine(string.Format("instance_of_this_method.{0} += {1};", i.Name.Substring(4), param[0].Name));
+                        }
+                        else if (propType == "remove")
+                        {
+                            sb.AppendLine(string.Format("instance_of_this_method.{0} -= {1};", i.Name.Substring(7), param[0].Name));
                         }
                         else
                             throw new NotImplementedException();
@@ -502,8 +524,11 @@ namespace ILRuntime.Runtime.CLRBinding
                 if (!i.IsStatic && ((type.IsValueType && !type.IsPrimitive) || hasByRef))//need to write back value type instance
                 {
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
-
-                    if (type.IsValueType && !type.IsPrimitive)
+                    bool noWriteback = false;
+#if NET_4_6 || NET_STANDARD_2_0
+                    noWriteback = type == typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder) && i.Name == "Start";
+#endif
+                    if (type.IsValueType && !type.IsPrimitive && !noWriteback)
                     {
                         if (valueTypeBinders != null && valueTypeBinders.Contains(type))
                         {

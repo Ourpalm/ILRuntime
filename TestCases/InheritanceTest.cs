@@ -130,13 +130,23 @@ namespace TestCases
         public static void InheritanceTest07()
         {
             TestClass2 cls = new TestCls5();
-            Console.WriteLine(cls.VMethod2());
-            Console.WriteLine(cls.AbMethod2(122));
+            cls.VMethod1();
             int val = 0;
             cls.VMethod3(ref val);
             if (val != 11)
-                throw new Exception();
-            Console.WriteLine(val);
+                throw new Exception($"{val} != 11");
+            float val2 = cls.AbMethod2(val);
+            if (val2 != 12.2f)
+                throw new Exception($"{val2} != 12.1f");
+
+            cls = new TestCls6();
+            val = 0;
+            cls.VMethod3(ref val);
+            if (val != 21)
+                throw new Exception($"{val} != 21");
+            val2 = cls.AbMethod2(val);
+            if (val2 != 24.2f)
+                throw new Exception($"{val2} != 23.2f");
         }
 
         public static void InheritanceTest08()
@@ -215,6 +225,24 @@ namespace TestCases
             new TestClass().TestMethod();
         }
 
+        public static void InheritanceTest14()
+        {
+            Data2 data = new Data2();
+
+            GenericInheritanceTestCls<Data2> instance = new GenericInheritanceTestCls<Data2>(data);
+            instance.TestVirtual();
+        }
+
+        public static void InheritanceTest15()
+        {
+            var cls = new TestCls7();
+            int val = 0;
+            cls.VMethod3(ref val);
+
+            if (val != 1)
+                throw new Exception();
+        }
+
         public interface IData { }
 
         public class Data : IData { }
@@ -253,6 +281,73 @@ namespace TestCases
             protected override void AbMethod1()
             {
                 
+            }
+        }
+
+        class TestCls6 : TestClass2
+        {
+            public override void VMethod3(ref int arg)
+            {
+                base.VMethod3(ref arg);
+                arg += 20;
+            }
+            public override bool VMethod2()
+            {
+                return base.VMethod2();
+            }
+            public override float AbMethod2(int arg1)
+            {
+                return arg1 + 3.2f;
+            }
+
+            protected override void AbMethod1()
+            {
+
+            }
+        }
+
+        class TestCls7 : TestClass2
+        {
+            public override float AbMethod2(int arg1)
+            {
+                return arg1 + 1.2f;
+            }
+
+            protected override void AbMethod1()
+            {
+
+            }
+        }
+        class BaseData
+        {
+            public string m_Message;
+        }
+
+        class Data2: BaseData
+        {
+            public Data2()
+            {
+                m_Message = "hello";
+            }
+        }
+        class GenericInheritanceTestCls<T> : ClassInheritanceTest where T : BaseData
+        {
+            protected T m_Data;     //泛型字段
+
+            public GenericInheritanceTestCls(T data)
+            {
+                m_Data = data;
+            }
+
+            public override void TestVirtual()
+            {
+                m_Data = null;          //这行可能把stack写坏了
+                TestAbstract();  //运行到这行会报错，解决方法有2个：1、将"m_Data = null;"这行注释掉。2、将"protected T m_Data;" 改为 "protected BaseData m_Data;"，去掉泛型字段
+
+            }
+            public override void TestAbstract()
+            {
+                Console.WriteLine("OK");
             }
         }
 
@@ -398,7 +493,7 @@ namespace TestCases
 
     class AA : AABase
     {
-        public void AA1()
+        public new void AA1()
         {
             Console.WriteLine("AA1");
         }

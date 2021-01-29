@@ -295,5 +295,142 @@ namespace TestCases
             if(rawPos.y != 1122333)
                 throw new AccessViolationException();
         }
+
+        public static void UnitTest_10039()
+        {
+            Test10039 obj = new Test10039();
+            obj.Test();
+        }
+
+        class Test10039
+        {
+            TestVector3 m;
+            TestVector3NoBinding m2;
+            public void Test()
+            {
+                m = new TestVector3();
+                m2 = TestVector3NoBinding.zero;
+                UnitTest_10039Sub(m);
+                UnitTest_10039Sub2(m2);
+            }
+            void UnitTest_10039Sub(TestVector3 arg)
+            {
+                arg = TestVector3.One2;
+
+                if (arg.X != 1)
+                    throw new Exception();
+            }
+
+            void UnitTest_10039Sub2(TestVector3NoBinding arg)
+            {
+                arg = TestVector3NoBinding.one;
+
+                if (arg.x != 1)
+                    throw new Exception();
+            }
+        }
+
+        public static void UnitTest_10040()
+        {
+            TestVector3 dot = new TestVector3();
+            dot.X = 10;
+            dot.Y = 10;
+
+            for (int i = 0; i < 50; i++)
+            {
+                dot.X++;
+            }
+
+            Console.WriteLine("dot.X == " + dot.X);
+            if (dot.X != 60)
+                throw new AccessViolationException();
+
+        }
+
+        public static void UnitTest_10041()
+        {
+            TestVector3NoBinding dot = new TestVector3NoBinding();
+            dot.x = 10;
+            dot.x = 10;
+
+            for (int i = 0; i < 50; i++)
+            {
+                dot.x++;
+            }
+
+            Console.WriteLine("dot.X == " + dot.x);
+            if (dot.x != 60)
+                throw new AccessViolationException();
+
+        }
+
+        static TestVector3 GetVector3()
+        {
+            return new TestVector3(123, 123, 123);
+        }
+
+        static Func<TestVector3> GetVector3Func = GetVector3;
+        public static void UnitTest_10042()
+        {
+            TestVector3 pos = GetVector3Func?.Invoke() ?? TestVector3.One2;
+            if (pos.X != 123)
+                throw new Exception();
+        }
+
+        public static void UnitTest_10043()
+        {
+            SubTestClass test = new SubTestClass();
+        }
+
+        public class TestBase
+        {
+            public int a;
+            public TestVector3 vec = new TestVector3();//”–Œ Ã‚
+
+            public TestBase()
+            {
+            }
+        }
+
+        public class TestClass : TestBase
+        {
+            private int b;
+
+            public TestClass()
+            {
+            }
+        }
+
+        public class SubTestClass : TestClass
+        {
+            int c;
+            public SubTestClass()
+            {
+            }
+        }
+
+        class A<T>
+        {
+            T value = default;
+            public A(T value)
+            {
+                this.value = value;
+            }
+        }
+
+        class IntA : A<int>
+        {
+            public IntA(int value)
+                : base(value)
+            {
+
+            }
+        }
+
+        public static void UnitTest_10044()
+        {
+
+            IntA a = new IntA(100);
+        }
     }
 }

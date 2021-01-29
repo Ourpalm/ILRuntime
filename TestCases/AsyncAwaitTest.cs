@@ -49,6 +49,21 @@ namespace TestCases
             });
             Console.WriteLine($"TestRunSub1 complete");
         }
+        public async static Task TestRun4()
+        {
+            Console.WriteLine("Load 1");
+            await TestLoad("Load 1 complete");
+            Console.WriteLine("Load 2");
+            await TestLoad("Load 2 complete");
+            Console.WriteLine("Load 3");
+            await TestLoad("Load 3 complete");
+
+        }
+        static async Task TestLoad(string msg)
+        {
+            await Task.Delay(1000);
+            Console.WriteLine(msg);
+        }
 
         public static async Task<int> TestRun2()
         {
@@ -122,9 +137,55 @@ namespace TestCases
             return lines;
         }*/
 
+        public async static void TestRun5()
+        {
+            Console.WriteLine("TestConditionAwait Start ");
+            await DoConditionAwait();
+            Console.WriteLine("TestConditionAwait End");
+        }
+
+        static int v = 0;
+        static async Task DoConditionAwait()
+        {
+            if (v > 0)
+            {
+                await Task.Delay(1000);
+            }
+            Console.WriteLine("DoConditionAwait End");
+        }
+
         class AsyncAwaitTest1
         {
             public string a;
+        }
+
+        public static class TestClass
+        {
+            public static async Task Show1()
+            {
+                await Task.CompletedTask;
+            }
+
+            public static void Show2()
+            {
+                Show3();
+            }
+
+            public static async void Show3()
+            {
+                Console.WriteLine("Show3");
+                await Task.CompletedTask;
+            }
+        }
+
+        public static void TestRun6()
+        {
+            InitAsync();
+        }
+        private static async void InitAsync()
+        {
+            Console.WriteLine("a1");
+            TestClass.Show2();
         }
     }
 }

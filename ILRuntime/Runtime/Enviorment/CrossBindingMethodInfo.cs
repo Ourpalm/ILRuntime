@@ -394,7 +394,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T4>(),
             InvocationContext.GetInvocationType<T5>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T), typeof(T3), typeof(T4), typeof(T5) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5) };
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
 
@@ -456,7 +456,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T3>(),
             InvocationContext.GetInvocationType<T4>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T), typeof(T3), typeof(T4) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2), typeof(T3), typeof(T4) };
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2, T3 arg3, T4 arg4);
 
@@ -516,7 +516,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T2>(),
             InvocationContext.GetInvocationType<T3>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T), typeof(T3) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2), typeof(T3) };
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2, T3 arg3);
 
@@ -574,7 +574,7 @@ namespace ILRuntime.Runtime.Enviorment
             InvocationContext.GetInvocationType<T>(),
             InvocationContext.GetInvocationType<T2>(),
         };
-        static Type[] pTypes = new Type[] { typeof(T), typeof(T) };
+        static Type[] pTypes = new Type[] { typeof(T), typeof(T2) };
 
 
         public delegate void InvocationDelegate(ILTypeInstance instance, T arg, T2 arg2);
@@ -682,8 +682,10 @@ namespace ILRuntime.Runtime.Enviorment
         public string Name { get; private set; }
         protected AppDomain domain;
         protected IMethod method;
+        private IMethod baseMethod;
         private bool methodGot;
         protected bool invoking;
+        static List<IType> emptyParam = new List<IType>();
 
         public CrossBindingMethodInfo(string name)
         {
@@ -722,9 +724,22 @@ namespace ILRuntime.Runtime.Enviorment
                             param.Add(domain.GetType(i));
                     }
                 }
+                else
+                    param = emptyParam;
                 if (ReturnType != null)
                     rt = domain.GetType(ReturnType);
-                method = ilType.GetMethod(Name, param, null, rt);
+                if (ilType.FirstCLRBaseType != null)
+                    baseMethod = ilType.FirstCLRBaseType.GetMethod(Name, param, null, rt);
+                if (ilType.FirstCLRInterface != null)
+                    baseMethod = ilType.FirstCLRInterface.GetMethod(Name, param, null, rt);
+                if (baseMethod == null)
+                    method = ilType.GetMethod(Name, param, null, rt);
+            }
+            if (baseMethod != null)
+            {
+                method = ins.Type.GetVirtualMethod(baseMethod);
+                if (method is CLRMethod)
+                    method = null;
             }
         }
 
