@@ -647,6 +647,81 @@ namespace ILRuntime.Runtime.Intepreter
         }
     }
 
+    class MethodDelegateAdapter<T1, T2, T3, T4, T5> : DelegateAdapter
+    {
+        Action<T1, T2, T3, T4, T5> action;
+
+        static InvocationTypes[] pTypes;
+
+        static MethodDelegateAdapter()
+        {
+            pTypes = new InvocationTypes[]
+            {
+                InvocationContext.GetInvocationType<T1>(),
+                InvocationContext.GetInvocationType<T2>(),
+                InvocationContext.GetInvocationType<T3>(),
+                InvocationContext.GetInvocationType<T4>(),
+                InvocationContext.GetInvocationType<T5>(),
+            };
+        }
+        public MethodDelegateAdapter()
+        {
+
+        }
+
+        private MethodDelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+            : base(appdomain, instance, method)
+        {
+            action = InvokeILMethod;
+        }
+
+        public override Delegate Delegate
+        {
+            get
+            {
+                return action;
+            }
+        }
+
+        void InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4, T5 p5)
+        {
+            using (var c = appdomain.BeginInvoke(method))
+            {
+                var ctx = c;
+                if (method.HasThis)
+                    ctx.PushObject(instance);
+                ctx.PushParameter(pTypes[0], p1);
+                ctx.PushParameter(pTypes[1], p2);
+                ctx.PushParameter(pTypes[2], p3);
+                ctx.PushParameter(pTypes[3], p4);
+                ctx.PushParameter(pTypes[4], p5);
+                ctx.Invoke();
+            }
+        }
+
+        public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
+        {
+            return new MethodDelegateAdapter<T1, T2, T3, T4, T5>(appdomain, instance, method);
+        }
+
+        public override IDelegateAdapter Clone()
+        {
+            var res = new MethodDelegateAdapter<T1, T2, T3, T4, T5>(appdomain, instance, method);
+            res.isClone = true;
+            return res;
+        }
+
+        public override void Combine(Delegate dele)
+        {
+            action += (Action<T1, T2, T3, T4, T5>)dele;
+        }
+
+        public override void Remove(Delegate dele)
+        {
+            action -= (Action<T1, T2, T3, T4, T5>)dele;
+        }
+    }
+
     class MethodDelegateAdapter : DelegateAdapter
     {
         Action action;
