@@ -647,6 +647,7 @@ namespace ILRuntime.Runtime.Intepreter
         }
     }
 
+#if NET_4_6 || NET_STANDARD_2_0
     class MethodDelegateAdapter<T1, T2, T3, T4, T5> : DelegateAdapter
     {
         Action<T1, T2, T3, T4, T5> action;
@@ -721,6 +722,7 @@ namespace ILRuntime.Runtime.Intepreter
             action -= (Action<T1, T2, T3, T4, T5>)dele;
         }
     }
+#endif
 
     class MethodDelegateAdapter : DelegateAdapter
     {
