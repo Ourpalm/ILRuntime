@@ -170,6 +170,12 @@ namespace TestCases
         //测试支持性
         public static explicit operator int(Vector3 b) { return 0; } //这是一个显式转换
         public static implicit operator float(Vector3 a) { return a.x; } //这是一个隐式转换
+
+        public Vector3 TestReturnThis(float x)
+        {
+            this.x += x;
+            return this;
+        }
     }
 
     public class StructTests
@@ -272,5 +278,16 @@ namespace TestCases
             var cl = new TestClass();
             cl.Test();
         }
+
+        public static void StructTest8()
+        {
+            Vector3 vec = new Vector3(1, 1, 1);
+            Vector3 vec2 = vec.TestReturnThis(2);
+
+            Console.WriteLine($"vec2.x ={vec2.x}");
+            if (vec2.x != 3)
+                throw new Exception();
+        }
+
     }
 }
