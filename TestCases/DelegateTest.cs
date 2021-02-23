@@ -232,6 +232,47 @@ namespace TestCases
             return ILRuntimeTest.TestFramework.TestCLREnum.Test2;
         }
 
+        static int test20Val;
+        public static void DelegateTest20()
+        {
+            test20Val = 0;
+            Action<int> act = (b) => test20Val += b + 2;
+            act += (b) => test20Val += b + 3;
+
+            act(1);
+            if (test20Val != 7)
+                throw new Exception(test20Val.ToString());
+
+            test20Val = 0;
+            List<Action<int>> lst = new List<Action<int>>();
+            lst.Add(act);
+
+            lst[0](1);
+            if (test20Val != 7)
+                throw new Exception(test20Val.ToString());
+
+        }
+
+        public static void DelegateTest21()
+        {
+            test20Val = 0;
+            Func<int, int> act = (b) => test20Val += b + 2;
+            act += (b) => test20Val += b + 3;
+
+            var val = act(1);
+            if (val != 7)
+                throw new Exception(test20Val.ToString());
+
+            test20Val = 0;
+            List<Func<int, int>> lst = new List<Func<int, int>>();
+            lst.Add(act);
+
+            val = lst[0](1);
+            if (val != 7)
+                throw new Exception(test20Val.ToString());
+
+        }
+
         static void TestString(string a)
         {
             Console.WriteLine("test1:" + a);

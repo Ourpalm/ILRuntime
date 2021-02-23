@@ -389,6 +389,19 @@ namespace TestCases
             Console.WriteLine(ILRuntimeTest.TestMainForm._app.GetCurrentStackTrace());
         }
 
+        public static void UnitTest_1016()
+        {
+            uint u1 = 1607900000;
+            uint u2 = 1609000000;
+            double d1 = u1;
+            double d2 = u2;
+
+            double diff = Math.Abs(d1 - u1);
+            Console.WriteLine("diff=" + diff);
+            if (Math.Abs(d1 - u1) > 1)
+                throw new Exception("diff=" + diff);
+        }
+
         public class TestClass<T> where T : class, new()
         {
             public T tValue;

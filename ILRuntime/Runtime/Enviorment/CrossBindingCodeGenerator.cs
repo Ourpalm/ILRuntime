@@ -7,7 +7,6 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
 using System.Reflection;
 using System.Threading;
-using UnityEngine;
 
 namespace ILRuntime.Runtime.Enviorment
 {
