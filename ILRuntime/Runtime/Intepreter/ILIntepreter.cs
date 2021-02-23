@@ -439,13 +439,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.StackObjectReference:
                                             {
-                                                objRef2 = GetObjectAndResolveReference(objRef);
-                                                *objRef = *objRef2;
-                                                if (objRef->ObjectType >= ObjectTypes.Object)
-                                                {
-                                                    objRef->Value = mStack.Count;
-                                                    mStack.Add(mStack[objRef2->Value]);
-                                                }
+                                                CopyToStack(objRef, GetObjectAndResolveReference(objRef), mStack);
                                             }
                                             break;
                                         case ObjectTypes.FieldReference:
