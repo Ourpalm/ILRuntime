@@ -108,8 +108,8 @@ namespace TestCases
             Console.WriteLine("UnitTest_Performance3");
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            int[] arr = new int[5000000];
-            for (int i = 0; i < 5000000; i++)
+            int[] arr = new int[500000];
+            for (int i = 0; i < 500000; i++)
             {
                 arr[i] = i;
             }

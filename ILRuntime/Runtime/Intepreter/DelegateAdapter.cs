@@ -43,15 +43,12 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        TResult InvokeILMethod()
+        unsafe TResult InvokeILMethod()
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
-
-                ctx.Invoke();
+                var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+                ctx.SetInvoked(esp); 
                 return ctx.ReadResult<TResult>(pTypes[0]);
             }
         }
@@ -111,16 +108,14 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        TResult InvokeILMethod(T1 p1)
+        unsafe TResult InvokeILMethod(T1 p1)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
 
-                ctx.Invoke();
+                var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+                ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[1]);
             }
         }
@@ -181,17 +176,15 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        TResult InvokeILMethod(T1 p1, T2 p2)
+        unsafe TResult InvokeILMethod(T1 p1, T2 p2)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
 
-                ctx.Invoke();
+                var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+                ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[2]);
             }
         }
@@ -254,18 +247,16 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        TResult InvokeILMethod(T1 p1, T2 p2, T3 p3)
+        unsafe TResult InvokeILMethod(T1 p1, T2 p2, T3 p3)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
 
-                ctx.Invoke();
+                var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+                ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[3]);
             }
         }
@@ -328,19 +319,17 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        TResult InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4)
+        unsafe TResult InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
                 ctx.PushParameter(pTypes[3], p4);
 
-                ctx.Invoke();
+                var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+                ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[4]);
             }
         }
@@ -399,15 +388,12 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void InvokeILMethod(T1 p1)
+        unsafe void InvokeILMethod(T1 p1)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pType, p1);
-                ctx.Invoke();
+                ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
             }
         }
 
@@ -467,16 +453,13 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void InvokeILMethod(T1 p1, T2 p2)
+        unsafe void InvokeILMethod(T1 p1, T2 p2)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
-                ctx.Invoke();
+                ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
             }
         }
 
@@ -537,17 +520,14 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void InvokeILMethod(T1 p1, T2 p2, T3 p3)
+        unsafe void InvokeILMethod(T1 p1, T2 p2, T3 p3)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
-                ctx.Invoke();
+                ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
             }
         }
 
@@ -609,18 +589,15 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4)
+        unsafe void InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
                 ctx.PushParameter(pTypes[3], p4);
-                ctx.Invoke();
+                ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
             }
         }
 
@@ -684,19 +661,16 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4, T5 p5)
+        unsafe void InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4, T5 p5)
         {
-            using (var c = appdomain.BeginInvoke(method))
+            using (var ctx = BeginInvoke())
             {
-                var ctx = c;
-                if (method.HasThis)
-                    ctx.PushObject(instance);
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
                 ctx.PushParameter(pTypes[3], p4);
                 ctx.PushParameter(pTypes[4], p5);
-                ctx.Invoke();
+                ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
             }
         }
 
@@ -747,12 +721,12 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void InvokeILMethod()
+        unsafe void InvokeILMethod()
         {
-            if (method.HasThis)
-                appdomain.Invoke(method, instance, null);
-            else
-                appdomain.Invoke(method, null, null);
+            using(var ctx = BeginInvoke())
+            {
+                ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+            }
         }
 
         public override IDelegateAdapter Instantiate(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -865,6 +839,13 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 return false;
             }
+        }
+
+        unsafe protected InvocationContext BeginInvoke()
+        {
+            var ctx = appdomain.BeginInvoke(method);
+            ctx.ESP++;//required to simulate delegate invocation
+            return ctx;
         }
 
         public unsafe StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, IList<object> mStack)
