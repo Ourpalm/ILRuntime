@@ -5328,6 +5328,11 @@ namespace ILRuntime.Runtime.Intepreter
                 esp->ObjectType = ObjectTypes.Integer;
                 esp->Value = (sbyte)obj;
             }
+            else if (obj is Enum)
+            {
+                esp->ObjectType = ObjectTypes.Integer;
+                esp->Value = Convert.ToInt32(obj);
+            }
             else
                 throw new NotImplementedException();
         }

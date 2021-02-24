@@ -297,6 +297,15 @@ namespace TestCases
             obj.Test(123);
         }
 
+        public static void UnitTest_RefCLREnum()
+        {
+            ILRuntimeTest.TestFramework.TestCLREnumClass.TestCLREnumRef(out var key, out var tag);
+            if (key != 2)
+                throw new Exception("key");
+            if (tag != ILRuntimeTest.TestFramework.TestCLREnum.Test2)
+                throw new Exception("tag");
+        }
+
         static T TestRef<T>(ref T obj) where T : SingletonTest, new()
         {
             obj.testFloat = 3;

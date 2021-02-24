@@ -23,9 +23,12 @@ namespace ILRuntime.Runtime.Generated
             FieldInfo field;
             Type[] args;
             Type type = typeof(ILRuntimeTest.TestFramework.TestCLREnumClass);
+            args = new Type[]{typeof(System.UInt32).MakeByRefType(), typeof(ILRuntimeTest.TestFramework.TestCLREnum).MakeByRefType()};
+            method = type.GetMethod("TestCLREnumRef", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TestCLREnumRef_0);
             args = new Type[]{};
             method = type.GetMethod("get_Test2", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_Test2_0);
+            app.RegisterCLRMethodRedirection(method, get_Test2_1);
 
             field = type.GetField("Test", flag);
             app.RegisterCLRFieldGetter(field, get_Test_0);
@@ -36,7 +39,117 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
-        static StackObject* get_Test2_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* TestCLREnumRef_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ILRuntimeTest.TestFramework.TestCLREnum @tag = (ILRuntimeTest.TestFramework.TestCLREnum)__intp.RetriveInt32(ptr_of_this_method, __mStack);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.UInt32 @key = (System.UInt32)__intp.RetriveInt32(ptr_of_this_method, __mStack);
+
+
+            ILRuntimeTest.TestFramework.TestCLREnumClass.TestCLREnumRef(out @key, out @tag);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var ___dst = ILIntepreter.ResolveReference(ptr_of_this_method);
+                        ___dst->ObjectType = ObjectTypes.Integer;
+                        ___dst->Value = (int)@tag;
+                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = @tag;
+                        }
+                        else
+                        {
+                            var ___type = __domain.GetType(___obj.GetType()) as CLRType;
+                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, @tag);
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var ___type = __domain.GetType(ptr_of_this_method->Value);
+                        if(___type is ILType)
+                        {
+                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = @tag;
+                        }
+                        else
+                        {
+                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, @tag);
+                        }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as ILRuntimeTest.TestFramework.TestCLREnum[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = @tag;
+                    }
+                    break;
+            }
+
+            __intp.Free(ptr_of_this_method);
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            switch(ptr_of_this_method->ObjectType)
+            {
+                case ObjectTypes.StackObjectReference:
+                    {
+                        var ___dst = ILIntepreter.ResolveReference(ptr_of_this_method);
+                        ___dst->ObjectType = ObjectTypes.Integer;
+                        ___dst->Value = (int)@key;
+                    }
+                    break;
+                case ObjectTypes.FieldReference:
+                    {
+                        var ___obj = __mStack[ptr_of_this_method->Value];
+                        if(___obj is ILTypeInstance)
+                        {
+                            ((ILTypeInstance)___obj)[ptr_of_this_method->ValueLow] = @key;
+                        }
+                        else
+                        {
+                            var ___type = __domain.GetType(___obj.GetType()) as CLRType;
+                            ___type.SetFieldValue(ptr_of_this_method->ValueLow, ref ___obj, @key);
+                        }
+                    }
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var ___type = __domain.GetType(ptr_of_this_method->Value);
+                        if(___type is ILType)
+                        {
+                            ((ILType)___type).StaticInstance[ptr_of_this_method->ValueLow] = @key;
+                        }
+                        else
+                        {
+                            ((CLRType)___type).SetStaticFieldValue(ptr_of_this_method->ValueLow, @key);
+                        }
+                    }
+                    break;
+                 case ObjectTypes.ArrayReference:
+                    {
+                        var instance_of_arrayReference = __mStack[ptr_of_this_method->Value] as System.UInt32[];
+                        instance_of_arrayReference[ptr_of_this_method->ValueLow] = @key;
+                    }
+                    break;
+            }
+
+            __intp.Free(ptr_of_this_method);
+            return __ret;
+        }
+
+        static StackObject* get_Test2_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
