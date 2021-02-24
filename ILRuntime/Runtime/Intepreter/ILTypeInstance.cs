@@ -638,7 +638,7 @@ namespace ILRuntime.Runtime.Intepreter
                 return base.GetHashCode();
         }
 
-        public bool CanAssignTo(IType type)
+        public virtual bool CanAssignTo(IType type)
         {
             return this.type.CanAssignTo(type);
         }

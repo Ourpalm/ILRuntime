@@ -996,6 +996,32 @@ namespace ILRuntime.Runtime.Intepreter
             return method.ToString();
         }
 
+        public override bool CanAssignTo(IType type)
+        {
+            if (type.IsDelegate)
+            {
+                var im = type.GetMethod("Invoke", method.ParameterCount);
+                if (im.IsDelegateInvoke)
+                {
+                    if (im.ParameterCount == method.ParameterCount && im.ReturnType == method.ReturnType)
+                    {
+                        for (int i = 0; i < im.ParameterCount; i++)
+                        {
+                            if (im.Parameters[i] != method.Parameters[i])
+                                return false;
+                        }
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
         public Delegate GetConvertor(Type type)
         {
             if (converters == null)
