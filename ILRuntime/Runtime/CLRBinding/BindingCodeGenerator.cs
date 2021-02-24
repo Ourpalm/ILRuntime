@@ -348,19 +348,20 @@ namespace ILRuntime.Runtime.Generated
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, new UTF8Encoding(false)))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine(@"using System;
+                sb.AppendLine($@"using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace ILRuntime.Runtime.Generated
-{
+{{
     class CLRBindings
-    {
+    {{
+{SmartBindText}
         /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
         /// </summary>
         public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
-        {");
+        {{");
                 foreach (var i in clsNames)
                 {
                     sb.Append("            ");
@@ -756,6 +757,18 @@ namespace ILRuntime.Runtime.Generated
             return clsNames;
         }
 
+
+        static private string SmartBindText = @"
+//will auto register in unity
+#if UNITY_5_3_OR_NEWER
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+#endif
+        static private void RegisterBindAction()
+        {
+            ILRuntime.Runtime.CLRBinding.SmartCLRBindings.RegisterBindAction(Initialize);
+        }
+";
+
         internal static void GenerateBindingInitializeScript(List<string> clsNames, List<Type> valueTypeBinders, string outputPath)
         {
             if (!System.IO.Directory.Exists(outputPath))
@@ -764,14 +777,15 @@ namespace ILRuntime.Runtime.Generated
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, new UTF8Encoding(false)))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine(@"using System;
+                sb.AppendLine($@"using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace ILRuntime.Runtime.Generated
-{
+{{
     class CLRBindings
-    {");
+    {{
+{SmartBindText}");
 
                 if (valueTypeBinders != null)
                 {
