@@ -77,6 +77,8 @@ namespace ILRuntime.Runtime.Generated
             System_Action_3_Int32_String_String_Binding.Register(app);
             ILRuntimeTest_TestFramework_BaseClassTest_Binding.Register(app);
             System_Action_1_String_Binding.Register(app);
+            System_Collections_Generic_List_1_Action_1_Int32_Binding.Register(app);
+            System_Collections_Generic_List_1_Func_2_Int32_Int32_Binding.Register(app);
             System_Action_Binding.Register(app);
             System_Math_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
@@ -84,6 +86,7 @@ namespace ILRuntime.Runtime.Generated
             System_Single_Binding.Register(app);
             System_Byte_Binding.Register(app);
             System_Char_Binding.Register(app);
+            System_Double_Binding.Register(app);
             System_IO_File_Binding.Register(app);
             System_IO_FileStream_Binding.Register(app);
             System_IO_Stream_Binding.Register(app);
@@ -93,11 +96,11 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_String_Int64_Binding.Register(app);
             System_Int32_Array_Binding.Register(app);
             System_Int32_Array_Binding_Array_Binding.Register(app);
-            System_Double_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestVector3_Binding.Register(app);
             System_Int32_Array3_Binding.Register(app);
             System_Int32_Array2_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass4_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestCLREnumClass_Binding.Register(app);
             System_Nullable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int32_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_Int32_Binding.Register(app);
@@ -133,7 +136,6 @@ namespace ILRuntime.Runtime.Generated
             System_AccessViolationException_Binding.Register(app);
             System_Func_1_TestVector3_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Object_Object_Binding.Register(app);
-            ILRuntimeTest_TestFramework_TestCLREnumClass_Binding.Register(app);
             System_IComparable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);

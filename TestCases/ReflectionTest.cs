@@ -175,6 +175,16 @@ namespace TestCases
         [Test]
         public class TestCls2
         {
+            public TestCls2()
+            {
+
+            }
+
+            public TestCls2(int a1, int a2)
+            {
+                Attribute_field = a1;
+                ILAttribute_field = a2;
+            }
             [TestCLR]
             public int Attribute_field;
 
@@ -186,6 +196,11 @@ namespace TestCases
 
             [Test]
             public int ILAttribute_prop { get; set; }
+
+            public override string ToString()
+            {
+                return $"Attribute_field={Attribute_field},ILAttribute_field={ILAttribute_field}";
+            }
 
         }
 
@@ -437,6 +452,14 @@ namespace TestCases
         static int ReflectionTest17Sub()
         {
             return 20;
+        }
+
+        public static void ReflectionTest18()
+        {
+            var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
+            var obj = Activator.CreateInstance(t, 2, 3);
+            
+            Console.WriteLine(obj);
         }
     }
 }

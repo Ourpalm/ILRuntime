@@ -273,6 +273,22 @@ namespace TestCases
 
         }
 
+        public static void DelegateTest22()
+        {
+            DelegateTest22Sub<string, Object>("11", "22", DelegateTest22Sub2);
+        }
+        static void DelegateTest22Sub<T, U>(string str, Object obj, Action<T, U> action)
+        {
+            Action<string, Object> callback = action as Action<string, Object>;//在此用as转换为泛型委托时，提示空引用
+            callback(str, obj);
+        }
+
+        static void DelegateTest22Sub2(string str, Object obj)
+        {
+            string res = str + obj;
+            if (res != "1122")
+                throw new Exception();
+        }
         static void TestString(string a)
         {
             Console.WriteLine("test1:" + a);
