@@ -348,20 +348,21 @@ namespace ILRuntime.Runtime.Generated
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, new UTF8Encoding(false)))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($@"using System;
+                sb.AppendLine(@"using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace ILRuntime.Runtime.Generated
-{{
+{
     class CLRBindings
-    {{
-{SmartBindText}
+    {");
+                sb.Append(SmartBindText);
+                sb.Append(@"
         /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
         /// </summary>
-        public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
-        {{");
+                public static void Initialize(ILRuntime.Runtime.Enviorment.AppDomain app)
+        {");
                 foreach (var i in clsNames)
                 {
                     sb.Append("            ");
@@ -763,9 +764,9 @@ namespace ILRuntime.Runtime.Generated
 #if UNITY_5_3_OR_NEWER
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
 #endif
-        static private void RegisterBindAction()
+        static private void RegisterBindingAction()
         {
-            ILRuntime.Runtime.CLRBinding.SmartCLRBindings.RegisterBindAction(Initialize);
+            ILRuntime.Runtime.CLRBinding.CLRBindingUtils.RegisterBindingAction(Initialize);
         }
 ";
 
@@ -777,15 +778,16 @@ namespace ILRuntime.Runtime.Generated
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(outputPath + "/CLRBindings.cs", false, new UTF8Encoding(false)))
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($@"using System;
+                sb.Append(@"using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace ILRuntime.Runtime.Generated
-{{
+{
     class CLRBindings
-    {{
-{SmartBindText}");
+    {
+");
+                sb.Append(SmartBindText);
 
                 if (valueTypeBinders != null)
                 {

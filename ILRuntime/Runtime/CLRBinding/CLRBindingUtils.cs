@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace ILRuntime.Runtime.CLRBinding
 {
-    public class SmartCLRBindings
+    public class CLRBindingUtils
     {
 
-        static private Action<ILRuntime.Runtime.Enviorment.AppDomain> InitializeAction;
-        static public void RegisterBindAction(Action<ILRuntime.Runtime.Enviorment.AppDomain> action)
+        static private Action<ILRuntime.Runtime.Enviorment.AppDomain> initializeAction;
+        static public void RegisterBindingAction(Action<ILRuntime.Runtime.Enviorment.AppDomain> action)
         {
-            InitializeAction = action;
+            initializeAction = action;
         }
 
         /// <summary>
@@ -21,9 +21,9 @@ namespace ILRuntime.Runtime.CLRBinding
         /// <param name="appDomain"></param>
         static public void Initialize(ILRuntime.Runtime.Enviorment.AppDomain appDomain)
         {
-            if (InitializeAction != null)
+            if (initializeAction != null)
             {
-                InitializeAction(appDomain);
+                initializeAction(appDomain);
             }
         }
 
