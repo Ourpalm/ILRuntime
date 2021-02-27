@@ -59,7 +59,10 @@ namespace ILRuntime.Reflection
         {
             get
             {
-                return MethodAttributes.Public;
+                MethodAttributes ma = MethodAttributes.Public;
+                if (method.IsStatic)
+                    ma |= MethodAttributes.Static;
+                return ma;
             }
         }
 

@@ -461,5 +461,13 @@ namespace TestCases
             
             Console.WriteLine(obj);
         }
+
+        public static void ReflectionTest19()
+        {
+            var t = Type.GetType("TestCases.ReflectionTest");
+            var mi = t.GetMethod(nameof(ReflectionTest19));
+            if (!mi.IsStatic)
+                throw new Exception();
+        }
     }
 }
