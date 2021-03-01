@@ -317,6 +317,17 @@ namespace LitJson
             context.ExpectingValue = false;
         }
 
+        public void Write(float number)
+        {
+            DoValidation(Condition.Value);
+            PutNewline();
+
+            string str = Convert.ToString(number, number_format);
+            Put(str);
+
+            context.ExpectingValue = false;
+        }
+
         public void Write (double number)
         {
             DoValidation (Condition.Value);
