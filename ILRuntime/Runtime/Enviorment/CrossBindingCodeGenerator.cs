@@ -115,10 +115,23 @@ namespace ");
                 bool isProperty = i.IsSpecialName && (i.Name.StartsWith("get_") || i.Name.StartsWith("set_"));
                 PropertyGenerateInfo pInfo = null;
                 bool isGetter = false;
+                bool isIndexFunc = false;
+                bool isByRef;
+                string clsName, realClsName;
                 StringBuilder oriBuilder = null;
+
                 if (isProperty)
                 {
                     string pName = i.Name.Substring(4);
+                    if (i.Name == "get_Item" || i.Name == "set_Item")
+                    {
+                        StringBuilder sBuilder = new StringBuilder();
+                        var p = i.GetParameters()[0];
+                        p.ParameterType.GetClassName(out clsName, out realClsName, out isByRef, true);
+                        pName = $"this [{realClsName + " " + p.Name}]";
+
+                        isIndexFunc = true;
+                    }
                     isGetter = i.Name.StartsWith("get_");
                     oriBuilder = sb;
                     sb = new StringBuilder();
@@ -143,9 +156,7 @@ namespace ");
                 var param = i.GetParameters();
                 string modifier = i.IsFamily ? "protected" : "public";
                 string overrideStr = i.DeclaringType.IsInterface ? "" : (i.IsFinal ? "new " : "override ");
-                string clsName, realClsName;
                 string returnString = "";
-                bool isByRef;
                 if (i.ReturnType != typeof(void))
                 {
                     i.ReturnType.GetClassName(out clsName, out realClsName, out isByRef, true);
@@ -170,13 +181,16 @@ namespace ");
                     sb.AppendLine(string.Format("                if (m{0}_{1}.CheckShouldInvokeBase(this.instance))", i.Name, index));
                     if (isProperty)
                     {
+                        string baseMethodName = isIndexFunc
+                            ? $"base[{i.GetParameters()[0].Name}]"
+                            : $"base.{i.Name.Substring(4)}";
                         if (isGetter)
                         {
-                            sb.AppendLine(string.Format("                    return base.{0};", i.Name.Substring(4)));
+                            sb.AppendLine(string.Format("                    return {0};", baseMethodName));
                         }
                         else
                         {
-                            sb.AppendLine(string.Format("                    base.{0} = value;", i.Name.Substring(4)));
+                            sb.AppendLine(string.Format("                    {0} = value;", baseMethodName));
                         }
                     }
                     else
@@ -270,13 +284,26 @@ namespace ");
 
         static bool ShouldSkip(MethodInfo info)
         {
+            var paramInfos = info.GetParameters();
             if (info.Name == "ToString" || info.Name == "GetHashCode" || info.Name == "Finalize")
-                return info.GetParameters().Length == 0;
-            if (info.Name == "Equals" && info.GetParameters().Length == 1 && info.GetParameters()[0].ParameterType == typeof(object))
+                return paramInfos.Length == 0;
+            if (info.Name == "Equals" && paramInfos.Length == 1 && paramInfos[0].ParameterType == typeof(object))
                 return true;
-            if (info.IsAssembly || info.IsFamilyOrAssembly || info.IsPrivate)
+            if (info.IsAssembly || info.IsFamilyOrAssembly || info.IsPrivate || info.IsFinal)
                 return true;
             if (info.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                return true;
+
+            for (int i = 0; i < paramInfos.Length; ++i)
+            {
+                var paramType = paramInfos[i].ParameterType;
+                if (paramType.IsPointer || paramType.IsNotPublic || paramType.IsNested && !paramType.IsNestedPublic)
+                {
+                    return true;
+                }
+            }
+            var returnType = info.ReturnType;
+            if (returnType.IsNotPublic || returnType.IsNested && !returnType.IsNestedPublic)
                 return true;
 
             return false;
@@ -503,9 +530,13 @@ namespace ");
             MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             foreach (var i in methods)
             {
-                if ((i.IsVirtual || i.IsAbstract || type.IsInterface)
-                    && !(type.IsInterface && list.Any(m => m.ToString() == i.ToString())))
+                if ((i.IsVirtual || i.IsAbstract || type.IsInterface) && !i.ContainsGenericParameters)
+                {
+                    if (list.Any(m => IsMethodEqual(m, i)))
+                        continue;
+
                     list.Add(i);
+                }
             }
 
             var interfaceArray = type.GetInterfaces();
@@ -516,6 +547,34 @@ namespace ");
                     GetMethods(interfaceArray[i], list);
                 }
             }
+        }
+
+        static bool IsMethodEqual(MethodInfo left, MethodInfo right)
+        {
+            var leftParams = left.GetParameters();
+            var rightParams = right.GetParameters();
+            if (leftParams.Length != rightParams.Length)
+            {
+                return false;
+            }
+
+            // 有些继承了多个interface的类，且这几个interface的类有相同函数名的时候，子类实现的接口就会带上interfere的fullName
+            string leftMethodName = left.Name.Replace(left.DeclaringType.FullName, "");
+            string rightMethodName = right.Name.Replace(right.DeclaringType.FullName, "");
+            if (leftMethodName != rightMethodName)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < leftParams.Length; ++i)
+            {
+                if (leftParams[i].ParameterType != rightParams[i].ParameterType)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         static void GenInitParams(StringBuilder sb, ParameterInfo[] param)
