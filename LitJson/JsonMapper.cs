@@ -23,6 +23,18 @@ using Object = System.Object;
 
 namespace LitJson
 {
+    /// <summary>
+    /// Attribute for skip json serialized/deserialized
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+    public class JsonIgnoreAttribute : Attribute
+    {
+        public JsonIgnoreAttribute()
+        {
+
+        }
+    }
+
     internal struct PropertyMetadata
     {
         public MemberInfo Info;
@@ -226,6 +238,10 @@ namespace LitJson
 
             data.Properties = new Dictionary<string, PropertyMetadata> ();
             foreach (PropertyInfo p_info in type.GetProperties ()) {
+                if (p_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
+                {
+                    continue;
+                }
                 if (p_info.Name == "Item") {
                     ParameterInfo[] parameters = p_info.GetIndexParameters ();
 
@@ -253,6 +269,10 @@ namespace LitJson
             }
 
             foreach (FieldInfo f_info in type.GetFields ()) {
+                if (f_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
+                {
+                    continue;
+                }
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
                 p_data.IsField = true;
@@ -278,6 +298,11 @@ namespace LitJson
             IList<PropertyMetadata> props = new List<PropertyMetadata> ();
 
             foreach (PropertyInfo p_info in type.GetProperties ()) {
+                if (p_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
+                {
+                    continue;
+                }
+
                 if (p_info.Name == "Item")
                     continue;
 
@@ -288,6 +313,11 @@ namespace LitJson
             }
 
             foreach (FieldInfo f_info in type.GetFields ()) {
+                if (f_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
+                {
+                    continue;
+                }
+
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
                 p_data.IsField = true;
