@@ -238,10 +238,8 @@ namespace LitJson
 
             data.Properties = new Dictionary<string, PropertyMetadata> ();
             foreach (PropertyInfo p_info in type.GetProperties ()) {
-                if (p_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
-                {
+                if (Attribute.IsDefined(p_info, typeof(JsonIgnoreAttribute), true))
                     continue;
-                }
                 if (p_info.Name == "Item") {
                     ParameterInfo[] parameters = p_info.GetIndexParameters ();
 
@@ -269,10 +267,8 @@ namespace LitJson
             }
 
             foreach (FieldInfo f_info in type.GetFields ()) {
-                if (f_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
-                {
+                if (Attribute.IsDefined(f_info, typeof(JsonIgnoreAttribute), true))
                     continue;
-                }
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
                 p_data.IsField = true;
@@ -298,10 +294,8 @@ namespace LitJson
             IList<PropertyMetadata> props = new List<PropertyMetadata> ();
 
             foreach (PropertyInfo p_info in type.GetProperties ()) {
-                if (p_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
-                {
+                if (Attribute.IsDefined(p_info, typeof(JsonIgnoreAttribute), true))
                     continue;
-                }
 
                 if (p_info.Name == "Item")
                     continue;
@@ -313,10 +307,8 @@ namespace LitJson
             }
 
             foreach (FieldInfo f_info in type.GetFields ()) {
-                if (f_info.GetCustomAttribute(typeof(JsonIgnoreAttribute), true) != null)
-                {
+                if (Attribute.IsDefined(f_info, typeof(JsonIgnoreAttribute), true))
                     continue;
-                }
 
                 PropertyMetadata p_data = new PropertyMetadata ();
                 p_data.Info = f_info;
