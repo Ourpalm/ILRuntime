@@ -13,8 +13,6 @@ using System.Runtime.InteropServices;
 using ILRuntime.Mono.Cecil.Cil;
 using ILRuntime.Mono.Collections.Generic;
 
-#if !READ_ONLY
-
 namespace ILRuntime.Mono.Cecil.Pdb
 {
 	internal class SymWriter
@@ -30,7 +28,7 @@ namespace ILRuntime.Mono.Cecil.Pdb
 		static Guid s_symUnmangedWriterIID = new Guid("0b97726e-9e6d-4f05-9a26-424022093caa");
 		static Guid s_CorSymWriter_SxS_ClassID = new Guid ("108296c1-281e-11d3-bd22-0000f80849bd");
 
-		readonly ISymUnmanagedWriter2 m_writer;
+		readonly ISymUnmanagedWriter2 writer;
 		readonly Collection<ISymUnmanagedDocumentWriter> documents;
 
 		public SymWriter ()
@@ -38,7 +36,7 @@ namespace ILRuntime.Mono.Cecil.Pdb
 			object objWriter;
 			CoCreateInstance (ref s_CorSymWriter_SxS_ClassID, null, 1, ref s_symUnmangedWriterIID, out objWriter);
 
-			m_writer = (ISymUnmanagedWriter2) objWriter;
+			writer = (ISymUnmanagedWriter2) objWriter;
 			documents = new Collection<ISymUnmanagedDocumentWriter> ();
 		}
 
@@ -47,10 +45,10 @@ namespace ILRuntime.Mono.Cecil.Pdb
 			int size;
 
 			// get size of debug info
-			m_writer.GetDebugInfo (out idd, 0, out size, null);
+			writer.GetDebugInfo (out idd, 0, out size, null);
 
 			byte[] debug_info = new byte[size];
-			m_writer.GetDebugInfo (out idd, size, out size, debug_info);
+			writer.GetDebugInfo (out idd, size, out size, debug_info);
 
 			return debug_info;
 		}
@@ -65,23 +63,23 @@ namespace ILRuntime.Mono.Cecil.Pdb
 			int startOffset,
 			int endOffset)
 		{
-			m_writer.DefineLocalVariable2 (name, (int)attributes, sigToken, 1 /* ILOffset*/, addr1, addr2, addr3, startOffset, endOffset);
+			writer.DefineLocalVariable2 (name, (int)attributes, sigToken, 1 /* ILOffset*/, addr1, addr2, addr3, startOffset, endOffset);
 		}
 
 		public void DefineConstant2 (string name, object value, int sigToken)
 		{
 			if (value == null) {
-				m_writer.DefineConstant2 (name, 0, sigToken);
+				writer.DefineConstant2 (name, 0, sigToken);
 				return;
 			}
 
-			m_writer.DefineConstant2 (name, value, sigToken);
+			writer.DefineConstant2 (name, value, sigToken);
 		}
 
 		public void Close ()
 		{
-			m_writer.Close ();
-			Marshal.ReleaseComObject (m_writer);
+			writer.Close ();
+			Marshal.ReleaseComObject (writer);
 
 			foreach (var document in documents)
 				Marshal.ReleaseComObject (document);
@@ -89,72 +87,70 @@ namespace ILRuntime.Mono.Cecil.Pdb
 
 		public void CloseMethod ()
 		{
-			m_writer.CloseMethod ();
+			writer.CloseMethod ();
 		}
 
 		public void CloseNamespace ()
 		{
-			m_writer.CloseNamespace ();
+			writer.CloseNamespace ();
 		}
 
 		public void CloseScope (int endOffset)
 		{
-			m_writer.CloseScope (endOffset);
+			writer.CloseScope (endOffset);
 		}
 
 		public SymDocumentWriter DefineDocument (string url, Guid language, Guid languageVendor, Guid documentType)
 		{
-			ISymUnmanagedDocumentWriter unmanagedDocumentWriter;
-			m_writer.DefineDocument (url, ref language, ref languageVendor, ref documentType, out unmanagedDocumentWriter);
+			ISymUnmanagedDocumentWriter doc_writer;
+			writer.DefineDocument (url, ref language, ref languageVendor, ref documentType, out doc_writer);
 
-			documents.Add (unmanagedDocumentWriter);
-			return new SymDocumentWriter (unmanagedDocumentWriter);
+			documents.Add (doc_writer);
+			return new SymDocumentWriter (doc_writer);
 		}
 
 		public void DefineSequencePoints (SymDocumentWriter document, int[] offsets, int[] lines, int[] columns, int[] endLines, int[] endColumns)
 		{
-			m_writer.DefineSequencePoints (document.GetUnmanaged(), offsets.Length, offsets, lines, columns, endLines, endColumns);
+			writer.DefineSequencePoints (document.Writer, offsets.Length, offsets, lines, columns, endLines, endColumns);
 		}
 
 		public void Initialize (object emitter, string filename, bool fFullBuild)
 		{
-			m_writer.Initialize (emitter, filename, null, fFullBuild);
+			writer.Initialize (emitter, filename, null, fFullBuild);
 		}
 
 		public void SetUserEntryPoint (int methodToken)
 		{
-			m_writer.SetUserEntryPoint (methodToken);
+			writer.SetUserEntryPoint (methodToken);
 		}
 
 		public void OpenMethod (int methodToken)
 		{
-			m_writer.OpenMethod (methodToken);
+			writer.OpenMethod (methodToken);
 		}
 
 		public void OpenNamespace (string name)
 		{
-			m_writer.OpenNamespace (name);
+			writer.OpenNamespace (name);
 		}
 
 		public int OpenScope (int startOffset)
 		{
 			int result;
-			m_writer.OpenScope (startOffset, out result);
+			writer.OpenScope (startOffset, out result);
 			return result;
 		}
 
 		public void UsingNamespace (string fullName)
 		{
-			m_writer.UsingNamespace (fullName);
+			writer.UsingNamespace (fullName);
 		}
 
 		public void DefineCustomMetadata (string name, byte [] metadata)
 		{
 			var handle = GCHandle.Alloc (metadata, GCHandleType.Pinned);
-			m_writer.SetSymAttribute (0, name, (uint) metadata.Length, handle.AddrOfPinnedObject ());
+			writer.SetSymAttribute (0, name, (uint) metadata.Length, handle.AddrOfPinnedObject ());
 			handle.Free ();
 		}
 	}
 }
-
-#endif

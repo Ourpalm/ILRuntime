@@ -104,7 +104,9 @@ namespace ILRuntime.Mono.Collections.Generic {
 			if (capacity < 0)
 				throw new ArgumentOutOfRangeException ();
 
-			items = new T [capacity];
+			items = capacity == 0 
+				? Empty<T>.Array
+				: new T [capacity];
 		}
 
 		public Collection (ICollection<T> items)

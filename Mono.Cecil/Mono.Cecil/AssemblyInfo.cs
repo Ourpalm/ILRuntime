@@ -14,11 +14,9 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle (Consts.AssemblyName)]
 
-#if !NET_CORE
 [assembly: Guid ("fd225bb4-fa53-44b2-a6db-85f5e48dcb54")]
-#endif
 
-[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Pdb, PublicKey=" + Consts.PublicKey)]
-[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Mdb, PublicKey=" + Consts.PublicKey)]
-[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Rocks, PublicKey=" + Consts.PublicKey)]
-[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Tests, PublicKey=" + Consts.PublicKey)]
+[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Pdb")]
+[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Mdb")]
+[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Rocks")]
+[assembly: InternalsVisibleTo ("ILRuntime.Mono.Cecil.Tests")]

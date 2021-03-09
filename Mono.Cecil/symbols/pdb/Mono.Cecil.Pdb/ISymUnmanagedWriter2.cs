@@ -13,8 +13,6 @@ using System.Runtime.InteropServices.ComTypes;
 
 using ILRuntime.Mono.Cecil.Cil;
 
-#if !READ_ONLY
-
 namespace ILRuntime.Mono.Cecil.Pdb {
 
 	[Guid ("0B97726E-9E6D-4f05-9A26-424022093CAA")]
@@ -86,5 +84,3 @@ namespace ILRuntime.Mono.Cecil.Pdb {
 			[In] int sigToken);
 	}
 }
-
-#endif

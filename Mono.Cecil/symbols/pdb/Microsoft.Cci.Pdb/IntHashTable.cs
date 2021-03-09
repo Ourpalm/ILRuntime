@@ -1,13 +1,6 @@
-//-----------------------------------------------------------------------------
-//
 // Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the Microsoft Public License.
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//-----------------------------------------------------------------------------
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections;
 
@@ -114,14 +107,14 @@ namespace Microsoft.Cci.Pdb {
     */
 
     // A typical resize algorithm would pick the smallest prime number in this array
-    // that is larger than twice the previous capacity.
-    // Suppose our Hashtable currently has capacity x and enough elements are added
-    // such that a resize needs to occur. Resizing first computes 2x then finds the
-    // first prime in the table greater than 2x, i.e. if primes are ordered
-    // p_1, p_2, …, p_i,…, it finds p_n such that p_n-1 < 2x < p_n.
-    // Doubling is important for preserving the asymptotic complexity of the
-    // hashtable operations such as add.  Having a prime guarantees that double
-    // hashing does not lead to infinite loops.  IE, your hash function will be
+    // that is larger than twice the previous capacity. 
+    // Suppose our Hashtable currently has capacity x and enough elements are added 
+    // such that a resize needs to occur. Resizing first computes 2x then finds the 
+    // first prime in the table greater than 2x, i.e. if primes are ordered 
+    // p_1, p_2, …, p_i,…, it finds p_n such that p_n-1 < 2x < p_n. 
+    // Doubling is important for preserving the asymptotic complexity of the 
+    // hashtable operations such as add.  Having a prime guarantees that double 
+    // hashing does not lead to infinite loops.  IE, your hash function will be 
     // h1(key) + i*h2(key), 0 <= i < size.  h2 and the size must be relatively prime.
     private static readonly int[] primes = {
             3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,

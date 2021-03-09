@@ -1,13 +1,6 @@
-//-----------------------------------------------------------------------------
-//
 // Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the Microsoft Public License.
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//-----------------------------------------------------------------------------
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 
 namespace Microsoft.Cci.Pdb {
@@ -18,6 +11,14 @@ namespace Microsoft.Cci.Pdb {
     internal ushort flags;
     //internal uint segment;
     //internal uint address;
+
+    internal PdbSlot(uint slot, uint typeToken, string name, ushort flags)
+    {
+      this.slot = slot;
+      this.typeToken = typeToken;
+      this.name = name;
+      this.flags = flags;
+    }
 
     internal PdbSlot(BitAccess bits) {
       AttrSlotSym slot;

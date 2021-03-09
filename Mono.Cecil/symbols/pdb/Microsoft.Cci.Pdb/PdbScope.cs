@@ -1,13 +1,6 @@
-//-----------------------------------------------------------------------------
-//
 // Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the Microsoft Public License.
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//-----------------------------------------------------------------------------
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 
 namespace Microsoft.Cci.Pdb {
@@ -22,14 +15,19 @@ namespace Microsoft.Cci.Pdb {
     internal uint offset;
     internal uint length;
 
-    internal PdbScope(uint address, uint length, PdbSlot[] slots, PdbConstant[] constants, string[] usedNamespaces) {
+    internal PdbScope(uint address, uint offset, uint length, PdbSlot[] slots, PdbConstant[] constants, string[] usedNamespaces) {
       this.constants = constants;
       this.slots = slots;
       this.scopes = new PdbScope[0];
       this.usedNamespaces = usedNamespaces;
       this.address = address;
-      this.offset = 0;
+      this.offset = offset;
       this.length = length;
+    }
+
+    internal PdbScope(uint address, uint length, PdbSlot[] slots, PdbConstant[] constants, string[] usedNamespaces)
+      : this(address, 0, length, slots, constants, usedNamespaces)
+    {
     }
 
     internal PdbScope(uint funcOffset, BlockSym32 block, BitAccess bits, out uint typind) {

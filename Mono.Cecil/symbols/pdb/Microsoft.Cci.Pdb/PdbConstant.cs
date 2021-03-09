@@ -1,21 +1,21 @@
-//-----------------------------------------------------------------------------
-//
-// Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the Microsoft Public License.
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//-----------------------------------------------------------------------------
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.Cci.Pdb {
+  /// <summary />
   internal class PdbConstant {
     internal string name;
     internal uint token;
     internal object value;
+
+    internal PdbConstant(string name, uint token, object value) {
+      this.name = name;
+      this.token = token;
+      this.value = value;
+    }
 
     internal PdbConstant(BitAccess bits) {
       bits.ReadUInt32(out this.token);
@@ -78,7 +78,7 @@ namespace Microsoft.Cci.Pdb {
             break;
           default:
             //TODO: error
-            break;
+            break; 
         }
       } else {
         //TODO: error

@@ -17,8 +17,6 @@ using ILRuntime.Mono.Cecil.Metadata;
 
 namespace ILRuntime.Mono.Cecil {
 
-#if !READ_ONLY
-
 	public interface IMetadataImporterProvider {
 		IMetadataImporter GetMetadataImporter (ModuleDefinition module);
 	}
@@ -155,9 +153,7 @@ namespace ILRuntime.Mono.Cecil {
 			{ typeof (float), ElementType.R4 },
 			{ typeof (double), ElementType.R8 },
 			{ typeof (string), ElementType.String },
-#if !NET_CORE
 			{ typeof (TypedReference), ElementType.TypedByRef },
-#endif
 			{ typeof (IntPtr), ElementType.I },
 			{ typeof (UIntPtr), ElementType.U },
 			{ typeof (object), ElementType.Object },
@@ -178,7 +174,7 @@ namespace ILRuntime.Mono.Cecil {
 				type.Name,
 				module,
 				ImportScope (type),
-				type.IsValueType ());
+				type.IsValueType);
 
 			reference.etype = ImportElementType (type);
 
@@ -187,7 +183,7 @@ namespace ILRuntime.Mono.Cecil {
 			else
 				reference.Namespace = type.Namespace ?? string.Empty;
 
-			if (type.IsGenericType ())
+			if (type.IsGenericType)
 				ImportGenericParameters (reference, type.GetGenericArguments ());
 
 			return reference;
@@ -195,12 +191,12 @@ namespace ILRuntime.Mono.Cecil {
 
 		protected virtual IMetadataScope ImportScope (Type type)
 		{
-			return ImportScope (type.Assembly ());
+			return ImportScope (type.Assembly);
 		}
 
 		static bool ImportOpenGenericType (Type type, ImportGenericKind import_kind)
 		{
-			return type.IsGenericType () && type.IsGenericTypeDefinition () && import_kind == ImportGenericKind.Open;
+			return type.IsGenericType && type.IsGenericTypeDefinition && import_kind == ImportGenericKind.Open;
 		}
 
 		static bool ImportOpenGenericMethod (SR.MethodBase method, ImportGenericKind import_kind)
@@ -224,7 +220,7 @@ namespace ILRuntime.Mono.Cecil {
 			if (type.IsArray)
 				return new ArrayType (ImportType (type.GetElementType (), context), type.GetArrayRank ());
 
-			if (type.IsGenericType ())
+			if (type.IsGenericType)
 				return ImportGenericInstance (type, context);
 
 			if (type.IsGenericParameter)
@@ -238,8 +234,8 @@ namespace ILRuntime.Mono.Cecil {
 			if (context.IsEmpty)
 				throw new InvalidOperationException ();
 
-			if (type.DeclaringMethod () != null)
-				return context.MethodParameter (NormalizeMethodName (type.DeclaringMethod ()), type.GenericParameterPosition);
+			if (type.DeclaringMethod != null)
+				return context.MethodParameter (NormalizeMethodName (type.DeclaringMethod), type.GenericParameterPosition);
 
 			if (type.DeclaringType != null)
 				return context.TypeParameter (NormalizeTypeFullName (type.DeclaringType), type.GenericParameterPosition);
@@ -263,8 +259,8 @@ namespace ILRuntime.Mono.Cecil {
 		TypeReference ImportGenericInstance (Type type, ImportGenericContext context)
 		{
 			var element_type = ImportType (type.GetGenericTypeDefinition (), context, ImportGenericKind.Definition);
-			var instance = new GenericInstanceType (element_type);
 			var arguments = type.GetGenericArguments ();
+			var instance = new GenericInstanceType (element_type, arguments.Length);
 			var instance_arguments = instance.GenericArguments;
 
 			context.Push (element_type);
@@ -287,7 +283,7 @@ namespace ILRuntime.Mono.Cecil {
 
 		static bool IsGenericInstance (Type type)
 		{
-			return type.IsGenericType () && !type.IsGenericTypeDefinition ();
+			return type.IsGenericType && !type.IsGenericTypeDefinition;
 		}
 
 		static ElementType ImportElementType (Type type)
@@ -315,10 +311,8 @@ namespace ILRuntime.Mono.Cecil {
 			reference = new AssemblyNameReference (name.Name, name.Version)
 			{
 				PublicKeyToken = name.GetPublicKeyToken (),
-#if !NET_CORE
 				Culture = name.CultureInfo.Name,
 				HashAlgorithm = (AssemblyHashAlgorithm) name.HashAlgorithm,
-#endif
 			};
 
 			module.AssemblyReferences.Add (reference);
@@ -364,20 +358,12 @@ namespace ILRuntime.Mono.Cecil {
 
 		static SR.FieldInfo ResolveFieldDefinition (SR.FieldInfo field)
 		{
-#if NET_CORE
-			throw new NotImplementedException ();
-#else
 			return field.Module.ResolveField (field.MetadataToken);
-#endif
 		}
 
 		static SR.MethodBase ResolveMethodDefinition (SR.MethodBase method)
 		{
-#if NET_CORE
-			throw new NotImplementedException ();
-#else
 			return method.Module.ResolveMethod (method.MetadataToken);
-#endif
 		}
 
 		MethodReference ImportMethod (SR.MethodBase method, ImportGenericContext context, ImportGenericKind import_kind)
@@ -647,9 +633,8 @@ namespace ILRuntime.Mono.Cecil {
 			case ElementType.GenericInst:
 				var instance = (GenericInstanceType) type;
 				var element_type = ImportType (instance.ElementType, context);
-				var imported_instance = new GenericInstanceType (element_type);
-
 				var arguments = instance.GenericArguments;
+				var imported_instance = new GenericInstanceType (element_type, arguments.Count);
 				var imported_arguments = imported_instance.GenericArguments;
 
 				for (int i = 0; i < arguments.Count; i++)
@@ -760,8 +745,6 @@ namespace ILRuntime.Mono.Cecil {
 			return ImportMethod (method, ImportGenericContext.For (context));
 		}
 	}
-
-#endif
 
 	static partial class Mixin {
 

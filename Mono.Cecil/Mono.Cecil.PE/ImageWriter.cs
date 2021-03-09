@@ -11,8 +11,6 @@
 using System;
 using System.IO;
 
-#if !READ_ONLY
-
 using ILRuntime.Mono.Cecil.Cil;
 using ILRuntime.Mono.Cecil.Metadata;
 
@@ -243,8 +241,8 @@ namespace ILRuntime.Mono.Cecil.PE {
 			WriteUInt16 (0);	// OSMinor
 			WriteUInt16 (0);	// UserMajor
 			WriteUInt16 (0);	// UserMinor
-			WriteUInt16 (4);	// SubSysMajor
-			WriteUInt16 (0);	// SubSysMinor
+			WriteUInt16 (module.subsystem_major);	// SubSysMajor
+			WriteUInt16 (module.subsystem_minor);	// SubSysMinor
 			WriteUInt32 (0);	// Reserved
 
 			var last_section = LastSection();
@@ -255,17 +253,22 @@ namespace ILRuntime.Mono.Cecil.PE {
 			WriteUInt16 (GetSubSystem ());	// SubSystem
 			WriteUInt16 ((ushort) module.Characteristics);	// DLLFlags
 
-			const ulong stack_reserve = 0x100000;
-			const ulong stack_commit = 0x1000;
-			const ulong heap_reserve = 0x100000;
-			const ulong heap_commit = 0x1000;
-
 			if (!pe64) {
-				WriteUInt32 ((uint) stack_reserve);
-				WriteUInt32 ((uint) stack_commit);
-				WriteUInt32 ((uint) heap_reserve);
-				WriteUInt32 ((uint) heap_commit);
+				const uint stack_reserve = 0x100000;
+				const uint stack_commit = 0x1000;
+				const uint heap_reserve = 0x100000;
+				const uint heap_commit = 0x1000;
+
+				WriteUInt32 (stack_reserve);
+				WriteUInt32 (stack_commit);
+				WriteUInt32 (heap_reserve);
+				WriteUInt32 (heap_commit);
 			} else {
+				const ulong stack_reserve = 0x400000;
+				const ulong stack_commit = 0x4000;
+				const ulong heap_reserve = 0x100000;
+				const ulong heap_commit = 0x2000;
+
 				WriteUInt64 (stack_reserve);
 				WriteUInt64 (stack_commit);
 				WriteUInt64 (heap_reserve);
@@ -355,6 +358,11 @@ namespace ILRuntime.Mono.Cecil.PE {
 			WriteUInt32 (characteristics);
 		}
 
+		uint GetRVAFileOffset (Section section, RVA rva)
+		{
+			return section.PointerToRawData + rva - section.VirtualAddress;
+		}
+
 		void MoveTo (uint pointer)
 		{
 			BaseStream.Seek (pointer, SeekOrigin.Begin);
@@ -362,7 +370,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 
 		void MoveToRVA (Section section, RVA rva)
 		{
-			BaseStream.Seek (section.PointerToRawData + rva - section.VirtualAddress, SeekOrigin.Begin);
+			BaseStream.Seek (GetRVAFileOffset (section, rva), SeekOrigin.Begin);
 		}
 
 		void MoveToRVA (TextSegment segment)
@@ -846,5 +854,3 @@ namespace ILRuntime.Mono.Cecil.PE {
 		}
 	}
 }
-
-#endif
