@@ -264,13 +264,17 @@ namespace ILRuntime.CLR.Method
             private set;
         }
 
-        public void Prewarm()
+        public void Prewarm(HashSet<ILMethod> alreadyPrewarmed)
         {
+            //如果参数alreadyPrewarmed不为空，则以递归方式prewarm当前方法，以及所有子调用
+            //如果参数alreadyPrewarmed为空，则只prewarm当前方法
+            if (alreadyPrewarmed != null && alreadyPrewarmed.Add(this) == false)
+                return;
             if (body == null)
-                InitCodeBody();
+                InitCodeBody(alreadyPrewarmed);
         }
 
-        void InitCodeBody()
+        void InitCodeBody(HashSet<ILMethod> alreadyPrewarmed = null)
         {
             if (def.HasBody)
             {
@@ -288,7 +292,7 @@ namespace ILRuntime.CLR.Method
                 for (int i = 0; i < body.Length; i++)
                 {
                     var c = def.Body.Instructions[i];
-                    InitToken(ref body[i], c.Operand, addr);
+                    InitToken(ref body[i], c.Operand, addr, alreadyPrewarmed);
                     if (i > 0 && c.OpCode.Code == Mono.Cecil.Cil.Code.Callvirt && def.Body.Instructions[i - 1].OpCode.Code == Mono.Cecil.Cil.Code.Constrained)
                     {
                         body[i - 1].TokenLong = body[i].TokenInteger;
@@ -331,7 +335,7 @@ namespace ILRuntime.CLR.Method
                 body = new OpCode[0];
         }
 
-        unsafe void InitToken(ref OpCode code, object token, Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
+        unsafe void InitToken(ref OpCode code, object token, Dictionary<Mono.Cecil.Cil.Instruction, int> addr, HashSet<ILMethod> alreadyPrewarmed)
         {
             switch (code.Code)
             {
@@ -431,6 +435,11 @@ namespace ILRuntime.CLR.Method
                                 code.TokenInteger = m.GetHashCode();
                             else
                                 code.TokenInteger = token.GetHashCode();
+                            //递归prewarm
+                            if (alreadyPrewarmed != null && m is ILMethod ilMethod)
+                            {
+                                ilMethod.Prewarm(alreadyPrewarmed);
+                            }
                         }
                         else
                         {
