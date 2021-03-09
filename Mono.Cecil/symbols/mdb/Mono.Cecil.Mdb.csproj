@@ -9,14 +9,11 @@
 	<SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Mono.Cecil.csproj">
-      <Project>{D68133BD-1E63-496E-9EDE-4FBDBF77B486}</Project>
-      <Name>Mono.Cecil</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\..\ProjectInfo.cs" />
     <Compile Include="Mono.Cecil.Mdb\*.cs" />
     <Compile Include="Mono.CompilerServices.SymbolWriter\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Mono.Cecil.csproj" />
   </ItemGroup>
 </Project>
