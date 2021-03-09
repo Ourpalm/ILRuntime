@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <ProjectGuid>{D68133BD-1E63-496E-9EDE-4FBDBF77B486}</ProjectGuid>
-    <RootNamespace>ILRuntim.Mono.Cecil</RootNamespace>
-    <AssemblyName>ILRuntim.Mono.Cecil</AssemblyName>
+    <RootNamespace>ILRuntime.Mono.Cecil</RootNamespace>
+    <AssemblyName>ILRuntime.Mono.Cecil</AssemblyName>
     <TargetFramework>net35</TargetFramework>
     <TargetFrameworkProfile />
   </PropertyGroup>
