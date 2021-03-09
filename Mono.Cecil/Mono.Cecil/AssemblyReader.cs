@@ -3785,9 +3785,6 @@ namespace ILRuntime.Mono.Cecil {
 			if (length == 0)
 				return string.Empty;
 
-			if (position + length >= buffer.Length)
-				return string.Empty;
-
 			if (position + length > buffer.Length)
 				return string.Empty;
 			
