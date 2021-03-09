@@ -307,7 +307,7 @@ namespace ILRuntime.Runtime.Debugger
             if (msg.IsLambda)
             {
                 ILMethod found = null;
-                foreach (var i in domain.LoadedTypes)
+                foreach (var i in domain.LoadedTypes.ToArray())
                 {
                     var vt = i.Value as ILType;
                     if (vt != null)
