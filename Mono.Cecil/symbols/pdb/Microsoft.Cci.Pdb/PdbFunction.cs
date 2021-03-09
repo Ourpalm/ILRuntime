@@ -1,16 +1,11 @@
-//-----------------------------------------------------------------------------
-//
 // Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the Microsoft Public License.
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//-----------------------------------------------------------------------------
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+#pragma warning disable 1591 // TODO: doc comments
 
 namespace Microsoft.Cci.Pdb {
   internal class PdbFunction {
@@ -43,6 +38,13 @@ namespace Microsoft.Cci.Pdb {
     internal List<ILocalScope>/*?*/ iteratorScopes;
     internal PdbSynchronizationInformation/*?*/ synchronizationInformation;
 
+    /// <summary>
+    /// Flag saying whether the method has been identified as a product of VB compilation using
+    /// the legacy Windows PDB symbol format, in which case scope ends need to be shifted by 1
+    /// due to different semantics of scope limits in VB and C# compilers.
+    /// </summary>
+    private bool visualBasicScopesAdjusted = false;
+
     private static string StripNamespace(string module) {
       int li = module.LastIndexOf('.');
       if (li > 0) {
@@ -51,6 +53,36 @@ namespace Microsoft.Cci.Pdb {
       return module;
     }
 
+    /// <summary>
+    /// When the Windows PDB reader identifies a PdbFunction as having 'Basic' as its source language,
+    /// it calls this method which adjusts all scopes by adding 1 to their lengths to compensate
+    /// for different behavior of VB vs. the C# compiler w.r.t. emission of scope info.
+    /// </summary>
+    internal void AdjustVisualBasicScopes()
+    {
+      if (!visualBasicScopesAdjusted)
+      {
+        visualBasicScopesAdjusted = true;
+
+        // Don't adjust root scope as that one is correct
+        foreach (PdbScope scope in scopes)
+        {
+          AdjustVisualBasicScopes(scope.scopes);
+        }
+      }
+    }
+
+    /// <summary>
+    /// Recursively update the entire scope tree by adding 1 to the length of each scope.
+    /// </summary>
+    private void AdjustVisualBasicScopes(PdbScope[] scopes)
+    {
+      foreach (PdbScope scope in scopes)
+      {
+        scope.length++;
+        AdjustVisualBasicScopes(scope.scopes);
+      }
+    }
 
     internal static PdbFunction[] LoadManagedFunctions(/*string module,*/
                                                        BitAccess bits, uint limit,
@@ -260,15 +292,7 @@ namespace Microsoft.Cci.Pdb {
               if (oem.idOem == msilMetaData) {
                 string name = bits.ReadString();
                 if (name == "MD2") {
-                  byte version;
-                  bits.ReadUInt8(out version);
-                  if (version == 4) {
-                    byte count;
-                    bits.ReadUInt8(out count);
-                    bits.Align(4);
-                    while (count-- > 0)
-                      this.ReadCustomMetadata(bits);
-                  }
+                  ReadMD2CustomMetadata(bits);
                 } else if (name == "asyncMethodInfo") {
                   this.synchronizationInformation = new PdbSynchronizationInformation(bits);
                 }
@@ -338,27 +362,47 @@ namespace Microsoft.Cci.Pdb {
       }
     }
 
-    private void ReadCustomMetadata(BitAccess bits) {
-      int savedPosition = bits.Position;
+    internal void ReadMD2CustomMetadata(BitAccess bits)
+    {
       byte version;
       bits.ReadUInt8(out version);
-      if (version != 4) {
-        throw new PdbDebugException("Unknown custom metadata item version: {0}", version);
+      if (version == 4) {
+        byte count;
+        bits.ReadUInt8(out count);
+        bits.Align(4);
+        while (count-- > 0)
+          this.ReadCustomMetadata(bits);
       }
-      byte kind;
-      bits.ReadUInt8(out kind);
-      bits.Align(4);
-      uint numberOfBytesInItem;
-      bits.ReadUInt32(out numberOfBytesInItem);
-      switch (kind) {
-        case 0: this.ReadUsingInfo(bits); break;
-        case 1: this.ReadForwardInfo(bits); break;
-        case 2: break; // this.ReadForwardedToModuleInfo(bits); break;
-        case 3: this.ReadIteratorLocals(bits); break;
-        case 4: this.ReadForwardIterator(bits); break;
-        // TODO: handle unknown custom metadata, 5 & 6 are new with roslyn, see https://roslyn.codeplex.com/workitem/54
-      }
-      bits.Position = savedPosition+(int)numberOfBytesInItem;
+    }
+
+    private void ReadCustomMetadata(BitAccess bits)
+    {
+        int savedPosition = bits.Position;
+        byte version;
+        bits.ReadUInt8(out version);
+        byte kind;
+        bits.ReadUInt8(out kind);
+        bits.Position += 2;   // 2-bytes padding
+        uint numberOfBytesInItem;
+        bits.ReadUInt32(out numberOfBytesInItem);
+        if (version == 4)
+        {
+            switch (kind)
+            {
+                case 0: this.ReadUsingInfo(bits); break;
+                case 1: this.ReadForwardInfo(bits); break;
+                case 2: break; // this.ReadForwardedToModuleInfo(bits); break;
+                case 3: this.ReadIteratorLocals(bits); break;
+                case 4: this.ReadForwardIterator(bits); break;
+                case 5: break; // dynamic locals - see http://index/#Microsoft.VisualStudio.LanguageServices/Shared/CustomDebugInfoReader.cs,a3031f7681d76e93
+                case 6: break; // EnC data
+                case 7: break; // EnC data for lambdas and closures
+                // ignore any other unknown record types that may be added in future, instead of throwing an exception
+                // see more details here: https://github.com/tmat/roslyn/blob/portable-pdb/docs/specs/PortablePdb-Metadata.md
+                default: break; // throw new PdbDebugException("Unknown custom metadata item kind: {0}", kind);
+            }
+		}
+        bits.Position = savedPosition + (int)numberOfBytesInItem;
     }
 
     private void ReadForwardIterator(BitAccess bits) {

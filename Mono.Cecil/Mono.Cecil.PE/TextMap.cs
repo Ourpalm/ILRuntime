@@ -10,8 +10,6 @@
 
 using System;
 
-#if !READ_ONLY
-
 using RVA = System.UInt32;
 
 namespace ILRuntime.Mono.Cecil.PE {
@@ -108,5 +106,3 @@ namespace ILRuntime.Mono.Cecil.PE {
 		}
 	}
 }
-
-#endif

@@ -9,6 +9,7 @@
 //
 
 using System;
+using System.Threading;
 using ILRuntime.Mono.Collections.Generic;
 
 namespace ILRuntime.Mono.Cecil {
@@ -34,9 +35,11 @@ namespace ILRuntime.Mono.Cecil {
 			ref Collection<CustomAttribute> variable,
 			ModuleDefinition module)
 		{
-			return module.HasImage ()
-				? module.Read (ref variable, self, (provider, reader) => reader.ReadCustomAttributes (provider))
-				: variable = new Collection<CustomAttribute>();
+			if (module.HasImage ())
+				return module.Read (ref variable, self, (provider, reader) => reader.ReadCustomAttributes (provider));
+
+			Interlocked.CompareExchange (ref variable, new Collection<CustomAttribute> (), null);
+			return variable;
 		}
 	}
 }

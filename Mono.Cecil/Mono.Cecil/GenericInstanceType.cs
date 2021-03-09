@@ -11,6 +11,7 @@
 using System;
 using System.Text;
 
+using System.Threading;
 using ILRuntime.Mono.Collections.Generic;
 
 using MD = ILRuntime.Mono.Cecil.Metadata;
@@ -26,7 +27,12 @@ namespace ILRuntime.Mono.Cecil {
 		}
 
 		public Collection<TypeReference> GenericArguments {
-			get { return arguments ?? (arguments = new Collection<TypeReference> ()); }
+			get {
+				if (arguments == null)
+					Interlocked.CompareExchange (ref arguments, new Collection<TypeReference> (), null);
+
+				return arguments;
+			}
 		}
 
 		public override TypeReference DeclaringType {
@@ -60,6 +66,12 @@ namespace ILRuntime.Mono.Cecil {
 		{
 			base.IsValueType = type.IsValueType;
 			this.etype = MD.ElementType.GenericInst;
+		}
+
+		internal GenericInstanceType (TypeReference type, int arity)
+			: this (type)
+		{
+			this.arguments = new Collection<TypeReference> (arity);
 		}
 	}
 }

@@ -14,3 +14,5 @@ TestResults
 project.lock.json
 .vs/
 .idea/
+packages/*
+nuget.exe

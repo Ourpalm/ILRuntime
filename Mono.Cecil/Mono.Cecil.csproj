@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <ProjectGuid>{D68133BD-1E63-496E-9EDE-4FBDBF77B486}</ProjectGuid>
-    <RootNamespace>ILRuntim.Mono.Cecil</RootNamespace>
-    <AssemblyName>ILRuntim.Mono.Cecil</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>ILRuntime.Mono.Cecil</RootNamespace>
+    <AssemblyName>ILRuntime.Mono.Cecil</AssemblyName>
+    <TargetFramework>net35</TargetFramework>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'net_3_5_Debug_ReadOnly'">
@@ -68,6 +68,4 @@
     <Compile Include="Mono.Collections.Generic\*.cs" />
     <Compile Include="Mono.Security.Cryptography\*.cs" />
   </ItemGroup>
-  <Import Project="Mono.Cecil.props" />
-  <Import Project="$(MSBuildCSharpTargets)" Condition=" ! $(NetStandard) " />
 </Project>

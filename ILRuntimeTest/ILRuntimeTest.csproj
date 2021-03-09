@@ -41,8 +41,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ILRuntim.Mono.Cecil">
-      <HintPath>..\Dependencies\ILRuntim.Mono.Cecil.dll</HintPath>
+    <Reference Include="ILRuntime.Mono.Cecil">
+      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="ILRuntime.Mono.Cecil.Mdb">
       <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.Mdb.dll</HintPath>

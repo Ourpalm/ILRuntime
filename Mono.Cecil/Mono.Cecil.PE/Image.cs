@@ -29,6 +29,8 @@ namespace ILRuntime.Mono.Cecil.PE {
 		public TargetArchitecture Architecture;
 		public ModuleCharacteristics Characteristics;
 		public ushort LinkerVersion;
+		public ushort SubSystemMajor;
+		public ushort SubSystemMinor;
 
 		public ImageDebugHeader DebugHeader;
 

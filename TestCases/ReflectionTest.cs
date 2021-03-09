@@ -120,6 +120,12 @@ namespace TestCases
             {
                 throw new Exception("isDefeinded == false 3");
             }
+
+            var attr = (TestCLRAttribute)typeof(TestCls2).GetField("Attribute_field").GetCustomAttributes(typeof(TestCLRAttribute), false)[0];
+            if(attr.Name != "Example")
+            {
+                throw new Exception("attr.Name != Example");
+            }
         }
 
         public static void ReflectionTest08()
@@ -144,6 +150,12 @@ namespace TestCases
             if (isDefined == false)
             {
                 throw new Exception("isDefeinded == false 3");
+            }
+
+            var attr = (TestAttribute)typeof(TestCls2).GetField("ILAttribute_field").GetCustomAttributes(typeof(TestAttribute), false)[0];
+            if (attr.Name != "Example")
+            {
+                throw new Exception("attr.Name != Example");
             }
         }
         [Obsolete("gasdgas")]
@@ -185,10 +197,10 @@ namespace TestCases
                 Attribute_field = a1;
                 ILAttribute_field = a2;
             }
-            [TestCLR]
+            [TestCLR(Name = "Example")]
             public int Attribute_field;
 
-            [Test]
+            [Test(Name = "Example")]
             public int ILAttribute_field;
 
             [TestCLR]
@@ -208,6 +220,7 @@ namespace TestCases
         class TestAttribute : Attribute
         {
             bool testField;
+            public string Name;
             public TestAttribute()
             {
 

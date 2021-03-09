@@ -47,6 +47,16 @@ namespace ILRuntime.Reflection
                         appdomain.Invoke(setter, ins, p);
                     }
                 }
+                if(attribute.HasFields)
+                {
+                    foreach (var j in attribute.Fields)
+                    {
+                        var field = it.GetField(j.Name, out int index);
+                        if (field != null)
+                            ((ILRuntime.Runtime.Intepreter.ILTypeInstance)ins)[index] = j.Argument.Value;
+                    }
+                }
+                ins = ((ILRuntime.Runtime.Intepreter.ILTypeInstance)ins).CLRInstance;
             }
             else
             {
@@ -69,6 +79,14 @@ namespace ILRuntime.Reflection
                     {
                         var prop = at.TypeForCLR.GetProperty(j.Name);
                         prop.SetValue(ins, j.Argument.Value, null);
+                    }
+                }
+                if(attribute.HasFields)
+                {
+                    foreach(var j in attribute.Fields)
+                    {
+                        var field = at.TypeForCLR.GetField(j.Name);
+                        field.SetValue(ins, j.Argument.Value);
                     }
                 }
             }

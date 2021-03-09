@@ -35,8 +35,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ILRuntim.Mono.Cecil">
-      <HintPath>..\Dependencies\ILRuntim.Mono.Cecil.dll</HintPath>
+    <Reference Include="ILRuntime.Mono.Cecil">
+      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

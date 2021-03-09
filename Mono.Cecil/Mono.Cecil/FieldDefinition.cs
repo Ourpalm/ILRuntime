@@ -9,6 +9,7 @@
 //
 
 using System;
+using System.Threading;
 using ILRuntime.Mono.Collections.Generic;
 
 namespace ILRuntime.Mono.Cecil {
@@ -37,7 +38,11 @@ namespace ILRuntime.Mono.Cecil {
 				return;
 			}
 
-			offset = Module.Read (this, (field, reader) => reader.ReadFieldLayout (field));
+			lock (Module.SyncRoot) {
+				if (offset != Mixin.NotResolvedMarker)
+					return;
+				offset = Module.Read (this, (field, reader) => reader.ReadFieldLayout (field));
+			}
 		}
 
 		public bool HasLayoutInfo {
@@ -63,7 +68,7 @@ namespace ILRuntime.Mono.Cecil {
 			set { offset = value; }
 		}
 
-		internal new FieldDefinitionProjection WindowsRuntimeProjection {
+		internal FieldDefinitionProjection WindowsRuntimeProjection {
 			get { return (FieldDefinitionProjection) projection; }
 			set { projection = value; }
 		}
@@ -76,7 +81,11 @@ namespace ILRuntime.Mono.Cecil {
 			if (!HasImage)
 				return;
 
-			rva = Module.Read (this, (field, reader) => reader.ReadFieldRVA (field));
+			lock (Module.SyncRoot) {
+				if (rva != Mixin.NotResolvedMarker)
+					return;
+				rva = Module.Read (this, (field, reader) => reader.ReadFieldRVA (field));
+			}
 		}
 
 		public int RVA {

@@ -69,12 +69,11 @@ namespace ILRuntime.Mono.Cecil {
 			if (parameters.metadata_resolver != null)
 				module.metadata_resolver = parameters.metadata_resolver;
 
-#if !READ_ONLY
 			if (parameters.metadata_importer_provider != null)
 				module.metadata_importer = parameters.metadata_importer_provider.GetMetadataImporter (module);
+
 			if (parameters.reflection_importer_provider != null)
 				module.reflection_importer = parameters.reflection_importer_provider.GetReflectionImporter (module);
-#endif
 
 			GetMetadataKind (module, parameters);
 
@@ -104,8 +103,14 @@ namespace ILRuntime.Mono.Cecil {
 					? symbol_reader_provider.GetSymbolReader (module, parameters.SymbolStream)
 					: symbol_reader_provider.GetSymbolReader (module, module.FileName);
 
-				if (reader != null)
-					module.ReadSymbols (reader, parameters.ThrowIfSymbolsAreNotMatching);
+				if (reader != null) {
+					try {
+						module.ReadSymbols (reader, parameters.ThrowIfSymbolsAreNotMatching);
+					} catch (Exception) {
+						reader.Dispose ();
+						throw;
+					}
+				}
 			}
 
 			if (module.Image.HasDebugTables ())
@@ -238,10 +243,18 @@ namespace ILRuntime.Mono.Cecil {
 				var parameter = parameters [i];
 
 				if (parameter.HasConstraints)
-					Mixin.Read (parameter.Constraints);
+					ReadGenericParameterConstraints (parameter);
 
 				ReadCustomAttributes (parameter);
 			}
+		}
+
+		void ReadGenericParameterConstraints (GenericParameter parameter)
+		{
+			var constraints = parameter.Constraints;
+
+			for (int i = 0; i < constraints.Count; i++)
+				ReadCustomAttributes (constraints [i]);
 		}
 
 		void ReadSecurityDeclarations (ISecurityDeclarationProvider provider)
@@ -406,7 +419,7 @@ namespace ILRuntime.Mono.Cecil {
 			for (int i = 0; i < methods.Count; i++) {
 				var method = methods [i];
 
-				if (method.HasBody && method.token.RID != 0 && method.debug_info == null)
+				if (method.HasBody && method.token.RID != 0 && (method.debug_info == null || !method.debug_info.HasSequencePoints))
 					method.debug_info = symbol_reader.Read (method);
 			}
 		}
@@ -1119,11 +1132,14 @@ namespace ILRuntime.Mono.Cecil {
 			metadata.AddTypeReference (type);
 
 			if (scope_token.TokenType == TokenType.TypeRef) {
-				declaring_type = GetTypeDefOrRef (scope_token);
+				if (scope_token.RID != rid) {
+					declaring_type = GetTypeDefOrRef (scope_token);
 
-				scope = declaring_type != null
-					? declaring_type.Scope
-					: module;
+					scope = declaring_type != null
+						? declaring_type.Scope
+						: module;
+				} else // obfuscated typeref row pointing to self
+					scope = module;
 			} else
 				scope = GetTypeReferenceScope (scope_token);
 
@@ -1985,27 +2001,31 @@ namespace ILRuntime.Mono.Cecil {
 		{
 			InitializeGenericConstraints ();
 
-			Collection<MetadataToken> mapping;
+			Collection<Row<uint, MetadataToken>> mapping;
 			if (!metadata.TryGetGenericConstraintMapping (generic_parameter, out mapping))
 				return false;
 
 			return mapping.Count > 0;
 		}
 
-		public Collection<TypeReference> ReadGenericConstraints (GenericParameter generic_parameter)
+		public GenericParameterConstraintCollection ReadGenericConstraints (GenericParameter generic_parameter)
 		{
 			InitializeGenericConstraints ();
 
-			Collection<MetadataToken> mapping;
+			Collection<Row<uint, MetadataToken>> mapping;
 			if (!metadata.TryGetGenericConstraintMapping (generic_parameter, out mapping))
-				return new Collection<TypeReference> ();
+				return new GenericParameterConstraintCollection (generic_parameter);
 
-			var constraints = new Collection<TypeReference> (mapping.Count);
+			var constraints = new GenericParameterConstraintCollection (generic_parameter, mapping.Count);
 
 			this.context = (IGenericContext) generic_parameter.Owner;
 
-			for (int i = 0; i < mapping.Count; i++)
-				constraints.Add (GetTypeDefOrRef (mapping [i]));
+			for (int i = 0; i < mapping.Count; i++) {
+				constraints.Add (
+					new GenericParameterConstraint (
+						GetTypeDefOrRef (mapping [i].Col2),
+						new MetadataToken (TokenType.GenericParamConstraint, mapping [i].Col1)));
+			}
 
 			metadata.RemoveGenericConstraintMapping (generic_parameter);
 
@@ -2019,15 +2039,16 @@ namespace ILRuntime.Mono.Cecil {
 
 			var length = MoveTo (Table.GenericParamConstraint);
 
-			metadata.GenericConstraints = new Dictionary<uint, Collection<MetadataToken>> (length);
+			metadata.GenericConstraints = new Dictionary<uint, Collection<Row<uint, MetadataToken>>> (length);
 
-			for (int i = 1; i <= length; i++)
+			for (uint i = 1; i <= length; i++) {
 				AddGenericConstraintMapping (
 					ReadTableIndex (Table.GenericParam),
-					ReadMetadataToken (CodedIndex.TypeDefOrRef));
+					new Row<uint, MetadataToken> (i, ReadMetadataToken (CodedIndex.TypeDefOrRef)));
+			}
 		}
 
-		void AddGenericConstraintMapping (uint generic_parameter, MetadataToken constraint)
+		void AddGenericConstraintMapping (uint generic_parameter, Row<uint, MetadataToken> constraint)
 		{
 			metadata.SetGenericConstraintMapping (
 				generic_parameter,
@@ -2120,7 +2141,7 @@ namespace ILRuntime.Mono.Cecil {
 			return call_site;
 		}
 
-		public VariableDefinitionCollection ReadVariables (MetadataToken local_var_token)
+		public VariableDefinitionCollection ReadVariables (MetadataToken local_var_token, MethodDefinition method = null)
 		{
 			if (!MoveTo (Table.StandAloneSig, local_var_token.RID))
 				return null;
@@ -2135,7 +2156,7 @@ namespace ILRuntime.Mono.Cecil {
 			if (count == 0)
 				return null;
 
-			var variables = new VariableDefinitionCollection ((int) count);
+			var variables = new VariableDefinitionCollection (method, (int) count);
 
 			for (int i = 0; i < count; i++)
 				variables.Add (new VariableDefinition (reader.ReadTypeSignature ()));
@@ -2257,9 +2278,11 @@ namespace ILRuntime.Mono.Cecil {
 			if (call_conv != methodspec_sig)
 				throw new NotSupportedException ();
 
-			var instance = new GenericInstanceMethod (method);
+			var arity = reader.ReadCompressedUInt32 ();
 
-			reader.ReadGenericInstanceSignature (method, instance);
+			var instance = new GenericInstanceMethod (method, (int) arity);
+
+			reader.ReadGenericInstanceSignature (method, instance, arity);
 
 			return instance;
 		}
@@ -2303,10 +2326,6 @@ namespace ILRuntime.Mono.Cecil {
 			}
 
 			member.token = new MetadataToken (TokenType.MemberRef, rid);
-
-			if (module.IsWindowsMetadata ())
-				WindowsRuntimeProjections.Project (member);
-
 			return member;
 		}
 
@@ -2994,7 +3013,7 @@ namespace ILRuntime.Mono.Cecil {
 				value = new decimal (signature.ReadInt32 (), signature.ReadInt32 (), signature.ReadInt32 (), (b & 0x80) != 0, (byte) (b & 0x7f));
 			} else if (type.IsTypeOf ("System", "DateTime")) {
 				value = new DateTime (signature.ReadInt64());
-			} else if (type.etype == ElementType.Object || type.etype == ElementType.None || type.etype == ElementType.Class) {
+			} else if (type.etype == ElementType.Object || type.etype == ElementType.None || type.etype == ElementType.Class || type.etype == ElementType.Array) {
 				value = null;
 			} else
 				value = signature.ReadConstantSignature (type.etype);
@@ -3303,10 +3322,8 @@ namespace ILRuntime.Mono.Cecil {
 				owner_parameters.Add (new GenericParameter (owner));
 		}
 
-		public void ReadGenericInstanceSignature (IGenericParameterProvider provider, IGenericInstance instance)
+		public void ReadGenericInstanceSignature (IGenericParameterProvider provider, IGenericInstance instance, uint arity)
 		{
-			var arity = ReadCompressedUInt32 ();
-
 			if (!provider.IsDefinition)
 				CheckGenericContext (provider, (int) arity - 1);
 
@@ -3402,9 +3419,11 @@ namespace ILRuntime.Mono.Cecil {
 			case ElementType.GenericInst: {
 				var is_value_type = ReadByte () == (byte) ElementType.ValueType;
 				var element_type = GetTypeDefOrRef (ReadTypeTokenSignature ());
-				var generic_instance = new GenericInstanceType (element_type);
 
-				ReadGenericInstanceSignature (element_type, generic_instance);
+				var arity = ReadCompressedUInt32 ();
+				var generic_instance = new GenericInstanceType (element_type, (int) arity);
+
+				ReadGenericInstanceSignature (element_type, generic_instance, arity);
 
 				if (is_value_type) {
 					generic_instance.KnownValueType ();
@@ -3766,10 +3785,10 @@ namespace ILRuntime.Mono.Cecil {
 			if (length == 0)
 				return string.Empty;
 
-			if (position + length >= buffer.Length)
+			if (position + length > buffer.Length)
 				return string.Empty;
-
-			var @string = Encoding.UTF8.GetString (buffer, position, length);
+			
+			var @string = Encoding.UTF8.GetString(buffer, position, length);
 
 			position += length;
 			return @string;
@@ -3795,8 +3814,6 @@ namespace ILRuntime.Mono.Cecil {
 
 		public Collection<SequencePoint> ReadSequencePoints (Document document)
 		{
-			var sequence_points = new Collection<SequencePoint> ();
-
 			ReadCompressedUInt32 (); // local_sig_token
 
 			if (document == null)
@@ -3807,6 +3824,13 @@ namespace ILRuntime.Mono.Cecil {
 			var start_column = 0;
 			var first_non_hidden = true;
 
+			//there's about 5 compressed int32's per sequenec points.  we don't know exactly how many
+			//but let's take a conservative guess so we dont end up reallocating the sequence_points collection
+			//as it grows.
+			var bytes_remaining_for_sequencepoints = sig_length - (position - start);
+			var estimated_sequencepoint_amount = (int)bytes_remaining_for_sequencepoints / 5;
+			var sequence_points = new Collection<SequencePoint> (estimated_sequencepoint_amount);
+			
 			for (var i = 0; CanReadMore (); i++) {
 				var delta_il = (int) ReadCompressedUInt32 ();
 				if (i > 0 && delta_il == 0) {
@@ -3853,7 +3877,7 @@ namespace ILRuntime.Mono.Cecil {
 
 		public bool CanReadMore ()
 		{
-			return position - start < sig_length;
+			return (position - start) < sig_length;
 		}
 	}
 }

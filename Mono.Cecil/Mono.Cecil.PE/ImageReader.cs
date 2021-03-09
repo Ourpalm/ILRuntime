@@ -81,8 +81,8 @@ namespace ILRuntime.Mono.Cecil.PE {
 			// Characteristics		2
 			ushort characteristics = ReadUInt16 ();
 
-			ushort subsystem, dll_characteristics, linker_version;
-			ReadOptionalHeaders (out subsystem, out dll_characteristics, out linker_version);
+			ushort subsystem, dll_characteristics;
+			ReadOptionalHeaders (out subsystem, out dll_characteristics);
 			ReadSections (sections);
 			ReadCLIHeader ();
 			ReadMetadata ();
@@ -90,7 +90,6 @@ namespace ILRuntime.Mono.Cecil.PE {
 
 			image.Kind = GetModuleKind (characteristics, subsystem);
 			image.Characteristics = (ModuleCharacteristics) dll_characteristics;
-			image.LinkerVersion = linker_version;
 		}
 
 		TargetArchitecture ReadArchitecture ()
@@ -109,7 +108,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 			return ModuleKind.Console;
 		}
 
-		void ReadOptionalHeaders (out ushort subsystem, out ushort dll_characteristics, out ushort linker)
+		void ReadOptionalHeaders (out ushort subsystem, out ushort dll_characteristics)
 		{
 			// - PEOptionalHeader
 			//   - StandardFieldsHeader
@@ -119,7 +118,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 
 			//						pe32 || pe64
 
-			linker = ReadUInt16 ();
+			image.LinkerVersion = ReadUInt16 ();
 			// CodeSize				4
 			// InitializedDataSize	4
 			// UninitializedDataSize4
@@ -138,11 +137,16 @@ namespace ILRuntime.Mono.Cecil.PE {
 			// UserMinor			2
 			// SubSysMajor			2
 			// SubSysMinor			2
+			Advance(44);
+
+			image.SubSystemMajor = ReadUInt16 ();
+			image.SubSystemMinor = ReadUInt16 ();
+
 			// Reserved				4
 			// ImageSize			4
 			// HeaderSize			4
 			// FileChecksum			4
-			Advance (64);
+			Advance (16);
 
 			// SubSystem			2
 			subsystem = ReadUInt16 ();
@@ -346,7 +350,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 					PointerToRawData = ReadInt32 (),
 				};
 
-				if (directory.AddressOfRawData == 0) {
+				if (directory.PointerToRawData == 0 || directory.SizeOfData < 0) {
 					entries [i] = new ImageDebugHeaderEntry (directory, Empty<byte>.Array);
 					continue;
 				}
@@ -477,7 +481,7 @@ namespace ILRuntime.Mono.Cecil.PE {
 		{
 			uint offset = (uint) BaseStream.Position - table_heap_offset - image.MetadataSection.PointerToRawData; // header
 
-			int stridx_size = image.StringHeap.IndexSize;
+			int stridx_size = image.StringHeap != null ? image.StringHeap.IndexSize : 2;
 			int guididx_size = image.GuidHeap != null ? image.GuidHeap.IndexSize : 2;
 			int blobidx_size = image.BlobHeap != null ? image.BlobHeap.IndexSize : 2;
 

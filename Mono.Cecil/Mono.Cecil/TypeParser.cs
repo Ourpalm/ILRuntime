@@ -296,7 +296,7 @@ namespace ILRuntime.Mono.Cecil {
 			if (generic_arguments.IsNullOrEmpty ())
 				return type;
 
-			var instance = new GenericInstanceType (type);
+			var instance = new GenericInstanceType (type, generic_arguments.Length);
 			var instance_arguments = instance.GenericArguments;
 
 			for (int i = 0; i < generic_arguments.Length; i++)
