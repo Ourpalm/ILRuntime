@@ -2554,6 +2554,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     esp = redirect(this, esp, mStack, cm, true);
                                                 else
                                                 {
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                                                    if (!allowUnboundCLRMethod)
+                                                        throw new NotSupportedException(cm.ToString() + " is not bound!");
+#endif
                                                     object result = cm.Invoke(this, esp, mStack, true);
                                                     int paramCount = cm.ParameterCount;
                                                     for (int i = 1; i <= paramCount; i++)
