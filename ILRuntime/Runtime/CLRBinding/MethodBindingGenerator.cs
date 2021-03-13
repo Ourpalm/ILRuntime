@@ -186,6 +186,8 @@ namespace ILRuntime.Runtime.CLRBinding
                     p.ParameterType.AppendArgumentCode(sb, j, p.Name, valueTypeBinders, isMultiArr, hasByRef, true);
                     sb.AppendLine();
                 }
+                bool noUnbox = (type.Name.Contains("AsyncTaskMethodBuilder") || type.FullName.StartsWith("System.Runtime.CompilerServices.AsyncVoidMethodBuilder")) && i.Name == "Start";
+
                 if (!i.IsStatic)
                 {
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
@@ -215,9 +217,14 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     else
                     {
-                        if (type.IsValueType)
-                            sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");
-                        sb.AppendLine(string.Format("            {0} instance_of_this_method = {1};", typeClsName, type.GetRetrieveValueCode(typeClsName)));
+                        if (type.IsValueType && !type.IsPrimitive)
+                        {
+                            sb.AppendLine("            ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);");                            
+                        }
+                        if (noUnbox)
+                            sb.AppendLine(string.Format("            object instance_of_this_method = {0};", type.GetRetrieveValueCode(typeClsName)));
+                        else
+                            sb.AppendLine(string.Format("            {0} instance_of_this_method = {1};", typeClsName, type.GetRetrieveValueCode(typeClsName)));
                         if (!type.IsValueType && !hasByRef)
                             sb.AppendLine("            __intp.Free(ptr_of_this_method);");
                     }
@@ -250,6 +257,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb2.Append('>');
                     genericArguments = sb2.ToString();
                 }
+                
                 if (i.IsStatic)
                 {
                     if (isProperty)
@@ -367,36 +375,72 @@ namespace ILRuntime.Runtime.CLRBinding
                         t[1] = i.Name.Substring(firstUnderlineIndex + 1);
                         string propType = t[0];
 
-                        if (propType == "get")
+                        if(noUnbox)
                         {
-                            bool isIndexer = param.Length > 0;
-                            if (isIndexer)
+                            if (propType == "get")
                             {
-                                sb.AppendLine(string.Format("instance_of_this_method[{0}];", param[0].Name));
+                                bool isIndexer = param.Length > 0;
+                                if (isIndexer)
+                                {
+                                    sb.AppendLine(string.Format("(({1})instance_of_this_method)[{0}];", param[0].Name, typeClsName));
+                                }
+                                else
+                                    sb.AppendLine(string.Format("(({1})instance_of_this_method).{0};", t[1], typeClsName));
+                            }
+                            else if (propType == "set")
+                            {
+                                bool isIndexer = param.Length > 1;
+                                if (isIndexer)
+                                {
+                                    sb.AppendLine(string.Format("(({2})instance_of_this_method)[{0}] = {1};", param[0].Name, param[1].Name, typeClsName));
+                                }
+                                else
+                                    sb.AppendLine(string.Format("(({2})instance_of_this_method).{0} = {1};", t[1], param[0].Name, typeClsName, typeClsName));
+                            }
+                            else if (propType == "add")
+                            {
+                                sb.AppendLine(string.Format("(({2})instance_of_this_method).{0} += {1};", i.Name.Substring(4), param[0].Name, typeClsName));
+                            }
+                            else if (propType == "remove")
+                            {
+                                sb.AppendLine(string.Format("(({2})instance_of_this_method).{0} -= {1};", i.Name.Substring(7), param[0].Name, typeClsName));
                             }
                             else
-                                sb.AppendLine(string.Format("instance_of_this_method.{0};", t[1]));
-                        }
-                        else if (propType == "set")
-                        {
-                            bool isIndexer = param.Length > 1;
-                            if (isIndexer)
-                            {
-                                sb.AppendLine(string.Format("instance_of_this_method[{0}] = {1};", param[0].Name, param[1].Name));
-                            }
-                            else
-                                sb.AppendLine(string.Format("instance_of_this_method.{0} = {1};", t[1], param[0].Name));
-                        }
-                        else if (propType == "add")
-                        {
-                            sb.AppendLine(string.Format("instance_of_this_method.{0} += {1};", i.Name.Substring(4), param[0].Name));
-                        }
-                        else if (propType == "remove")
-                        {
-                            sb.AppendLine(string.Format("instance_of_this_method.{0} -= {1};", i.Name.Substring(7), param[0].Name));
+                                throw new NotImplementedException();
                         }
                         else
-                            throw new NotImplementedException();
+                        {
+                            if (propType == "get")
+                            {
+                                bool isIndexer = param.Length > 0;
+                                if (isIndexer)
+                                {
+                                    sb.AppendLine(string.Format("instance_of_this_method[{0}];", param[0].Name));
+                                }
+                                else
+                                    sb.AppendLine(string.Format("instance_of_this_method.{0};", t[1]));
+                            }
+                            else if (propType == "set")
+                            {
+                                bool isIndexer = param.Length > 1;
+                                if (isIndexer)
+                                {
+                                    sb.AppendLine(string.Format("instance_of_this_method[{0}] = {1};", param[0].Name, param[1].Name));
+                                }
+                                else
+                                    sb.AppendLine(string.Format("instance_of_this_method.{0} = {1};", t[1], param[0].Name));
+                            }
+                            else if (propType == "add")
+                            {
+                                sb.AppendLine(string.Format("instance_of_this_method.{0} += {1};", i.Name.Substring(4), param[0].Name));
+                            }
+                            else if (propType == "remove")
+                            {
+                                sb.AppendLine(string.Format("instance_of_this_method.{0} -= {1};", i.Name.Substring(7), param[0].Name));
+                            }
+                            else
+                                throw new NotImplementedException();
+                        }
                     }
                     else if (isMultiArr)
                     {
@@ -418,7 +462,10 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     else
                     {
-                        sb.Append(string.Format("instance_of_this_method.{0}{1}(", i.Name, genericArguments));
+                        if(noUnbox)
+                            sb.Append(string.Format("(({2})instance_of_this_method).{0}{1}(", i.Name, genericArguments, typeClsName));
+                        else
+                            sb.Append(string.Format("instance_of_this_method.{0}{1}(", i.Name, genericArguments));
                         param.AppendParameters(sb);
                         sb.AppendLine(");");
                     }
@@ -524,10 +571,7 @@ namespace ILRuntime.Runtime.CLRBinding
                 if (!i.IsStatic && ((type.IsValueType && !type.IsPrimitive) || hasByRef))//need to write back value type instance
                 {
                     sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
-                    bool noWriteback = false;
-#if NET_4_6 || NET_STANDARD_2_0
-                    noWriteback = type == typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder) && i.Name == "Start";
-#endif
+                    bool noWriteback = noUnbox; 
                     if (type.IsValueType && !type.IsPrimitive && !noWriteback)
                     {
                         if (valueTypeBinders != null && valueTypeBinders.Contains(type))

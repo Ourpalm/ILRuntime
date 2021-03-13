@@ -187,5 +187,29 @@ namespace TestCases
             Console.WriteLine("a1");
             TestClass.Show2();
         }
+
+
+
+        public async static void TestRun7()
+        {
+            int i;// = await TestRun7Sub(0);
+            //Console.WriteLine(i); // 输出0
+            i = await TestRun7Sub(1);
+            Console.WriteLine(i);
+        }
+
+        public static async Task<int> TestRun7Sub(int i)
+        {
+            if (i > 0)
+            {
+                // 注意：这个分支没有await
+                return 1;
+            }
+            else
+            {
+                await Task.Delay(1);
+                return 0;
+            }
+        }
     }
 }

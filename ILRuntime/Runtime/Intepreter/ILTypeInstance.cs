@@ -273,6 +273,50 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        public unsafe void AssignFieldNoClone(int index, object value)
+        {
+            if (index < fields.Length && index >= 0)
+            {
+                fixed (StackObject* ptr = fields)
+                {
+                    StackObject* esp = &ptr[index];
+                    if (value != null)
+                    {
+                        var vt = value.GetType();
+                        if (vt.IsPrimitive)
+                        {
+                            ILIntepreter.UnboxObject(esp, value, managedObjs, type.AppDomain);
+                        }
+                        else if (vt.IsEnum)
+                        {
+                            esp->ObjectType = ObjectTypes.Integer;
+                            esp->Value = value.ToInt32();
+                            esp->ValueLow = 0;
+                        }
+                        else
+                        {
+
+                            esp->ObjectType = ObjectTypes.Object;
+                            esp->Value = index;
+                            managedObjs[index] = value;
+                        }
+                    }
+                    else
+                        *esp = StackObject.Null;
+                }
+            }
+            else
+            {
+                if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
+                {
+                    CLRType clrType = type.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
+                    clrType.SetFieldValue(index, ref clrInstance, value);
+                }
+                else
+                    throw new TypeLoadException();
+            }
+        }
+
         const int SizeOfILTypeInstance = 21;
         public unsafe int GetSizeInMemory(HashSet<object> traversedObj)
         {

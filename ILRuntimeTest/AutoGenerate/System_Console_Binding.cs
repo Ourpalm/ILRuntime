@@ -25,10 +25,10 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.String)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_0);
-            args = new Type[]{typeof(System.String), typeof(System.Object)};
+            args = new Type[]{typeof(System.Int32)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_1);
-            args = new Type[]{typeof(System.Int32)};
+            args = new Type[]{typeof(System.String), typeof(System.Object)};
             method = type.GetMethod("WriteLine", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, WriteLine_2);
             args = new Type[]{typeof(System.Boolean)};
@@ -86,6 +86,21 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 @value = ptr_of_this_method->Value;
+
+
+            System.Console.WriteLine(@value);
+
+            return __ret;
+        }
+
+        static StackObject* WriteLine_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
@@ -98,21 +113,6 @@ namespace ILRuntime.Runtime.Generated
 
 
             System.Console.WriteLine(@format, @arg0);
-
-            return __ret;
-        }
-
-        static StackObject* WriteLine_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Int32 @value = ptr_of_this_method->Value;
-
-
-            System.Console.WriteLine(@value);
 
             return __ret;
         }

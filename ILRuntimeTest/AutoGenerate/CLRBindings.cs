@@ -7,6 +7,15 @@ namespace ILRuntime.Runtime.Generated
     class CLRBindings
     {
 
+//will auto register in unity
+#if UNITY_5_3_OR_NEWER
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+#endif
+        static private void RegisterBindingAction()
+        {
+            ILRuntime.Runtime.CLRBinding.CLRBindingUtils.RegisterBindingAction(Initialize);
+        }
+
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVector3> s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder = null;
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct> s_ILRuntimeTest_TestFramework_TestVectorStruct_Binding_Binder = null;
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestVectorStruct2> s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder = null;
@@ -19,9 +28,17 @@ namespace ILRuntime.Runtime.Generated
         {
             System_Object_Binding.Register(app);
             System_String_Binding.Register(app);
+            System_Collections_Generic_EqualityComparer_1_Int32_Binding.Register(app);
+            System_Collections_Generic_EqualityComparer_1_Single_Binding.Register(app);
+            System_Collections_Generic_EqualityComparer_1_String_Binding.Register(app);
+            System_Collections_Generic_EqualityComparer_1_ILTypeInstance_Binding.Register(app);
             System_Activator_Binding.Register(app);
             System_Console_Binding.Register(app);
+            System_Int32_Binding.Register(app);
+            System_Exception_Binding.Register(app);
+            System_Single_Binding.Register(app);
             System_Type_Binding.Register(app);
+            System_Math_Binding.Register(app);
             System_Runtime_CompilerServices_AsyncTaskMethodBuilder_Binding.Register(app);
             System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Int32_Binding.Register(app);
             System_Runtime_CompilerServices_AsyncVoidMethodBuilder_Binding.Register(app);
@@ -29,14 +46,12 @@ namespace ILRuntime.Runtime.Generated
             System_Runtime_CompilerServices_TaskAwaiter_Binding.Register(app);
             System_Threading_Tasks_Task_1_Int32_Binding.Register(app);
             System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.Register(app);
-            System_Exception_Binding.Register(app);
             System_Collections_IDictionary_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Binding.Register(app);
             System_Linq_Enumerable_Binding.Register(app);
             System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Object_Binding.Register(app);
             ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding.Register(app);
-            System_Int32_Binding.Register(app);
             System_Object_Array_Binding.Register(app);
             System_Action_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_List_1_Int32_Binding.Register(app);
@@ -59,6 +74,7 @@ namespace ILRuntime.Runtime.Generated
             System_Reflection_MethodBase_Binding.Register(app);
             System_Reflection_MemberInfo_Binding.Register(app);
             System_Reflection_FieldInfo_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestCLRAttribute_Binding.Register(app);
             System_Reflection_PropertyInfo_Binding.Register(app);
             ILRuntimeTest_TestMainForm_Binding.Register(app);
             ILRuntime_Runtime_Enviorment_AppDomain_Binding.Register(app);
@@ -79,11 +95,10 @@ namespace ILRuntime.Runtime.Generated
             System_Action_1_String_Binding.Register(app);
             System_Collections_Generic_List_1_Action_1_Int32_Binding.Register(app);
             System_Collections_Generic_List_1_Func_2_Int32_Int32_Binding.Register(app);
+            System_Action_2_String_Object_Binding.Register(app);
             System_Action_Binding.Register(app);
-            System_Math_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
-            System_Single_Binding.Register(app);
             System_Byte_Binding.Register(app);
             System_Char_Binding.Register(app);
             System_Double_Binding.Register(app);
@@ -139,7 +154,6 @@ namespace ILRuntime.Runtime.Generated
             System_IComparable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);
-            System_Collections_Generic_EqualityComparer_1_Int32_Binding.Register(app);
 
             ILRuntime.CLR.TypeSystem.CLRType __clrType = null;
             __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVector3));

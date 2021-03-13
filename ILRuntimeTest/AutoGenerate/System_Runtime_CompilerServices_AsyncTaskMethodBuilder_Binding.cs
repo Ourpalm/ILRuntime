@@ -164,9 +164,9 @@ namespace ILRuntime.Runtime.Generated
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
             ptr_of_this_method = ILIntepreter.GetObjectAndResolveReference(ptr_of_this_method);
-            System.Runtime.CompilerServices.AsyncTaskMethodBuilder instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            object instance_of_this_method = (System.Runtime.CompilerServices.AsyncTaskMethodBuilder)typeof(System.Runtime.CompilerServices.AsyncTaskMethodBuilder).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
 
-            instance_of_this_method.Start<ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @stateMachine);
+            ((System.Runtime.CompilerServices.AsyncTaskMethodBuilder)instance_of_this_method).Start<ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @stateMachine);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
             switch(ptr_of_this_method->ObjectType)
