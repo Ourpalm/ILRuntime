@@ -282,7 +282,7 @@ namespace ILRuntime.CLR.Method
                 return;
             //当前方法用到的IType，提前InitializeMethods()。各个子调用，提前InitParameters()
             var body = Body;
-            //当前方法用到的CLR局部变量，提前InitializeFields()
+            //当前方法用到的CLR局部变量，提前InitializeFields()、GetTypeFlags()
             for (int i = 0; i < LocalVariableCount; i++)
             {
                 var v = Variables[i];
@@ -299,6 +299,7 @@ namespace ILRuntime.CLR.Method
                 if (t is CLRType ct)
                 {
                     var fields = ct.Fields;
+                    ILRuntime.CLR.Utils.Extensions.GetTypeFlags(ct.TypeForCLR);
                 }
             }
             foreach (var ins in body)
