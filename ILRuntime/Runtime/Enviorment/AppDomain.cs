@@ -1008,7 +1008,7 @@ namespace ILRuntime.Runtime.Enviorment
             var methods = t.GetMethods();
             foreach(var i in methods)
             {
-                ((ILMethod)i).Prewarm();
+                ((ILMethod)i).Prewarm(true);
             }
         }
 
@@ -1031,7 +1031,7 @@ namespace ILRuntime.Runtime.Enviorment
                         ILMethod m = (ILMethod)j;
                         if(m.Name == mn && m.GenericParameterCount == 0)
                         {
-                            m.Prewarm();
+                            m.Prewarm(false);
                         }
                     }
                 }
