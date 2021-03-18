@@ -312,13 +312,20 @@ namespace ILRuntime.CLR.Method
                     case OpCodeEnum.Ldvirtftn:
                     case OpCodeEnum.Callvirt:
                         {
-                            //如果参数alreadyPrewarmed不为空，则不仅prewarm当前方法，还会递归prewarm所有子调用
-                            //如果参数alreadyPrewarmed为空，则只prewarm当前方法
-                            if (alreadyPrewarmed == null)
-                                continue;
-                            var ilm = appdomain.GetMethod(ins.TokenInteger) as ILMethod;
-                            if (ilm != null)
-                                ilm.Prewarm(alreadyPrewarmed);
+                            var m = appdomain.GetMethod(ins.TokenInteger);
+                            if (m is ILMethod ilm)
+                            {
+                                //如果参数alreadyPrewarmed不为空，则不仅prewarm当前方法，还会递归prewarm所有子调用
+                                //如果参数alreadyPrewarmed为空，则只prewarm当前方法
+                                if (alreadyPrewarmed != null)
+                                {
+                                    ilm.Prewarm(alreadyPrewarmed);
+                                }
+                            }
+                            else if (m is CLRMethod clrm)
+                            {
+                                ILRuntime.CLR.Utils.Extensions.GetTypeFlags(clrm.DeclearingType.TypeForCLR);
+                            }
                         }
                         break;
                     case OpCodeEnum.Ldfld:
