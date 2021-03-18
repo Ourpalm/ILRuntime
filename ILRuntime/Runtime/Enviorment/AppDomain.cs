@@ -1005,11 +1005,10 @@ namespace ILRuntime.Runtime.Enviorment
             IType t = GetType(type);
             if (t == null || t is CLRType)
                 return;
-            var alreadyPrewarmed = new HashSet<ILMethod>();
             var methods = t.GetMethods();
             foreach(var i in methods)
             {
-                ((ILMethod)i).Prewarm(alreadyPrewarmed);
+                ((ILMethod)i).Prewarm();
             }
         }
 
@@ -1024,7 +1023,6 @@ namespace ILRuntime.Runtime.Enviorment
                 IType t = GetType(i.TypeName);
                 if (t == null || t is CLRType || i.MethodNames == null)
                     continue;
-                var alreadyPrewarmed = new HashSet<ILMethod>();
                 var methods = t.GetMethods();
                 foreach (var mn in i.MethodNames)
                 {
@@ -1033,7 +1031,7 @@ namespace ILRuntime.Runtime.Enviorment
                         ILMethod m = (ILMethod)j;
                         if(m.Name == mn && m.GenericParameterCount == 0)
                         {
-                            m.Prewarm(alreadyPrewarmed);
+                            m.Prewarm();
                         }
                     }
                 }
