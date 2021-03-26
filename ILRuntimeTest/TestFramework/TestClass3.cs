@@ -17,6 +17,7 @@ namespace ILRuntimeTest.TestFramework
     {
         protected int a;
         protected int b;
+        protected TestClass2 cls2;
 
         public virtual void KKK()
         {

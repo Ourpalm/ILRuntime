@@ -243,6 +243,47 @@ namespace TestCases
                 throw new Exception();
         }
 
+        public static void InheritanceTest16()
+        {
+            InheritanceTest16SubCls2 cls = new InheritanceTest16SubCls2();
+            cls.KKK();
+        }
+
+        class InheritanceTest16SubCls : TestClass2
+        {
+            public int constVal = 11111;
+            protected override void AbMethod1()
+            {
+                
+            }
+
+            public override float AbMethod2(int arg1)
+            {
+                return arg1 * 12333f;
+            }
+
+            public int Test(int arg)
+            {
+                return arg + constVal;
+            }
+        }
+
+        class InheritanceTest16SubCls2 : TestClass4
+        {
+            public override void KKK()
+            {
+                cls2 = new InheritanceTest16SubCls();
+
+                float res = cls2.AbMethod2(1);
+                if (Math.Abs(12333 - res) > 0.00001f)
+                    throw new Exception();
+
+                int res2 = ((InheritanceTest16SubCls)cls2).Test(5);
+                if (res2 != 11116)
+                    throw new Exception();
+            }
+        }
+
         public interface IData { }
 
         public class Data : IData { }
