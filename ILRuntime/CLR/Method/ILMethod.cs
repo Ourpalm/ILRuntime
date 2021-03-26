@@ -264,10 +264,88 @@ namespace ILRuntime.CLR.Method
             private set;
         }
 
-        public void Prewarm()
+        public void Prewarm(bool recursive)
         {
-            if (body == null)
-                InitCodeBody();
+            HashSet<ILMethod> alreadyPrewarmed = null;
+            if (recursive)
+            {
+                alreadyPrewarmed = new HashSet<ILMethod>();
+            }
+            Prewarm(alreadyPrewarmed);
+        }
+
+        private void Prewarm(HashSet<ILMethod> alreadyPrewarmed)
+        {
+            if (alreadyPrewarmed != null && alreadyPrewarmed.Add(this) == false)
+                return;
+            if (GenericParameterCount > 0 && !IsGenericInstance)
+                return;
+            //当前方法用到的IType，提前InitializeMethods()。各个子调用，提前InitParameters()
+            var body = Body;
+            //当前方法用到的CLR局部变量，提前InitializeFields()、GetTypeFlags()
+            for (int i = 0; i < LocalVariableCount; i++)
+            {
+                var v = Variables[i];
+                var vt = v.VariableType;
+                IType t;
+                if (vt.IsGenericParameter)
+                {
+                    t = FindGenericArgument(vt.Name);
+                }
+                else
+                {
+                    t = appdomain.GetType(v.VariableType, DeclearingType, this);
+                }
+                if (t is CLRType ct)
+                {
+                    var fields = ct.Fields;
+                    ILRuntime.CLR.Utils.Extensions.GetTypeFlags(ct.TypeForCLR);
+                }
+            }
+            foreach (var ins in body)
+            {
+                switch (ins.Code)
+                {
+                    case OpCodeEnum.Call:
+                    case OpCodeEnum.Newobj:
+                    case OpCodeEnum.Ldftn:
+                    case OpCodeEnum.Ldvirtftn:
+                    case OpCodeEnum.Callvirt:
+                        {
+                            var m = appdomain.GetMethod(ins.TokenInteger);
+                            if (m is ILMethod ilm)
+                            {
+                                //如果参数alreadyPrewarmed不为空，则不仅prewarm当前方法，还会递归prewarm所有子调用
+                                //如果参数alreadyPrewarmed为空，则只prewarm当前方法
+                                if (alreadyPrewarmed != null)
+                                {
+                                    ilm.Prewarm(alreadyPrewarmed);
+                                }
+                            }
+                            else if (m is CLRMethod clrm)
+                            {
+                                ILRuntime.CLR.Utils.Extensions.GetTypeFlags(clrm.DeclearingType.TypeForCLR);
+                            }
+                        }
+                        break;
+                    case OpCodeEnum.Ldfld:
+                    case OpCodeEnum.Stfld:
+                    case OpCodeEnum.Ldflda:
+                    case OpCodeEnum.Ldsfld:
+                    case OpCodeEnum.Ldsflda:
+                    case OpCodeEnum.Stsfld:
+                    case OpCodeEnum.Ldtoken:
+                        {
+                            //提前InitializeBaseType()
+                            var t = appdomain.GetType((int)(ins.TokenLong >> 32));
+                            if (t != null)
+                            {
+                                var baseType = t.BaseType;
+                            }
+                        }
+                        break;
+                }
+            }
         }
 
         void InitCodeBody()
