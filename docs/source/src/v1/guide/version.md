@@ -5,6 +5,26 @@ order: 1
 ---
 
 ## 更新记录
+
+### V1.6.7
+- Appdomain.Prewarm接口加入递归预热的选项
+- 优化ILRuntime遇到异常时输出的日志，可在Unity的Console中直接点击前往源码
+- 增加CLRBinding在处理遇到同名类型时的容错
+- 修正跨域继承适配器自动生成工具生成的代码部分情况无法正常编译的问题
+- 完善Debug模式下部分异常的错误日志输出，方便定位问题
+- 修正个别情况下，为值类型方法this赋值时导致栈损坏的问题
+- 修正一个泛型方法匹配的Bug
+- 修正将ILRuntime中的多播委托实例存入List等容器时，只有最后一个挂接的回调被执行的Bug
+- 修正一个ref/out操作枚举变量时的Bug
+- 修正在泛型方法中转换Action等泛型委托失败的Bug
+- 增加CLRBindingUtils，使得应用可以同时兼容有CLR绑定和无CLR绑定的情况（直接删除CLR绑定自动生成代码也不会造成编译错误）
+- 给Litjson加入JsonIgnore特性
+- 修正FieldInfo，PropertyInfo等反射类型调用GetCustomAttributes时出错的问题
+- 修正ILRuntime中获取Attributes无法获取部分参数值的Bug
+- 修正一个导致async await中断的Bug
+- 修正一个跨域继承访问基类protected变量出错的Bug
+- 升级Mono.Cecil到0.11.3
+
 ### V1.6.6
 - Appdomain.Prewarm接口加入预热指定方法的参数
 - AppDomain新增GetCurrentStackTrace接口获取当前调用栈，仅支持从热更中调用

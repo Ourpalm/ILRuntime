@@ -19,7 +19,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.6</button>
+        <button class="hiden-in-phone">V1.6.7</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -161,7 +161,26 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-6"><a href="#V1-6-6" class="headerlink" title="V1.6.6"></a>V1.6.6</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-7"><a href="#V1-6-7" class="headerlink" title="V1.6.7"></a>V1.6.7</h3><ul>
+<li>Appdomain.Prewarm接口加入递归预热的选项</li>
+<li>优化ILRuntime遇到异常时输出的日志，可在Unity的Console中直接点击前往源码</li>
+<li>增加CLRBinding在处理遇到同名类型时的容错</li>
+<li>修正跨域继承适配器自动生成工具生成的代码部分情况无法正常编译的问题</li>
+<li>完善Debug模式下部分异常的错误日志输出，方便定位问题</li>
+<li>修正个别情况下，为值类型方法this赋值时导致栈损坏的问题</li>
+<li>修正一个泛型方法匹配的Bug</li>
+<li>修正将ILRuntime中的多播委托实例存入List等容器时，只有最后一个挂接的回调被执行的Bug</li>
+<li>修正一个ref/out操作枚举变量时的Bug</li>
+<li>修正在泛型方法中转换Action等泛型委托失败的Bug</li>
+<li>增加CLRBindingUtils，使得应用可以同时兼容有CLR绑定和无CLR绑定的情况（直接删除CLR绑定自动生成代码也不会造成编译错误）</li>
+<li>给Litjson加入JsonIgnore特性</li>
+<li>修正FieldInfo，PropertyInfo等反射类型调用GetCustomAttributes时出错的问题</li>
+<li>修正ILRuntime中获取Attributes无法获取部分参数值的Bug</li>
+<li>修正一个导致async await中断的Bug</li>
+<li>修正一个跨域继承访问基类protected变量出错的Bug</li>
+<li>升级Mono.Cecil到0.11.3</li>
+</ul>
+<h3 id="V1-6-6"><a href="#V1-6-6" class="headerlink" title="V1.6.6"></a>V1.6.6</h3><ul>
 <li>Appdomain.Prewarm接口加入预热指定方法的参数</li>
 <li>AppDomain新增GetCurrentStackTrace接口获取当前调用栈，仅支持从热更中调用</li>
 <li>修改Profiler宏，以简化Unity平台上报Profiler数据</li>
