@@ -27,6 +27,8 @@ namespace ILRuntimeTest.TestFramework
     public class DelegateTest
     {
         public static IntDelegate IntDelegateTest;
+        public static event IntDelegate IntDelegateEventTest;
+        public event IntDelegate IntDelegateEventTest2;
         public static Int2Delegate IntDelegateTest1;
         public static IntDelegate2 IntDelegateTest2;
         public static IntDelegate2 IntDelegateTestReturn;
@@ -36,6 +38,16 @@ namespace ILRuntimeTest.TestFramework
         public static Func<int, float, short, double> DelegatePerformanceTest;
         public static Action<TestCLREnum> EnumDelegateTest;
         public static Func<TestCLREnum> EnumDelegateTest2;
+
+        public static void TestEvent()
+        {
+            IntDelegateEventTest(100);
+        }
+
+        public void TestEvent2()
+        {
+            IntDelegateEventTest2(22222);
+        }
 
         public static void TestEnumDelegate()
         {

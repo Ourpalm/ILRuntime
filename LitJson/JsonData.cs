@@ -741,6 +741,10 @@ namespace LitJson
 
         private static void WriteJson (IJsonWrapper obj, JsonWriter writer)
         {
+            if(obj is JsonData && (obj as JsonData).type == JsonType.None)
+            {
+                (obj as JsonData).EnsureDictionary();
+            }
             if (obj == null) {
                 writer.Write (null);
                 return;

@@ -50,12 +50,10 @@ namespace ILRuntime.Mono.Cecil.Mdb {
 			this.documents = new Dictionary<string, Document> ();
 		}
 
-#if !READ_ONLY
 		public ISymbolWriterProvider GetWriterProvider ()
 		{
 			return new MdbWriterProvider ();
 		}
-#endif
 
 		public bool ProcessDebugHeader (ImageDebugHeader header)
 		{

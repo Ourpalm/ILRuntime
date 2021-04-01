@@ -120,6 +120,12 @@ namespace TestCases
             {
                 throw new Exception("isDefeinded == false 3");
             }
+
+            var attr = (TestCLRAttribute)typeof(TestCls2).GetField("Attribute_field").GetCustomAttributes(typeof(TestCLRAttribute), false)[0];
+            if(attr.Name != "Example")
+            {
+                throw new Exception("attr.Name != Example");
+            }
         }
 
         public static void ReflectionTest08()
@@ -144,6 +150,12 @@ namespace TestCases
             if (isDefined == false)
             {
                 throw new Exception("isDefeinded == false 3");
+            }
+
+            var attr = (TestAttribute)typeof(TestCls2).GetField("ILAttribute_field").GetCustomAttributes(typeof(TestAttribute), false)[0];
+            if (attr.Name != "Example")
+            {
+                throw new Exception("attr.Name != Example");
             }
         }
         [Obsolete("gasdgas")]
@@ -175,10 +187,20 @@ namespace TestCases
         [Test]
         public class TestCls2
         {
-            [TestCLR]
+            public TestCls2()
+            {
+
+            }
+
+            public TestCls2(int a1, int a2)
+            {
+                Attribute_field = a1;
+                ILAttribute_field = a2;
+            }
+            [TestCLR(Name = "Example")]
             public int Attribute_field;
 
-            [Test]
+            [Test(Name = "Example")]
             public int ILAttribute_field;
 
             [TestCLR]
@@ -187,12 +209,18 @@ namespace TestCases
             [Test]
             public int ILAttribute_prop { get; set; }
 
+            public override string ToString()
+            {
+                return $"Attribute_field={Attribute_field},ILAttribute_field={ILAttribute_field}";
+            }
+
         }
 
         [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
         class TestAttribute : Attribute
         {
             bool testField;
+            public string Name;
             public TestAttribute()
             {
 
@@ -437,6 +465,22 @@ namespace TestCases
         static int ReflectionTest17Sub()
         {
             return 20;
+        }
+
+        public static void ReflectionTest18()
+        {
+            var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
+            var obj = Activator.CreateInstance(t, 2, 3);
+            
+            Console.WriteLine(obj);
+        }
+
+        public static void ReflectionTest19()
+        {
+            var t = Type.GetType("TestCases.ReflectionTest");
+            var mi = t.GetMethod(nameof(ReflectionTest19));
+            if (!mi.IsStatic)
+                throw new Exception();
         }
     }
 }

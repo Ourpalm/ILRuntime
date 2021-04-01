@@ -11,6 +11,6 @@
 using System;
 using System.Reflection;
 
-[assembly: AssemblyTitle ("Mono.Cecil.Mdb")]
+[assembly: AssemblyTitle ("ILRuntime.Mono.Cecil.Mdb")]
 
 [assembly: CLSCompliant (false)]

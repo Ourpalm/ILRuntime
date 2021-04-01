@@ -1,16 +1,13 @@
-//-----------------------------------------------------------------------------
-//
-// Copyright (C) Microsoft Corporation.  All Rights Reserved.
-//
-//-----------------------------------------------------------------------------
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.Cci;
-using Microsoft.Cci.Pdb;
-using System.Text;
 
-namespace Microsoft.Cci {
+#pragma warning disable 1591 // TODO: doc comments
+
+namespace Microsoft.Cci.Pdb {
 
   internal sealed class PdbIteratorScope : ILocalScope {
 

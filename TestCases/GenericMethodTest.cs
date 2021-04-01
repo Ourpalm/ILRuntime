@@ -9,6 +9,23 @@ using ILRuntimeTest.TestBase;
 
 namespace TestCases
 {
+
+    public static class TestGenericExtensionExtension
+    {
+        public class Test1<T>
+        {
+
+        }
+
+        public class Test2<T>
+        {
+
+        }
+        public static void CreateCollector<T>(this Test1<T> arg1, Test2<T>[] arg2)
+        {
+
+        }
+    }
     class GenericMethodTest
     {
         class GTest
@@ -330,6 +347,66 @@ namespace TestCases
             Console.WriteLine(t.ToString());
         }
 
+        public static void GenericMethodTest14()
+        {
+            Dictionary<int, List<int>> _notSelDict = new Dictionary<int, List<int>>();
+            var notSelGuids = _notSelDict.SelectMany(dict => dict.Value).ToList();
+            Console.WriteLine(notSelGuids.Count.ToString());
+        }
+
+
+        class Creater<T>
+        {
+            public bool Test(T me, T other)
+            {
+                var idiot1 = me as Man;
+
+                var idiot2 = other as Man;
+                return idiot1.Test(idiot2);
+            }
+        }
+
+        class Man
+        {
+            int a;
+
+            public Man(int a)
+            {
+                this.a = a;
+            }
+
+            public bool Test(Man other) => a == other.a;
+        }
+
+        static void Test<T>(Creater<T> creater) where T : Man
+        {
+            var m1 = new Man(33);
+            var m2 = new Man(33);
+
+            T t1 = (T)m1;
+            T t2 = (T)m2;
+
+            //传入创建的create有问题
+            if (creater.Test(t1, t2))  // Exception NullReference
+                Console.WriteLine(true);
+            else
+                Console.WriteLine(false);
+        }
+
+        static Creater<T> TestCreate<T>() => new Creater<T>();
+
+        // 测试用例
+        public static void GenericMethodTest15()
+        {
+            var creater = TestCreate<Man>();
+            Test(creater);
+        }
+
+        public static void GenericMethodTest16()
+        {
+            var testa = new TestA<int>();
+            testa.TestStatic();  //输出了‘arr’ 然后报错  调用了泛型数组的方法，正常应该调用泛型接口的方法
+        }
         public static void GenericExtensionMethod1Test1()
         {
             new ExtensionClass().Method1(v => { });
@@ -414,6 +491,13 @@ namespace TestCases
         {
             new SubExtensionClass<int>().Method3(new ArgumentException());
         }
+
+        public static void GenericExtensionMethod3Test8()
+        {
+            var t1 = new TestGenericExtensionExtension.Test1<int>();
+            var t2 = new TestGenericExtensionExtension.Test2<int>[] { new TestGenericExtensionExtension.Test2<int>() };
+            t1.CreateCollector(t2);
+        }        
 
         public static void GenericStaticMethodTest1()
         {
@@ -516,6 +600,47 @@ namespace TestCases
         {
             var t = typeof(T);//出错
             Console.WriteLine(t);
+        }
+
+        public static void GenericStaticMethodTest14()
+        {
+            var e2 = GenericStaticMethodTest14Sub<EnumTest.TestEnum>();
+            Console.WriteLine(e2);
+        }
+
+        static T GenericStaticMethodTest14Sub<T>()
+        {
+            return default(T);
+        }
+    }
+
+
+
+    interface ITestA<T> //泛型接口
+    {
+        void Test();
+    }
+
+    class TestA<T> : ITestA<T>
+    {
+        public void Test()
+        {
+            Console.WriteLine("TestA impl");
+        }
+    }
+    static class TestStaticClassGenericMethod     //扩展方法静态类 两个方法同名
+    {
+        public static void TestStatic<T>(this T[] arr) //泛型数组
+        {
+            Console.WriteLine("arr");
+            Console.WriteLine(arr.Length);
+            throw new Exception("Wrong method");
+        }
+
+        public static void TestStatic<T>(this ITestA<T> test)//泛型接口
+        {
+            Console.WriteLine("ITestA");
+            test.Test();
         }
     }
 }

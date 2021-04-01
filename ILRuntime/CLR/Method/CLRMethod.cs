@@ -303,8 +303,8 @@ namespace ILRuntime.CLR.Method
                     instance = StackObject.ToObject((Minus(esp, paramCount + 1)), appdomain, mStack);
                     if (!(instance is Reflection.ILRuntimeWrapperType))
                         instance = declaringType.TypeForCLR.CheckCLRTypes(instance);
-                    if (declaringType.IsValueType)
-                        instance = ILIntepreter.CheckAndCloneValueType(instance, appdomain);
+                    //if (declaringType.IsValueType)
+                    //    instance = ILIntepreter.CheckAndCloneValueType(instance, appdomain);
                     if (instance == null)
                         throw new NullReferenceException();
                 }
@@ -391,7 +391,27 @@ namespace ILRuntime.CLR.Method
             {
                 p[i] = genericArguments[i].TypeForCLR;
             }
-            var t = def.MakeGenericMethod(p);
+
+            MethodInfo t = null;
+#if UNITY_EDITOR || (DEBUG && !DISABLE_ILRUNTIME_DEBUG)
+            try
+            {
+#endif
+                t = def.MakeGenericMethod(p);
+#if UNITY_EDITOR || (DEBUG && !DISABLE_ILRUNTIME_DEBUG)
+            }
+            catch (Exception e)
+            {
+                string argString = "";
+                for (int i = 0; i < genericArguments.Length; i++)
+                {
+                    argString += genericArguments[i].TypeForCLR.FullName + ", ";
+                }
+
+                argString = argString.Substring(0, argString.Length - 2);
+                throw new Exception($"MakeGenericMethod failed : {def.DeclaringType.FullName}.{def.Name}<{argString}>");
+            }
+#endif
             var res = new CLRMethod(t, declaringType, appdomain);
             res.genericArguments = genericArguments;
             return res;

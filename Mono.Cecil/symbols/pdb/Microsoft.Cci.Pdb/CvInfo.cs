@@ -1,32 +1,6 @@
-//-----------------------------------------------------------------------------
-//
 // Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the Microsoft Public License.
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//-----------------------------------------------------------------------------
-//
-//  File:   CvInfo.cs
-//
-//  Generic CodeView information definitions
-//
-//  Structures, constants, etc. for accessing and interpreting
-//  CodeView information.
-//
-//  The master copy of this file resides in the langapi project (in C++).
-//  All Microsoft projects are required to use the master copy without
-//  modification.  Modification of the master version or a copy
-//  without consultation with all parties concerned is extremely
-//  risky.
-//
-//  When this file is modified, the corresponding documentation file
-//  omfdeb.doc in the langapi project must be updated.
-//
-//  This is a read-only copy of the C++ file converted to C#.
-//
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 
 namespace Microsoft.Cci.Pdb {

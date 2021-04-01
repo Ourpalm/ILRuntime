@@ -9,24 +9,30 @@
 
 using System;
 
-#if !READ_ONLY
-
 namespace ILRuntime.Mono.Cecil.Pdb
 {
 	internal class SymDocumentWriter
 	{
-		readonly ISymUnmanagedDocumentWriter m_unmanagedDocumentWriter;
+		readonly ISymUnmanagedDocumentWriter writer;
 
-		public SymDocumentWriter (ISymUnmanagedDocumentWriter unmanagedDocumentWriter)
+		public ISymUnmanagedDocumentWriter Writer
 		{
-			m_unmanagedDocumentWriter = unmanagedDocumentWriter;
+			get { return writer; }
 		}
 
-		public ISymUnmanagedDocumentWriter GetUnmanaged ()
+		public SymDocumentWriter(ISymUnmanagedDocumentWriter writer)
 		{
-			return m_unmanagedDocumentWriter;
+			this.writer = writer;
+		}
+
+		public void SetSource(byte[] source)
+		{
+			writer.SetSource((uint)source.Length, source);
+		}
+
+		public void SetCheckSum(Guid hashAlgo, byte[] checkSum)
+        {
+			writer.SetCheckSum(hashAlgo, (uint)checkSum.Length, checkSum);
 		}
 	}
 }
-
-#endif

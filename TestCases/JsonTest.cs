@@ -168,5 +168,76 @@ namespace TestCases
                 Console.WriteLine("Fail");
             }
         }
+
+        public static void JsonTest7()
+        {
+            JsonTestEnum[] arr = new JsonTestEnum[] { JsonTestEnum.Test2, JsonTestEnum.Test3 };
+            string json = JsonMapper.ToJson(arr);
+
+            JsonTestEnum[] arr2 = JsonMapper.ToObject<JsonTestEnum[]>(json);
+            if (arr2[0] != JsonTestEnum.Test2)
+                throw new Exception();
+        }
+
+        public class GenericTest<T>
+        {
+            public string name;
+            public List<T> data;
+
+            public override string ToString()
+            {
+                return $"name={name}, data=[{string.Join(", ", data)}]";
+            }
+        }
+
+        public class DataClass
+        {
+            public int code;
+            public string msg;
+            public override string ToString()
+            {
+                return $"code:{code}, msg:{msg}";
+            }
+        }
+        
+        public static void JsonTest8()
+        {
+            //T如果非热更，是可以的
+            Console.WriteLine("Generic Test where T in local");
+            GenericTest<int> g = new GenericTest<int>();
+            g.name = "intTest";
+            g.data = new List<int>()
+            {
+                0,1,2,3,4,5
+            };
+            var js = JsonMapper.ToJson(g);
+            Console.WriteLine("js:\n" + js);
+            var gObj = JsonMapper.ToObject<GenericTest<int>>(js);
+            Console.WriteLine(gObj.ToString());
+            Console.WriteLine("====================");
+
+            //T如果热更，也是可以的
+            Console.WriteLine("Generic Test where T in hotfix");
+            GenericTest<DataClass> d = new GenericTest<DataClass>();
+            d.name = "dataClassTest";
+            d.data = new List<DataClass>()
+            {
+                new DataClass()
+                {
+                    code = 200,
+                    msg="测试200"
+                },
+                new DataClass()
+                {
+                    code = 404,
+                    msg="测试404"
+                }
+            };
+            js = JsonMapper.ToJson(d);
+            Console.WriteLine("js:\n" + js);
+            var gObj2 = JsonMapper.ToObject<GenericTest<DataClass>>(js);
+            Console.WriteLine(gObj2.ToString());
+            Console.WriteLine("====================");
+        }
     }
 }

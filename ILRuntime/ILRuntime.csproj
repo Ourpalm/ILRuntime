@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_4_6</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_4_6;NO_PROFILER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,8 +35,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ILRuntim.Mono.Cecil">
-      <HintPath>..\Dependencies\ILRuntim.Mono.Cecil.dll</HintPath>
+    <Reference Include="ILRuntime.Mono.Cecil">
+      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -57,6 +57,7 @@
     <Compile Include="Other\DelegateExportAttribute.cs" />
     <Compile Include="Other\NeedAdaptorAttribute.cs" />
     <Compile Include="Other\ThreadSafeDictionary.cs" />
+    <Compile Include="Other\UncheckedStack.cs" />
     <Compile Include="Other\UncheckedList.cs" />
     <Compile Include="Reflection\Extensions.cs" />
     <Compile Include="Reflection\ILRuntimeConstructorInfo.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
     <Compile Include="Runtime\CLRBinding\BindingGeneratorExtensions.cs" />
     <Compile Include="Runtime\CLRBinding\CommonBindingGenerator.cs" />
+    <Compile Include="Runtime\CLRBinding\CLRBindingUtils.cs" />
     <Compile Include="Runtime\CLRBinding\ValueTypeBindingGenerator.cs" />
     <Compile Include="Runtime\CLRBinding\FieldBindingGenerator.cs" />
     <Compile Include="Runtime\CLRBinding\MethodBindingGenerator.cs" />

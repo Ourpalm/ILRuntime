@@ -38,8 +38,8 @@ namespace ILRuntime.Runtime.CLRBinding
             if (i.IsSpecialName)
             {
                 string[] t = i.Name.Split('_');
-                if (t[0] == "add" || t[0] == "remove")
-                    return true;
+                //if (t[0] == "add" || t[0] == "remove")
+                //    return true;
                 if (t[0] == "get" || t[0] == "set")
                 {
                     Type[] ts;
@@ -86,6 +86,8 @@ namespace ILRuntime.Runtime.CLRBinding
                 var j = param[i];
                 if (j.IsOut && j.ParameterType.IsByRef)
                     sb.Append("out ");
+                else if (j.IsIn && j.ParameterType.IsByRef)
+                    sb.Append("in ");
                 else if (j.ParameterType.IsByRef)
                     sb.Append("ref ");
                 if (isMultiArr)
@@ -170,6 +172,10 @@ namespace ILRuntime.Runtime.CLRBinding
                         }
                         else
                             throw new NotSupportedException();
+                    }
+                    else if (p.GetElementType().IsEnum)
+                    {
+                        sb.AppendLine(string.Format("            {0} @{1} = ({0})__intp.RetriveInt32(ptr_of_this_method, __mStack);", realClsName, name));
                     }
                     else
                     {
@@ -331,6 +337,12 @@ namespace ILRuntime.Runtime.CLRBinding
                 }
                 else
                     throw new NotImplementedException();
+            }
+            else if(type.IsEnum)
+            {
+                sb.AppendLine("                        ___dst->ObjectType = ObjectTypes.Integer;");
+                sb.Append("                        ___dst->Value = (int)@" + paramName);
+                sb.AppendLine(";");
             }
             else
             {

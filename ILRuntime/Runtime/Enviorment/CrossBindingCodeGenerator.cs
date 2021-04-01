@@ -21,16 +21,12 @@ namespace ILRuntime.Runtime.Enviorment
             public string Modifier;
             public string OverrideString;
         }
+
         public static string GenerateCrossBindingAdapterCode(Type baseType, string nameSpace)
         {
             StringBuilder sb = new StringBuilder();
-            MethodInfo[] methods = baseType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             List<MethodInfo> virtMethods = new List<MethodInfo>();
-            foreach (var i in methods)
-            {
-                if (i.IsVirtual || i.IsAbstract || baseType.IsInterface)
-                    virtMethods.Add(i);
-            }
+            GetMethods(baseType, virtMethods);
             string clsName, realClsName;
             bool isByRef;
             baseType.GetClassName(out clsName, out realClsName, out isByRef, true);
@@ -100,11 +96,11 @@ namespace ");
                     return instance.ToString();
                 }
                 else
-                    return instance.Type.FullName;
-            }
-        }
-    }
-}");
+                    return instance.Type.FullName;");
+            sb.AppendLine("            }");
+            sb.AppendLine("        }");
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
             return sb.ToString();
         }
 
@@ -119,10 +115,23 @@ namespace ");
                 bool isProperty = i.IsSpecialName && (i.Name.StartsWith("get_") || i.Name.StartsWith("set_"));
                 PropertyGenerateInfo pInfo = null;
                 bool isGetter = false;
+                bool isIndexFunc = false;
+                bool isByRef;
+                string clsName, realClsName;
                 StringBuilder oriBuilder = null;
+
                 if (isProperty)
                 {
                     string pName = i.Name.Substring(4);
+                    if (i.Name == "get_Item" || i.Name == "set_Item")
+                    {
+                        StringBuilder sBuilder = new StringBuilder();
+                        var p = i.GetParameters()[0];
+                        p.ParameterType.GetClassName(out clsName, out realClsName, out isByRef, true);
+                        pName = $"this [{realClsName + " " + p.Name}]";
+
+                        isIndexFunc = true;
+                    }
                     isGetter = i.Name.StartsWith("get_");
                     oriBuilder = sb;
                     sb = new StringBuilder();
@@ -146,10 +155,8 @@ namespace ");
                 }
                 var param = i.GetParameters();
                 string modifier = i.IsFamily ? "protected" : "public";
-                string overrideStr = i.DeclaringType.IsInterface ? "" : "override ";
-                string clsName, realClsName;
+                string overrideStr = i.DeclaringType.IsInterface ? "" : (i.IsFinal ? "new " : "override ");
                 string returnString = "";
-                bool isByRef;
                 if (i.ReturnType != typeof(void))
                 {
                     i.ReturnType.GetClassName(out clsName, out realClsName, out isByRef, true);
@@ -174,13 +181,16 @@ namespace ");
                     sb.AppendLine(string.Format("                if (m{0}_{1}.CheckShouldInvokeBase(this.instance))", i.Name, index));
                     if (isProperty)
                     {
+                        string baseMethodName = isIndexFunc
+                            ? $"base[{i.GetParameters()[0].Name}]"
+                            : $"base.{i.Name.Substring(4)}";
                         if (isGetter)
                         {
-                            sb.AppendLine(string.Format("                    return base.{0};", i.Name.Substring(4)));
+                            sb.AppendLine(string.Format("                    return {0};", baseMethodName));
                         }
                         else
                         {
-                            sb.AppendLine(string.Format("                    base.{0} = value;", i.Name.Substring(4)));
+                            sb.AppendLine(string.Format("                    {0} = value;", baseMethodName));
                         }
                     }
                     else
@@ -274,10 +284,28 @@ namespace ");
 
         static bool ShouldSkip(MethodInfo info)
         {
+            var paramInfos = info.GetParameters();
             if (info.Name == "ToString" || info.Name == "GetHashCode" || info.Name == "Finalize")
-                return info.GetParameters().Length == 0;
-            if (info.Name == "Equals" && info.GetParameters().Length == 1 && info.GetParameters()[0].ParameterType == typeof(object))
+                return paramInfos.Length == 0;
+            if (info.Name == "Equals" && paramInfos.Length == 1 && paramInfos[0].ParameterType == typeof(object))
                 return true;
+            if (info.IsAssembly || info.IsFamilyOrAssembly || info.IsPrivate || info.IsFinal)
+                return true;
+            if (info.GetCustomAttributes(typeof(ObsoleteAttribute), true).Length > 0)
+                return true;
+
+            for (int i = 0; i < paramInfos.Length; ++i)
+            {
+                var paramType = paramInfos[i].ParameterType;
+                if (paramType.IsPointer || paramType.IsNotPublic || paramType.IsNested && !paramType.IsNestedPublic)
+                {
+                    return true;
+                }
+            }
+            var returnType = info.ReturnType;
+            if (returnType.IsNotPublic || returnType.IsNested && !returnType.IsNestedPublic)
+                return true;
+
             return false;
         }
         static string GetParametersString(ParameterInfo[] param, Type returnType)
@@ -426,7 +454,9 @@ namespace ");
             GetParameterDefinition(sb, param, false);
             sb.AppendLine(@")
             {
-                EnsureMethod(instance);
+                EnsureMethod(instance);");
+            GenInitParams(sb, param);
+            sb.AppendLine(@"
                 if (method != null)
                 {
                     invoking = true;");
@@ -491,6 +521,73 @@ namespace ");
             }
         }");
         }
+
+        static void GetMethods(Type type, List<MethodInfo> list)
+        {
+            if (type == null)
+                return;
+
+            MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (var i in methods)
+            {
+                if ((i.IsVirtual || i.IsAbstract || type.IsInterface) && !i.ContainsGenericParameters)
+                {
+                    if (list.Any(m => IsMethodEqual(m, i)))
+                        continue;
+
+                    list.Add(i);
+                }
+            }
+
+            var interfaceArray = type.GetInterfaces();
+            if (interfaceArray != null)
+            {
+                for (int i = 0; i < interfaceArray.Length; ++i)
+                {
+                    GetMethods(interfaceArray[i], list);
+                }
+            }
+        }
+
+        static bool IsMethodEqual(MethodInfo left, MethodInfo right)
+        {
+            var leftParams = left.GetParameters();
+            var rightParams = right.GetParameters();
+            if (leftParams.Length != rightParams.Length)
+            {
+                return false;
+            }
+
+            // 有些继承了多个interface的类，且这几个interface的类有相同函数名的时候，子类实现的接口就会带上interfere的fullName
+            string leftMethodName = left.Name.Replace(left.DeclaringType.FullName, "");
+            string rightMethodName = right.Name.Replace(right.DeclaringType.FullName, "");
+            if (leftMethodName != rightMethodName)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < leftParams.Length; ++i)
+            {
+                if (leftParams[i].ParameterType != rightParams[i].ParameterType)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        static void GenInitParams(StringBuilder sb, ParameterInfo[] param)
+        {
+            foreach (var p in param)
+            {
+                if (p.IsOut)
+                {
+                    sb.AppendLine($"                    {p.Name} = default({p.ParameterType.GetElementType().FullName});");
+                }
+            }
+        }
+
         static string GetPushString(Type type, string argName)
         {
             if (type.IsPrimitive)

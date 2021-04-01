@@ -16,8 +16,6 @@ using ILRuntime.Mono.Cecil.PE;
 
 using RVA = System.UInt32;
 
-#if !READ_ONLY
-
 namespace ILRuntime.Mono.Cecil.Metadata {
 
 	sealed class TableHeapBuffer : HeapBuffer {
@@ -501,5 +499,3 @@ namespace ILRuntime.Mono.Cecil.Metadata {
 		}
 	}
 }
-
-#endif

@@ -202,6 +202,25 @@ namespace ILRuntime.Runtime.Enviorment
             hasReturn = method.ReturnType != domain.VoidType;
         }
 
+        internal void SetInvoked(StackObject* esp)
+        {
+            this.esp = esp - 1;
+            invocated = true;
+        }
+
+        internal StackObject* ESP
+        {
+            get => esp;
+            set
+            {
+                esp = value;
+            }
+        }
+
+        internal ILIntepreter Intepreter => intp;
+
+        internal IList<object> ManagedStack => mStack;
+
         public void PushBool(bool val)
         {
             PushInteger(val ? 1 : 0);

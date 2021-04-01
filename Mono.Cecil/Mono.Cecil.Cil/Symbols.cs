@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using SR = System.Reflection;
 
 using ILRuntime.Mono.Collections.Generic;
@@ -118,7 +119,12 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 
 		public Collection<ScopeDebugInformation> Scopes {
-			get { return scopes ?? (scopes = new Collection<ScopeDebugInformation> ()); }
+			get {
+				if (scopes == null)
+					Interlocked.CompareExchange (ref scopes, new Collection<ScopeDebugInformation> (), null);
+
+				return scopes;
+			}
 		}
 
 		public bool HasVariables {
@@ -126,7 +132,12 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 
 		public Collection<VariableDebugInformation> Variables {
-			get { return variables ?? (variables = new Collection<VariableDebugInformation> ()); }
+			get {
+				if (variables == null)
+					Interlocked.CompareExchange (ref variables, new Collection<VariableDebugInformation> (), null);
+
+				return variables;
+			}
 		}
 
 		public bool HasConstants {
@@ -134,7 +145,12 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 
 		public Collection<ConstantDebugInformation> Constants {
-			get { return constants ?? (constants = new Collection<ConstantDebugInformation> ()); }
+			get {
+				if (constants == null)
+					Interlocked.CompareExchange (ref constants, new Collection<ConstantDebugInformation> (), null);
+
+				return constants;
+			}
 		}
 
 		internal ScopeDebugInformation ()
@@ -191,6 +207,10 @@ namespace ILRuntime.Mono.Cecil.Cil {
 			get { return instruction == null && !offset.HasValue; }
 		}
 
+		internal bool IsResolved => instruction != null || !offset.HasValue;
+
+		internal Instruction ResolvedInstruction => instruction;
+
 		public InstructionOffset (Instruction instruction)
 		{
 			if (instruction == null)
@@ -228,6 +248,10 @@ namespace ILRuntime.Mono.Cecil.Cil {
 			}
 		}
 
+		internal bool IsResolved => variable != null;
+
+		internal VariableDefinition ResolvedVariable => variable;
+
 		public VariableIndex (VariableDefinition variable)
 		{
 			if (variable == null)
@@ -259,7 +283,12 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 
 		public Collection<CustomDebugInformation> CustomDebugInformations {
-			get { return custom_infos ?? (custom_infos = new Collection<CustomDebugInformation> ()); }
+			get {
+				if (custom_infos == null)
+					Interlocked.CompareExchange (ref custom_infos, new Collection<CustomDebugInformation> (), null);
+
+				return custom_infos;
+			}
 		}
 
 		internal DebugInformation ()
@@ -409,7 +438,13 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 
 		public Collection<ImportTarget> Targets {
-			get { return targets ?? (targets = new Collection<ImportTarget> ()); }
+			get
+			{
+				if (targets == null)
+					Interlocked.CompareExchange (ref targets, new Collection<ImportTarget> (), null);
+
+				return targets;
+			}
 		}
 
 		public ImportDebugInformation Parent {
@@ -488,11 +523,21 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 
 		public Collection<InstructionOffset> Yields {
-			get { return yields ?? (yields = new Collection<InstructionOffset> ()); }
+			get {
+				if (yields == null)
+					Interlocked.CompareExchange (ref yields, new Collection<InstructionOffset> (), null);
+
+				return yields;
+			}
 		}
 
 		public Collection<InstructionOffset> Resumes {
-			get { return resumes ?? (resumes = new Collection<InstructionOffset> ()); }
+			get {
+				if (resumes == null)
+					Interlocked.CompareExchange (ref resumes, new Collection<InstructionOffset> (), null);
+
+				return resumes;
+			}
 		}
 
 		public Collection<MethodDefinition> ResumeMethods {
@@ -641,7 +686,12 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 
 		public Collection<SequencePoint> SequencePoints {
-			get { return sequence_points ?? (sequence_points = new Collection<SequencePoint> ()); }
+			get {
+				if (sequence_points == null)
+					Interlocked.CompareExchange (ref sequence_points, new Collection<SequencePoint> (), null);
+
+				return sequence_points;
+			}
 		}
 
 		public ScopeDebugInformation Scope {
@@ -750,9 +800,8 @@ namespace ILRuntime.Mono.Cecil.Cil {
 	}
 
 	public interface ISymbolReader : IDisposable {
-#if !READ_ONLY
+
 		ISymbolWriterProvider GetWriterProvider ();
-#endif
 		bool ProcessDebugHeader (ImageDebugHeader header);
 		MethodDebugInformation Read (MethodDefinition method);
 	}
@@ -938,12 +987,18 @@ namespace ILRuntime.Mono.Cecil.Cil {
 
 			var suffix = GetSymbolNamespace (kind);
 
-			var cecil_name = typeof (SymbolProvider).Assembly ().GetName ();
+			var cecil_name = typeof(SymbolProvider).Assembly.GetName();
 
-			var name = new SR.AssemblyName {
+			var name = new SR.AssemblyName
+			{
 				Name = cecil_name.Name + "." + suffix,
 				Version = cecil_name.Version,
+
+#if NET_CORE
+				CultureName = cecil_name.CultureName,
+#else
 				CultureInfo = cecil_name.CultureInfo,
+#endif
 			};
 
 			name.SetPublicKeyToken (cecil_name.GetPublicKeyToken ());
@@ -1007,8 +1062,6 @@ namespace ILRuntime.Mono.Cecil.Cil {
 		}
 	}
 
-#if !READ_ONLY
-
 	public interface ISymbolWriter : IDisposable {
 
 		ISymbolReaderProvider GetReaderProvider ();
@@ -1041,8 +1094,6 @@ namespace ILRuntime.Mono.Cecil.Cil {
 			throw new NotSupportedException ();
 		}
 	}
-
-#endif
 }
 
 namespace ILRuntime.Mono.Cecil {

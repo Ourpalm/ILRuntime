@@ -17,7 +17,7 @@ namespace ILRuntime.Reflection
         Mono.Cecil.MethodDefinition definition;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
 
-        object[] customAttributes;
+        Attribute[] customAttributes;
         Type[] attributeTypes;
         public ILRuntimeMethodInfo(ILMethod m)
         {
@@ -34,7 +34,7 @@ namespace ILRuntime.Reflection
 
         void InitializeCustomAttribute()
         {
-            customAttributes = new object[definition.CustomAttributes.Count];
+            customAttributes = new Attribute[definition.CustomAttributes.Count];
             attributeTypes = new Type[customAttributes.Length];
             for (int i = 0; i < definition.CustomAttributes.Count; i++)
             {
@@ -42,7 +42,7 @@ namespace ILRuntime.Reflection
                 var at = appdomain.GetType(attribute.AttributeType, null, null);
                 try
                 {
-                    object ins = attribute.CreateInstance(at, appdomain);
+                    Attribute ins = attribute.CreateInstance(at, appdomain) as Attribute;
 
                     attributeTypes[i] = at.ReflectionType;
                     customAttributes[i] = ins;
@@ -59,7 +59,10 @@ namespace ILRuntime.Reflection
         {
             get
             {
-                return MethodAttributes.Public;
+                MethodAttributes ma = MethodAttributes.Public;
+                if (method.IsStatic)
+                    ma |= MethodAttributes.Static;
+                return ma;
             }
         }
 
@@ -123,7 +126,7 @@ namespace ILRuntime.Reflection
             List<object> res = new List<object>();
             for (int i = 0; i < customAttributes.Length; i++)
             {
-                if (attributeTypes[i] == attributeType)
+                if (attributeTypes[i].Equals(attributeType))
                     res.Add(customAttributes[i]);
             }
             return res.ToArray();
@@ -166,7 +169,7 @@ namespace ILRuntime.Reflection
         {
             get
             {
-                return method.ReturnType.ReflectionType;
+                return method.ReturnType?.ReflectionType;
             }
         }
     }

@@ -46,6 +46,7 @@
     <Compile Include="DelegateInnerTest.cs" />
     <Compile Include="GenericMethodTest.cs" />
     <Compile Include="JsonTest.cs" />
+    <Compile Include="StaticTest.cs" />
     <Compile Include="ReflectionTest.cs" />
     <Compile Include="InheritanceTest.cs" />
     <Compile Include="DelegateTest.cs" />

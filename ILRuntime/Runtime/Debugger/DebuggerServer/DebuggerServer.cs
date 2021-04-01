@@ -10,6 +10,7 @@ using ILRuntime.Runtime.Debugger.Protocol;
 
 namespace ILRuntime.Runtime.Debugger
 {
+#pragma warning disable
     public class DebuggerServer
     {
         public const int Version = 2;
@@ -306,7 +307,7 @@ namespace ILRuntime.Runtime.Debugger
             if (msg.IsLambda)
             {
                 ILMethod found = null;
-                foreach (var i in domain.LoadedTypes)
+                foreach (var i in domain.LoadedTypes.ToArray())
                 {
                     var vt = i.Value as ILType;
                     if (vt != null)

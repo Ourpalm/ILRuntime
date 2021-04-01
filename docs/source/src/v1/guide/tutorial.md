@@ -14,6 +14,9 @@ order: 100
 
 ILRuntime1.6版新增了Package Manager发布，使用Unity2018以上版本可以直接通过Package Manager安装，具体方法如下
 
+> 如果你使用的是`中国特别版`Unity，那直接打开Package Manager即可找到ILRuntime
+> 如果你使用的是`国际版`Unity，或者无法在PackageManager中找到ILRuntime，则需要按照以下步骤设置项目
+
 首先需要在项目的Packages/manifest.json中，添加ILRuntime的源信息，在这个文件的dependencies节点前增加以下代码
 ```json
   "scopedRegistries": [
@@ -38,6 +41,8 @@ ILRuntime包安装完毕后，在Package Manager中选中ILRuntime， 右边详�
 >示例导入工程后有可能因为没开启unsafe导致编译报错，可以在PlayerSettings中勾选Allow unsafe code解决编译问题。
 
 在Assets\Samples\ILRuntime\1.6\Demo\HotFix_Project~目录中打开热更DLL的vs工程，直接编译，然后就可以正常运行ILRuntime的Demo示例了
+
+> 如果在进行以上配置后依然无法找到ILRuntime，可以按照下面`Unity3D的示例工程`的步骤手动安装ILRuntime
 
 #### **Unity3D的示例工程**
 
