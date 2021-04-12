@@ -94,6 +94,9 @@ namespace TestCases
         {
             GenericArrayTest<ArrayTest> cls = new ArrayTest.GenericArrayTest<ArrayTest>();
             cls.Init();
+            Console.WriteLine(cls.arr.Length);
+            if (cls.arr.Length != 10)
+                throw new Exception();
         }
 
         public static void ArrayBindTest()
@@ -163,7 +166,7 @@ namespace TestCases
 		
         class GenericArrayTest<T>
         {
-            T[][] arr;
+            public T[][] arr;
             public void Init()
             {
                 arr = new T[10][];

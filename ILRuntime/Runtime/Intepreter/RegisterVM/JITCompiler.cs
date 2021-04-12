@@ -67,7 +67,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
 #if OUTPUT_JIT_RESULT
             int cnt = 1;
-            Console.WriteLine("JIT Results:");
+            Console.WriteLine($"JIT Results for{method}:");
             foreach (var b in blocks)
             {
                 Console.WriteLine($"Block {cnt++}, Instructions:{b.FinalInstructions.Count}");
@@ -324,6 +324,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Cgt:
                 case Code.Cgt_Un:
                 case Code.Ceq:
+                case Code.Ldelema:
                 case Code.Ldelem_I1:
                 case Code.Ldelem_U1:
                 case Code.Ldelem_I2:
@@ -333,6 +334,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldelem_I8:
                 case Code.Ldelem_R4:
                 case Code.Ldelem_R8:
+                case Code.Ldelem_Any:
+                case Code.Ldelem_Ref:
                     op.Register1 = (short)(baseRegIdx - 2); //explicit use dest register for optimization
                     op.Register2 = (short)(baseRegIdx - 2);
                     op.Register3 = (short)(baseRegIdx - 1);
@@ -340,6 +343,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Nop:
                 case Code.Castclass:
+                case Code.Constrained:
                     break;
                 case Code.Stloc_0:
                     op.Code = OpCodes.OpCodeREnum.Move;

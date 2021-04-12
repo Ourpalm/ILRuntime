@@ -126,12 +126,17 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Stelem_I4:
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
+                case OpCodeREnum.Stelem_Any:
+                case OpCodeREnum.Stelem_Ref:
                 case OpCodeREnum.Ldelem_I1:
                 case OpCodeREnum.Ldelem_I2:
                 case OpCodeREnum.Ldelem_I:
                 case OpCodeREnum.Ldelem_I4:
                 case OpCodeREnum.Ldelem_R4:
                 case OpCodeREnum.Ldelem_R8:
+                case OpCodeREnum.Ldelem_Ref:
+                case OpCodeREnum.Ldelem_Any:
+                case OpCodeREnum.Ldelema:
                     param = string.Format("r{0},r{1},r{2}", Register1, Register2, Register3);
                     break;
                 case OpCodeREnum.Ldc_I4_0:

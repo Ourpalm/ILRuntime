@@ -151,6 +151,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Br_S:
                 case OpCodeREnum.Br:
                 case OpCodeREnum.Nop:
+                case OpCodeREnum.Constrained:
                 case OpCodeREnum.InlineStart:
                 case OpCodeREnum.InlineEnd:
                 case OpCodeREnum.Castclass:
@@ -212,6 +213,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldelem_I8:
                 case OpCodeREnum.Ldelem_R4:
                 case OpCodeREnum.Ldelem_R8:
+                case OpCodeREnum.Ldelem_Any:
+                case OpCodeREnum.Ldelem_Ref:
+                case OpCodeREnum.Ldelema:
                     r1 = op.Register2;
                     r2 = op.Register3;
                     return true;
@@ -223,6 +227,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
                 case OpCodeREnum.Stelem_Ref:
+                case OpCodeREnum.Stelem_Any:
                     r1 = op.Register1;
                     r2 = op.Register2;
                     r3 = op.Register3;
@@ -333,6 +338,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldelem_I8:
                 case OpCodeREnum.Ldelem_R4:
                 case OpCodeREnum.Ldelem_R8:
+                case OpCodeREnum.Ldelem_Any:
+                case OpCodeREnum.Ldelem_Ref:
+                case OpCodeREnum.Ldelema:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Br_S:
@@ -362,6 +370,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Bne_Un:
                 case OpCodeREnum.Bne_Un_S:
                 case OpCodeREnum.Nop:
+                case OpCodeREnum.Constrained:
                 case OpCodeREnum.Ret:
                 case OpCodeREnum.Push:
                 case OpCodeREnum.InlineStart:
@@ -381,6 +390,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
                 case OpCodeREnum.Stelem_Ref:
+                case OpCodeREnum.Stelem_Any:
                 case OpCodeREnum.Stfld:
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Throw:
@@ -516,6 +526,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldelem_I8:
                 case OpCodeREnum.Ldelem_R4:
                 case OpCodeREnum.Ldelem_R8:
+                case OpCodeREnum.Ldelem_Any:
+                case OpCodeREnum.Ldelem_Ref:
+                case OpCodeREnum.Ldelema:
                     switch (idx)
                     {
                         case 0:
@@ -536,6 +549,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
                 case OpCodeREnum.Stelem_Ref:
+                case OpCodeREnum.Stelem_Any:
                     switch (idx)
                     {
                         case 0:
@@ -707,6 +721,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldelem_I8:
                 case OpCodeREnum.Ldelem_R4:
                 case OpCodeREnum.Ldelem_R8:
+                case OpCodeREnum.Ldelem_Any:
+                case OpCodeREnum.Ldelem_Ref:
+                case OpCodeREnum.Ldelema:
                     op.Register1 = dst;
                     break;
                 case OpCodeREnum.Br_S:
@@ -738,6 +755,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Nop:
                 case OpCodeREnum.Ret:
                 case OpCodeREnum.Push:
+                case OpCodeREnum.Constrained:
                     break;
                 default:
                     throw new NotImplementedException();

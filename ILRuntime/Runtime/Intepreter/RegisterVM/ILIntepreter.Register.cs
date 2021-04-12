@@ -24,7 +24,7 @@ namespace ILRuntime.Runtime.Intepreter
         public IList<object> ManagedStack;
     }
     public unsafe partial class ILIntepreter
-    {   
+    {
         internal StackObject* ExecuteR(ILMethod method, StackObject* esp, out bool unhandledException)
         {
 #if DEBUG
@@ -43,7 +43,7 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             OpCodeR[] body = method.BodyRegister;
             StackFrame frame;
-            stack.InitializeFrame(method, esp, out frame); 
+            stack.InitializeFrame(method, esp, out frame);
             StackObject* v1 = frame.LocalVarPointer;
             int finallyEndAddress = 0;
 
@@ -668,7 +668,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         ILType t = type as ILType;
 
-                                                        t.StaticInstance.CopyToRegister((int)ip->OperandLong,ref info, ip->Register1);
+                                                        t.StaticInstance.CopyToRegister((int)ip->OperandLong, ref info, ip->Register1);
                                                     }
                                                     else
                                                         throw new NotImplementedException();
@@ -956,7 +956,7 @@ namespace ILRuntime.Runtime.Intepreter
                             #region FieldOperation
                             case OpCodeREnum.Stfld:
                                 {
-                                    reg2 = Add(r, ip->Register2); 
+                                    reg2 = Add(r, ip->Register2);
                                     objRef = GetObjectAndResolveReference(Add(r, ip->Register1));
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
@@ -999,29 +999,29 @@ namespace ILRuntime.Runtime.Intepreter
                                                             case ObjectTypes.FieldReference:
                                                                 {
                                                                     var oldObj = mStack[objRef->Value];
-                                                                    int idx = objRef->ValueLow;
+                                                                    intVal = objRef->ValueLow;
                                                                     if (oldObj is ILTypeInstance)
                                                                     {
-                                                                        ((ILTypeInstance)oldObj)[idx] = obj;
+                                                                        ((ILTypeInstance)oldObj)[intVal] = obj;
                                                                     }
                                                                     else
                                                                     {
                                                                         var it = AppDomain.GetType(oldObj.GetType());
-                                                                        ((CLRType)it).SetFieldValue(idx, ref oldObj, obj);
+                                                                        ((CLRType)it).SetFieldValue(intVal, ref oldObj, obj);
                                                                     }
                                                                 }
                                                                 break;
                                                             case ObjectTypes.StaticFieldReference:
                                                                 {
                                                                     var it = AppDomain.GetType(objRef->Value);
-                                                                    int idx = objRef->ValueLow;
+                                                                    intVal = objRef->ValueLow;
                                                                     if (it is ILType)
                                                                     {
-                                                                        ((ILType)it).StaticInstance[idx] = obj;
+                                                                        ((ILType)it).StaticInstance[intVal] = obj;
                                                                     }
                                                                     else
                                                                     {
-                                                                        ((CLRType)it).SetStaticFieldValue(idx, obj);
+                                                                        ((CLRType)it).SetStaticFieldValue(intVal, obj);
                                                                     }
                                                                 }
                                                                 break;
@@ -1147,11 +1147,11 @@ namespace ILRuntime.Runtime.Intepreter
                                         else
                                         {
                                             CLRType t = type as CLRType;
-                                            int idx = (int)ip->OperandLong;
-                                            var f = t.GetField(idx);
+                                            intVal = (int)ip->OperandLong;
+                                            var f = t.GetField(intVal);
                                             obj = null;
-                                            if (!((CLRType)t).AssignFieldFromStack(idx, ref obj, this, reg1, mStack))
-                                                t.SetStaticFieldValue(idx, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(reg1, domain, mStack), domain)));                                            
+                                            if (!((CLRType)t).AssignFieldFromStack(intVal, ref obj, this, reg1, mStack))
+                                                t.SetStaticFieldValue(intVal, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(reg1, domain, mStack), domain)));
                                         }
                                     }
                                     else
@@ -1166,17 +1166,17 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (type is ILType)
                                         {
                                             ILType t = type as ILType;
-                                            t.StaticInstance.CopyToRegister((int)ip->OperandLong,ref info, ip->Register1);
+                                            t.StaticInstance.CopyToRegister((int)ip->OperandLong, ref info, ip->Register1);
                                         }
                                         else
                                         {
                                             CLRType t = type as CLRType;
-                                            int idx = (int)ip->OperandLong;
+                                            intVal = (int)ip->OperandLong;
                                             ret = Add(r, ip->Register1);
-                                            if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref ret, mStack))
+                                            if (!((CLRType)type).CopyFieldToStack(intVal, null, this, ref ret, mStack))
                                             {
-                                                var f = t.GetField(idx);
-                                                obj = t.GetFieldValue(idx, null);
+                                                var f = t.GetField(intVal);
+                                                obj = t.GetFieldValue(intVal, null);
                                                 if (obj is CrossBindingAdaptorType)
                                                     obj = ((CrossBindingAdaptorType)obj).ILInstance;
                                                 AssignToRegister(ref info, ip->Register1, obj, f.FieldType == typeof(object));
@@ -1191,7 +1191,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     reg1 = Add(r, ip->Register1);
                                     reg1->ObjectType = ObjectTypes.StaticFieldReference;
-                                    reg1->Value = (int)(ip->OperandLong >> 32); 
+                                    reg1->Value = (int)(ip->OperandLong >> 32);
                                     reg1->ValueLow = (int)(ip->OperandLong);
                                 }
                                 break;
@@ -1245,7 +1245,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 throw new NotImplementedException();
                                             }
-                                            esp = PushObject(esp, mStack, dele);                                            
+                                            esp = PushObject(esp, mStack, dele);
                                         }
                                         else
                                         {
@@ -1398,7 +1398,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             ILTypeInstance ins = ((ILType)type).Instantiate(false);
                                                             ins.AssignFromStack(objRef, domain, mStack);
                                                             //FreeStackValueType(obj);
-                                                            AssignToRegister(ref info, ip->Register1, ins, true); 
+                                                            AssignToRegister(ref info, ip->Register1, ins, true);
                                                         }
                                                         break;
                                                     default:
@@ -2243,7 +2243,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         ushort[] arr2 = mStack[reg1->Value] as ushort[];
-                                        if(arr2 != null)
+                                        if (arr2 != null)
                                         {
                                             arr2[reg2->Value] = (ushort)reg3->Value;
                                         }
@@ -2328,12 +2328,39 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg3 = Add(r, ip->Register3);
 
                                     Array arr = mStack[reg2->Value] as Array;
-                                    var idx = reg3->Value;
+                                    intVal = reg3->Value;
 
                                     reg1->ObjectType = ObjectTypes.ArrayReference;
                                     reg1->Value = mStack.Count;
-                                    mStack.Add(arr);
-                                    reg1->ValueLow = idx;
+                                    mStack[GetManagedStackIndex(ref info, ip->Register1)] = arr;
+                                    reg1->ValueLow = intVal;
+                                }
+                                break;
+                            case OpCodeREnum.Ldelem_Ref:
+                            case OpCodeREnum.Ldelem_Any:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register3);
+                                    Array arr = mStack[reg2->Value] as Array;
+                                    obj = arr.GetValue(reg3->Value);
+                                    if (obj is CrossBindingAdaptorType)
+                                        obj = ((CrossBindingAdaptorType)obj).ILInstance;
+
+                                    if (obj is ILTypeInstance)
+                                    {
+                                        ILTypeInstance ins = (ILTypeInstance)obj;
+                                        if (ins.Type.IsValueType && !ins.Boxed)
+                                        {
+                                            AllocValueType(reg1, ins.Type);
+                                            dst = ILIntepreter.ResolveReference(reg1);
+                                            ins.CopyValueTypeToStack(dst, mStack);
+                                        }
+                                        else
+                                            AssignToRegister(ref info, ip->Register1, obj, true);
+                                    }
+                                    else
+                                        AssignToRegister(ref info, ip->Register1, obj, !arr.GetType().GetElementType().IsPrimitive);
                                 }
                                 break;
                             case OpCodeREnum.Ldelem_I1:
@@ -2445,7 +2472,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg3 = Add(r, ip->Register3);
 
                                     long[] arr = mStack[reg2->Value] as long[];
-                                    if(arr != null)
+                                    if (arr != null)
                                     {
                                         reg1->ObjectType = ObjectTypes.Long;
                                         *(long*)(&reg1->Value) = arr[reg3->Value];
@@ -2584,7 +2611,7 @@ namespace ILRuntime.Runtime.Intepreter
                 throw new NotImplementedException();
             var v = Add(info.RegisterStart, reg);
             var idx = info.LocalManagedBase + (reg - argCnt);
-                
+
             switch (val->ObjectType)
             {
                 case ObjectTypes.Null:
@@ -2634,6 +2661,15 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+        static int GetManagedStackIndex(ref RegisterFrameInfo info, short reg)
+        {
+            var argCnt = info.ParameterCount;
+            if (reg < argCnt)
+                throw new NotImplementedException();
+
+            return info.LocalManagedBase + (reg - argCnt);
+        }
+
         internal static void AssignToRegister(ref RegisterFrameInfo info, short reg, object obj, bool isBox = false)
         {
             var argCnt = info.ParameterCount;
@@ -2645,7 +2681,7 @@ namespace ILRuntime.Runtime.Intepreter
             var dst = Add(info.RegisterStart, reg);
             if (obj != null)
             {
-                var idx = info.LocalManagedBase + (reg - argCnt);
+                var idx = GetManagedStackIndex(ref info, reg);
 
                 if (!isBox)
                 {
