@@ -12,6 +12,16 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 
 namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
+    class RegisterVMSymbolLink
+    {
+        public RegisterVMSymbol Value;
+    }
+    struct RegisterVMSymbol
+    {
+        public Instruction Instruction;
+        public ILMethod Method;
+        public RegisterVMSymbolLink ParentSymbol;
+    }
     class CodeBasicBlock
     {
         List<Instruction> instructions = new List<Instruction>();
@@ -21,7 +31,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         HashSet<CodeBasicBlock> prevBlocks = new HashSet<CodeBasicBlock>();
         HashSet<CodeBasicBlock> nextBlocks = new HashSet<CodeBasicBlock>();
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-        Dictionary<int, Instruction> instructionMapping = new Dictionary<int, Instruction>();
+        Dictionary<int, RegisterVMSymbol> instructionMapping = new Dictionary<int, RegisterVMSymbol>();
 #endif
         short endRegister = -1;
         Instruction entry;
@@ -38,7 +48,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public HashSet<CodeBasicBlock> NextBlocks { get { return nextBlocks; } }
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-        public Dictionary<int, Instruction> InstructionMapping => instructionMapping;
+        public Dictionary<int, RegisterVMSymbol> InstructionMapping => instructionMapping;
 #endif
         public short EndRegister
         {

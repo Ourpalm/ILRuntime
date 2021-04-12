@@ -7,6 +7,7 @@ using System.Reflection;
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Intepreter.RegisterVM;
 using ILRuntime.Runtime.Debugger;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Reflection;
@@ -16,7 +17,7 @@ namespace ILRuntime.CLR.Method
     {
         OpCode[] body;
         OpCodeR[] bodyRegister;
-        Dictionary<int, Mono.Cecil.Cil.Instruction> registerSymbols;
+        Dictionary<int, RegisterVMSymbol> registerSymbols;
         MethodDefinition def;
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -37,7 +38,7 @@ namespace ILRuntime.CLR.Method
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
 
-        public Dictionary<int, Mono.Cecil.Cil.Instruction> RegisterVMSymbols => registerSymbols;
+        internal Dictionary<int, RegisterVMSymbol> RegisterVMSymbols => registerSymbols;
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
 

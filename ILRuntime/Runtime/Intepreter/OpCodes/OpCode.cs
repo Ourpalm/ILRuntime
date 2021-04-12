@@ -244,6 +244,15 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                         }
                     }
                     break;
+                case OpCodeREnum.Initobj:
+                    if (domain == null)
+                        param = string.Format("r{0}, {1}", Register1, Operand);
+                    else
+                    {
+                        var type = domain.GetType(Operand);
+                        param = string.Format("r{0}, {1}", Register1, type);
+                    }
+                    break;
                 case OpCodeREnum.Newarr:
                     if (domain == null)
                         param = string.Format("r{0}, r{1}", Register1, Register2);

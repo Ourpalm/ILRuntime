@@ -161,6 +161,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
                 case OpCodeREnum.Push:
+                case OpCodeREnum.Initobj:
                 case OpCodeREnum.Throw:
                 case OpCodeREnum.Stsfld:
                     r1 = op.Register1;
@@ -373,6 +374,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Constrained:
                 case OpCodeREnum.Ret:
                 case OpCodeREnum.Push:
+                case OpCodeREnum.Initobj:
                 case OpCodeREnum.InlineStart:
                 case OpCodeREnum.InlineEnd:
                 case OpCodeREnum.Stind_I:
@@ -572,6 +574,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Push:
                 case OpCodeREnum.Throw:
                 case OpCodeREnum.Stsfld:
+                case OpCodeREnum.Initobj:
                     op.Register1 = src;
                     break;
                 case OpCodeREnum.Blt:

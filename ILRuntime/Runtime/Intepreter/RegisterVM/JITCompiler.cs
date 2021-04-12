@@ -30,10 +30,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             entryMapping = null;
         }
 
-        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, Instruction> symbols)
+        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, RegisterVMSymbol> symbols)
         {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-            symbols = new Dictionary<int, Instruction>();
+            symbols = new Dictionary<int, RegisterVMSymbol>();
 #endif
             var body = def.Body;
             short locVarRegStart = (short)def.Parameters.Count;
@@ -130,7 +130,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             }
                         }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                        Instruction oriIns;
+                        RegisterVMSymbol oriIns;
                         if (b.InstructionMapping.TryGetValue(idx, out oriIns))
                             symbols.Add(res.Count, oriIns);
 #endif
@@ -285,7 +285,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         else
                         {
                             baseRegIdx -= (short)pCnt;
-                            Optimizer.InlineMethod(block, toInline, baseRegIdx, hasRet);
+                            RegisterVMSymbolLink link = null;
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                            link = new RegisterVMSymbolLink();
+                            link.Value.Instruction = ins;
+                            link.Value.Method = method;
+#endif
+                            Optimizer.InlineMethod(block, toInline, link, baseRegIdx, hasRet);
                             if (hasRet)
                                 baseRegIdx++;
                             return;
@@ -300,6 +306,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Stsfld:
                     op.Register1 = --baseRegIdx;
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+                    break;
+                case Code.Initobj:
+                    op.Register1 = --baseRegIdx;
+                    op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Ret:
                     if (hasReturn)
@@ -558,7 +568,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     throw new NotImplementedException();
             }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-            block.InstructionMapping.Add(lst.Count, ins);
+            RegisterVMSymbol s = new RegisterVMSymbol()
+            {
+                Instruction = ins,
+                Method = method
+            };
+            block.InstructionMapping.Add(lst.Count, s);
 #endif
             lst.Add(op);
         }

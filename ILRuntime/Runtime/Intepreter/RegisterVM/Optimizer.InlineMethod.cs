@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
     partial class Optimizer
     {
         public const int MaximalInlineInstructionCount = 10;
-        public static void InlineMethod(CodeBasicBlock block, ILMethod method, short baseRegIdx, bool hasReturn)
+        public static void InlineMethod(CodeBasicBlock block, ILMethod method,RegisterVMSymbolLink symbolLink, short baseRegIdx, bool hasReturn)
         {
             var ins = block.FinalInstructions;
             var body = method.BodyRegister;
@@ -89,7 +89,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 {
                     opcode.Operand += branchOffset;
                 }
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                RegisterVMSymbol oriIns;
+                if (method.RegisterVMSymbols.TryGetValue(i, out oriIns))
+                {
+                    oriIns.ParentSymbol = symbolLink;
+                    block.InstructionMapping.Add(ins.Count, oriIns);
+                }
+#endif
                 ins.Add(opcode);
             }
 
