@@ -80,7 +80,20 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
 
-            
+#if OUTPUT_JIT_RESULT
+            cnt = 1;
+            Console.WriteLine("Optimizer Results:");
+            foreach (var b in blocks)
+            {
+                Console.WriteLine($"Block {cnt++}, Instructions:{b.FinalInstructions.Count}");
+                for (int i = 0; i < b.FinalInstructions.Count; i++)
+                {
+                    string canRemove = b.CanRemove.Contains(i) ? "(x)" : "";
+                    Console.WriteLine($"    {i}:{canRemove}{b.FinalInstructions[i].ToString(appdomain)}");
+                }
+            }
+#endif
+
             List<OpCodeR> res = new List<OpCodeR>();
             Dictionary<int, int> jumpTargets = new Dictionary<int, int>();
             int bIdx = 0;
@@ -129,6 +142,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
+#if OUTPUT_JIT_RESULT
+            Console.WriteLine("Final Results:");
+
+            for (int i = 0; i < res.Count; i++)
+            {
+                Console.WriteLine($"    {i}:{res[i].ToString(appdomain)}");
+            }
+            
+#endif
             return res.ToArray();
         }
 

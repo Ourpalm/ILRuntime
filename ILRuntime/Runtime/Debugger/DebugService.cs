@@ -101,6 +101,10 @@ namespace ILRuntime.Runtime.Debugger
             Mono.Cecil.Cil.Instruction ins = null;
             if (frames[0].Address != null)
             {
+                if (domain.EnableRegisterVM)
+                {
+                    sb.AppendLine(string.Format("JIT_{0:X}:{1}", frames[0].Address.Value, frames[0].Method.BodyRegister[frames[0].Address.Value]));
+                }
                 ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
                 sb.AppendLine(ins.ToString());
             }
