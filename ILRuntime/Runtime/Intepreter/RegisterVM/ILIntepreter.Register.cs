@@ -1934,6 +1934,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else if (type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
+                                        else
+                                            WriteNull(objRef);
                                     }
                                 }
                                 break;

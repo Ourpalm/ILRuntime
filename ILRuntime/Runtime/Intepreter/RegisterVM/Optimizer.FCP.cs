@@ -124,7 +124,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     postPropagation = false;
                                     canRemove.Add(i);
                                     ended = true;
-                                    if (!propagationInline)
+                                    //if (!propagationInline)
                                         break;
                                 }
                             }

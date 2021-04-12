@@ -38,8 +38,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         isInline = false;
                         continue;
                     }
-                    if (isInline)
-                        continue;
+                    //if (isInline)
+                    //    continue;
                     if (X.Code == OpCodeREnum.Nop)
                     {
                         canRemove.Add(i);
@@ -56,13 +56,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             continue;
                         }
                         //Only deal with stack->local
-                        if (xSrc < stackRegisterBegin || xDst >= stackRegisterBegin)
+                        if (xSrc < stackRegisterBegin/* || xDst >= stackRegisterBegin*/)
                             continue;
                         bool ended = false;
                         for (int j = i - 1; j >= 0; j--)
                         {
-                            if (canRemove.Contains(j))
-                                continue;
                             OpCodeR Y = lst[j];
 
                             short yDst;
