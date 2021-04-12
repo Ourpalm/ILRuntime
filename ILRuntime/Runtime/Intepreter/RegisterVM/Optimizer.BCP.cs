@@ -61,22 +61,52 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         bool ended = false;
                         for (int j = i - 1; j >= 0; j--)
                         {
+                            if (canRemove.Contains(j))
+                                continue;
                             OpCodeR Y = lst[j];
 
                             short yDst;
                             if (GetOpcodeDestRegister(ref Y, out yDst))
                             {
-                                if (xSrc == yDst)
-                                {
-                                    ReplaceOpcodeDest(ref Y, xDst);
-                                    canRemove.Add(i);
-                                    ended = true;
-                                    lst[j] = Y;
-                                    break;
-                                }
                                 if (xDst == yDst)
                                 {
                                     ended = true;
+                                    break;
+                                }
+                                if (xSrc == yDst)
+                                {
+                                    ReplaceOpcodeDest(ref Y, xDst);
+                                    for (int k = j + 1; k < i; k++)
+                                    {
+                                        if (canRemove.Contains(k))
+                                            continue;
+                                        OpCodeR Z = lst[k];
+                                        bool replaced = false;
+                                        short zSrc, zSrc2, zSrc3;
+                                        if (GetOpcodeSourceRegister(ref Z, hasReturn, out zSrc, out zSrc2, out zSrc3))
+                                        {
+                                            if(zSrc == yDst)
+                                            {
+                                                replaced = true;
+                                                ReplaceOpcodeSource(ref Z, 0, xDst);
+                                            }
+                                            if (zSrc2 == yDst)
+                                            {
+                                                replaced = true;
+                                                ReplaceOpcodeSource(ref Z, 1, xDst);
+                                            }
+                                            if (zSrc3 == yDst)
+                                            {
+                                                replaced = true;
+                                                ReplaceOpcodeSource(ref Z, 2, xDst);
+                                            }
+                                        }
+                                        if (replaced)
+                                            lst[k] = Z;
+                                    }
+                                    canRemove.Add(i);
+                                    ended = true;
+                                    lst[j] = Y;
                                     break;
                                 }
                             }
