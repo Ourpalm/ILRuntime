@@ -358,6 +358,63 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Sub:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) - *((long*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value - reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) - *((float*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) - *((double*)&reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Mul:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) * *((long*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value * reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) * *((float*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) * *((double*)&reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+
                             case OpCodeREnum.Div:
                                 {
                                     reg1 = Add(r, ip->Register2);
@@ -400,6 +457,220 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = (int)((uint)reg1->Value / (uint)reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Rem:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) % *((long*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value % reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) % *((float*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) % *((double*)&reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Rem_Un:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((ulong*)&reg3->Value) = *((ulong*)&reg1->Value) % *((ulong*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = (int)((uint)reg1->Value % (uint)reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Xor:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) ^ *((long*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value ^ reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.And:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) & *((long*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value & reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Or:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) | *((long*)&reg2->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value | reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Shl:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) << reg2->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value << reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Shr:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) >> reg2->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value >> reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Shr_Un:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register3);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((ulong*)&reg3->Value) = *((ulong*)&reg1->Value) >> reg2->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            *((uint*)&reg3->Value) = (uint)reg1->Value >> reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Not:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = ~*((long*)&reg1->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = ~reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Neg:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg3 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = -*((long*)&reg1->Value);
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = -reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((float*)&reg3->Value) = -*((float*)&reg1->Value);
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((double*)&reg3->Value) = -*((double*)&reg1->Value);
                                             break;
                                         default:
                                             throw new NotImplementedException();
