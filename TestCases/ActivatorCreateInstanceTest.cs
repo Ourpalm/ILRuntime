@@ -36,6 +36,14 @@ namespace TestCases
             return EqualityComparer<T>.Default.Equals(value, default);
         }
 
+        public static void ActivatorCreateInstanceWithArgsTestSimple ()
+        {
+            ActivatorCreateInstanceTestClass inst = Activator.CreateInstance<ActivatorCreateInstanceTestClass>();
+            //Console.WriteLine($"Create without args: {inst}");
+
+            if (!IsDefault(inst.IntValue))
+                throw new Exception(inst.IntValue.ToString());
+        }
         public static void ActivatorCreateInstanceWithArgsTest()
         {
             ActivatorCreateInstanceTestClass inst = Activator.CreateInstance<ActivatorCreateInstanceTestClass>();
