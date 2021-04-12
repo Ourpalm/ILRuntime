@@ -1373,6 +1373,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Box:
                                 {
+                                    reg1 = Add(r, ip->Register1);
                                     objRef = Add(r, ip->Register2);
                                     type = domain.GetType(ip->Operand);
                                     if (type != null)
@@ -1384,7 +1385,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 ILEnumTypeInstance ins = new Intepreter.ILEnumTypeInstance((ILType)type);
                                                 ins.AssignFromStack(0, objRef, AppDomain, mStack);
                                                 ins.Boxed = true;
-                                                esp = PushObject(esp, mStack, ins, true);
+                                                AssignToRegister(ref info, ip->Register1, ins, true);
                                             }
                                             else
                                             {
@@ -1397,7 +1398,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             ILTypeInstance ins = ((ILType)type).Instantiate(false);
                                                             ins.AssignFromStack(objRef, domain, mStack);
                                                             //FreeStackValueType(obj);
-                                                            esp = PushObject(esp, mStack, ins, true);
+                                                            AssignToRegister(ref info, ip->Register1, ins, true); 
                                                         }
                                                         break;
                                                     default:
@@ -1406,7 +1407,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             //Free(obj);
                                                             if (type.IsArray)
                                                             {
-                                                                esp = PushObject(esp, mStack, obj, true);
+                                                                AssignToRegister(ref info, ip->Register1, obj, true);
                                                             }
                                                             else
                                                             {
@@ -1417,11 +1418,11 @@ namespace ILRuntime.Runtime.Intepreter
                                                                     {
                                                                         ins.Boxed = true;
                                                                     }
-                                                                    esp = PushObject(esp, mStack, ins, true);
+                                                                    AssignToRegister(ref info, ip->Register1, ins, true);
                                                                 }
                                                                 else
                                                                 {
-                                                                    esp = PushNull(esp);
+                                                                    AssignToRegister(ref info, ip->Register1, null, false);
                                                                 }
                                                             }
                                                         }
@@ -1439,10 +1440,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(esp, mStack, objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, 0, true);
+                                                            AssignToRegister(ref info, ip->Register1, 0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1455,10 +1456,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(esp, mStack, (objRef->Value == 1), true);
+                                                            AssignToRegister(ref info, ip->Register1, objRef->Value == 1, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, false, true);
+                                                            AssignToRegister(ref info, ip->Register1, false, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1471,10 +1472,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(esp, mStack, (byte)objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, (byte)objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, 0L, true);
+                                                            AssignToRegister(ref info, ip->Register1, (byte)0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1487,10 +1488,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(objRef, mStack, (short)objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, (short)objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(objRef, mStack, (short)0, true);
+                                                            AssignToRegister(ref info, ip->Register1, (short)0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1503,10 +1504,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Long:
-                                                            esp = PushObject(esp, mStack, *(long*)&objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, *(long*)&objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, 0L, true);
+                                                            AssignToRegister(ref info, ip->Register1, 0L, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1519,10 +1520,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Float:
-                                                            esp = PushObject(esp, mStack, *(float*)&objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, *(float*)&objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, 0f, true);
+                                                            AssignToRegister(ref info, ip->Register1, 0f, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1535,10 +1536,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Double:
-                                                            esp = PushObject(esp, mStack, *(double*)&objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, *(double*)&objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, 0.0, true);
+                                                            AssignToRegister(ref info, ip->Register1, 0.0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1551,7 +1552,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(esp, mStack, (char)objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, (char)objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1564,10 +1565,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(esp, mStack, (uint)objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, (uint)objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, (uint)0, true);
+                                                            AssignToRegister(ref info, ip->Register1, (uint)0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1580,10 +1581,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(esp, mStack, (ushort)objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, (ushort)objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, (ushort)0, true);
+                                                            AssignToRegister(ref info, ip->Register1, (ushort)0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1596,10 +1597,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Long:
-                                                            esp = PushObject(esp, mStack, *(ulong*)&objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, *(ulong*)&objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, (ulong)0, true);
+                                                            AssignToRegister(ref info, ip->Register1, (ulong)0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1612,10 +1613,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     switch (objRef->ObjectType)
                                                     {
                                                         case ObjectTypes.Integer:
-                                                            esp = PushObject(esp, mStack, (sbyte)objRef->Value, true);
+                                                            AssignToRegister(ref info, ip->Register1, (sbyte)objRef->Value, true);
                                                             break;
                                                         case ObjectTypes.Null:
-                                                            esp = PushObject(esp, mStack, (sbyte)0, true);
+                                                            AssignToRegister(ref info, ip->Register1, (sbyte)0, true);
                                                             break;
                                                         case ObjectTypes.Object:
                                                             break;
@@ -1628,7 +1629,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else if (type.TypeForCLR.IsEnum)
                                             {
-                                                esp = PushObject(esp, mStack, Enum.ToObject(type.TypeForCLR, StackObject.ToObject(objRef, AppDomain, mStack)), true);
+                                                AssignToRegister(ref info, ip->Register1, Enum.ToObject(type.TypeForCLR, StackObject.ToObject(objRef, AppDomain, mStack)), true);
                                             }
                                             else
                                             {
@@ -1640,7 +1641,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         throw new InvalidCastException();
                                                     object ins = ((CLRType)vt).ValueTypeBinder.ToObject(dst, mStack);
                                                     FreeStackValueType(objRef);
-                                                    esp = PushObject(esp, mStack, ins, true);
+                                                    AssignToRegister(ref info, ip->Register1, ins, true);
                                                 }
                                                 //nothing to do for CLR type boxing
                                             }
@@ -1649,7 +1650,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                         throw new NullReferenceException();
 
-                                    esp = PopToRegister(ref info, ip->Register1, esp);
+                                    //esp = PopToRegister(ref info, ip->Register1, esp);
                                 }
                                 break;
                             case OpCodeREnum.Unbox:

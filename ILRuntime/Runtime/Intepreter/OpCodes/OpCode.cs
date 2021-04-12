@@ -60,6 +60,12 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
 
         public override string ToString()
         {
+
+            return ToString(null);
+        }
+
+        public string ToString(Enviorment.AppDomain domain)
+        {
             string param = null;
             switch (Code)
             {
@@ -85,7 +91,13 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     param = string.Format("r{0},r{1}", Register1, Register2);
                     break;
                 case OpCodeREnum.Box:
-                    param = string.Format("r{0},r{1},{2}", Register1, Register2, Operand);
+                    if (domain == null)
+                        param = string.Format("r{0},r{1},{2}", Register1, Register2, Operand);
+                    else
+                    {
+                        var type = domain.GetType(Operand);
+                        param = string.Format("r{0},r{1},{2}", Register1, Register2, type);
+                    }
                     break;
 
                 case OpCodeREnum.Stfld:
@@ -110,9 +122,16 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ceq:
                 case OpCodeREnum.Stelem_I1:
                 case OpCodeREnum.Stelem_I2:
+                case OpCodeREnum.Stelem_I:
                 case OpCodeREnum.Stelem_I4:
                 case OpCodeREnum.Stelem_R4:
                 case OpCodeREnum.Stelem_R8:
+                case OpCodeREnum.Ldelem_I1:
+                case OpCodeREnum.Ldelem_I2:
+                case OpCodeREnum.Ldelem_I:
+                case OpCodeREnum.Ldelem_I4:
+                case OpCodeREnum.Ldelem_R4:
+                case OpCodeREnum.Ldelem_R8:
                     param = string.Format("r{0},r{1},r{2}", Register1, Register2, Register3);
                     break;
                 case OpCodeREnum.Ldc_I4_0:
@@ -134,10 +153,21 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                    param = string.Format("r{0}, {1}", Register1, Operand);
+                    break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Newobj:
-                    param = string.Format("r{0}, {1}", Register1, Operand);
+                    if (domain == null)
+                        param = string.Format("r{0}, {1}", Register1, Operand);
+                    else
+                    {
+                        IMethod m = domain.GetMethod(Operand);
+                        if (m is CLR.Method.CLRMethod)
+                            param = m != null ? string.Format("r{0}, {1}::{2}", Register1, m.DeclearingType.FullName, m) : string.Format("r{0}, {1}", Register1, Operand);
+                        else
+                            param = m != null ? string.Format("r{0}, {1}", Register1, m) : string.Format("r{0}, {1}", Register1, Operand);
+                    }
                     break;
                 case OpCodeREnum.Blt:
                 case OpCodeREnum.Blt_S:
@@ -179,11 +209,44 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     param = string.Format("r{0},{1}", Register1, OperandDouble);
                     break;
                 case OpCodeREnum.Ldstr:
+                    if (domain == null)
+                        param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
+                    else
+                        param = string.Format("r{0},\"{1}\"", Register1, domain.GetString(OperandLong));
+                    break;
                 case OpCodeREnum.Ldtoken:
-                    param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
+                    if (domain == null)
+                        param = string.Format("r{0},0x{1:X}", Register1, OperandLong);
+                    else
+                    {
+                        switch (Operand)
+                        {
+                            case 0:
+                                {
+                                    var type = domain.GetType((int)(OperandLong >> 32));
+                                    int fieldIdx = (int)OperandLong;
+                                    param = string.Format("r{0},{1}.{2}", Register1, type.FullName, (type is CLR.TypeSystem.ILType) ? ((CLR.TypeSystem.ILType)type).TypeDefinition.Fields[fieldIdx].Name : ((CLR.TypeSystem.CLRType)type).Fields[fieldIdx].Name);                                    
+                                }
+                                break;
+                            case 1:
+                                {
+                                    var type = domain.GetType((int)OperandLong);
+                                    param = string.Format("r{0},\"{1}\"", Register1, type);
+                                }
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
                     break;
                 case OpCodeREnum.Newarr:
-                    param = string.Format("r{0}, r{1}", Register1, Register2);
+                    if (domain == null)
+                        param = string.Format("r{0}, r{1}", Register1, Register2);
+                    else
+                    {
+                        var type = domain.GetType(Operand);
+                        param = string.Format("r{0}, {2}, r{1}", Register1, Register2, type);
+                    }
                     break;
             }
             return string.Format("{0} {1}", Code.ToString().ToLower().Replace('_', '.'), param);

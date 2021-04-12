@@ -63,6 +63,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 i.EndRegister = baseRegIdx;
             }
 
+#if OUTPUT_JIT_RESULT
+            int cnt = 1;
+            Console.WriteLine("JIT Results:");
+            foreach (var b in blocks)
+            {
+                Console.WriteLine($"Block {cnt++}, Instructions:{b.FinalInstructions.Count}");
+                for(int i = 0; i < b.FinalInstructions.Count; i++)
+                {
+                    Console.WriteLine($"    {i}:{b.FinalInstructions[i].ToString(appdomain)}");
+                }
+            }
+#endif
+
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
