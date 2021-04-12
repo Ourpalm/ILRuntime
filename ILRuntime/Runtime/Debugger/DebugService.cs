@@ -103,10 +103,14 @@ namespace ILRuntime.Runtime.Debugger
             {
                 if (domain.EnableRegisterVM)
                 {
-                    sb.AppendLine(string.Format("JIT_{0:X}:{1}", frames[0].Address.Value, frames[0].Method.BodyRegister[frames[0].Address.Value]));
+                    frames[0].Method.RegisterVMSymbols.TryGetValue(frames[0].Address.Value, out ins);
+                    sb.AppendLine(string.Format("{0}(JIT_{1:X}:{2})", ins, frames[0].Address.Value, frames[0].Method.BodyRegister[frames[0].Address.Value]));
                 }
-                ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
-                sb.AppendLine(ins.ToString());
+                else
+                {
+                    ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
+                    sb.AppendLine(ins.ToString());
+                }
             }
             for (int i = 0; i < frames.Length; i++)
             {
@@ -115,7 +119,10 @@ namespace ILRuntime.Runtime.Debugger
                 string document = "";
                 if (f.Address != null)
                 {
-                    ins = m.Definition.Body.Instructions[f.Address.Value];
+                    if (domain.EnableRegisterVM)
+                        f.Method.RegisterVMSymbols.TryGetValue(f.Address.Value, out ins);
+                    else
+                        ins = m.Definition.Body.Instructions[f.Address.Value];
                     
                     var seq = FindSequencePoint(ins, m.Definition.DebugInformation.GetSequencePointMapping());
                     if (seq != null)

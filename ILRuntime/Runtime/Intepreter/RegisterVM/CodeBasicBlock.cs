@@ -20,6 +20,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         HashSet<int> pendingCP = new HashSet<int>();
         HashSet<CodeBasicBlock> prevBlocks = new HashSet<CodeBasicBlock>();
         HashSet<CodeBasicBlock> nextBlocks = new HashSet<CodeBasicBlock>();
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+        Dictionary<int, Instruction> instructionMapping = new Dictionary<int, Instruction>();
+#endif
         short endRegister = -1;
         Instruction entry;
         public List<Instruction> Instructions { get { return instructions; } }
@@ -34,6 +37,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         public HashSet<CodeBasicBlock> NextBlocks { get { return nextBlocks; } }
 
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+        public Dictionary<int, Instruction> InstructionMapping => instructionMapping;
+#endif
         public short EndRegister
         {
             get

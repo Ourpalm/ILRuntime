@@ -30,8 +30,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             entryMapping = null;
         }
 
-        public OpCodeR[] Compile(out int stackRegisterCnt)
+        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, Instruction> symbols)
         {
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+            symbols = new Dictionary<int, Instruction>();
+#endif
             var body = def.Body;
             short locVarRegStart = (short)def.Parameters.Count;
             if (!def.IsStatic)
@@ -43,7 +46,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
             foreach(var i in blocks)
             {
-                var lst = i.FinalInstructions;
                 baseRegIdx = baseRegStart;
                 if (i.PreviousBlocks.Count > 0)
                 {
@@ -58,7 +60,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 foreach (var ins in i.Instructions)
                 {
-                    Translate(lst, ins, locVarRegStart, ref baseRegIdx);
+                    Translate(i, ins, locVarRegStart, ref baseRegIdx);
                 }
                 i.EndRegister = baseRegIdx;
             }
@@ -127,6 +129,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 inlinedBranches.Add(res.Count);
                             }
                         }
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                        Instruction oriIns;
+                        if (b.InstructionMapping.TryGetValue(idx, out oriIns))
+                            symbols.Add(res.Count, oriIns);
+#endif
                         res.Add(ins);
                     }
                 }
@@ -154,8 +161,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             return res.ToArray();
         }
 
-        void Translate(List<OpCodeR> lst, Instruction ins, short locVarRegStart, ref short baseRegIdx)
+        void Translate(CodeBasicBlock block, Instruction ins, short locVarRegStart, ref short baseRegIdx)
         {
+            List<OpCodeR> lst = block.FinalInstructions;
             OpCodeR op = new OpCodeR();
             var code = ins.OpCode;
             var token = ins.Operand;
@@ -277,7 +285,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         else
                         {
                             baseRegIdx -= (short)pCnt;
-                            Optimizer.InlineMethod(lst, toInline, baseRegIdx, hasRet);
+                            Optimizer.InlineMethod(block, toInline, baseRegIdx, hasRet);
                             if (hasRet)
                                 baseRegIdx++;
                             return;
@@ -545,6 +553,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 default:
                     throw new NotImplementedException();
             }
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+            block.InstructionMapping.Add(lst.Count, ins);
+#endif
             lst.Add(op);
         }
 

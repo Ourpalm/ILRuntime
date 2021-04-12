@@ -16,6 +16,7 @@ namespace ILRuntime.CLR.Method
     {
         OpCode[] body;
         OpCodeR[] bodyRegister;
+        Dictionary<int, Mono.Cecil.Cil.Instruction> registerSymbols;
         MethodDefinition def;
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -35,6 +36,8 @@ namespace ILRuntime.CLR.Method
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
+
+        public Dictionary<int, Mono.Cecil.Cil.Instruction> RegisterVMSymbols => registerSymbols;
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
 
@@ -385,7 +388,7 @@ namespace ILRuntime.CLR.Method
                 if (appdomain.EnableRegisterVM)
                 {
                     Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
-                    bodyRegister = jit.Compile(out stackRegisterCnt);
+                    bodyRegister = jit.Compile(out stackRegisterCnt, out registerSymbols);
                 }
                 else
                 {
@@ -420,9 +423,11 @@ namespace ILRuntime.CLR.Method
                     exceptionHandler[i] = e;
                     //Mono.Cecil.Cil.ExceptionHandlerType.
                 }
-                //Release Method body to save memory
                 variables = def.Body.Variables;
+#if !DEBUG || DISABLE_ILRUNTIME_DEBUG
+                //Release Method body to save memory
                 def.Body = null;
+#endif
             }
             else
                 body = new OpCode[0];

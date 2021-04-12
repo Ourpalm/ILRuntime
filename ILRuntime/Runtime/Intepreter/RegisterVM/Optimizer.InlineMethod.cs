@@ -15,8 +15,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
     partial class Optimizer
     {
         public const int MaximalInlineInstructionCount = 10;
-        public static void InlineMethod(List<OpCodeR> ins, ILMethod method, short baseRegIdx, bool hasReturn)
+        public static void InlineMethod(CodeBasicBlock block, ILMethod method, short baseRegIdx, bool hasReturn)
         {
+            var ins = block.FinalInstructions;
             var body = method.BodyRegister;
             OpCodeR start = new OpCodeR();
             start.Code = OpCodeREnum.InlineStart;
