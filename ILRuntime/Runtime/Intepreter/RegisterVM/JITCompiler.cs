@@ -84,7 +84,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
 #if OUTPUT_JIT_RESULT
             cnt = 1;
-            Console.WriteLine("Optimizer Results for {method}:");
+            Console.WriteLine($"Optimizer Results for {method}:");
             foreach (var b in blocks)
             {
                 Console.WriteLine($"Block {cnt++}, Instructions:{b.FinalInstructions.Count}");
@@ -150,7 +150,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
 #if OUTPUT_JIT_RESULT
-            Console.WriteLine("Final Results for {method}:");
+            Console.WriteLine($"Final Results for {method}:");
 
             for (int i = 0; i < res.Count; i++)
             {
