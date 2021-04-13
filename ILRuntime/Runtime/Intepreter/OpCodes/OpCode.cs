@@ -92,21 +92,25 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarga:
                 case OpCodeREnum.Ldarga_S:
-                    param = string.Format("r{0},r{1}", Register1, Register2);
+                    param = string.Format("r{0}, r{1}", Register1, Register2);
                     break;
                 case OpCodeREnum.Box:
                     if (domain == null)
-                        param = string.Format("r{0},r{1},{2}", Register1, Register2, Operand);
+                        param = string.Format("r{0}, r{1}, {2}", Register1, Register2, Operand);
                     else
                     {
                         var type = domain.GetType(Operand);
-                        param = string.Format("r{0},r{1},{2}", Register1, Register2, type);
+                        param = string.Format("r{0}, r{1}, {2}", Register1, Register2, type);
                     }
                     break;
 
                 case OpCodeREnum.Stfld:
                 case OpCodeREnum.Ldfld:
-                    param = string.Format("r{0},r{1},0x{2:X8}", Register1, Register2, OperandLong);
+                    param = string.Format("r{0}, r{1}, 0x{2:X8}", Register1, Register2, OperandLong);
+                    break;
+                case OpCodeREnum.Stsfld:
+                case OpCodeREnum.Ldsfld:
+                    param = string.Format("r{0}, 0x{1:X8}", Register1, OperandLong);
                     break;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
@@ -184,6 +188,21 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                             param = m != null ? string.Format("r{0}, {1}::{2}", Register1, m.DeclearingType.FullName, m) : string.Format("r{0}, {1}", Register1, Operand2);
                         else
                             param = m != null ? string.Format("r{0}, {1}", Register1, m) : string.Format("r{0}, {1}", Register1, Operand2);
+                    }
+                    break;
+
+                case OpCodeREnum.Ldvirtftn:
+                    if (domain == null)
+                    {
+                        param = string.Format("r{0}, r{1} {2}", Register1, Register2, Operand2);
+                    }
+                    else
+                    {
+                        IMethod m = domain.GetMethod(Operand2);
+                        if (m is CLR.Method.CLRMethod)
+                            param = m != null ? string.Format("r{0}, r{1}, {2}::{3}", Register1, Register2, m.DeclearingType.FullName, m) : string.Format("r{0}, r{1}, {2}", Register1, Register2, Operand2);
+                        else
+                            param = m != null ? string.Format("r{0}, r{1}, {2}", Register1, Register2, m) : string.Format("r{0}, r{1}, {2}", Register1, Register2, Operand2);
                     }
                     break;
                 case OpCodeREnum.Call:

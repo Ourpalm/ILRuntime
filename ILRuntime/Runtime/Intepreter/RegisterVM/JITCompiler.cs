@@ -264,11 +264,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             {
                                 case 1:
                                     op.Register2 = (short)(baseRegIdx - 1);
-                                    op.Register3 = -1;
-                                    op.Register4 = -1;
                                     break;
                                 case 2:
-                                    op.Register4 = -1;
                                     op.Register3 = (short)(baseRegIdx - 1);
                                     op.Register2 = (short)(baseRegIdx - 2);
                                     break;
@@ -306,11 +303,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 {
                                     case 1:
                                         op.Register2 = (short)(baseRegIdx - 1);
-                                        op.Register3 = -1;
-                                        op.Register4 = -1;
                                         break;
                                     case 2:
-                                        op.Register4 = -1;
                                         op.Register3 = (short)(baseRegIdx - 1);
                                         op.Register2 = (short)(baseRegIdx - 2);
                                         break;
@@ -629,11 +623,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
                 case Code.Ldvirtftn:
                     {
-                        op.Register1 = (short)(baseRegIdx - 1);
-                        op.Register2 = (short)(baseRegIdx - 1);
                         bool hasReturn, canInline;
                         ILMethod toInline;
                         InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline);
+                        op.Register1 = (short)(baseRegIdx - 1);
+                        op.Register2 = (short)(baseRegIdx - 1);
                     }
                     break;
                 case Code.Pop:
