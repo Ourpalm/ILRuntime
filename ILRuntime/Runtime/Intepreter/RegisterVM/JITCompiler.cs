@@ -14,6 +14,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     struct JITCompiler
     {
+        public const int CallRegisterParamCount = 3;
         Enviorment.AppDomain appdomain;
         ILType declaringType;
         ILMethod method;
@@ -249,12 +250,34 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         bool canInline;
                         ILMethod toInline;
                         var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
-                        for (int i = pCnt; i > 0; i--)
+                        int pushCnt = Math.Max(pCnt - CallRegisterParamCount, 0);
+                        for (int i = pCnt; i > pCnt - pushCnt; i--)
                         {
                             OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
                             op2.Code = OpCodes.OpCodeREnum.Push;
                             op2.Register1 = (short)(baseRegIdx - i);
                             lst.Add(op2);
+                        }
+                        if (pushCnt < pCnt)
+                        {
+                            switch (pCnt - pushCnt)
+                            {
+                                case 1:
+                                    op.Register2 = (short)(baseRegIdx - 1);
+                                    op.Register3 = -1;
+                                    op.Register4 = -1;
+                                    break;
+                                case 2:
+                                    op.Register4 = -1;
+                                    op.Register3 = (short)(baseRegIdx - 1);
+                                    op.Register2 = (short)(baseRegIdx - 2);
+                                    break;
+                                case 3:
+                                    op.Register4 = (short)(baseRegIdx - 1);
+                                    op.Register3 = (short)(baseRegIdx - 2);
+                                    op.Register2 = (short)(baseRegIdx - 3);
+                                    break;
+                            }
                         }
                         baseRegIdx -= (short)pCnt;
                         op.Register1 = baseRegIdx++;
@@ -269,18 +292,42 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
                         if (!canInline)
                         {
-                            for (int i = pCnt; i > 0; i--)
+                            int pushCnt = Math.Max(pCnt - CallRegisterParamCount, 0);
+                            for (int i = pCnt; i > pCnt - pushCnt; i--)
                             {
                                 OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
                                 op2.Code = OpCodes.OpCodeREnum.Push;
                                 op2.Register1 = (short)(baseRegIdx - i);
                                 lst.Add(op2);
                             }
+                            if (pushCnt < pCnt)
+                            {
+                                switch(pCnt - pushCnt)
+                                {
+                                    case 1:
+                                        op.Register2 = (short)(baseRegIdx - 1);
+                                        op.Register3 = -1;
+                                        op.Register4 = -1;
+                                        break;
+                                    case 2:
+                                        op.Register4 = -1;
+                                        op.Register3 = (short)(baseRegIdx - 1);
+                                        op.Register2 = (short)(baseRegIdx - 2);
+                                        break;
+                                    case 3:
+                                        op.Register4 = (short)(baseRegIdx - 1);
+                                        op.Register3 = (short)(baseRegIdx - 2);
+                                        op.Register2 = (short)(baseRegIdx - 3);
+                                        break;
+                                }
+                            }
 
                             baseRegIdx -= (short)pCnt;
 
                             if (hasRet)
                                 op.Register1 = baseRegIdx++;
+                            else
+                                op.Register1 = -1;
                         }
                         else
                         {
@@ -329,6 +376,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Mul_Ovf_Un:
                 case Code.Div:
                 case Code.Div_Un:
+                case Code.Rem:
+                case Code.Rem_Un:
+                case Code.Shr:
+                case Code.Shr_Un:
+                case Code.Shl:
+                case Code.Xor:
+                case Code.Or:
+                case Code.And:
                 case Code.Clt:
                 case Code.Clt_Un:
                 case Code.Cgt:
@@ -435,6 +490,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     if (def.HasThis)
                     {
                         op.Register2++;
+                    }
+                    break;
+                case Code.Starg:
+                case Code.Starg_S:
+                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Register2 = --baseRegIdx;
+                    op.Register1 = (short)((ParameterDefinition)ins.Operand).Index;
+                    if (def.HasThis)
+                    {
+                        op.Register1++;
                     }
                     break;
                 case Code.Newarr:
@@ -596,12 +661,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             var m = appdomain.GetMethod(token, declaringType, method, out invalidToken);
             toInline = null;
             canInline = false;
+            op.Register2 = -1;
+            op.Register3 = -1;
+            op.Register4 = -1;
             if (m != null)
             {
                 if (invalidToken)
-                    op.Operand = m.GetHashCode();
+                    op.Operand2 = m.GetHashCode();
                 else
-                    op.Operand = token.GetHashCode();
+                    op.Operand2 = token.GetHashCode();
                 pCnt = m.ParameterCount;
                 if (!m.IsStatic && op.Code != OpCodeREnum.Newobj)
                     pCnt++;
@@ -626,7 +694,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 pCnt = _ref.HasParameters ? _ref.Parameters.Count : 0;
                 if (_ref.HasThis)
                     pCnt++;
-                op.Operand2 = pCnt;
+                op.Operand3 = pCnt;
                 hasReturn = false;
             }
             return pCnt;

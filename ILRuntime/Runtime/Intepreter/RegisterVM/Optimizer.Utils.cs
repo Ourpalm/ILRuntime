@@ -142,14 +142,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldc_R4:
                 case OpCodeREnum.Ldc_R8:
                 case OpCodeREnum.Ldstr:
-                case OpCodeREnum.Callvirt:
-                case OpCodeREnum.Call:
-                case OpCodeREnum.Newobj:
                 case OpCodeREnum.Ldtoken:
                 case OpCodeREnum.Ldftn:
                 case OpCodeREnum.Ldsfld:
                 case OpCodeREnum.Ldsflda:
                     return false;
+                case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Call:
+                case OpCodeREnum.Newobj:
+                    r1 = op.Register2;
+                    r2 = op.Register3;
+                    r3 = op.Register4;
+                    return true;
                 case OpCodeREnum.Br_S:
                 case OpCodeREnum.Br:
                 case OpCodeREnum.Nop:
@@ -202,6 +206,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Mul_Ovf_Un:
                 case OpCodeREnum.Div:
                 case OpCodeREnum.Div_Un:
+                case OpCodeREnum.Rem:
+                case OpCodeREnum.Rem_Un:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Shl:
+                case OpCodeREnum.Shr:
+                case OpCodeREnum.Shr_Un:
                 case OpCodeREnum.Clt:
                 case OpCodeREnum.Clt_Un:
                 case OpCodeREnum.Cgt:
@@ -413,6 +425,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Mul_Ovf_Un:
                 case OpCodeREnum.Div:
                 case OpCodeREnum.Div_Un:
+                case OpCodeREnum.Rem:
+                case OpCodeREnum.Rem_Un:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Shl:
+                case OpCodeREnum.Shr:
+                case OpCodeREnum.Shr_Un:
                 case OpCodeREnum.Clt:
                 case OpCodeREnum.Clt_Un:
                 case OpCodeREnum.Cgt:
@@ -520,6 +540,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Mul_Ovf_Un:
                 case OpCodeREnum.Div:
                 case OpCodeREnum.Div_Un:
+                case OpCodeREnum.Rem:
+                case OpCodeREnum.Rem_Un:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Shl:
+                case OpCodeREnum.Shr:
+                case OpCodeREnum.Shr_Un:
                 case OpCodeREnum.Clt:
                 case OpCodeREnum.Clt_Un:
                 case OpCodeREnum.Cgt:
@@ -568,6 +596,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             break;
                         case 2:
                             op.Register3 = src;
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                    break;
+                case OpCodeREnum.Call:
+                case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Newobj:
+
+                    switch (idx)
+                    {
+                        case 0:
+                            op.Register2 = src;
+                            break;
+                        case 1:
+                            op.Register3 = src;
+                            break;
+                        case 2:
+                            op.Register4 = src;
                             break;
                         default:
                             throw new NotSupportedException();
@@ -655,6 +702,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Mul_Ovf_Un:
                 case OpCodeREnum.Div:
                 case OpCodeREnum.Div_Un:
+                case OpCodeREnum.Rem:
+                case OpCodeREnum.Rem_Un:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Shl:
+                case OpCodeREnum.Shr:
+                case OpCodeREnum.Shr_Un:
                 case OpCodeREnum.Clt:
                 case OpCodeREnum.Clt_Un:
                 case OpCodeREnum.Cgt:

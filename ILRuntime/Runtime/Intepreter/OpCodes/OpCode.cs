@@ -42,13 +42,13 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         [FieldOffset(6)]
         public short Register2;
         [FieldOffset(8)]
-        public int Operand;
-        [FieldOffset(8)]
-        public float OperandFloat;
-        [FieldOffset(8)]
         public short Register3;
         [FieldOffset(10)]
         public short Register4;
+        [FieldOffset(8)]
+        public int Operand;
+        [FieldOffset(8)]
+        public float OperandFloat;
         [FieldOffset(12)]
         public int Operand2;
         [FieldOffset(16)]
@@ -57,6 +57,8 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public long OperandLong;
         [FieldOffset(12)]
         public double OperandDouble;
+        [FieldOffset(20)]
+        public int Operand4;
 
         public override string ToString()
         {
@@ -117,6 +119,14 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Mul_Ovf_Un:
                 case OpCodeREnum.Div:
                 case OpCodeREnum.Div_Un:
+                case OpCodeREnum.Rem:
+                case OpCodeREnum.Rem_Un:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Shl:
+                case OpCodeREnum.Shr:
+                case OpCodeREnum.Shr_Un:
                 case OpCodeREnum.Clt:
                 case OpCodeREnum.Clt_Un:
                 case OpCodeREnum.Cgt:
@@ -165,15 +175,25 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Newobj:
+                    string retR = Register1 >= 0 ? "r" + Register1 : "-";
+                    if (Register2 >= 0)
+                        retR += ", r" + Register2;
+                    if (Register3 >= 0)
+                        retR += ", r" + Register3;
+                    if (Register4 >= 0)
+                        retR += ", r" + Register4;
+
                     if (domain == null)
-                        param = string.Format("r{0}, {1}", Register1, Operand);
+                    {
+                        param = string.Format("{0}, {1}", retR, Operand2);
+                    }
                     else
                     {
-                        IMethod m = domain.GetMethod(Operand);
+                        IMethod m = domain.GetMethod(Operand2);
                         if (m is CLR.Method.CLRMethod)
-                            param = m != null ? string.Format("r{0}, {1}::{2}", Register1, m.DeclearingType.FullName, m) : string.Format("r{0}, {1}", Register1, Operand);
+                            param = m != null ? string.Format("{0}, {1}::{2}", retR, m.DeclearingType.FullName, m) : string.Format("{0}, {1}", retR, Operand2);
                         else
-                            param = m != null ? string.Format("r{0}, {1}", Register1, m) : string.Format("r{0}, {1}", Register1, Operand);
+                            param = m != null ? string.Format("{0}, {1}", retR, m) : string.Format("{0}, {1}", retR, Operand2);
                     }
                     break;
                 case OpCodeREnum.Blt:

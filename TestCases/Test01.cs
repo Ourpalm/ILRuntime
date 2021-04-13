@@ -58,6 +58,15 @@ namespace TestCases
             }
             sw.Stop();
             Console.WriteLine(string.Format("cps:{0:0}, result={1}", (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
+
+            sw.Restart();
+            cnt = 0;
+            for (int i = 0; i < 1000000; i++)
+            {
+                cnt += ILRuntimeTest.TestFramework.TestClass2.Add(i, 2);
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("cps:{0:0}, result={1}", (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
         }
 
         public static int UnitTest_PerformanceSimple()

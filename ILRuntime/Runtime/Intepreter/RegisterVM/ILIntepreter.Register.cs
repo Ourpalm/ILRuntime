@@ -27,6 +27,7 @@ namespace ILRuntime.Runtime.Intepreter
     {
         internal StackObject* ExecuteR(ILMethod method, StackObject* esp, out bool unhandledException)
         {
+            
 #if DEBUG
             if (method == null)
                 throw new NullReferenceException();
@@ -1104,11 +1105,11 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Call:
                             case OpCodeREnum.Callvirt:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand);
+                                    IMethod m = domain.GetMethod(ip->Operand2);
                                     if (m == null)
                                     {
                                         //Irrelevant method
-                                        int cnt = ip->Operand2;
+                                        int cnt = Math.Max(ip->Operand3 - RegisterVM.JITCompiler.CallRegisterParamCount, 0);
                                         //Balance the stack
                                         for (int i = 0; i < cnt; i++)
                                         {
@@ -1118,6 +1119,27 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
+                                        intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
+                                        intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
+                                        for (int i = 0; i < intVal; i++)
+                                        {
+                                            switch (i)
+                                            {
+                                                case 0:
+                                                    reg1 = Add(r, ip->Register2);
+                                                    break;
+                                                case 1:
+                                                    reg1 = Add(r, ip->Register3);
+                                                    break;
+                                                case 2:
+                                                    reg1 = Add(r, ip->Register4);
+                                                    break;
+                                                default:
+                                                    throw new NotSupportedException();
+                                            }
+                                            CopyToStack(esp, reg1, mStack);
+                                            esp++;
+                                        }
                                         if (m is ILMethod)
                                         {
                                             ILMethod ilm = (ILMethod)m;
@@ -1479,7 +1501,28 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Initialization & Instantiation
                             case OpCodeREnum.Newobj:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand);
+                                    IMethod m = domain.GetMethod(ip->Operand2);
+                                    intVal = m.ParameterCount;
+                                    intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
+                                    for (int i = 0; i < intVal; i++)
+                                    {
+                                        switch (i)
+                                        {
+                                            case 0:
+                                                reg1 = Add(r, ip->Register2);
+                                                break;
+                                            case 1:
+                                                reg1 = Add(r, ip->Register3);
+                                                break;
+                                            case 2:
+                                                reg1 = Add(r, ip->Register4);
+                                                break;
+                                            default:
+                                                throw new NotSupportedException();
+                                        }
+                                        CopyToStack(esp, reg1, mStack);
+                                        esp++;
+                                    }
                                     if (m is ILMethod)
                                     {
                                         type = m.DeclearingType as ILType;

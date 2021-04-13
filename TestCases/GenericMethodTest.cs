@@ -328,6 +328,7 @@ namespace TestCases
             GenericMethodTest12Sub(new int[] { 3 }, k => {
                 k = k + 2;//error;
                 k = k << 2;//error;
+                Console.WriteLine($"k={k}");
             });
         }
 
