@@ -213,12 +213,20 @@ namespace ILRuntime.Runtime.Intepreter
                         switch (code)
                         {
                             #region Arguments and Local Variable
-                            case OpCodeREnum.Ldarg:
+                            /*case OpCodeREnum.Ldarg:
                             case OpCodeREnum.Ldarg_S:
                                 {
                                     reg1 = Add(r, ip->Register2);
                                     CopyToRegister(ref info, ip->Register1, reg1);
                                 }
+                                break;*/
+                            case OpCodeREnum.Ldarga:
+                            case OpCodeREnum.Ldarga_S:
+                                reg1 = Add(r, ip->Register2);
+                                reg2 = Add(r, ip->Register1);
+                                
+                                reg2->ObjectType = ObjectTypes.StackObjectReference;
+                                *(long*)&reg2->Value = (long)reg1;
                                 break;
                             #endregion
                             #region Load Constants
@@ -1100,7 +1108,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (m == null)
                                     {
                                         //Irrelevant method
-                                        int cnt = (int)ip->OperandLong;
+                                        int cnt = ip->Operand2;
                                         //Balance the stack
                                         for (int i = 0; i < cnt; i++)
                                         {

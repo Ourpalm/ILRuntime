@@ -88,6 +88,8 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Stind_R8:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldarga:
+                case OpCodeREnum.Ldarga_S:
                     param = string.Format("r{0},r{1}", Register1, Register2);
                     break;
                 case OpCodeREnum.Box:

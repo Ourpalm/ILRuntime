@@ -420,6 +420,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = (short)(code.Code - (Code.Ldarg_0));
                     break;
                 case Code.Ldarg_S:
+                    op.Code = OpCodes.OpCodeREnum.Move;
+                    op.Register1 = baseRegIdx++;
+                    op.Register2 = (short)((ParameterDefinition)ins.Operand).Index;
+                    if (def.HasThis)
+                    {
+                        op.Register2++;
+                    }
+                    break;
+                case Code.Ldarga:
+                case Code.Ldarga_S:
                     op.Register1 = baseRegIdx++;
                     op.Register2 = (short)((ParameterDefinition)ins.Operand).Index;
                     if (def.HasThis)
@@ -565,7 +575,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     baseRegIdx--;
                     return;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(string.Format("Unknown Opcode:{0}", code.Code));
             }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             RegisterVMSymbol s = new RegisterVMSymbol()
@@ -616,7 +626,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 pCnt = _ref.HasParameters ? _ref.Parameters.Count : 0;
                 if (_ref.HasThis)
                     pCnt++;
-                op.OperandLong = pCnt;
+                op.Operand2 = pCnt;
                 hasReturn = false;
             }
             return pCnt;
