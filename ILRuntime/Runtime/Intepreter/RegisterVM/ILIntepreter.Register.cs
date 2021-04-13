@@ -1502,26 +1502,29 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Newobj:
                                 {
                                     IMethod m = domain.GetMethod(ip->Operand2);
-                                    intVal = m.ParameterCount;
-                                    intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
-                                    for (int i = 0; i < intVal; i++)
+                                    if (m != null)
                                     {
-                                        switch (i)
+                                        intVal = m.ParameterCount;
+                                        intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
+                                        for (int i = 0; i < intVal; i++)
                                         {
-                                            case 0:
-                                                reg1 = Add(r, ip->Register2);
-                                                break;
-                                            case 1:
-                                                reg1 = Add(r, ip->Register3);
-                                                break;
-                                            case 2:
-                                                reg1 = Add(r, ip->Register4);
-                                                break;
-                                            default:
-                                                throw new NotSupportedException();
+                                            switch (i)
+                                            {
+                                                case 0:
+                                                    reg1 = Add(r, ip->Register2);
+                                                    break;
+                                                case 1:
+                                                    reg1 = Add(r, ip->Register3);
+                                                    break;
+                                                case 2:
+                                                    reg1 = Add(r, ip->Register4);
+                                                    break;
+                                                default:
+                                                    throw new NotSupportedException();
+                                            }
+                                            CopyToStack(esp, reg1, mStack);
+                                            esp++;
                                         }
-                                        CopyToStack(esp, reg1, mStack);
-                                        esp++;
                                     }
                                     if (m is ILMethod)
                                     {

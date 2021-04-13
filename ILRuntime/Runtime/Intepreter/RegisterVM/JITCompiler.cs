@@ -686,7 +686,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 //Cannot find method or the method is dummy
                 MethodReference _ref = (MethodReference)token;
                 pCnt = _ref.HasParameters ? _ref.Parameters.Count : 0;
-                if (_ref.HasThis)
+                if (_ref.HasThis && op.Code != OpCodeREnum.Newobj)
                     pCnt++;
                 op.Operand3 = pCnt;
                 hasReturn = false;
