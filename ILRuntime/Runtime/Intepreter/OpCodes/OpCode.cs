@@ -172,6 +172,20 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Brfalse_S:
                     param = string.Format("r{0}, {1}", Register1, Operand);
                     break;
+                case OpCodeREnum.Ldftn:
+                    if (domain == null)
+                    {
+                        param = string.Format("r{0}, {1}", Register1, Operand2);
+                    }
+                    else
+                    {
+                        IMethod m = domain.GetMethod(Operand2);
+                        if (m is CLR.Method.CLRMethod)
+                            param = m != null ? string.Format("r{0}, {1}::{2}", Register1, m.DeclearingType.FullName, m) : string.Format("r{0}, {1}", Register1, Operand2);
+                        else
+                            param = m != null ? string.Format("r{0}, {1}", Register1, m) : string.Format("r{0}, {1}", Register1, Operand2);
+                    }
+                    break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Newobj:

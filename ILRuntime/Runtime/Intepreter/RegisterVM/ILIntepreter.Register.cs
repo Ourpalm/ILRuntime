@@ -2353,13 +2353,13 @@ namespace ILRuntime.Runtime.Intepreter
 
                             case OpCodeREnum.Ldftn:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand);
+                                    IMethod m = domain.GetMethod(ip->Operand2);
                                     AssignToRegister(ref info, ip->Register1, m);
                                 }
                                 break;
                             case OpCodeREnum.Ldvirtftn:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand);
+                                    IMethod m = domain.GetMethod(ip->Operand2);
                                     objRef = Add(r, ip->Register2);
                                     if (m is ILMethod)
                                     {

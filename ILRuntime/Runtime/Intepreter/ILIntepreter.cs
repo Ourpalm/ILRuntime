@@ -5275,6 +5275,10 @@ namespace ILRuntime.Runtime.Intepreter
                     ((CLRType)vt).ValueTypeBinder.CopyValueTypeToStack(obj, dst, mStack);
                 }
             }
+            else if(obj == null)
+            {
+                return;
+            }
             else if (obj is int)
             {
                 esp->ObjectType = ObjectTypes.Integer;
