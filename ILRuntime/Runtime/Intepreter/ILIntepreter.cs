@@ -5164,7 +5164,10 @@ namespace ILRuntime.Runtime.Intepreter
                     object obj = p[i];
                     if (obj is CrossBindingAdaptorType)
                         obj = ((CrossBindingAdaptorType)obj).ILInstance;
-                    esp = ILIntepreter.PushObject(esp, mStack, obj, isBox);
+                    var res = ILIntepreter.PushObject(esp, mStack, obj, isBox);
+                    if (esp->ObjectType < ObjectTypes.Object && domain.EnableRegisterVM)
+                        mStack.Add(null);
+                    esp = res;
                 }
             }
             return esp;

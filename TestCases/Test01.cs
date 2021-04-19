@@ -52,14 +52,8 @@ namespace TestCases
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             int cnt = 0;
-            label:
             for (int i = 0; i < 1000000; i++)
             {
-                if (cnt > 1000)
-                    break;
-                if (cnt > 100)
-                    goto label;
-
                 cnt += Add(i, 2);
             }
             sw.Stop();

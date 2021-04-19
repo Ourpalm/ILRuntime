@@ -17,6 +17,7 @@ namespace ILRuntime.Runtime.Intepreter
     unsafe struct RegisterFrameInfo
     {
         public ILIntepreter Intepreter;
+        public int FrameManagedBase;
         public int LocalManagedBase;
         public int ParameterCount;
         public int LocalCount;
@@ -74,12 +75,12 @@ namespace ILRuntime.Runtime.Intepreter
                 var a = Add(r, i);
                 switch (a->ObjectType)
                 {
-                    case ObjectTypes.Null:
+                    /*case ObjectTypes.Null:
                         //Need to reserve place for null, in case of starg
                         a->ObjectType = ObjectTypes.Object;
                         a->Value = mStack.Count;
                         mStack.Add(null);
-                        break;
+                        break;*/
                     case ObjectTypes.ValueTypeObjectReference:
                         //CloneStackValueType(a, a, mStack);
                         break;
@@ -90,11 +91,14 @@ namespace ILRuntime.Runtime.Intepreter
                             if (i > 0 || !method.HasThis)//this instance should not be cloned
                                 mStack[a->Value] = CheckAndCloneValueType(mStack[a->Value], AppDomain);
                         }
-                        frame.ManagedStackBase--;
                         break;
                 }
             }
+            frame.ManagedStackBase -= paramCnt;
+            if (frame.ManagedStackBase < 0)
+            {
 
+            }
             stack.PushFrame(ref frame);
 
             int locBase = mStack.Count;
@@ -104,6 +108,7 @@ namespace ILRuntime.Runtime.Intepreter
             info.Intepreter = this;
             info.LocalCount = locCnt;
             info.LocalManagedBase = locBase;
+            info.FrameManagedBase = frame.ManagedStackBase;
             info.ParameterCount = paramCnt;
             info.RegisterStart = r;
             info.ManagedStack = mStack;
@@ -846,6 +851,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     reg1 = Add(r, ip->Register1);
                                     CopyToStack(esp, reg1, mStack);
+                                    if (ip->Operand == 1)
+                                        mStack.Add(null);
                                     esp++;
                                 }
                                 break;
@@ -1310,6 +1317,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
                                         intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
+                                        bool isILMethod = m is ILMethod;
                                         for (int i = 0; i < intVal; i++)
                                         {
                                             switch (i)
@@ -1327,9 +1335,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                     throw new NotSupportedException();
                                             }
                                             CopyToStack(esp, reg1, mStack);
+                                            if(isILMethod && reg1->ObjectType< ObjectTypes.Object)
+                                            {
+                                                mStack.Add(null);
+                                            }
                                             esp++;
                                         }
-                                        if (m is ILMethod)
+                                        if (isILMethod)
                                         {
                                             ILMethod ilm = (ILMethod)m;
                                             bool processed = false;
@@ -1778,12 +1790,18 @@ namespace ILRuntime.Runtime.Intepreter
                                             else
                                             {
                                                 obj = ((ILType)type).Instantiate(false);
+#if DEBUG
+                                                if (obj == null)
+                                                    throw new NullReferenceException();
+#endif
                                                 objRef = PushObject(esp, mStack, obj);//this parameter for constructor
                                             }
                                             esp = objRef;
                                             for (int i = 0; i < m.ParameterCount; i++)
                                             {
                                                 CopyToStack(esp, reg1 + i, mStack);
+                                                if (esp->ObjectType < ObjectTypes.Object)
+                                                    mStack.Add(null);
                                                 esp++;
                                             }
                                             esp = ExecuteR((ILMethod)m, esp, out unhandledException);
@@ -3273,10 +3291,8 @@ namespace ILRuntime.Runtime.Intepreter
             if (mStackSrc == null)
                 mStackSrc = mStack;
 
-            if (reg < argCnt)
-                throw new NotImplementedException();
             var v = Add(info.RegisterStart, reg);
-            var idx = info.LocalManagedBase + (reg - argCnt);
+            var idx = info.FrameManagedBase + reg;
 
             switch (val->ObjectType)
             {
@@ -3330,10 +3346,8 @@ namespace ILRuntime.Runtime.Intepreter
         static int GetManagedStackIndex(ref RegisterFrameInfo info, short reg)
         {
             var argCnt = info.ParameterCount;
-            if (reg < argCnt)
-                throw new NotImplementedException();
-
-            return info.LocalManagedBase + (reg - argCnt);
+            
+            return info.FrameManagedBase + reg;
         }
 
         internal static void AssignToRegister(ref RegisterFrameInfo info, short reg, object obj, bool isBox = false)

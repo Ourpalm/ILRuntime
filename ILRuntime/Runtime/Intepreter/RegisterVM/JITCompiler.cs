@@ -247,9 +247,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Newobj:
                     {
-                        bool canInline;
+                        bool canInline, isILMethod;
                         ILMethod toInline;
-                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
+                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline, out isILMethod);
                         int pushCnt = Math.Max(pCnt - CallRegisterParamCount, 0);
                         for (int i = pCnt; i > pCnt - pushCnt; i--)
                         {
@@ -283,9 +283,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Call:
                 case Code.Callvirt:
                     {
-                        bool canInline;
+                        bool canInline, isILMethod;
                         ILMethod toInline;
-                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline);
+                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline, out isILMethod);
 
                         if (!canInline)
                         {
@@ -294,6 +294,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             {
                                 OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
                                 op2.Code = OpCodes.OpCodeREnum.Push;
+                                op2.Operand = isILMethod ? 1 : 0;
                                 op2.Register1 = (short)(baseRegIdx - i);
                                 lst.Add(op2);
                             }
@@ -617,17 +618,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldftn:
                     {
                         op.Register1 = baseRegIdx++;
-                        bool hasReturn, canInline;
+                        bool hasReturn, canInline, isILMethod;
                         ILMethod toInline;
-                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline);
+                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline, out isILMethod);
                     }
                     break;
 
                 case Code.Ldvirtftn:
                     {
-                        bool hasReturn, canInline;
+                        bool hasReturn, canInline, isILMethod;
                         ILMethod toInline;
-                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline);
+                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline, out isILMethod);
                         op.Register1 = (short)(baseRegIdx - 1);
                         op.Register2 = (short)(baseRegIdx - 1);
                     }
@@ -650,7 +651,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
 
         
-        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline, out ILMethod toInline)
+        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline, out ILMethod toInline, out bool isILMethod)
         {
             bool invalidToken;
             int pCnt = 0;
@@ -670,8 +671,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 if (!m.IsStatic && op.Code != OpCodeREnum.Newobj)
                     pCnt++;
                 hasReturn = m.ReturnType != appdomain.VoidType;
-                if(m is ILMethod)
+                if (m is ILMethod)
                 {
+                    isILMethod = !m.IsDelegateInvoke;
                     if (!m.IsConstructor && !((ILMethod)m).IsVirtual)
                     {
                         var body = ((ILMethod)m).BodyRegister;
@@ -682,9 +684,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                     }
                 }
+                else
+                    isILMethod = false;
             }
             else
             {
+                isILMethod = false;
                 //Cannot find method or the method is dummy
                 MethodReference _ref = (MethodReference)token;
                 pCnt = _ref.HasParameters ? _ref.Parameters.Count : 0;
