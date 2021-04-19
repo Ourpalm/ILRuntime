@@ -868,7 +868,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldind_U4:
                                 {
                                     reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    dst = Add(r, ip->Register1);
                                     val = GetObjectAndResolveReference(reg1);
                                     switch (val->ObjectType)
                                     {
@@ -877,8 +877,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                //LoadFromFieldReference(instance, idx, reg2, mStack);
-                                                throw new NotImplementedException();
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
                                             }
                                             break;
                                         case ObjectTypes.ArrayReference:
@@ -886,19 +885,121 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                //LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
-
-                                                throw new NotImplementedException();
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
                                             }
                                             break;
                                         default:
                                             {
-                                                reg2->ObjectType = ObjectTypes.Integer;
-                                                reg2->Value = val->Value;
-                                                reg2->ValueLow = 0;
+                                                dst->ObjectType = ObjectTypes.Integer;
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = 0;
                                             }
                                             break;
                                     }
+                                }
+                                break;
+                            case OpCodeREnum.Ldind_I8:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    dst = Add(r, ip->Register1);
+                                    val = GetObjectAndResolveReference(reg1);
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Long;
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldind_R4:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    dst = Add(r, ip->Register1);
+                                    val = GetObjectAndResolveReference(reg1);
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->ObjectType = ObjectTypes.Float;
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = 0;
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldind_R8:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    dst = Add(r, ip->Register1);
+                                    val = GetObjectAndResolveReference(reg1);
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var instance = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                *dst = *val;
+                                                dst->ObjectType = ObjectTypes.Double;
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldind_Ref:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    val = GetObjectAndResolveReference(reg1);
+                                    CopyToRegister(ref info, ip->Register1, val);
                                 }
                                 break;
                             case OpCodeREnum.Stind_I:
@@ -914,14 +1015,14 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         case ObjectTypes.FieldReference:
                                             {
-                                                //StoreValueToFieldReference(mStack[dst->Value], dst->ValueLow, val, mStack);
-                                                throw new NotImplementedException();
+                                                obj = mStack[dst->Value];
+                                                StoreValueToFieldReference(ref obj, dst->ValueLow, reg1, mStack);
+                                                mStack[dst->Value] = obj;
                                             }
                                             break;
                                         case ObjectTypes.ArrayReference:
                                             {
-                                                //StoreValueToArrayReference(dst, val, mStack[dst->Value].GetType().GetElementType(), mStack);
-                                                throw new NotImplementedException();
+                                                StoreValueToArrayReference(dst, reg1, mStack[dst->Value].GetType().GetElementType(), mStack);
                                             }
                                             break;
                                         default:
@@ -930,9 +1031,97 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             break;
                                     }
-                                    /*Free(esp - 1);
+                                }
+                                break;
+                            case OpCodeREnum.Stind_I8:
+                                {
+                                    val = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    dst = GetObjectAndResolveReference(reg2);
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                obj = mStack[dst->Value];
+                                                StoreValueToFieldReference(ref obj, dst->ValueLow, val, mStack);
+                                                mStack[dst->Value] = obj;
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, typeof(long), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = val->ValueLow;
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stind_R8:
+                                {
+                                    val = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    dst = GetObjectAndResolveReference(reg2);
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                obj = mStack[dst->Value];
+                                                StoreValueToFieldReference(ref obj, dst->ValueLow, val, mStack);
+                                                mStack[dst->Value] = obj;
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, typeof(double), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                dst->Value = val->Value;
+                                                dst->ValueLow = val->ValueLow;
+                                            }
+                                            break;
+                                    }
+
+                                    Free(esp - 1);
                                     Free(esp - 1 - 1);
-                                    esp = esp - 1 - 1;*/
+                                    esp = esp - 1 - 1;
+                                }
+                                break;
+                            case OpCodeREnum.Stind_Ref:
+                                {
+                                    val = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    dst = GetObjectAndResolveReference(reg2);
+                                    switch (dst->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                obj = mStack[dst->Value];
+                                                StoreValueToFieldReference(ref obj, dst->ValueLow, val, mStack);
+                                                mStack[dst->Value] = obj;
+                                            }
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                StoreValueToArrayReference(dst, val, typeof(object), mStack);
+                                            }
+                                            break;
+                                        default:
+                                            {
+                                                CopyToRegister(ref info, ip->Register1, val);
+                                            }
+                                            break;
+                                    }
+
+                                    Free(esp - 1);
+                                    Free(esp - 1 - 1);
+                                    esp = esp - 1 - 1;
                                 }
                                 break;
                             case OpCodeREnum.Ldtoken:

@@ -527,6 +527,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Stind_I8:
                 case Code.Stind_R4:
                 case Code.Stind_R8:
+                case Code.Stind_Ref:
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 2;
@@ -574,6 +575,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldind_U1:
                 case Code.Ldind_U2:
                 case Code.Ldind_U4:
+                case Code.Ldind_Ref:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     break;

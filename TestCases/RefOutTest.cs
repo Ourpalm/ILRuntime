@@ -57,8 +57,10 @@ namespace TestCases
 
         public static void UnitTest_RefOutNull()
         {
-            A aaa;
+            A aaa = new A(123);
             TryGet(out aaa);
+            if (aaa != null)
+                throw new Exception();
         }
         public static void UnitTest_Typeof()
         {
