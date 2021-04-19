@@ -336,8 +336,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 AssignToRegister(ref info, ip->Register1, AppDomain.GetString(ip->OperandLong));
                                 break;
                             case OpCodeREnum.Ldnull:
-                                reg1 = Add(r, ip->Register1);
-                                WriteNull(reg1);
+                                //reg1 = Add(r, ip->Register1);
+                                AssignToRegister(ref info, ip->Register1, null, true);
+                                //WriteNull(reg1);
                                 break;
                             #endregion
 
@@ -1189,7 +1190,17 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         default:
                                             {
-                                               CopyToAddress(ref info, dst, val);
+                                                switch (val->ObjectType)
+                                                {
+                                                    case ObjectTypes.Object:
+                                                        mStack[dst->Value] = mStack[val->Value];
+                                                        break;
+                                                    case ObjectTypes.Null:
+                                                        mStack[dst->Value] = null;
+                                                        break;
+                                                    default:
+                                                        throw new NotImplementedException();
+                                                }
                                             }
                                             break;
                                     }
@@ -3443,15 +3454,16 @@ namespace ILRuntime.Runtime.Intepreter
             var mStack = info.ManagedStack;
 
             var v = Add(info.RegisterStart, reg);
-            var idx = info.FrameManagedBase + reg;
+            var idx = GetManagedStackIndex(ref info, reg);
 
             CopySub(val, v, idx, mStack, mStackSrc);
         }
 
+#if NET_4_6 || NET_STANDARD_2_0
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         static int GetManagedStackIndex(ref RegisterFrameInfo info, short reg)
         {
-            var argCnt = info.ParameterCount;
-            
             return info.FrameManagedBase + reg;
         }
 
@@ -3461,13 +3473,11 @@ namespace ILRuntime.Runtime.Intepreter
             var mStack = info.ManagedStack;
             var locCnt = info.LocalCount;
 
-            if (reg < argCnt)
-                throw new NotImplementedException();
             var dst = Add(info.RegisterStart, reg);
+            var idx = GetManagedStackIndex(ref info, reg);
             if (obj != null)
             {
-                var idx = GetManagedStackIndex(ref info, reg);
-
+            
                 if (!isBox)
                 {
                     var typeFlags = obj.GetType().GetTypeFlags();
@@ -3497,7 +3507,9 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else
             {
-                WriteNull(dst);
+                dst->ObjectType = ObjectTypes.Object;
+                dst->Value = idx;
+                mStack[idx] = null;
             }
         }
 

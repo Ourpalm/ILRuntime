@@ -846,7 +846,10 @@ namespace ILRuntime.Runtime.Enviorment
                     }
                 }
                 bool unhandled;
-                ret = intp.Execute(ilmethod, esp, out unhandled);
+                if (domain.EnableRegisterVM)
+                    ret = intp.ExecuteR(ilmethod, esp, out unhandled);
+                else
+                    ret = intp.Execute(ilmethod, esp, out unhandled);
                 ILRuntimeMethodInfo imi = (ILRuntimeMethodInfo)instance;
                 var rt = imi.ILMethod.ReturnType;
                 if (rt != domain.VoidType)
