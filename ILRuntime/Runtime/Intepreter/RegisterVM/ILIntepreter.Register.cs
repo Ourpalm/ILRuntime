@@ -1645,7 +1645,6 @@ namespace ILRuntime.Runtime.Intepreter
                                                 if (type != null)
                                                 {
                                                     var token = (int)ip->OperandLong;
-                                                    ret = Add(r, ip->Register1);
                                                     if (!((CLRType)type).CopyFieldToStack(token, obj, this, ref esp, mStack))
                                                     {
                                                         var ft = ((CLRType)type).GetField(token);
@@ -1742,8 +1741,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             CLRType t = type as CLRType;
                                             intVal = (int)ip->OperandLong;
-                                            ret = Add(r, ip->Register1);
-                                            if (!((CLRType)type).CopyFieldToStack(intVal, null, this, ref ret, mStack))
+                                            if (!((CLRType)type).CopyFieldToStack(intVal, null, this, ref esp, mStack))
                                             {
                                                 var f = t.GetField(intVal);
                                                 obj = t.GetFieldValue(intVal, null);
