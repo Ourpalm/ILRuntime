@@ -96,6 +96,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
                 case OpCodeREnum.Ldind_I4:
+                case OpCodeREnum.Ldind_I8:
                 case OpCodeREnum.Ldind_R4:
                 case OpCodeREnum.Ldind_R8:
                 case OpCodeREnum.Ldind_U1:
@@ -328,6 +329,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
                 case OpCodeREnum.Ldind_I4:
+                case OpCodeREnum.Ldind_I8:
                 case OpCodeREnum.Ldind_R4:
                 case OpCodeREnum.Ldind_R8:
                 case OpCodeREnum.Ldind_U1:
@@ -494,6 +496,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
                 case OpCodeREnum.Ldind_I4:
+                case OpCodeREnum.Ldind_I8:
                 case OpCodeREnum.Ldind_R4:
                 case OpCodeREnum.Ldind_R8:
                 case OpCodeREnum.Ldind_U1:
@@ -764,6 +767,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
                 case OpCodeREnum.Ldind_I4:
+                case OpCodeREnum.Ldind_I8:
                 case OpCodeREnum.Ldind_R4:
                 case OpCodeREnum.Ldind_R8:
                 case OpCodeREnum.Ldind_U1:
