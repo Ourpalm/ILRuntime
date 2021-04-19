@@ -952,7 +952,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                                LoadFromFieldReferenceToRegister(ref info, instance, idx, ip->Register1);
                                             }
                                             break;
                                         case ObjectTypes.ArrayReference:
@@ -986,7 +986,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                                LoadFromFieldReferenceToRegister(ref info, instance, idx, ip->Register1);
                                             }
                                             break;
                                         case ObjectTypes.ArrayReference:
@@ -1019,7 +1019,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                                LoadFromFieldReferenceToRegister(ref info, instance, idx, ip->Register1);
                                             }
                                             break;
                                         case ObjectTypes.ArrayReference:
@@ -1053,7 +1053,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                LoadFromFieldReference(instance, idx, dst, mStack);
+                                                LoadFromFieldReferenceToRegister(ref info, instance, idx, ip->Register1);
                                             }
                                             break;
                                         case ObjectTypes.ArrayReference:
@@ -3353,6 +3353,29 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp);
+        }
+
+        void LoadFromFieldReferenceToRegister(ref RegisterFrameInfo info, object obj, int idx, short reg)
+        {
+            if (obj is ILTypeInstance)
+            {
+                ((ILTypeInstance)obj).CopyToRegister(idx, ref info, reg);
+            }
+            else
+            {
+                CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
+                StackObject so;
+                StackObject* esp = &so;
+                var mStack = info.ManagedStack;
+                if (!t.CopyFieldToStack(idx, obj, this, ref esp, mStack))
+                {
+                    AssignToRegister(ref info, reg, t.GetFieldValue(idx, obj));
+                }
+                else
+                {
+                    PopToRegister(ref info, reg, esp);
+                }
+            }
         }
 
         void CopySub(StackObject* val, StackObject* v, int idx, IList<object> mStack, IList<object> mStackSrc = null)
