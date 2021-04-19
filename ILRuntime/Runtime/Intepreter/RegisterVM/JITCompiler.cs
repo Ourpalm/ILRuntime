@@ -533,6 +533,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register2 = (short)(baseRegIdx - 1);
                     baseRegIdx -= 2;
                     break;
+                case Code.Stobj:
+                    op.Register1 = (short)(baseRegIdx - 2);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    baseRegIdx -= 2;
+                    break;
                 case Code.Conv_I:
                 case Code.Conv_I1:
                 case Code.Conv_I2:
@@ -579,6 +585,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldind_Ref:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
+                    break;
+                case Code.Ldobj:
+                    op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Ldfld:
                 case Code.Ldflda:

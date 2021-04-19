@@ -212,8 +212,8 @@ namespace ILRuntime.CLR.Method
                 if (bodyRegister == null)
                     InitCodeBody();
                 return bodyRegister;
-			}
-		}
+            }
+        }
 
         public bool HasBody
         {

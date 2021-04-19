@@ -83,6 +83,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ldind_U2:
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldind_Ref:
+                case OpCodeREnum.Ldobj:
                 case OpCodeREnum.Stind_I:
                 case OpCodeREnum.Stind_I1:
                 case OpCodeREnum.Stind_I2:
@@ -91,6 +92,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Stind_R4:
                 case OpCodeREnum.Stind_R8:
                 case OpCodeREnum.Stind_Ref:
+                case OpCodeREnum.Stobj:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarga:

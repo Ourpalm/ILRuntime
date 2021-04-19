@@ -21,6 +21,7 @@ namespace ILRuntime.Runtime.Intepreter
         public int LocalManagedBase;
         public int ParameterCount;
         public int LocalCount;
+        public StackObject* StackBase;
         public StackObject* RegisterStart;
         public IList<object> ManagedStack;
     }
@@ -95,10 +96,6 @@ namespace ILRuntime.Runtime.Intepreter
                 }
             }
             frame.ManagedStackBase -= paramCnt;
-            if (frame.ManagedStackBase < 0)
-            {
-
-            }
             stack.PushFrame(ref frame);
 
             int locBase = mStack.Count;
@@ -106,6 +103,7 @@ namespace ILRuntime.Runtime.Intepreter
             int stackRegCnt = method.StackRegisterCount;
             RegisterFrameInfo info;
             info.Intepreter = this;
+            info.StackBase = stack.StackBase;
             info.LocalCount = locCnt;
             info.LocalManagedBase = locBase;
             info.FrameManagedBase = frame.ManagedStackBase;
@@ -866,6 +864,76 @@ namespace ILRuntime.Runtime.Intepreter
                                     *(long*)&reg2->Value = (long)reg1;
                                 }
                                 break;
+                            case OpCodeREnum.Ldobj:
+                                {
+                                    reg1 = Add(r, ip->Register2);
+                                    reg2 = Add(r, ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var t = AppDomain.GetType(ip->Operand);
+                                                obj = mStack[reg1->Value];
+                                                var idx = reg1->ValueLow;
+                                                intVal = GetManagedStackIndex(ref info, ip->Register1);
+                                                LoadFromArrayReference(obj, idx, reg2, t, mStack, intVal);
+                                            }
+                                            break;
+                                        case ObjectTypes.StackObjectReference:
+                                            {
+                                                CopyToRegister(ref info, ip->Register1, GetObjectAndResolveReference(reg1));
+                                            }
+                                            break;
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                obj = mStack[reg1->Value];
+                                                int idx = reg1->ValueLow;
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    ((ILTypeInstance)obj).CopyToRegister(idx, ref info, ip->Register1);
+                                                }
+                                                else
+                                                {
+                                                    type = AppDomain.GetType(ip->Operand);
+                                                    if (!((CLRType)type).CopyFieldToStack(idx, obj, this, ref esp, mStack))
+                                                    {
+                                                        obj = ((CLRType)type).GetFieldValue(idx, obj);
+                                                        AssignToRegister(ref info, ip->Register1, obj);                                                        
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(reg1->Value);
+                                                int idx = reg1->ValueLow;
+                                                if (type is ILType)
+                                                {
+                                                    ((ILType)type).StaticInstance.CopyToRegister(idx, ref info, ip->Register1);
+                                                }
+                                                else
+                                                {
+                                                    if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref esp, mStack))
+                                                    {
+                                                        obj = ((CLRType)type).GetFieldValue(idx, null);
+                                                        AssignToRegister(ref info, ip->Register1, obj);
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Ldind_I:
                             case OpCodeREnum.Ldind_I1:
                             case OpCodeREnum.Ldind_I2:
@@ -892,7 +960,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                                intVal = GetManagedStackIndex(ref info, ip->Register1);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack, intVal);
                                             }
                                             break;
                                         default:
@@ -925,7 +994,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                                intVal = GetManagedStackIndex(ref info, ip->Register1);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack, intVal);
                                             }
                                             break;
                                         default:
@@ -957,6 +1027,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
+                                                intVal = GetManagedStackIndex(ref info, ip->Register1);
                                                 LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
                                             }
                                             break;
@@ -990,7 +1061,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = mStack[val->Value];
                                                 var idx = val->ValueLow;
                                                 //Free(dst);
-                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
+                                                intVal = GetManagedStackIndex(ref info, ip->Register1);
+                                                LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack, intVal);
                                             }
                                             break;
                                         default:
@@ -1094,10 +1166,6 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             break;
                                     }
-
-                                    Free(esp - 1);
-                                    Free(esp - 1 - 1);
-                                    esp = esp - 1 - 1;
                                 }
                                 break;
                             case OpCodeREnum.Stind_Ref:
@@ -1121,14 +1189,10 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         default:
                                             {
-                                                CopyToRegister(ref info, ip->Register1, val);
+                                               CopyToAddress(ref info, dst, val);
                                             }
                                             break;
                                     }
-
-                                    Free(esp - 1);
-                                    Free(esp - 1 - 1);
-                                    esp = esp - 1 - 1;
                                 }
                                 break;
                             case OpCodeREnum.Ldtoken:
@@ -1582,7 +1646,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     var token = (int)ip->OperandLong;
                                                     ret = Add(r, ip->Register1);
-                                                    if (!((CLRType)type).CopyFieldToStack(token, obj, this, ref ret, mStack))
+                                                    if (!((CLRType)type).CopyFieldToStack(token, obj, this, ref esp, mStack))
                                                     {
                                                         var ft = ((CLRType)type).GetField(token);
                                                         obj = ((CLRType)type).GetFieldValue(token, obj);
@@ -1590,6 +1654,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                             obj = ((CrossBindingAdaptorType)obj).ILInstance;
 
                                                         AssignToRegister(ref info, ip->Register1, obj, ft.FieldType == typeof(object));
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
                                                     }
                                                 }
                                                 else
@@ -1682,6 +1750,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                 if (obj is CrossBindingAdaptorType)
                                                     obj = ((CrossBindingAdaptorType)obj).ILInstance;
                                                 AssignToRegister(ref info, ip->Register1, obj, f.FieldType == typeof(object));
+                                            }
+                                            else
+                                            {
+                                                esp = PopToRegister(ref info, ip->Register1, esp);
                                             }
                                         }
                                     }
@@ -3283,17 +3355,10 @@ namespace ILRuntime.Runtime.Intepreter
             return stack.PopFrame(ref frame, esp);
         }
 
-        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, IList<object> mStackSrc = null)
+        void CopySub(StackObject* val, StackObject* v, int idx, IList<object> mStack, IList<object> mStackSrc = null)
         {
-            var argCnt = info.ParameterCount;
-            var mStack = info.ManagedStack;
-            var locCnt = info.LocalCount;
             if (mStackSrc == null)
                 mStackSrc = mStack;
-
-            var v = Add(info.RegisterStart, reg);
-            var idx = info.FrameManagedBase + reg;
-
             switch (val->ObjectType)
             {
                 case ObjectTypes.Null:
@@ -3341,6 +3406,25 @@ namespace ILRuntime.Runtime.Intepreter
                     mStack[idx] = null;
                     break;
             }
+        }
+
+        internal void CopyToAddress(ref RegisterFrameInfo info, StackObject* dst, StackObject* val)
+        {
+            var mStack = info.ManagedStack;
+            var idx = (dst - info.StackBase);
+
+            CopySub(val, dst, (int)idx, mStack);
+        }
+
+
+        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, IList<object> mStackSrc = null)
+        {
+            var mStack = info.ManagedStack;
+
+            var v = Add(info.RegisterStart, reg);
+            var idx = info.FrameManagedBase + reg;
+
+            CopySub(val, v, idx, mStack, mStackSrc);
         }
 
         static int GetManagedStackIndex(ref RegisterFrameInfo info, short reg)

@@ -103,6 +103,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U2:
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldind_Ref:
+                case OpCodeREnum.Ldobj:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarg_S:
@@ -124,6 +125,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_R4:
                 case OpCodeREnum.Stind_R8:
                 case OpCodeREnum.Stind_Ref:
+                case OpCodeREnum.Stobj:
                 case OpCodeREnum.Stfld:
                     r1 = op.Register1;
                     r2 = op.Register2;
@@ -336,6 +338,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U2:
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldind_Ref:
+                case OpCodeREnum.Ldobj:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarg_S:
@@ -406,6 +409,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_R4:
                 case OpCodeREnum.Stind_R8:
                 case OpCodeREnum.Stind_Ref:
+                case OpCodeREnum.Stobj:
                 case OpCodeREnum.Stelem_I:
                 case OpCodeREnum.Stelem_I1:
                 case OpCodeREnum.Stelem_I2:
@@ -503,6 +507,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U2:
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldind_Ref:
+                case OpCodeREnum.Ldobj:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarg_S:
@@ -525,6 +530,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_R4:
                 case OpCodeREnum.Stind_R8:
                 case OpCodeREnum.Stind_Ref:
+                case OpCodeREnum.Stobj:
                 case OpCodeREnum.Stfld:
                     switch (idx)
                     {
@@ -774,6 +780,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U2:
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldind_Ref:
+                case OpCodeREnum.Ldobj:
                 case OpCodeREnum.Ldloca:
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarg_S:
