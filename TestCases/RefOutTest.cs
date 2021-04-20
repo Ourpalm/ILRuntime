@@ -357,5 +357,37 @@ namespace TestCases
                 mask |= (long)1 << i;
             }
         }
+
+        class UnitTest_NestedGenericRefOutClass
+        {
+            public int IntValue = 2;
+            public string StringValue = "fff";
+        }
+        public static void UnitTest_NestedGenericRefOut()
+        {
+            UnitTest_NestedGenericRefOutClass obj = new UnitTest_NestedGenericRefOutClass();
+            string loc = obj.StringValue;
+            //int loc2 = 444;
+            //UnitTest_NestedGenericRefOutSub(ref loc2);
+            UnitTest_NestedGenericRefOutStringSub(ref loc);
+            //if (loc2 == 444)
+            //    throw new Exception();
+            if (loc != null)
+                throw new Exception();
+        }
+
+        static void UnitTest_NestedGenericRefOutSub(ref int value)
+        {
+            UnitTest_NestedGenericRefOutSub2(ref value);
+        }
+        static void UnitTest_NestedGenericRefOutStringSub(ref string value)
+        {
+            UnitTest_NestedGenericRefOutSub2(ref value);
+        }
+
+        static void UnitTest_NestedGenericRefOutSub2<T>(ref T result)
+        {
+            result = default;
+        }
     }
 }

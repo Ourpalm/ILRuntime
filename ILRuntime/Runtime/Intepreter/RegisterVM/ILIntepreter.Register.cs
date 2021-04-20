@@ -23,6 +23,7 @@ namespace ILRuntime.Runtime.Intepreter
         public int LocalCount;
         public StackObject* StackBase;
         public StackObject* RegisterStart;
+        public StackObject* RegisterEnd;
         public IList<object> ManagedStack;
     }
     public unsafe partial class ILIntepreter
@@ -109,6 +110,7 @@ namespace ILRuntime.Runtime.Intepreter
             info.FrameManagedBase = frame.ManagedStackBase;
             info.ParameterCount = paramCnt;
             info.RegisterStart = r;
+            info.RegisterEnd = Add(stackRegStart, stackRegCnt);
             info.ManagedStack = mStack;
 
             object obj;
@@ -182,7 +184,8 @@ namespace ILRuntime.Runtime.Intepreter
             for (int i = 0; i < stackRegCnt; i++)
             {
                 var loc = Add(stackRegStart, i);
-                *loc = StackObject.Null;
+                loc->ObjectType = ObjectTypes.Object;
+                loc->Value = mStack.Count;                
                 mStack.Add(null);
             }
             var bp = stack.ValueTypeStackPointer;
@@ -927,6 +930,86 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         esp = PopToRegister(ref info, ip->Register1, esp);
                                                     }
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stobj:
+                                {
+                                    val = Add(r, ip->Register2);
+                                    objRef = Add(r, ip->Register1);
+                                    switch (objRef->ObjectType)
+                                    {
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                var t = AppDomain.GetType(ip->Operand);
+                                                StoreValueToArrayReference(objRef, val, t, mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.StackObjectReference:
+                                            {
+                                                objRef = GetObjectAndResolveReference(objRef);
+                                                if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                                {
+                                                    switch (val->ObjectType)
+                                                    {
+                                                        case ObjectTypes.Object:
+                                                            dst = ILIntepreter.ResolveReference(objRef);
+                                                            CopyValueTypeToStack(dst, mStack[val->Value], mStack);
+                                                            break;
+                                                        case ObjectTypes.ValueTypeObjectReference:
+                                                            CopyStackValueType(val, objRef, mStack);
+                                                            break;
+                                                        default:
+                                                            throw new NotImplementedException();
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (val->ObjectType >= ObjectTypes.Object)
+                                                    {
+                                                        mStack[objRef->Value] = mStack[val->Value];
+                                                        objRef->ValueLow = val->ValueLow;
+                                                    }
+                                                    else
+                                                    {
+                                                        *objRef = *val;
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.FieldReference:
+                                            {
+                                                obj = mStack[objRef->Value];
+                                                int idx = objRef->ValueLow;
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    ((ILTypeInstance)obj).AssignFromStack(idx, val, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    var t = AppDomain.GetType(ip->Operand);
+                                                    if (!((CLRType)t).AssignFieldFromStack(idx, ref obj, this, val, mStack))
+                                                        ((CLRType)t).SetFieldValue(idx, ref obj, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(val, AppDomain, mStack)));
+                                                }
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                var t = AppDomain.GetType(objRef->Value);
+                                                if (t is ILType)
+                                                {
+                                                    ((ILType)t).StaticInstance.AssignFromStack(objRef->ValueLow, val, AppDomain, mStack);
+                                                }
+                                                else
+                                                {
+                                                    obj = null;
+                                                    if (!((CLRType)t).AssignFieldFromStack(objRef->ValueLow, ref obj, this, val, mStack))
+                                                        ((CLRType)t).SetStaticFieldValue(objRef->ValueLow, t.TypeForCLR.CheckCLRTypes(StackObject.ToObject(val, AppDomain, mStack)));
                                                 }
                                             }
                                             break;
@@ -2402,7 +2485,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Initobj:
                                 {
-                                    objRef = GetObjectAndResolveReference(Add(r, ip->Register1));
+                                    reg1 = Add(r, ip->Register1);
+                                    objRef = GetObjectAndResolveReference(reg1);
                                     type = domain.GetType(ip->Operand);
                                     if (type is ILType)
                                     {
@@ -2523,7 +2607,17 @@ namespace ILRuntime.Runtime.Intepreter
                                                         if (objRef->ObjectType >= ObjectTypes.Object)
                                                             mStack[objRef->Value] = null;
                                                         else
-                                                            PushNull(objRef);
+                                                        {
+                                                            if (reg1->ObjectType != ObjectTypes.StackObjectReference)
+                                                                WriteNull(ref info, ip->Register1);
+                                                            else if (objRef >= info.RegisterStart && objRef < info.RegisterEnd)
+                                                            {
+                                                                short reg = (short)(objRef - info.RegisterStart);
+                                                                WriteNull(ref info, reg);
+                                                            }
+                                                            else
+                                                                throw new NotSupportedException();
+                                                        }
                                                     }
                                                     break;
                                             }
@@ -2547,14 +2641,23 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else if (type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
+                                        else if (objRef->ObjectType >= ObjectTypes.Object)
+                                            mStack[objRef->Value] = null;
                                         else
-                                            WriteNull(objRef);
+                                        {
+                                            if (objRef >= info.RegisterStart && objRef < info.RegisterEnd)
+                                            {
+                                                short reg = (short)(objRef - info.RegisterStart);
+                                                WriteNull(ref info, reg);
+                                            }
+                                            else
+                                                throw new NotSupportedException();
+                                        }
                                     }
                                 }
                                 break;
                             case OpCodeREnum.Isinst:
                                 {
-                                    reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2);
                                     type = domain.GetType(ip->Operand);
                                     if (type != null)
@@ -2569,7 +2672,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(int) && tclr != typeof(bool) && tclr != typeof(short) && tclr != typeof(byte) && tclr != typeof(ushort) && tclr != typeof(uint))
                                                         {
-                                                            WriteNull(reg1);
+                                                            WriteNull(ref info, ip->Register1);
                                                         }
                                                     }
                                                     break;
@@ -2577,7 +2680,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(long) && tclr != typeof(ulong))
                                                         {
-                                                            WriteNull(reg1);
+                                                            WriteNull(ref info, ip->Register1);
                                                         }
                                                     }
                                                     break;
@@ -2585,7 +2688,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(float))
                                                         {
-                                                            WriteNull(reg1);
+                                                            WriteNull(ref info, ip->Register1);
                                                         }
                                                     }
                                                     break;
@@ -2593,12 +2696,12 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         if (tclr != typeof(double))
                                                         {
-                                                            WriteNull(reg1);
+                                                            WriteNull(ref info, ip->Register1);
                                                         }
                                                     }
                                                     break;
                                                 case ObjectTypes.Null:
-                                                    WriteNull(reg1);
+                                                    WriteNull(ref info, ip->Register1);
                                                     break;
                                             }
                                         }
@@ -2616,7 +2719,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     }
                                                     else
                                                     {
-                                                        WriteNull(reg1);
+                                                        WriteNull(ref info, ip->Register1);
                                                     }
                                                 }
                                                 else
@@ -2627,13 +2730,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                     }
                                                     else
                                                     {
-                                                        WriteNull(reg1);
+                                                        WriteNull(ref info, ip->Register1);
                                                     }
                                                 }
                                             }
                                             else
                                             {
-                                                WriteNull(reg1);
+                                                WriteNull(ref info, ip->Register1);
                                             }
                                         }
                                     }
@@ -3533,11 +3636,14 @@ namespace ILRuntime.Runtime.Intepreter
             esp->Value = 0;
         }
 
-        public static void WriteNull(StackObject* esp)
+        internal static void WriteNull(ref RegisterFrameInfo info, short reg)
         {
-            esp->ObjectType = ObjectTypes.Null;
-            esp->Value = -1;
+            var esp = Add(info.RegisterStart, reg);
+            int idx = GetManagedStackIndex(ref info, reg);
+            esp->ObjectType = ObjectTypes.Object;
+            esp->Value = idx;
             esp->ValueLow = 0;
+            info.ManagedStack[idx] = null;
         }
     }
 }
