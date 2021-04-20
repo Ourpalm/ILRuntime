@@ -456,7 +456,10 @@ namespace ILRuntime.Runtime.Intepreter
                 if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
                     CLRType clrType = info.Intepreter.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
-                    ILIntepreter.AssignToRegister(ref info, reg, clrType.GetFieldValue(fieldIdx, clrInstance));
+                    var obj = clrType.GetFieldValue(fieldIdx, clrInstance);
+                    if (obj is CrossBindingAdaptorType)
+                        obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                    ILIntepreter.AssignToRegister(ref info, reg, obj);
                 }
                 else
                     throw new TypeLoadException();
