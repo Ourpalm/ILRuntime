@@ -3268,10 +3268,16 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else if (type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
-                                        else if (objRef->ObjectType >= ObjectTypes.Object)
-                                            mStack[objRef->Value] = null;
                                         else
-                                            PushNull(objRef);
+                                        {
+                                            if (!type.IsValueType)
+                                            {
+                                                if (objRef->ObjectType >= ObjectTypes.Object)
+                                                    mStack[objRef->Value] = null;
+                                                else
+                                                    PushNull(objRef);
+                                            }
+                                        }
                                     }
 
                                     Free(esp - 1);

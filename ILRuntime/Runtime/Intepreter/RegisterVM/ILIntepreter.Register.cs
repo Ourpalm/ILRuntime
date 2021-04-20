@@ -2641,17 +2641,23 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else if (type.IsPrimitive)
                                             StackObject.Initialized(objRef, type);
-                                        else if (objRef->ObjectType >= ObjectTypes.Object)
-                                            mStack[objRef->Value] = null;
                                         else
                                         {
-                                            if (objRef >= info.RegisterStart && objRef < info.RegisterEnd)
+                                            if (!type.IsValueType)
                                             {
-                                                short reg = (short)(objRef - info.RegisterStart);
-                                                WriteNull(ref info, reg);
+                                                if (objRef->ObjectType >= ObjectTypes.Object)
+                                                    mStack[objRef->Value] = null;
+                                                else
+                                                {
+                                                    if (objRef >= info.RegisterStart && objRef < info.RegisterEnd)
+                                                    {
+                                                        short reg = (short)(objRef - info.RegisterStart);
+                                                        WriteNull(ref info, reg);
+                                                    }
+                                                    else
+                                                        throw new NotSupportedException();
+                                                }
                                             }
-                                            else
-                                                throw new NotSupportedException();
                                         }
                                     }
                                 }
