@@ -2939,7 +2939,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             res = *(double*)&reg1->Value > *(double*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Object:
-                                            res = mStack[reg1->Value] != null && reg2->ObjectType == ObjectTypes.Null;
+                                            res = mStack[reg1->Value] != null && (reg2->ObjectType == ObjectTypes.Null || mStack[reg2->Value] == null);
                                             break;
                                         case ObjectTypes.Null:
                                             res = false;
@@ -3205,8 +3205,8 @@ namespace ILRuntime.Runtime.Intepreter
                                     intVal = reg3->Value;
 
                                     reg1->ObjectType = ObjectTypes.ArrayReference;
-                                    reg1->Value = mStack.Count;
-                                    mStack[GetManagedStackIndex(ref info, ip->Register1)] = arr;
+                                    reg1->Value = GetManagedStackIndex(ref info, ip->Register1);
+                                    mStack[reg1->Value] = arr;
                                     reg1->ValueLow = intVal;
                                 }
                                 break;
