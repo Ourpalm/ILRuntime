@@ -842,7 +842,10 @@ namespace ILRuntime.Runtime.Enviorment
                     object[] arr = (object[])p;
                     for (int i = 0; i < ilmethod.ParameterCount; i++)
                     {
-                        esp = ILIntepreter.PushObject(esp, mStack, CheckCrossBindingAdapter(arr[i]));
+                        var res = ILIntepreter.PushObject(esp, mStack, CheckCrossBindingAdapter(arr[i]));
+                        if (esp->ObjectType < ObjectTypes.Object && domain.EnableRegisterVM)
+                            mStack.Add(null);
+                        esp = res;
                     }
                 }
                 bool unhandled;
