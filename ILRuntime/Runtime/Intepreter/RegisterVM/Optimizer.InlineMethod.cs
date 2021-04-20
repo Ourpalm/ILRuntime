@@ -14,7 +14,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     partial class Optimizer
     {
-        public const int MaximalInlineInstructionCount = 1;
+        public const int MaximalInlineInstructionCount = 10;
         public static void InlineMethod(CodeBasicBlock block, ILMethod method,RegisterVMSymbolLink symbolLink, short baseRegIdx, bool hasReturn)
         {
             var ins = block.FinalInstructions;
