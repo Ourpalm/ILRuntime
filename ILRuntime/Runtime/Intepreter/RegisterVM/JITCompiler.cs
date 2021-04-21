@@ -21,6 +21,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         MethodDefinition def;
         bool hasReturn;
         Dictionary<Instruction, int> entryMapping;
+
         public JITCompiler(Enviorment.AppDomain appDomain, ILType declaringType, ILMethod method)
         {
             this.appdomain = appDomain;
@@ -36,6 +37,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             symbols = new Dictionary<int, RegisterVMSymbol>();
 #endif
+            
             var body = def.Body;
             short locVarRegStart = (short)def.Parameters.Count;
             if (!def.IsStatic)
@@ -65,7 +67,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 i.EndRegister = baseRegIdx;
             }
-
 #if OUTPUT_JIT_RESULT
             int cnt = 1;
             Console.WriteLine($"JIT Results for {method}:");
@@ -78,7 +79,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
             }
 #endif
-
+            
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);

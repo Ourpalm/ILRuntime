@@ -16,6 +16,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
     {
         public RegisterVMSymbol Value;
     }
+
+    struct InlineMethodInfo
+    {
+        public short LocalStartRegister;
+        public ILMethod Method;
+    }
     struct RegisterVMSymbol
     {
         public Instruction Instruction;
@@ -48,7 +54,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public HashSet<CodeBasicBlock> NextBlocks { get { return nextBlocks; } }
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-        public Dictionary<int, RegisterVMSymbol> InstructionMapping => instructionMapping;
+        public Dictionary<int, RegisterVMSymbol> InstructionMapping { get { return instructionMapping; } }
 #endif
         public short EndRegister
         {

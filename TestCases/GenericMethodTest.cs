@@ -613,6 +613,30 @@ namespace TestCases
         {
             return default(T);
         }
+
+        public static void GenericStaticMethodTest15()
+        {
+            var e2 = GenericStaticMethodTest14Sub<TestVector3>();
+            Console.WriteLine(e2);
+        }
+
+        public static void GenericStaticMethodTest16()
+        {
+            var e2 = GenericStaticMethodTest14Sub<TestVector3NoBinding>();
+            Console.WriteLine(e2);
+        }
+
+        public static void GenericStaticMethodTest17()
+        {
+            var e2 = GenericStaticMethodTest14Sub<int>();
+            Console.WriteLine(e2);
+        }
+
+        public static void GenericStaticMethodTest18()
+        {
+            var e2 = GenericStaticMethodTest14Sub<Vector3>();
+            Console.WriteLine(e2);
+        }
     }
 
 

@@ -38,13 +38,15 @@ namespace ILRuntime.CLR.Method
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
 
-        internal Dictionary<int, RegisterVMSymbol> RegisterVMSymbols => registerSymbols;
+        internal Dictionary<int, RegisterVMSymbol> RegisterVMSymbols { get { return registerSymbols; } }
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
 
         internal int StartLine { get; set; }
 
         internal int EndLine { get; set; }
+
+        public ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get { return appdomain; } }
 
         public MethodInfo ReflectionMethodInfo
         {
@@ -385,7 +387,7 @@ namespace ILRuntime.CLR.Method
             {
                 localVarCnt = def.Body.Variables.Count;
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
-                
+
                 if (appdomain.EnableRegisterVM)
                 {
                     Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);

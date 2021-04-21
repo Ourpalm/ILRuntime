@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
     partial class Optimizer
     {
         public const int MaximalInlineInstructionCount = 10;
-        public static void InlineMethod(CodeBasicBlock block, ILMethod method,RegisterVMSymbolLink symbolLink, short baseRegIdx, bool hasReturn)
+        public static void InlineMethod(CodeBasicBlock block, ILMethod method, RegisterVMSymbolLink symbolLink, short baseRegIdx, bool hasReturn)
         {
             var ins = block.FinalInstructions;
             var body = method.BodyRegister;
@@ -25,7 +25,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             int branchStart = ins.Count;
             int branchOffset = 0;
             List<int> reloc = new List<int>();
-            for(int i=0;i<body.Length;i++)
+            for (int i = 0; i < body.Length; i++)
             {
                 var opcode = body[i];
                 short r1 = 0;
@@ -100,7 +100,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 ins.Add(opcode);
             }
 
-            foreach(var i in reloc)
+            foreach (var i in reloc)
             {
                 var opcode = ins[i];
                 opcode.Operand = ins.Count - branchStart;

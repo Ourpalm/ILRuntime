@@ -19,8 +19,6 @@ namespace ILRuntime.Runtime.Intepreter
         public ILIntepreter Intepreter;
         public int FrameManagedBase;
         public int LocalManagedBase;
-        public int ParameterCount;
-        public int LocalCount;
         public StackObject* StackBase;
         public StackObject* RegisterStart;
         public StackObject* RegisterEnd;
@@ -28,6 +26,46 @@ namespace ILRuntime.Runtime.Intepreter
     }
     public unsafe partial class ILIntepreter
     {
+        /*void InitializeRegisterLocal(StackObject* loc, IType t, IList<object> mStack)
+        {
+            bool isEnum = false;
+            isEnum = t.IsEnum;
+            if (!t.IsByRef && t.IsValueType && !t.IsPrimitive && !isEnum)
+            {
+                if (t is ILType)
+                {
+                    stack.AllocValueType(loc, t);
+                }
+                else
+                {
+                    CLRType cT = (CLRType)t;
+                    if (cT.ValueTypeBinder != null)
+                    {
+                        stack.AllocValueType(loc, t);
+                    }
+                    else
+                    {
+                        var obj = ((CLRType)t).CreateDefaultInstance();
+                        loc->ObjectType = ObjectTypes.Object;
+                        loc->Value = locBase + i;
+                        mStack[locBase + i] = obj;
+                    }
+                }
+            }
+            else
+            {
+                if (t.IsPrimitive || isEnum)
+                {
+                    StackObject.Initialized(loc, t);
+                }
+                else
+                {
+                    loc->ObjectType = ObjectTypes.Object;
+                    loc->Value = locBase + i;
+                }
+            }
+        }*/
+
         internal StackObject* ExecuteR(ILMethod method, StackObject* esp, out bool unhandledException)
         {
             
@@ -48,11 +86,9 @@ namespace ILRuntime.Runtime.Intepreter
             OpCodeR[] body = method.BodyRegister;
             StackFrame frame;
             stack.InitializeFrame(method, esp, out frame);
-            StackObject* v1 = frame.LocalVarPointer;
             int finallyEndAddress = 0;
 
-            var stackRegStart = frame.BasePointer;
-            esp = Add(frame.BasePointer, method.StackRegisterCount);
+            var stackRegStart = frame.LocalVarPointer;
             StackObject* r = Minus(frame.LocalVarPointer, method.ParameterCount);
             IList<object> mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
@@ -105,83 +141,22 @@ namespace ILRuntime.Runtime.Intepreter
             RegisterFrameInfo info;
             info.Intepreter = this;
             info.StackBase = stack.StackBase;
-            info.LocalCount = locCnt;
             info.LocalManagedBase = locBase;
             info.FrameManagedBase = frame.ManagedStackBase;
-            info.ParameterCount = paramCnt;
             info.RegisterStart = r;
-            info.RegisterEnd = Add(stackRegStart, stackRegCnt);
             info.ManagedStack = mStack;
 
             object obj;
 
-            //Managed Stack reserved for local variable
-            for (int i = 0; i < locCnt; i++)
+            /*for (int i = 0; i < locCnt; i++)
             {
-                mStack.Add(null);
-            }
+                InitializeRegisterLocal(method, i, v1, locBase, mStack);
+            }*/
+            esp = Add(stackRegStart, stackRegCnt + locCnt);
 
-            for (int i = 0; i < locCnt; i++)
-            {
-                var v = method.Variables[i];
-                bool isEnum = false;
-                var vt = v.VariableType;
-                IType t;
-                if (vt.IsGenericParameter)
-                {
-                    t = method.FindGenericArgument(vt.Name);
-                }
-                else
-                {
-                    t = AppDomain.GetType(v.VariableType, method.DeclearingType, method);
-                }
-                isEnum = t.IsEnum;
-                if (!t.IsByRef && t.IsValueType && !t.IsPrimitive && !isEnum)
-                {
-                    if (t is ILType)
-                    {
-                        //var obj = ((ILType)t).Instantiate(false);
-                        var loc = Add(v1, i);
-                        stack.AllocValueType(loc, t);
+            info.RegisterEnd = esp;
 
-                        /*loc->ObjectType = ObjectTypes.Object;
-                        loc->Value = mStack.Count;
-                        mStack.Add(obj);*/
-
-                    }
-                    else
-                    {
-                        CLRType cT = (CLRType)t;
-                        var loc = Add(v1, i);
-                        if (cT.ValueTypeBinder != null)
-                        {
-                            stack.AllocValueType(loc, t);
-                        }
-                        else
-                        {
-                            obj = ((CLRType)t).CreateDefaultInstance();
-                            loc->ObjectType = ObjectTypes.Object;
-                            loc->Value = locBase + i;
-                            mStack[locBase + i] = obj;
-                        }
-                    }
-                }
-                else
-                {
-                    if (t.IsPrimitive || isEnum)
-                    {
-                        var loc = Add(v1, i);
-                        StackObject.Initialized(loc, t);
-                    }
-                    else
-                    {
-                        var loc = Add(v1, i);
-                        loc->ObjectType = ObjectTypes.Object;
-                        loc->Value = locBase + i;
-                    }
-                }
-            }
-            for (int i = 0; i < stackRegCnt; i++)
+            for (int i = 0; i < stackRegCnt + locCnt; i++)
             {
                 var loc = Add(stackRegStart, i);
                 loc->ObjectType = ObjectTypes.Object;
@@ -2511,18 +2486,26 @@ namespace ILRuntime.Runtime.Intepreter
                                                 case ObjectTypes.Object:
                                                     {
                                                         obj = mStack[objRef->Value];
-                                                        if (obj != null)
+                                                        if (obj == null)
                                                         {
-                                                            if (obj is ILTypeInstance)
+                                                            if (it.IsEnum)
                                                             {
-                                                                ILTypeInstance instance = obj as ILTypeInstance;
-                                                                instance.Clear();
+                                                                StackObject.Initialized(objRef, it);
+                                                                continue;
                                                             }
                                                             else
-                                                                throw new NotSupportedException();
+                                                            {
+                                                                throw new NotImplementedException();
+                                                            }
+                                                        }
+
+                                                        if (obj is ILTypeInstance)
+                                                        {
+                                                            ILTypeInstance instance = obj as ILTypeInstance;
+                                                            instance.Clear();
                                                         }
                                                         else
-                                                            throw new NullReferenceException();
+                                                            throw new NotSupportedException();
                                                     }
                                                     break;
                                                 case ObjectTypes.ArrayReference:
@@ -2653,6 +2636,25 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         short reg = (short)(objRef - info.RegisterStart);
                                                         WriteNull(ref info, reg);
+                                                    }
+                                                    else
+                                                        throw new NotSupportedException();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var cT = (CLRType)type;
+                                                if (cT.ValueTypeBinder != null)
+                                                    throw new NotImplementedException();
+                                                obj = cT.CreateDefaultInstance();
+                                                if (objRef->ObjectType >= ObjectTypes.Object)
+                                                    mStack[objRef->Value] = obj;
+                                                else
+                                                {
+                                                    if (objRef >= info.RegisterStart && objRef < info.RegisterEnd)
+                                                    {
+                                                        short reg = (short)(objRef - info.RegisterStart);
+                                                        AssignToRegister(ref info, reg, obj);
                                                     }
                                                     else
                                                         throw new NotSupportedException();
@@ -3578,9 +3580,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal static void AssignToRegister(ref RegisterFrameInfo info, short reg, object obj, bool isBox = false)
         {
-            var argCnt = info.ParameterCount;
             var mStack = info.ManagedStack;
-            var locCnt = info.LocalCount;
 
             var dst = Add(info.RegisterStart, reg);
             var idx = GetManagedStackIndex(ref info, reg);
