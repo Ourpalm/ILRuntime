@@ -48,7 +48,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 if (GetOpcodeDestRegister(ref opcode, out r1))
                 {
-                    ReplaceOpcodeDest(ref opcode, (short)(r1 + baseRegIdx));
+                    if (r1 >= 0)
+                        ReplaceOpcodeDest(ref opcode, (short)(r1 + baseRegIdx));
                 }
 
                 if (opcode.Code == OpCodeREnum.Ret)

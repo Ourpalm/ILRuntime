@@ -1502,7 +1502,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2); 
                                     transfer = false;
-                                    switch (esp->ObjectType)
+                                    switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
                                             transfer = (uint)reg1->Value < (uint)reg2->Value;
@@ -1534,7 +1534,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2);
                                     transfer = false;
-                                    switch (esp->ObjectType)
+                                    switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
                                             transfer = reg1->Value <= reg2->Value;
@@ -1566,7 +1566,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2);
                                     transfer = false;
-                                    switch (esp->ObjectType)
+                                    switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
                                             transfer = (uint)reg1->Value <= (uint)reg2->Value;
@@ -1599,7 +1599,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg2 = Add(r, ip->Register2);
 
                                     transfer = false;
-                                    switch (esp->ObjectType)
+                                    switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
                                             transfer = reg1->Value > reg2->Value;
