@@ -116,5 +116,21 @@ namespace TestCases
             char c = str[1];
             Console.WriteLine(c);
         }
+
+        public static void UnitTest_TestInline01()
+        {
+            object obj = new object();
+            UnitTest_TestInline01Sub(obj);
+            if (obj == null)
+                throw new Exception();
+        }
+
+        static void UnitTest_TestInline01Sub(object obj)
+        {
+            Console.WriteLine(obj);
+            obj = null;
+            if (obj != null)
+                throw new Exception();
+        }
     }
 }

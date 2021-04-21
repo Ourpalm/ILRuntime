@@ -2611,11 +2611,17 @@ namespace ILRuntime.Runtime.Intepreter
                                                     var vt = domain.GetType(dst->Value);
                                                     if (vt != type)
                                                         throw new InvalidCastException();
-                                                    object ins = ((CLRType)vt).ValueTypeBinder.ToObject(dst, mStack);
+                                                    obj = ((CLRType)vt).ValueTypeBinder.ToObject(dst, mStack);
                                                     FreeStackValueType(objRef);
-                                                    AssignToRegister(ref info, ip->Register1, ins, true);
+                                                    AssignToRegister(ref info, ip->Register1, obj, true);
                                                 }
-                                                //nothing to do for CLR type boxing
+                                                else if (objRef->ObjectType == ObjectTypes.Object)
+                                                {
+                                                    obj = mStack[objRef->Value];
+                                                    AssignToRegister(ref info, ip->Register1, obj, true);
+                                                }
+                                                else
+                                                    throw new NotSupportedException();
                                             }
                                         }
                                     }
