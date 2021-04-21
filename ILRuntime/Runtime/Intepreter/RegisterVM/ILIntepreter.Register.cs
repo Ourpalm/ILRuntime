@@ -167,6 +167,7 @@ namespace ILRuntime.Runtime.Intepreter
             ValueTypeBasePointer = bp;
 
             StackObject* reg1, reg2, reg3, objRef, val, dst, ret;
+            bool transfer;
             int intVal = 0;
             long longVal = 0;
             float floatVal = 0;
@@ -1367,12 +1368,108 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Beq:
+                            case OpCodeREnum.Beq_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    transfer = false;
+                                    if (reg1->ObjectType == reg2->ObjectType)
+                                    {
+                                        switch (reg1->ObjectType)
+                                        {
+                                            case ObjectTypes.Null:
+                                                transfer = true;
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                transfer = reg1->Value == reg2->Value;
+                                                break;
+                                            case ObjectTypes.Long:
+                                                transfer = *(long*)&reg1->Value == *(long*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Float:
+                                                transfer = *(float*)&reg1->Value == *(float*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Double:
+                                                transfer = *(double*)&reg1->Value == *(double*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Object:
+                                                transfer = mStack[reg1->Value] == mStack[reg2->Value];
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
+                                    else if (reg1->ObjectType == ObjectTypes.Null || reg2->ObjectType == ObjectTypes.Null)
+                                    {
+                                        if (reg1->ObjectType == ObjectTypes.Null && reg2->ObjectType == ObjectTypes.Object)
+                                            transfer = mStack[reg2->Value] == null;
+                                        else if(reg1->ObjectType == ObjectTypes.Object && reg2->ObjectType == ObjectTypes.Null)
+                                            transfer = mStack[reg1->Value] == null;
+                                    }
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Bne_Un:
+                            case OpCodeREnum.Bne_Un_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    transfer = false;
+                                    if (reg1->ObjectType == reg2->ObjectType)
+                                    {
+                                        switch (reg1->ObjectType)
+                                        {
+                                            case ObjectTypes.Null:
+                                                transfer = false;
+                                                break;
+                                            case ObjectTypes.Integer:
+                                                transfer = (uint)reg1->Value != (uint)reg2->Value;
+                                                break;
+                                            case ObjectTypes.Float:
+                                                transfer = *(float*)&reg1->Value != *(float*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Long:
+                                                transfer = *(long*)&reg1->Value != *(long*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Double:
+                                                transfer = *(double*)&reg1->Value != *(double*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Object:
+                                                transfer = mStack[reg1->Value] != mStack[reg2->Value];
+                                                break;
+                                            default:
+                                                throw new NotImplementedException();
+                                        }
+                                    }
+                                    else if(reg1->ObjectType == ObjectTypes.Null || reg2->ObjectType== ObjectTypes.Null)
+                                    {
+                                        if (reg1->ObjectType == ObjectTypes.Null && reg2->ObjectType == ObjectTypes.Object)
+                                            transfer = mStack[reg2->Value] != null;
+                                        else if (reg1->ObjectType == ObjectTypes.Object && reg2->ObjectType == ObjectTypes.Null)
+                                            transfer = mStack[reg1->Value] != null;
+                                    }
+                                    else
+                                        transfer = true;
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Blt:
                             case OpCodeREnum.Blt_S:
                                 {
                                     reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2);
-                                    bool transfer = false;
+                                    transfer = false;
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
@@ -1399,12 +1496,173 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Blt_Un:
+                            case OpCodeREnum.Blt_Un_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2); 
+                                    transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value < (uint)reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value < *(ulong*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value < *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value < *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Ble:
+                            case OpCodeREnum.Ble_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value <= reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value <= *(long*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value <= *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value <= *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Ble_Un:
+                            case OpCodeREnum.Ble_Un_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value <= (uint)reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value <= *(ulong*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value <= *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value <= *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Bgt:
+                            case OpCodeREnum.Bgt_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+
+                                    transfer = false;
+                                    switch (esp->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value > reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value > *(long*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value > *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value > *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Bgt_Un:
+                            case OpCodeREnum.Bgt_Un_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value > (uint)reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value > *(ulong*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value > *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value > *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Bge:
                             case OpCodeREnum.Bge_S:
                                 {
                                     reg1 = Add(r, ip->Register1);
                                     reg2 = Add(r, ip->Register2);
-                                    bool transfer = false;
+                                    transfer = false;
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
@@ -1412,6 +1670,38 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Long:
                                             transfer = *(long*)&reg1->Value >= *(long*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value >= *(float*)&reg2->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value >= *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Bge_Un:
+                            case OpCodeREnum.Bge_Un_S:
+                                {
+                                    reg1 = Add(r, ip->Register1);
+                                    reg2 = Add(r, ip->Register2);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value >= (uint)reg2->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value >= *(ulong*)&reg2->Value;
                                             break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&reg1->Value >= *(float*)&reg2->Value;
