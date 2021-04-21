@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
     partial class Optimizer
     {
         public const int MaximalInlineInstructionCount = 10;
-        public static void InlineMethod(CodeBasicBlock block, ILMethod method, RegisterVMSymbolLink symbolLink, short baseRegIdx, bool hasReturn)
+        public static void InlineMethod(CodeBasicBlock block, ILMethod method, RegisterVMSymbolLink symbolLink, ref Dictionary<int, int[]> jumpTables, short baseRegIdx, bool hasReturn)
         {
             var ins = block.FinalInstructions;
             var body = method.BodyRegister;
@@ -88,6 +88,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 if (IsBranching(opcode.Code))
                 {
                     opcode.Operand += branchOffset;
+                }
+                if (opcode.Code == OpCodeREnum.Switch)
+                {
+                    int[] targets = method.JumpTablesRegister[opcode.Operand];
+                    int[] newTargets = new int[targets.Length];
+                    for (int j = 0; j < targets.Length; j++)
+                    {
+                        newTargets[j] = targets[j] + branchOffset;
+                    }
+                    if (jumpTables == null)
+                        jumpTables = new Dictionary<int, int[]>();
+                    jumpTables.Add(opcode.Operand, newTargets);
                 }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
                 RegisterVMSymbol oriIns;

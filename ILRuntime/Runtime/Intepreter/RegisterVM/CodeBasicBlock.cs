@@ -125,7 +125,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         else
                         {
-                            if (cur.entry != (Instruction)i.Operand)
+                            if (i.Operand is Instruction)
+                            {
+                                if (cur.entry != (Instruction)i.Operand)
+                                {
+                                    entryMapping[cur.entry] = res.Count - 1;
+                                    cur = new CodeBasicBlock();
+                                    res.Add(cur);
+                                }
+                            }
+                            else
                             {
                                 entryMapping[cur.entry] = res.Count - 1;
                                 cur = new CodeBasicBlock();

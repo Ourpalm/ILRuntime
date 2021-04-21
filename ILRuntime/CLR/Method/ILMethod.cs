@@ -25,7 +25,7 @@ namespace ILRuntime.CLR.Method
         ExceptionHandler[] exceptionHandler;
         KeyValuePair<string, IType>[] genericParameters;
         IType[] genericArguments;
-        Dictionary<int, int[]> jumptables;
+        Dictionary<int, int[]> jumptables, jumptablesR;
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
         ILRuntimeConstructorInfo reflectionCtorInfo;
@@ -37,6 +37,7 @@ namespace ILRuntime.CLR.Method
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
+        public Dictionary<int, int[]> JumpTablesRegister { get { return jumptablesR; } }
 
         internal Dictionary<int, RegisterVMSymbol> RegisterVMSymbols { get { return registerSymbols; } }
 
@@ -391,7 +392,7 @@ namespace ILRuntime.CLR.Method
                 if (appdomain.EnableRegisterVM)
                 {
                     Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
-                    bodyRegister = jit.Compile(out stackRegisterCnt, out registerSymbols);
+                    bodyRegister = jit.Compile(out stackRegisterCnt, out jumptablesR, out registerSymbols);
                 }
                 else
                 {

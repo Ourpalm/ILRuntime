@@ -21,6 +21,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         MethodDefinition def;
         bool hasReturn;
         Dictionary<Instruction, int> entryMapping;
+        Dictionary<int, int[]> jumptables;
 
         public JITCompiler(Enviorment.AppDomain appDomain, ILType declaringType, ILMethod method)
         {
@@ -30,9 +31,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             def = method.Definition;
             hasReturn = method.ReturnType != appdomain.VoidType;
             entryMapping = null;
+            jumptables = null;
         }
 
-        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, RegisterVMSymbol> symbols)
+        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, int[]> switchTargets, out Dictionary<int, RegisterVMSymbol> symbols)
         {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             symbols = new Dictionary<int, RegisterVMSymbol>();
@@ -130,6 +132,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 ins.Operand += inlineOffset;
                                 inlinedBranches.Add(res.Count);
                             }
+                            else if(ins.Code == OpCodeREnum.Switch)
+                            {
+                                int[] targets = jumptables[ins.Operand];
+                                for(int j = 0; j < targets.Length; j++)
+                                {
+                                    targets[j] = targets[j] + inlineOffset;
+                                }
+                                inlinedBranches.Add(res.Count);
+                            }
                         }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
                         RegisterVMSymbol oriIns;
@@ -148,7 +159,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Operand = jumpTargets[op.Operand];
                     res[i] = op;
                 }
+                else if(op.Code == OpCodeREnum.Switch && !inlinedBranches.Contains(i))
+                {
+                    int[] targets = jumptables[op.Operand];
+                    for(int j = 0; j < targets.Length; j++)
+                    {
+                        targets[j] = jumpTargets[targets[j]];
+                    }
+                }
             }
+            switchTargets = jumptables;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
 #if OUTPUT_JIT_RESULT
@@ -162,7 +182,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
             return res.ToArray();
         }
+        void PrepareJumpTable(object token)
+        {
+            int hashCode = token.GetHashCode();
 
+            if (jumptables == null)
+                jumptables = new Dictionary<int, int[]>();
+            if (jumptables.ContainsKey(hashCode))
+                return;
+            Mono.Cecil.Cil.Instruction[] e = token as Mono.Cecil.Cil.Instruction[];
+            int[] addrs = new int[e.Length];
+            for (int i = 0; i < e.Length; i++)
+            {
+                addrs[i] = entryMapping[e[i]];
+            }
+
+            jumptables[hashCode] = addrs;
+        }
         void Translate(CodeBasicBlock block, Instruction ins, short locVarRegStart, ref short baseRegIdx)
         {
             List<OpCodeR> lst = block.FinalInstructions;
@@ -183,6 +219,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Brfalse_S:
                     op.Register1 = --baseRegIdx;
                     op.Operand = entryMapping[(Mono.Cecil.Cil.Instruction)token];
+                    break;
+                case Code.Switch:
+                    op.Register1 = --baseRegIdx;
+                    PrepareJumpTable(token);
+                    op.Operand = token.GetHashCode();
                     break;
                 case Code.Blt:
                 case Code.Blt_S:
@@ -334,7 +375,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             link.Value.Instruction = ins;
                             link.Value.Method = method;
 #endif
-                            Optimizer.InlineMethod(block, toInline, link, baseRegIdx, hasRet);
+                            Optimizer.InlineMethod(block, toInline, link, ref jumptables, baseRegIdx, hasRet);
                             if (hasRet)
                                 baseRegIdx++;
                             return;

@@ -179,6 +179,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Brtrue_S:
                 case OpCodeREnum.Brfalse:
                 case OpCodeREnum.Brfalse_S:
+                case OpCodeREnum.Switch:
                     param = string.Format("r{0}, {1}", Register1, Operand);
                     break;
                 case OpCodeREnum.Ldftn:

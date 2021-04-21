@@ -1721,6 +1721,17 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Switch:
+                                {
+                                    intVal = Add(r, ip->Register1)->Value;
+                                    var table = method.JumpTablesRegister[ip->Operand];
+                                    if (intVal >= 0 && intVal < table.Length)
+                                    {
+                                        ip = ptr + table[intVal];
+                                        continue;
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Call:
                             case OpCodeREnum.Callvirt:
                                 {
