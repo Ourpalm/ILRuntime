@@ -151,6 +151,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldftn:
                 case OpCodeREnum.Ldsfld:
                 case OpCodeREnum.Ldsflda:
+                case OpCodeREnum.Constrained:
                     return false;
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Call:
@@ -159,10 +160,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     r2 = op.Register3;
                     r3 = op.Register4;
                     return true;
+
                 case OpCodeREnum.Br_S:
                 case OpCodeREnum.Br:
                 case OpCodeREnum.Nop:
-                case OpCodeREnum.Constrained:
                 case OpCodeREnum.InlineStart:
                 case OpCodeREnum.InlineEnd:
                 case OpCodeREnum.Castclass:

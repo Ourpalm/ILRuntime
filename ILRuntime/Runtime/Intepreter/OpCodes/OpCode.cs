@@ -211,28 +211,43 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                             param = m != null ? string.Format("r{0}, r{1}, {2}", Register1, Register2, m) : string.Format("r{0}, r{1}, {2}", Register1, Register2, Operand2);
                     }
                     break;
+                case OpCodeREnum.Constrained:
+                    {
+                        if (domain == null)
+                        {
+                            param = Operand.ToString();
+                        }
+                        else
+                        {
+                            var m = domain.GetType(Operand);
+                            param = m != null ? m.ToString() : Operand.ToString();
+                        }
+                    }
+                    break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Newobj:
-                    string retR = Register1 >= 0 ? "r" + Register1 : "-";
-                    if (Register2 >= 0)
-                        retR += ", r" + Register2;
-                    if (Register3 >= 0)
-                        retR += ", r" + Register3;
-                    if (Register4 >= 0)
-                        retR += ", r" + Register4;
+                    {
+                        string retR = Register1 >= 0 ? "r" + Register1 : "-";
+                        if (Register2 >= 0)
+                            retR += ", r" + Register2;
+                        if (Register3 >= 0)
+                            retR += ", r" + Register3;
+                        if (Register4 >= 0)
+                            retR += ", r" + Register4;
 
-                    if (domain == null)
-                    {
-                        param = string.Format("{0}, {1}", retR, Operand2);
-                    }
-                    else
-                    {
-                        IMethod m = domain.GetMethod(Operand2);
-                        if (m is CLR.Method.CLRMethod)
-                            param = m != null ? string.Format("{0}, {1}::{2}", retR, m.DeclearingType.FullName, m) : string.Format("{0}, {1}", retR, Operand2);
+                        if (domain == null)
+                        {
+                            param = string.Format("{0}, {1}", retR, Operand2);
+                        }
                         else
-                            param = m != null ? string.Format("{0}, {1}", retR, m) : string.Format("{0}, {1}", retR, Operand2);
+                        {
+                            IMethod m = domain.GetMethod(Operand2);
+                            if (m is CLR.Method.CLRMethod)
+                                param = m != null ? string.Format("{0}, {1}::{2}", retR, m.DeclearingType.FullName, m) : string.Format("{0}, {1}", retR, Operand2);
+                            else
+                                param = m != null ? string.Format("{0}, {1}", retR, m) : string.Format("{0}, {1}", retR, Operand2);
+                        }
                     }
                     break;
                 case OpCodeREnum.Blt:

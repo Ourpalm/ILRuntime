@@ -166,7 +166,7 @@ namespace ILRuntime.Runtime.Intepreter
             var bp = stack.ValueTypeStackPointer;
             ValueTypeBasePointer = bp;
 
-            StackObject* reg1, reg2, reg3, objRef, val, dst, ret;
+            StackObject* reg1, reg2, reg3, objRef, objRef2, val, dst, ret;
             bool transfer;
             int intVal = 0;
             long longVal = 0;
@@ -207,7 +207,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldarga_S:
                                 reg1 = Add(r, ip->Register2);
                                 reg2 = Add(r, ip->Register1);
-                                
+
                                 reg2->ObjectType = ObjectTypes.StackObjectReference;
                                 *(long*)&reg2->Value = (long)reg1;
                                 break;
@@ -878,7 +878,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (!((CLRType)type).CopyFieldToStack(idx, obj, this, ref esp, mStack))
                                                     {
                                                         obj = ((CLRType)type).GetFieldValue(idx, obj);
-                                                        AssignToRegister(ref info, ip->Register1, obj);                                                        
+                                                        AssignToRegister(ref info, ip->Register1, obj);
                                                     }
                                                     else
                                                     {
@@ -1404,7 +1404,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         if (reg1->ObjectType == ObjectTypes.Null && reg2->ObjectType == ObjectTypes.Object)
                                             transfer = mStack[reg2->Value] == null;
-                                        else if(reg1->ObjectType == ObjectTypes.Object && reg2->ObjectType == ObjectTypes.Null)
+                                        else if (reg1->ObjectType == ObjectTypes.Object && reg2->ObjectType == ObjectTypes.Null)
                                             transfer = mStack[reg1->Value] == null;
                                     }
                                     if (transfer)
@@ -1447,7 +1447,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 throw new NotImplementedException();
                                         }
                                     }
-                                    else if(reg1->ObjectType == ObjectTypes.Null || reg2->ObjectType== ObjectTypes.Null)
+                                    else if (reg1->ObjectType == ObjectTypes.Null || reg2->ObjectType == ObjectTypes.Null)
                                     {
                                         if (reg1->ObjectType == ObjectTypes.Null && reg2->ObjectType == ObjectTypes.Object)
                                             transfer = mStack[reg2->Value] != null;
@@ -1500,7 +1500,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Blt_Un_S:
                                 {
                                     reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2); 
+                                    reg2 = Add(r, ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1749,31 +1749,35 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
-                                        intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
                                         bool isILMethod = m is ILMethod;
-                                        for (int i = 0; i < intVal; i++)
+
+                                        if (ip->Operand4 == 0)
                                         {
-                                            switch (i)
+                                            intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
+                                            intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
+                                            for (int i = 0; i < intVal; i++)
                                             {
-                                                case 0:
-                                                    reg1 = Add(r, ip->Register2);
-                                                    break;
-                                                case 1:
-                                                    reg1 = Add(r, ip->Register3);
-                                                    break;
-                                                case 2:
-                                                    reg1 = Add(r, ip->Register4);
-                                                    break;
-                                                default:
-                                                    throw new NotSupportedException();
+                                                switch (i)
+                                                {
+                                                    case 0:
+                                                        reg1 = Add(r, ip->Register2);
+                                                        break;
+                                                    case 1:
+                                                        reg1 = Add(r, ip->Register3);
+                                                        break;
+                                                    case 2:
+                                                        reg1 = Add(r, ip->Register4);
+                                                        break;
+                                                    default:
+                                                        throw new NotSupportedException();
+                                                }
+                                                CopyToStack(esp, reg1, mStack);
+                                                if (isILMethod && reg1->ObjectType < ObjectTypes.Object)
+                                                {
+                                                    mStack.Add(null);
+                                                }
+                                                esp++;
                                             }
-                                            CopyToStack(esp, reg1, mStack);
-                                            if(isILMethod && reg1->ObjectType< ObjectTypes.Object)
-                                            {
-                                                mStack.Add(null);
-                                            }
-                                            esp++;
                                         }
                                         if (isILMethod)
                                         {
@@ -2629,6 +2633,140 @@ namespace ILRuntime.Runtime.Intepreter
                                         throw new NullReferenceException();
 
                                     //esp = PopToRegister(ref info, ip->Register1, esp);
+                                }
+                                break;
+                            case OpCodeREnum.Constrained:
+                                {
+                                    type = domain.GetType(ip->Operand);
+                                    var m = domain.GetMethod((int)ip->Operand2);
+                                    var pCnt = m.ParameterCount;
+                                    objRef = Minus(esp, pCnt + 1);
+                                    var insIdx = mStack.Count;
+                                    if (objRef->ObjectType < ObjectTypes.Object)
+                                    {
+                                        bool moved = false;
+                                        //move parameters
+                                        for (int i = 0; i < pCnt; i++)
+                                        {
+                                            var pPtr = Minus(esp, i + 1);
+                                            if (pPtr->ObjectType >= ObjectTypes.Object)
+                                            {
+                                                var oldVal = pPtr->Value;
+                                                insIdx--;
+                                                if (!moved)
+                                                {
+                                                    pPtr->Value = mStack.Count;
+                                                    mStack.Add(mStack[oldVal]);
+                                                    mStack[oldVal] = null;
+                                                    moved = true;
+                                                }
+                                                else
+                                                {
+                                                    mStack[oldVal + 1] = mStack[oldVal];
+                                                    mStack[oldVal] = null;
+                                                    pPtr->Value = oldVal + 1;
+                                                }
+                                            }
+                                        }
+                                        if (!moved)
+                                        {
+                                            mStack.Add(null);
+                                        }
+                                    }
+                                    else
+                                        insIdx = objRef->Value;
+                                    objRef2 = GetObjectAndResolveReference(objRef);
+                                    if (type != null)
+                                    {
+                                        if (type is ILType)
+                                        {
+                                            var t = (ILType)type;
+                                            if (t.IsEnum)
+                                            {
+                                                ILEnumTypeInstance ins = new ILEnumTypeInstance(t);
+                                                switch (objRef2->ObjectType)
+                                                {
+                                                    case ObjectTypes.FieldReference:
+                                                        {
+                                                            var owner = mStack[objRef2->Value] as ILTypeInstance;
+                                                            int idx = objRef2->ValueLow;
+                                                            //Free(objRef);
+                                                            owner.PushToStack(idx, objRef, this, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    case ObjectTypes.StaticFieldReference:
+                                                        {
+                                                            var st = AppDomain.GetType(objRef2->Value) as ILType;
+                                                            int idx = objRef2->ValueLow;
+                                                            //Free(objRef);
+                                                            st.StaticInstance.PushToStack(idx, objRef, this, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    case ObjectTypes.ArrayReference:
+                                                        {
+                                                            var arr = mStack[objRef2->Value];
+                                                            var idx = objRef2->ValueLow;
+                                                            //Free(objRef);
+                                                            LoadFromArrayReference(arr, idx, objRef, t, mStack);
+                                                            ins.AssignFromStack(0, objRef, AppDomain, mStack);
+                                                            ins.Boxed = true;
+                                                        }
+                                                        break;
+                                                    default:
+                                                        ins.AssignFromStack(0, objRef2, AppDomain, mStack);
+                                                        ins.Boxed = true;
+                                                        break;
+                                                }
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = ins;
+
+                                                //esp = PushObject(esp - 1, mStack, ins);
+                                            }
+                                            else
+                                            {
+                                                object res = RetriveObject(objRef2, mStack);
+                                                //Free(objRef);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = res;
+                                                //esp = PushObject(objRef, mStack, res, true);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var tt = type.TypeForCLR;
+                                            if (tt.IsEnum)
+                                            {
+                                                mStack[insIdx] = Enum.ToObject(tt, StackObject.ToObject(objRef2, AppDomain, mStack));
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                //esp = PushObject(esp - 1, mStack, Enum.ToObject(tt, StackObject.ToObject(obj, AppDomain, mStack)), true);
+                                            }
+                                            else if (tt.IsPrimitive)
+                                            {
+                                                mStack[insIdx] = tt.CheckCLRTypes(StackObject.ToObject(objRef2, AppDomain, mStack));
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                //esp = PushObject(esp - 1, mStack, tt.CheckCLRTypes(StackObject.ToObject(obj, AppDomain, mStack)));
+                                            }
+                                            else
+                                            {
+                                                object res = RetriveObject(objRef2, mStack);
+                                                //Free(objRef);
+                                                objRef->ObjectType = ObjectTypes.Object;
+                                                objRef->Value = insIdx;
+                                                mStack[insIdx] = res;
+                                                //esp = PushObject(objRef, mStack, res, true);
+                                            }
+                                        }
+                                    }
+                                    else
+                                        throw new NullReferenceException();
                                 }
                                 break;
                             case OpCodeREnum.Unbox:

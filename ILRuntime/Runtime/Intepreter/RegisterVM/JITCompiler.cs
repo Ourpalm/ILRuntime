@@ -334,10 +334,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         bool canInline, isILMethod;
                         ILMethod toInline;
                         var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline, out isILMethod);
-
-                        if (!canInline)
+                        bool hasConstrained = false;
+                        int constrainIdx = -1;
+                        if (lst.Count > 0)
                         {
-                            int pushCnt = Math.Max(pCnt - CallRegisterParamCount, 0);
+                            constrainIdx = lst.Count - 1;
+                            hasConstrained = lst[constrainIdx].Code == OpCodeREnum.Constrained;
+                        }
+                        if (!canInline || hasConstrained)
+                        {
+                            int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - CallRegisterParamCount, 0);
                             for (int i = pCnt; i > pCnt - pushCnt; i--)
                             {
                                 OpCodes.OpCodeR op2 = new OpCodes.OpCodeR();
@@ -364,7 +370,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         break;
                                 }
                             }
-
+                            if (hasConstrained)
+                            {
+                                op.Operand4 = 1;
+                                var old = lst[constrainIdx];
+                                lst.RemoveAt(constrainIdx);
+                                old.Operand2 = op.Operand2;
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                                var symbol = block.InstructionMapping[constrainIdx];
+                                block.InstructionMapping.Remove(constrainIdx);
+                                block.InstructionMapping.Add(lst.Count, symbol);
+#endif
+                                lst.Add(old);
+                            }
                             baseRegIdx -= (short)pCnt;
 
                             if (hasRet)
@@ -451,7 +469,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Nop:
                 case Code.Castclass:
-                case Code.Constrained:
                     break;
                 case Code.Stloc_0:
                     op.Code = OpCodes.OpCodeREnum.Move;
@@ -657,6 +674,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Isinst:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
+                    op.Operand = method.GetTypeTokenHashCode(token);
+                    break;
+                case Code.Constrained:
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Ldtoken:
