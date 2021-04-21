@@ -70,7 +70,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 var op2 = ins[j];
                                 if (IsBranching(op2.Code))
                                 {
-                                    if (op2.Operand >= i)
+                                    if (op2.Operand > i)
                                     {
                                         op2.Operand++;
                                         ins[j] = op2;
@@ -99,6 +99,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                     if (jumpTables == null)
                         jumpTables = new Dictionary<int, int[]>();
+                    opcode.Operand = newTargets.GetHashCode();
                     jumpTables.Add(opcode.Operand, newTargets);
                 }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG

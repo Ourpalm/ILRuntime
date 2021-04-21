@@ -38,8 +38,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             symbols = new Dictionary<int, RegisterVMSymbol>();
+#else
+            symbols = null;
 #endif
-            
+
             var body = def.Body;
             short locVarRegStart = (short)def.Parameters.Count;
             if (!def.IsStatic)
@@ -112,7 +114,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 for (int idx = 0; idx < b.FinalInstructions.Count; idx++)
                 {
                     if (b.CanRemove.Contains(idx))
+                    {
+                        if (isInline)
+                            inlineOffset--;
                         continue;
+                    }
                     var ins = b.FinalInstructions[idx];
                     if (ins.Code == OpCodeREnum.InlineStart)
                     {

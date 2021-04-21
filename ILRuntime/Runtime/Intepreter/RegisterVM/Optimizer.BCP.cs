@@ -30,16 +30,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     OpCodeR X = lst[i];
                     if (X.Code == OpCodeREnum.InlineStart)
                     {
-                        isInline = true;
+                        isInline = false;
                         continue;
                     }
                     if (X.Code == OpCodeREnum.InlineEnd)
                     {
-                        isInline = false;
+                        isInline = true;
                         continue;
                     }
-                    //if (isInline)
-                    //    continue;
+                    if (isInline)
+                        continue;
                     if (X.Code == OpCodeREnum.Nop)
                     {
                         canRemove.Add(i);
