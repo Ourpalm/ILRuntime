@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 
 using ILRuntime.Runtime.Stack;
+using System.Diagnostics;
 
 namespace ILRuntimeTest
 {
@@ -33,20 +34,50 @@ namespace ILRuntimeTest
             managedIdx = 0;
             List<StackObjectAllocation> lst = new List<StackObjectAllocation>();
             StackObjectAllocator allocator = new StackObjectAllocator(Alloc);
-            lst.Add(allocator.Alloc((StackObject*)2, 5, 10));
+            lst.Add(allocator.Alloc((StackObject*)2, 8, 3));
             managedIdx += 10;
 
             lst.Add(allocator.Alloc((StackObject*)3, 2, 1));
             managedIdx += 1;
 
-            lst.Add(allocator.Alloc((StackObject*)2, 2, 1));
+            lst.Add(allocator.Alloc((StackObject*)2, 2, 3));
             managedIdx += 1;
 
-            lst.Add(allocator.Alloc((StackObject*)4, 2, 1));
+            lst.Add(allocator.Alloc((StackObject*)4, 4, 4));
             managedIdx += 1;
 
             allocator.Free((StackObject*)2);
             allocator.Free((StackObject*)4);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            Random rand = new Random();
+            for (int i = 0; i < 100000000; i++)
+            {
+                /*switch (i % 3)
+                {
+                    case 0:
+                        allocator.Alloc((StackObject*)2, 5, 2);
+                        break;
+                    case 1:
+                        allocator.Alloc((StackObject*)3, 5, 2);
+                        break;
+                    case 2:
+                        allocator.Alloc((StackObject*)2, 5, 2);
+                        break;
+                }*/
+                allocator.Alloc((StackObject*)rand.Next(2, 5), rand.Next(2, 5), rand.Next(2, 5));
+            }
+            sw.Stop();
+            Console.WriteLine("Elapsed:" + sw.ElapsedMilliseconds);
+            sw.Restart();
+            for (int i = 0; i < 100000000; i++)
+            {
+                rand.Next(2, 8);
+                rand.Next(2, 10);
+                rand.Next(2, 10);
+            }
+            Console.WriteLine("Elapsed:" + sw.ElapsedMilliseconds);
 
         }
 
@@ -54,7 +85,7 @@ namespace ILRuntimeTest
         {
             dst = curPtr;
             curPtr -= size;
-            mIdx = managedIdx;            
+            mIdx = managedIdx;
         }
     }
 }

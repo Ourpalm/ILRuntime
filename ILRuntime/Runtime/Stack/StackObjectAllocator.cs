@@ -30,6 +30,7 @@ namespace ILRuntime.Runtime.Stack
         public StackObjectAllocator(StackObjectAllocateCallback cb)
         {
             allocCallback = cb;
+            freeBlocks = new MemoryBlockInfo[8];
         }
 
         void ExpandFreeList()
@@ -38,69 +39,6 @@ namespace ILRuntime.Runtime.Stack
             MemoryBlockInfo[] newArr = new MemoryBlockInfo[freeBlocks.Length + expandSize];
             freeBlocks.CopyTo(newArr, 0);
             freeBlocks = newArr;
-        }
-
-
-        void InsertFreeMemoryBlock(ref MemoryBlockInfo block, int index)
-        {
-            if (index >= freeBlocks.Length - 1)
-            {
-                ExpandFreeList();
-                freeBlocks[index] = block;
-            }
-            else
-            {
-                int freeSize = 0, freeMCount = 0, freeBlock = 0;
-                for (int i = index; i < freeBlocks.Length; i++)
-                {
-                    if (freeBlocks[i].RequestAddress != null || freeBlocks[i].StartAddress == null)
-                        break;
-                    freeSize += freeBlocks[i].Size;
-                    freeMCount += freeBlocks[i].ManagedCount;
-                    freeBlock++;
-                }
-                if (freeBlock > 0)
-                {
-                    freeBlocks[index].Size = freeSize + block.Size;
-                    freeBlocks[index].ManagedCount = freeMCount + block.ManagedCount;
-
-                    int tail = index + freeBlock + 1;
-                    var cnt = freeBlocks.Length;
-                    if (tail < freeBlocks.Length)
-                    {
-                        Array.Copy(freeBlocks, tail, freeBlocks, index + 1, cnt - tail);
-                    }
-                    for (int i = cnt - freeBlock; i < cnt; i++)
-                    {
-                        freeBlocks[i] = default(MemoryBlockInfo);
-                    }
-                }
-                else
-                {
-                    Array.Copy(freeBlocks, index, freeBlocks, index + 1, freeBlocks.Length - index - 1);
-                    freeBlocks[index] = block;
-                }
-            }
-        }
-
-        void CheckBlockSizeAndAlloc(StackObject* ptr, ref MemoryBlockInfo block, int idx, int size, int managedSize, out StackObjectAllocation alloc)
-        {
-            if (block.Size > size || block.ManagedCount > managedSize)
-            {
-                MemoryBlockInfo newBlock = new MemoryBlockInfo()
-                {
-                    StartAddress = ILIntepreter.Minus(block.StartAddress, size),
-                    Size = block.Size - size,
-                    ManagedIndex = block.ManagedIndex + managedSize,
-                    ManagedCount = block.ManagedCount - managedSize
-                };
-                InsertFreeMemoryBlock(ref newBlock, idx + 1);
-                block.Size = size;
-                block.ManagedCount = managedSize;
-            }
-            block.RequestAddress = ptr;
-            alloc.Address = block.StartAddress;
-            alloc.ManagedIndex = block.ManagedIndex;
         }
 
         void FreeBlock(int idx)
@@ -165,10 +103,10 @@ namespace ILRuntime.Runtime.Stack
 
         public StackObjectAllocation Alloc(StackObject* ptr, int size, int managedSize)
         {
-            if (freeBlocks == null)
-                freeBlocks = new MemoryBlockInfo[8];
             int found = -1;
             int emptyIndex = -1;
+            StackObjectAllocation alloc;
+
             for (int i = 0; i < freeBlocks.Length; i++)
             {
                 if (freeBlocks[i].StartAddress == null)
@@ -178,6 +116,16 @@ namespace ILRuntime.Runtime.Stack
                 }
                 if (freeBlocks[i].RequestAddress == ptr)
                 {
+                    if (freeBlocks[i].Size >= size && freeBlocks[i].ManagedCount >= managedSize)
+                    {
+                        return new StackObjectAllocation()
+                        {
+                            Address = freeBlocks[i].StartAddress,
+                            ManagedIndex = freeBlocks[i].ManagedIndex
+                        };
+                    }
+                    //freeBlocks[i].RequestAddress = null;
+                    //freeIndex = i;
                     FreeBlock(i);
                 }
             }
@@ -194,10 +142,14 @@ namespace ILRuntime.Runtime.Stack
                     }
                 }
             }
-            StackObjectAllocation alloc;
             if (found >= 0)
             {
-                CheckBlockSizeAndAlloc(ptr, ref freeBlocks[found], found, size, managedSize, out alloc);
+                freeBlocks[found].RequestAddress = ptr;
+                return new StackObjectAllocation()
+                {
+                    Address = freeBlocks[found].StartAddress,
+                    ManagedIndex = freeBlocks[found].ManagedIndex
+                };
             }
             else
             {
