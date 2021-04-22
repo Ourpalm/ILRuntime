@@ -16,13 +16,13 @@ namespace ILRuntime.Runtime.Stack
         public int ManagedCount;
     }
 
-    unsafe struct StackObjectAllocation
+    public unsafe struct StackObjectAllocation
     {
         public StackObject* Address;
         public int ManagedIndex;
     }
     public unsafe delegate void StackObjectAllocateCallback(int size, out StackObject* ptr, out int managedIdx);
-    unsafe class StackObjectAllocator
+    public unsafe class StackObjectAllocator
     {
         MemoryBlockInfo[] freeBlocks;
         StackObjectAllocateCallback allocCallback;
@@ -122,6 +122,21 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
+        public void Free(StackObject* ptr)
+        {
+            var cnt = freeBlocks.Length;
+            for (int i = 0; i < cnt; i++)
+            {
+                if (freeBlocks[i].StartAddress == null)
+                    break;
+                if (freeBlocks[i].RequestAddress == ptr)
+                {
+                    FreeBlock(i);
+                    break;
+                }
+            }
+        }
+
         public StackObjectAllocation Alloc(StackObject* ptr, int size, int managedSize)
         {
             if (freeBlocks == null)
@@ -130,14 +145,13 @@ namespace ILRuntime.Runtime.Stack
             int emptyIndex = -1;
             for (int i = 0; i < freeBlocks.Length; i++)
             {
-                if (freeBlocks[i].StartAddress == null)
+                if (freeBlocks[i].StartAddress == null && emptyIndex < 0)
                 {
                     emptyIndex = i;
-                    break;
                 }
                 if (freeBlocks[i].RequestAddress == ptr)
                 {
-                    FreeBlock(i);                    
+                    FreeBlock(i);
                 }
             }
             for (int i = 0; i < freeBlocks.Length; i++)

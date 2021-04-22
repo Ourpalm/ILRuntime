@@ -130,6 +130,7 @@
     <Compile Include="Runtime\Stack\RuntimeStack.cs" />
     <Compile Include="Runtime\Stack\StackFrame.cs" />
     <Compile Include="Runtime\Stack\StackObject.cs" />
+    <Compile Include="Runtime\Stack\StackObjectAllocator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -391,7 +391,7 @@ namespace ILRuntime.CLR.Method
 
                 if (appdomain.EnableRegisterVM)
                 {
-                    Runtime.Intepreter.RegisterVM.JITCompiler jit = new Runtime.Intepreter.RegisterVM.JITCompiler(appdomain, declaringType, this);
+                    JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
                     bodyRegister = jit.Compile(out stackRegisterCnt, out jumptablesR, out registerSymbols);
                 }
                 else
