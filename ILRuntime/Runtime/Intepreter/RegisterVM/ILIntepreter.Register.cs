@@ -89,7 +89,7 @@ namespace ILRuntime.Runtime.Intepreter
             int finallyEndAddress = 0;
 
             var stackRegStart = frame.LocalVarPointer;
-            StackObject* r = Minus(frame.LocalVarPointer, method.ParameterCount);
+            StackObject* r = frame.LocalVarPointer - method.ParameterCount;
             IList<object> mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
             if (method.HasThis)//this parameter is always object reference
@@ -110,7 +110,7 @@ namespace ILRuntime.Runtime.Intepreter
             //Managed Stack reserved for arguments(In case of starg)
             for (int i = 0; i < paramCnt; i++)
             {
-                var a = Add(r, i);
+                var a = (r + i);
                 switch (a->ObjectType)
                 {
                     /*case ObjectTypes.Null:
@@ -152,7 +152,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 InitializeRegisterLocal(method, i, v1, locBase, mStack);
             }*/
-            esp = Add(stackRegStart, stackRegCnt + locCnt);
+            esp = stackRegStart + stackRegCnt + locCnt;
 
             info.RegisterEnd = esp;
 
@@ -199,14 +199,14 @@ namespace ILRuntime.Runtime.Intepreter
                             /*case OpCodeREnum.Ldarg:
                             case OpCodeREnum.Ldarg_S:
                                 {
-                                    reg1 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register2);
                                     CopyToRegister(ref info, ip->Register1, reg1);
                                 }
                                 break;*/
                             case OpCodeREnum.Ldarga:
                             case OpCodeREnum.Ldarga_S:
-                                reg1 = Add(r, ip->Register2);
-                                reg2 = Add(r, ip->Register1);
+                                reg1 = (r + ip->Register2);
+                                reg2 = (r + ip->Register1);
 
                                 reg2->ObjectType = ObjectTypes.StackObjectReference;
                                 *(long*)&reg2->Value = (long)reg1;
@@ -215,70 +215,70 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Load Constants
                             case OpCodeREnum.Ldc_I4_M1:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = -1;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_0:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 0;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_1:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 1;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_2:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 2;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_3:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 3;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 4;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_5:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 5;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_6:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 6;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_7:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 7;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I4_8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.Integer;
                                     reg1->Value = 8;
                                 }
@@ -286,27 +286,27 @@ namespace ILRuntime.Runtime.Intepreter
 
                             case OpCodeREnum.Ldc_I4:
                             case OpCodeREnum.Ldc_I4_S:
-                                reg1 = Add(r, ip->Register1);
+                                reg1 = (r + ip->Register1);
                                 reg1->ObjectType = ObjectTypes.Integer;
                                 reg1->Value = ip->Operand;
                                 break;
                             case OpCodeREnum.Ldc_R4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     *(float*)(&reg1->Value) = ip->OperandFloat;
                                     reg1->ObjectType = ObjectTypes.Float;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_I8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     *(long*)(&reg1->Value) = ip->OperandLong;
                                     reg1->ObjectType = ObjectTypes.Long;
                                 }
                                 break;
                             case OpCodeREnum.Ldc_R8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     *(double*)(&reg1->Value) = ip->OperandDouble;
                                     reg1->ObjectType = ObjectTypes.Double;
                                 }
@@ -315,7 +315,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 AssignToRegister(ref info, ip->Register1, AppDomain.GetString(ip->OperandLong));
                                 break;
                             case OpCodeREnum.Ldnull:
-                                //reg1 = Add(r, ip->Register1);
+                                //reg1 = (r + ip->Register1);
                                 AssignToRegister(ref info, ip->Register1, null, true);
                                 //WriteNull(reg1);
                                 break;
@@ -324,9 +324,9 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Althemetics
                             case OpCodeREnum.Add:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2); 
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -352,9 +352,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Sub:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -380,9 +380,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Mul:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -409,9 +409,9 @@ namespace ILRuntime.Runtime.Intepreter
 
                             case OpCodeREnum.Div:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -437,9 +437,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Div_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -457,9 +457,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Rem:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -485,9 +485,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Rem_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -505,9 +505,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Xor:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -525,9 +525,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.And:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -545,9 +545,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Or:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -565,9 +565,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Shl:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -585,9 +585,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Shr:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -605,9 +605,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Shr_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -625,8 +625,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Not:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -644,8 +644,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Neg:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -679,8 +679,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Conv_Ovf_I4:
                             case OpCodeREnum.Conv_Ovf_I4_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -706,8 +706,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Conv_Ovf_I8:
                             case OpCodeREnum.Conv_Ovf_I8_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Integer:
@@ -731,8 +731,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Conv_R4:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -756,8 +756,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Conv_R8:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.Long:
@@ -781,8 +781,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Conv_R_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     bool isDouble = false;
                                     double val2 = 0;
                                     switch (reg1->ObjectType)
@@ -820,14 +820,14 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Load Store
                             case OpCodeREnum.Move:
                                 {
-                                    reg1 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register2);
                                     CopyToRegister(ref info, ip->Register1, reg1);
                                 }
                                 break;
 
                             case OpCodeREnum.Push:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     CopyToStack(esp, reg1, mStack);
                                     if (ip->Operand == 1)
                                         mStack.Add(null);
@@ -837,8 +837,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldloca:
                             case OpCodeREnum.Ldloca_S:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
 
                                     reg2->ObjectType = ObjectTypes.StackObjectReference;
                                     *(long*)&reg2->Value = (long)reg1;
@@ -846,8 +846,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldobj:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     switch (reg1->ObjectType)
                                     {
                                         case ObjectTypes.ArrayReference:
@@ -916,8 +916,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stobj:
                                 {
-                                    val = Add(r, ip->Register2);
-                                    objRef = Add(r, ip->Register1);
+                                    val = (r + ip->Register2);
+                                    objRef = (r + ip->Register1);
                                     switch (objRef->ObjectType)
                                     {
                                         case ObjectTypes.ArrayReference:
@@ -1002,8 +1002,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldind_U2:
                             case OpCodeREnum.Ldind_U4:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    dst = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    dst = (r + ip->Register1);
                                     val = GetObjectAndResolveReference(reg1);
                                     switch (val->ObjectType)
                                     {
@@ -1036,8 +1036,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldind_I8:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    dst = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    dst = (r + ip->Register1);
                                     val = GetObjectAndResolveReference(reg1);
                                     switch (val->ObjectType)
                                     {
@@ -1069,8 +1069,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldind_R4:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    dst = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    dst = (r + ip->Register1);
                                     val = GetObjectAndResolveReference(reg1);
                                     switch (val->ObjectType)
                                     {
@@ -1103,8 +1103,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldind_R8:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    dst = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    dst = (r + ip->Register1);
                                     val = GetObjectAndResolveReference(reg1);
                                     switch (val->ObjectType)
                                     {
@@ -1136,7 +1136,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldind_Ref:
                                 {
-                                    reg1 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register2);
                                     val = GetObjectAndResolveReference(reg1);
                                     CopyToRegister(ref info, ip->Register1, val);
                                 }
@@ -1147,8 +1147,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Stind_I4:
                             case OpCodeREnum.Stind_R4:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     dst = GetObjectAndResolveReference(reg2);
                                     switch (dst->ObjectType)
                                     {
@@ -1174,8 +1174,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stind_I8:
                                 {
-                                    val = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    val = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     dst = GetObjectAndResolveReference(reg2);
                                     switch (dst->ObjectType)
                                     {
@@ -1202,8 +1202,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stind_R8:
                                 {
-                                    val = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    val = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     dst = GetObjectAndResolveReference(reg2);
                                     switch (dst->ObjectType)
                                     {
@@ -1230,8 +1230,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stind_Ref:
                                 {
-                                    val = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register1);
+                                    val = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
                                     dst = GetObjectAndResolveReference(reg2);
                                     switch (dst->ObjectType)
                                     {
@@ -1307,7 +1307,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ret:
                                 if (hasReturn)
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     CopyToStack(esp, reg1, mStack);
                                     esp++;
                                 }
@@ -1320,7 +1320,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Brtrue:
                             case OpCodeREnum.Brtrue_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     bool res = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1344,7 +1344,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Brfalse:
                             case OpCodeREnum.Brfalse_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     bool res = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1371,8 +1371,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Beq:
                             case OpCodeREnum.Beq_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     if (reg1->ObjectType == reg2->ObjectType)
                                     {
@@ -1418,8 +1418,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Bne_Un:
                             case OpCodeREnum.Bne_Un_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     if (reg1->ObjectType == reg2->ObjectType)
                                     {
@@ -1467,8 +1467,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Blt:
                             case OpCodeREnum.Blt_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1499,8 +1499,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Blt_Un:
                             case OpCodeREnum.Blt_Un_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1531,8 +1531,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ble:
                             case OpCodeREnum.Ble_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1563,8 +1563,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ble_Un:
                             case OpCodeREnum.Ble_Un_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1595,8 +1595,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Bgt:
                             case OpCodeREnum.Bgt_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
 
                                     transfer = false;
                                     switch (reg1->ObjectType)
@@ -1628,8 +1628,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Bgt_Un:
                             case OpCodeREnum.Bgt_Un_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1660,8 +1660,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Bge:
                             case OpCodeREnum.Bge_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1692,8 +1692,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Bge_Un:
                             case OpCodeREnum.Bge_Un_S:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     transfer = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -1723,7 +1723,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Switch:
                                 {
-                                    intVal = Add(r, ip->Register1)->Value;
+                                    intVal = (r + ip->Register1)->Value;
                                     var table = method.JumpTablesRegister[ip->Operand];
                                     if (intVal >= 0 && intVal < table.Length)
                                     {
@@ -1760,13 +1760,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                 switch (i)
                                                 {
                                                     case 0:
-                                                        reg1 = Add(r, ip->Register2);
+                                                        reg1 = (r + ip->Register2);
                                                         break;
                                                     case 1:
-                                                        reg1 = Add(r, ip->Register3);
+                                                        reg1 = (r + ip->Register3);
                                                         break;
                                                     case 2:
-                                                        reg1 = Add(r, ip->Register4);
+                                                        reg1 = (r + ip->Register4);
                                                         break;
                                                     default:
                                                         throw new NotSupportedException();
@@ -1785,7 +1785,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             bool processed = false;
                                             if (m.IsDelegateInvoke)
                                             {
-                                                var instance = StackObject.ToObject((Minus(esp, m.ParameterCount + 1)), domain, mStack);
+                                                var instance = StackObject.ToObject((esp - (m.ParameterCount + 1)), domain, mStack);
                                                 if (instance is IDelegateAdapter)
                                                 {
                                                     esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
@@ -1796,7 +1796,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 if (code == OpCodeREnum.Callvirt)
                                                 {
-                                                    objRef = GetObjectAndResolveReference(Minus(esp, ilm.ParameterCount + 1));
+                                                    objRef = GetObjectAndResolveReference(esp - (ilm.ParameterCount + 1));
                                                     if (objRef->ObjectType == ObjectTypes.Null)
                                                         throw new NullReferenceException();
                                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
@@ -1825,7 +1825,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             bool processed = false;
                                             if (cm.IsDelegateInvoke)
                                             {
-                                                var instance = StackObject.ToObject((Minus(esp, cm.ParameterCount + 1)), domain, mStack);
+                                                var instance = StackObject.ToObject((esp - (cm.ParameterCount + 1)), domain, mStack);
                                                 if (instance is IDelegateAdapter)
                                                 {
                                                     esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
@@ -1868,9 +1868,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                     int paramCount = cm.ParameterCount;
                                                     for (int i = 1; i <= paramCount; i++)
                                                     {
-                                                        Free(Minus(esp, i));
+                                                        Free(esp - (i));
                                                     }
-                                                    esp = Minus(esp, paramCount);
+                                                    esp = esp - (paramCount);
                                                     if (cm.HasThis)
                                                     {
                                                         Free(esp - 1);
@@ -1896,8 +1896,8 @@ namespace ILRuntime.Runtime.Intepreter
                             #region FieldOperation
                             case OpCodeREnum.Stfld:
                                 {
-                                    reg2 = Add(r, ip->Register2);
-                                    objRef = GetObjectAndResolveReference(Add(r, ip->Register1));
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
@@ -1989,16 +1989,16 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldfld:
                                 {
-                                    reg2 = Add(r, ip->Register2);
+                                    reg2 = (r + ip->Register2);
                                     objRef = GetObjectAndResolveReference(reg2);
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = *(StackObject**)&objRef->Value;
                                         var ft = domain.GetType(dst->Value);
                                         if (ft is ILType)
-                                            val = Minus(dst, (int)ip->OperandLong + 1);
+                                            val = dst - ((int)ip->OperandLong + 1);
                                         else
-                                            val = Minus(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                            val = dst - (((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
                                         //TODO: Check master modification
                                         CopyToRegister(ref info, ip->Register1, dst);
                                     }
@@ -2044,8 +2044,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldflda:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     objRef = GetObjectAndResolveReference(reg2);
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
@@ -2053,11 +2053,11 @@ namespace ILRuntime.Runtime.Intepreter
                                         StackObject* fieldAddr;
                                         if (ft is ILType)
                                         {
-                                            fieldAddr = Minus(ILIntepreter.ResolveReference(objRef), (int)ip->OperandLong + 1);
+                                            fieldAddr = ILIntepreter.ResolveReference(objRef) - ((int)ip->OperandLong + 1);
                                         }
                                         else
                                         {
-                                            fieldAddr = Minus(ILIntepreter.ResolveReference(objRef), ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                            fieldAddr = ILIntepreter.ResolveReference(objRef) - (((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
                                         }
                                         reg1->ObjectType = ObjectTypes.StackObjectReference;
                                         *(long*)&reg1->Value = (long)fieldAddr;
@@ -2081,7 +2081,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     type = AppDomain.GetType((int)(ip->OperandLong >> 32));
                                     if (type != null)
                                     {
-                                        reg1 = Add(r, ip->Register1);
+                                        reg1 = (r + ip->Register1);
                                         if (type is ILType)
                                         {
                                             ILType t = type as ILType;
@@ -2135,7 +2135,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldsflda:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     reg1->ObjectType = ObjectTypes.StaticFieldReference;
                                     reg1->Value = (int)(ip->OperandLong >> 32);
                                     reg1->ValueLow = (int)(ip->OperandLong);
@@ -2156,13 +2156,13 @@ namespace ILRuntime.Runtime.Intepreter
                                             switch (i)
                                             {
                                                 case 0:
-                                                    reg1 = Add(r, ip->Register2);
+                                                    reg1 = (r + ip->Register2);
                                                     break;
                                                 case 1:
-                                                    reg1 = Add(r, ip->Register3);
+                                                    reg1 = (r + ip->Register3);
                                                     break;
                                                 case 2:
-                                                    reg1 = Add(r, ip->Register4);
+                                                    reg1 = (r + ip->Register4);
                                                     break;
                                                 default:
                                                     throw new NotSupportedException();
@@ -2338,7 +2338,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     {
                                                         Free(esp - i);
                                                     }
-                                                    esp = Minus(esp, paramCount);
+                                                    esp = esp - (paramCount);
                                                     esp = PushObject(esp, mStack, result);//new constructedObj
                                                 }
                                             }
@@ -2349,8 +2349,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Box:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    objRef = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    objRef = (r + ip->Register2);
                                     type = domain.GetType(ip->Operand);
                                     if (type != null)
                                     {
@@ -2640,7 +2640,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     type = domain.GetType(ip->Operand);
                                     var m = domain.GetMethod((int)ip->Operand2);
                                     var pCnt = m.ParameterCount;
-                                    objRef = Minus(esp, pCnt + 1);
+                                    objRef = esp - (pCnt + 1);
                                     var insIdx = mStack.Count;
                                     if (objRef->ObjectType < ObjectTypes.Object)
                                     {
@@ -2648,7 +2648,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         //move parameters
                                         for (int i = 0; i < pCnt; i++)
                                         {
-                                            var pPtr = Minus(esp, i + 1);
+                                            var pPtr = esp - (i + 1);
                                             if (pPtr->ObjectType >= ObjectTypes.Object)
                                             {
                                                 var oldVal = pPtr->Value;
@@ -2772,7 +2772,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Unbox:
                             case OpCodeREnum.Unbox_Any:
                                 {
-                                    objRef = Add(r, ip->Register2);
+                                    objRef = (r + ip->Register2);
                                     if (objRef->ObjectType == ObjectTypes.Object)
                                     {
                                         obj = mStack[objRef->Value];
@@ -2785,7 +2785,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 bool isEnumObj = obj is ILEnumTypeInstance;
                                                 if ((t is CLRType) && clrType.IsPrimitive && !isEnumObj)
                                                 {
-                                                    reg1 = Add(r, ip->Register1);
+                                                    reg1 = (r + ip->Register1);
                                                     if (clrType == typeof(int))
                                                     {
                                                         intVal = obj.ToInt32();
@@ -2905,7 +2905,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Initobj:
                                 {
-                                    reg1 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register1);
                                     objRef = GetObjectAndResolveReference(reg1);
                                     type = domain.GetType(ip->Operand);
                                     if (type is ILType)
@@ -3111,7 +3111,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Isinst:
                                 {
-                                    reg2 = Add(r, ip->Register2);
+                                    reg2 = (r + ip->Register2);
                                     type = domain.GetType(ip->Operand);
                                     if (type != null)
                                     {
@@ -3207,7 +3207,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldvirtftn:
                                 {
                                     IMethod m = domain.GetMethod(ip->Operand2);
-                                    objRef = Add(r, ip->Register2);
+                                    objRef = (r + ip->Register2);
                                     if (m is ILMethod)
                                     {
                                         ILMethod ilm = (ILMethod)m;
@@ -3233,9 +3233,9 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Compare
                             case OpCodeREnum.Ceq:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     bool res = false;
                                     if (reg1->ObjectType == reg2->ObjectType)
                                     {
@@ -3280,9 +3280,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Clt:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     bool res = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -3309,9 +3309,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Clt_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     bool res = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -3338,9 +3338,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Cgt:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     bool res = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -3367,9 +3367,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Cgt_Un:
                                 {
-                                    reg1 = Add(r, ip->Register2);
-                                    reg2 = Add(r, ip->Register3);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register3);
+                                    reg3 = (r + ip->Register1);
                                     bool res = false;
                                     switch (reg1->ObjectType)
                                     {
@@ -3405,7 +3405,7 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Array
                             case OpCodeREnum.Newarr:
                                 {
-                                    reg2 = Add(r, ip->Register2);
+                                    reg2 = (r + ip->Register2);
                                     type = domain.GetType(ip->Operand);
                                     object arr = null;
                                     if (type != null)
@@ -3443,9 +3443,9 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Stelem_Ref:
                             case OpCodeREnum.Stelem_Any:
                                 {
-                                    reg1 = Add(r, ip->Register3);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register1);
+                                    reg1 = (r + ip->Register3);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
 
                                     val = GetObjectAndResolveReference(reg1);
                                     Array arr = mStack[reg3->Value] as Array;
@@ -3526,9 +3526,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stelem_I1:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     byte[] arr = mStack[reg1->Value] as byte[];
                                     if (arr != null)
@@ -3552,9 +3552,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stelem_I2:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     short[] arr = mStack[reg1->Value] as short[];
                                     if (arr != null)
@@ -3578,9 +3578,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stelem_I4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     int[] arr = mStack[reg1->Value] as int[];
                                     if (arr != null)
@@ -3596,9 +3596,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stelem_R4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     float[] arr = mStack[reg1->Value] as float[];
                                     arr[reg2->Value] = *(float*)(&reg3->Value);
@@ -3606,9 +3606,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stelem_I8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     long[] arr = mStack[reg1->Value] as long[];
                                     if (arr != null)
@@ -3624,9 +3624,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stelem_R8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     double[] arr = mStack[reg1->Value] as double[];
                                     arr[reg2->Value] = *(double*)(&reg3->Value);
@@ -3634,8 +3634,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldlen:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
                                     Array arr = mStack[reg2->Value] as Array;
 
                                     reg1->ObjectType = ObjectTypes.Integer;
@@ -3644,9 +3644,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelema:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     Array arr = mStack[reg2->Value] as Array;
                                     intVal = reg3->Value;
@@ -3660,9 +3660,9 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldelem_Ref:
                             case OpCodeREnum.Ldelem_Any:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
                                     Array arr = mStack[reg2->Value] as Array;
                                     obj = arr.GetValue(reg3->Value);
                                     if (obj is CrossBindingAdaptorType)
@@ -3686,9 +3686,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I1:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     bool[] arr = mStack[reg2->Value] as bool[];
                                     if (arr != null)
@@ -3706,9 +3706,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_U1:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     byte[] arr = mStack[reg2->Value] as byte[];
                                     if (arr != null)
@@ -3726,9 +3726,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I2:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     short[] arr = mStack[reg2->Value] as short[];
                                     if (arr != null)
@@ -3746,9 +3746,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_U2:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     ushort[] arr = mStack[reg2->Value] as ushort[];
                                     if (arr != null)
@@ -3766,9 +3766,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     int[] arr = mStack[reg2->Value] as int[];
                                     reg1->ObjectType = ObjectTypes.Integer;
@@ -3777,9 +3777,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_U4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     uint[] arr = mStack[reg2->Value] as uint[];
                                     reg1->ObjectType = ObjectTypes.Integer;
@@ -3788,9 +3788,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_I8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     long[] arr = mStack[reg2->Value] as long[];
                                     if (arr != null)
@@ -3808,9 +3808,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_R4:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     float[] arr = mStack[reg2->Value] as float[];
                                     reg1->ObjectType = ObjectTypes.Float;
@@ -3819,9 +3819,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Ldelem_R8:
                                 {
-                                    reg1 = Add(r, ip->Register1);
-                                    reg2 = Add(r, ip->Register2);
-                                    reg3 = Add(r, ip->Register3);
+                                    reg1 = (r + ip->Register1);
+                                    reg2 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register3);
 
                                     double[] arr = mStack[reg2->Value] as double[];
                                     reg1->ObjectType = ObjectTypes.Double;
@@ -3832,7 +3832,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                             case OpCodeREnum.Throw:
                                 {
-                                    objRef = GetObjectAndResolveReference(Add(r, ip->Register1));
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
                                     var ex = mStack[objRef->Value] as Exception;
                                     throw ex;
                                 }
