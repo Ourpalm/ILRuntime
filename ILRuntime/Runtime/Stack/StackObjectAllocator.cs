@@ -106,8 +106,8 @@ namespace ILRuntime.Runtime.Stack
             int found = -1;
             int emptyIndex = -1;
             StackObjectAllocation alloc;
-
-            for (int i = 0; i < freeBlocks.Length; i++)
+            int cnt = freeBlocks.Length;
+            for (int i = 0; i < cnt; i++)
             {
                 if (freeBlocks[i].StartAddress == null)
                 {
@@ -129,7 +129,7 @@ namespace ILRuntime.Runtime.Stack
                     FreeBlock(i);
                 }
             }
-            for (int i = 0; i < freeBlocks.Length; i++)
+            for (int i = 0; i < cnt; i++)
             {
                 if (freeBlocks[i].StartAddress == null)
                     break;

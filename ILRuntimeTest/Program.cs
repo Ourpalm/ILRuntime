@@ -52,8 +52,9 @@ namespace ILRuntimeTest
             Stopwatch sw = new Stopwatch();
             sw.Start();
             Random rand = new Random();
-            for (int i = 0; i < 100000000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
+                allocator.Alloc((StackObject*)2, 5, 2);
                 /*switch (i % 3)
                 {
                     case 0:
@@ -66,12 +67,12 @@ namespace ILRuntimeTest
                         allocator.Alloc((StackObject*)2, 5, 2);
                         break;
                 }*/
-                allocator.Alloc((StackObject*)rand.Next(2, 5), rand.Next(2, 5), rand.Next(2, 5));
+                //allocator.Alloc((StackObject*)rand.Next(2, 5), rand.Next(2, 5), rand.Next(2, 5));
             }
             sw.Stop();
             Console.WriteLine("Elapsed:" + sw.ElapsedMilliseconds);
             sw.Restart();
-            for (int i = 0; i < 100000000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 rand.Next(2, 8);
                 rand.Next(2, 10);
