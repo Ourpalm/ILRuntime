@@ -57,7 +57,7 @@ namespace TestCases
                 cnt += Add(i, 2);
             }
             sw.Stop();
-            Console.WriteLine(string.Format("cps:{0:0}, result={1}", (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
+            Console.WriteLine(string.Format("time: {0:0}ms cps:{1:0}, result={2}", sw.ElapsedMilliseconds, (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
 
             sw.Restart();
             cnt = 0;
@@ -66,13 +66,13 @@ namespace TestCases
                 cnt += ILRuntimeTest.TestFramework.TestClass2.Add(i, 2);
             }
             sw.Stop();
-            Console.WriteLine(string.Format("cps:{0:0}, result={1}", (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
+            Console.WriteLine(string.Format("time: {0:0}ms cps:{1:0}, result={2}", sw.ElapsedMilliseconds, (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
         }
 
         public static int UnitTest_PerformanceSimple()
         {
             int cnt = 0;
-            for (int i = 0; i < 500000; i++)
+            for (int i = 0; i < 5000000; i++)
             {
                 cnt += i;
             }

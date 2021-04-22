@@ -43,25 +43,42 @@ namespace ILRuntime.Runtime.Stack
 
         void InsertFreeMemoryBlock(ref MemoryBlockInfo block, int index)
         {
-            if (index >= freeBlocks.Length)
+            if (index >= freeBlocks.Length - 1)
             {
                 ExpandFreeList();
                 freeBlocks[index] = block;
             }
             else
             {
-                int freeSize = 0, freeMCount = 0;
+                int freeSize = 0, freeMCount = 0, freeBlock = 0;
                 for (int i = index; i < freeBlocks.Length; i++)
                 {
                     if (freeBlocks[i].RequestAddress != null || freeBlocks[i].StartAddress == null)
                         break;
                     freeSize += freeBlocks[i].Size;
                     freeMCount += freeBlocks[i].ManagedCount;
+                    freeBlock++;
                 }
-                if (freeSize > 0 || freeMCount > 0)
+                if (freeBlock > 0)
                 {
                     freeBlocks[index].Size = freeSize + block.Size;
                     freeBlocks[index].ManagedCount = freeMCount + block.ManagedCount;
+
+                    int tail = index + freeBlock + 1;
+                    var cnt = freeBlocks.Length;
+                    if (tail < freeBlocks.Length)
+                    {
+                        Array.Copy(freeBlocks, tail, freeBlocks, index + 1, cnt - tail);
+                    }
+                    for (int i = cnt - freeBlock; i < cnt; i++)
+                    {
+                        freeBlocks[i] = default(MemoryBlockInfo);
+                    }
+                }
+                else
+                {
+                    Array.Copy(freeBlocks, index, freeBlocks, index + 1, freeBlocks.Length - index - 1);
+                    freeBlocks[index] = block;
                 }
             }
         }
@@ -93,6 +110,15 @@ namespace ILRuntime.Runtime.Stack
             int freeSize = 0;
             int freeManaged = 0;
             int freeBlock = 0;
+            for (int i = idx-1; i >= 0; i--)
+            {
+                if (freeBlocks[i].RequestAddress == null)
+                {
+                    idx = i;
+                }
+                else
+                    break;
+            }
             for (int i = idx + 1; i < cnt; i++)
             {
                 if (freeBlocks[i].StartAddress == null)
@@ -113,7 +139,7 @@ namespace ILRuntime.Runtime.Stack
                 int tail = idx + freeBlock + 1;
                 if (tail < freeBlocks.Length)
                 {
-                    Array.Copy(freeBlocks, tail, freeBlocks, idx + 1, freeBlock);
+                    Array.Copy(freeBlocks, tail, freeBlocks, idx + 1, cnt - tail);
                 }
                 for (int i = cnt - freeBlock; i < cnt; i++)
                 {
@@ -145,9 +171,10 @@ namespace ILRuntime.Runtime.Stack
             int emptyIndex = -1;
             for (int i = 0; i < freeBlocks.Length; i++)
             {
-                if (freeBlocks[i].StartAddress == null && emptyIndex < 0)
+                if (freeBlocks[i].StartAddress == null)
                 {
                     emptyIndex = i;
+                    break;
                 }
                 if (freeBlocks[i].RequestAddress == ptr)
                 {
