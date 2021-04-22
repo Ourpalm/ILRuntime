@@ -38,8 +38,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         isInline = true;
                         continue;
                     }
-                    if (isInline)
-                        continue;
+                    //if (isInline)
+                    //    continue;
                     if (X.Code == OpCodeREnum.Nop)
                     {
                         canRemove.Add(i);
@@ -56,13 +56,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             continue;
                         }
                         //Only deal with stack->local
-                        if (xSrc < stackRegisterBegin/* || xDst >= stackRegisterBegin*/)
+                        if (xSrc < stackRegisterBegin/* || xDst >= stackRegisterBegin*/ || isInline)
                             continue;
                         bool ended = false;
+                        bool propagationInline = false;
                         for (int j = i - 1; j >= 0; j--)
                         {
                             OpCodeR Y = lst[j];
-
+                            if (Y.Code == OpCodeREnum.InlineStart)
+                                propagationInline = false;
+                            else if (Y.Code == OpCodeREnum.InlineEnd)
+                            {
+                                propagationInline = true;
+                            }
                             short yDst;
                             if (GetOpcodeDestRegister(ref Y, out yDst))
                             {
@@ -73,6 +79,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 }
                                 if (xSrc == yDst)
                                 {
+                                    if (propagationInline)
+                                    {
+                                        ended = true;
+                                        break;
+                                    }
                                     ReplaceOpcodeDest(ref Y, xDst);
                                     for (int k = j + 1; k < i; k++)
                                     {

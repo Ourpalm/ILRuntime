@@ -54,7 +54,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
                 if (opcode.Code == OpCodeREnum.Ret)
                 {
-                    if (hasReturn)
+                    bool needMove = hasReturn && opcode.Register1 != baseRegIdx;
+                    if (needMove)
                     {
                         opcode.Code = OpCodeREnum.Move;
                         opcode.Register2 = opcode.Register1;
@@ -64,7 +65,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                     if (i < body.Length - 1)
                     {
-                        if (hasReturn)
+                        if (needMove)
                         {
                             for (int j = 0; j < ins.Count; j++)
                             {

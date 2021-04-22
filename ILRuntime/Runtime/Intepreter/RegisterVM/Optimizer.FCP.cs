@@ -37,8 +37,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         isInline = false;
                         continue;
                     }
-                    if (isInline)
-                        continue;
+                    //if (isInline)
+                    //    continue;
                     if (X.Code == OpCodeREnum.Nop || X.Code == OpCodeREnum.Castclass)
                     {
                         canRemove.Add(i);
@@ -55,7 +55,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             continue;
                         }
                         //Only deal with local->stack, local->local, stack->stack
-                        if (xSrc >= stackRegisterBegin && xDst < stackRegisterBegin)
+                        if (xSrc >= stackRegisterBegin && xDst < stackRegisterBegin || isInline)
                             continue;
                         bool postPropagation = false;
                         bool ended = false;
@@ -68,8 +68,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             else if (Y.Code == OpCodeREnum.InlineEnd)
                             {
                                 propagationInline = false;
-                                if (ended)
-                                    break;
                             }
                             short ySrc, ySrc2, ySrc3;
                             if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
@@ -80,6 +78,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     if (postPropagation)
                                     {
                                         postPropagation = false;
+                                        ended = true;
+                                        break;
+                                    }
+                                    if(propagationInline)
+                                    {
                                         ended = true;
                                         break;
                                     }
@@ -94,6 +97,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         ended = true;
                                         break;
                                     }
+                                    if (propagationInline)
+                                    {
+                                        ended = true;
+                                        break;
+                                    }
                                     ReplaceOpcodeSource(ref Y, 1, xSrc);
                                     replaced = true;
                                 }
@@ -102,6 +110,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     if (postPropagation)
                                     {
                                         postPropagation = false;
+                                        ended = true;
+                                        break;
+                                    }
+                                    if (propagationInline)
+                                    {
                                         ended = true;
                                         break;
                                     }
@@ -121,6 +134,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 }
                                 if (xDst == yDst)
                                 {
+                                    if (propagationInline)
+                                    {
+                                        ended = true;
+                                        break;
+                                    }
                                     postPropagation = false;
                                     canRemove.Add(i);
                                     ended = true;
