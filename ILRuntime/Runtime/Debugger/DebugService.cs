@@ -138,19 +138,23 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     if (f.Address != null)
                     {
-                        f.Method.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol);
-                        RegisterVMSymbolLink link = null;
-                        do
+                        if (f.Method.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))
                         {
-                            if (link != null)
-                                vmSymbol = link.Value;
-                            ins = vmSymbol.Instruction;
-                            var md = vmSymbol.Method.Definition;
-                            document = GetInstructionDocument(ins, md);
-                            sb.AppendFormat("at {0} {1}\r\n", vmSymbol.Method, document);
-                            link = vmSymbol.ParentSymbol;
+                            RegisterVMSymbolLink link = null;
+                            do
+                            {
+                                if (link != null)
+                                    vmSymbol = link.Value;
+                                ins = vmSymbol.Instruction;
+                                var md = vmSymbol.Method.Definition;
+                                document = GetInstructionDocument(ins, md);
+                                sb.AppendFormat("at {0} {1}\r\n", vmSymbol.Method, document);
+                                link = vmSymbol.ParentSymbol;
+                            }
+                            while (link != null);
                         }
-                        while (link != null);
+                        else
+                            sb.AppendFormat("at {0} {1}\r\n", m, document);
                     }
                     else
                         sb.AppendFormat("at {0} {1}\r\n", m, document);

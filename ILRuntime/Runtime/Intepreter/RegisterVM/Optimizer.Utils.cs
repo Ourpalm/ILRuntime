@@ -48,7 +48,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             return false;
         }
-        static bool GetOpcodeSourceRegister(ref OpCodeR op, bool hasReturn, out short r1, out short r2, out short r3)
+        public static bool GetOpcodeSourceRegister(ref OpCodeR op, bool hasReturn, out short r1, out short r2, out short r3)
         {
             r1 = -1;
             r2 = -1;
@@ -267,7 +267,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
         }
 
-        static bool GetOpcodeDestRegister(ref OpCodes.OpCodeR op, out short r1)
+        public static bool GetOpcodeDestRegister(ref OpCodes.OpCodeR op, out short r1)
         {
             r1 = -1;
             switch (op.Code)

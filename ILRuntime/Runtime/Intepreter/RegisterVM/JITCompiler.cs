@@ -34,6 +34,50 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             jumptables = null;
         }
 
+        bool CheckNeedInitObj(CodeBasicBlock block, short reg, bool hasReturn, HashSet<CodeBasicBlock> visited)
+        {
+            if (visited.Contains(block))
+                return false;
+            visited.Add(block);
+            for (int i = 0; i < block.FinalInstructions.Count; i++)
+            {
+                var ins = block.FinalInstructions[i];
+                short r1, r2, r3, rw;
+                Optimizer.GetOpcodeDestRegister(ref ins, out rw);
+                if (Optimizer.GetOpcodeSourceRegister(ref ins, hasReturn, out r1, out r2, out r3))
+                {
+                    if (r1 == reg || r2 == reg || r3 == reg)
+                    {
+                        if (ins.Code == OpCodeREnum.Ldloca || ins.Code == OpCodeREnum.Ldloca_S)
+                        {
+                            if (i < block.FinalInstructions.Count - 1)
+                            {
+                                var next = block.FinalInstructions[i + 1];
+                                if (next.Code == OpCodeREnum.Initobj && next.Register1 == rw)
+                                    return false;
+                            }
+                            else
+                                return true;
+                        }
+                        else
+                            return rw != reg;
+                    }
+                }
+                if (rw == reg)
+                    return false;
+            }
+            if (block.NextBlocks != null && block.NextBlocks.Count > 0)
+            {
+                foreach (var i in block.NextBlocks)
+                {
+                    if (CheckNeedInitObj(i, reg, hasReturn, visited))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
         public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, int[]> switchTargets, out Dictionary<int, RegisterVMSymbol> symbols)
         {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
@@ -71,6 +115,40 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 i.EndRegister = baseRegIdx;
             }
+
+            //Append init local
+            var first = blocks[0];
+            int idx = 0;
+            int appendIdx = 0;
+            HashSet<CodeBasicBlock> visitedBlocks = body.Variables.Count > 0 ? new HashSet<CodeBasicBlock>() : null;
+            for (short r = locVarRegStart; r < locVarRegStart + body.Variables.Count; r++)
+            {
+                visitedBlocks.Clear();
+                if (CheckNeedInitObj(first, r, method.ReturnType != method.AppDomain.VoidType, visitedBlocks))
+                {
+                    OpCodeR code = new OpCodeR();
+                    code.Code = OpCodeREnum.Initobj;
+                    code.Register1 = r;
+                    code.Operand = method.GetTypeTokenHashCode(body.Variables[idx].VariableType);
+                    first.FinalInstructions.Insert(appendIdx++, code);
+                }
+                idx++;
+            }
+            for (idx = first.FinalInstructions.Count - 1; idx >= 0; idx--)
+            {
+                if (idx >= appendIdx)
+                {
+                    RegisterVMSymbol symbol;
+
+                    if (first.InstructionMapping.TryGetValue(idx - appendIdx, out symbol))
+                    {
+                        first.InstructionMapping[idx] = first.InstructionMapping[idx - appendIdx];
+                    }
+                }
+                else
+                    first.InstructionMapping.Remove(idx);
+            }
+            
 #if OUTPUT_JIT_RESULT
             int cnt = 1;
             Console.WriteLine($"JIT Results for {method}:");
@@ -111,7 +189,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 jumpTargets[bIdx++] = res.Count;
                 bool isInline = false;
                 int inlineOffset = 0;
-                for (int idx = 0; idx < b.FinalInstructions.Count; idx++)
+                for (idx = 0; idx < b.FinalInstructions.Count; idx++)
                 {
                     if (b.CanRemove.Contains(idx))
                     {

@@ -299,35 +299,22 @@ namespace ILRuntime.Runtime.Stack
                         allocator = new StackObjectAllocator(AllocBlock);
                     var allocation = allocator.Alloc(ptr, fieldCount + 1, mCnt);
                     dst = allocation.Address;
-                    ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
-                    *(long*)&ptr->Value = (long)dst;
-
-                    if (dst->ObjectType == ObjectTypes.ValueTypeDescriptor && dst->Value == type.GetHashCode())
-                    {
-                        ClearValueTypeObject(type, dst);
-                    }
-                    else
-                    {
-                        dst->ObjectType = ObjectTypes.ValueTypeDescriptor;
-                        dst->Value = type.GetHashCode();
-                        dst->ValueLow = fieldCount;
-                        InitializeValueTypeObject(type, dst);
-                    }
                 }
                 else
                 {
                     dst = valueTypePtr;
-                    ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
-                    *(long*)&ptr->Value = (long)dst;
-                    dst->ObjectType = ObjectTypes.ValueTypeDescriptor;
-                    dst->Value = type.GetHashCode();
-                    dst->ValueLow = fieldCount;
+
                     valueTypePtr = ILIntepreter.Minus(valueTypePtr, fieldCount + 1);
                     if (valueTypePtr <= StackBase)
                         throw new StackOverflowException();
-
-                    InitializeValueTypeObject(type, dst);
                 }
+
+                ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                *(long*)&ptr->Value = (long)dst;
+                dst->ObjectType = ObjectTypes.ValueTypeDescriptor;
+                dst->Value = type.GetHashCode();
+                dst->ValueLow = fieldCount;
+                InitializeValueTypeObject(type, dst);
             }
             else
                 throw new ArgumentException(type.FullName + " is not a value type.", "type");
