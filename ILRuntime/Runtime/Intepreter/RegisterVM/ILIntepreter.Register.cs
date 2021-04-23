@@ -3964,8 +3964,14 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        void CopySub(StackObject* val, StackObject* v, int idx, IList<object> mStack, IList<object> mStackSrc = null)
+
+        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, IList<object> mStackSrc = null)
         {
+            var mStack = info.ManagedStack;
+
+            var v = Add(info.RegisterStart, reg);
+            var idx = GetManagedStackIndex(ref info, reg);
+
             if (mStackSrc == null)
                 mStackSrc = mStack;
             switch (val->ObjectType)
@@ -3990,6 +3996,12 @@ namespace ILRuntime.Runtime.Intepreter
                         {
                             var dst = *(StackObject**)&v->Value;
                             var ct = domain.GetType(dst->Value) as CLRType;
+                            var st = domain.GetType(obj.GetType());
+                            if(dst->Value != st.GetHashCode())
+                            {
+                                stack.FreeRegisterValueType(v);
+                                stack.AllocValueType(v, st, true);
+                            }
                             var binder = ct.ValueTypeBinder;
                             binder.CopyValueTypeToStack(obj, dst, mStack);
                         }
@@ -4004,10 +4016,27 @@ namespace ILRuntime.Runtime.Intepreter
                 case ObjectTypes.ValueTypeObjectReference:
                     if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
                     {
+                        if(!CanCopyStackValueType(val,v))
+                        {
+                            var dst = *(StackObject**)&val->Value;
+                            var ct = domain.GetType(dst->Value);
+                            stack.FreeRegisterValueType(v);
+                            stack.AllocValueType(v, ct, true);
+                        }
                         CopyStackValueType(val, v, mStack);
                     }
                     else
-                        throw new NotImplementedException();
+                    {
+                        if (v >= info.RegisterStart && v < info.RegisterEnd)
+                        {
+                            var dst = ResolveReference(val);
+                            var type = domain.GetType(dst->Value);
+                            stack.AllocValueType(v, type, true);
+                            CopyStackValueType(val, v, mStack);
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
                     //FreeStackValueType(val);
                     break;
                 default:
@@ -4015,25 +4044,6 @@ namespace ILRuntime.Runtime.Intepreter
                     mStack[idx] = null;
                     break;
             }
-        }
-
-        internal void CopyToAddress(ref RegisterFrameInfo info, StackObject* dst, StackObject* val)
-        {
-            var mStack = info.ManagedStack;
-            var idx = (dst - info.StackBase);
-
-            CopySub(val, dst, (int)idx, mStack);
-        }
-
-
-        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, IList<object> mStackSrc = null)
-        {
-            var mStack = info.ManagedStack;
-
-            var v = Add(info.RegisterStart, reg);
-            var idx = GetManagedStackIndex(ref info, reg);
-
-            CopySub(val, v, idx, mStack, mStackSrc);
         }
 
 #if NET_4_6 || NET_STANDARD_2_0
@@ -4091,8 +4101,28 @@ namespace ILRuntime.Runtime.Intepreter
         StackObject* PopToRegister(ref RegisterFrameInfo info, short reg, StackObject* esp)
         {
             var val = esp - 1;
-            CopyToRegister(ref info, reg, val);
-            Free(val);
+            if (val->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var v = Add(info.RegisterStart, reg);
+                if (CanCopyStackValueType(val, v))
+                {
+                    CopyStackValueType(val, v, info.ManagedStack);
+                    Free(val);
+                }
+                else
+                {
+                    if(v->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                    {
+                        stack.FreeRegisterValueType(v);
+                    }
+                    stack.AllocValueTypeAndCopy(v, val);
+                }
+            }
+            else
+            {
+                CopyToRegister(ref info, reg, val);
+                Free(val);
+            }
             return val;
         }
 

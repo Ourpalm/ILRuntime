@@ -55,7 +55,7 @@ namespace ILRuntime.Runtime.Stack
             {
                 return valueTypePtr;
             }
-            private set
+            internal set
             {
                 if (value > ValueTypeStackBase)
                     throw new StackOverflowException();
@@ -286,6 +286,47 @@ namespace ILRuntime.Runtime.Stack
                 allocator.Clear();
         }
 
+        public void AllocValueTypeAndCopy(StackObject* ptr, StackObject* src)
+        {
+            var dst = ILIntepreter.ResolveReference(src);
+            var type = intepreter.AppDomain.GetType(dst->Value);
+            int size, managedCount;
+            type.GetValueTypeSize(out size, out managedCount);
+            if (allocator == null)
+                allocator = new StackObjectAllocator(AllocBlock);
+            StackObjectAllocation alloc;
+            if(allocator.AllocExisting(ptr, size, managedCount, out alloc))
+            {
+                if (dst != alloc.Address)
+                {
+                    dst = alloc.Address;
+                    ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                    *(long*)&ptr->Value = (long)dst;
+                    int managedIdx = alloc.ManagedIndex;
+                    InitializeValueTypeObject(type, dst, true, ref managedIdx);
+                    ILIntepreter.CopyStackValueType(src, ptr, managedStack);
+                    FreeValueTypeObject(src);
+                }
+                else
+                {
+                    ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                    *(long*)&ptr->Value = (long)dst;
+                }
+            }
+            else
+            {
+                int start = int.MaxValue;
+                int end = int.MinValue;
+                StackObject* endAddr;
+                CountValueTypeManaged(src, ref start, ref end, &endAddr);
+                if (endAddr == valueTypePtr)
+                    valueTypePtr = dst;
+                allocator.RegisterAllocation(ptr, dst, size, start, managedCount);
+                ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                *(long*)&ptr->Value = (long)dst;
+            }
+        }
+
         public void AllocValueType(StackObject* ptr, IType type, bool register = false)
         {
             if (type.IsValueType)
@@ -296,10 +337,9 @@ namespace ILRuntime.Runtime.Stack
                 int managedIdx = -1;
                 if (register)
                 {
-                    var mCnt = CountValueTypeManaged(type);
                     if (allocator == null)
                         allocator = new StackObjectAllocator(AllocBlock);
-                    var allocation = allocator.Alloc(ptr, size, mCnt);
+                    var allocation = allocator.Alloc(ptr, size, managedCount);
                     dst = allocation.Address;
                     managedIdx = allocation.ManagedIndex;
                 }
@@ -321,7 +361,7 @@ namespace ILRuntime.Runtime.Stack
                 throw new ArgumentException(type.FullName + " is not a value type.", "type");
         }
 
-        void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, ref int managedIdx)
+        internal void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, ref int managedIdx)
         {
             ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
             ptr->Value = type.GetHashCode();
@@ -498,7 +538,7 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        void RemoveManagedStackRange(int start, int end)
+        internal void RemoveManagedStackRange(int start, int end)
         {
             if (start != int.MaxValue)
             {
@@ -513,6 +553,13 @@ namespace ILRuntime.Runtime.Stack
                 else
                     throw new NotSupportedException();
             }
+        }
+
+        public void FreeRegisterValueType(StackObject* esp)
+        {
+            if (esp->ObjectType != ObjectTypes.ValueTypeObjectReference)
+                return;
+            allocator.Free(esp);
         }
 
         public void FreeValueTypeObject(StackObject* esp)
@@ -531,7 +578,7 @@ namespace ILRuntime.Runtime.Stack
             RemoveManagedStackRange(start, end);
         }
 
-        void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)
+        public void CountValueTypeManaged(StackObject* esp, ref int start, ref int end, StackObject** endAddr)
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(esp);
             int cnt = descriptor->ValueLow;

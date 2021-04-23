@@ -148,6 +148,64 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
+        public void RegisterAllocation(StackObject* ptr, StackObject* src, int size, int managedIndex, int managedCount)
+        {
+            int emptyIndex = -1;
+            int cnt = freeBlocks.Length;
+            for (int i = 0; i < cnt; i++)
+            {
+                if (freeBlocks[i].StartAddress == null)
+                {
+                    emptyIndex = i;
+                    break;
+                }
+            }
+            if (emptyIndex == -1)
+            {
+                emptyIndex = freeBlocks.Length;
+                ExpandFreeList();
+            }
+            StackObject* dst;
+            int mIdx;
+            allocCallback(size, out dst, out mIdx);
+            if (dst != src)
+                throw new NotSupportedException();
+            freeBlocks[emptyIndex] = new MemoryBlockInfo()
+            {
+                StartAddress = dst,
+                RequestAddress = ptr,
+                Size = size,
+                ManagedCount = managedCount,
+                ManagedIndex = managedIndex != int.MaxValue ? managedIndex : mIdx
+            };
+        }
+
+        public bool AllocExisting(StackObject* ptr, int size, int managedSize, out StackObjectAllocation alloc)
+        {
+            int cnt = freeBlocks.Length;
+            for (int i = 0; i < cnt; i++)
+            {
+                if (freeBlocks[i].StartAddress == null)
+                {
+                    break;
+                }
+                if (freeBlocks[i].RequestAddress == ptr || freeBlocks[i].RequestAddress == null)
+                {
+                    if (freeBlocks[i].Size >= size && freeBlocks[i].ManagedCount >= managedSize)
+                    {
+                        freeBlocks[i].RequestAddress = ptr;
+                        alloc = new StackObjectAllocation()
+                        {
+                            Address = freeBlocks[i].StartAddress,
+                            ManagedIndex = freeBlocks[i].ManagedIndex
+                        };
+                        return true;
+                    }
+                }
+            }
+            alloc = new StackObjectAllocation();
+            return false;
+        }
         public StackObjectAllocation Alloc(StackObject* ptr, int size, int managedSize)
         {
             int found = -1;
