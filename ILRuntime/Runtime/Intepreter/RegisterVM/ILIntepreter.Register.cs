@@ -2000,7 +2000,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         else
                                             val = dst - (((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
                                         //TODO: Check master modification
-                                        CopyToRegister(ref info, ip->Register1, dst);
+                                        CopyToRegister(ref info, ip->Register1, val);
                                     }
                                     else
                                     {
@@ -2946,7 +2946,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                                 }
                                                                 else
                                                                 {
-                                                                    throw new NotImplementedException();
+                                                                    if (objRef >= info.RegisterStart && objRef < info.RegisterEnd)
+                                                                    {
+                                                                        stack.AllocValueType(objRef, type, true);
+                                                                        continue;
+                                                                    }
+                                                                    else
+                                                                        throw new NotSupportedException();
                                                                 }
                                                             }
 
@@ -3097,7 +3103,15 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 var cT = (CLRType)type;
                                                 if (cT.ValueTypeBinder != null)
-                                                    throw new NotImplementedException();
+                                                {
+                                                    if (objRef >= info.RegisterStart && objRef < info.RegisterEnd)
+                                                    {
+                                                        stack.AllocValueType(objRef, type, true);
+                                                        continue;
+                                                    }
+                                                    else
+                                                        throw new NotSupportedException();
+                                                }
                                                 obj = cT.CreateDefaultInstance();
                                                 if (objRef->ObjectType >= ObjectTypes.Object)
                                                     mStack[objRef->Value] = obj;
@@ -3994,7 +4008,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                         throw new NotImplementedException();
-                    FreeStackValueType(val);
+                    //FreeStackValueType(val);
                     break;
                 default:
                     *v = *val;
