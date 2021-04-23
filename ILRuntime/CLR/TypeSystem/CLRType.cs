@@ -43,6 +43,8 @@ namespace ILRuntime.CLR.TypeSystem
         ILRuntimeWrapperType wraperType;
         ValueTypeBinder valueTypeBinder;
 
+        int valuetypeFieldCount, valuetypeManagedCount;
+        bool valuetypeSizeCalculated;
         int hashCode = -1;
         static int instance_id = 0x20000000;
 
@@ -958,6 +960,44 @@ namespace ILRuntime.CLR.TypeSystem
         public IType ResolveGenericType(IType contextType)
         {
             throw new NotImplementedException();
+        }
+        public void GetValueTypeSize(out int fieldCout, out int managedCount)
+        {
+            if (!valuetypeSizeCalculated)
+            {
+                var cnt = TotalFieldCount;
+                valuetypeFieldCount = cnt + 1;
+                valuetypeManagedCount = 0;
+                for (int i = 0; i < cnt; i++)
+                {
+                    var it = OrderedFieldTypes[i] as CLRType;
+                    if (it.IsValueType)
+                    {
+                        if (!it.IsPrimitive && !it.IsEnum)
+                        {
+                            if (it.ValueTypeBinder != null)
+                            {
+                                int fSize, fmCnt;
+                                it.GetValueTypeSize(out fSize, out fmCnt);
+                                valuetypeFieldCount += fSize;
+                                valuetypeManagedCount += fmCnt;
+                            }
+                            else
+                            {
+                                valuetypeManagedCount++;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        valuetypeManagedCount++;
+                    }
+                }
+
+                valuetypeSizeCalculated = true;
+            }
+            fieldCout = valuetypeFieldCount;
+            managedCount = valuetypeManagedCount;
         }
 
         public override int GetHashCode()

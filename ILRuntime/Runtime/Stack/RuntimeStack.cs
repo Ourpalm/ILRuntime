@@ -282,23 +282,16 @@ namespace ILRuntime.Runtime.Stack
         {
             if (type.IsValueType)
             {
-                int fieldCount = 0;
                 StackObject* dst;
-                if (type is ILType)
-                {
-                    fieldCount = ((ILType)type).TotalFieldCount;
-                }
-                else
-                {
-                    fieldCount = ((CLRType)type).TotalFieldCount;
-                }
+                int size, managedCount;
+                type.GetValueTypeSize(out size, out managedCount);
                 int managedIdx = -1;
                 if (register)
                 {
                     var mCnt = CountValueTypeManaged(type);
                     if (allocator == null)
                         allocator = new StackObjectAllocator(AllocBlock);
-                    var allocation = allocator.Alloc(ptr, fieldCount + 1, mCnt);
+                    var allocation = allocator.Alloc(ptr, size, mCnt);
                     dst = allocation.Address;
                     managedIdx = allocation.ManagedIndex;
                 }
@@ -307,24 +300,26 @@ namespace ILRuntime.Runtime.Stack
                     dst = valueTypePtr;
                     managedIdx = managedStack.Count;
 
-                    valueTypePtr = ILIntepreter.Minus(valueTypePtr, fieldCount + 1);
+                    valueTypePtr = ILIntepreter.Minus(valueTypePtr, size);
                     if (valueTypePtr <= StackBase)
                         throw new StackOverflowException();
                 }
 
                 ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
                 *(long*)&ptr->Value = (long)dst;
-                dst->ObjectType = ObjectTypes.ValueTypeDescriptor;
-                dst->Value = type.GetHashCode();
-                dst->ValueLow = fieldCount;
-                InitializeValueTypeObject(type, dst, register, managedIdx);
+                InitializeValueTypeObject(type, dst, register, ref managedIdx);
             }
             else
                 throw new ArgumentException(type.FullName + " is not a value type.", "type");
         }
 
-        void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, int managedIdx)
+        void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, ref int managedIdx)
         {
+            ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
+            ptr->Value = type.GetHashCode();
+            ptr->ValueLow = type.TotalFieldCount;
+            StackObject* endPtr = ptr - (type.TotalFieldCount + 1);
+            
             if (type is ILType)
             {
                 ILType t = (ILType)type;
@@ -339,7 +334,14 @@ namespace ILRuntime.Runtime.Stack
                         if (ft.IsValueType)
                         {
                             if (ft is ILType || ((CLRType)ft).ValueTypeBinder != null)
-                                AllocValueType(val, ft, register);
+                            {
+                                val->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                                *(long*)&val->Value = (long)endPtr;
+                                InitializeValueTypeObject(ft, endPtr, register, ref managedIdx);
+                                int size, mCnt;
+                                ft.GetValueTypeSize(out size, out mCnt);
+                                endPtr -= size;
+                            }
                             else
                             {
                                 val->ObjectType = ObjectTypes.Object;
@@ -364,7 +366,7 @@ namespace ILRuntime.Runtime.Stack
                     }
                 }
                 if (type.BaseType != null && type.BaseType is ILType)
-                    InitializeValueTypeObject((ILType)type.BaseType, ptr, register, managedIdx);
+                    InitializeValueTypeObject((ILType)type.BaseType, ptr, register, ref managedIdx);
             }
             else
             {
@@ -381,7 +383,14 @@ namespace ILRuntime.Runtime.Stack
                         if (it.IsValueType)
                         {
                             if (it.ValueTypeBinder != null)
-                                AllocValueType(val, it, register);
+                            {
+                                val->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                                *(long*)&val->Value = (long)endPtr;
+                                InitializeValueTypeObject(it, endPtr, register, ref managedIdx);
+                                int size, mCnt;
+                                it.GetValueTypeSize(out size, out mCnt);
+                                endPtr -= size;
+                            }
                             else
                             {
                                 val->ObjectType = ObjectTypes.Object;
