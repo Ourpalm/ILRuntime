@@ -123,6 +123,8 @@ namespace ILRuntime.Runtime.Stack
             int mStackBase = frame.ManagedStackBase;
             if (method.HasThis)
                 ret--;
+            if (allocator != null)
+                allocator.FreeBefore(frame.ValueTypeBasePointer);
             for (StackObject* ptr = ret; ptr < frame.LocalVarPointer; ptr++)
             {
                 if (ptr->ObjectType == ObjectTypes.ValueTypeObjectReference)
@@ -276,6 +278,12 @@ namespace ILRuntime.Runtime.Stack
             if (valueTypePtr <= StackBase)
                 throw new StackOverflowException();
             managedIdx = managedStack.Count;            
+        }
+
+        public void ClearAllocator()
+        {
+            if (allocator != null)
+                allocator.Clear();
         }
 
         public void AllocValueType(StackObject* ptr, IType type, bool register = false)

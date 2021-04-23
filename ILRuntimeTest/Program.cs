@@ -34,17 +34,19 @@ namespace ILRuntimeTest
             managedIdx = 0;
             List<StackObjectAllocation> lst = new List<StackObjectAllocation>();
             StackObjectAllocator allocator = new StackObjectAllocator(Alloc);
-            lst.Add(allocator.Alloc((StackObject*)2, 8, 3));
+            lst.Add(allocator.Alloc((StackObject*)8, 8, 3));
             managedIdx += 10;
 
-            lst.Add(allocator.Alloc((StackObject*)3, 2, 1));
+            lst.Add(allocator.Alloc((StackObject*)3, 8, 10));
             managedIdx += 1;
+            lst.Add(allocator.Alloc((StackObject*)9, 8, 3));
 
             lst.Add(allocator.Alloc((StackObject*)2, 2, 3));
             managedIdx += 1;
 
             lst.Add(allocator.Alloc((StackObject*)4, 4, 4));
             managedIdx += 1;
+
 
             allocator.Free((StackObject*)2);
             allocator.Free((StackObject*)4);
@@ -54,7 +56,7 @@ namespace ILRuntimeTest
             Random rand = new Random();
             for (int i = 0; i < 1000000; i++)
             {
-                allocator.Alloc((StackObject*)2, 5, 2);
+                //allocator.Alloc((StackObject*)2, 5, 2);
                 /*switch (i % 3)
                 {
                     case 0:
@@ -67,7 +69,7 @@ namespace ILRuntimeTest
                         allocator.Alloc((StackObject*)2, 5, 2);
                         break;
                 }*/
-                //allocator.Alloc((StackObject*)rand.Next(2, 5), rand.Next(2, 5), rand.Next(2, 5));
+                allocator.Alloc((StackObject*)rand.Next(2, 5), rand.Next(2, 5), rand.Next(2, 5));
             }
             sw.Stop();
             Console.WriteLine("Elapsed:" + sw.ElapsedMilliseconds);
@@ -79,6 +81,7 @@ namespace ILRuntimeTest
                 rand.Next(2, 10);
             }
             Console.WriteLine("Elapsed:" + sw.ElapsedMilliseconds);
+            allocator.FreeBefore((StackObject*)0xfff40);
 
         }
 
