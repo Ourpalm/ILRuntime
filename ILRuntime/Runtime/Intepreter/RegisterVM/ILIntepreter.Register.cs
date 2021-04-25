@@ -2224,11 +2224,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             bool isValueType = type.IsValueType;
                                             if (isValueType)
                                             {
-                                                throw new NotImplementedException();
                                                 stack.AllocValueType(esp, type);
                                                 objRef = esp + 1;
                                                 objRef->ObjectType = ObjectTypes.StackObjectReference;
                                                 *(StackObject**)&objRef->Value = esp;
+                                                mStack.Add(null);
                                                 objRef++;
                                             }
                                             else
@@ -2259,6 +2259,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             else
                                             {
                                                 //PushToRegister(ref info, ip->Register1, obj);
+                                                //mStack[reg1->Value] = obj;
                                                 esp = PushObject(reg1, mStack, obj);//new constructedObj
                                             }
                                         }
