@@ -2146,6 +2146,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                                     }
                                                                 }
                                                                 break;
+                                                            case ObjectTypes.ArrayReference:
+                                                                {
+                                                                    var arr = mStack[objRef->Value] as Array;
+                                                                    int idx = objRef->ValueLow;
+                                                                    arr.SetValue(obj, idx);
+                                                                }
+                                                                break;
                                                             case ObjectTypes.StaticFieldReference:
                                                                 {
                                                                     var it = AppDomain.GetType(objRef->Value);
