@@ -150,6 +150,7 @@ namespace ILRuntime.Runtime.Stack
 
         public void RegisterAllocation(StackObject* ptr, StackObject* src, int size, int managedIndex, int managedCount)
         {
+            dirty = true;
             int emptyIndex = -1;
             int cnt = freeBlocks.Length;
             for (int i = 0; i < cnt; i++)

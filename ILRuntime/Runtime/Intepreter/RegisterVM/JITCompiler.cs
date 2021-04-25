@@ -98,6 +98,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, int[]> switchTargets, Dictionary<Instruction, int> addr, out Dictionary<int, RegisterVMSymbol> symbols)
         {
+            method.Compiling = true;
             symbols = new Dictionary<int, RegisterVMSymbol>();
 
             var body = def.Body;
@@ -294,6 +295,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
 #endif
+            method.Compiling = false;
+
             return res.ToArray();
         }
         void PrepareJumpTable(object token)
@@ -849,8 +852,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             lst.Add(op);
         }
 
-        
-        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline,out IMethod m, out ILMethod toInline, out bool isILMethod)
+
+        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline, out IMethod m, out ILMethod toInline, out bool isILMethod)
         {
             bool invalidToken;
             int pCnt = 0;
@@ -875,13 +878,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     isILMethod = !m.IsDelegateInvoke;
                     var ilm = (ILMethod)m;
                     bool hasExceptionHandler = ilm.Definition.HasBody && ilm.Definition.Body.HasExceptionHandlers;
-                    if (!ilm.IsDelegateInvoke && !ilm.IsVirtual && !hasExceptionHandler)
+                    if (!ilm.IsDelegateInvoke && !ilm.IsVirtual && !hasExceptionHandler && !ilm.Compiling)
                     {
-                        var body = ((ILMethod)m).BodyRegister;
+                        var body = ilm.BodyRegister;
                         if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)
                         {
                             canInline = true;
-                            toInline = (ILMethod)m;
+                            toInline = ilm;
                         }
                     }
                 }

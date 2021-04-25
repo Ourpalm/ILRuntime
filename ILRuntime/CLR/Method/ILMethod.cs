@@ -34,6 +34,8 @@ namespace ILRuntime.CLR.Method
         int hashCode = -1;
         static int instance_id = 0x10000000;
 
+        public bool Compiling { get; set; }
+
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
