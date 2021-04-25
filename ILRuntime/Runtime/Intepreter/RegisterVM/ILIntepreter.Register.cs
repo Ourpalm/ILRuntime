@@ -675,6 +675,140 @@ namespace ILRuntime.Runtime.Intepreter
                             #endregion
 
                             #region Conversion
+                            case OpCodeREnum.Conv_U1:
+                            case OpCodeREnum.Conv_Ovf_U1:
+                            case OpCodeREnum.Conv_Ovf_U1_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            intVal = (byte)reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            intVal = (byte)*(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            intVal = (byte)*(double*)&reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Integer;
+                                    reg2->Value = intVal;
+                                    reg2->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_I1:
+                            case OpCodeREnum.Conv_Ovf_I1:
+                            case OpCodeREnum.Conv_Ovf_I1_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            intVal = (sbyte)reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            intVal = (sbyte)*(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            intVal = (sbyte)*(double*)&reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Integer;
+                                    reg2->Value = intVal;
+                                    reg2->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_U2:
+                            case OpCodeREnum.Conv_Ovf_U2:
+                            case OpCodeREnum.Conv_Ovf_U2_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            intVal = (ushort)reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            intVal = (ushort)*(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            intVal = (ushort)*(double*)&reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Integer;
+                                    reg2->Value = intVal;
+                                    reg2->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_I2:
+                            case OpCodeREnum.Conv_Ovf_I2:
+                            case OpCodeREnum.Conv_Ovf_I2_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                        case ObjectTypes.Integer:
+                                            intVal = (short)(reg1->Value);
+                                            break;
+                                        case ObjectTypes.Float:
+                                            intVal = (short)*(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            intVal = (short)*(double*)&reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Integer;
+                                    reg2->Value = intVal;
+                                    reg2->ValueLow = 0;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_U4:
+                            case OpCodeREnum.Conv_U:
+                            case OpCodeREnum.Conv_Ovf_U4:
+                            case OpCodeREnum.Conv_Ovf_U4_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1); 
+                                    uint uintVal;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            uintVal = (uint)*(long*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            uintVal = (uint)reg1->Value;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            uintVal = (uint)*(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            uintVal = (uint)*(double*)&reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Integer;
+                                    reg2->Value = (int)uintVal;
+                                    reg2->ValueLow = 0;
+                                }
+                                break;
                             case OpCodeREnum.Conv_I4:
                             case OpCodeREnum.Conv_I:
                             case OpCodeREnum.Conv_Ovf_I:
@@ -730,6 +864,34 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     reg2->ObjectType = ObjectTypes.Long;
                                     *(long*)(&reg2->Value) = longVal;
+                                }
+                                break;
+                            case OpCodeREnum.Conv_U8:
+                            case OpCodeREnum.Conv_Ovf_U8:
+                            case OpCodeREnum.Conv_Ovf_U8_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg2 = (r + ip->Register1);
+                                    ulong ulongVal;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            ulongVal = (uint)reg1->Value;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            ip++;
+                                            continue;
+                                        case ObjectTypes.Float:
+                                            ulongVal = (ulong)*(float*)&reg1->Value;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            ulongVal = (ulong)*(double*)&reg1->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    reg2->ObjectType = ObjectTypes.Long;
+                                    *(ulong*)(&reg2->Value) = ulongVal;
                                 }
                                 break;
                             case OpCodeREnum.Conv_R4:
