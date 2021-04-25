@@ -863,7 +863,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 if (m is ILMethod)
                 {
                     isILMethod = !m.IsDelegateInvoke;
-                    if (!((ILMethod)m).IsVirtual)
+                    if (!((ILMethod)m).IsVirtual && !((ILMethod)m).Definition.Body.HasExceptionHandlers)
                     {
                         var body = ((ILMethod)m).BodyRegister;
                         if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)
