@@ -2079,7 +2079,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                         }
 
-                                        if (m.ReturnType != AppDomain.VoidType)
+                                        if (m.ReturnType != AppDomain.VoidType && !m.IsConstructor)
                                         {
                                             esp = PopToRegister(ref info, ip->Register1, esp);
                                         }
@@ -4204,16 +4204,24 @@ namespace ILRuntime.Runtime.Intepreter
                         }
                         else
                         {
-                            var dst = *(StackObject**)&v->Value;
-                            var ct = domain.GetType(dst->Value) as CLRType;
-                            var st = domain.GetType(obj.GetType());
-                            if(dst->Value != st.GetHashCode())
+                            var st = domain.GetType(obj.GetType()) as CLRType;
+                            var binder = st.ValueTypeBinder;
+                            if (binder != null)
                             {
-                                stack.FreeRegisterValueType(v);
-                                stack.AllocValueType(v, st, true);
+                                var dst = *(StackObject**)&v->Value;
+                                if (dst->Value != st.GetHashCode())
+                                {
+                                    stack.FreeRegisterValueType(v);
+                                    stack.AllocValueType(v, st, true);
+                                }
+                                binder.CopyValueTypeToStack(obj, dst, mStackSrc);
                             }
-                            var binder = ct.ValueTypeBinder;
-                            binder.CopyValueTypeToStack(obj, dst, mStackSrc);
+                            else
+                            {
+                                v->ObjectType = ObjectTypes.Object;
+                                v->Value = idx;
+                                mStack[idx] = obj;
+                            }
                         }
                     }
                     else
