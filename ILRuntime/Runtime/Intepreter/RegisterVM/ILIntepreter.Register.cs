@@ -4187,7 +4187,13 @@ namespace ILRuntime.Runtime.Intepreter
                         if (obj is ILTypeInstance)
                         {
                             var dst = *(StackObject**)&v->Value;
-                            ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStack);
+                            var st = ((ILTypeInstance)obj).Type;
+                            if (dst->Value != st.GetHashCode())
+                            {
+                                stack.FreeRegisterValueType(v);
+                                stack.AllocValueType(v, st, true);
+                            }
+                            ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStackSrc);
                         }
                         else
                         {
@@ -4200,7 +4206,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 stack.AllocValueType(v, st, true);
                             }
                             var binder = ct.ValueTypeBinder;
-                            binder.CopyValueTypeToStack(obj, dst, mStack);
+                            binder.CopyValueTypeToStack(obj, dst, mStackSrc);
                         }
                     }
                     else
