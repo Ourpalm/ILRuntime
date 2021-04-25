@@ -839,7 +839,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Pop:
                     baseRegIdx--;
-                    return;
+                    op.Code = OpCodeREnum.Nop;
+                    break;
                 default:
                     throw new NotImplementedException(string.Format("Unknown Opcode:{0}", code.Code));
             }
