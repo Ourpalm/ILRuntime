@@ -405,7 +405,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     {
                         bool canInline, isILMethod;
                         ILMethod toInline;
-                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline, out isILMethod);
+                        IMethod m;
+                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out m, out toInline, out isILMethod);
                         int pushCnt = Math.Max(pCnt - CallRegisterParamCount, 0);
                         for (int i = pCnt; i > pCnt - pushCnt; i--)
                         {
@@ -441,7 +442,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     {
                         bool canInline, isILMethod;
                         ILMethod toInline;
-                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out toInline, out isILMethod);
+                        IMethod m;
+                        var pCnt = InitializeFunctionParam(ref op, token, out hasRet, out canInline, out m, out toInline, out isILMethod);
                         bool hasConstrained = false;
                         int constrainIdx = -1;
                         if (lst.Count > 0)
@@ -451,6 +453,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         if (!canInline || hasConstrained)
                         {
+                            if (code.Code == Code.Callvirt && m is ILMethod)
+                            {
+                                ILMethod ilm = (ILMethod)m;
+                                if (!ilm.Definition.IsAbstract && !ilm.Definition.IsVirtual && !ilm.DeclearingType.IsInterface)
+                                    op.Code = OpCodeREnum.Call;
+                            }
                             int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - CallRegisterParamCount, 0);
                             for (int i = pCnt; i > pCnt - pushCnt; i--)
                             {
@@ -811,7 +819,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         op.Register1 = baseRegIdx++;
                         bool hasReturn, canInline, isILMethod;
                         ILMethod toInline;
-                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline, out isILMethod);
+                        IMethod m;
+                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out m, out toInline, out isILMethod);
                     }
                     break;
 
@@ -819,7 +828,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     {
                         bool hasReturn, canInline, isILMethod;
                         ILMethod toInline;
-                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out toInline, out isILMethod);
+                        IMethod m;
+                        InitializeFunctionParam(ref op, token, out hasReturn, out canInline, out m, out toInline, out isILMethod);
                         op.Register1 = (short)(baseRegIdx - 1);
                         op.Register2 = (short)(baseRegIdx - 1);
                     }
@@ -840,11 +850,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
 
         
-        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline, out ILMethod toInline, out bool isILMethod)
+        int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline,out IMethod m, out ILMethod toInline, out bool isILMethod)
         {
             bool invalidToken;
             int pCnt = 0;
-            var m = appdomain.GetMethod(token, declaringType, method, out invalidToken);
+            m = appdomain.GetMethod(token, declaringType, method, out invalidToken);
             toInline = null;
             canInline = false;
             op.Register2 = -1;
@@ -863,7 +873,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 if (m is ILMethod)
                 {
                     isILMethod = !m.IsDelegateInvoke;
-                    if (!((ILMethod)m).IsVirtual && !((ILMethod)m).Definition.Body.HasExceptionHandlers)
+                    var ilm = (ILMethod)m;
+                    bool hasExceptionHandler = ilm.Definition.HasBody && ilm.Definition.Body.HasExceptionHandlers;
+                    if (!ilm.IsDelegateInvoke && !ilm.IsVirtual && !hasExceptionHandler)
                     {
                         var body = ((ILMethod)m).BodyRegister;
                         if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)
