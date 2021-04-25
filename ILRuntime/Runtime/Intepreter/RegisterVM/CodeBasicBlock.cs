@@ -36,9 +36,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         HashSet<int> pendingCP = new HashSet<int>();
         HashSet<CodeBasicBlock> prevBlocks = new HashSet<CodeBasicBlock>();
         HashSet<CodeBasicBlock> nextBlocks = new HashSet<CodeBasicBlock>();
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
         Dictionary<int, RegisterVMSymbol> instructionMapping = new Dictionary<int, RegisterVMSymbol>();
-#endif
         short endRegister = -1;
         Instruction entry;
         public List<Instruction> Instructions { get { return instructions; } }
