@@ -77,13 +77,28 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             return false;
         }
 
-        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, int[]> switchTargets, out Dictionary<int, RegisterVMSymbol> symbols)
+        bool IsCatchHandler(CodeBasicBlock block, MethodBody body)
         {
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+            if (body.HasExceptionHandlers)
+            {
+                var firstIns = block.Instructions[0];
+                foreach(var eh in body.ExceptionHandlers)
+                {
+                    if(eh.HandlerType == Mono.Cecil.Cil.ExceptionHandlerType.Catch)
+                    {
+                        if (eh.HandlerStart == firstIns)
+                            return true;
+                    }
+                }
+                return false;
+            }
+            else
+                return false;
+        }
+
+        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, int[]> switchTargets, Dictionary<Instruction, int> addr, out Dictionary<int, RegisterVMSymbol> symbols)
+        {
             symbols = new Dictionary<int, RegisterVMSymbol>();
-#else
-            symbols = null;
-#endif
 
             var body = def.Body;
             short locVarRegStart = (short)def.Parameters.Count;
@@ -94,9 +109,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
             var blocks = CodeBasicBlock.BuildBasicBlocks(body, out entryMapping);
 
-            foreach(var i in blocks)
+            foreach (var i in blocks)
             {
                 baseRegIdx = baseRegStart;
+                if (IsCatchHandler(i, body))
+                    baseRegIdx++;
                 if (i.PreviousBlocks.Count > 0)
                 {
                     foreach (var j in i.PreviousBlocks)
@@ -147,20 +164,20 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 else
                     first.InstructionMapping.Remove(idx);
             }
-            
+
 #if OUTPUT_JIT_RESULT
             int cnt = 1;
             Console.WriteLine($"JIT Results for {method}:");
             foreach (var b in blocks)
             {
                 Console.WriteLine($"Block {cnt++}, Instructions:{b.FinalInstructions.Count}");
-                for(int i = 0; i < b.FinalInstructions.Count; i++)
+                for (int i = 0; i < b.FinalInstructions.Count; i++)
                 {
                     Console.WriteLine($"    {i}:{b.FinalInstructions[i].ToString(appdomain)}");
                 }
             }
 #endif
-            
+
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
@@ -183,13 +200,20 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             Dictionary<int, int> jumpTargets = new Dictionary<int, int>();
             int bIdx = 0;
             HashSet<int> inlinedBranches = new HashSet<int>();
-            foreach(var b in blocks)
+            int curIndex = 0;
+            foreach (var b in blocks)
             {
                 jumpTargets[bIdx++] = res.Count;
                 bool isInline = false;
                 int inlineOffset = 0;
                 for (idx = 0; idx < b.FinalInstructions.Count; idx++)
                 {
+                    RegisterVMSymbol oriIns;
+                    bool hasOri = b.InstructionMapping.TryGetValue(idx, out oriIns);
+                    if (hasOri)
+                    {
+                        addr[oriIns.Instruction] = curIndex;
+                    }
                     if (b.CanRemove.Contains(idx))
                     {
                         if (isInline)
@@ -215,26 +239,24 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 ins.Operand += inlineOffset;
                                 inlinedBranches.Add(res.Count);
                             }
-                            else if(ins.Code == OpCodeREnum.Switch)
+                            else if (ins.Code == OpCodeREnum.Switch)
                             {
                                 int[] targets = jumptables[ins.Operand];
-                                for(int j = 0; j < targets.Length; j++)
+                                for (int j = 0; j < targets.Length; j++)
                                 {
                                     targets[j] = targets[j] + inlineOffset;
                                 }
                                 inlinedBranches.Add(res.Count);
                             }
                         }
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                        RegisterVMSymbol oriIns;
-                        if (b.InstructionMapping.TryGetValue(idx, out oriIns))
+                        if (hasOri)
                             symbols.Add(res.Count, oriIns);
-#endif
+                        curIndex++;
                         res.Add(ins);
                     }
                 }
             }
-            for(int i = 0; i < res.Count; i++)
+            for (int i = 0; i < res.Count; i++)
             {
                 var op = res[i];
                 if (Optimizer.IsBranching(op.Code) && !inlinedBranches.Contains(i))
@@ -242,15 +264,24 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Operand = jumpTargets[op.Operand];
                     res[i] = op;
                 }
-                else if(op.Code == OpCodeREnum.Switch && !inlinedBranches.Contains(i))
+                else if (op.Code == OpCodeREnum.Switch && !inlinedBranches.Contains(i))
                 {
                     int[] targets = jumptables[op.Operand];
-                    for(int j = 0; j < targets.Length; j++)
+                    for (int j = 0; j < targets.Length; j++)
                     {
                         targets[j] = jumpTargets[targets[j]];
                     }
                 }
+                else if(op.Code == OpCodeREnum.Leave || op.Code == OpCodeREnum.Leave_S)
+                {
+                    var oriIns = symbols[i];
+                    op.Operand = addr[(Instruction)oriIns.Instruction.Operand];
+                    res[i] = op;
+                }
             }
+#if !DEBUG || DISABLE_ILRUNTIME_DEBUG
+            symbols = null;
+#endif
             switchTargets = jumptables;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             stackRegisterCnt = totalRegCnt - baseRegStart;
@@ -261,7 +292,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             {
                 Console.WriteLine($"    {i}:{res[i].ToString(appdomain)}");
             }
-            
+
 #endif
             return res.ToArray();
         }
@@ -453,11 +484,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 var old = lst[constrainIdx];
                                 lst.RemoveAt(constrainIdx);
                                 old.Operand2 = op.Operand2;
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
                                 var symbol = block.InstructionMapping[constrainIdx];
                                 block.InstructionMapping.Remove(constrainIdx);
                                 block.InstructionMapping.Add(lst.Count, symbol);
-#endif
                                 lst.Add(old);
                             }
                             baseRegIdx -= (short)pCnt;
@@ -546,6 +575,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case Code.Nop:
                 case Code.Castclass:
+                case Code.Readonly:
+                case Code.Volatile:
+                case Code.Endfinally:
+                    break;
+                case Code.Leave:
+                case Code.Leave_S:
                     break;
                 case Code.Stloc_0:
                     op.Code = OpCodes.OpCodeREnum.Move;
@@ -795,14 +830,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 default:
                     throw new NotImplementedException(string.Format("Unknown Opcode:{0}", code.Code));
             }
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             RegisterVMSymbol s = new RegisterVMSymbol()
             {
                 Instruction = ins,
                 Method = method
             };
             block.InstructionMapping.Add(lst.Count, s);
-#endif
             lst.Add(op);
         }
 

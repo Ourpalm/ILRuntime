@@ -1897,6 +1897,36 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Leave:
+                            case OpCodeREnum.Leave_S:
+                                {
+                                    if (method.ExceptionHandler != null)
+                                    {
+                                        ExceptionHandler eh = null;
+
+                                        int addr = ip->Operand;
+                                        var sql = from e in method.ExceptionHandler
+                                                  where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                  select e;
+                                        eh = sql.FirstOrDefault();
+                                        if (eh != null)
+                                        {
+                                            finallyEndAddress = ip->Operand;
+                                            ip = ptr + eh.HandlerStart;
+                                            continue;
+                                        }
+                                    }
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
+
+                            case OpCodeREnum.Endfinally:
+                                {
+                                    ip = ptr + finallyEndAddress;
+                                    finallyEndAddress = 0;
+                                    continue;
+                                }
+                                break;
                             case OpCodeREnum.Call:
                             case OpCodeREnum.Callvirt:
                                 {
@@ -4071,7 +4101,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp--;
                                     }
                                 }
-                                esp = PushObject(esp, mStack, ex);
+                                short exReg = (short)(paramCnt + locCnt);
+                                AssignToRegister(ref info, exReg, ex);
                                 unhandledException = false;
                                 ip = ptr + eh.HandlerStart;
                                 continue;

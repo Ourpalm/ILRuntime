@@ -392,7 +392,7 @@ namespace ILRuntime.CLR.Method
                 if (appdomain.EnableRegisterVM)
                 {
                     JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
-                    bodyRegister = jit.Compile(out stackRegisterCnt, out jumptablesR, out registerSymbols);
+                    bodyRegister = jit.Compile(out stackRegisterCnt, out jumptablesR, addr, out registerSymbols);
                 }
                 else
                 {
@@ -447,28 +447,6 @@ namespace ILRuntime.CLR.Method
                 code.Code = (OpCodeEnum)c.OpCode.Code;
                 addr[c] = i;
                 body[i] = code;
-            }
-            for (int i = 0; i < body.Length; i++)
-            {
-                var c = def.Body.Instructions[i];
-                InitToken(ref body[i], c.Operand, addr);
-                if (i > 0 && c.OpCode.Code == Mono.Cecil.Cil.Code.Callvirt && def.Body.Instructions[i - 1].OpCode.Code == Mono.Cecil.Cil.Code.Constrained)
-                {
-                    body[i - 1].TokenLong = body[i].TokenInteger;
-                }
-            }
-        }
-
-        void InitRegisterCodeBody(Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
-        {
-            bodyRegister = new OpCodeR[def.Body.Instructions.Count];
-            for (int i = 0; i < body.Length; i++)
-            {
-                var c = def.Body.Instructions[i];
-                OpCodeR code = new OpCodeR();
-                code.Code = (OpCodeREnum)c.OpCode.Code;
-                addr[c] = i;
-                bodyRegister[i] = code;
             }
             for (int i = 0; i < body.Length; i++)
             {

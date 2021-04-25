@@ -274,6 +274,8 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     break;
                 case OpCodeREnum.Br:
                 case OpCodeREnum.Br_S:
+                case OpCodeREnum.Leave:
+                case OpCodeREnum.Leave_S:
                     param = string.Format("{0}", Operand);
                     break;
                 case OpCodeREnum.Ldc_I4:

@@ -167,6 +167,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.InlineStart:
                 case OpCodeREnum.InlineEnd:
                 case OpCodeREnum.Castclass:
+                case OpCodeREnum.Readonly:
+                case OpCodeREnum.Leave:
+                case OpCodeREnum.Leave_S:
+                case OpCodeREnum.Endfinally:
+                case OpCodeREnum.Volatile:
                     return false;
                 case OpCodeREnum.Brtrue:
                 case OpCodeREnum.Brtrue_S:
@@ -426,6 +431,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Throw:
                 case OpCodeREnum.Castclass:
+                case OpCodeREnum.Readonly:
+                case OpCodeREnum.Leave:
+                case OpCodeREnum.Leave_S:
+                case OpCodeREnum.Endfinally:
+                case OpCodeREnum.Volatile:
                     return false;
                 case OpCodeREnum.Add:
                 case OpCodeREnum.Add_Ovf:
