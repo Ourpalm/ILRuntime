@@ -56,7 +56,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             continue;
                         }
                         //Only deal with stack->local
-                        if (xSrc < stackRegisterBegin/* || xDst >= stackRegisterBegin*/ || isInline)
+                        if (xSrc < stackRegisterBegin || xDst >= stackRegisterBegin || isInline)
                             continue;
                         bool ended = false;
                         bool propagationInline = false;
@@ -72,7 +72,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             short yDst;
                             if (GetOpcodeDestRegister(ref Y, out yDst))
                             {
-                                if (xDst == yDst)
+                                if (xDst == yDst && !propagationInline)
                                 {
                                     ended = true;
                                     break;

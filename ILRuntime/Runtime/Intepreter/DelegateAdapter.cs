@@ -844,6 +844,7 @@ namespace ILRuntime.Runtime.Intepreter
         unsafe protected InvocationContext BeginInvoke()
         {
             var ctx = appdomain.BeginInvoke(method);
+            *ctx.ESP = default(StackObject);
             ctx.ESP++;//required to simulate delegate invocation
             return ctx;
         }
