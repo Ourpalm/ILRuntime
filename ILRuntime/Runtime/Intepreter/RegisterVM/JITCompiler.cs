@@ -56,8 +56,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 if (next.Code == OpCodeREnum.Initobj && next.Register1 == rw)
                                     return false;
                             }
-                            else
-                                return true;
+                            return true;
                         }
                         else
                             return rw != reg;
