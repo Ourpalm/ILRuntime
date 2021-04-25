@@ -41,19 +41,42 @@ namespace TestCases
 
         static int Add(int a, int b)
         {
-            return a + b;
+            if (b < 0)
+                return a;
+            else
+                return a + b;
         }
 
         public static void UnitTest_Performance2()
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
+            int cnt = 0;
             for (int i = 0; i < 1000000; i++)
             {
-                Add(1, 2);
+                cnt += Add(i, 2);
             }
             sw.Stop();
-            Console.WriteLine(string.Format("cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+            Console.WriteLine(string.Format("time: {0:0}ms cps:{1:0}, result={2}", sw.ElapsedMilliseconds, (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
+
+            sw.Restart();
+            cnt = 0;
+            for (int i = 0; i < 1000000; i++)
+            {
+                cnt += ILRuntimeTest.TestFramework.TestClass2.Add(i, 2);
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("time: {0:0}ms cps:{1:0}, result={2}", sw.ElapsedMilliseconds, (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
+        }
+
+        public static int UnitTest_PerformanceSimple()
+        {
+            int cnt = 0;
+            for (int i = 0; i < 5000000; i++)
+            {
+                cnt += i;
+            }
+            return cnt;
         }
         /// <summary>
         /// 性能测试

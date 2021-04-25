@@ -20,14 +20,24 @@ namespace TestCases
             int[] aa = new int[] { 1, 2, 3, 4, 5 };
 
             uint index = 2;
-            int i = aa[index]; //throw exception here
-
+            int i = 10;
+            aa[index] = 20;
+            i = aa[index];
+            Console.WriteLine("i {0}", i);
         }
 
         public static void ArrayTest03()
         {
             double[] propValueArr = new double[] { 0.5, 0.5 };
-            ArrayTest03Sub(propValueArr, 1, new ArrayTest03Cls(), 14);
+            Console.WriteLine("{0} ", propValueArr[0]);
+            //ArrayTest03Sub(propValueArr, 1, new ArrayTest03Cls(), 14);
+        }
+        public static void ArrayTestLong()
+        {
+            double[] propValueArr = new double[2];
+            propValueArr[0] = 0.5;
+            propValueArr[1] = 0.5;
+            Console.WriteLine("{0} ", propValueArr[0]);
         }
 
         class ArrayTest03Cls
@@ -84,6 +94,9 @@ namespace TestCases
         {
             GenericArrayTest<ArrayTest> cls = new ArrayTest.GenericArrayTest<ArrayTest>();
             cls.Init();
+            Console.WriteLine(cls.arr.Length);
+            if (cls.arr.Length != 10)
+                throw new Exception();
         }
 
         public static void ArrayBindTest()
@@ -93,9 +106,67 @@ namespace TestCases
             Console.WriteLine(arr.Length);
         }
 
+        static int[] sa = new int[] { 1, 2, 3, 4, 5 };
+        public static void ArrayTest09()
+        {
+            uint index = 2;
+            int i = sa[index]; 
+            Console.WriteLine(i);
+        }
+
+        public static void ArrayTest10()
+        {
+            int[] aa = new int[] { 1, 2, 3, 4, 5 };
+            int index = 2;
+            int i = aa[index];
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest11()
+        {
+            ushort[] aa = new ushort[] { 1, 2, 65535, 4, 5 };
+            uint index = 2;
+            ushort i = aa[index]; 
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest12()
+        {
+            long[] aa = new long[3] { -1, 54 , 43742424878678 };
+            uint index = 2;
+            long i = aa[index]; 
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest13()
+        {
+            byte[] aa = new byte[] { 7, 16, 32 };
+            uint index = 2;
+            byte i = aa[index]; 
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest14()
+        {
+            char[] aa = new char[] {'a', 'b', 'c', 'd'}; //data is error ; ldtoken
+            uint index = 2;
+            char i = aa[index]; //元数据
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest15()
+        {
+            float[] aa = new float[] { 1.5f, float.MaxValue, 10.0f, 0.54587122115f };
+            uint index = 3;
+            float i = aa[index];
+            Console.WriteLine(i);
+        }
+        public static void ArrayTest16()
+        {
+            double[] aa = new double[] { 1.5f, float.MaxValue, 10.0f, 0.54587122115f };
+            uint index = 3;
+            double i = aa[index];
+            Console.WriteLine(i);
+		}
+		
         class GenericArrayTest<T>
         {
-            T[][] arr;
+            public T[][] arr;
             public void Init()
             {
                 arr = new T[10][];

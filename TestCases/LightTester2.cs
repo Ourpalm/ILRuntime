@@ -14,6 +14,29 @@ namespace TestCases
             TestSwitch(253);            
         }
 
+        public static void UnitTest_SwitchInline()
+        {
+            if (TestSwitchInline(1) != 5)
+                throw new Exception();
+            if (TestSwitchInline(2) != 9)
+                throw new Exception();
+            if (TestSwitchInline(253) != 100)
+                throw new Exception();
+        }
+
+        static int TestSwitchInline(int value)
+        {
+            switch(value)
+            {
+                case 1:
+                    return 5;
+                case 2:
+                    return 9;
+                default:
+                    return 100;
+            }
+        }
+
         static void TestSwitch(int value)
         {
             switch (value)
@@ -92,6 +115,22 @@ namespace TestCases
             string str = "12345";
             char c = str[1];
             Console.WriteLine(c);
+        }
+
+        public static void UnitTest_TestInline01()
+        {
+            object obj = new object();
+            UnitTest_TestInline01Sub(obj);
+            if (obj == null)
+                throw new Exception();
+        }
+
+        static void UnitTest_TestInline01Sub(object obj)
+        {
+            Console.WriteLine(obj);
+            obj = null;
+            if (obj != null)
+                throw new Exception();
         }
     }
 }

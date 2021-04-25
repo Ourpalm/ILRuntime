@@ -328,6 +328,7 @@ namespace TestCases
             GenericMethodTest12Sub(new int[] { 3 }, k => {
                 k = k + 2;//error;
                 k = k << 2;//error;
+                Console.WriteLine($"k={k}");
             });
         }
 
@@ -611,6 +612,30 @@ namespace TestCases
         static T GenericStaticMethodTest14Sub<T>()
         {
             return default(T);
+        }
+
+        public static void GenericStaticMethodTest15()
+        {
+            var e2 = GenericStaticMethodTest14Sub<TestVector3>();
+            Console.WriteLine(e2);
+        }
+
+        public static void GenericStaticMethodTest16()
+        {
+            var e2 = GenericStaticMethodTest14Sub<TestVector3NoBinding>();
+            Console.WriteLine(e2);
+        }
+
+        public static void GenericStaticMethodTest17()
+        {
+            var e2 = GenericStaticMethodTest14Sub<int>();
+            Console.WriteLine(e2);
+        }
+
+        public static void GenericStaticMethodTest18()
+        {
+            var e2 = GenericStaticMethodTest14Sub<Vector3>();
+            Console.WriteLine(e2);
         }
     }
 

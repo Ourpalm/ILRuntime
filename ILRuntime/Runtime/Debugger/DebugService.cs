@@ -9,6 +9,7 @@ using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.CLR.Utils;
+using ILRuntime.Runtime.Intepreter.RegisterVM;
 
 namespace ILRuntime.Runtime.Debugger
 {
@@ -93,36 +94,83 @@ namespace ILRuntime.Runtime.Debugger
             return false;
         }
 
+        string GetInstructionDocument(Mono.Cecil.Cil.Instruction ins, Mono.Cecil.MethodDefinition md)
+        {
+            if (ins != null)
+            {
+                var seq = FindSequencePoint(ins, md.DebugInformation.GetSequencePointMapping());
+                if (seq != null)
+                {
+                    string path = seq.Document.Url.Replace("\\", "/");
+                    return string.Format("(at {0}:{1})", path, seq.StartLine);
+                }
+            }
+            return null;
+        }
+
         public string GetStackTrace(ILIntepreter intepreper)
         {
             StringBuilder sb = new StringBuilder();
             ILRuntime.CLR.Method.ILMethod m;
             StackFrame[] frames = intepreper.Stack.Frames.ToArray();
             Mono.Cecil.Cil.Instruction ins = null;
+            RegisterVMSymbol vmSymbol;
             if (frames[0].Address != null)
             {
-                ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
-                sb.AppendLine(ins.ToString());
+                if (domain.EnableRegisterVM)
+                {
+                    frames[0].Method.RegisterVMSymbols.TryGetValue(frames[0].Address.Value, out vmSymbol);
+                    ins = vmSymbol.Instruction;
+                    sb.AppendLine(string.Format("{0}(JIT_{1:0000}:{2})", ins, frames[0].Address.Value, frames[0].Method.BodyRegister[frames[0].Address.Value]));
+                }
+                else
+                {
+                    ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
+                    sb.AppendLine(ins.ToString());
+                }
             }
             for (int i = 0; i < frames.Length; i++)
             {
                 var f = frames[i];
                 m = f.Method;
                 string document = "";
-                if (f.Address != null)
+                if (domain.EnableRegisterVM)
                 {
-                    ins = m.Definition.Body.Instructions[f.Address.Value];
-                    
-                    var seq = FindSequencePoint(ins, m.Definition.DebugInformation.GetSequencePointMapping());
-                    if (seq != null)
+                    if (f.Address != null)
                     {
-                        string path = seq.Document.Url.Replace("\\", "/");
-                        document = string.Format("(at {0}:{1})", path, seq.StartLine);
+                        if (f.Method.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))
+                        {
+                            RegisterVMSymbolLink link = null;
+                            do
+                            {
+                                if (link != null)
+                                    vmSymbol = link.Value;
+                                ins = vmSymbol.Instruction;
+                                var md = vmSymbol.Method.Definition;
+                                document = GetInstructionDocument(ins, md);
+                                sb.AppendFormat("at {0} {1}\r\n", vmSymbol.Method, document);
+                                link = vmSymbol.ParentSymbol;
+                            }
+                            while (link != null);
+                        }
+                        else
+                            sb.AppendFormat("at {0} {1}\r\n", m, document);
                     }
+                    else
+                        sb.AppendFormat("at {0} {1}\r\n", m, document);
                 }
-                sb.AppendFormat("at {0} {1}\r\n", m, document);
-            }
+                else
+                {
+                    if (f.Address != null)
+                    {
+                        ins = m.Definition.Body.Instructions[f.Address.Value];
+                        var md = m.Definition;
 
+                        document = GetInstructionDocument(ins, md);
+                    }
+                    sb.AppendFormat("at {0} {1}\r\n", m, document);
+                }
+            }
             return sb.ToString();
         }
 

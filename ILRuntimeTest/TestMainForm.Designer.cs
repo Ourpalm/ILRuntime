@@ -36,6 +36,7 @@
             this.txtPath = new System.Windows.Forms.TextBox();
             this.btnRunSelect = new System.Windows.Forms.Button();
             this.btnGenerateBinding = new System.Windows.Forms.Button();
+            this.cbEnableRegVM = new System.Windows.Forms.CheckBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnTestCrossBind = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -79,7 +80,7 @@
             this.tbLog.Multiline = true;
             this.tbLog.Name = "tbLog";
             this.tbLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbLog.Size = new System.Drawing.Size(809, 192);
+            this.tbLog.Size = new System.Drawing.Size(806, 189);
             this.tbLog.TabIndex = 2;
             // 
             // btnLoad
@@ -97,9 +98,9 @@
             // 
             this.txtPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPath.Location = new System.Drawing.Point(12, 385);
+            this.txtPath.Location = new System.Drawing.Point(150, 384);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(374, 21);
+            this.txtPath.Size = new System.Drawing.Size(236, 21);
             this.txtPath.TabIndex = 4;
             // 
             // btnRunSelect
@@ -123,6 +124,16 @@
             this.btnGenerateBinding.Text = "Binding";
             this.btnGenerateBinding.UseVisualStyleBackColor = true;
             this.btnGenerateBinding.Click += new System.EventHandler(this.btnGenerateBinding_Click);
+            // 
+            // cbEnableRegVM
+            // 
+            this.cbEnableRegVM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cbEnableRegVM.Location = new System.Drawing.Point(12, 386);
+            this.cbEnableRegVM.Name = "cbEnableRegVM";
+            this.cbEnableRegVM.Size = new System.Drawing.Size(132, 16);
+            this.cbEnableRegVM.TabIndex = 7;
+            this.cbEnableRegVM.Text = "Enable Register VM";
+            this.cbEnableRegVM.UseVisualStyleBackColor = true;
             // 
             // splitContainer1
             // 
@@ -166,6 +177,7 @@
             this.Controls.Add(this.txtPath);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.btnRun);
+            this.Controls.Add(this.cbEnableRegVM);
             this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "TestMainForm";
@@ -191,6 +203,7 @@
         private System.Windows.Forms.TextBox txtPath;
         private System.Windows.Forms.Button btnRunSelect;
         private System.Windows.Forms.Button btnGenerateBinding;
+        private System.Windows.Forms.CheckBox cbEnableRegVM;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnTestCrossBind;
     }

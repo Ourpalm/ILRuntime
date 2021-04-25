@@ -73,6 +73,9 @@ namespace ILRuntime.Runtime.Enviorment
             return UnityMainThreadID != 0 && (UnityMainThreadID != System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
 #endif
+
+        public bool EnableRegisterVM { get; set; }
+
         internal bool SuppressStaticConstructor { get; set; }
 
         public unsafe AppDomain()
@@ -1137,6 +1140,7 @@ namespace ILRuntime.Runtime.Enviorment
 #endif
                 inteptreter.Stack.ManagedStack.Clear();
                 inteptreter.Stack.Frames.Clear();
+                inteptreter.Stack.ClearAllocator();
                 freeIntepreters.Enqueue(inteptreter);
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
                 //debugService.ThreadEnded(inteptreter);

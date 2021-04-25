@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_4_6;NO_PROFILER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_4_6;NO_PROFILER;OUTPUT_JIT_RESULT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -117,10 +117,20 @@
     <Compile Include="Runtime\Enviorment\AppDomain.cs" />
     <Compile Include="Runtime\Intepreter\ILIntepreter.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCode.cs" />
+    <Compile Include="Runtime\Intepreter\OpCodes\OpCodeREnum.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.BCP.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.InlineMethod.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.RegisterCleanup.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.Utils.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.FCP.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\ILIntepreter.Register.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\CodeBasicBlock.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\JITCompiler.cs" />
     <Compile Include="Runtime\Stack\RuntimeStack.cs" />
     <Compile Include="Runtime\Stack\StackFrame.cs" />
     <Compile Include="Runtime\Stack\StackObject.cs" />
+    <Compile Include="Runtime\Stack\StackObjectAllocator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

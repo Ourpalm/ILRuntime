@@ -7,6 +7,7 @@ using System.Reflection;
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Intepreter.RegisterVM;
 using ILRuntime.Runtime.Debugger;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Reflection;
@@ -15,6 +16,8 @@ namespace ILRuntime.CLR.Method
     public class ILMethod : IMethod
     {
         OpCode[] body;
+        OpCodeR[] bodyRegister;
+        Dictionary<int, RegisterVMSymbol> registerSymbols;
         MethodDefinition def;
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -22,11 +25,11 @@ namespace ILRuntime.CLR.Method
         ExceptionHandler[] exceptionHandler;
         KeyValuePair<string, IType>[] genericParameters;
         IType[] genericArguments;
-        Dictionary<int, int[]> jumptables;
+        Dictionary<int, int[]> jumptables, jumptablesR;
         bool isDelegateInvoke;
         ILRuntimeMethodInfo refletionMethodInfo;
         ILRuntimeConstructorInfo reflectionCtorInfo;
-        int paramCnt, localVarCnt;
+        int paramCnt, localVarCnt, stackRegisterCnt;
         Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> variables;
         int hashCode = -1;
         static int instance_id = 0x10000000;
@@ -34,12 +37,17 @@ namespace ILRuntime.CLR.Method
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
+        public Dictionary<int, int[]> JumpTablesRegister { get { return jumptablesR; } }
+
+        internal Dictionary<int, RegisterVMSymbol> RegisterVMSymbols { get { return registerSymbols; } }
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
 
         internal int StartLine { get; set; }
 
         internal int EndLine { get; set; }
+
+        public ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get { return appdomain; } }
 
         public MethodInfo ReflectionMethodInfo
         {
@@ -69,7 +77,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                if (body == null)
+                if (body == null && bodyRegister == null)
                     InitCodeBody();
                 return exceptionHandler;
             }
@@ -200,6 +208,16 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        internal OpCodeR[] BodyRegister
+        {
+            get
+            {
+                if (bodyRegister == null)
+                    InitCodeBody();
+                return bodyRegister;
+            }
+        }
+
         public bool HasBody
         {
             get
@@ -216,11 +234,27 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public int StackRegisterCount
+        {
+            get
+            {
+                return stackRegisterCnt;
+            }
+        }
+
         public bool IsConstructor
         {
             get
             {
                 return def.IsConstructor;
+            }
+        }
+
+        public bool IsVirtual
+        {
+            get
+            {
+                return def.IsVirtual;
             }
         }
 
@@ -353,24 +387,16 @@ namespace ILRuntime.CLR.Method
             if (def.HasBody)
             {
                 localVarCnt = def.Body.Variables.Count;
-                body = new OpCode[def.Body.Instructions.Count];
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
-                for (int i = 0; i < body.Length; i++)
+
+                if (appdomain.EnableRegisterVM)
                 {
-                    var c = def.Body.Instructions[i];
-                    OpCode code = new OpCode();
-                    code.Code = (OpCodeEnum)c.OpCode.Code;
-                    addr[c] = i;
-                    body[i] = code;
+                    JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
+                    bodyRegister = jit.Compile(out stackRegisterCnt, out jumptablesR, addr, out registerSymbols);
                 }
-                for (int i = 0; i < body.Length; i++)
+                else
                 {
-                    var c = def.Body.Instructions[i];
-                    InitToken(ref body[i], c.Operand, addr);
-                    if (i > 0 && c.OpCode.Code == Mono.Cecil.Cil.Code.Callvirt && def.Body.Instructions[i - 1].OpCode.Code == Mono.Cecil.Cil.Code.Constrained)
-                    {
-                        body[i - 1].TokenLong = body[i].TokenInteger;
-                    }
+                    InitStackCodeBody(addr);
                 }
 
                 for (int i = 0; i < def.Body.ExceptionHandlers.Count; i++)
@@ -401,12 +427,36 @@ namespace ILRuntime.CLR.Method
                     exceptionHandler[i] = e;
                     //Mono.Cecil.Cil.ExceptionHandlerType.
                 }
-                //Release Method body to save memory
                 variables = def.Body.Variables;
+#if !DEBUG || DISABLE_ILRUNTIME_DEBUG
+                //Release Method body to save memory
                 def.Body = null;
+#endif
             }
             else
                 body = new OpCode[0];
+        }
+
+        void InitStackCodeBody(Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
+        {
+            body = new OpCode[def.Body.Instructions.Count];
+            for (int i = 0; i < body.Length; i++)
+            {
+                var c = def.Body.Instructions[i];
+                OpCode code = new OpCode();
+                code.Code = (OpCodeEnum)c.OpCode.Code;
+                addr[c] = i;
+                body[i] = code;
+            }
+            for (int i = 0; i < body.Length; i++)
+            {
+                var c = def.Body.Instructions[i];
+                InitToken(ref body[i], c.Operand, addr);
+                if (i > 0 && c.OpCode.Code == Mono.Cecil.Cil.Code.Callvirt && def.Body.Instructions[i - 1].OpCode.Code == Mono.Cecil.Cil.Code.Constrained)
+                {
+                    body[i - 1].TokenLong = body[i].TokenInteger;
+                }
+            }
         }
 
         unsafe void InitToken(ref OpCode code, object token, Dictionary<Mono.Cecil.Cil.Instruction, int> addr)
@@ -580,7 +630,7 @@ namespace ILRuntime.CLR.Method
             }
         }
 
-        int GetTypeTokenHashCode(object token)
+        internal int GetTypeTokenHashCode(object token)
         {
             var t = appdomain.GetType(token, declaringType, this);
             bool isGenericParameter = CheckHasGenericParamter(token);

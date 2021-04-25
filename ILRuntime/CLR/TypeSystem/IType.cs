@@ -86,5 +86,9 @@ namespace ILRuntime.CLR.TypeSystem
         IType FindGenericArgument(string key);
 
         IType ResolveGenericType(IType contextType);
+
+        int TotalFieldCount { get; }
+
+        void GetValueTypeSize(out int fieldCout, out int managedCount);
     }
 }

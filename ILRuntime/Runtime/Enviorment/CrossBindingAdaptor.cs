@@ -116,6 +116,11 @@ namespace ILRuntime.Runtime.Enviorment
             return type.GetVirtualMethod(method);
         }
 
+        public void GetValueTypeSize(out int fieldCout, out int managedCount)
+        {
+            type.GetValueTypeSize(out fieldCout, out managedCount);
+        }
+
         public bool IsGenericInstance
         {
             get
@@ -280,6 +285,14 @@ namespace ILRuntime.Runtime.Enviorment
         public int ArrayRank
         {
             get { return type.ArrayRank; }
+        }
+
+        public int TotalFieldCount
+        {
+            get
+            {
+                return type.TotalFieldCount;
+            }
         }
         #endregion
     }

@@ -47,6 +47,8 @@ namespace ILRuntime.CLR.TypeSystem
         public TypeDefinition TypeDefinition { get { return definition; } }
         bool mToStringGot, mEqualsGot, mGetHashCodeGot;
         IMethod mToString, mEquals, mGetHashCode;
+        int valuetypeFieldCount, valuetypeManagedCount;
+        bool valuetypeSizeCalculated;
 
         public IMethod ToStringMethod
         {
@@ -1263,6 +1265,50 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
             return size;
+        }
+
+        public void GetValueTypeSize(out int fieldCout, out int managedCount)
+        {
+            if (!valuetypeSizeCalculated)
+            {
+                valuetypeFieldCount = FieldTypes.Length + 1;
+                valuetypeManagedCount = 0;
+                for (int i = 0; i < FieldTypes.Length; i++)
+                {
+                    var ft = FieldTypes[i];
+                    if (ft.IsValueType)
+                    {
+                        if (!ft.IsPrimitive && !ft.IsEnum)
+                        {
+                            if (ft is ILType || ((CLRType)ft).ValueTypeBinder != null)
+                            {
+                                int fSize, fmCnt;
+                                ft.GetValueTypeSize(out fSize, out fmCnt);
+                                valuetypeFieldCount += fSize;
+                                valuetypeManagedCount += fmCnt;
+                            }
+                            else
+                            {
+                                valuetypeManagedCount++;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        valuetypeManagedCount++;
+                    }
+                }
+                if (BaseType != null && BaseType is ILType)
+                {
+                    int fSize, fmCnt;
+                    BaseType.GetValueTypeSize(out fSize, out fmCnt);
+                    valuetypeFieldCount += fSize - 1;//no header for base type fields
+                    valuetypeManagedCount += fmCnt;
+                }
+                valuetypeSizeCalculated = true;
+            }
+            fieldCout = valuetypeFieldCount;
+            managedCount = valuetypeManagedCount;
         }
 
         public override int GetHashCode()
