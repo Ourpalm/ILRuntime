@@ -85,13 +85,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         break;
                                     }
                                     ReplaceOpcodeDest(ref Y, xDst);
-                                    for (int k = j + 1; k < i; k++)
+                                    for (int k = j + 1; k < lst.Count; k++)
                                     {
                                         if (canRemove.Contains(k))
                                             continue;
                                         OpCodeR Z = lst[k];
                                         bool replaced = false;
                                         short zSrc, zSrc2, zSrc3;
+                                        short zDst;
+                                        GetOpcodeDestRegister(ref Z, out zDst);
                                         if (GetOpcodeSourceRegister(ref Z, hasReturn, out zSrc, out zSrc2, out zSrc3))
                                         {
                                             if(zSrc == yDst)
@@ -112,6 +114,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         }
                                         if (replaced)
                                             lst[k] = Z;
+                                        if (zDst >= 0)
+                                        {
+                                            if (zDst == yDst)
+                                                break;
+                                        }
                                     }
                                     canRemove.Add(i);
                                     ended = true;
