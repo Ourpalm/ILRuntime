@@ -97,9 +97,47 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarga:
                 case OpCodeREnum.Ldarga_S:
+                case OpCodeREnum.Conv_I:
+                case OpCodeREnum.Conv_I1:
+                case OpCodeREnum.Conv_I2:
+                case OpCodeREnum.Conv_I4:
+                case OpCodeREnum.Conv_I8:
+                case OpCodeREnum.Conv_Ovf_I:
+                case OpCodeREnum.Conv_Ovf_I1:
+                case OpCodeREnum.Conv_Ovf_I1_Un:
+                case OpCodeREnum.Conv_Ovf_I2:
+                case OpCodeREnum.Conv_Ovf_I2_Un:
+                case OpCodeREnum.Conv_Ovf_I4:
+                case OpCodeREnum.Conv_Ovf_I4_Un:
+                case OpCodeREnum.Conv_Ovf_I8:
+                case OpCodeREnum.Conv_Ovf_I8_Un:
+                case OpCodeREnum.Conv_Ovf_I_Un:
+                case OpCodeREnum.Conv_Ovf_U:
+                case OpCodeREnum.Conv_Ovf_U1:
+                case OpCodeREnum.Conv_Ovf_U1_Un:
+                case OpCodeREnum.Conv_Ovf_U2:
+                case OpCodeREnum.Conv_Ovf_U2_Un:
+                case OpCodeREnum.Conv_Ovf_U4:
+                case OpCodeREnum.Conv_Ovf_U4_Un:
+                case OpCodeREnum.Conv_Ovf_U8:
+                case OpCodeREnum.Conv_Ovf_U8_Un:
+                case OpCodeREnum.Conv_Ovf_U_Un:
+                case OpCodeREnum.Conv_R4:
+                case OpCodeREnum.Conv_R8:
+                case OpCodeREnum.Conv_R_Un:
+                case OpCodeREnum.Conv_U:
+                case OpCodeREnum.Conv_U1:
+                case OpCodeREnum.Conv_U2:
+                case OpCodeREnum.Conv_U4:
+                case OpCodeREnum.Conv_U8:
+                case OpCodeREnum.Not:
+                case OpCodeREnum.Neg:
                     param = string.Format("r{0}, r{1}", Register1, Register2);
                     break;
                 case OpCodeREnum.Box:
+                case OpCodeREnum.Unbox:
+                case OpCodeREnum.Unbox_Any:
+                case OpCodeREnum.Isinst:
                     if (domain == null)
                         param = string.Format("r{0}, r{1}, {2}", Register1, Register2, Operand);
                     else

@@ -140,7 +140,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                 }
             }
-            entryMapping[cur.entry] = res.Count - 1;
+            if (cur.entry != null)
+                entryMapping[cur.entry] = res.Count - 1;
+            else
+                res.RemoveAt(res.Count - 1);
 
             for (int i = 0; i < res.Count; i++)
             {

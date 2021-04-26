@@ -771,6 +771,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldind_U2:
                 case Code.Ldind_U4:
                 case Code.Ldind_Ref:
+                case Code.Neg:
+                case Code.Not:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     break;
