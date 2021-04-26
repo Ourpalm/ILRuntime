@@ -325,5 +325,35 @@ namespace TestCases
             };
             return s;
         }
+
+        public static void StructTest10()
+        {
+            ILRuntimeTest.TestFramework.TestVector3 vec = StructTest10Sub();
+            if (vec.X != 1)
+                throw new Exception();
+        }
+
+        static ILRuntimeTest.TestFramework.TestVector3 StructTest10Sub()
+        {
+            ILRuntimeTest.TestFramework.TestVector3 res = ILRuntimeTest.TestFramework.TestVector3.One2;
+            switch(res.X)
+            {
+                case 2:
+                    Console.WriteLine("113");
+                    break;
+                case 6:
+                    Console.WriteLine("1136");
+                    break;
+                case 100:
+                    Console.WriteLine("11399");
+                    break;
+                case 133:
+                    Console.WriteLine("1131");
+                    break;
+            }
+            object[] arr = new object[] { res };
+            Console.WriteLine("vec=" + arr[0]);
+            return res;
+        }
     }
 }

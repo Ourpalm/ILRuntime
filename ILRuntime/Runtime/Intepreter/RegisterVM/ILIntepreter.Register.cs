@@ -2819,7 +2819,6 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (vt != type)
                                                         throw new InvalidCastException();
                                                     obj = ((CLRType)vt).ValueTypeBinder.ToObject(dst, mStack);
-                                                    FreeStackValueType(objRef);
                                                     AssignToRegister(ref info, ip->Register1, obj, true);
                                                 }
                                                 else if (objRef->ObjectType == ObjectTypes.Object)
@@ -2828,7 +2827,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                     AssignToRegister(ref info, ip->Register1, obj, true);
                                                 }
                                                 else
-                                                    throw new NotSupportedException();
+                                                {
+                                                    CopyToRegister(ref info, ip->Register1, objRef);
+                                                }
                                             }
                                         }
                                     }
