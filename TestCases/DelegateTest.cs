@@ -350,8 +350,35 @@ namespace TestCases
             return a + 100;
         }
 
+        static void FacadeAction(bool v)
+        {
+            Console.WriteLine(v);
+        }
+
+        public static void DelegateTest23()
+        {
+            DelegateTestCls.FacadeAction = FacadeAction;
+            DelegateTestCls.FacadeAction2 = FacadeAction;
+            DelegateTestCls.FacadeAction3 = FacadeAction;
+            DelegateTestCls.FacadeAction4 = FacadeAction;
+            DelegateTest23Sub();
+        }
+        static float[] ParamArray = new float[4];
+        static void DelegateTest23Sub()
+        {
+            DelegateTestCls.FacadeAction?.Invoke(1 == ParamArray[0] ? true : false);
+            DelegateTestCls.FacadeAction2?.Invoke(1 == ParamArray[1] ? true : false);
+            DelegateTestCls.FacadeAction3?.Invoke(1 == ParamArray[2] ? true : false);
+            DelegateTestCls.FacadeAction4?.Invoke(1 == ParamArray[3] ? true : false);
+
+        }
         class DelegateTestCls : DelegateTestClsBase
         {
+            public static Action<bool> FacadeAction;
+            public static Action<bool> FacadeAction2;
+            public static Action<bool> FacadeAction3;
+            public static Action<bool> FacadeAction4;
+
             public DelegateTestCls(int b)
             {
                 this.b = b;
