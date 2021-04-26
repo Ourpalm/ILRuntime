@@ -87,8 +87,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     ReplaceOpcodeDest(ref Y, xDst);
                                     for (int k = j + 1; k < lst.Count; k++)
                                     {
-                                        if (canRemove.Contains(k))
-                                            continue;
                                         OpCodeR Z = lst[k];
                                         bool replaced = false;
                                         short zSrc, zSrc2, zSrc3;

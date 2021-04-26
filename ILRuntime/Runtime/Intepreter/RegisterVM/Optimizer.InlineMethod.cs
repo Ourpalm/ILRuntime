@@ -69,7 +69,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         {
                             if (needMove)
                             {
-                                for (int j = 0; j < ins.Count; j++)
+                                for (int j = branchStart; j < ins.Count; j++)
                                 {
                                     var op2 = ins[j];
                                     if (IsBranching(op2.Code))
