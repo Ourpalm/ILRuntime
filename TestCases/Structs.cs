@@ -289,5 +289,41 @@ namespace TestCases
                 throw new Exception();
         }
 
+        class ClassA
+        {
+            public string str;
+            public ClassA(string s)
+            {
+                str = s;
+            }
+            public static implicit operator string(ClassA a) => a.str;
+
+        }
+
+        struct StructA
+        {
+            public ClassA A;
+        }
+        public static void StructTest9()
+        {
+            StructTest9Sub(new ClassA("aaa"));
+        }
+
+        static void StructTest9Sub(ClassA a)
+        {
+            StructTest9Sub2(a);
+            string str2 = a;
+            if (str2 != "aaa")
+                throw new Exception();
+        }
+
+        static StructA StructTest9Sub2(ClassA a)
+        {
+            StructA s = new StructA()
+            {
+                A = a,
+            };
+            return s;
+        }
     }
 }

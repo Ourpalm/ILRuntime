@@ -4193,14 +4193,23 @@ namespace ILRuntime.Runtime.Intepreter
                         var obj = mStackSrc[val->Value];
                         if (obj is ILTypeInstance)
                         {
-                            var dst = *(StackObject**)&v->Value;
                             var st = ((ILTypeInstance)obj).Type;
-                            if (dst->Value != st.GetHashCode())
+                            if (st.IsValueType)
                             {
-                                stack.FreeRegisterValueType(v);
-                                stack.AllocValueType(v, st, true);
+                                var dst = *(StackObject**)&v->Value;
+                                if (dst->Value != st.GetHashCode())
+                                {
+                                    stack.FreeRegisterValueType(v);
+                                    stack.AllocValueType(v, st, true);
+                                }
+                                ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStackSrc);
                             }
-                            ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStackSrc);
+                            else
+                            {
+                                v->ObjectType = ObjectTypes.Object;
+                                v->Value = idx;
+                                mStack[idx] = obj;
+                            }
                         }
                         else
                         {
