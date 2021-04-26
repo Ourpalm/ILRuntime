@@ -534,7 +534,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             link.Value.Instruction = ins;
                             link.Value.Method = method;
 #endif
+#if DEBUG && !NO_PROFILER
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
+
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.BeginSample("JITCompiler.InlineMethod");
+#else
+                UnityEngine.Profiler.BeginSample("JITCompiler.InlineMethod");
+#endif
+
+#endif
                             Optimizer.InlineMethod(block, toInline, link, ref jumptables, baseRegIdx, hasRet);
+#if UNITY_EDITOR
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.EndSample();
+#else
+                UnityEngine.Profiler.EndSample();
+#endif
+#endif
                             if (hasRet)
                                 baseRegIdx++;
                             return;
