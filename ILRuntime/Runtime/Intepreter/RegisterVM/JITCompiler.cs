@@ -98,6 +98,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, int[]> switchTargets, Dictionary<Instruction, int> addr, out Dictionary<int, RegisterVMSymbol> symbols)
         {
+#if DEBUG && !NO_PROFILER
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
+
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.BeginSample("JITCompiler.Compile");
+#else
+                UnityEngine.Profiler.BeginSample("JITCompiler.Compile");
+#endif
+
+#endif
             method.Compiling = true;
             symbols = new Dictionary<int, RegisterVMSymbol>();
 
@@ -296,8 +306,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
 #endif
             method.Compiling = false;
-
-            return res.ToArray();
+            var arr = res.ToArray();
+#if UNITY_EDITOR
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.EndSample();
+#else
+                UnityEngine.Profiler.EndSample();
+#endif
+#endif
+            return arr;
         }
         void PrepareJumpTable(object token)
         {
