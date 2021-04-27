@@ -278,6 +278,7 @@ namespace ILRuntime.CLR.Method
                         if (instance is CrossBindingAdaptorType && paramCount == 0)//It makes no sense to call the Adaptor's default constructor
                             return null;
                         cDef.Invoke(instance, param);
+                        Array.Clear(invocationParam, 0, invocationParam.Length);
                         return null;
                     }
                     else
@@ -288,7 +289,7 @@ namespace ILRuntime.CLR.Method
                 else
                 {
                     var res = cDef.Invoke(param);
-
+                    Array.Clear(invocationParam, 0, invocationParam.Length);
                     FixReference(paramCount, esp, param, mStack, null, false);
                     return res;
                 }
@@ -314,6 +315,7 @@ namespace ILRuntime.CLR.Method
                 else*/
                 {
                     res = def.Invoke(instance, param);
+                    Array.Clear(invocationParam, 0, invocationParam.Length);
                 }
 
                 FixReference(paramCount, esp, param, mStack, instance, !def.IsStatic);
