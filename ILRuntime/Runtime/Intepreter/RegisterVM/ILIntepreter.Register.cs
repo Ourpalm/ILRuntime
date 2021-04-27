@@ -660,11 +660,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             reg3->Value = -reg1->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            reg3->ObjectType = ObjectTypes.Long;
+                                            reg3->ObjectType = ObjectTypes.Float;
                                             *((float*)&reg3->Value) = -*((float*)&reg1->Value);
                                             break;
                                         case ObjectTypes.Double:
-                                            reg3->ObjectType = ObjectTypes.Long;
+                                            reg3->ObjectType = ObjectTypes.Double;
                                             *((double*)&reg3->Value) = -*((double*)&reg1->Value);
                                             break;
                                         default:
