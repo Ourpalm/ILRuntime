@@ -183,6 +183,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         pendingBlocks.Clear();
                         bool cannotRemove = false;
                         bool isAbort = false;
+                        processedBlocks.Clear();
                         foreach (var nb in originBlock.NextBlocks)
                             pendingBlocks.Enqueue(nb);
                         while (pendingBlocks.Count > 0)
