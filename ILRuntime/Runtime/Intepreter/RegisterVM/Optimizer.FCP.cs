@@ -188,13 +188,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             var cur = pendingBlocks.Dequeue();
 
                             var ins = cur.FinalInstructions;
-                            var canRemove = cur.CanRemove;
                             bool propagationInline = false;
 
                             for (int j = 0; j < ins.Count; j++)
                             {
-                                if (canRemove.Contains(j))
-                                    continue;
                                 if(cur == originBlock && j == idx)
                                 {
                                     isAbort = true;
