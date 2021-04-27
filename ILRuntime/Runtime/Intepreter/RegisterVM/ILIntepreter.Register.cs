@@ -4195,7 +4195,8 @@ namespace ILRuntime.Runtime.Intepreter
                         if (obj is ILTypeInstance)
                         {
                             var st = ((ILTypeInstance)obj).Type;
-                            if (st.IsValueType)
+                            //Delegate and enum instance's type is null
+                            if (st != null && st.IsValueType)
                             {
                                 var dst = *(StackObject**)&v->Value;
                                 if (dst->Value != st.GetHashCode())
