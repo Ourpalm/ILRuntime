@@ -4220,17 +4220,26 @@ namespace ILRuntime.Runtime.Intepreter
                         }
                         else
                         {
-                            var st = domain.GetType(obj.GetType()) as CLRType;
-                            var binder = st.ValueTypeBinder;
-                            if (binder != null)
+                            if (obj != null)
                             {
-                                var dst = *(StackObject**)&v->Value;
-                                if (dst->Value != st.GetHashCode())
+                                var st = domain.GetType(obj.GetType()) as CLRType;
+                                var binder = st.ValueTypeBinder;
+                                if (binder != null)
                                 {
-                                    stack.FreeRegisterValueType(v);
-                                    stack.AllocValueType(v, st, true);
+                                    var dst = *(StackObject**)&v->Value;
+                                    if (dst->Value != st.GetHashCode())
+                                    {
+                                        stack.FreeRegisterValueType(v);
+                                        stack.AllocValueType(v, st, true);
+                                    }
+                                    binder.CopyValueTypeToStack(obj, dst, mStackSrc);
                                 }
-                                binder.CopyValueTypeToStack(obj, dst, mStackSrc);
+                                else
+                                {
+                                    v->ObjectType = ObjectTypes.Object;
+                                    v->Value = idx;
+                                    mStack[idx] = obj;
+                                }
                             }
                             else
                             {
