@@ -356,11 +356,32 @@ namespace ILRuntime.Runtime.Debugger
                     if (activeBreakpoints.TryGetValue(methodHash, out bps))
                         lst = bps.ToArray();
                 }
-                bool bpHit = false;
 
+                RegisterVMSymbol vmSymbol;
+                Mono.Cecil.Cil.Instruction ins = null;
+                Mono.Cecil.MethodDefinition md = null;
+
+                if (domain.EnableRegisterVM)
+                {
+                    if(method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
+                    {
+                        while (vmSymbol.ParentSymbol != null)
+                            vmSymbol = vmSymbol.ParentSymbol.Value;
+                        ins = vmSymbol.Instruction;
+                        md = vmSymbol.Method.Definition;
+                    }
+                }
+                else
+                {
+                    md = method.Definition;
+                    ins = md.Body.Instructions[ip];
+                }
+
+                if (ins == null)
+                    return;
                 if (lst != null)
                 {
-                    var sp = method.Definition.DebugInformation.GetSequencePoint(method.Definition.Body.Instructions[ip]);
+                    var sp = md.DebugInformation.GetSequencePoint(ins);
                     if (sp != null)
                     {
                         foreach (var i in lst)
@@ -368,16 +389,15 @@ namespace ILRuntime.Runtime.Debugger
                             if ((i.StartLine + 1) == sp.StartLine)
                             {
                                 DoBreak(intp, i.BreakpointHashCode, false);
-                                bpHit = true;
-                                break;
+                                return;
                             }
                         }
                     }
                 }
 
-                if (!bpHit)
+                if (intp.CurrentStepType != StepTypes.None)
                 {
-                    var sp = method.Definition.DebugInformation.GetSequencePoint(method.Definition.Body.Instructions[ip]);//.SequencePoint;
+                    var sp = md.DebugInformation.GetSequencePoint(ins);
                     if (sp != null && IsSequenceValid(sp))
                     {
                         switch (intp.CurrentStepType)
@@ -438,89 +458,146 @@ namespace ILRuntime.Runtime.Debugger
             intp.Break();
         }
 
+        unsafe void InitializeStackFrameInfo(ILIntepreter intp, StackFrame f, List<StackFrameInfo> frameInfos)
+        {
+            Mono.Cecil.Cil.Instruction ins = null;
+            var m = f.Method;
+            int argCnt = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
+            StackObject* frameBasePointer = Minus(f.LocalVarPointer, argCnt);
+            if (f.Address != null)
+            {
+                if (intp.AppDomain.EnableRegisterVM)
+                {
+                    RegisterVMSymbol vmSymbol;
+                    if(m.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))
+                    {
+                        RegisterVMSymbolLink link = null;
+                        StackObject* basePointer;
+                        do
+                        {
+                            if (link != null)
+                            {
+                                vmSymbol = link.Value;
+                            }                            
+                            ins = vmSymbol.Instruction;
+                            m = vmSymbol.Method;
+                            if(vmSymbol.ParentSymbol!=null)
+                            {
+                                basePointer = Add(frameBasePointer, vmSymbol.ParentSymbol.BaseRegisterIndex);
+                            }
+                            else
+                            {
+                                basePointer = frameBasePointer;
+                            }
+                            var info = CreateStackFrameInfo(m, ins);
+                            AddStackFrameInfoVariables(intp, info, m, basePointer);
+                            frameInfos.Add(info);
+                            link = vmSymbol.ParentSymbol;
+                        }
+                        while (link != null);
+                    }
+                    else
+                    {
+                        var info = CreateStackFrameInfo(m, null);
+                        AddStackFrameInfoVariables(intp, info, m, frameBasePointer);
+                    }
+                }
+                else
+                {
+                    ins = m.Definition.Body.Instructions[f.Address.Value];
+                    var info = CreateStackFrameInfo(m, ins);
+                    AddStackFrameInfoVariables(intp, info, m, frameBasePointer);
+                }
+            }
+            else
+            {
+                var info = CreateStackFrameInfo(m, null);
+                AddStackFrameInfoVariables(intp, info, m, frameBasePointer);
+            }
+        }
+
+        StackFrameInfo CreateStackFrameInfo(ILMethod m, Mono.Cecil.Cil.Instruction ins)
+        {
+            Mono.Cecil.MethodDefinition md = m.Definition;
+            StackFrameInfo info = new StackFrameInfo();
+            info.MethodName = m.ToString();
+            if (ins != null)
+            {
+                var seq = FindSequencePoint(ins, md.DebugInformation.GetSequencePointMapping());
+                if (seq != null)
+                {
+                    info.DocumentName = seq.Document.Url;
+                    info.StartLine = seq.StartLine - 1;
+                    info.StartColumn = seq.StartColumn - 1;
+                    info.EndLine = seq.EndLine - 1;
+                    info.EndColumn = seq.EndColumn - 1;
+                }
+            }
+            return info;
+        }
+
+        unsafe void AddStackFrameInfoVariables(ILIntepreter intp, StackFrameInfo info, ILMethod m, StackObject* basePointer)
+        {
+            int argumentCount = m.ParameterCount;
+            if (m.HasThis)
+                argumentCount++;
+            info.LocalVariables = new VariableInfo[argumentCount + m.LocalVariableCount];
+            for (int i = 0; i < argumentCount; i++)
+            {
+                int argIdx = m.HasThis ? i - 1 : i;
+                var arg = basePointer;
+                string name = null;
+                object v = null;
+                string typeName = null;
+                var val = Add(arg, i);
+                v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
+                if (argIdx >= 0)
+                {
+                    var lv = m.Definition.Parameters[argIdx];
+                    name = string.IsNullOrEmpty(lv.Name) ? "arg" + lv.Index : lv.Name;
+                    typeName = lv.ParameterType.FullName;
+                }
+                else
+                {
+                    name = "this";
+                    typeName = m.DeclearingType.FullName;
+                }
+
+                VariableInfo vinfo = VariableInfo.FromObject(v);
+                vinfo.Address = (long)val;
+                vinfo.Name = name;
+                vinfo.TypeName = typeName;
+                vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
+
+                info.LocalVariables[i] = vinfo;
+            }
+            for (int i = argumentCount; i < info.LocalVariables.Length; i++)
+            {
+                var locIdx = i - argumentCount;
+                var lv = m.Definition.Body.Variables[locIdx];
+                var val = Add(basePointer, argumentCount + locIdx);
+                var v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
+                var type = intp.AppDomain.GetType(lv.VariableType, m.DeclearingType, m);
+                string vName = null;
+                m.Definition.DebugInformation.TryGetName(lv, out vName);
+                string name = string.IsNullOrEmpty(vName) ? "v" + lv.Index : vName;
+                VariableInfo vinfo = VariableInfo.FromObject(v);
+                vinfo.Address = (long)val;
+                vinfo.Name = name;
+                vinfo.TypeName = lv.VariableType.FullName;
+                vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
+                info.LocalVariables[i] = vinfo;
+            }
+        }
+
         unsafe StackFrameInfo[] GetStackFrameInfo(ILIntepreter intp)
         {
             StackFrame[] frames = intp.Stack.Frames.ToArray();
-            Mono.Cecil.Cil.Instruction ins = null;
-            ILMethod m;
             List<StackFrameInfo> frameInfos = new List<StackFrameInfo>();
 
             for (int j = 0; j < frames.Length; j++)
             {
-                StackFrameInfo info = new Debugger.StackFrameInfo();
-                var f = frames[j];
-                m = f.Method;
-                info.MethodName = m.ToString();
-
-                if (f.Address != null)
-                {
-                    ins = m.Definition.Body.Instructions[f.Address.Value];
-
-                    var seq = FindSequencePoint(ins, m.Definition.DebugInformation.GetSequencePointMapping());
-                    if (seq != null)
-                    {
-                        info.DocumentName = seq.Document.Url;
-                        info.StartLine = seq.StartLine - 1;
-                        info.StartColumn = seq.StartColumn - 1;
-                        info.EndLine = seq.EndLine - 1;
-                        info.EndColumn = seq.EndColumn - 1;
-                    }
-                    else
-                        continue;
-                }
-                StackFrame topFrame = f;
-                m = topFrame.Method;
-                int argumentCount = m.ParameterCount;
-                if (m.HasThis)
-                    argumentCount++;
-                info.LocalVariables = new VariableInfo[argumentCount + m.LocalVariableCount];
-                for(int i = 0; i < argumentCount; i++)
-                {
-                    int argIdx = m.HasThis ? i - 1 : i;
-                    var arg = Minus(topFrame.LocalVarPointer, argumentCount);
-                    string name = null;
-                    object v = null;
-                    string typeName = null;
-                    var val = Add(arg, i);
-                    v =  StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
-                    if (argIdx >= 0)
-                    {
-                        var lv = m.Definition.Parameters[argIdx];
-                        name = string.IsNullOrEmpty(lv.Name) ? "arg" + lv.Index : lv.Name;
-                        typeName = lv.ParameterType.FullName;
-                    }
-                    else
-                    {
-                        name = "this";
-                        typeName = m.DeclearingType.FullName;
-                    }
-
-                    VariableInfo vinfo = VariableInfo.FromObject(v);
-                    vinfo.Address = (long)val;
-                    vinfo.Name = name;
-                    vinfo.TypeName = typeName;
-                    vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
-
-                    info.LocalVariables[i] = vinfo;
-                }
-                for (int i = argumentCount; i < info.LocalVariables.Length; i++)
-                {
-                    var locIdx = i - argumentCount;
-                    var lv = m.Definition.Body.Variables[locIdx];
-                    var val = Add(topFrame.LocalVarPointer, locIdx);
-                    var v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
-                    var type = intp.AppDomain.GetType(lv.VariableType, m.DeclearingType, m);
-                    string vName = null;
-                    m.Definition.DebugInformation.TryGetName(lv, out vName);
-                    string name = string.IsNullOrEmpty(vName) ? "v" + lv.Index : vName;
-                    VariableInfo vinfo = VariableInfo.FromObject(v);
-                    vinfo.Address = (long)val;
-                    vinfo.Name = name;
-                    vinfo.TypeName = lv.VariableType.FullName;
-                    vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
-                    info.LocalVariables[i] = vinfo;
-                }
-                frameInfos.Add(info);
+                InitializeStackFrameInfo(intp, frames[j], frameInfos);
             }
             return frameInfos.ToArray();
         }

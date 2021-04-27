@@ -14,6 +14,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     class RegisterVMSymbolLink
     {
+        public int BaseRegisterIndex;
         public RegisterVMSymbol Value;
     }
 

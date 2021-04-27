@@ -535,6 +535,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             RegisterVMSymbolLink link = null;
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
                             link = new RegisterVMSymbolLink();
+                            link.BaseRegisterIndex = baseRegIdx;
                             link.Value.Instruction = ins;
                             link.Value.Method = method;
 #endif
