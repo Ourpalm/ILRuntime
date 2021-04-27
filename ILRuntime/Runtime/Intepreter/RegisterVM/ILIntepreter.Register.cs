@@ -2121,8 +2121,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     var fieldToken = (int)ip->OperandLong;
                                                     var f = ((CLRType)type).GetField(fieldToken);
-                                                    if (!((CLRType)type).AssignFieldFromStack(fieldToken, ref obj, this, reg2, mStack))
+                                                    CopyToStack(esp, reg2, mStack);
+                                                    if (!((CLRType)type).AssignFieldFromStack(fieldToken, ref obj, this, esp, mStack))
                                                         ((CLRType)type).SetFieldValue(fieldToken, ref obj, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(reg2, domain, mStack), domain)));
+                                                    Free(esp);
                                                     //Writeback
                                                     if (t.IsValueType)
                                                     {
@@ -2295,8 +2297,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             intVal = (int)ip->OperandLong;
                                             var f = t.GetField(intVal);
                                             obj = null;
-                                            if (!((CLRType)t).AssignFieldFromStack(intVal, ref obj, this, reg1, mStack))
+                                            CopyToStack(esp, reg1, mStack);
+
+                                            if (!((CLRType)t).AssignFieldFromStack(intVal, ref obj, this, esp, mStack))
                                                 t.SetStaticFieldValue(intVal, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(reg1, domain, mStack), domain)));
+                                            Free(esp);
                                         }
                                     }
                                     else
