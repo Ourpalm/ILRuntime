@@ -134,11 +134,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 }
                                 if (xDst == yDst)
                                 {
-                                    if (propagationInline)
-                                    {
-                                        ended = true;
-                                        break;
-                                    }
                                     postPropagation = false;
                                     canRemove.Add(i);
                                     ended = true;
@@ -178,20 +173,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     foreach (var idx in pendingFCP)
                     {
                         var X = originBlock.FinalInstructions[idx];
-                        short xDst;
+                        short xDst, xSrc, xSrc2, xSrc3;
                         GetOpcodeDestRegister(ref X, out xDst);
+                        GetOpcodeSourceRegister(ref X, hasReturn, out xSrc, out xSrc2, out xSrc3);
                         pendingBlocks.Clear();
                         bool cannotRemove = false;
                         bool isAbort = false;
                         processedBlocks.Clear();
                         foreach (var nb in originBlock.NextBlocks)
                             pendingBlocks.Enqueue(nb);
+                        processedBlocks.Add(originBlock);
                         while (pendingBlocks.Count > 0)
                         {
                             var cur = pendingBlocks.Dequeue();
 
                             var ins = cur.FinalInstructions;
                             var canRemove = cur.CanRemove;
+                            bool propagationInline = false;
 
                             for (int j = 0; j < ins.Count; j++)
                             {
@@ -203,15 +201,49 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     break;
                                 }
                                 var Y = ins[j];
-
+                                if (Y.Code == OpCodeREnum.InlineStart)
+                                    propagationInline = true;
+                                else if (Y.Code == OpCodeREnum.InlineEnd)
+                                {
+                                    propagationInline = false;
+                                }
                                 short ySrc, ySrc2, ySrc3, yDst;
                                 if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
                                 {
-                                    if (ySrc == xDst || ySrc2 == xDst || ySrc3 == xDst)
+                                    bool replaced = false;
+                                    if (ySrc == xDst)
                                     {
-                                        cannotRemove = true;
-                                        break;
+                                        if (propagationInline || cur.PreviousBlocks.Count > 1)
+                                        {
+                                            cannotRemove = true;
+                                            break;
+                                        }
+                                        replaced = true;
+                                        ReplaceOpcodeSource(ref Y, 0, xSrc);
                                     }
+                                    if (ySrc2 == xDst)
+                                    {
+                                        if (propagationInline || cur.PreviousBlocks.Count > 1)
+                                        {
+                                            cannotRemove = true;
+                                            break;
+                                        }
+                                        replaced = true;
+                                        ReplaceOpcodeSource(ref Y, 1, xSrc);
+                                    }
+                                    if (ySrc3 == xDst)
+                                    {
+                                        if (propagationInline || cur.PreviousBlocks.Count > 1)
+                                        {
+                                            cannotRemove = true;
+                                            break;
+                                        }
+                                        replaced = true;
+                                        ReplaceOpcodeSource(ref Y, 2, xSrc);
+                                    }
+
+                                    if (replaced)
+                                        ins[j] = Y;
                                 }
                                 if(GetOpcodeDestRegister(ref Y, out yDst))
                                 {
@@ -220,6 +252,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         isAbort = true;
                                         break;
                                     }
+                                }
+                                if(Y.Code == OpCodeREnum.Ret)
+                                {
+                                    isAbort = true;
+                                    break;
                                 }
                             }
 

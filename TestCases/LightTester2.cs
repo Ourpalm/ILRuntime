@@ -11,7 +11,7 @@ namespace TestCases
         {
             TestSwitch(1);
             TestSwitch(2);
-            TestSwitch(253);            
+            TestSwitch(253);
         }
 
         public static void UnitTest_SwitchInline()
@@ -26,7 +26,7 @@ namespace TestCases
 
         static int TestSwitchInline(int value)
         {
-            switch(value)
+            switch (value)
             {
                 case 1:
                     return 5;
@@ -62,7 +62,7 @@ namespace TestCases
                 case 12:
                     Console.WriteLine("case XX");
                     break;
-                
+
                 default:
                     Console.WriteLine("case default");
                     break;
@@ -131,6 +131,91 @@ namespace TestCases
             obj = null;
             if (obj != null)
                 throw new Exception();
+        }
+
+        public static void UnitTest_TestFCP()
+        {
+            var color = ToColor("#FF00FF00");
+            if (Math.Abs(color.x - 1) > 0.001f || Math.Abs(color.y - 1) > 0.001f || Math.Abs(color.z - 0) > 0.001f)
+                throw new Exception();
+        }
+
+        static ILRuntimeTest.TestFramework.TestVector3NoBinding ToColor(string str)
+        {
+            string strNew = str.StartsWith("#") ? str.Remove(0, 1) : str;
+            string str1 = strNew.Substring(0, 2);
+            string str2 = strNew.Substring(2, 2);
+            string str3 = strNew.Substring(4, 2);
+            float num1 = (float)Convert.ToInt64(str1, 16) / 255;
+            float num2 = (float)Convert.ToInt64(str2, 16) / 255;
+            float num3 = (float)Convert.ToInt64(str3, 16) / 255;
+            if (strNew.Length > 7)
+            {
+                string str4 = strNew.Substring(6, 2);
+                float num4 = (float)Convert.ToInt64(str4, 16) / 255;
+                ILRuntimeTest.TestFramework.TestVector3NoBinding color1 = new ILRuntimeTest.TestFramework.TestVector3NoBinding(num1, num3, num4);
+                return color1;
+            }
+            ILRuntimeTest.TestFramework.TestVector3NoBinding color = new ILRuntimeTest.TestFramework.TestVector3NoBinding(num1, num2, num3);
+            return color;
+        }
+        static Dictionary<int, int>[] CachePosSnDic = { null, null, null };
+        static Dictionary<int, bool> tabHasItemDic = new Dictionary<int, bool>();
+        public static void UnitTest_TestFCP2()
+        {
+            var array = UnitTest_TestFCP2Sub();
+            int count = array.Count;
+            for(int i=0;i< count; ++i)
+            {
+                for(int j = 0; j < CachePosSnDic.Length; j++)
+                {
+                    if (CachePosSnDic[j] == null)
+                        CachePosSnDic[j] = new Dictionary<int, int>();
+                    CachePosSnDic[j].Add(array[i].TestVal2, 0);
+                }
+            }
+
+            var tabarray = UnitTest_TestFCP2Sub2();
+            int tabCount = tabarray.Count;
+            for(int i = 0; i < tabCount; ++i)
+            {
+                tabHasItemDic.Add(tabarray[i].TestVal2, false);
+            }
+        }
+
+        class TestCls
+        {
+            public int TestVal2;
+        }
+        static List<TestCls> UnitTest_TestFCP2Sub()
+        {
+            var res = new List<TestCls>();
+            res.Add(new TestCls()
+            {
+                TestVal2 = 1
+            });
+            res.Add(new TestCls()
+            {
+                TestVal2 = 2
+            });
+            res.Add(new TestCls()
+            {
+                TestVal2 = 3
+            });
+            res.Add(new TestCls()
+            {
+                TestVal2 = 4
+            });
+            res.Add(new TestCls()
+            {
+                TestVal2 = 5
+            });
+            return res;
+        }
+
+        static List<TestCls> UnitTest_TestFCP2Sub2()
+        {
+            return new List<TestCls>();
         }
     }
 }
