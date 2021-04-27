@@ -3110,7 +3110,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Initobj:
                                 {
                                     reg1 = (r + ip->Register1);
-                                    objRef = GetObjectAndResolveReference(reg1);
+                                    objRef = ip->Operand2 == 1 ? reg1 : GetObjectAndResolveReference(reg1);
                                     type = domain.GetType(ip->Operand);
                                     if (type is ILType)
                                     {

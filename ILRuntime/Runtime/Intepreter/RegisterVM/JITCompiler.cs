@@ -125,14 +125,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 baseRegIdx = baseRegStart;
                 if (IsCatchHandler(i, body))
                     baseRegIdx++;
-                if (i.PreviousBlocks.Count > 0)
+                else
                 {
-                    foreach (var j in i.PreviousBlocks)
+                    if (i.PreviousBlocks.Count > 0)
                     {
-                        if (j.EndRegister >= 0)
+                        foreach (var j in i.PreviousBlocks)
                         {
-                            baseRegIdx = j.EndRegister;
-                            break;
+                            if (j.EndRegister >= 0)
+                            {
+                                baseRegIdx = j.EndRegister;
+                                break;
+                            }
                         }
                     }
                 }
@@ -157,6 +160,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     code.Code = OpCodeREnum.Initobj;
                     code.Register1 = r;
                     code.Operand = method.GetTypeTokenHashCode(body.Variables[idx].VariableType);
+                    code.Operand2 = 1;
                     first.FinalInstructions.Insert(appendIdx++, code);
                 }
                 idx++;

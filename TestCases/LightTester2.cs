@@ -217,5 +217,20 @@ namespace TestCases
         {
             return new List<TestCls>();
         }
+
+        public static void UnitTest_TestFCP3()
+        {
+            for(int i = 0; i < 100; i++)
+            {
+                try
+                {
+                    throw new Exception("test");
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"{ex.Message}\r\n{ex.Data["StackTrace"]}");
+                }
+            }
+        }
     }
 }
