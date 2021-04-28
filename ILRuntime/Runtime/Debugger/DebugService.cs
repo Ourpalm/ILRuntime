@@ -335,19 +335,75 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     intp.ClearDebugState();
                     intp.CurrentStepType = type;
-                    intp.LastStepFrameBase = intp.Stack.Frames.Count > 0 ? intp.Stack.Frames.Peek().BasePointer : (StackObject*)0;
                     intp.LastStepInstructionIndex = intp.Stack.Frames.Count > 0 ? intp.Stack.Frames.Peek().Address.Value : 0;
+                    intp.LastStepFrameBase = intp.Stack.Frames.Count > 0 ? ResolveCurrentFrameBasePointer(intp) : (StackObject*)0;
 
                     intp.Resume();
                 }
             }
         }
 
+        unsafe StackObject* ResolveCurrentFrameBasePointer(ILIntepreter intp,ILMethod method = null, int ip = -1)
+        {
+            StackObject* basePointer = intp.Stack.Frames.Peek().BasePointer;
+            if (method == null)
+                method = intp.Stack.Frames.Peek().Method;
+            if (ip < 0)
+                ip = intp.Stack.Frames.Peek().Address.Value;
+            if (domain.EnableRegisterVM)
+            {
+                basePointer = intp.Stack.Frames.Peek().LocalVarPointer;
+                RegisterVMSymbol vmSymbol;
+                if (method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
+                {
+                    var paramCnt = method.HasThis ? method.ParameterCount + 1 : method.ParameterCount;
+                    var frameBase = basePointer - paramCnt;
+                    int registerCnt = vmSymbol.Method.StackRegisterCount + vmSymbol.Method.LocalVariableCount;
+                    if (method.HasThis)
+                        frameBase--;
+                    var curParamCnt = vmSymbol.Method.HasThis ? vmSymbol.Method.ParameterCount + 1 : vmSymbol.Method.ParameterCount;
+
+                    if (vmSymbol.ParentSymbol != null)
+                    {
+                        basePointer = frameBase + vmSymbol.ParentSymbol.BaseRegisterIndex;
+                    }
+                    else
+                    {
+                        registerCnt -= vmSymbol.Method.StackRegisterCount;
+                        basePointer = frameBase ;
+                    }
+                    basePointer = basePointer + curParamCnt + registerCnt;
+                }
+            }
+            return basePointer;
+        }
+
         unsafe internal void CheckShouldBreak(ILMethod method, ILIntepreter intp, int ip)
         {
             if (server != null && server.IsAttached)
             {
-                int methodHash = method.GetHashCode();
+                RegisterVMSymbol vmSymbol;
+                Mono.Cecil.Cil.Instruction ins = null;
+                Mono.Cecil.MethodDefinition md = null;
+                ILMethod m = method;
+                if (domain.EnableRegisterVM)
+                {
+                    if(method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
+                    {
+                        ins = vmSymbol.Instruction;
+                        m = vmSymbol.Method;
+                        md = vmSymbol.Method.Definition;
+                        
+                    }
+                }
+                else
+                {
+                    md = method.Definition;
+                    ins = md.Body.Instructions[ip];
+                }
+                StackObject* basePointer = ResolveCurrentFrameBasePointer(intp, method, ip);
+
+                int methodHash = m.GetHashCode();
                 BreakpointInfo[] lst = null;
 
                 lock (activeBreakpoints)
@@ -356,27 +412,6 @@ namespace ILRuntime.Runtime.Debugger
                     if (activeBreakpoints.TryGetValue(methodHash, out bps))
                         lst = bps.ToArray();
                 }
-
-                RegisterVMSymbol vmSymbol;
-                Mono.Cecil.Cil.Instruction ins = null;
-                Mono.Cecil.MethodDefinition md = null;
-
-                if (domain.EnableRegisterVM)
-                {
-                    if(method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
-                    {
-                        while (vmSymbol.ParentSymbol != null)
-                            vmSymbol = vmSymbol.ParentSymbol.Value;
-                        ins = vmSymbol.Instruction;
-                        md = vmSymbol.Method.Definition;
-                    }
-                }
-                else
-                {
-                    md = method.Definition;
-                    ins = md.Body.Instructions[ip];
-                }
-
                 if (ins == null)
                     return;
                 if (lst != null)
@@ -406,14 +441,14 @@ namespace ILRuntime.Runtime.Debugger
                                 DoBreak(intp, 0, true);
                                 break;
                             case StepTypes.Over:
-                                if (intp.Stack.Frames.Peek().BasePointer <= intp.LastStepFrameBase && ip != intp.LastStepInstructionIndex)
+                                if (basePointer <= intp.LastStepFrameBase && ip != intp.LastStepInstructionIndex)
                                 {
                                     DoBreak(intp, 0, true);
                                 }
                                 break;
                             case StepTypes.Out:
                                 {
-                                    if (intp.Stack.Frames.Count > 0 && intp.Stack.Frames.Peek().BasePointer < intp.LastStepFrameBase)
+                                    if (intp.Stack.Frames.Count > 0 && basePointer < intp.LastStepFrameBase)
                                     {
                                         DoBreak(intp, 0, true);
                                     }
@@ -432,10 +467,11 @@ namespace ILRuntime.Runtime.Debugger
 
         void DoBreak(ILIntepreter intp, int bpHash, bool isStep)
         {
-            KeyValuePair<int, StackFrameInfo[]>[] frames = new KeyValuePair<int, StackFrameInfo[]>[AppDomain.Intepreters.Count];
+            var arr = AppDomain.Intepreters.ToArray();
+            KeyValuePair<int, StackFrameInfo[]>[] frames = new KeyValuePair<int, StackFrameInfo[]>[arr.Length];
             frames[0] = new KeyValuePair<int, StackFrameInfo[]>(intp.GetHashCode(), GetStackFrameInfo(intp));
             int idx = 1;
-            foreach (var j in AppDomain.Intepreters)
+            foreach (var j in arr)
             {
                 if (j.Value != intp)
                 {
@@ -500,6 +536,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         var info = CreateStackFrameInfo(m, null);
                         AddStackFrameInfoVariables(intp, info, m, frameBasePointer);
+                        frameInfos.Add(info);
                     }
                 }
                 else
@@ -507,12 +544,14 @@ namespace ILRuntime.Runtime.Debugger
                     ins = m.Definition.Body.Instructions[f.Address.Value];
                     var info = CreateStackFrameInfo(m, ins);
                     AddStackFrameInfoVariables(intp, info, m, frameBasePointer);
+                    frameInfos.Add(info);
                 }
             }
             else
             {
                 var info = CreateStackFrameInfo(m, null);
                 AddStackFrameInfoVariables(intp, info, m, frameBasePointer);
+                frameInfos.Add(info);
             }
         }
 

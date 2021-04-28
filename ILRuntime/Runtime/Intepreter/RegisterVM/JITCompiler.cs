@@ -294,7 +294,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     res[i] = op;
                 }
             }
-#if !DEBUG || DISABLE_ILRUNTIME_DEBUG
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+            FixSymbol(symbols);
+#else
             symbols = null;
 #endif
             switchTargets = jumptables;
@@ -337,6 +339,44 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
             jumptables[hashCode] = addrs;
+        }
+
+        void FixSymbol(Dictionary<int, RegisterVMSymbol> symbol)
+        {
+            HashSet<Instruction> includedIns = new HashSet<Instruction>();
+            foreach(var i in symbol.ToArray())
+            {
+                RegisterVMSymbol cur = i.Value;
+                RegisterVMSymbolLink link = null;
+                while (cur.ParentSymbol != null)
+                {
+                    link = cur.ParentSymbol;
+                    cur = cur.ParentSymbol.Value;
+                }
+                var sm = cur.Method.Definition.DebugInformation.GetSequencePointMapping();
+                var sq = FindSequencePoint(cur.Instruction, sm);
+                if(sq != null && !includedIns.Contains(sq))
+                {
+                    includedIns.Add(sq);
+                    cur.Instruction = sq;
+                    if (link != null)
+                        link.Value = cur;
+                    else
+                    {
+                        symbol[i.Key] = cur;
+                    }
+                }
+            }
+        }
+
+        Instruction FindSequencePoint(Instruction ins, IDictionary<Instruction, SequencePoint> seqMapping)
+        {
+            Mono.Cecil.Cil.Instruction cur = ins;
+            Mono.Cecil.Cil.SequencePoint sp;
+            while (!seqMapping.TryGetValue(cur, out sp) && cur.Previous != null)
+                cur = cur.Previous;
+
+            return cur;
         }
         void Translate(CodeBasicBlock block, Instruction ins, short locVarRegStart, ref short baseRegIdx)
         {

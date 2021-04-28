@@ -183,7 +183,6 @@ namespace ILRuntimeDebugEngine.AD7
             }
             catch(Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(ex.ToString(), "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 System.Diagnostics.Debug.WriteLine(ex.ToString());
             }
             return false;
