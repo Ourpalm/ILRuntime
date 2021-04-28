@@ -1189,6 +1189,31 @@ namespace ILRuntime.Runtime.Intepreter
                                                 LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack, intVal);
                                             }
                                             break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(val->Value);
+                                                var idx = val->ValueLow;
+                                                if (type is ILType)
+                                                {
+                                                    ((ILType)type).StaticInstance.CopyToRegister(idx, ref info, ip->Register1);
+                                                }
+                                                else
+                                                {
+                                                    if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref esp, mStack))
+                                                    {
+                                                        var ft = ((CLRType)type).GetField(idx);
+                                                        obj = ((CLRType)type).GetFieldValue(idx, null);
+                                                        if (obj is CrossBindingAdaptorType)
+                                                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                                        AssignToRegister(ref info, ip->Register1, obj, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
+                                                    }
+                                                }
+                                            }
+                                            break;
                                         default:
                                             {
                                                 dst->ObjectType = ObjectTypes.Integer;
@@ -1221,6 +1246,31 @@ namespace ILRuntime.Runtime.Intepreter
                                                 //Free(dst);
                                                 intVal = GetManagedStackIndex(ref info, ip->Register1);
                                                 LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack, intVal);
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(val->Value);
+                                                var idx = val->ValueLow;
+                                                if (type is ILType)
+                                                {
+                                                    ((ILType)type).StaticInstance.CopyToRegister(idx, ref info, ip->Register1);
+                                                }
+                                                else
+                                                {
+                                                    if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref esp, mStack))
+                                                    {
+                                                        var ft = ((CLRType)type).GetField(idx);
+                                                        obj = ((CLRType)type).GetFieldValue(idx, null);
+                                                        if (obj is CrossBindingAdaptorType)
+                                                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                                        AssignToRegister(ref info, ip->Register1, obj, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
+                                                    }
+                                                }
                                             }
                                             break;
                                         default:
@@ -1256,6 +1306,31 @@ namespace ILRuntime.Runtime.Intepreter
                                                 LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack);
                                             }
                                             break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(val->Value);
+                                                var idx = val->ValueLow;
+                                                if (type is ILType)
+                                                {
+                                                    ((ILType)type).StaticInstance.CopyToRegister(idx, ref info, ip->Register1);
+                                                }
+                                                else
+                                                {
+                                                    if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref esp, mStack))
+                                                    {
+                                                        var ft = ((CLRType)type).GetField(idx);
+                                                        obj = ((CLRType)type).GetFieldValue(idx, null);
+                                                        if (obj is CrossBindingAdaptorType)
+                                                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                                        AssignToRegister(ref info, ip->Register1, obj, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
+                                                    }
+                                                }
+                                            }
+                                            break;
                                         default:
                                             {
                                                 dst->ObjectType = ObjectTypes.Float;
@@ -1288,6 +1363,31 @@ namespace ILRuntime.Runtime.Intepreter
                                                 //Free(dst);
                                                 intVal = GetManagedStackIndex(ref info, ip->Register1);
                                                 LoadFromArrayReference(instance, idx, dst, instance.GetType().GetElementType(), mStack, intVal);
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(val->Value);
+                                                var idx = val->ValueLow;
+                                                if (type is ILType)
+                                                {
+                                                    ((ILType)type).StaticInstance.CopyToRegister(idx, ref info, ip->Register1);
+                                                }
+                                                else
+                                                {
+                                                    if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref esp, mStack))
+                                                    {
+                                                        var ft = ((CLRType)type).GetField(idx);
+                                                        obj = ((CLRType)type).GetFieldValue(idx, null);
+                                                        if (obj is CrossBindingAdaptorType)
+                                                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                                        AssignToRegister(ref info, ip->Register1, obj, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
+                                                    }
+                                                }
                                             }
                                             break;
                                         default:
@@ -1329,6 +1429,30 @@ namespace ILRuntime.Runtime.Intepreter
                                                 StoreValueToArrayReference(dst, reg1, mStack[dst->Value].GetType().GetElementType(), mStack);
                                             }
                                             break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(dst->Value);
+                                                int idx = dst->ValueLow;
+                                                if (type != null)
+                                                {
+                                                    if (type is ILType)
+                                                    {
+                                                        ILType t = type as ILType;
+                                                        t.StaticInstance.AssignFromStack(idx, reg1, AppDomain, mStack);
+                                                    }
+                                                    else
+                                                    {
+                                                        CLRType t = type as CLRType;
+                                                        var f = t.GetField(idx);
+                                                        obj = null;
+                                                        if (!((CLRType)t).AssignFieldFromStack(idx, ref obj, this, reg1, mStack))
+                                                            t.SetStaticFieldValue(idx, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(reg1, domain, mStack), domain)));
+                                                    }
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
+                                            }
+                                            break;
                                         default:
                                             {
                                                 dst->Value = reg1->Value;
@@ -1354,6 +1478,30 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.ArrayReference:
                                             {
                                                 StoreValueToArrayReference(dst, val, typeof(long), mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(dst->Value);
+                                                int idx = dst->ValueLow;
+                                                if (type != null)
+                                                {
+                                                    if (type is ILType)
+                                                    {
+                                                        ILType t = type as ILType;
+                                                        t.StaticInstance.AssignFromStack(idx, val, AppDomain, mStack);
+                                                    }
+                                                    else
+                                                    {
+                                                        CLRType t = type as CLRType;
+                                                        var f = t.GetField(idx);
+                                                        obj = null;
+                                                        if (!((CLRType)t).AssignFieldFromStack(idx, ref obj, this, val, mStack))
+                                                            t.SetStaticFieldValue(idx, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
+                                                    }
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
                                             }
                                             break;
                                         default:
@@ -1384,6 +1532,30 @@ namespace ILRuntime.Runtime.Intepreter
                                                 StoreValueToArrayReference(dst, val, typeof(double), mStack);
                                             }
                                             break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(dst->Value);
+                                                int idx = dst->ValueLow;
+                                                if (type != null)
+                                                {
+                                                    if (type is ILType)
+                                                    {
+                                                        ILType t = type as ILType;
+                                                        t.StaticInstance.AssignFromStack(idx, val, AppDomain, mStack);
+                                                    }
+                                                    else
+                                                    {
+                                                        CLRType t = type as CLRType;
+                                                        var f = t.GetField(idx);
+                                                        obj = null;
+                                                        if (!((CLRType)t).AssignFieldFromStack(idx, ref obj, this, val, mStack))
+                                                            t.SetStaticFieldValue(idx, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
+                                                    }
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
+                                            }
+                                            break;
                                         default:
                                             {
                                                 dst->Value = val->Value;
@@ -1410,6 +1582,30 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.ArrayReference:
                                             {
                                                 StoreValueToArrayReference(dst, val, typeof(object), mStack);
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(dst->Value);
+                                                int idx = dst->ValueLow;
+                                                if (type != null)
+                                                {
+                                                    if (type is ILType)
+                                                    {
+                                                        ILType t = type as ILType;
+                                                        t.StaticInstance.AssignFromStack(idx, val, AppDomain, mStack);
+                                                    }
+                                                    else
+                                                    {
+                                                        CLRType t = type as CLRType;
+                                                        var f = t.GetField(idx);
+                                                        obj = null;
+                                                        if (!((CLRType)t).AssignFieldFromStack(idx, ref obj, this, val, mStack))
+                                                            t.SetStaticFieldValue(idx, f.FieldType.CheckCLRTypes(CheckAndCloneValueType(StackObject.ToObject(val, domain, mStack), domain)));
+                                                    }
+                                                }
+                                                else
+                                                    throw new TypeLoadException();
                                             }
                                             break;
                                         default:
@@ -4190,6 +4386,77 @@ namespace ILRuntime.Runtime.Intepreter
                     v->ObjectType = ObjectTypes.Object;
                     v->Value = idx;
                     mStack[idx] = null;
+                    break;
+                case ObjectTypes.StaticFieldReference:
+                    {
+                        var type = info.Intepreter.AppDomain.GetType(val->Value);
+                        if (type is ILType)
+                        {
+                            var st = type as ILType;
+                            if (st.IsValueType)
+                            {
+                                if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                {
+                                    var dst = *(StackObject**)&v->Value;
+                                    if (dst->Value != st.GetHashCode())
+                                    {
+                                        stack.FreeRegisterValueType(v);
+                                        stack.AllocValueType(v, st, true);
+                                    }
+                                }
+                                st.StaticInstance.CopyToRegister(val->ValueLow, ref info, reg);
+                            }
+                            else if (st.IsPrimitive)
+                            {
+                                st.StaticInstance.PushToStack(val->ValueLow, v, info.Intepreter, mStack);
+                            }
+                            else
+                            {
+                                v->ObjectType = ObjectTypes.Object;
+                                v->Value = idx;
+                                mStack[idx] = st.StaticInstance[val->ValueLow];
+                            }
+                        }
+                        else
+                        {
+                            var st = type as CLRType;
+                            var binder = st.ValueTypeBinder;
+                            if (binder != null)
+                            {
+                                if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                {
+                                    var dst = *(StackObject**)&v->Value;
+                                    if (dst->Value != st.GetHashCode())
+                                    {
+                                        stack.FreeRegisterValueType(v);
+                                        stack.AllocValueType(v, st, true);
+                                    }
+                                }
+                                StackObject tmp;
+                                StackObject* esp = &tmp;
+                                if (!st.CopyFieldToStack(val->ValueLow, null, this, ref esp, mStack))
+                                {
+                                    var obj = ((CLRType)type).GetFieldValue(val->ValueLow, null);
+                                    if (obj is CrossBindingAdaptorType)
+                                        obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                    AssignToRegister(ref info, reg, obj, false);
+                                }
+                                else
+                                {
+                                    PopToRegister(ref info, reg, esp);
+                                }
+                            }
+                            else
+                            {
+                                var obj = st.GetFieldValue(val->ValueLow, null);
+                                if (obj is CrossBindingAdaptorType)
+                                    obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                v->ObjectType = ObjectTypes.Object;
+                                v->Value = idx;
+                                mStack[idx] = obj;
+                            }
+                        }
+                    }
                     break;
                 case ObjectTypes.Object:
                 case ObjectTypes.FieldReference:

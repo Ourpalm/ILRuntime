@@ -73,5 +73,51 @@ namespace TestCases
                 }
             }
         }
+
+        private static int testVal;
+        private static Vector3 testVal2;
+        private static object testVal3;
+
+        private static void UnitTest_StaticTest04Sub(ref int i)
+        {
+            Console.WriteLine(i);
+            i = 0;
+        }
+
+        public static void UnitTest_StaticTest04()
+        {
+            testVal = 111;
+            UnitTest_StaticTest04Sub(ref testVal);
+            if (testVal != 0)
+                throw new Exception();
+        }
+
+        private static void UnitTest_StaticTest05Sub(ref Vector3 i)
+        {
+            Console.WriteLine(i);
+            i = Vector3.Zero;
+        }
+
+        public static void UnitTest_StaticTest05()
+        {
+            testVal2 = Vector3.One;
+            UnitTest_StaticTest05Sub(ref testVal2);
+            if (testVal2.x != 0)
+                throw new Exception();
+        }
+
+        private static void UnitTest_StaticTest06Sub(ref object i)
+        {
+            Console.WriteLine(i);
+            i = 0;
+        }
+
+        public static void UnitTest_StaticTest06()
+        {
+            testVal3 = 111;
+            UnitTest_StaticTest06Sub(ref testVal3);
+            if ((int)testVal3 != 0)
+                throw new Exception();
+        }
     }
 }

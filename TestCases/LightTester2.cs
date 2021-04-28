@@ -116,7 +116,24 @@ namespace TestCases
             char c = str[1];
             Console.WriteLine(c);
         }
-
+        public static bool static_field = true;
+        public static bool static_Property => static_field;
+        public static int UnitTest_2006()
+        {
+            int a = 2;
+            int n = 0;
+            try
+            {
+                if (static_Property) //属性
+                    n += a;
+                return n;
+            }
+            catch (Exception)
+            {
+                n = -1;
+            }
+            return n;
+        }
         public static void UnitTest_TestInline01()
         {
             object obj = new object();
