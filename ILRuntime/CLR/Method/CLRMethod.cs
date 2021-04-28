@@ -289,8 +289,8 @@ namespace ILRuntime.CLR.Method
                 else
                 {
                     var res = cDef.Invoke(param);
-                    Array.Clear(invocationParam, 0, invocationParam.Length);
                     FixReference(paramCount, esp, param, mStack, null, false);
+                    Array.Clear(invocationParam, 0, invocationParam.Length);
                     return res;
                 }
 
@@ -315,10 +315,10 @@ namespace ILRuntime.CLR.Method
                 else*/
                 {
                     res = def.Invoke(instance, param);
-                    Array.Clear(invocationParam, 0, invocationParam.Length);
                 }
 
                 FixReference(paramCount, esp, param, mStack, instance, !def.IsStatic);
+                Array.Clear(invocationParam, 0, invocationParam.Length);
                 return res;
             }
         }

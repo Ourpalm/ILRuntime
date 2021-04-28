@@ -55,5 +55,23 @@ namespace TestCases
             //    throw new Exception("result != 2");
             //NormalClass.result = 0;
         }
+
+        public static void UnitTest_StaticTest03()
+        {
+            dict[1] = new List<string>() { "helloworld", "hi" };
+            UnitTest_StaticTest03Sub();
+        }
+        public static Dictionary<int, List<string>> dict = new Dictionary<int, List<string>>();
+        static void UnitTest_StaticTest03Sub()
+        {
+            if (dict.TryGetValue(1, out var ls))
+            {
+                ls.Add("ggg");
+                foreach (var item in ls)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+        }
     }
 }
