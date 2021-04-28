@@ -119,5 +119,26 @@ namespace TestCases
             if ((int)testVal3 != 0)
                 throw new Exception();
         }
+
+        public static bool static_field = true;
+        public static bool static_Property => static_field;
+
+
+        public static int UnitTest_StaticTest07()
+        {
+            int a = 2;
+            int n = 0;
+            try
+            {
+                if (static_Property) //属性
+                    n += a;
+                return n;
+            }
+            catch (Exception)
+            {
+                n = -1;
+            }
+            return n;
+        }
     }
 }

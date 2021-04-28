@@ -221,13 +221,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 jumpTargets[bIdx++] = res.Count;
                 bool isInline = false;
                 int inlineOffset = 0;
+                bool inlineAddressSet = false;
                 for (idx = 0; idx < b.FinalInstructions.Count; idx++)
                 {
                     RegisterVMSymbol oriIns;
                     bool hasOri = b.InstructionMapping.TryGetValue(idx, out oriIns);
                     if (hasOri)
                     {
-                        addr[oriIns.Instruction] = curIndex;
+                        if (isInline)
+                        {
+                            if (!inlineAddressSet)
+                            {
+                                while (oriIns.ParentSymbol != null)
+                                    oriIns = oriIns.ParentSymbol.Value;
+                                addr[oriIns.Instruction] = curIndex;
+                                inlineAddressSet = true;
+                            }
+                        }
+                        else
+                            addr[oriIns.Instruction] = curIndex;
                     }
                     if (b.CanRemove.Contains(idx))
                     {
@@ -238,6 +250,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     var ins = b.FinalInstructions[idx];
                     if (ins.Code == OpCodeREnum.InlineStart)
                     {
+                        inlineAddressSet = false;
                         isInline = true;
                         inlineOffset = res.Count;
                     }
