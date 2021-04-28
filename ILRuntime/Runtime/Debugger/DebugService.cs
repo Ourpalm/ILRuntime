@@ -388,6 +388,8 @@ namespace ILRuntime.Runtime.Debugger
                 ILMethod m = method;
                 if (domain.EnableRegisterVM)
                 {
+                    if (!method.IsRegisterVMSymbolFixed)
+                        method.FixRegisterVMSymbol();
                     if(method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
                     {
                         ins = vmSymbol.Instruction;

@@ -18,6 +18,7 @@ namespace ILRuntime.CLR.Method
         OpCode[] body;
         OpCodeR[] bodyRegister;
         Dictionary<int, RegisterVMSymbol> registerSymbols;
+        bool symbolFixed;
         MethodDefinition def;
         List<IType> parameters;
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
@@ -42,6 +43,8 @@ namespace ILRuntime.CLR.Method
         public Dictionary<int, int[]> JumpTablesRegister { get { return jumptablesR; } }
 
         internal Dictionary<int, RegisterVMSymbol> RegisterVMSymbols { get { return registerSymbols; } }
+
+        internal bool IsRegisterVMSymbolFixed { get { return symbolFixed; } }
 
         internal IDelegateAdapter DelegateAdapter { get; set; }
 
@@ -164,6 +167,15 @@ namespace ILRuntime.CLR.Method
                 }
             }
 #endif
+        }
+
+        public void FixRegisterVMSymbol()
+        {
+            if (!symbolFixed && registerSymbols != null)
+            {
+                symbolFixed = true;
+                JITCompiler.FixSymbol(registerSymbols);
+            }
         }
 
         Mono.Cecil.Cil.SequencePoint GetValidSequence(int startIdx, int dir)

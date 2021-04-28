@@ -295,7 +295,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
             }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-            FixSymbol(symbols);
+            //FixSymbol(symbols);
 #else
             symbols = null;
 #endif
@@ -341,7 +341,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             jumptables[hashCode] = addrs;
         }
 
-        void FixSymbol(Dictionary<int, RegisterVMSymbol> symbol)
+        public static void FixSymbol(Dictionary<int, RegisterVMSymbol> symbol)
         {
             HashSet<Instruction> includedIns = new HashSet<Instruction>();
             foreach(var i in symbol.ToArray())
@@ -369,7 +369,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
         }
 
-        Instruction FindSequencePoint(Instruction ins, IDictionary<Instruction, SequencePoint> seqMapping)
+        static Instruction FindSequencePoint(Instruction ins, IDictionary<Instruction, SequencePoint> seqMapping)
         {
             Mono.Cecil.Cil.Instruction cur = ins;
             Mono.Cecil.Cil.SequencePoint sp;
