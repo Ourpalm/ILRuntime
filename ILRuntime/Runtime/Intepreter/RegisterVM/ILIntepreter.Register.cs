@@ -4343,7 +4343,7 @@ namespace ILRuntime.Runtime.Intepreter
                 }
             }
 
-#if UNITY_EDITOR
+#if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
                 UnityEngine.Profiling.Profiler.EndSample();

@@ -326,7 +326,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
             method.Compiling = false;
             var arr = res.ToArray();
-#if UNITY_EDITOR
+#if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
                 UnityEngine.Profiling.Profiler.EndSample();
@@ -603,7 +603,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
 #endif
                             Optimizer.InlineMethod(block, toInline, link, ref jumptables, baseRegIdx, hasRet);
-#if UNITY_EDITOR
+#if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
                 UnityEngine.Profiling.Profiler.EndSample();
