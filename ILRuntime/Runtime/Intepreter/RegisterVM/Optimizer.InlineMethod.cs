@@ -80,6 +80,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                             ins[j] = op2;
                                         }
                                     }
+                                    else if(op2.Code == OpCodeREnum.Switch)
+                                    {
+                                        var targets = jumpTables[op2.Operand];
+                                        for(int k = 0; k < targets.Length; k++)
+                                        {
+                                            if (targets[k] > i)
+                                                targets[k]++;
+                                        }
+                                    }
                                 }
                             }
                             reloc.Add(ins.Count);
