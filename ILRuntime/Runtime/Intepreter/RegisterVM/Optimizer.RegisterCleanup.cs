@@ -16,7 +16,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
     {
         public static int CleanupRegister(List<OpCodeR> ins, int locRegStart, bool hasReturn)
         {
-            short maxRegNum = -1;
+            short maxRegNum = (short)locRegStart;
             HashSet<short> usedRegisters = new HashSet<short>();
             //arguments can not be cleaned
             for (short i = 0; i < locRegStart; i++)
