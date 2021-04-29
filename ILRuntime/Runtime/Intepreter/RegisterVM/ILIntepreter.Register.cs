@@ -169,6 +169,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
             var bp = stack.ValueTypeStackPointer;
             ValueTypeBasePointer = bp;
+            var ehs = method.ExceptionHandlerRegister;
 
             StackObject* reg1, reg2, reg3, objRef, objRef2, val, dst, ret;
             bool transfer;
@@ -2097,12 +2098,12 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Leave:
                             case OpCodeREnum.Leave_S:
                                 {
-                                    if (method.ExceptionHandlerRegister != null)
+                                    if (ehs != null)
                                     {
                                         ExceptionHandler eh = null;
 
                                         int addr = ip->Operand;
-                                        var sql = from e in method.ExceptionHandlerRegister
+                                        var sql = from e in ehs
                                                   where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
                                                   select e;
                                         eh = sql.FirstOrDefault();
@@ -4276,14 +4277,14 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
-                        if (method.ExceptionHandlerRegister != null)
+                        if (ehs != null)
                         {
                             int addr = (int)(ip - ptr);
-                            var eh = GetCorrespondingExceptionHandler(method.ExceptionHandlerRegister, ex, addr, ExceptionHandlerType.Catch, true);
+                            var eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, true);
 
                             if (eh == null)
                             {
-                                eh = GetCorrespondingExceptionHandler(method.ExceptionHandlerRegister, ex, addr, ExceptionHandlerType.Catch, false);
+                                eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, false);
                             }
                             if (eh != null)
                             {

@@ -132,6 +132,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v3 = frame.LocalVarPointer + 1 + 1;
             StackObject* v4 = Add(frame.LocalVarPointer, 3);
             int finallyEndAddress = 0;
+            var ehs = method.ExceptionHandler;
 
             esp = frame.BasePointer;
             var arg = Minus(frame.LocalVarPointer, method.ParameterCount);
@@ -1907,12 +1908,12 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Leave:
                             case OpCodeEnum.Leave_S:
                                 {
-                                    if (method.ExceptionHandler != null)
+                                    if (ehs != null)
                                     {
                                         ExceptionHandler eh = null;
 
                                         int addr = ip->TokenInteger;
-                                        var sql = from e in method.ExceptionHandler
+                                        var sql = from e in ehs
                                                   where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
                                                   select e;
                                         eh = sql.FirstOrDefault();
@@ -4421,14 +4422,14 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
-                        if (method.ExceptionHandler != null)
+                        if (ehs != null)
                         {
                             int addr = (int)(ip - ptr);
-                            var eh = GetCorrespondingExceptionHandler(method.ExceptionHandler, ex, addr, ExceptionHandlerType.Catch, true);
+                            var eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, true);
 
                             if (eh == null)
                             {
-                                eh = GetCorrespondingExceptionHandler(method.ExceptionHandler, ex, addr, ExceptionHandlerType.Catch, false);
+                                eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, false);
                             }
                             if (eh != null)
                             {
