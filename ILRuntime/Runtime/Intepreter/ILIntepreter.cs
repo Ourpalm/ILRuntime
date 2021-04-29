@@ -92,9 +92,10 @@ namespace ILRuntime.Runtime.Intepreter
                     throw new NullReferenceException("instance should not be null!");
                 esp = PushObject(esp, mStack, instance);
             }
-            esp = PushParameters(method, esp, p);
+            bool useRegister = method.ShouldUseRegisterVM;
+            esp = PushParameters(method, esp, p, useRegister);
             bool unhandledException;
-            if (AppDomain.EnableRegisterVM)
+            if (useRegister)
                 esp = ExecuteR(method, esp, out unhandledException);
             else
                 esp = Execute(method, esp, out unhandledException);
@@ -1982,7 +1983,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                         ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                                     }
                                                 }
-                                                esp = Execute(ilm, esp, out unhandledException);
+                                                if (ilm.ShouldUseRegisterVM)
+                                                {
+                                                    PrepareRegisterCallStack(esp, mStack, ilm);
+                                                    esp = ExecuteR(ilm, esp, out unhandledException);
+                                                }
+                                                else
+                                                    esp = Execute(ilm, esp, out unhandledException);
                                                 ValueTypeBasePointer = bp;
                                                 if (unhandledException)
                                                     returned = true;
@@ -2665,7 +2672,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                 CopyToStack(esp, a + i, mStack);
                                                 esp++;
                                             }
-                                            esp = Execute((ILMethod)m, esp, out unhandledException);
+                                            if (((ILMethod)m).ShouldUseRegisterVM)
+                                            {
+                                                PrepareRegisterCallStack(esp, mStack, (ILMethod)m);
+                                                esp = ExecuteR((ILMethod)m, esp, out unhandledException);
+                                            }
+                                            else
+                                                esp = Execute((ILMethod)m, esp, out unhandledException);
                                             for (int i = m.ParameterCount - 1; i >= 0; i--)
                                             {
                                                 Free(Add(a, i));
@@ -4411,11 +4424,11 @@ namespace ILRuntime.Runtime.Intepreter
                         if (method.ExceptionHandler != null)
                         {
                             int addr = (int)(ip - ptr);
-                            var eh = GetCorrespondingExceptionHandler(method, ex, addr, ExceptionHandlerType.Catch, true);
+                            var eh = GetCorrespondingExceptionHandler(method.ExceptionHandler, ex, addr, ExceptionHandlerType.Catch, true);
 
                             if (eh == null)
                             {
-                                eh = GetCorrespondingExceptionHandler(method, ex, addr, ExceptionHandlerType.Catch, false);
+                                eh = GetCorrespondingExceptionHandler(method.ExceptionHandler, ex, addr, ExceptionHandlerType.Catch, false);
                             }
                             if (eh != null)
                             {
@@ -4482,6 +4495,41 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp);
+        }
+
+        void PrepareRegisterCallStack(StackObject* esp, IList<object> mStack, ILMethod method)
+        {
+            var pCnt = method.HasThis ? method.ParameterCount + 1 : method.ParameterCount;
+            StackObject* basePointer = esp - pCnt;
+            int mBase = mStack.Count;
+            int existing = 0;
+            for (int i = 0; i < pCnt; i++)
+            {
+                StackObject* cur = basePointer + i;
+                if (cur->ObjectType < ObjectTypes.Object)
+                {
+                    if (cur->ObjectType == ObjectTypes.Null)
+                    {
+                        cur->ObjectType = ObjectTypes.Object;
+                        cur->Value = mStack.Count;
+                    }
+                    mStack.Add(null);
+                }
+                else
+                    existing++;
+            }
+            if (existing > 0)
+            {
+                mBase = mBase - existing;
+                for (int i = 0; i < pCnt; i++)
+                {
+                    StackObject* cur = basePointer + i;
+                    if (cur->ObjectType >= ObjectTypes.Object)
+                    {
+                        cur->Value = mBase + i;
+                    }
+                }
+            }
         }
 
         void DumpStack(StackObject* esp)
@@ -5109,12 +5157,12 @@ namespace ILRuntime.Runtime.Intepreter
             throw new NotImplementedException();
         }
 
-        ExceptionHandler GetCorrespondingExceptionHandler(ILMethod method, object obj, int addr, ExceptionHandlerType type, bool explicitMatch)
+        ExceptionHandler GetCorrespondingExceptionHandler(ExceptionHandler[] eh, object obj, int addr, ExceptionHandlerType type, bool explicitMatch)
         {
             ExceptionHandler res = null;
             int distance = int.MaxValue;
             Exception ex = obj is ILRuntimeException ? ((ILRuntimeException)obj).InnerException : obj as Exception;
-            foreach (var i in method.ExceptionHandler)
+            foreach (var i in eh)
             {
                 if (i.HandlerType == type)
                 {
@@ -5364,7 +5412,7 @@ namespace ILRuntime.Runtime.Intepreter
                 return esp;
         }
 
-        StackObject* PushParameters(IMethod method, StackObject* esp, object[] p)
+        StackObject* PushParameters(IMethod method, StackObject* esp, object[] p, bool useRegister)
         {
             IList<object> mStack = stack.ManagedStack;
             var plist = method.Parameters;
@@ -5383,7 +5431,7 @@ namespace ILRuntime.Runtime.Intepreter
                     if (obj is CrossBindingAdaptorType)
                         obj = ((CrossBindingAdaptorType)obj).ILInstance;
                     var res = ILIntepreter.PushObject(esp, mStack, obj, isBox);
-                    if (esp->ObjectType < ObjectTypes.Object && domain.EnableRegisterVM)
+                    if (esp->ObjectType < ObjectTypes.Object && useRegister)
                         mStack.Add(null);
                     esp = res;
                 }

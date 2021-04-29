@@ -974,11 +974,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 {
                     isILMethod = !m.IsDelegateInvoke;
                     var ilm = (ILMethod)m;
+                    bool noJIT = (ilm.JITFlags & ILRuntimeJITFlags.NoJIT) != ILRuntimeJITFlags.None;
+                    bool forceInline = (ilm.JITFlags & ILRuntimeJITFlags.ForceInline) != ILRuntimeJITFlags.None;
                     bool hasExceptionHandler = ilm.Definition.HasBody && ilm.Definition.Body.HasExceptionHandlers;
-                    if (!ilm.IsDelegateInvoke && !ilm.IsVirtual && !hasExceptionHandler && !ilm.Compiling)
+                    if (!ilm.IsDelegateInvoke && !ilm.IsVirtual && !noJIT && !hasExceptionHandler && !ilm.Compiling)
                     {
-                        var body = ilm.BodyRegister;
-                        if (body == null || body.Length <= Optimizer.MaximalInlineInstructionCount)
+                        var def = ilm.Definition;
+                        if (!def.HasBody || forceInline || def.Body.Instructions.Count <= Optimizer.MaximalInlineInstructionCount)
                         {
                             canInline = true;
                             toInline = ilm;

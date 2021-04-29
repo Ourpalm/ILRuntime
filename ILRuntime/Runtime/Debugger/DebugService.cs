@@ -67,7 +67,8 @@ namespace ILRuntime.Runtime.Debugger
         public void StopDebugService()
         {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-            server.Stop();
+            if (server != null)
+                server.Stop();
             server = null;
 #endif
         }
@@ -117,7 +118,7 @@ namespace ILRuntime.Runtime.Debugger
             RegisterVMSymbol vmSymbol;
             if (frames[0].Address != null)
             {
-                if (domain.EnableRegisterVM)
+                if (frames[0].IsRegister)
                 {
                     frames[0].Method.RegisterVMSymbols.TryGetValue(frames[0].Address.Value, out vmSymbol);
                     ins = vmSymbol.Instruction;
@@ -134,7 +135,7 @@ namespace ILRuntime.Runtime.Debugger
                 var f = frames[i];
                 m = f.Method;
                 string document = "";
-                if (domain.EnableRegisterVM)
+                if (f.IsRegister)
                 {
                     if (f.Address != null)
                     {
@@ -350,7 +351,7 @@ namespace ILRuntime.Runtime.Debugger
                 method = intp.Stack.Frames.Peek().Method;
             if (ip < 0)
                 ip = intp.Stack.Frames.Peek().Address.Value;
-            if (domain.EnableRegisterVM)
+            if (intp.Stack.Frames.Peek().IsRegister)
             {
                 basePointer = intp.Stack.Frames.Peek().LocalVarPointer;
                 RegisterVMSymbol vmSymbol;
@@ -386,7 +387,7 @@ namespace ILRuntime.Runtime.Debugger
                 Mono.Cecil.Cil.Instruction ins = null;
                 Mono.Cecil.MethodDefinition md = null;
                 ILMethod m = method;
-                if (domain.EnableRegisterVM)
+                if (intp.Stack.Frames.Peek().IsRegister)
                 {
                     if (!method.IsRegisterVMSymbolFixed)
                         method.FixRegisterVMSymbol();
@@ -504,7 +505,7 @@ namespace ILRuntime.Runtime.Debugger
             StackObject* frameBasePointer = Minus(f.LocalVarPointer, argCnt);
             if (f.Address != null)
             {
-                if (intp.AppDomain.EnableRegisterVM)
+                if (f.IsRegister)
                 {
                     RegisterVMSymbol vmSymbol;
                     if(m.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))

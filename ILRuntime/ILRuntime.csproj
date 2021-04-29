@@ -103,6 +103,7 @@
     <Compile Include="Runtime\Enviorment\InvocationContext.cs" />
     <Compile Include="Runtime\Enviorment\ValueTypeBinder.cs" />
     <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
+    <Compile Include="Runtime\ILRuntimeJITAttribute.cs" />
     <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />
     <Compile Include="Runtime\Enviorment\DelegateManager.cs" />
     <Compile Include="Runtime\Enviorment\CLRRedirections.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="Runtime\Intepreter\OpCodes\OpCode.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeREnum.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\AsyncJITCompileWorker.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.BCP.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.InlineMethod.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.RegisterCleanup.cs" />

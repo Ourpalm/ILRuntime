@@ -86,6 +86,7 @@ namespace ILRuntime.Runtime.Intepreter
             OpCodeR[] body = method.BodyRegister;
             StackFrame frame;
             stack.InitializeFrame(method, esp, out frame);
+            frame.IsRegister = true;
             int finallyEndAddress = 0;
 
             var stackRegStart = frame.LocalVarPointer;
@@ -2096,12 +2097,12 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Leave:
                             case OpCodeREnum.Leave_S:
                                 {
-                                    if (method.ExceptionHandler != null)
+                                    if (method.ExceptionHandlerRegister != null)
                                     {
                                         ExceptionHandler eh = null;
 
                                         int addr = ip->Operand;
-                                        var sql = from e in method.ExceptionHandler
+                                        var sql = from e in method.ExceptionHandlerRegister
                                                   where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
                                                   select e;
                                         eh = sql.FirstOrDefault();
@@ -2204,7 +2205,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                         ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                                     }
                                                 }
-                                                esp = ExecuteR(ilm, esp, out unhandledException);
+                                                if (ilm.ShouldUseRegisterVM)
+                                                    esp = ExecuteR(ilm, esp, out unhandledException);
+                                                else
+                                                    esp = Execute(ilm, esp, out unhandledException);
                                                 ValueTypeBasePointer = bp;
                                                 if (unhandledException)
                                                     returned = true;
@@ -2651,7 +2655,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                     mStack.Add(null);
                                                 esp++;
                                             }
-                                            esp = ExecuteR((ILMethod)m, esp, out unhandledException);
+                                            if (((ILMethod)m).ShouldUseRegisterVM)
+                                                esp = ExecuteR(((ILMethod)m), esp, out unhandledException);
+                                            else
+                                                esp = Execute(((ILMethod)m), esp, out unhandledException); 
                                             ValueTypeBasePointer = bp;
                                             if (isValueType)
                                             {
@@ -4269,14 +4276,14 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
-                        if (method.ExceptionHandler != null)
+                        if (method.ExceptionHandlerRegister != null)
                         {
                             int addr = (int)(ip - ptr);
-                            var eh = GetCorrespondingExceptionHandler(method, ex, addr, ExceptionHandlerType.Catch, true);
+                            var eh = GetCorrespondingExceptionHandler(method.ExceptionHandlerRegister, ex, addr, ExceptionHandlerType.Catch, true);
 
                             if (eh == null)
                             {
-                                eh = GetCorrespondingExceptionHandler(method, ex, addr, ExceptionHandlerType.Catch, false);
+                                eh = GetCorrespondingExceptionHandler(method.ExceptionHandlerRegister, ex, addr, ExceptionHandlerType.Catch, false);
                             }
                             if (eh != null)
                             {

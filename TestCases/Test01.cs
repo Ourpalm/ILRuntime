@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntime.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,12 +40,12 @@ namespace TestCases
 
         }
 
+        [ILRuntimeJIT(ILRuntimeJITFlags.JITOnDemand)]
         static int Add(int a, int b)
         {
             if (b < 0)
                 return a;
-            else
-                return a + b;
+            return a + b;
         }
 
         public static void UnitTest_Performance2()

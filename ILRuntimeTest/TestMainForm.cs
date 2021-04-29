@@ -40,8 +40,6 @@ namespace ILRuntimeTest
 
             listView1.Columns.AddRange(row1);
             listView1.View = View.Details;
-            _app = new ILRuntime.Runtime.Enviorment.AppDomain();
-            _app.DebugService.StartDebugService(56000);
         }
 
         private void OnBtnRun(object sender, EventArgs e)
@@ -77,7 +75,6 @@ namespace ILRuntimeTest
 
             if (_testUnitList.Count <= 0)
                 return;
-            _app.EnableRegisterVM = cbEnableRegVM.Checked;
             _resList.Clear();
             foreach (var unit in _testUnitList)
             {
@@ -85,7 +82,6 @@ namespace ILRuntimeTest
                 _resList.Add(unit.CheckResult());
             }
 
-            _app.EnableRegisterVM = false;
             listView1.Items.Clear();
             StringBuilder sb = new StringBuilder();
             foreach (var resInfo in _resList)
@@ -136,6 +132,8 @@ namespace ILRuntimeTest
                         pdbPath = Path.Combine(path, name) + ".mdb";
                     }
 
+                    _app = new ILRuntime.Runtime.Enviorment.AppDomain(cbEnableRegVM.Checked ? ILRuntime.Runtime.ILRuntimeJITFlags.JITImmediately : ILRuntime.Runtime.ILRuntimeJITFlags.None);
+                    _app.DebugService.StartDebugService(56000);
                     fs2 = new System.IO.FileStream(pdbPath, FileMode.Open);
                     {
                         ILRuntime.Mono.Cecil.Cil.ISymbolReaderProvider symbolReaderProvider = null;
@@ -170,11 +168,9 @@ namespace ILRuntimeTest
 
             var testUnit = _testUnitList[_selectItemArgs.ItemIndex];
 
-            _app.EnableRegisterVM = cbEnableRegVM.Checked;
             testUnit.Run();
             var res = testUnit.CheckResult();
 
-            _app.EnableRegisterVM = false;
             _selectItemArgs.Item.SubItems[1].Text = res.Result.ToString();
             _selectItemArgs.Item.BackColor = res.Result ? Color.Green : Color.Red;
 

@@ -863,15 +863,16 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 esp = ILIntepreter.PushObject(esp, mStack, instance);
             int paramCnt = method.ParameterCount;
+            bool useRegister = method.ShouldUseRegisterVM;
             for (int i = paramCnt; i > 0; i--)
             {
                 intp.CopyToStack(esp, Minus(ebp, i), mStack);
-                if (esp->ObjectType < ObjectTypes.Object && appdomain.EnableRegisterVM)
+                if (esp->ObjectType < ObjectTypes.Object && useRegister)
                     mStack.Add(null);
                 esp++;
             }
             StackObject* ret;
-            if (appdomain.EnableRegisterVM)
+            if (useRegister)
                 ret = intp.ExecuteR(method, esp, out unhandled);
             else
                 ret = intp.Execute(method, esp, out unhandled);

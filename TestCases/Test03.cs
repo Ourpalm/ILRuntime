@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using ILRuntime.Runtime;
+
 namespace TestCases
 {
 
     class Test03
     {
+        [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
         public static void Test_01()
         {
             Console.WriteLine(Equals2(new int[] { 1 }, 1)); //NotSupportedException: Not supported opcode Readonly
