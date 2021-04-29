@@ -529,7 +529,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             constrainIdx = lst.Count - 1;
                             hasConstrained = lst[constrainIdx].Code == OpCodeREnum.Constrained;
                         }
-                        if (!canInline || hasConstrained)
+                        bool needInline = canInline && !hasConstrained;
+                        if (needInline)
+                        {
+                            if (toInline.BodyRegister.Length > Optimizer.MaximalInlineInstructionCount / 2)
+                                needInline = false;
+                        }
+                        if (!needInline)
                         {
                             if (code.Code == Code.Callvirt && m is ILMethod)
                             {
