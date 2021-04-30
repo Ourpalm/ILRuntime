@@ -986,7 +986,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     if (!ilm.IsDelegateInvoke && !ilm.IsVirtual && !noJIT && !hasExceptionHandler && !ilm.Compiling)
                     {
                         var def = ilm.Definition;
-                        if (!def.HasBody || forceInline || def.Body.Instructions.Count <= Optimizer.MaximalInlineInstructionCount)
+                        bool codeSizeOK = ilm.IsRegisterBodyReady ? ilm.BodyRegister.Length <= Optimizer.MaximalInlineInstructionCount : def.Body.Instructions.Count <= Optimizer.MaximalInlineInstructionCount;
+                        if (!def.HasBody || forceInline || codeSizeOK)
                         {
                             canInline = true;
                             toInline = ilm;

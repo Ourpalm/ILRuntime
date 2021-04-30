@@ -45,6 +45,8 @@ namespace ILRuntime.CLR.Method
 
         public bool Compiling { get; set; }
 
+        public bool IsRegisterBodyReady { get { return bodyRegister != null; } }
+
         public MethodDefinition Definition { get { return def; } }
 
         public Dictionary<int, int[]> JumpTables { get { return jumptables; } }
