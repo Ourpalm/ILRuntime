@@ -4522,11 +4522,12 @@ namespace ILRuntime.Runtime.Intepreter
             if (existing > 0)
             {
                 mBase = mBase - existing;
-                for (int i = 0; i < pCnt; i++)
+                for (int i = pCnt - 1; i >= 0; i--)
                 {
                     StackObject* cur = basePointer + i;
                     if (cur->ObjectType >= ObjectTypes.Object)
                     {
+                        mStack[mBase + i] = mStack[cur->Value];
                         cur->Value = mBase + i;
                     }
                 }
