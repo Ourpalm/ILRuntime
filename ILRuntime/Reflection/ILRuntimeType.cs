@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -326,7 +326,7 @@ namespace ILRuntime.Reflection
             }
             if ((bindingAttr & BindingFlags.DeclaredOnly) != BindingFlags.DeclaredOnly)
             {
-                if (BaseType != null && BaseType is ILRuntimeWrapperType)
+                if (BaseType != null && (BaseType is ILRuntimeWrapperType || BaseType is ILRuntimeType))
                 {
                     res.AddRange(BaseType.GetFields(bindingAttr));
                 }
@@ -422,7 +422,7 @@ namespace ILRuntime.Reflection
             }
             if ((bindingAttr & BindingFlags.DeclaredOnly) != BindingFlags.DeclaredOnly)
             {
-                if (BaseType != null && BaseType is ILRuntimeWrapperType)
+                if (BaseType != null && (BaseType is ILRuntimeWrapperType || BaseType is ILRuntimeType ))
                 {
                     res.AddRange(BaseType.GetProperties(bindingAttr));
                 }
