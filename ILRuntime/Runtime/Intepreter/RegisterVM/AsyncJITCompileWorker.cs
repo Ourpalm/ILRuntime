@@ -43,7 +43,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     ILMethod m;
                     lock (jobs)
                         m = jobs.Dequeue();
-                    m.InitCodeBody(true);
+                    try
+                    {
+                        m.InitCodeBody(true);
+                    }
+                    catch(Exception ex)
+                    {
+                        string str = string.Format("Compile {0} failed\r\n{1}", m, ex);
+#if UNITY_5_5_OR_NEWER
+                        UnityEngine.Debug.LogError(str);
+#else
+                        Console.WriteLine(str);
+#endif
+                    }
                 }
             }
         }
