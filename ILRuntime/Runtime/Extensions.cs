@@ -9,7 +9,7 @@ namespace ILRuntime.Runtime
 {
     public static class Extensions
     {
-        public static bool GetJITFlags(this Mono.Cecil.CustomAttribute attribute, Enviorment.AppDomain appdomain, out ILRuntimeJITFlags flags)
+        public static bool GetJITFlags(this Mono.Cecil.CustomAttribute attribute, Enviorment.AppDomain appdomain, out int flags)
         {
             var at = appdomain.GetType(attribute.AttributeType, null, null);
             flags = ILRuntimeJITFlags.None;
@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime
             {
                 if (attribute.HasConstructorArguments)
                 {
-                    flags = (ILRuntimeJITFlags)(int)attribute.ConstructorArguments[0].Value;
+                    flags = (int)attribute.ConstructorArguments[0].Value;
                 }
                 else
                     flags = ILRuntimeJITFlags.JITOnDemand;

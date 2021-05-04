@@ -45,7 +45,7 @@ namespace ILRuntime.CLR.TypeSystem
         IType firstCLRBaseType, firstCLRInterface;
         int hashCode = -1;
         static int instance_id = 0x10000000;
-        ILRuntimeJITFlags jitFlags;
+        int jitFlags;
         public TypeDefinition TypeDefinition { get { return definition; } }
         bool mToStringGot, mEqualsGot, mGetHashCodeGot;
         IMethod mToString, mEquals, mGetHashCode;
@@ -700,7 +700,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 for (int i = 0; i < definition.CustomAttributes.Count; i++)
                 {
-                    ILRuntimeJITFlags f;
+                    int f;
                     if (definition.CustomAttributes[i].GetJITFlags(AppDomain, out f))
                     {
                         this.jitFlags = f;

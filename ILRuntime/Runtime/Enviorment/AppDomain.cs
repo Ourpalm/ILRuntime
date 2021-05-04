@@ -63,7 +63,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
         DebugService debugService;
         AsyncJITCompileWorker jitWorker = new AsyncJITCompileWorker();
-        ILRuntimeJITFlags defaultJITFlags;
+        int defaultJITFlags;
 
         /// <summary>
         /// Determine if invoking unbinded CLR method(using reflection) is allowed
@@ -80,9 +80,9 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal bool SuppressStaticConstructor { get; set; }
 
-        public ILRuntimeJITFlags DefaultJITFlags { get { return defaultJITFlags; } }
+        public int DefaultJITFlags { get { return defaultJITFlags; } }
 
-        public unsafe AppDomain(ILRuntimeJITFlags defaultJITFlags = ILRuntimeJITFlags.None)
+        public unsafe AppDomain(int defaultJITFlags = ILRuntimeJITFlags.None)
         {
             AllowUnboundCLRMethod = true;
             InvocationContext.InitializeDefaultConverters();

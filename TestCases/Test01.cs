@@ -156,6 +156,30 @@ namespace TestCases
             Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
 
+        public static void UnitTest_Performance9()
+        {
+            int[] array = new int[1024];
+            for (int i = 0; i < 1024; ++i)
+            {
+                array[i] = i;
+            }
+
+            int total = 0;
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            for (int j = 0; j < 1000; ++j)
+            {
+                for (int i = 0; i < 1024; ++i)
+                {
+                    total = total + array[i];
+                }
+            }
+
+            sw.Stop();
+            Console.WriteLine(string.Format("res=" + total + ", time:{0:0}", sw.ElapsedMilliseconds));
+        }
+
         public static void UnitTest_Performance6()
         {
             PerformanceTestCls obj = new PerformanceTestCls();
