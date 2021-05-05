@@ -121,6 +121,7 @@
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeREnum.cs" />
     <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\AsyncJITCompileWorker.cs" />
+    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.ELDC.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.BCP.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.InlineMethod.cs" />
     <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.RegisterCleanup.cs" />

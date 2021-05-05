@@ -196,6 +196,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
+            Optimizer.EliminateConstantLoad(blocks, hasReturn);
 
 #if OUTPUT_JIT_RESULT
             cnt = 1;

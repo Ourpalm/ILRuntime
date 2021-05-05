@@ -14,6 +14,334 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     partial class Optimizer
     {
+        public static bool SupportIntemediateValue(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Add:
+                case OpCodeREnum.Sub:
+                case OpCodeREnum.Mul:
+                case OpCodeREnum.Div:
+                case OpCodeREnum.Rem:
+                case OpCodeREnum.Rem_Un:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.Shl:
+                case OpCodeREnum.Shr:
+                case OpCodeREnum.Shr_Un:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Ceq:
+                case OpCodeREnum.Cgt:
+                case OpCodeREnum.Cgt_Un:
+                case OpCodeREnum.Clt:
+                case OpCodeREnum.Clt_Un:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static void ReplaceRegisterWithConstant(ref OpCodeR op, ref OpCodeR constant)
+        {
+            switch (op.Code)
+            {
+                case OpCodeREnum.Add:
+                case OpCodeREnum.Sub:
+                case OpCodeREnum.Mul:
+                case OpCodeREnum.Div:
+                case OpCodeREnum.Rem:
+                case OpCodeREnum.Rem_Un:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.Shl:
+                case OpCodeREnum.Shr:
+                case OpCodeREnum.Shr_Un:
+                case OpCodeREnum.Ceq:
+                case OpCodeREnum.Cgt:
+                case OpCodeREnum.Cgt_Un:
+                case OpCodeREnum.Clt:
+                case OpCodeREnum.Clt_Un:
+                    op.Register3 = 0;
+                    break;
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                    op.Register2 = 0;
+                    break;
+            }
+
+            switch (constant.Code)
+            {
+                case OpCodeREnum.Ldc_I4:
+                case OpCodeREnum.Ldc_I4_S:
+                    op.Operand = constant.Operand;
+                    break;
+                case OpCodeREnum.Ldc_I4_0:
+                    op.Operand = 0;
+                    break;
+                case OpCodeREnum.Ldc_I4_1:
+                    op.Operand = 1;
+                    break;
+                case OpCodeREnum.Ldc_I4_2:
+                    op.Operand = 2;
+                    break;
+                case OpCodeREnum.Ldc_I4_3:
+                    op.Operand = 3;
+                    break;
+                case OpCodeREnum.Ldc_I4_4:
+                    op.Operand = 4;
+                    break;
+                case OpCodeREnum.Ldc_I4_5:
+                    op.Operand = 5;
+                    break;
+                case OpCodeREnum.Ldc_I4_6:
+                    op.Operand = 6;
+                    break;
+                case OpCodeREnum.Ldc_I4_7:
+                    op.Operand = 7;
+                    break;
+                case OpCodeREnum.Ldc_I4_8:
+                    op.Operand = 8;
+                    break;
+                case OpCodeREnum.Ldc_I4_M1:
+                    op.Operand = -1;
+                    break;
+                case OpCodeREnum.Ldc_I8:
+                    op.OperandLong = constant.OperandLong;
+                    break;
+                case OpCodeREnum.Ldc_R4:
+                    op.OperandFloat = constant.OperandFloat;
+                    break;
+                case OpCodeREnum.Ldc_R8:
+                    op.OperandDouble = constant.OperandDouble;
+                    break;
+            }
+        }
+
+        public static OpCodeREnum GetIntemediateValueOpcode(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Add:
+                    return OpCodeREnum.Addi;
+                case OpCodeREnum.Sub:
+                    return OpCodeREnum.Subi;
+                case OpCodeREnum.Mul:
+                    return OpCodeREnum.Muli;
+                case OpCodeREnum.Div:
+                    return OpCodeREnum.Divi;
+                case OpCodeREnum.Rem:
+                    return OpCodeREnum.Remi;
+                case OpCodeREnum.Rem_Un:
+                    return OpCodeREnum.Remi_Un;
+                case OpCodeREnum.And:
+                    return OpCodeREnum.Andi;
+                case OpCodeREnum.Or:
+                    return OpCodeREnum.Ori;
+                case OpCodeREnum.Xor:
+                    return OpCodeREnum.Xori;
+                case OpCodeREnum.Shl:
+                    return OpCodeREnum.Shli;
+                case OpCodeREnum.Shr:
+                    return OpCodeREnum.Shri;
+                case OpCodeREnum.Shr_Un:
+                    return OpCodeREnum.Shri_Un;
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                    return OpCodeREnum.Beqi;                
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                    return OpCodeREnum.Bgei;
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                    return OpCodeREnum.Bgei_Un;
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                    return OpCodeREnum.Bgti;
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                    return OpCodeREnum.Bgti_Un;
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
+                    return OpCodeREnum.Bnei_Un;
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                    return OpCodeREnum.Blei;
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                    return OpCodeREnum.Blei_Un;
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                    return OpCodeREnum.Blti;
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                    return OpCodeREnum.Blti_Un;
+                case OpCodeREnum.Ceq:
+                    return OpCodeREnum.Ceqi;
+                case OpCodeREnum.Cgt:
+                    return OpCodeREnum.Cgti;
+                case OpCodeREnum.Cgt_Un:
+                    return OpCodeREnum.Cgti_Un;
+                case OpCodeREnum.Clt:
+                    return OpCodeREnum.Clti;
+                case OpCodeREnum.Clt_Un:
+                    return OpCodeREnum.Clti_Un;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        public static bool SupportOperandSwap(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Add:
+                case OpCodeREnum.Mul:
+                case OpCodeREnum.And:
+                case OpCodeREnum.Or:
+                case OpCodeREnum.Xor:
+                case OpCodeREnum.Beq:
+                case OpCodeREnum.Beq_S:
+                case OpCodeREnum.Bne_Un:
+                case OpCodeREnum.Bne_Un_S:
+                case OpCodeREnum.Ceq:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool HasInverseOpcode(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                case OpCodeREnum.Cgt:
+                case OpCodeREnum.Cgt_Un:
+                case OpCodeREnum.Clt:
+                case OpCodeREnum.Clt_Un:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static OpCodeREnum GetInverseOpcode(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Bge:
+                case OpCodeREnum.Bge_S:
+                    return OpCodeREnum.Ble;
+                case OpCodeREnum.Bge_Un:
+                case OpCodeREnum.Bge_Un_S:
+                    return OpCodeREnum.Ble_Un;
+                case OpCodeREnum.Bgt:
+                case OpCodeREnum.Bgt_S:
+                    return OpCodeREnum.Blt;
+                case OpCodeREnum.Bgt_Un:
+                case OpCodeREnum.Bgt_Un_S:
+                    return OpCodeREnum.Blt_Un;
+                case OpCodeREnum.Ble:
+                case OpCodeREnum.Ble_S:
+                    return OpCodeREnum.Bge;
+                case OpCodeREnum.Ble_Un:
+                case OpCodeREnum.Ble_Un_S:
+                    return OpCodeREnum.Bge_Un;
+                case OpCodeREnum.Blt:
+                case OpCodeREnum.Blt_S:
+                    return OpCodeREnum.Bgt;
+                case OpCodeREnum.Blt_Un:
+                case OpCodeREnum.Blt_Un_S:
+                    return OpCodeREnum.Bgt_Un;
+                case OpCodeREnum.Cgt:
+                    return OpCodeREnum.Clt;
+                case OpCodeREnum.Clt:
+                    return OpCodeREnum.Cgt;
+                case OpCodeREnum.Clt_Un:
+                    return OpCodeREnum.Cgt_Un;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        public static bool IsLoadConstant(OpCodeREnum op)
+        {
+            switch (op)
+            {
+                case OpCodeREnum.Ldc_I4:
+                case OpCodeREnum.Ldc_I4_0:
+                case OpCodeREnum.Ldc_I4_1:
+                case OpCodeREnum.Ldc_I4_2:
+                case OpCodeREnum.Ldc_I4_3:
+                case OpCodeREnum.Ldc_I4_4:
+                case OpCodeREnum.Ldc_I4_5:
+                case OpCodeREnum.Ldc_I4_6:
+                case OpCodeREnum.Ldc_I4_7:
+                case OpCodeREnum.Ldc_I4_8:
+                case OpCodeREnum.Ldc_I4_M1:
+                case OpCodeREnum.Ldc_I4_S:
+                case OpCodeREnum.Ldc_I8:
+                case OpCodeREnum.Ldc_R4:
+                case OpCodeREnum.Ldc_R8:
+                    return true;
+                default:
+                    return false;
+            }
+        }
         public static bool IsBranching(OpCodeREnum op)
         {
             switch (op)
@@ -184,6 +512,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Throw:
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Switch:
+                case OpCodeREnum.Beqi:
+                case OpCodeREnum.Bgei:
+                case OpCodeREnum.Bgei_Un:
+                case OpCodeREnum.Bgti:
+                case OpCodeREnum.Bgti_Un:
+                case OpCodeREnum.Bnei_Un:
+                case OpCodeREnum.Blei:
+                case OpCodeREnum.Blei_Un:
+                case OpCodeREnum.Blti:
+                case OpCodeREnum.Blti_Un:
                     r1 = op.Register1;
                     return true;
                 case OpCodeREnum.Blt:
@@ -247,6 +585,25 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldelema:
                     r1 = op.Register2;
                     r2 = op.Register3;
+                    return true;
+                case OpCodeREnum.Addi:
+                case OpCodeREnum.Subi:
+                case OpCodeREnum.Muli:
+                case OpCodeREnum.Divi:
+                case OpCodeREnum.Remi:
+                case OpCodeREnum.Remi_Un:
+                case OpCodeREnum.Andi:
+                case OpCodeREnum.Ori:
+                case OpCodeREnum.Xori:
+                case OpCodeREnum.Shli:
+                case OpCodeREnum.Shri:
+                case OpCodeREnum.Shri_Un:
+                case OpCodeREnum.Ceqi:
+                case OpCodeREnum.Cgti:
+                case OpCodeREnum.Cgti_Un:
+                case OpCodeREnum.Clti:
+                case OpCodeREnum.Clti_Un:
+                    r1 = op.Register2;
                     return true;
                 case OpCodeREnum.Stelem_I:
                 case OpCodeREnum.Stelem_I1:
@@ -465,6 +822,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Cgt:
                 case OpCodeREnum.Cgt_Un:
                 case OpCodeREnum.Ceq:
+                case OpCodeREnum.Addi:
+                case OpCodeREnum.Subi:
+                case OpCodeREnum.Muli:
+                case OpCodeREnum.Divi:
+                case OpCodeREnum.Remi:
+                case OpCodeREnum.Remi_Un:
+                case OpCodeREnum.Andi:
+                case OpCodeREnum.Ori:
+                case OpCodeREnum.Xori:
+                case OpCodeREnum.Shli:
+                case OpCodeREnum.Shri:
+                case OpCodeREnum.Shri_Un:
+                case OpCodeREnum.Ceqi:
+                case OpCodeREnum.Cgti:
+                case OpCodeREnum.Cgti_Un:
+                case OpCodeREnum.Clti:
+                case OpCodeREnum.Clti_Un:
                     r1 = op.Register1;
                     return true;
                 default:
@@ -538,6 +912,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldflda:
                 case OpCodeREnum.Ldvirtftn:
                 case OpCodeREnum.Isinst:
+                case OpCodeREnum.Addi:
+                case OpCodeREnum.Subi:
+                case OpCodeREnum.Muli:
+                case OpCodeREnum.Divi:
+                case OpCodeREnum.Remi:
+                case OpCodeREnum.Remi_Un:
+                case OpCodeREnum.Andi:
+                case OpCodeREnum.Ori:
+                case OpCodeREnum.Xori:
+                case OpCodeREnum.Shli:
+                case OpCodeREnum.Shri:
+                case OpCodeREnum.Shri_Un:
+                case OpCodeREnum.Ceqi:
+                case OpCodeREnum.Cgti:
+                case OpCodeREnum.Cgti_Un:
+                case OpCodeREnum.Clti:
+                case OpCodeREnum.Clti_Un:
                     op.Register2 = src;
                     break;
 
@@ -663,6 +1054,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Throw:
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Initobj:
+                case OpCodeREnum.Beqi:
+                case OpCodeREnum.Bgei:
+                case OpCodeREnum.Bgei_Un:
+                case OpCodeREnum.Bgti:
+                case OpCodeREnum.Bgti_Un:
+                case OpCodeREnum.Bnei_Un:
+                case OpCodeREnum.Blei:
+                case OpCodeREnum.Blei_Un:
+                case OpCodeREnum.Blti:
+                case OpCodeREnum.Blti_Un:
                     op.Register1 = src;
                     break;
                 case OpCodeREnum.Blt:
@@ -830,6 +1231,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldelem_Any:
                 case OpCodeREnum.Ldelem_Ref:
                 case OpCodeREnum.Ldelema:
+                case OpCodeREnum.Addi:
+                case OpCodeREnum.Subi:
+                case OpCodeREnum.Muli:
+                case OpCodeREnum.Divi:
+                case OpCodeREnum.Remi:
+                case OpCodeREnum.Remi_Un:
+                case OpCodeREnum.Andi:
+                case OpCodeREnum.Ori:
+                case OpCodeREnum.Xori:
+                case OpCodeREnum.Shli:
+                case OpCodeREnum.Shri:
+                case OpCodeREnum.Shri_Un:
+                case OpCodeREnum.Ceqi:
+                case OpCodeREnum.Cgti:
+                case OpCodeREnum.Cgti_Un:
+                case OpCodeREnum.Clti:
+                case OpCodeREnum.Clti_Un:
                     op.Register1 = dst;
                     break;
                 case OpCodeREnum.Br_S:
