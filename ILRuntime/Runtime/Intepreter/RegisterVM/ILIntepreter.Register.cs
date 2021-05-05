@@ -853,8 +853,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             longVal = reg1->Value;
                                             break;
                                         case ObjectTypes.Long:
-                                            ip++;
-                                            continue;
+                                            longVal = *(long*)&reg1->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             longVal = (long)*(float*)&reg1->Value;
                                             break;
@@ -881,8 +881,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             ulongVal = (uint)reg1->Value;
                                             break;
                                         case ObjectTypes.Long:
-                                            ip++;
-                                            continue;
+                                            ulongVal = (ulong)*(long*)&reg1->Value;
+                                            break;
                                         case ObjectTypes.Float:
                                             ulongVal = (ulong)*(float*)&reg1->Value;
                                             break;
@@ -906,8 +906,8 @@ namespace ILRuntime.Runtime.Intepreter
                                             floatVal = (float)*(long*)&reg1->Value;
                                             break;
                                         case ObjectTypes.Float:
-                                            ip++;
-                                            continue;
+                                            floatVal = *(float*)&reg1->Value;
+                                            break;
                                         case ObjectTypes.Double:
                                             floatVal = (float)*(double*)&reg1->Value;
                                             break;
@@ -937,7 +937,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             doubleVal = reg1->Value;
                                             break;
                                         case ObjectTypes.Double:
-                                            ip++;
+                                            doubleVal = *(double*)&reg1->Value;
                                             continue;
                                         default:
                                             throw new NotImplementedException();
@@ -959,14 +959,15 @@ namespace ILRuntime.Runtime.Intepreter
                                             isDouble = true;
                                             break;
                                         case ObjectTypes.Float:
-                                            ip++;
-                                            continue;
+                                            floatVal = *(float*)&reg1->Value;
+                                            break;
                                         case ObjectTypes.Integer:
                                             floatVal = (uint)reg1->Value;
                                             break;
                                         case ObjectTypes.Double:
-                                            ip++;
-                                            continue;
+                                            doubleVal = *(double*)&reg1->Value;
+                                            isDouble = true;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
