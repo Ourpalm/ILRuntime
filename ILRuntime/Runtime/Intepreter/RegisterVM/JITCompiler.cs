@@ -268,6 +268,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 ins.Operand += inlineOffset;
                                 inlinedBranches.Add(res.Count);
                             }
+                            else if (Optimizer.IsIntermediateBranching(ins.Code))
+                            {
+                                ins.Operand4 += inlineOffset;
+                                inlinedBranches.Add(res.Count);
+                            }
                             else if (ins.Code == OpCodeREnum.Switch)
                             {
                                 int[] targets = jumptables[ins.Operand];
@@ -291,6 +296,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 if (Optimizer.IsBranching(op.Code) && !inlinedBranches.Contains(i))
                 {
                     op.Operand = jumpTargets[op.Operand];
+                    res[i] = op;
+                }
+                else if (Optimizer.IsIntermediateBranching(op.Code) && !inlinedBranches.Contains(i))
+                {
+                    op.Operand4 = jumpTargets[op.Operand4];
                     res[i] = op;
                 }
                 else if (op.Code == OpCodeREnum.Switch && !inlinedBranches.Contains(i))

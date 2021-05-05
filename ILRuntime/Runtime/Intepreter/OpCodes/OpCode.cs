@@ -168,23 +168,23 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Blti_Un:
                     if (Operand != 0)
                     {
-                        param = string.Format("r{0},{2}", Register1, Operand);
+                        param = string.Format("r{0},{1},{2}", Register1, Operand, Operand4);
                     }
                     else if (OperandLong != 0)
                     {
-                        param = string.Format("r{0},{2}", Register1, OperandLong);
+                        param = string.Format("r{0},{1},{2}", Register1, OperandLong, Operand4);
                     }
                     else if (OperandFloat != 0)
                     {
-                        param = string.Format("r{0},{2}", Register1, OperandFloat);
+                        param = string.Format("r{0},{1},{2}", Register1, OperandFloat, Operand4);
                     }
                     else if (OperandDouble != 0)
                     {
-                        param = string.Format("r{0},{2}", Register1, OperandDouble);
+                        param = string.Format("r{0},{1},{2}", Register1, OperandDouble, Operand4);
                     }
                     else
                     {
-                        param = string.Format("r{0},0", Register1);
+                        param = string.Format("r{0},0,{1}", Register1, Operand4);
                     }
                     break;
                 case OpCodeREnum.Ceqi:

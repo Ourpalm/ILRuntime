@@ -355,6 +355,33 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Addi:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) + ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value + ip->Operand;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) + ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) + ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Sub:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -377,6 +404,34 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Double:
                                             reg3->ObjectType = ObjectTypes.Double;
                                             *((double*)&reg3->Value) = *((double*)&reg1->Value) - *((double*)&reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+
+                            case OpCodeREnum.Subi:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) - ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value - ip->Operand;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) - ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) - ip->OperandDouble;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -412,6 +467,33 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
 
+                            case OpCodeREnum.Muli:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) * ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value * ip->Operand;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) * ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) * ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Div:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -440,6 +522,34 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+
+                            case OpCodeREnum.Divi:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) / ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value / ip->Operand;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) / ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) / ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Div_Un:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -454,6 +564,25 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = (int)((uint)reg1->Value / (uint)reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Divi_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((ulong*)&reg3->Value) = *((ulong*)&reg1->Value) / (ulong)ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = (int)((uint)reg1->Value / (uint)ip->Operand);
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -488,6 +617,33 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Remi:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) % ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value % ip->Operand;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            reg3->ObjectType = ObjectTypes.Float;
+                                            *((float*)&reg3->Value) = *((float*)&reg1->Value) % ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            reg3->ObjectType = ObjectTypes.Double;
+                                            *((double*)&reg3->Value) = *((double*)&reg1->Value) % ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Rem_Un:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -502,6 +658,25 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = (int)((uint)reg1->Value % (uint)reg2->Value);
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Remi_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((ulong*)&reg3->Value) = *((ulong*)&reg1->Value) % (ulong)ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = (int)((uint)reg1->Value % (uint)ip->Operand);
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -528,6 +703,25 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Xori:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) ^ ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value ^ ip->Operand;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.And:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -542,6 +736,25 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value & reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Andi:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) & ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value & ip->Operand;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -568,6 +781,25 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Ori:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) | ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value | ip->Operand;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Shl:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -582,6 +814,25 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             reg3->ObjectType = ObjectTypes.Integer;
                                             reg3->Value = reg1->Value << reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Shli:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) << ip->Operand;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value << ip->Operand;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -608,6 +859,26 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+
+                            case OpCodeREnum.Shri:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((long*)&reg3->Value) = *((long*)&reg1->Value) >> ip->Operand;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            reg3->Value = reg1->Value >> ip->Operand;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Shr_Un:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -622,6 +893,25 @@ namespace ILRuntime.Runtime.Intepreter
                                         case ObjectTypes.Integer:
                                             reg3->ObjectType = ObjectTypes.Integer;
                                             *((uint*)&reg3->Value) = (uint)reg1->Value >> reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Shri_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Long:
+                                            reg3->ObjectType = ObjectTypes.Long;
+                                            *((ulong*)&reg3->Value) = *((ulong*)&reg1->Value) >> ip->Operand;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            reg3->ObjectType = ObjectTypes.Integer;
+                                            *((uint*)&reg3->Value) = (uint)reg1->Value >> ip->Operand;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -938,7 +1228,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Double:
                                             doubleVal = *(double*)&reg1->Value;
-                                            continue;
+                                            break;
                                         default:
                                             throw new NotImplementedException();
                                     }
@@ -1779,6 +2069,41 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Beqi:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Null:
+                                            transfer = ip->Operand == 0;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value == ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value == ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value == ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value == ip->OperandDouble;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            transfer = mStack[reg1->Value] == null && ip->Operand == 0;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Bne_Un:
                             case OpCodeREnum.Bne_Un_S:
                                 {
@@ -1828,6 +2153,41 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Bnei_Un:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Null:
+                                            transfer = ip->Operand != 0;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value != ip->Operand;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value != ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value != ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value != ip->OperandDouble;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            transfer = mStack[reg1->Value] != null || ip->Operand != 0;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Blt:
                             case OpCodeREnum.Blt_S:
                                 {
@@ -1855,6 +2215,36 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (transfer)
                                     {
                                         ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Blti:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value < ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value < ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value < ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value < ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
                                         continue;
                                     }
 
@@ -1892,6 +2282,36 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Blti_Un:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value < (uint)ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value < (ulong)ip->Operand;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value < ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value < ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Ble:
                             case OpCodeREnum.Ble_S:
                                 {
@@ -1924,6 +2344,36 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Blei:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value <= ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value <= ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value <= ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value <= ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Ble_Un:
                             case OpCodeREnum.Ble_Un_S:
                                 {
@@ -1951,6 +2401,36 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (transfer)
                                     {
                                         ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Blei_Un:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value <= (uint)ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value <= (ulong)ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value <= ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value <= ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
                                         continue;
                                     }
 
@@ -1989,6 +2469,37 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Bgti:
+                                {
+                                    reg1 = (r + ip->Register1);
+
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value > ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value > ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value > ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value > ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Bgt_Un:
                             case OpCodeREnum.Bgt_Un_S:
                                 {
@@ -2016,6 +2527,36 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (transfer)
                                     {
                                         ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Bgti_Un:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value > (uint)ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value > (ulong)ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value >ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value > ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
                                         continue;
                                     }
 
@@ -2053,6 +2594,36 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Bgei:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = reg1->Value >= ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(long*)&reg1->Value >= ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value >= ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value >= ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
+                                        continue;
+                                    }
+
+                                }
+                                break;
                             case OpCodeREnum.Bge_Un:
                             case OpCodeREnum.Bge_Un_S:
                                 {
@@ -2080,6 +2651,36 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (transfer)
                                     {
                                         ip = ptr + ip->Operand;
+                                        continue;
+                                    }
+
+                                }
+                                break;
+                            case OpCodeREnum.Bgei_Un:
+                                {
+                                    reg1 = (r + ip->Register1);
+                                    transfer = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            transfer = (uint)reg1->Value >= (uint)ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            transfer = *(ulong*)&reg1->Value >= (ulong)ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            transfer = *(float*)&reg1->Value >= ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            transfer = *(double*)&reg1->Value >= ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+
+                                    if (transfer)
+                                    {
+                                        ip = ptr + ip->Operand4;
                                         continue;
                                     }
 
@@ -3698,6 +4299,38 @@ namespace ILRuntime.Runtime.Intepreter
 
                                 }
                                 break;
+                            case OpCodeREnum.Ceqi:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value == ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&reg1->Value == ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value == ip->OperandDouble;
+                                            break;
+                                        case ObjectTypes.Integer:
+                                            res = reg1->Value == ip->Operand;
+                                            break;
+                                        case ObjectTypes.Null:
+                                            res = ip->Operand == 0;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+
+                                }
+                                break;
                             case OpCodeREnum.Clt:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -3717,6 +4350,34 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Double:
                                             res = *(double*)&reg1->Value < *(double*)&reg2->Value;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
+                            case OpCodeREnum.Clti:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = reg1->Value < ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&reg1->Value < ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value < ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value < ip->OperandDouble;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -3756,6 +4417,34 @@ namespace ILRuntime.Runtime.Intepreter
                                         WriteZero(reg3);
                                 }
                                 break;
+                            case OpCodeREnum.Clti_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = (uint)reg1->Value < (uint)ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = (ulong)*(long*)&reg1->Value < (ulong)ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value < ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value < ip->OperandDouble;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
                             case OpCodeREnum.Cgt:
                                 {
                                     reg1 = (r + ip->Register2);
@@ -3775,6 +4464,34 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Double:
                                             res = *(double*)&reg1->Value > *(double*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
+                            case OpCodeREnum.Cgti:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = reg1->Value > ip->Operand;
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = *(long*)&reg1->Value > ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value > ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value > ip->OperandDouble;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -3807,6 +4524,40 @@ namespace ILRuntime.Runtime.Intepreter
                                             break;
                                         case ObjectTypes.Object:
                                             res = mStack[reg1->Value] != null && (reg2->ObjectType == ObjectTypes.Null || mStack[reg2->Value] == null);
+                                            break;
+                                        case ObjectTypes.Null:
+                                            res = false;
+                                            break;
+                                        default:
+                                            throw new NotImplementedException();
+                                    }
+                                    if (res)
+                                        WriteOne(reg3);
+                                    else
+                                        WriteZero(reg3);
+                                }
+                                break;
+                            case OpCodeREnum.Cgti_Un:
+                                {
+                                    reg1 = (r + ip->Register2);
+                                    reg3 = (r + ip->Register1);
+                                    bool res = false;
+                                    switch (reg1->ObjectType)
+                                    {
+                                        case ObjectTypes.Integer:
+                                            res = ((uint)reg1->Value > (uint)ip->Operand);
+                                            break;
+                                        case ObjectTypes.Long:
+                                            res = (ulong)*(long*)&reg1->Value > (ulong)ip->OperandLong;
+                                            break;
+                                        case ObjectTypes.Float:
+                                            res = *(float*)&reg1->Value > ip->OperandFloat;
+                                            break;
+                                        case ObjectTypes.Double:
+                                            res = *(double*)&reg1->Value > ip->OperandDouble;
+                                            break;
+                                        case ObjectTypes.Object:
+                                            res = mStack[reg1->Value] != null && ip->Operand != 0;
                                             break;
                                         case ObjectTypes.Null:
                                             res = false;
