@@ -696,6 +696,10 @@ namespace ILRuntime.CLR.TypeSystem
 
         void InitializeMethods()
         {
+            methods = new Dictionary<string, List<ILMethod>>();
+            constructors = new List<ILMethod>();
+            if (definition == null)
+                return;
             if (definition.HasCustomAttributes)
             {
                 for (int i = 0; i < definition.CustomAttributes.Count; i++)
@@ -708,10 +712,6 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                 }
             }
-            methods = new Dictionary<string, List<ILMethod>>();
-            constructors = new List<ILMethod>();
-            if (definition == null)
-                return;
             foreach (var i in definition.Methods)
             {
                 if (i.IsConstructor)
