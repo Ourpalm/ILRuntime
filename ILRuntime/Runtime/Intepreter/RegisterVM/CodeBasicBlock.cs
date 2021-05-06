@@ -53,6 +53,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public HashSet<CodeBasicBlock> NextBlocks { get { return nextBlocks; } }
 
         public Dictionary<int, RegisterVMSymbol> InstructionMapping { get { return instructionMapping; } }
+
+        public bool NeedLoadConstantElimination { get; set; }
         public short EndRegister
         {
             get

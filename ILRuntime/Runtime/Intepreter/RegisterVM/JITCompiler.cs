@@ -971,6 +971,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             };
             block.InstructionMapping.Add(lst.Count, s);
             lst.Add(op);
+            if (!block.NeedLoadConstantElimination)
+                block.NeedLoadConstantElimination = Optimizer.IsLoadConstant(op.Code);
         }
 
 

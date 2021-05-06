@@ -18,14 +18,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         {
             foreach (var b in blocks)
             {
+                if (!b.NeedLoadConstantElimination)
+                    continue;
                 var lst = b.FinalInstructions;
                 HashSet<int> canRemove = b.CanRemove;
                 //HashSet<int> pendingBCP = b.PendingCP;
                 bool isInline = false;
                 for (int i = 0; i < lst.Count; i++)
                 {
-                    if (canRemove.Contains(i))
-                        continue;
                     OpCodeR X = lst[i];
                     if (X.Code == OpCodeREnum.InlineStart)
                     {
