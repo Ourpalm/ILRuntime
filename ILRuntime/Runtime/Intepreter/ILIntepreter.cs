@@ -1912,9 +1912,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         ExceptionHandler eh = null;
 
-                                        int addr = ip->TokenInteger;
+                                        int addr = (int)(ip - ptr);
                                         var sql = from e in ehs
-                                                  where addr == e.HandlerEnd + 1 && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                  where addr >= e.TryStart && addr <=e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
                                                   select e;
                                         eh = sql.FirstOrDefault();
                                         if (eh != null)
@@ -4552,11 +4552,12 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        static bool CanCastTo(StackObject* src, StackObject* dst)
+        bool CanCastTo(StackObject* src, StackObject* dst)
         {
-            if (src->Value == dst->Value)
-                return true;
-            return false;
+            var sType = AppDomain.GetType(src->Value);
+            var dType = AppDomain.GetType(dst->Value);
+
+            return sType.CanAssignTo(dType);
         }
 
         bool CanCopyStackValueType(StackObject* src, StackObject* dst)
@@ -4571,7 +4572,7 @@ namespace ILRuntime.Runtime.Intepreter
                 return false;
         }
 
-        public static void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
+        public void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
             StackObject* dstDescriptor = ILIntepreter.ResolveReference(dst);

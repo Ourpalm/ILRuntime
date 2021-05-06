@@ -304,7 +304,7 @@ namespace ILRuntime.Runtime.Stack
                     *(long*)&ptr->Value = (long)dst;
                     int managedIdx = alloc.ManagedIndex;
                     InitializeValueTypeObject(type, dst, true, ref managedIdx);
-                    ILIntepreter.CopyStackValueType(src, ptr, managedStack);
+                    intepreter.CopyStackValueType(src, ptr, managedStack);
                     FreeValueTypeObject(src);
                 }
                 else
