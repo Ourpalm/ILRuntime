@@ -80,6 +80,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                             ins[j] = op2;
                                         }
                                     }
+                                    else if (IsIntermediateBranching(op2.Code))
+                                    {
+                                        if (op2.Operand4 > i)
+                                        {
+                                            op2.Operand4++;
+                                            ins[j] = op2;
+                                        }
+                                    }
                                     else if(op2.Code == OpCodeREnum.Switch)
                                     {
                                         var targets = jumpTables[op2.Operand];

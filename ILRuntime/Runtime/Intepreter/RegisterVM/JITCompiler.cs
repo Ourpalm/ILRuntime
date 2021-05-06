@@ -608,6 +608,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             link.BaseRegisterIndex = baseRegIdx;
                             link.Value.Instruction = ins;
                             link.Value.Method = method;
+#else
+                            RegisterVMSymbol vmS = new RegisterVMSymbol()
+                            {
+                                Instruction = ins,
+                                Method = method
+                            };
+                            block.InstructionMapping.Add(lst.Count,vmS);
 #endif
 #if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
