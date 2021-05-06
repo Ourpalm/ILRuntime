@@ -56,7 +56,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             }
                             short r1, r2, r3;
                             GetOpcodeSourceRegister(ref Y, hasReturn, out r1, out r2, out r3);
-                            if (r1 == xDst || r2 == xDst)
+                            if (r1 == xDst || r2 == xDst || r3 == xDst)
                             {
                                 if (SupportIntemediateValue(Y.Code))
                                 {
@@ -95,6 +95,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 }
                                 break;
                             }
+                            short yDst;
+                            GetOpcodeDestRegister(ref Y, out yDst);
+                            if (yDst == xDst)
+                                break;
                         }
                     }
                 }
