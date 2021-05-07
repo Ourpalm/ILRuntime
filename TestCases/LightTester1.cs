@@ -87,7 +87,7 @@ namespace TestCases
             ILRuntimeTest.TestFramework.TestStruct b = a.Struct;
             a.Struct.value += 100;
             Console.WriteLine(b.value);
-            Console.WriteLine(a.Struct.value);            
+            Console.WriteLine(a.Struct.value);
         }
 
         class StructTest2
@@ -231,7 +231,7 @@ namespace TestCases
                 this.a = a;
                 this.b = b;
             }
-        }       
+        }
 
         public static int UnitTest_1008()
         {
@@ -296,14 +296,14 @@ namespace TestCases
             Console.WriteLine(string.Format("A={0},B={1}", test2.A, test2.B));
             test2 = new C();
             test2.TestVirtual();
-            Console.WriteLine(string.Format("A={0},B={1}", test2.A, test2.B));            
+            Console.WriteLine(string.Format("A={0},B={1}", test2.A, test2.B));
             ClsA test3 = new ClsA();
             test3.TestVirtual();
-            Console.WriteLine(string.Format("A={0},B={1}", test3.A, test3.B));      
+            Console.WriteLine(string.Format("A={0},B={1}", test3.A, test3.B));
             test = test3 as B;
             if (test == null)
             {
-                Console.WriteLine(string.Format("A={0},B={1}", test.A, test.B));            
+                Console.WriteLine(string.Format("A={0},B={1}", test.A, test.B));
             }
             return test3.B;
         }
@@ -420,5 +420,48 @@ namespace TestCases
             }
         }
 
+        public static void UnitTest_1017()
+        {
+            int defaultTabSN = -1;
+            UnitTest_1017Sub(defaultTabSN != -1 ? defaultTabSN : 111, false);
+        }
+
+        static void UnitTest_1017Sub(int result, bool flag)
+        {
+            if (result != 111)
+                throw new Exception();
+            Console.WriteLine($"result={result}");
+        }
+
+        public static void UnitTest_1018()
+        {
+            UnitTest_1018Sub(false, new sss(), 0);
+        }
+        class sss
+        {
+            public int Position { get; set; }
+        }
+
+        static void UnitTest_1018Sub(bool byPos, sss data, int idx)
+        {
+            Dictionary<int, sss> retDict = new Dictionary<int, sss>();
+            for (int i = 0; i < 10; i++)
+            {
+                if (byPos)
+                {
+
+                }
+                else
+                {
+                    var key = byPos ? data.Position : ++idx;
+                    Console.WriteLine($"byPos:{byPos}, key:{key},idx:{idx}");
+                    if (retDict.ContainsKey(key))
+                    {
+                        Console.WriteLine("Contains");
+                    }
+                    retDict[key] = data;
+                }
+            }
+        }
     }
 }

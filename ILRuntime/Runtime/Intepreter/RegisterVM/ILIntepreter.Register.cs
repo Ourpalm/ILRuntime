@@ -2163,7 +2163,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             transfer = ip->Operand != 0;
                                             break;
                                         case ObjectTypes.Integer:
-                                            transfer = (uint)reg1->Value != ip->Operand;
+                                            transfer = (uint)reg1->Value != (uint)ip->Operand;
                                             break;
                                         case ObjectTypes.Float:
                                             transfer = *(float*)&reg1->Value != ip->OperandFloat;
