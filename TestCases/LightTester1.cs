@@ -432,5 +432,36 @@ namespace TestCases
                 throw new Exception();
             Console.WriteLine($"result={result}");
         }
+
+        public static void UnitTest_1018()
+        {
+            UnitTest_1018Sub(false, new sss(), 0);
+        }
+        class sss
+        {
+            public int Position { get; set; }
+        }
+
+        static void UnitTest_1018Sub(bool byPos, sss data, int idx)
+        {
+            Dictionary<int, sss> retDict = new Dictionary<int, sss>();
+            for (int i = 0; i < 10; i++)
+            {
+                if (byPos)
+                {
+
+                }
+                else
+                {
+                    var key = byPos ? data.Position : ++idx;
+                    Console.WriteLine($"byPos:{byPos}, key:{key},idx:{idx}");
+                    if (retDict.ContainsKey(key))
+                    {
+                        Console.WriteLine("Contains");
+                    }
+                    retDict[key] = data;
+                }
+            }
+        }
     }
 }

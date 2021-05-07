@@ -69,6 +69,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             {
                                 propagationInline = true;
                             }
+
+                            short ySrc, ySrc2, ySrc3;
+                            if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
+                            {
+                                if (ySrc >= 0 && ySrc == xDst)
+                                {
+                                    break;
+                                }
+                                if (ySrc2 >= 0 && ySrc2 == xDst)
+                                {
+                                    break;
+                                }
+                                if (ySrc3 >= 0 && ySrc3 == xDst)
+                                {
+                                    break;
+                                }
+                            }
                             short yDst;
                             if (GetOpcodeDestRegister(ref Y, out yDst))
                             {
@@ -121,25 +138,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     canRemove.Add(i);
                                     ended = true;
                                     lst[j] = Y;
-                                    break;
-                                }
-                            }
-                            short ySrc, ySrc2, ySrc3;
-                            if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
-                            {
-                                if (ySrc >= 0 && ySrc == xDst)
-                                {
-                                    ended = true;
-                                    break;
-                                }
-                                if (ySrc2 >= 0 && ySrc2 == xDst)
-                                {
-                                    ended = true;
-                                    break;
-                                }
-                                if (ySrc3 >= 0 && ySrc3 == xDst)
-                                {
-                                    ended = true;
                                     break;
                                 }
                             }
