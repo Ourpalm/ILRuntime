@@ -296,7 +296,7 @@ namespace ILRuntime.CLR.TypeSystem
         /// <param name="def"></param>
         void RetriveDefinitino(TypeReference def)
         {
-            if (!def.IsGenericParameter)
+            if (!def.IsGenericParameter&&definition==null)
             {
                 if (def is TypeSpecification)
                 {
