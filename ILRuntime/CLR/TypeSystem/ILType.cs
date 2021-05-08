@@ -1101,18 +1101,9 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        public IType FindGenericArgument(string key)
-        {
-            if (genericArguments != null)
-            {
-                foreach (var i in genericArguments)
-                {
-                    if (i.Key == key)
-                        return i.Value;
-                }
-            }
-            return null;
-        }
+        public IType FindGenericArgument ( string key ) => this.Generic ( key ) ?? this.Generic ( definition.GenericParameters?.Select ( ( t, i ) => Tuple.Create ( t.Name, $"!{ i }" ) ).Where ( t => t.Item1 == key ).Select ( t => t.Item2 ).FirstOrDefault () );
+
+        private IType Generic ( string key ) => genericArguments?.Where ( t => t.Key == key ).Select ( t => t.Value ).SingleOrDefault ();
 
         public bool CanAssignTo(IType type)
         {
