@@ -404,7 +404,7 @@ namespace ILRuntime.CLR.TypeSystem
                 {
                     return byRefCLRType;
                 }
-                else if (definition.IsEnum)
+                else if (this.IsEnum)
                 {
                     if (enumType == null)
                         InitializeFields();
