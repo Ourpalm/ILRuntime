@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntime.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -248,6 +249,73 @@ namespace TestCases
                     Console.WriteLine($"{ex.Message}\r\n{ex.Data["StackTrace"]}");
                 }
             }
+        }
+
+        [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
+        public static void UnitTest_TestStackRegisterTransition()
+        {
+            TestCls a = new TestCls();
+            a.TestVal2 = 2;
+
+            TestCls c = new TestCls();
+            c.TestVal2 = 3;
+
+            List<TestCls> d = new List<TestCls>();
+            d.Add(c);
+            for (int i = 0; i < 3; i++)
+            {
+                UnitTest_TestStackRegisterTransition(null, (i & 1) == 1, a, d);
+            }
+        }
+
+        static void UnitTest_TestStackRegisterTransition(TestCls a, bool b, TestCls c, List<TestCls> d)
+        {
+            Console.WriteLine(b);
+            Console.WriteLine(a);
+            Console.WriteLine(c.TestVal2);
+            Console.WriteLine(d.Count);
+
+            if (a != null || c.TestVal2 != 2 || d.Count != 1)
+                throw new Exception();
+        }
+        private class A1
+        {
+            public int i = 0;
+        }
+
+        private class A2
+        {
+            public int i1 = 1;
+            public int i2 = 2;
+            public int i3 = 3;
+            public int i4 = 4;
+        }
+
+        private class A3
+        {
+            public void DoSomething(A2 t2, bool b, A1 t1, List<int> list)
+            {
+                t1.i += 100;
+                t2.i3 += 5;
+
+                Console.WriteLine($"{t1.i}{t2.i3}");
+            }
+        }
+
+        [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
+        public static void UnitTest_TestStackRegisterTransition2()
+        {
+            A1 t1 = new A1();
+            A2 t2 = new A2();
+            A3 t3 = new A3();
+
+            List<int> list = new List<int>();
+
+            for (int i = 0; i < 1000; i++)
+            {
+                t3.DoSomething(t2, (i & 1) == 1, t1, list);
+            }
+
         }
     }
 }
