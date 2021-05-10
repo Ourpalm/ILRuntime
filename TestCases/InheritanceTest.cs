@@ -248,6 +248,43 @@ namespace TestCases
             InheritanceTest16SubCls2 cls = new InheritanceTest16SubCls2();
             cls.KKK();
         }
+        public static void InheritanceTest17()
+        {
+            ClassB b = new ClassB();
+            CrossClass crossClass = new CrossClass();
+            if (!b.OutMethod(out crossClass.classA)) return;
+        }
+
+        class CrossClass : TestClass3
+        {
+            public ClassA classA;
+        }
+
+        class ClassA
+        {
+
+        }
+        class ClassC
+        {
+            public void Init()
+            {
+                ClassB b = new ClassB();
+                CrossClass crossClass = new CrossClass();
+                if (!b.OutMethod(out crossClass.classA)) return;
+            }
+        }
+        class ClassB
+        {
+            public bool OutMethod(out ClassA a)
+            {
+                a = new ClassA();
+                if (a == null)
+                {
+                    throw new Exception("classA is null");
+                }
+                return true;
+            }
+        }
 
         class InheritanceTest16SubCls : TestClass2
         {

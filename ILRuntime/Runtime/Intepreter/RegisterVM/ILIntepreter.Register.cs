@@ -1695,8 +1695,54 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldind_Ref:
                                 {
                                     reg1 = (r + ip->Register2);
+                                    dst = (r + ip->Register1);
                                     val = GetObjectAndResolveReference(reg1);
-                                    CopyToRegister(ref info, ip->Register1, val);
+                                    switch (val->ObjectType)
+                                    {
+                                        case ObjectTypes.FieldReference:
+                                            obj = mStack[val->Value];
+                                            intVal = val->ValueLow;
+                                            //Free(dst);
+                                            LoadFromFieldReferenceToRegister(ref info, obj, intVal, ip->Register1);
+                                            break;
+                                        case ObjectTypes.ArrayReference:
+                                            {
+                                                obj = mStack[val->Value];
+                                                var idx = val->ValueLow;
+                                                //Free(dst);
+                                                intVal = GetManagedStackIndex(ref info, ip->Register1);
+                                                LoadFromArrayReference(obj, idx, dst, obj.GetType().GetElementType(), mStack, intVal);
+                                            }
+                                            break;
+                                        case ObjectTypes.StaticFieldReference:
+                                            {
+                                                type = AppDomain.GetType(val->Value);
+                                                var idx = val->ValueLow;
+                                                if (type is ILType)
+                                                {
+                                                    ((ILType)type).StaticInstance.CopyToRegister(idx, ref info, ip->Register1);
+                                                }
+                                                else
+                                                {
+                                                    if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref esp, mStack))
+                                                    {
+                                                        var ft = ((CLRType)type).GetField(idx);
+                                                        obj = ((CLRType)type).GetFieldValue(idx, null);
+                                                        if (obj is CrossBindingAdaptorType)
+                                                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                                                        AssignToRegister(ref info, ip->Register1, obj, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        esp = PopToRegister(ref info, ip->Register1, esp);
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            CopyToRegister(ref info, ip->Register1, val);
+                                            break;
+                                    }
                                 }
                                 break;
                             case OpCodeREnum.Stind_I:
