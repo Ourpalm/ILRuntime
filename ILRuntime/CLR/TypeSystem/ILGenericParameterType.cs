@@ -115,7 +115,7 @@ namespace ILRuntime.CLR.TypeSystem
                 byrefType.isByRef = true;
                 byrefType.elementType = this;
             }
-            return this;
+            return byrefType;
         }
 
 
@@ -205,7 +205,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return false;
+                return isByRef;
             }
         }
 

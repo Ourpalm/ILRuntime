@@ -801,7 +801,7 @@ namespace ILRuntime.CLR.TypeSystem
                         bool match = true;
                         if (genericArguments != null && i.GenericParameterCount == genericArguments.Length && genericMethod == null)
                         {
-                            genericMethod = CheckGenericParams(i, param, ref match);
+                            genericMethod = CheckGenericParams(i, param, genericArguments, ref match);
                         }
                         else
                         {
@@ -869,7 +869,26 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        ILMethod CheckGenericParams(ILMethod i, List<IType> param, ref bool match)
+        bool IsGenericArgumentMatch(IType p, IType p2, IType[] genericArguments)
+        {
+            bool found = false;
+            foreach (var a in genericArguments)
+            {
+                if (a == p2)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                return false;
+            }
+            else
+                return true;
+        }
+
+        ILMethod CheckGenericParams(ILMethod i, List<IType> param, IType[] genericArguments, ref bool match)
         {
             ILMethod genericMethod = null;
             if (param != null)
@@ -878,7 +897,15 @@ namespace ILRuntime.CLR.TypeSystem
                 {
                     var p = i.Parameters[j];
                     if (p.IsGenericParameter)
-                        continue;
+                    {
+                        if (IsGenericArgumentMatch(p, param[j], genericArguments))
+                            continue;
+                        else
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
                     if (p.IsByRef)
                         p = p.ElementType;
                     if (p.IsArray)
@@ -889,20 +916,16 @@ namespace ILRuntime.CLR.TypeSystem
                         p2 = p2.ElementType;
                     if (p2.IsArray)
                         p2 = p2.ElementType;
-
                     if (p.IsGenericParameter)
                     {
-                        if (i.Parameters[j].IsByRef == param[j].IsByRef && i.Parameters[j].IsArray == param[j].IsArray)
-                        {
+                        if (i.Parameters[j].IsByRef == param[j].IsByRef && i.Parameters[j].IsArray == param[j].IsArray && IsGenericArgumentMatch(p, p2, genericArguments))
                             continue;
-                        }
                         else
                         {
                             match = false;
                             break;
                         }
                     }
-
                     if (p.HasGenericParameter)
                     {
                         if (p.Name != p2.Name)
