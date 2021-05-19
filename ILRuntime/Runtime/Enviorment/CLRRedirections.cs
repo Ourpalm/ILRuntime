@@ -838,7 +838,6 @@ namespace ILRuntime.Runtime.Enviorment
                     esp = ret;
                 var ilmethod = ((ILRuntimeMethodInfo)instance).ILMethod;
                 bool useRegister = ilmethod.ShouldUseRegisterVM;
-                int cnt = 0;
                 if (p != null)
                 {
                     object[] arr = (object[])p;
@@ -846,10 +845,7 @@ namespace ILRuntime.Runtime.Enviorment
                     {
                         var res = ILIntepreter.PushObject(esp, mStack, CheckCrossBindingAdapter(arr[i]));
                         if (esp->ObjectType < ObjectTypes.Object && useRegister)
-                        {
                             mStack.Add(null);
-                            cnt++;
-                        }
                         esp = res;
                     }
                 }
@@ -857,11 +853,7 @@ namespace ILRuntime.Runtime.Enviorment
                 if (useRegister)
                     ret = intp.ExecuteR(ilmethod, esp, out unhandled);
                 else
-                {
                     ret = intp.Execute(ilmethod, esp, out unhandled);
-                    if (cnt > 0)
-                        intp.Stack.RemoveManagedStackRange(mStack.Count - cnt, mStack.Count - 1);
-                }
                 ILRuntimeMethodInfo imi = (ILRuntimeMethodInfo)instance;
                 var rt = imi.ILMethod.ReturnType;
                 if (rt != domain.VoidType)
