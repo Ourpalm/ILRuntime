@@ -35,6 +35,8 @@ namespace ILRuntimeTest.TestFramework
 
         public static TestVector3 One = new TestVector3(1, 1, 1);
 
+        public static Func<TestVector3, float> TestDelegate;
+
         public TestVector3(float x, float y, float z)
         {
             X = x;

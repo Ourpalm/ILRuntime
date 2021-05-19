@@ -2791,7 +2791,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         bool isILMethod = m is ILMethod;
-
+                                        intVal = 0;
                                         if (ip->Operand4 == 0)
                                         {
                                             intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
@@ -2815,6 +2815,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 CopyToStack(esp, reg1, mStack);
                                                 if (isILMethod && reg1->ObjectType < ObjectTypes.Object)
                                                 {
+                                                    intVal++;
                                                     mStack.Add(null);
                                                 }
                                                 esp++;
@@ -2857,7 +2858,11 @@ namespace ILRuntime.Runtime.Intepreter
                                                 if (ilm.ShouldUseRegisterVM)
                                                     esp = ExecuteR(ilm, esp, out unhandledException);
                                                 else
+                                                {
                                                     esp = Execute(ilm, esp, out unhandledException);
+                                                    if (intVal > 0)
+                                                        stack.RemoveManagedStackRange(mStack.Count - intVal, mStack.Count - 1);
+                                                }
                                                 ValueTypeBasePointer = bp;
                                                 if (unhandledException)
                                                     returned = true;
@@ -3278,6 +3283,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             reg1 = esp - m.ParameterCount;
                                             obj = null;
                                             bool isValueType = type.IsValueType;
+                                            intVal = 0;
                                             if (isValueType)
                                             {
                                                 stack.AllocValueType(esp, type);
@@ -3285,6 +3291,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 objRef->ObjectType = ObjectTypes.StackObjectReference;
                                                 *(StackObject**)&objRef->Value = esp;
                                                 mStack.Add(null);
+                                                intVal++;
                                                 objRef++;
                                             }
                                             else
@@ -3301,13 +3308,20 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 CopyToStack(esp, reg1 + i, mStack);
                                                 if (esp->ObjectType < ObjectTypes.Object)
+                                                {
                                                     mStack.Add(null);
+                                                    intVal++;
+                                                }
                                                 esp++;
                                             }
                                             if (((ILMethod)m).ShouldUseRegisterVM)
                                                 esp = ExecuteR(((ILMethod)m), esp, out unhandledException);
                                             else
-                                                esp = Execute(((ILMethod)m), esp, out unhandledException); 
+                                            {
+                                                esp = Execute(((ILMethod)m), esp, out unhandledException);
+                                                if (intVal > 0)
+                                                    stack.RemoveManagedStackRange(mStack.Count - intVal, mStack.Count - 1);
+                                            }
                                             ValueTypeBasePointer = bp;
                                             if (isValueType)
                                             {

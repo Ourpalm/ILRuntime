@@ -7,6 +7,7 @@ namespace ILRuntimeTest
 {
     public class TestClass2Adapter : CrossBindingAdaptor
     {
+        static bool isInvokingToString;
         static CrossBindingMethodInfo mVMethod1_0 = new CrossBindingMethodInfo("VMethod1");
         static CrossBindingFunctionInfo<System.Boolean> mVMethod2_1 = new CrossBindingFunctionInfo<System.Boolean>("VMethod2");
         class VMethod3_2Info : CrossBindingMethodInfo
@@ -130,10 +131,18 @@ namespace ILRuntimeTest
             public override string ToString()
             {
                 IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
-                m = instance.Type.GetVirtualMethod(m);
-                if (m == null || m is ILMethod)
+                var vm = instance.Type.GetVirtualMethod(m);
+                if (vm == null || vm is ILMethod)
                 {
-                    return instance.ToString();
+                    if (!isInvokingToString)
+                    {
+                        isInvokingToString = true;
+                        string res = instance.ToString();
+                        isInvokingToString = false;
+                        return res;
+                    }
+                    else
+                        return instance.Type.FullName;
                 }
                 else
                     return instance.Type.FullName;

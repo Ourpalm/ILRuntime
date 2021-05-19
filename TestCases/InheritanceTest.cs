@@ -130,6 +130,7 @@ namespace TestCases
         public static void InheritanceTest07()
         {
             TestClass2 cls = new TestCls5();
+            Console.WriteLine(cls);
             cls.VMethod1();
             int val = 0;
             cls.VMethod3(ref val);
@@ -255,6 +256,23 @@ namespace TestCases
             if (!b.OutMethod(out crossClass.classA)) return;
         }
 
+        public static void InheritanceTest18()
+        {
+            TestCls5 obj = new TestCls5();
+            TestClass2.Register(obj);
+
+            TestCls5 res;
+            Alloc<TestCls5>(out res);
+            res.bbbb = 5000;
+            if (res.bbbb != 5000)
+                throw new Exception();
+        }
+
+        static void Alloc<T>(out T value)where T : TestClass2
+        {
+            value = TestClass2.Alloc() as T;
+        }
+
         class CrossClass : TestClass3
         {
             public ClassA classA;
@@ -342,6 +360,7 @@ namespace TestCases
 
         class TestCls5 : TestClass2
         {
+            public int bbbb;
             public override void VMethod3(ref int arg)
             {
                 base.VMethod3(ref arg);
@@ -359,6 +378,11 @@ namespace TestCases
             protected override void AbMethod1()
             {
                 
+            }
+
+            public override string ToString()
+            {
+                return base.ToString();
             }
         }
 

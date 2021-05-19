@@ -355,5 +355,26 @@ namespace TestCases
             Console.WriteLine("vec=" + arr[0]);
             return res;
         }
+
+        public static void StructTest11()
+        {
+            List<Anim> lst = new List<Anim>();
+            for(int i = 0; i < 50; i++)
+            {
+                lst.Add(new Anim(i.ToString(), i + 10f));
+            }
+        }
+
+        struct Anim
+        {
+            public string name;
+            public float duration;
+
+            public Anim(string name, float duration)
+            {
+                this.name = name;
+                this.duration = duration;
+            }
+        }
     }
 }
