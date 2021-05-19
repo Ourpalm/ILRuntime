@@ -30,14 +30,18 @@ namespace ILRuntime.Runtime.Generated
             method = type.GetMethod("get_one", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, get_one_1);
 
-            field = type.GetField("y", flag);
-            app.RegisterCLRFieldGetter(field, get_y_0);
-            app.RegisterCLRFieldSetter(field, set_y_0);
-            app.RegisterCLRFieldBinding(field, CopyToStack_y_0, AssignFromStack_y_0);
             field = type.GetField("x", flag);
-            app.RegisterCLRFieldGetter(field, get_x_1);
-            app.RegisterCLRFieldSetter(field, set_x_1);
-            app.RegisterCLRFieldBinding(field, CopyToStack_x_1, AssignFromStack_x_1);
+            app.RegisterCLRFieldGetter(field, get_x_0);
+            app.RegisterCLRFieldSetter(field, set_x_0);
+            app.RegisterCLRFieldBinding(field, CopyToStack_x_0, AssignFromStack_x_0);
+            field = type.GetField("y", flag);
+            app.RegisterCLRFieldGetter(field, get_y_1);
+            app.RegisterCLRFieldSetter(field, set_y_1);
+            app.RegisterCLRFieldBinding(field, CopyToStack_y_1, AssignFromStack_y_1);
+            field = type.GetField("z", flag);
+            app.RegisterCLRFieldGetter(field, get_z_2);
+            app.RegisterCLRFieldSetter(field, set_z_2);
+            app.RegisterCLRFieldBinding(field, CopyToStack_z_2, AssignFromStack_z_2);
 
             app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);
 
@@ -118,12 +122,42 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
-        static object get_y_0(ref object o)
+        static object get_x_0(ref object o)
+        {
+            return ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).x;
+        }
+
+        static StackObject* CopyToStack_x_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).x;
+            __ret->ObjectType = ObjectTypes.Float;
+            *(float*)&__ret->Value = result_of_this_method;
+            return __ret + 1;
+        }
+
+        static void set_x_0(ref object o, object v)
+        {
+            ILRuntimeTest.TestFramework.TestVector3NoBinding ins =(ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
+            ins.x = (System.Single)v;
+            o = ins;
+        }
+
+        static StackObject* AssignFromStack_x_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            System.Single @x = *(float*)&ptr_of_this_method->Value;
+            ILRuntimeTest.TestFramework.TestVector3NoBinding ins =(ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
+            ins.x = @x;
+            o = ins;
+            return ptr_of_this_method;
+        }
+
+        static object get_y_1(ref object o)
         {
             return ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).y;
         }
 
-        static StackObject* CopyToStack_y_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_y_1(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
         {
             var result_of_this_method = ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).y;
             __ret->ObjectType = ObjectTypes.Float;
@@ -131,14 +165,14 @@ namespace ILRuntime.Runtime.Generated
             return __ret + 1;
         }
 
-        static void set_y_0(ref object o, object v)
+        static void set_y_1(ref object o, object v)
         {
             ILRuntimeTest.TestFramework.TestVector3NoBinding ins =(ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
             ins.y = (System.Single)v;
             o = ins;
         }
 
-        static StackObject* AssignFromStack_y_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_y_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Single @y = *(float*)&ptr_of_this_method->Value;
@@ -148,32 +182,32 @@ namespace ILRuntime.Runtime.Generated
             return ptr_of_this_method;
         }
 
-        static object get_x_1(ref object o)
+        static object get_z_2(ref object o)
         {
-            return ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).x;
+            return ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).z;
         }
 
-        static StackObject* CopyToStack_x_1(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_z_2(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
         {
-            var result_of_this_method = ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).x;
+            var result_of_this_method = ((ILRuntimeTest.TestFramework.TestVector3NoBinding)o).z;
             __ret->ObjectType = ObjectTypes.Float;
             *(float*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
 
-        static void set_x_1(ref object o, object v)
+        static void set_z_2(ref object o, object v)
         {
             ILRuntimeTest.TestFramework.TestVector3NoBinding ins =(ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
-            ins.x = (System.Single)v;
+            ins.z = (System.Single)v;
             o = ins;
         }
 
-        static StackObject* AssignFromStack_x_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_z_2(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            System.Single @x = *(float*)&ptr_of_this_method->Value;
+            System.Single @z = *(float*)&ptr_of_this_method->Value;
             ILRuntimeTest.TestFramework.TestVector3NoBinding ins =(ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
-            ins.x = @x;
+            ins.z = @z;
             o = ins;
             return ptr_of_this_method;
         }

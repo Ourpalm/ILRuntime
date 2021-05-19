@@ -409,5 +409,17 @@ namespace TestCases
                 Console.WriteLine("dele4 a=" + (a + b));
             }
         }
+
+        public static void DelegateTest24()
+        {
+            List<ILRuntimeTest.TestFramework.TestVector3> list = new List<ILRuntimeTest.TestFramework.TestVector3>();
+            list.Add(new ILRuntimeTest.TestFramework.TestVector3(1, 2, 3));
+            list.Add(new ILRuntimeTest.TestFramework.TestVector3(2, 3, 4));
+            list.Add(new ILRuntimeTest.TestFramework.TestVector3(3, 4, 5));
+            var res = list.Sum(v => v.X);
+            Console.WriteLine(res);
+            if (res != 6)
+                throw new Exception();
+        }
     }
 }

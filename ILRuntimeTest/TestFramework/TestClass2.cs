@@ -10,6 +10,16 @@ namespace ILRuntimeTest.TestFramework
     [NeedAdaptor]
     public abstract class TestClass2
     {
+        static List<TestClass2> objs = new List<TestClass2>();
+        public static void Register(TestClass2 obj)
+        {
+            objs.Add(obj);
+        }
+
+        public static TestClass2 Alloc()
+        {
+            return objs[0];
+        }
         public static int Add(int a, int b)
         {
             if (b < 0)

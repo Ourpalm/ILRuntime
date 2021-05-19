@@ -2791,7 +2791,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         bool isILMethod = m is ILMethod;
-
+                                        bool useRegister = isILMethod && ((ILMethod)m).ShouldUseRegisterVM;
                                         if (ip->Operand4 == 0)
                                         {
                                             intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
@@ -2813,7 +2813,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         throw new NotSupportedException();
                                                 }
                                                 CopyToStack(esp, reg1, mStack);
-                                                if (isILMethod && reg1->ObjectType < ObjectTypes.Object)
+                                                if (useRegister && reg1->ObjectType < ObjectTypes.Object)
                                                 {
                                                     mStack.Add(null);
                                                 }
@@ -2854,10 +2854,12 @@ namespace ILRuntime.Runtime.Intepreter
                                                         ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                                     }
                                                 }
-                                                if (ilm.ShouldUseRegisterVM)
+                                                if (useRegister)
                                                     esp = ExecuteR(ilm, esp, out unhandledException);
                                                 else
+                                                {
                                                     esp = Execute(ilm, esp, out unhandledException);
+                                                }
                                                 ValueTypeBasePointer = bp;
                                                 if (unhandledException)
                                                     returned = true;
@@ -3278,13 +3280,15 @@ namespace ILRuntime.Runtime.Intepreter
                                             reg1 = esp - m.ParameterCount;
                                             obj = null;
                                             bool isValueType = type.IsValueType;
+                                            bool useRegister = ((ILMethod)m).ShouldUseRegisterVM;
                                             if (isValueType)
                                             {
                                                 stack.AllocValueType(esp, type);
                                                 objRef = esp + 1;
                                                 objRef->ObjectType = ObjectTypes.StackObjectReference;
                                                 *(StackObject**)&objRef->Value = esp;
-                                                mStack.Add(null);
+                                                if (useRegister)
+                                                    mStack.Add(null);
                                                 objRef++;
                                             }
                                             else
@@ -3300,14 +3304,18 @@ namespace ILRuntime.Runtime.Intepreter
                                             for (int i = 0; i < m.ParameterCount; i++)
                                             {
                                                 CopyToStack(esp, reg1 + i, mStack);
-                                                if (esp->ObjectType < ObjectTypes.Object)
+                                                if (esp->ObjectType < ObjectTypes.Object && useRegister)
+                                                {
                                                     mStack.Add(null);
+                                                }
                                                 esp++;
                                             }
-                                            if (((ILMethod)m).ShouldUseRegisterVM)
+                                            if (useRegister)
                                                 esp = ExecuteR(((ILMethod)m), esp, out unhandledException);
                                             else
-                                                esp = Execute(((ILMethod)m), esp, out unhandledException); 
+                                            {
+                                                esp = Execute(((ILMethod)m), esp, out unhandledException);
+                                            }
                                             ValueTypeBasePointer = bp;
                                             if (isValueType)
                                             {

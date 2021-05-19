@@ -271,7 +271,6 @@ namespace TestCases
             var obj = Fetch<TestInterface>();
             Console.WriteLine(obj.ToString());
         }
-
         interface IBinderCollection<T>
         {
             
@@ -407,6 +406,21 @@ namespace TestCases
         {
             var testa = new TestA<int>();
             testa.TestStatic();  //输出了‘arr’ 然后报错  调用了泛型数组的方法，正常应该调用泛型接口的方法
+        }
+        public static void GenericMethodTest17()
+        {
+            Foo3<object>(typeof(GenericMethodTest));
+        }
+
+        static void Foo3<T>(out T value) where T : class
+        {
+            value = null;
+            throw new Exception();
+        }
+
+        static void Foo3<T>(Type type) where T : class
+        {
+
         }
         public static void GenericExtensionMethod1Test1()
         {
