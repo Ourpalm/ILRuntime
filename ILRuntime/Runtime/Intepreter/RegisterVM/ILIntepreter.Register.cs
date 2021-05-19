@@ -2791,7 +2791,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         bool isILMethod = m is ILMethod;
-                                        intVal = 0;
+                                        int cnt = 0;
                                         if (ip->Operand4 == 0)
                                         {
                                             intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
@@ -2815,7 +2815,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 CopyToStack(esp, reg1, mStack);
                                                 if (isILMethod && reg1->ObjectType < ObjectTypes.Object)
                                                 {
-                                                    intVal++;
+                                                    cnt++;
                                                     mStack.Add(null);
                                                 }
                                                 esp++;
@@ -2860,8 +2860,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                 {
                                                     esp = Execute(ilm, esp, out unhandledException);
-                                                    if (intVal > 0)
-                                                        stack.RemoveManagedStackRange(mStack.Count - intVal, mStack.Count - 1);
+                                                    if (cnt > 0)
+                                                        stack.RemoveManagedStackRange(mStack.Count - cnt, mStack.Count - 1);
                                                 }
                                                 ValueTypeBasePointer = bp;
                                                 if (unhandledException)
