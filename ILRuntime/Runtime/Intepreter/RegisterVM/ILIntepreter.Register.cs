@@ -2813,7 +2813,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         throw new NotSupportedException();
                                                 }
                                                 CopyToStack(esp, reg1, mStack);
-                                                if (useRegister)
+                                                if (useRegister && reg1->ObjectType < ObjectTypes.Object)
                                                 {
                                                     mStack.Add(null);
                                                 }
@@ -3315,8 +3315,6 @@ namespace ILRuntime.Runtime.Intepreter
                                             else
                                             {
                                                 esp = Execute(((ILMethod)m), esp, out unhandledException);
-                                                if (intVal > 0)
-                                                    stack.RemoveManagedStackRange(mStack.Count - intVal, mStack.Count - 1);
                                             }
                                             ValueTypeBasePointer = bp;
                                             if (isValueType)
