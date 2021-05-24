@@ -749,8 +749,14 @@ namespace ILRuntime.Runtime.Enviorment
             if (method != null)
             {
                 invoking = true;
-                domain.Invoke(method, instance, null);
-                invoking = false;
+                try
+                {
+                    domain.Invoke(method, instance, null);
+                }
+                finally
+                {
+                    invoking = false;
+                }
             }
         }
     }
