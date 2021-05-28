@@ -1137,7 +1137,7 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                 }
             }
-            return null;
+            return o;
         }
 
         private IType Generic ( string key )
