@@ -303,6 +303,14 @@ namespace ILRuntime.Runtime.Enviorment
                 return default(StackObject);
             }
         }
+
+        public int TypeIndex
+        {
+            get
+            {
+                return -1;
+            }
+        }
         #endregion
     }
 }

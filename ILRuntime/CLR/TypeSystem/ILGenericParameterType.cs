@@ -36,7 +36,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
-                return !isByRef && !isArray; 
+                return !isByRef && !isArray;
             }
         }
 
@@ -240,5 +240,13 @@ namespace ILRuntime.CLR.TypeSystem
         }
 
         public StackObject DefaultObject { get { return default(StackObject); } }
+
+        public int TypeIndex
+        {
+            get
+            {
+                return -1;
+            }
+        }
     }
 }

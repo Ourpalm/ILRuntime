@@ -51,6 +51,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         StackObject DefaultObject { get; }
 
+        int TypeIndex { get; }
+
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
 
         /// <summary>

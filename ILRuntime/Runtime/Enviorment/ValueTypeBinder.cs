@@ -47,7 +47,7 @@ namespace ILRuntime.Runtime.Enviorment
                 case ObjectTypes.ValueTypeObjectReference:
                     {
                         var dst = ILIntepreter.ResolveReference(esp);
-                        var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder as ValueTypeBinder<K>;
+                        var vb = ((CLRType)domain.GetTypeByIndex(dst->Value)).ValueTypeBinder as ValueTypeBinder<K>;
                         if (vb != null)
                         {
                             vb.CopyValueTypeToStack(ref ins, dst, mStack);
@@ -77,7 +77,7 @@ namespace ILRuntime.Runtime.Enviorment
                 case ObjectTypes.ValueTypeObjectReference:
                     {
                         var dst = ILIntepreter.ResolveReference(esp);
-                        var vb = ((CLRType)domain.GetType(dst->Value)).ValueTypeBinder as ValueTypeBinder<K>;
+                        var vb = ((CLRType)domain.GetTypeByIndex(dst->Value)).ValueTypeBinder as ValueTypeBinder<K>;
                         if (vb != null)
                         {
                             vb.AssignFromStack(ref ins, dst, mStack);

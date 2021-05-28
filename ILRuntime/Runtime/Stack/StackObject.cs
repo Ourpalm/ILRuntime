@@ -96,7 +96,7 @@ namespace ILRuntime.Runtime.Stack
                 case ObjectTypes.ValueTypeObjectReference:
                     {
                         StackObject* dst = ILIntepreter.ResolveReference(esp);
-                        IType type = appdomain.GetType(dst->Value);
+                        IType type = appdomain.GetTypeByIndex(dst->Value);
                         if (type is ILType)
                         {
                             ILType iltype = (ILType)type;

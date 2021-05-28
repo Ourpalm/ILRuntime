@@ -47,6 +47,7 @@ namespace ILRuntime.CLR.TypeSystem
         int valuetypeFieldCount, valuetypeManagedCount;
         bool valuetypeSizeCalculated;
         int hashCode = -1;
+        int tIdx = -1;
         static int instance_id = 0x20000000;
 
         public Dictionary<int, FieldInfo> Fields
@@ -322,6 +323,16 @@ namespace ILRuntime.CLR.TypeSystem
             get
             {
                 return defaultObject;
+            }
+        }
+
+        public int TypeIndex
+        {
+            get
+            {
+                if (tIdx < 0)
+                    tIdx = appdomain.AllocTypeIndex(this);
+                return tIdx;
             }
         }
 

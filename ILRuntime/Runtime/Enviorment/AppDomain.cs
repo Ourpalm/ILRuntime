@@ -47,6 +47,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<Type, ValueTypeBinder> valueTypeBinders = new Dictionary<Type, ValueTypeBinder>();
         ThreadSafeDictionary<string, IType> mapType = new ThreadSafeDictionary<string, IType>();
         Dictionary<Type, IType> clrTypeMapping = new Dictionary<Type, IType>(new ByReferenceKeyComparer<Type>());
+        List<IType> typesByIndex = new List<IType>();
         ThreadSafeDictionary<int, IType> mapTypeToken = new ThreadSafeDictionary<int, IType>();
         ThreadSafeDictionary<int, IMethod> mapMethod = new ThreadSafeDictionary<int, IMethod>();
         ThreadSafeDictionary<long, string> mapString = new ThreadSafeDictionary<long, string>();
@@ -755,6 +756,21 @@ namespace ILRuntime.Runtime.Enviorment
         string GetAssemblyName(IMetadataScope scope)
         {
             return scope is AssemblyNameReference ? ((AssemblyNameReference)scope).FullName : null;
+        }
+
+        internal int AllocTypeIndex(IType type)
+        {
+            lock (typesByIndex)
+            {
+                int index = typesByIndex.Count;
+                typesByIndex.Add(type);
+                return index;
+            }
+        }
+
+        internal IType GetTypeByIndex(int index)
+        {
+            return typesByIndex[index];
         }
 
         internal IType GetType(object token, IType contextType, IMethod contextMethod)

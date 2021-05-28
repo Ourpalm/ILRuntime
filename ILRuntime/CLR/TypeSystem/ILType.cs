@@ -45,6 +45,7 @@ namespace ILRuntime.CLR.TypeSystem
         ILType genericDefinition;
         IType firstCLRBaseType, firstCLRInterface;
         int hashCode = -1;
+        int tIdx = -1;
         static int instance_id = 0x10000000;
         int jitFlags;
         public TypeDefinition TypeDefinition { get { return definition; } }
@@ -522,6 +523,15 @@ namespace ILRuntime.CLR.TypeSystem
         }
 
         public StackObject DefaultObject { get { return default(StackObject); } }
+        public int TypeIndex
+        {
+            get
+            {
+                if (tIdx < 0)
+                    tIdx = appdomain.AllocTypeIndex(this);
+                return tIdx;
+            }
+        }
 
         public List<IMethod> GetMethods ()
         {

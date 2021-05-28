@@ -289,7 +289,7 @@ namespace ILRuntime.Runtime.Stack
         public void AllocValueTypeAndCopy(StackObject* ptr, StackObject* src)
         {
             var dst = ILIntepreter.ResolveReference(src);
-            var type = intepreter.AppDomain.GetType(dst->Value);
+            var type = intepreter.AppDomain.GetTypeByIndex(dst->Value);
             int size, managedCount;
             type.GetValueTypeSize(out size, out managedCount);
             if (allocator == null)
@@ -364,7 +364,7 @@ namespace ILRuntime.Runtime.Stack
         internal void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, ref int managedIdx)
         {
             ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
-            ptr->Value = type.GetHashCode();
+            ptr->Value = type.TypeIndex;
             ptr->ValueLow = type.TotalFieldCount;
             StackObject* endPtr = ptr - (type.TotalFieldCount + 1);
             

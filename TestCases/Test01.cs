@@ -238,6 +238,19 @@ namespace TestCases
             sw.Stop();
             Console.WriteLine(string.Format("time=" + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
+
+        public static void UnitTest_Performance11()
+        {
+            TestVectorClass a = new TestVectorClass();
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1000000; i++)
+            {
+                TestVectorClass.ValueTypePerfTest2(i, "b", a.Obj, a);
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("time=" + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
         class PerformanceTestCls
         {
             public int A = 1;
