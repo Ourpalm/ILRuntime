@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntime.Runtime.Stack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -237,5 +238,7 @@ namespace ILRuntime.CLR.TypeSystem
                 return 0;
             }
         }
+
+        public StackObject DefaultObject { get { return default(StackObject); } }
     }
 }

@@ -122,7 +122,7 @@ namespace TestCases
             }
 
             var attr = (TestCLRAttribute)typeof(TestCls2).GetField("Attribute_field").GetCustomAttributes(typeof(TestCLRAttribute), false)[0];
-            if(attr.Name != "Example")
+            if (attr.Name != "Example")
             {
                 throw new Exception("attr.Name != Example");
             }
@@ -471,7 +471,7 @@ namespace TestCases
         {
             var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
             var obj = Activator.CreateInstance(t, 2, 3);
-            
+
             Console.WriteLine(obj);
         }
 
@@ -481,6 +481,13 @@ namespace TestCases
             var mi = t.GetMethod(nameof(ReflectionTest19));
             if (!mi.IsStatic)
                 throw new Exception();
+        }
+
+        public static void ReflectionTest20()
+        {
+            var t = Type.GetType("System.Action`1<int[]>");
+
+            Console.WriteLine(t);
         }
     }
 }

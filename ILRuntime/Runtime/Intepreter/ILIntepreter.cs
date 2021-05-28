@@ -4560,8 +4560,8 @@ namespace ILRuntime.Runtime.Intepreter
         {
             var sType = AppDomain.GetType(src->Value);
             var dType = AppDomain.GetType(dst->Value);
-
             return sType.CanAssignTo(dType);
+
         }
 
         bool CanCopyStackValueType(StackObject* src, StackObject* dst)
@@ -4580,15 +4580,19 @@ namespace ILRuntime.Runtime.Intepreter
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
             StackObject* dstDescriptor = ILIntepreter.ResolveReference(dst);
+#if DEBUG
             if (!CanCastTo(descriptor, dstDescriptor))
                 throw new InvalidCastException();
+#endif
             int cnt = descriptor->ValueLow;
             for (int i = 0; i < cnt; i++)
             {
                 StackObject* srcVal = Minus(descriptor, i + 1);
                 StackObject* dstVal = Minus(dstDescriptor, i + 1);
+#if DEBUG
                 if (srcVal->ObjectType != dstVal->ObjectType)
                     throw new NotSupportedException();
+#endif
                 switch (dstVal->ObjectType)
                 {
                     case ObjectTypes.Object:

@@ -9,6 +9,7 @@ using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Reflection;
+using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.CLR.TypeSystem
 {
@@ -519,6 +520,9 @@ namespace ILRuntime.CLR.TypeSystem
                 return typeRef.Name;
             }
         }
+
+        public StackObject DefaultObject { get { return default(StackObject); } }
+
         public List<IMethod> GetMethods ()
         {
             if ( methods == null )
