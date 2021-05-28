@@ -52,7 +52,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* AssignFromStack_Name_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            System.String @Name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.String @Name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             ((ILRuntimeTest.TestFramework.TestCLRAttribute)o).Name = @Name;
             return ptr_of_this_method;
         }

@@ -59,7 +59,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.TestAbstract();
@@ -74,7 +74,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.TestVirtual();
@@ -89,7 +89,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.TestField();
@@ -104,7 +104,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.InterfaceTest @ins = (ILRuntimeTest.TestFramework.InterfaceTest)typeof(ILRuntimeTest.TestFramework.InterfaceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.InterfaceTest @ins = (ILRuntimeTest.TestFramework.InterfaceTest)typeof(ILRuntimeTest.TestFramework.InterfaceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -225,7 +225,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* AssignFromStack_staticField_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            System.IDisposable @staticField = (System.IDisposable)typeof(System.IDisposable).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.IDisposable @staticField = (System.IDisposable)typeof(System.IDisposable).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField = @staticField;
             return ptr_of_this_method;
         }

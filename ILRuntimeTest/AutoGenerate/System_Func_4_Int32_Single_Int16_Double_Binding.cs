@@ -46,7 +46,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 @arg1 = ptr_of_this_method->Value;
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
-            System.Func<System.Int32, System.Single, System.Int16, System.Double> instance_of_this_method = (System.Func<System.Int32, System.Single, System.Int16, System.Double>)typeof(System.Func<System.Int32, System.Single, System.Int16, System.Double>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            System.Func<System.Int32, System.Single, System.Int16, System.Double> instance_of_this_method = (System.Func<System.Int32, System.Single, System.Int16, System.Double>)typeof(System.Func<System.Int32, System.Single, System.Int16, System.Double>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Invoke(@arg1, @arg2, @arg3);

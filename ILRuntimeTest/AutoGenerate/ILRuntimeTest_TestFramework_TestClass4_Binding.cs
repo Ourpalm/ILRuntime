@@ -43,7 +43,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestClass4 instance_of_this_method = (ILRuntimeTest.TestFramework.TestClass4)typeof(ILRuntimeTest.TestFramework.TestClass4).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestClass4 instance_of_this_method = (ILRuntimeTest.TestFramework.TestClass4)typeof(ILRuntimeTest.TestFramework.TestClass4).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.KKK();
@@ -58,10 +58,10 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 2);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestStruct[] @arr = (ILRuntimeTest.TestFramework.TestStruct[])typeof(ILRuntimeTest.TestFramework.TestStruct[]).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));
+            ILRuntimeTest.TestFramework.TestStruct[] @arr = (ILRuntimeTest.TestFramework.TestStruct[])typeof(ILRuntimeTest.TestFramework.TestStruct[]).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestClass4 instance_of_this_method = (ILRuntimeTest.TestFramework.TestClass4)typeof(ILRuntimeTest.TestFramework.TestClass4).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestClass4 instance_of_this_method = (ILRuntimeTest.TestFramework.TestClass4)typeof(ILRuntimeTest.TestFramework.TestClass4).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
 
             instance_of_this_method.TestArrayOut(out @arr);
 

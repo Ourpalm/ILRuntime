@@ -180,7 +180,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* AssignFromStack_Test_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            ILRuntimeTest.TestFramework.TestCLREnum @Test = (ILRuntimeTest.TestFramework.TestCLREnum)typeof(ILRuntimeTest.TestFramework.TestCLREnum).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestCLREnum @Test = (ILRuntimeTest.TestFramework.TestCLREnum)typeof(ILRuntimeTest.TestFramework.TestCLREnum).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)20);
             ILRuntimeTest.TestFramework.TestCLREnumClass.Test = @Test;
             return ptr_of_this_method;
         }

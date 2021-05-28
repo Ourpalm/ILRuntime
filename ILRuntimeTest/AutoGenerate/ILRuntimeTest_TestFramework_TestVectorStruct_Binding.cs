@@ -120,7 +120,7 @@ namespace ILRuntime.Runtime.Generated
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
                 ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @C, __intp, ptr_of_this_method, __mStack, true);
             } else {
-                @C = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+                @C = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
             }
             ILRuntimeTest.TestFramework.TestVectorStruct ins =(ILRuntimeTest.TestFramework.TestVectorStruct)o;
             ins.C = @C;
@@ -158,7 +158,7 @@ namespace ILRuntime.Runtime.Generated
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder != null) {
                 ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVectorStruct2_Binding_Binder.ParseValue(ref @B, __intp, ptr_of_this_method, __mStack, true);
             } else {
-                @B = (ILRuntimeTest.TestFramework.TestVectorStruct2)typeof(ILRuntimeTest.TestFramework.TestVectorStruct2).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+                @B = (ILRuntimeTest.TestFramework.TestVectorStruct2)typeof(ILRuntimeTest.TestFramework.TestVectorStruct2).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
             }
             ILRuntimeTest.TestFramework.TestVectorStruct ins =(ILRuntimeTest.TestFramework.TestVectorStruct)o;
             ins.B = @B;

@@ -125,7 +125,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* AssignFromStack_Struct_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            ILRuntimeTest.TestFramework.TestStruct @Struct = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.TestStruct @Struct = (ILRuntimeTest.TestFramework.TestStruct)typeof(ILRuntimeTest.TestFramework.TestStruct).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
             ((ILRuntimeTest.TestFramework.TestClass3)o).Struct = @Struct;
             return ptr_of_this_method;
         }

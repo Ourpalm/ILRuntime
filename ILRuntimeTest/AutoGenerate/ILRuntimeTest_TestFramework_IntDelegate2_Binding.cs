@@ -40,7 +40,7 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 @a = ptr_of_this_method->Value;
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.IntDelegate2 instance_of_this_method = (ILRuntimeTest.TestFramework.IntDelegate2)typeof(ILRuntimeTest.TestFramework.IntDelegate2).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack));
+            ILRuntimeTest.TestFramework.IntDelegate2 instance_of_this_method = (ILRuntimeTest.TestFramework.IntDelegate2)typeof(ILRuntimeTest.TestFramework.IntDelegate2).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Invoke(@a);
