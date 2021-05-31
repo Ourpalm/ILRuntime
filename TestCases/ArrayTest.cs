@@ -176,5 +176,29 @@ namespace TestCases
                 }
             }
         }
+
+
+        public static void ArrayTest17()
+        {
+            TestGenericDelegate<bool>[] array = new TestGenericDelegate<bool>[] { Callback1, Callback2, Callback3 };
+            for (int i = 0, length = array.Length; i < length; i++)
+            {
+                array[i].Invoke(i % 2 == 0);
+            }
+        }
+
+        public delegate void TestGenericDelegate<T>(T t);
+        static void Callback1(bool b)
+        {
+            Console.WriteLine($"Callback1 {b}");
+        }
+        static void Callback2(bool b)
+        {
+            Console.WriteLine($"Callback2  {b}");
+        }
+        static void Callback3(bool b)
+        {
+            Console.WriteLine($"Callback3  {b}");
+        }
     }
 }
