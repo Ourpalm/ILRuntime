@@ -4896,7 +4896,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (obj is ILTypeInstance)
                                     {
                                         ILTypeInstance ins = (ILTypeInstance)obj;
-                                        if (ins.Type.IsValueType && !ins.Boxed)
+                                        if (ins.Type != null && ins.Type.IsValueType && !ins.Boxed)
                                         {
                                             AllocValueType(reg1, ins.Type);
                                             dst = ILIntepreter.ResolveReference(reg1);
