@@ -412,6 +412,29 @@ namespace TestCases
             Foo3<object>(typeof(GenericMethodTest));
         }
 
+        public static void GenericMethodTest18()
+        {
+            float[] val = TestStaticGenericClassField<float[]>.GetValue("key");
+            Console.WriteLine($"=======TestStaticGenericClassField<float[]>.GetValue: {val}");
+
+            var val2 = TestStaticGenericClassField<float>.GetValue("key");
+            Console.WriteLine($"=======TestStaticGenericClassField<float>.GetValue: {val2}");
+
+        }
+        static class TestStaticGenericClassField<T>
+        {
+            public static readonly Dictionary<string, T> Dict = new Dictionary<string, T>();
+
+
+            public static T GetValue(string key, T def = default(T))
+            {
+                if (Dict.TryGetValue(key, out var res))
+                {
+                    return res;
+                }
+                return def;
+            }
+        }
         static void Foo3<T>(out T value) where T : class
         {
             value = null;

@@ -1289,7 +1289,7 @@ namespace ILRuntime.Runtime.Enviorment
                     GenericInstanceType gim = (GenericInstanceType)typeDef;
                     for (int i = 0; i < gim.GenericArguments.Count; i++)
                     {
-                        if (gim.GenericArguments[0].IsGenericParameter)
+                        if (gim.GenericArguments[i].IsGenericParameter)
                         {
                             invalidToken = true;
                             break;
