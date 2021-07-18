@@ -131,6 +131,7 @@ namespace ILRuntime.Runtime.Intepreter
             StackObject* v2 = frame.LocalVarPointer + 1;
             StackObject* v3 = frame.LocalVarPointer + 1 + 1;
             StackObject* v4 = Add(frame.LocalVarPointer, 3);
+            Exception lastCaughtEx = null;
             int finallyEndAddress = 0;
             var ehs = method.ExceptionHandler;
 
@@ -4410,6 +4411,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     esp--;
                                     throw ex;
                                 }
+                            case OpCodeEnum.Rethrow:
+                                {
+                                    throw lastCaughtEx;
+                                }
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Volatile:
                             case OpCodeEnum.Castclass:
@@ -4463,6 +4468,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp--;
                                     }
                                 }
+                                lastCaughtEx = ex;
                                 esp = PushObject(esp, mStack, ex);
                                 unhandledException = false;
                                 ip = ptr + eh.HandlerStart;

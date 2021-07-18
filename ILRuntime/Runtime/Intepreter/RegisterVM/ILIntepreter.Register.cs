@@ -88,6 +88,7 @@ namespace ILRuntime.Runtime.Intepreter
             stack.InitializeFrame(method, esp, out frame);
             frame.IsRegister = true;
             int finallyEndAddress = 0;
+            Exception lastCaughtEx = null;
 
             var stackRegStart = frame.LocalVarPointer;
             StackObject* r = frame.LocalVarPointer - method.ParameterCount;
@@ -5061,6 +5062,8 @@ namespace ILRuntime.Runtime.Intepreter
                                     var ex = mStack[objRef->Value] as Exception;
                                     throw ex;
                                 }
+                            case OpCodeREnum.Rethrow:
+                                throw lastCaughtEx;
                             default:
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
@@ -5109,6 +5112,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         esp--;
                                     }
                                 }
+                                lastCaughtEx = ex;
                                 short exReg = (short)(paramCnt + locCnt);
                                 AssignToRegister(ref info, exReg, ex);
                                 unhandledException = false;
