@@ -31,10 +31,24 @@ namespace ILRuntime.Runtime.Enviorment
                 var t = genericArguments[0];
                 if (t is ILType)
                 {
-                    return ILIntepreter.PushObject(esp, mStack, ((ILType)t).Instantiate());
+                    if (t.IsValueType && !t.IsEnum)
+                    {
+                        intp.AllocValueType(esp++, t);
+                        return esp;
+                    }
+                    else
+                        return ILIntepreter.PushObject(esp, mStack, ((ILType)t).Instantiate());
                 }
                 else
-                    return ILIntepreter.PushObject(esp, mStack, ((CLRType)t).CreateDefaultInstance());
+                {
+                    if (intp.AppDomain.ValueTypeBinders.ContainsKey(t.TypeForCLR))
+                    {
+                        intp.AllocValueType(esp++, t);
+                        return esp;
+                    }
+                    else
+                        return ILIntepreter.PushObject(esp, mStack, ((CLRType)t).CreateDefaultInstance());
+                }
             }
             else
                 throw new EntryPointNotFoundException();
