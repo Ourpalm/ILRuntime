@@ -489,5 +489,47 @@ namespace TestCases
 
             Console.WriteLine(t);
         }
+
+        public static void ReflectionTest21()
+        {
+            var type = typeof(TestA<,>);
+            type = type.MakeGenericType(typeof(TestB), typeof(TestC));
+            var a = (ITestA)Activator.CreateInstance(type);
+            a.Display();
+        }
+        interface ITestA
+        {
+            void Display();
+        }
+
+        class TestA<T, U> where T : TestB, new() where U : TestC, new()
+        {
+            public T instanceT;
+            public U instanceU;
+
+            public TestA()
+            {
+                instanceT = new T();
+                instanceU = new U();
+
+                instanceT.Name = "Lori";
+                instanceU.Name = "Chen";
+            }
+
+            public void Display()
+            {
+                Console.WriteLine($"T:{instanceT.Name} U:{instanceU.Name}");
+            }
+        }
+
+        class TestB
+        {
+            public string Name;
+        }
+
+        class TestC
+        {
+            public string Name;
+        }
     }
 }
