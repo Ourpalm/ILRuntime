@@ -473,7 +473,7 @@ namespace ");
             {
                 if (p.ParameterType.IsByRef)
                 {
-                    sb.AppendLine(GetPushString(p.ParameterType, p.Name));
+                    sb.AppendLine(GetPushString(p.ParameterType.GetElementType(), p.Name));
                     refIndex[p] = idx++;
                 }
             }
@@ -498,7 +498,7 @@ namespace ");
                 {
                     p.ParameterType.GetClassName(out clsName, out realClsName, out isByRef, true);
 
-                    sb.AppendLine(GetReadString(p.ParameterType, realClsName, refIndex[p].ToString(), p.Name));
+                    sb.AppendLine(GetReadString(p.ParameterType.GetElementType(), realClsName, refIndex[p].ToString(), p.Name));
                 }
             }
             sb.AppendLine("                        }");
