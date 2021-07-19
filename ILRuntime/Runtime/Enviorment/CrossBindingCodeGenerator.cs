@@ -614,7 +614,7 @@ namespace ");
                 }
                 else if (type == typeof(float))
                 {
-                    return string.Format("                            ctx.PushInteger({0});", argName);
+                    return string.Format("                            ctx.PushFloat({0});", argName);
                 }
                 else if (type == typeof(double))
                 {
