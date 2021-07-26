@@ -832,7 +832,7 @@ namespace ILRuntime.CLR.TypeSystem
                             }
                             if ( match )
                             {
-                                match = returnType == null || i.ReturnType == returnType;
+                                match = returnType == null || (i.ReturnType != null && i.ReturnType.TypeForCLR == returnType.TypeForCLR);
                             }
                             if ( match )
                                 return i;
