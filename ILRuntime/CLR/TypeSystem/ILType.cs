@@ -548,13 +548,26 @@ namespace ILRuntime.CLR.TypeSystem
         }
         void InitializeInterfaces ()
         {
-            interfaceInitialized = true;
             if ( definition != null && definition.HasInterfaces )
             {
                 interfaces = new IType [ definition.Interfaces.Count ];
                 for ( int i = 0; i < interfaces.Length; i++ )
                 {
-                    interfaces [ i ] = appdomain.GetType ( definition.Interfaces [ i ].InterfaceType, this, null );
+                    if (definition.Interfaces[i].InterfaceType.IsGenericInstance)
+                    {
+                        IGenericInstance ig = definition.Interfaces[i].InterfaceType as IGenericInstance;
+                        //generic contains self
+                        if (ig.GenericArguments.Contains(typeRef))
+                        {
+                            //adaptor.BaseCLRType need remove T, example: IMessage<>
+                            TypeReference elementType = definition.Interfaces[i].InterfaceType.GetElementType();
+                            interfaces[i] = appdomain.GetType(elementType, this, null);
+                        }
+                    }
+                    if(interfaces[i] == null)
+                    {
+                        interfaces[i] = appdomain.GetType(definition.Interfaces[i].InterfaceType, this, null);
+                    }
                     //only one clrInterface is valid
                     if ( interfaces [ i ] is CLRType && firstCLRInterface == null )
                     {
@@ -571,6 +584,8 @@ namespace ILRuntime.CLR.TypeSystem
             }
             if ( firstCLRInterface == null && BaseType != null && BaseType is ILType )
                 firstCLRInterface = ( ( ILType ) BaseType ).FirstCLRInterface;
+
+            interfaceInitialized = true;
         }
         void InitializeBaseType ()
         {
