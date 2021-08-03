@@ -117,6 +117,10 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     RegisterCLRMethodRedirection(i, CLRRedirections.TypeEquals);
                 }
+                if (i.Name == "IsAssignableFrom" && i.GetParameters()[0].ParameterType == typeof(Type))
+                {
+                    RegisterCLRMethodRedirection(i, CLRRedirections.IsAssignableFrom);
+                }
             }
             foreach (var i in typeof(System.Delegate).GetMethods())
             {
