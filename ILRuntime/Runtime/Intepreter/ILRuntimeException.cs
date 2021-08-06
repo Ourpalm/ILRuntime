@@ -34,12 +34,7 @@ namespace ILRuntime.Runtime.Intepreter
             }
 
             if (ds.OnILRuntimeException != null) {
-                var sb = new StringBuilder();
-                if (innerException != null) {
-                    sb.AppendLine($"{innerException.GetType().Name}: {innerException.Message}");
-                }
-                sb.AppendLine(stackTrace);
-                ds.OnILRuntimeException(sb.ToString());
+                ds.OnILRuntimeException(ToString());
             }
         }
 
