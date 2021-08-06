@@ -715,6 +715,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Readonly:
                 case Code.Volatile:
                 case Code.Endfinally:
+                case Code.Rethrow:
                     break;
                 case Code.Leave:
                 case Code.Leave_S:

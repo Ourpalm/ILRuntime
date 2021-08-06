@@ -271,6 +271,18 @@ namespace TestCases
         {
             var a = TestEnum.Enum2;
             Test18Sub(0x123456789, out a);
+            switch(a)
+            {
+                case TestEnum.Enum1:
+                    Console.WriteLine(a + "1");
+                    break;
+                case TestEnum.Enum2:
+                    Console.WriteLine(a + "1");
+                    break;
+                case TestEnum.Enum4:
+                    Console.WriteLine(a + "2");
+                    break;
+            }
             Console.WriteLine(a);
         }
 
