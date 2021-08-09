@@ -61,6 +61,7 @@
     <Compile Include="Structs.cs" />
     <Compile Include="Test01.cs" />
     <Compile Include="Test03.cs" />
+    <Compile Include="TestLL.cs" />
     <Compile Include="Test05.cs" />
     <Compile Include="TestValueTypeBinding.cs" />
     <Compile Include="TestCLREnum.cs" />
