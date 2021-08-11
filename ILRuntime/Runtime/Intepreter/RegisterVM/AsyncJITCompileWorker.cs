@@ -32,6 +32,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public void Dispose()
         {
             exit = true;
+            evt.Set ();
         }
         void DoJob()
         {
