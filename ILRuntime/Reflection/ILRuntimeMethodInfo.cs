@@ -7,6 +7,8 @@ using System.Globalization;
 
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.Utils;
+using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Enviorment;
 
 namespace ILRuntime.Reflection
 {
@@ -171,6 +173,41 @@ namespace ILRuntime.Reflection
             {
                 return method.ReturnType?.ReflectionType;
             }
+        }
+
+        public override Delegate CreateDelegate(Type delegateType)
+        {
+            throw new NotSupportedException("please use CreateDelegate(Type delegateType, object target)");
+        }
+
+        private IDelegateAdapter iDelegate;
+        public override Delegate CreateDelegate(Type delegateType, object target)
+        {
+            ILTypeInstance ilTypeInstance;
+            if (target is ILTypeInstance)
+            {
+                ilTypeInstance = target as ILTypeInstance;
+            }
+            else if (target is CrossBindingAdaptorType adaptor)
+            {
+                ilTypeInstance = adaptor.ILInstance;
+            }
+            else
+            {
+                return null;
+            }
+
+            IDelegateAdapter del;
+            if (iDelegate == null)
+            {
+                iDelegate = appdomain.DelegateManager.FindDelegateAdapter(ilTypeInstance, method, method);
+                del = iDelegate;
+            }
+            else
+            {
+                del = iDelegate.Instantiate(appdomain, ilTypeInstance, iDelegate.Method);
+            }
+            return del.GetConvertor(delegateType);
         }
     }
 }

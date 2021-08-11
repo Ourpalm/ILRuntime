@@ -729,7 +729,7 @@ namespace ILRuntime.Runtime.Intepreter
         internal IDelegateAdapter GetDelegateAdapter(ILMethod method)
         {
             if (delegates == null)
-                delegates = new Dictionary<ILMethod, IDelegateAdapter>();
+                return null;
 
             IDelegateAdapter res;
             if (delegates.TryGetValue(method, out res))
@@ -739,6 +739,9 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal void SetDelegateAdapter(ILMethod method, IDelegateAdapter adapter)
         {
+            if (delegates == null)
+                delegates = new Dictionary<ILMethod, IDelegateAdapter>();
+
             if (!delegates.ContainsKey(method))
                 delegates[method] = adapter;
             else
