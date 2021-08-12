@@ -648,16 +648,40 @@ namespace ILRuntime.CLR.TypeSystem
 
             return -1;
         }
-        public IType FindGenericArgument(string key)
+
+        public IType FindGenericArgument ( string key )
         {
-            if (genericArguments != null)
+            var o = this.Generic ( key );
+            if ( o == null )
             {
-                foreach (var i in genericArguments)
+                var aGenericParameters = this.TypeForCLR.GetGenericArguments ();
+                if ( aGenericParameters !=null )
                 {
-                    if (i.Key == key)
-                        return i.Value;
+                    for ( int i = 0; i < aGenericParameters.Length; i++ )
+                    {
+                        if ( aGenericParameters [ i ].Name == key )
+                        {
+                            return this.Generic ( "!" + i );
+                        }
+                    }
                 }
             }
+            return o;
+        }
+
+        private IType Generic ( string key )
+        {
+            if ( this.genericArguments != null )
+            {
+                for ( int i = 0; i < this.genericArguments.Length; i++ )
+                {
+                    if ( this.genericArguments [ i ].Key == key )
+                    {
+                        return this.genericArguments [ i ].Value;
+                    }
+                }
+            }
+
             return null;
         }
         public IMethod GetMethod(string name, int paramCount, bool declaredOnly = false)
