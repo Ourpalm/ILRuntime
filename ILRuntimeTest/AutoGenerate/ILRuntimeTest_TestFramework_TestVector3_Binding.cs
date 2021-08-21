@@ -38,6 +38,9 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("Normalize", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Normalize_4);
+            args = new Type[]{};
+            method = type.GetMethod("DoTest2", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, DoTest2_5);
 
             field = type.GetField("X", flag);
             app.RegisterCLRFieldGetter(field, get_X_0);
@@ -55,6 +58,10 @@ namespace ILRuntime.Runtime.Generated
             app.RegisterCLRFieldGetter(field, get_Z_3);
             app.RegisterCLRFieldSetter(field, set_Z_3);
             app.RegisterCLRFieldBinding(field, CopyToStack_Z_3, AssignFromStack_Z_3);
+            field = type.GetField("TestDelegate2", flag);
+            app.RegisterCLRFieldGetter(field, get_TestDelegate2_4);
+            app.RegisterCLRFieldSetter(field, set_TestDelegate2_4);
+            app.RegisterCLRFieldBinding(field, CopyToStack_TestDelegate2_4, AssignFromStack_TestDelegate2_4);
 
             app.RegisterCLRMemberwiseClone(type, PerformMemberwiseClone);
 
@@ -366,6 +373,17 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
+        static StackObject* DoTest2_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+
+
+            ILRuntimeTest.TestFramework.TestVector3.DoTest2();
+
+            return __ret;
+        }
+
 
         static object get_X_0(ref object o)
         {
@@ -488,6 +506,30 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.TestVector3 ins =(ILRuntimeTest.TestFramework.TestVector3)o;
             ins.Z = @Z;
             o = ins;
+            return ptr_of_this_method;
+        }
+
+        static object get_TestDelegate2_4(ref object o)
+        {
+            return ILRuntimeTest.TestFramework.TestVector3.TestDelegate2;
+        }
+
+        static StackObject* CopyToStack_TestDelegate2_4(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        {
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestVector3.TestDelegate2;
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static void set_TestDelegate2_4(ref object o, object v)
+        {
+            ILRuntimeTest.TestFramework.TestVector3.TestDelegate2 = (ILRuntimeTest.TestFramework.TestValueTypeDelegate)v;
+        }
+
+        static StackObject* AssignFromStack_TestDelegate2_4(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            ILRuntimeTest.TestFramework.TestValueTypeDelegate @TestDelegate2 = (ILRuntimeTest.TestFramework.TestValueTypeDelegate)typeof(ILRuntimeTest.TestFramework.TestValueTypeDelegate).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ILRuntimeTest.TestFramework.TestVector3.TestDelegate2 = @TestDelegate2;
             return ptr_of_this_method;
         }
 

@@ -343,13 +343,25 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            *a = *val;
-                                            if (isObj)
+                                            if (val->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                             {
-                                                a->Value = idx;
-                                                if (val->ObjectType == ObjectTypes.Null)
+                                                if (isObj)
                                                 {
-                                                    mStack[a->Value] = null;
+                                                    mStack[a->Value] = StackObject.ToObject(val, domain, mStack);
+                                                }
+                                                else
+                                                    throw new NotSupportedException();
+                                            }
+                                            else
+                                            {
+                                                *a = *val;
+                                                if (isObj)
+                                                {
+                                                    a->Value = idx;
+                                                    if (val->ObjectType == ObjectTypes.Null)
+                                                    {
+                                                        mStack[a->Value] = null;
+                                                    }
                                                 }
                                             }
                                         }

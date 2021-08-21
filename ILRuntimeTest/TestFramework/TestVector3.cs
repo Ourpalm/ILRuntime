@@ -29,6 +29,7 @@ namespace ILRuntimeTest.TestFramework
         }
     }
 
+    public delegate void TestValueTypeDelegate(TestVector3 vec);
     public struct TestVector3
     {
         public float X, Y, Z;
@@ -36,6 +37,13 @@ namespace ILRuntimeTest.TestFramework
         public static TestVector3 One = new TestVector3(1, 1, 1);
 
         public static Func<TestVector3, float> TestDelegate;
+
+        public static TestValueTypeDelegate TestDelegate2;
+
+        public static void DoTest2()
+        {
+            TestDelegate2(TestVector3.One);
+        }
 
         public TestVector3(float x, float y, float z)
         {

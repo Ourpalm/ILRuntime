@@ -453,5 +453,19 @@ namespace TestCases
                 Console.WriteLine($"forÄÚ: x = {x}");
             }
         }
+
+        public static void UnitTest_10046()
+        {
+            TestVector3.TestDelegate2 = UnitTest_10046Sub;
+            TestVector3.DoTest2();
+        }
+
+        static void UnitTest_10046Sub(TestVector3 a)
+        {
+            a = a + TestVector3.One2;
+            Console.WriteLine(a);
+            if (a.X != 2)
+                throw new Exception();
+        }
     }
 }

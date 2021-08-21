@@ -59,7 +59,15 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterFunctionDelegate<System.Linq.IGrouping<System.Byte, System.Byte>, ILRuntime.Runtime.Intepreter.ILTypeInstance>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestFramework.TestVector3, System.Single>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.TestVector3>();
             // delegate convertor
+            app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.TestValueTypeDelegate>((act) =>
+            {
+                return new ILRuntimeTest.TestFramework.TestValueTypeDelegate((vec) =>
+                {
+                    ((Action<ILRuntimeTest.TestFramework.TestVector3>)act)(vec);
+                });
+            });
             app.DelegateManager.RegisterDelegateConvertor<System.Predicate<ILRuntime.Runtime.Intepreter.ILTypeInstance>>((act) =>
             {
                 return new System.Predicate<ILRuntime.Runtime.Intepreter.ILTypeInstance>((obj) =>
