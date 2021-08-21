@@ -42,8 +42,10 @@ namespace TestCases
         public static void ReflectionTest04()
         {
             var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
+            var method = t.GetMethod("foo");
             var obj = Activator.CreateInstance(t);
             Console.WriteLine(obj);
+            method.Invoke(obj, new object[] { 100 });
 
             var arr = t.GetCustomAttributes(typeof(TestAttribute), false);
             foreach (var i in arr)
@@ -159,7 +161,7 @@ namespace TestCases
             }
         }
         [Obsolete("gasdgas")]
-        class TestCls
+        public class TestCls
         {
             [ContextStatic]
             [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.Collapsed)]
@@ -185,7 +187,7 @@ namespace TestCases
         [Obsolete]
         [Test(true, TestProp = "1234")]
         [Test]
-        public class TestCls2
+        public class TestCls2 : TestCls
         {
             public TestCls2()
             {
