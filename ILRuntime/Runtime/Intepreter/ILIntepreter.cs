@@ -4594,7 +4594,11 @@ namespace ILRuntime.Runtime.Intepreter
                 return false;
         }
 
+#if DEBUG
+        public void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack, bool noCheck = false)
+#else
         public void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
+#endif
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
             StackObject* dstDescriptor = ILIntepreter.ResolveReference(dst);
@@ -4608,10 +4612,10 @@ namespace ILRuntime.Runtime.Intepreter
                 StackObject* srcVal = Minus(descriptor, i + 1);
                 StackObject* dstVal = Minus(dstDescriptor, i + 1);
 #if DEBUG
-                if (srcVal->ObjectType != dstVal->ObjectType)
+                if (!noCheck && srcVal->ObjectType != dstVal->ObjectType)
                     throw new NotSupportedException();
 #endif
-                switch (dstVal->ObjectType)
+                switch (srcVal->ObjectType)
                 {
                     case ObjectTypes.Object:
                     case ObjectTypes.ArrayReference:
