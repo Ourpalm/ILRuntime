@@ -49,6 +49,9 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_IDictionary_Binding.Register(app);
             System_Byte_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
+            System_Int32_Array_Binding.Register(app);
+            ILRuntimeTest_TestBase_StaticGenericMethods_Binding.Register(app);
+            System_Int32_Array_Binding_Array_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Binding.Register(app);
             System_Linq_Enumerable_Binding.Register(app);
             System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.Register(app);
@@ -63,7 +66,6 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestBase_SubExtensionClass_Binding.Register(app);
             ILRuntimeTest_TestBase_SubExtensionClass_1_Int32_Binding.Register(app);
             System_ArgumentException_Binding.Register(app);
-            ILRuntimeTest_TestBase_StaticGenericMethods_Binding.Register(app);
             System_Action_1_ILTypeInstance_Binding.Register(app);
             System_Array_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding.Register(app);
@@ -119,8 +121,6 @@ namespace ILRuntime.Runtime.Generated
             System_Enum_Binding.Register(app);
             System_Collections_IEnumerator_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_Int64_Binding.Register(app);
-            System_Int32_Array_Binding.Register(app);
-            System_Int32_Array_Binding_Array_Binding.Register(app);
             System_Double_Binding.Register(app);
             System_Int32_Array3_Binding.Register(app);
             System_Int32_Array2_Binding.Register(app);

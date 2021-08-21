@@ -43,5 +43,10 @@ namespace ILRuntimeTest.TestBase
         {
             Console.WriteLine("进来了");
         }
+
+        public static void ArrayMethod<T>(T[][] val)
+        {
+            Console.WriteLine(val.Length);
+        }
     }
 }

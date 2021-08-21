@@ -22,12 +22,6 @@ namespace ILRuntime.Runtime.Generated
             MethodBase method;
             Type[] args;
             Type type = typeof(ILRuntimeTest.TestBase.StaticGenericMethods);
-            args = new Type[]{typeof(System.Action)};
-            method = type.GetMethod("StaticMethod", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, StaticMethod_0);
-            args = new Type[]{typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass>)};
-            method = type.GetMethod("StaticMethod", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, StaticMethod_1);
             Dictionary<string, List<MethodInfo>> genericMethods = new Dictionary<string, List<MethodInfo>>();
             List<MethodInfo> lst = null;                    
             foreach(var m in type.GetMethods())
@@ -43,6 +37,40 @@ namespace ILRuntime.Runtime.Generated
                 }
             }
             args = new Type[]{typeof(System.Int32)};
+            if (genericMethods.TryGetValue("ArrayMethod", out lst))
+            {
+                foreach(var m in lst)
+                {
+                    if(m.MatchGenericParameters(args, typeof(void), typeof(System.Int32[][])))
+                    {
+                        method = m.MakeGenericMethod(args);
+                        app.RegisterCLRMethodRedirection(method, ArrayMethod_0);
+
+                        break;
+                    }
+                }
+            }
+            args = new Type[]{typeof(System.Int32[])};
+            if (genericMethods.TryGetValue("ArrayMethod", out lst))
+            {
+                foreach(var m in lst)
+                {
+                    if(m.MatchGenericParameters(args, typeof(void), typeof(System.Int32[][][])))
+                    {
+                        method = m.MakeGenericMethod(args);
+                        app.RegisterCLRMethodRedirection(method, ArrayMethod_1);
+
+                        break;
+                    }
+                }
+            }
+            args = new Type[]{typeof(System.Action)};
+            method = type.GetMethod("StaticMethod", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, StaticMethod_2);
+            args = new Type[]{typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass>)};
+            method = type.GetMethod("StaticMethod", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, StaticMethod_3);
+            args = new Type[]{typeof(System.Int32)};
             if (genericMethods.TryGetValue("StaticMethod", out lst))
             {
                 foreach(var m in lst)
@@ -50,7 +78,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.Func<System.Int32>)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, StaticMethod_2);
+                        app.RegisterCLRMethodRedirection(method, StaticMethod_4);
 
                         break;
                     }
@@ -64,7 +92,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.Func<ILRuntimeTest.TestBase.ExtensionClass, System.Int32>)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, StaticMethod_3);
+                        app.RegisterCLRMethodRedirection(method, StaticMethod_5);
 
                         break;
                     }
@@ -72,10 +100,10 @@ namespace ILRuntime.Runtime.Generated
             }
             args = new Type[]{typeof(System.Func<System.Threading.Tasks.Task>)};
             method = type.GetMethod("StaticMethod", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, StaticMethod_4);
+            app.RegisterCLRMethodRedirection(method, StaticMethod_6);
             args = new Type[]{typeof(System.Func<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task>)};
             method = type.GetMethod("StaticMethod", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, StaticMethod_5);
+            app.RegisterCLRMethodRedirection(method, StaticMethod_7);
             args = new Type[]{typeof(System.Int32)};
             if (genericMethods.TryGetValue("StaticMethod", out lst))
             {
@@ -84,7 +112,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.Func<System.Threading.Tasks.Task<System.Int32>>)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, StaticMethod_6);
+                        app.RegisterCLRMethodRedirection(method, StaticMethod_8);
 
                         break;
                     }
@@ -98,7 +126,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.Func<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task<System.Int32>>)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, StaticMethod_7);
+                        app.RegisterCLRMethodRedirection(method, StaticMethod_9);
 
                         break;
                     }
@@ -106,13 +134,45 @@ namespace ILRuntime.Runtime.Generated
             }
             args = new Type[]{typeof(System.String), typeof(System.Collections.Generic.KeyValuePair<System.String, System.String[]>[])};
             method = type.GetMethod("Method", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Method_8);
+            app.RegisterCLRMethodRedirection(method, Method_10);
 
 
         }
 
 
-        static StackObject* StaticMethod_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* ArrayMethod_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32[][] @val = (System.Int32[][])typeof(System.Int32[][]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            __intp.Free(ptr_of_this_method);
+
+
+            ILRuntimeTest.TestBase.StaticGenericMethods.ArrayMethod<System.Int32>(@val);
+
+            return __ret;
+        }
+
+        static StackObject* ArrayMethod_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32[][][] @val = (System.Int32[][][])typeof(System.Int32[][][]).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            __intp.Free(ptr_of_this_method);
+
+
+            ILRuntimeTest.TestBase.StaticGenericMethods.ArrayMethod<System.Int32[]>(@val);
+
+            return __ret;
+        }
+
+        static StackObject* StaticMethod_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -128,7 +188,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* StaticMethod_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* StaticMethod_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -144,7 +204,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* StaticMethod_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* StaticMethod_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -160,7 +220,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* StaticMethod_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* StaticMethod_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -176,7 +236,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* StaticMethod_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* StaticMethod_6(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -192,7 +252,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* StaticMethod_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* StaticMethod_7(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -208,7 +268,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* StaticMethod_6(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* StaticMethod_8(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -224,7 +284,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* StaticMethod_7(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* StaticMethod_9(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -240,7 +300,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* Method_8(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Method_10(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
