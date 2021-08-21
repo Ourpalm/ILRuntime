@@ -2693,11 +2693,12 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else
                                                 esp = Execute((ILMethod)m, esp, out unhandledException);
+
+                                            ValueTypeBasePointer = bp;
                                             for (int i = m.ParameterCount - 1; i >= 0; i--)
                                             {
                                                 Free(Add(a, i));
                                             }
-                                            ValueTypeBasePointer = bp;
                                             if (isValueType)
                                             {
                                                 var ins = objRef - 1 - 1;
