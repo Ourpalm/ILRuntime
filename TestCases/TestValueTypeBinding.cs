@@ -432,5 +432,26 @@ namespace TestCases
 
             IntA a = new IntA(100);
         }
+
+        public static void UnitTest_10045()
+        {
+            JInt i = new JInt();
+            if (i++ != 0)
+                throw new Exception();
+            if (++i != 2)
+                throw new Exception();
+            if (i-- != 2)
+                throw new Exception();
+            i -= 10;
+            if (i != -9)
+                throw new Exception();
+            --i;
+            Console.WriteLine(i);
+
+            for (JInt x = 20; x > 0; x--)
+            {
+                Console.WriteLine($"forÄÚ: x = {x}");
+            }
+        }
     }
 }

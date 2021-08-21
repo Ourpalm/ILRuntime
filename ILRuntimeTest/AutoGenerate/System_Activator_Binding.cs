@@ -70,6 +70,20 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
             }
+            args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3)};
+            if (genericMethods.TryGetValue("CreateInstance", out lst))
+            {
+                foreach(var m in lst)
+                {
+                    if(m.MatchGenericParameters(args, typeof(ILRuntimeTest.TestFramework.TestVector3)))
+                    {
+                        method = m.MakeGenericMethod(args);
+                        app.RegisterCLRMethodRedirection(method, CreateInstance_4);
+
+                        break;
+                    }
+                }
+            }
             args = new Type[]{typeof(System.Object)};
             if (genericMethods.TryGetValue("CreateInstance", out lst))
             {
@@ -78,7 +92,7 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Object)))
                     {
                         method = m.MakeGenericMethod(args);
-                        app.RegisterCLRMethodRedirection(method, CreateInstance_4);
+                        app.RegisterCLRMethodRedirection(method, CreateInstance_5);
 
                         break;
                     }
@@ -163,6 +177,22 @@ namespace ILRuntime.Runtime.Generated
         }
 
         static StackObject* CreateInstance_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+
+
+            var result_of_this_method = System.Activator.CreateInstance<ILRuntimeTest.TestFramework.TestVector3>();
+
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
+        }
+
+        static StackObject* CreateInstance_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);

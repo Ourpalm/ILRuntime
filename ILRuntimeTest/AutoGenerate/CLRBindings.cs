@@ -112,7 +112,6 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
             System_Byte_Binding.Register(app);
             System_Char_Binding.Register(app);
-            System_Double_Binding.Register(app);
             System_IO_File_Binding.Register(app);
             System_IO_FileStream_Binding.Register(app);
             System_IO_Stream_Binding.Register(app);
@@ -122,6 +121,7 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_String_Int64_Binding.Register(app);
             System_Int32_Array_Binding.Register(app);
             System_Int32_Array_Binding_Array_Binding.Register(app);
+            System_Double_Binding.Register(app);
             System_Int32_Array3_Binding.Register(app);
             System_Int32_Array2_Binding.Register(app);
             System_UInt16_Binding.Register(app);
@@ -157,8 +157,11 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding.Register(app);
             System_AccessViolationException_Binding.Register(app);
             System_Func_1_TestVector3_Binding.Register(app);
+            ILRuntimeTest_TestFramework_JInt_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Object_Object_Binding.Register(app);
             System_IComparable_1_Int32_Binding.Register(app);
+            System_Collections_Generic_Dictionary_2_String_Single_Array_Binding.Register(app);
+            System_Collections_Generic_Dictionary_2_String_Single_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding_Enumerator_Binding.Register(app);
 
             ILRuntime.CLR.TypeSystem.CLRType __clrType = null;

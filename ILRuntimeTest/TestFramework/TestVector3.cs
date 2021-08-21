@@ -121,4 +121,97 @@ namespace ILRuntimeTest.TestFramework
         public float A;
         public float B;
     }
+
+    public struct JInt
+    {
+        private int _obscuredInt;
+        private int _obscuredKey;
+        private int _originalValue;
+
+        private int Value
+        {
+            get
+            {
+                var result = _obscuredInt - _obscuredKey;
+                if (!_originalValue.Equals(result))
+                {
+                    //AntiCheatHelper.OnDetected();
+                }
+                return result;
+            }
+
+            set
+            {
+                _originalValue = value;
+                unchecked
+                {
+                    //_obscuredKey = JRandom.RandomNum(int.MaxValue - value);
+                    _obscuredInt = value + _obscuredKey;
+                }
+            }
+        }
+
+        public JInt(int val = 0)
+        {
+            _obscuredInt = 0;
+            _obscuredKey = 0;
+            _originalValue = 0;
+            Value = val;
+        }
+
+        public JInt(string val = "0")
+        {
+            _obscuredInt = 0;
+            _obscuredKey = 0;
+            _originalValue = 0;
+            var result = int.TryParse(val, out var _value);
+            if (!result)
+            {
+                //Log.PrintError($"无法将{val}变为{Value.GetType()},已改为0");
+                Value = 0;
+            }
+            else
+            {
+                Value = _value;
+            }
+        }
+
+        public static implicit operator JInt(int val) => new JInt(val);
+        public static implicit operator int(JInt val) => val.Value;
+        public static bool operator ==(JInt a, JInt b) => a.Value == b.Value;
+        public static bool operator !=(JInt a, JInt b) => a.Value != b.Value;
+
+        public static JInt operator ++(JInt a)
+        {
+            a.Value++;
+            return a;
+        }
+
+        public static JInt operator --(JInt a)
+        {
+            a.Value--;
+            return a;
+        }
+
+        public static JInt operator +(JInt a, JInt b) => new JInt(a.Value + b.Value);
+        public static JInt operator +(JInt a, int b) => new JInt(a.Value + b);
+
+        public static JInt operator -(JInt a, JInt b) => new JInt(a.Value - b.Value);
+        public static JInt operator -(JInt a, int b) => new JInt(a.Value - b);
+
+        public static JInt operator *(JInt a, JInt b) => new JInt(a.Value * b.Value);
+        public static JInt operator *(JInt a, int b) => new JInt(a.Value * b);
+
+        public static JInt operator /(JInt a, JInt b) => new JInt(a.Value / b.Value);
+        public static JInt operator /(JInt a, int b) => new JInt(a.Value / b);
+
+        public static JInt operator %(JInt a, JInt b) => new JInt(a.Value % b.Value);
+        public static JInt operator %(JInt a, int b) => new JInt(a.Value % b);
+
+        public override string ToString() => Value.ToString();
+
+        public override int GetHashCode() => Value.GetHashCode();
+
+        public override bool Equals(object obj) => Value.Equals((obj is JInt ? (JInt)obj : default).Value);
+    }
 }
