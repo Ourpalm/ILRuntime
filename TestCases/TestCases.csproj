@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="ActivatorCreateInstanceTest.cs" />
     <Compile Include="AsyncAwaitTest.cs" />
+    <Compile Include="CLRBindingTest.cs" />
     <Compile Include="DelegateInnerTest.cs" />
     <Compile Include="GenericMethodTest.cs" />
     <Compile Include="JsonTest.cs" />

@@ -4832,7 +4832,7 @@ namespace ILRuntime.Runtime.Intepreter
                             res = ((int[])arr)[idx];
                         else
                         {
-                            res = (int)arr.GetValue(idx);
+                            res = (int)Convert.ToInt32(arr.GetValue(idx));
                         }
                     }
                     break;

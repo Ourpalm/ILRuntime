@@ -20,6 +20,8 @@ namespace ILRuntimeTest.TestFramework
             startIndex++;
             return startIndex.ToString() + length;
         }
+
+        public static void setBit(ref byte value, int pos, int bit) { value = (byte)(value & ~(1 << pos) | (bit << pos)); }
     }
 
     [NeedAdaptor]

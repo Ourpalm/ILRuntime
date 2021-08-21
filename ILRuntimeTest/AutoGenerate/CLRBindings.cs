@@ -47,6 +47,8 @@ namespace ILRuntime.Runtime.Generated
             System_Threading_Tasks_Task_1_Int32_Binding.Register(app);
             System_Runtime_CompilerServices_TaskAwaiter_1_Int32_Binding.Register(app);
             System_Collections_IDictionary_Binding.Register(app);
+            System_Byte_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
             System_Collections_Generic_List_1_Int32_Binding.Register(app);
             System_Linq_Enumerable_Binding.Register(app);
             System_Collections_Generic_List_1_Dictionary_2_String_Object_Binding.Register(app);
@@ -109,8 +111,6 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_Int32_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Boolean_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStruct_Binding.Register(app);
-            ILRuntimeTest_TestFramework_TestClass3_Binding.Register(app);
-            System_Byte_Binding.Register(app);
             System_Char_Binding.Register(app);
             System_IO_File_Binding.Register(app);
             System_IO_FileStream_Binding.Register(app);
