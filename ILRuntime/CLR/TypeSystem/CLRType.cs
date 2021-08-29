@@ -346,7 +346,8 @@ namespace ILRuntime.CLR.TypeSystem
 
                     if (memberwiseClone != null)
                     {
-                        memberwiseCloneDelegate = (ref object t) => memberwiseClone.Invoke(t, null);
+                        var del = (Func<object, object>)memberwiseClone.CreateDelegate(typeof(Func<object, object>));
+                        memberwiseCloneDelegate = (ref object t) => del(t);
                     }
                     else
                     {
