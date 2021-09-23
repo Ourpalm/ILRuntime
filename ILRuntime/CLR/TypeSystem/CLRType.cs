@@ -561,11 +561,11 @@ namespace ILRuntime.CLR.TypeSystem
         public IMethod GetVirtualMethod(IMethod method)
         {
             var m = GetMethod(method.Name, method.Parameters, null, method.ReturnType);
-            if (m == null)
-            {
-                return method;
-            }
-            else
+            //if (m == null)
+            //{
+            //    return method;
+            //}
+            //else
                 return m;
         }
 
