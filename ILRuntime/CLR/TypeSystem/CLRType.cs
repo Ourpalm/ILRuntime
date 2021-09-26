@@ -159,9 +159,9 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (genericArguments != null)
                 {
-                    foreach(var i in genericArguments)
+                    foreach (var i in genericArguments)
                     {
-                        if(i.Value is ILType && i.Value.HasGenericParameter)
+                        if (i.Value is ILType && i.Value.HasGenericParameter)
                         {
                             return true;
                         }
@@ -218,12 +218,12 @@ namespace ILRuntime.CLR.TypeSystem
 
         public bool IsArray
         {
-            get;private set;
+            get; private set;
         }
 
         public int ArrayRank
         {
-            get;private set;
+            get; private set;
         }
 
         public bool IsValueType
@@ -372,7 +372,7 @@ namespace ILRuntime.CLR.TypeSystem
         {
             interfaceInitialized = true;
             var arr = clrType.GetInterfaces();
-            if (arr.Length >0)
+            if (arr.Length > 0)
             {
                 interfaces = new IType[arr.Length];
                 for (int i = 0; i < interfaces.Length; i++)
@@ -475,7 +475,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        KeyValuePair<CLRFieldBindingDelegate,CLRFieldBindingDelegate> GetFieldBinding(int hash)
+        KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate> GetFieldBinding(int hash)
         {
             var dic = fieldBindingCache;
             KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate> res;
@@ -541,7 +541,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
             foreach (var i in clrType.GetConstructors())
             {
-                constructors.Add(new CLRMethod(i, this, appdomain));
+                constructors.Add(new CLRMethod(i, this, appdomain, false));
             }
         }
         public List<IMethod> GetMethods()
@@ -588,8 +588,8 @@ namespace ILRuntime.CLR.TypeSystem
             foreach (var i in fields)
             {
                 int hashCode = i.GetHashCode();
-
-                if (i.IsPublic || i.IsFamily || hasValueTypeBinder)
+                //if (i.IsPublic || i.IsFamily || hasValueTypeBinder)
+                if (i.IsPublic || !i.IsPrivate || i.IsFamily || hasValueTypeBinder) //Kailash Modify
                 {
                     fieldMapping[i.Name] = hashCode;
                     fieldInfoCache[hashCode] = i;
@@ -618,7 +618,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
 
                 KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate> binding;
-                if(AppDomain.FieldBindingMap.TryGetValue(i, out binding))
+                if (AppDomain.FieldBindingMap.TryGetValue(i, out binding))
                 {
                     if (fieldBindingCache == null) fieldBindingCache = new Dictionary<int, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>>();
                     fieldBindingCache[hashCode] = binding;
@@ -648,20 +648,19 @@ namespace ILRuntime.CLR.TypeSystem
 
             return -1;
         }
-
-        public IType FindGenericArgument ( string key )
+        public IType FindGenericArgument(string key)
         {
-            var o = this.Generic ( key );
-            if ( o == null )
+            var o = this.Generic(key);
+            if (o == null)
             {
-                var aGenericParameters = this.TypeForCLR.GetGenericArguments ();
-                if ( aGenericParameters !=null )
+                var aGenericParameters = this.TypeForCLR.GetGenericArguments();
+                if (aGenericParameters != null)
                 {
-                    for ( int i = 0; i < aGenericParameters.Length; i++ )
+                    for (int i = 0; i < aGenericParameters.Length; i++)
                     {
-                        if ( aGenericParameters [ i ].Name == key )
+                        if (aGenericParameters[i].Name == key)
                         {
-                            return this.Generic ( "!" + i );
+                            return this.Generic("!" + i);
                         }
                     }
                 }
@@ -669,15 +668,15 @@ namespace ILRuntime.CLR.TypeSystem
             return o;
         }
 
-        private IType Generic ( string key )
+        private IType Generic(string key)
         {
-            if ( this.genericArguments != null )
+            if (this.genericArguments != null)
             {
-                for ( int i = 0; i < this.genericArguments.Length; i++ )
+                for (int i = 0; i < this.genericArguments.Length; i++)
                 {
-                    if ( this.genericArguments [ i ].Key == key )
+                    if (this.genericArguments[i].Key == key)
                     {
-                        return this.genericArguments [ i ].Value;
+                        return this.genericArguments[i].Value;
                     }
                 }
             }
@@ -880,6 +879,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
             return null;
         }
+
         public bool CanAssignTo(IType type)
         {
             if (this == type)
