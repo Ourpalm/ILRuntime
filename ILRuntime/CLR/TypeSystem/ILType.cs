@@ -859,47 +859,33 @@ namespace ILRuntime.CLR.TypeSystem
 
         bool CheckGenericArguments ( ILMethod i, IType [] genericArguments )
         {
-            if ( genericArguments == null )
+            if (genericArguments == null)
             {
-                return i.GenericArguments == null;
+                return i.GenericArugmentsArray == null;
             }
             else
             {
-                if ( i.GenericArguments == null )
+                if (i.GenericArugmentsArray == null)
                     return false;
-                else if ( i.GenericArguments.Length != genericArguments.Length )
+
+                if (i.GenericArugmentsArray.Length != genericArguments.Length)
                     return false;
-                if ( i.GenericArguments.Length == genericArguments.Length )
+
+                for (int j = 0; j < genericArguments.Length; j++)
                 {
-                    for ( int j = 0; j < genericArguments.Length; j++ )
-                    {
-                        if ( i.GenericArguments [ j ].Value != genericArguments [ j ] )
-                            return false;
-                    }
-                    return true;
+                    if (i.GenericArugmentsArray[j] != genericArguments[j])
+                        return false;
                 }
-                else
-                    return false;
+                return true;
             }
         }
 
-        bool IsGenericArgumentMatch ( IType p, IType p2, IType [] genericArguments )
+        bool IsGenericArgumentMatch (IType p2, IType [] genericArguments )
         {
-            bool found = false;
             foreach ( var a in genericArguments )
-            {
-                if ( a == p2 )
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if ( !found )
-            {
-                return false;
-            }
-            else
-                return true;
+                return a == p2;
+         
+            return false;
         }
 
         ILMethod CheckGenericParams ( ILMethod i, List<IType> param, IType [] genericArguments, ref bool match )
@@ -912,7 +898,7 @@ namespace ILRuntime.CLR.TypeSystem
                     var p = i.Parameters [ j ];
                     if ( p.IsGenericParameter )
                     {
-                        if ( IsGenericArgumentMatch ( p, param [ j ], genericArguments ) )
+                        if ( IsGenericArgumentMatch (param [ j ], genericArguments ) )
                             continue;
                         else
                         {
@@ -932,7 +918,7 @@ namespace ILRuntime.CLR.TypeSystem
                         p2 = p2.ElementType;
                     if ( p.IsGenericParameter )
                     {
-                        if ( i.Parameters [ j ].IsByRef == param [ j ].IsByRef && i.Parameters [ j ].IsArray == param [ j ].IsArray && IsGenericArgumentMatch ( p, p2, genericArguments ) )
+                        if ( i.Parameters [ j ].IsByRef == param [ j ].IsByRef && i.Parameters [ j ].IsArray == param [ j ].IsArray && IsGenericArgumentMatch (p2, genericArguments ) )
                             continue;
                         else
                         {

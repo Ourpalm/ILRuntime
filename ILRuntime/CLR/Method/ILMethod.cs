@@ -25,7 +25,7 @@ namespace ILRuntime.CLR.Method
         ILRuntime.Runtime.Enviorment.AppDomain appdomain;
         ILType declaringType;
         ExceptionHandler[] exceptionHandler, exceptionHandlerR;
-        KeyValuePair<string, IType>[] genericParameters;
+        string[] genericArgumentKeys;
         IType[] genericArguments;
         Dictionary<int, int[]> jumptables, jumptablesR;
         bool isDelegateInvoke;
@@ -134,15 +134,20 @@ namespace ILRuntime.CLR.Method
             get
             {
                 if (IsGenericInstance)
-                    return 0;
-                return def.GenericParameters.Count;
+                {
+                    return genericArguments.Length;
+                }
+                else
+                {
+                    return def.GenericParameters.Count;
+                }
             }
         }
         public bool IsGenericInstance
         {
             get
             {
-                return genericParameters != null;
+                return genericArguments != null;
             }
         }
         public Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> Variables
@@ -152,8 +157,6 @@ namespace ILRuntime.CLR.Method
                 return variables;
             }
         }
-
-        public KeyValuePair<string, IType>[] GenericArguments { get { return genericParameters; } }
 
         public IType[] GenericArugmentsArray { get { return genericArguments; } }
 
@@ -205,12 +208,12 @@ namespace ILRuntime.CLR.Method
                 isDelegateInvoke = true;
             this.appdomain = domain;
             paramCnt = def.HasParameters ? def.Parameters.Count : 0;
-            if(def.HasCustomAttributes)
+            if (def.HasCustomAttributes)
             {
-                for(int i = 0; i < def.CustomAttributes.Count; i++)
+                for (int i = 0; i < def.CustomAttributes.Count; i++)
                 {
                     int f;
-                    if(def.CustomAttributes[i].GetJITFlags(domain, out f))
+                    if (def.CustomAttributes[i].GetJITFlags(domain, out f))
                     {
                         this.jitFlags = f;
                         break;
@@ -266,12 +269,13 @@ namespace ILRuntime.CLR.Method
         public IType FindGenericArgument(string name)
         {
             IType res = declaringType.FindGenericArgument(name);
-            if (res == null && genericParameters != null)
+
+            if (res == null && genericArguments != null)
             {
-                foreach (var i in genericParameters)
+                for (int i = 0, length = genericArguments.Length; i < length; i++)
                 {
-                    if (i.Key == name)
-                        return i.Value;
+                    if (genericArgumentKeys[i] == name)
+                        return genericArguments[i];
                 }
             }
             else
@@ -707,7 +711,7 @@ namespace ILRuntime.CLR.Method
                         var m = appdomain.GetMethod(token, declaringType, this, out invalidToken);
                         if (m != null)
                         {
-                            if(code.Code == OpCodeEnum.Callvirt && m is ILMethod)
+                            if (code.Code == OpCodeEnum.Callvirt && m is ILMethod)
                             {
                                 ILMethod ilm = (ILMethod)m;
                                 if (!ilm.def.IsAbstract && !ilm.def.IsVirtual && !ilm.DeclearingType.IsInterface)
@@ -820,7 +824,7 @@ namespace ILRuntime.CLR.Method
                 if (_ref.IsGenericInstance)
                 {
                     GenericInstanceType gi = (GenericInstanceType)_ref;
-                    foreach(var i in gi.GenericArguments)
+                    foreach (var i in gi.GenericArguments)
                     {
                         if (CheckHasGenericParamter(i))
                             return true;
@@ -908,16 +912,15 @@ namespace ILRuntime.CLR.Method
 
         public IMethod MakeGenericMethod(IType[] genericArguments)
         {
-            KeyValuePair<string, IType>[] genericParameters = new KeyValuePair<string, IType>[genericArguments.Length];
+            string[] genericArgumentKeys = new string[genericArguments.Length];
             for (int i = 0; i < genericArguments.Length; i++)
             {
                 string name = def.GenericParameters[i].Name;
-                IType val = genericArguments[i];
-                genericParameters[i] = new KeyValuePair<string, IType>(name, val);
+                genericArgumentKeys[i] = name;
             }
 
             ILMethod m = new ILMethod(def, declaringType, appdomain, jitFlags);
-            m.genericParameters = genericParameters;
+            m.genericArgumentKeys = genericArgumentKeys;
             m.genericArguments = genericArguments;
             if (m.def.ReturnType.IsGenericParameter)
             {
