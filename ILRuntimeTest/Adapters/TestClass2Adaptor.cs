@@ -154,7 +154,6 @@ namespace ILRuntimeTest
 
     public class IDisposableAdapter : CrossBindingAdaptor
     {
-        static CrossBindingMethodInfo mDispose_0 = new CrossBindingMethodInfo("Dispose");
         public override Type BaseCLRType
         {
             get
@@ -178,6 +177,7 @@ namespace ILRuntimeTest
 
         public class Adapter : System.IDisposable, CrossBindingAdaptorType
         {
+            CrossBindingMethodInfo mDispose_0 = new CrossBindingMethodInfo("Dispose");
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
 

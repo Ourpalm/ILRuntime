@@ -268,6 +268,23 @@ namespace TestCases
                 throw new Exception();
         }
 
+        public static void InheritanceTest19()
+        {
+            TestExplicitInterface a = new TestExplicitInterface();
+            ((IDisposable)a).Dispose();
+            if (!a.Called)
+                throw new Exception();
+        }
+
+        class TestExplicitInterface : IDisposable
+        {
+            public bool Called { get; set; }
+            void IDisposable.Dispose()
+            {
+                Called = true;
+            }
+        }
+
         static void Alloc<T>(out T value)where T : TestClass2
         {
             value = TestClass2.Alloc() as T;

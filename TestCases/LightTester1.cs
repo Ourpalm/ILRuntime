@@ -463,5 +463,13 @@ namespace TestCases
                 }
             }
         }
+
+        static int a = 0;
+        public static void UnitTest_1019()
+        {
+            uint x = 1000;
+            int xx = (int)x;
+            a = xx;
+        }
     }
 }
