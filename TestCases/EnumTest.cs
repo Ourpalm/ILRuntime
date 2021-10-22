@@ -342,6 +342,84 @@ namespace TestCases
             if (res >= 0)
                 throw new Exception();
         }
+
+        public static void Test30()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test();
+        }
+        public static void Test31()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test1();
+        }
+        public static void Test32()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test2();
+        }
+        public static void Test33()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test3();
+        }
+        private class TestClass1
+        {
+            private TestClass2 TestValue = new TestClass2();
+
+            public void Test()
+            {
+                for (int i = 0; i < 10; ++i)
+                {
+                    TestValue.Test1();
+                    TestValue.Test2();
+                    TestValue.Test3();
+                }
+            }
+            public void Test1()
+            {
+                for (int i = 0; i < 10; ++i)
+                    TestValue.Test1();
+            }
+            public void Test2()
+            {
+                for (int i = 0; i < 10; ++i)
+                    TestValue.Test2();
+            }
+            public void Test3()
+            {
+                for (int i = 0; i < 10; ++i)
+                    TestValue.Test3();
+            }
+        }
+
+        private class TestClass2
+        {
+            private object _testValue = TestEnumFlag.Feature3;
+
+            public void Test1()
+            {
+                if (_testValue is TestEnumFlag.Feature3)
+                    return;
+                throw new System.Exception();
+            }
+            public void Test2()
+            {
+                if (_testValue.Equals(TestEnumFlag.Feature3))
+                    return;
+                throw new System.Exception();
+            }
+            public void Test3()
+            {
+                if (object.Equals(_testValue, TestEnumFlag.Feature3))
+                    return;
+                throw new System.Exception();
+            }
+        }
         class SystemType
         {
             public int value = 10;
