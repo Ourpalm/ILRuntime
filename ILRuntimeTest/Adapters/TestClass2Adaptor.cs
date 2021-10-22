@@ -7,54 +7,6 @@ namespace ILRuntimeTest
 {
     public class TestClass2Adapter : CrossBindingAdaptor
     {
-        static bool isInvokingToString;
-        static CrossBindingMethodInfo mVMethod1_0 = new CrossBindingMethodInfo("VMethod1");
-        static CrossBindingFunctionInfo<System.Boolean> mVMethod2_1 = new CrossBindingFunctionInfo<System.Boolean>("VMethod2");
-        class VMethod3_2Info : CrossBindingMethodInfo
-        {
-            static Type[] pTypes = new Type[] { typeof(System.Int32).MakeByRefType() };
-
-            public VMethod3_2Info()
-                : base("VMethod3")
-            {
-
-            }
-
-            protected override Type ReturnType { get { return null; } }
-
-            protected override Type[] Parameters { get { return pTypes; } }
-            public void Invoke(ILTypeInstance instance, ref System.Int32 arg)
-            {
-                EnsureMethod(instance);
-                if (method != null)
-                {
-                    invoking = true;
-                    try
-                    {
-                        using (var ctx = domain.BeginInvoke(method))
-                        {
-                            ctx.PushObject(arg);
-                            ctx.PushObject(instance);
-                            ctx.PushReference(0);
-                            ctx.Invoke();
-                            arg = ctx.ReadObject<System.Int32>(0);
-                        }
-                    }
-                    finally
-                    {
-                        invoking = false;
-                    }
-                }
-            }
-
-            public override void Invoke(ILTypeInstance instance)
-            {
-                throw new NotSupportedException();
-            }
-        }
-        static VMethod3_2Info mVMethod3_2 = new VMethod3_2Info();
-        static CrossBindingMethodInfo mAbMethod1_3 = new CrossBindingMethodInfo("AbMethod1");
-        static CrossBindingFunctionInfo<System.Int32, System.Single> mAbMethod2_4 = new CrossBindingFunctionInfo<System.Int32, System.Single>("AbMethod2");
         public override Type BaseCLRType
         {
             get
@@ -78,6 +30,56 @@ namespace ILRuntimeTest
 
         public class Adapter : ILRuntimeTest.TestFramework.TestClass2, CrossBindingAdaptorType
         {
+            CrossBindingMethodInfo mVMethod1_0 = new CrossBindingMethodInfo("VMethod1");
+            CrossBindingFunctionInfo<System.Boolean> mVMethod2_1 = new CrossBindingFunctionInfo<System.Boolean>("VMethod2");
+            class VMethod3_2Info : CrossBindingMethodInfo
+            {
+                static Type[] pTypes = new Type[] { typeof(System.Int32).MakeByRefType() };
+
+                public VMethod3_2Info()
+                    : base("VMethod3")
+                {
+
+                }
+
+                protected override Type ReturnType { get { return null; } }
+
+                protected override Type[] Parameters { get { return pTypes; } }
+                public void Invoke(ILTypeInstance instance, ref System.Int32 arg)
+                {
+                    EnsureMethod(instance);
+
+                    if (method != null)
+                    {
+                        invoking = true;
+                        try
+                        {
+                            using (var ctx = domain.BeginInvoke(method))
+                            {
+                                ctx.PushInteger(arg);
+                                ctx.PushObject(instance);
+                                ctx.PushReference(0);
+                                ctx.Invoke();
+                                arg = ctx.ReadInteger(0);
+                            }
+                        }
+                        finally
+                        {
+                            invoking = false;
+                        }
+                    }
+                }
+
+                public override void Invoke(ILTypeInstance instance)
+                {
+                    throw new NotSupportedException();
+                }
+            }
+            VMethod3_2Info mVMethod3_2 = new VMethod3_2Info();
+            CrossBindingMethodInfo mAbMethod1_3 = new CrossBindingMethodInfo("AbMethod1");
+            CrossBindingFunctionInfo<System.Int32, System.Single> mAbMethod2_4 = new CrossBindingFunctionInfo<System.Int32, System.Single>("AbMethod2");
+
+            bool isInvokingToString;
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
 
@@ -131,8 +133,8 @@ namespace ILRuntimeTest
             public override string ToString()
             {
                 IMethod m = appdomain.ObjectType.GetMethod("ToString", 0);
-                var vm = instance.Type.GetVirtualMethod(m);
-                if (vm == null || vm is ILMethod)
+                m = instance.Type.GetVirtualMethod(m);
+                if (m == null || m is ILMethod)
                 {
                     if (!isInvokingToString)
                     {
