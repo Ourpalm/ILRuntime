@@ -1224,6 +1224,22 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 throw new NotSupportedException("Cannot invoke CLRMethod");
         }
+        
+
+        bool IsInvalidMethodReference(MethodReference _ref)
+        {
+            if ((_ref.DeclaringType.Name == "Object" || _ref.DeclaringType.Name == "Attribute")
+                    && _ref.Name == ".ctor"
+                    && _ref.DeclaringType.Namespace == "System"
+                    && _ref.ReturnType.Name == "Void"
+                    && _ref.ReturnType.Namespace == "System")
+            {
+                return true;
+            }
+            return false;
+        }
+        
+        
         internal IMethod GetMethod(object token, ILType contextType, ILMethod contextMethod, out bool invalidToken)
         {
             string methodname = null;
@@ -1241,17 +1257,13 @@ namespace ILRuntime.Runtime.Enviorment
             if (token is Mono.Cecil.MethodReference)
             {
                 Mono.Cecil.MethodReference _ref = (token as Mono.Cecil.MethodReference);
-                var refFullName = _ref.FullName;
-                if (refFullName == "System.Void System.Object::.ctor()")
+
+                if(IsInvalidMethodReference(_ref))
                 {
                     mapMethod[hashCode] = null;
                     return null;
                 }
-                if (refFullName == "System.Void System.Attribute::.ctor()")
-                {
-                    mapMethod[hashCode] = null;
-                    return null;
-                }
+                
                 methodname = _ref.Name;
                 var typeDef = _ref.DeclaringType;
                 type = GetType(typeDef, contextType, contextMethod);
