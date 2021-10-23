@@ -276,6 +276,22 @@ namespace TestCases
                 throw new Exception();
         }
 
+        public static void InheritanceTest20()
+        {
+            var mapa = new MapA();
+            var mapb = new MapB();
+            mapb.Add("11", new BModel());
+            var aList = new System.Collections.Generic.List<AModel>();
+            var bList = new System.Collections.Generic.List<BModel>();
+            mapa.GetAll(aList);
+            mapb.GetAll(bList);
+
+            if (bList.Count < 1)
+            {
+                throw new Exception();
+            }
+        }
+
         class TestExplicitInterface : IDisposable
         {
             public bool Called { get; set; }
@@ -869,5 +885,41 @@ namespace TestCases
 
         }
     }
+    public interface IModel { }
 
+    public class AModel : IModel { }
+    public class BModel : IModel { }
+
+    public abstract class BaseMap<TKey, TModel> where TModel : class, IModel
+    {
+        TestHashMap<TKey, TModel> map = new TestHashMap<TKey, TModel>();
+        public void Add(TKey key, TModel mode)
+        {
+            map.Add(key, mode);
+        }
+        public void BaseGetAll(System.Collections.Generic.List<TModel> list)
+        {
+            foreach (var pair in map)
+            {
+                list.Add(pair.Value);
+            }
+
+        }
+    }
+    //key为int 类型
+    public class MapA : BaseMap<int, AModel>
+    {
+        public void GetAll(System.Collections.Generic.List<AModel> list)
+        {
+            base.BaseGetAll(list);
+        }
+    }
+    //key为string 类型
+    public class MapB : BaseMap<string, BModel>
+    {
+        public void GetAll(System.Collections.Generic.List<BModel> list)
+        {
+            base.BaseGetAll(list);
+        }
+    }
 }

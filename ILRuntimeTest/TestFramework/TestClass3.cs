@@ -68,4 +68,28 @@ namespace ILRuntimeTest.TestFramework
             return a + b;
         }
     }
+    public class TestHashMap<TKey, TValue>
+    {
+        private System.Collections.Generic.Dictionary<TKey, TValue> dic;
+        public TestHashMap()
+        {
+            dic = new System.Collections.Generic.Dictionary<TKey, TValue>();
+        }
+        public TValue this[TKey key]
+        {
+            get => dic[key];
+            set => dic[key] = value;
+        }
+
+        public System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return dic.GetEnumerator();
+        }
+
+        public bool Add(TKey key, TValue value)
+        {
+            dic.Add(key, value);
+            return true;
+        }
+    }
 }
