@@ -241,7 +241,7 @@ namespace TestCases
         public static void UnitTest_10035()
         {
             TestVector3[] FuncBtnsPos1 = new TestVector3[3] { TestVector3.One, TestVector3.One, TestVector3.One };
-            foreach(var i in FuncBtnsPos1)
+            foreach (var i in FuncBtnsPos1)
             {
                 Console.WriteLine(i.ToString());
             }
@@ -292,7 +292,7 @@ namespace TestCases
             rawPos.y = 1122333;
 
             Console.WriteLine(rawPos.y);
-            if(rawPos.y != 1122333)
+            if (rawPos.y != 1122333)
                 throw new AccessViolationException();
         }
 
@@ -465,6 +465,16 @@ namespace TestCases
             a = a + TestVector3.One2;
             Console.WriteLine(a);
             if (a.X != 2)
+                throw new Exception();
+        }
+
+        public static void UnitTest_10047()
+        {
+            TestVector3[] arr2 = new TestVector3[10];
+            arr2[0].X = 1243;
+            arr2[0] += TestVector3.One;
+
+            if(Math.Abs(arr2[0].X - 1244)>0.001f)
                 throw new Exception();
         }
     }

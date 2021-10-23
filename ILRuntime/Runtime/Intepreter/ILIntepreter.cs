@@ -5408,7 +5408,7 @@ namespace ILRuntime.Runtime.Intepreter
             else
             {
                 Array arr = mStack[objRef->Value] as Array;
-                arr.SetValue(mStack[val->Value], objRef->ValueLow);
+                arr.SetValue(StackObject.ToObject(val, domain, mStack), objRef->ValueLow);
             }
         }
 
