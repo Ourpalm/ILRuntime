@@ -157,7 +157,7 @@ namespace ILRuntime.Reflection
             List<object> res = new List<object>();
             for (int i = 0; i < customAttributes.Length; i++)
             {
-                if (attributeTypes[i].Equals(attributeType))
+                if (attributeTypes[i].Equals(attributeType) || attributeTypes[i].IsSubclassOf(attributeType))
                 {
                     res.Add(customAttributes[i]);
                 }

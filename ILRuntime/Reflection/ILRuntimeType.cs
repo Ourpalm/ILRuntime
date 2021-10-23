@@ -613,6 +613,10 @@ namespace ILRuntime.Reflection
         {
             return type.GetHashCode();
         }
+        public override bool Equals(Type o)
+        {
+            return o is ILRuntimeType ? ((ILRuntimeType)o).type == type : false;
+        }
         public override bool Equals(object o)
         {
             return o is ILRuntimeType ? ((ILRuntimeType)o).type == type : false;

@@ -184,6 +184,47 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }*/
 
+        public static StackObject* IsAssignableFrom(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = ILIntepreter.Minus(esp, 2);
+            var p = esp - 1;
+            AppDomain dommain = intp.AppDomain;
+            var other = StackObject.ToObject(p, dommain, mStack);
+            intp.Free(p);
+            p = ILIntepreter.Minus(esp, 2);
+            var instance = StackObject.ToObject(p, dommain, mStack);
+            intp.Free(p);
+            if (instance is ILRuntimeType)
+            {
+                if (other is ILRuntimeType)
+                {
+                    if (((ILRuntimeType)instance).IsAssignableFrom((ILRuntimeType)other))
+                        return ILIntepreter.PushOne(ret);
+                    else
+                        return ILIntepreter.PushZero(ret);
+                }
+                else
+                    return ILIntepreter.PushZero(ret);
+            }
+            else
+            {
+                if (instance is ILRuntimeWrapperType)
+                {
+                    if (((ILRuntimeWrapperType)instance).IsAssignableFrom((Type)other))
+                        return ILIntepreter.PushOne(ret);
+                    else
+                        return ILIntepreter.PushZero(ret);
+                }
+                else
+                {
+                    if (((Type)instance).IsAssignableFrom((Type)other))
+                        return ILIntepreter.PushOne(ret);
+                    else
+                        return ILIntepreter.PushZero(ret);
+                }
+            }
+        }
+
         public unsafe static StackObject* InitializeArray(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
