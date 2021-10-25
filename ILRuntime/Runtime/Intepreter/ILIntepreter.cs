@@ -1927,7 +1927,8 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         int addr = (int)(ip - ptr);
                                         var sql = from e in ehs
-                                                  where addr >= e.TryStart && addr <=e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                  //where addr >= e.TryStart && addr <=e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+												  where addr >= e.TryStart && addr <=e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally // 如果调用 Fault 会导致协程函数 只执行一次
                                                   select e;
                                         eh = sql.FirstOrDefault();
                                         if (eh != null)
