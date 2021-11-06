@@ -477,5 +477,29 @@ namespace TestCases
             if(Math.Abs(arr2[0].X - 1244)>0.001f)
                 throw new Exception();
         }
+
+        public static void UnitTest_10048()
+        {
+            var pos = new TestVector3(0f, 0.8f, 0.5f);
+            var obj = pos as object;
+            UnitTest_10048Sub(obj);
+        }
+
+        static void UnitTest_10048Sub(object param = null)
+        {
+            var context = new UnitTest_10048Context( param);
+            object data = context.data;
+            Console.WriteLine("data:" + data.ToString());
+        }
+
+        public class UnitTest_10048Context
+        {
+            public object data;
+
+            public UnitTest_10048Context(object data = null)
+            {
+                this.data = data;
+            }
+        }
     }
 }

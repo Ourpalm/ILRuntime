@@ -265,8 +265,6 @@ namespace ILRuntime.Runtime.Intepreter
                 bool returned = false;
                 while (!returned)
                 {
-                    try
-                    {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
                         if (ShouldBreak)
                             Break();
@@ -2231,14 +2229,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (obj != null)
                                         {
                                             if (obj is ILTypeInstance)
-                                            {
-                                                ILTypeInstance instance = obj as ILTypeInstance;
-                                                instance.PushToStack((int)ip->TokenLong, ret, this, mStack);
-                                            }
-                                            else
-                                            {
-                                                //var t = obj.GetType();
-                                                type = AppDomain.GetType((int)(ip->TokenLong >> 32));
+                                        {
+                                            ILTypeInstance instance = obj as ILTypeInstance;
+                                            instance.PushToStack((int)ip->TokenLong, ret, this, mStack);
+                                        }
+                                        else
+                                        {
+                                            //var t = obj.GetType();
+                                            type = AppDomain.GetType((int)(ip->TokenLong >> 32));
                                                 if (type != null)
                                                 {
                                                     var token = (int)ip->TokenLong;
@@ -4437,72 +4435,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 throw new NotSupportedException("Not supported opcode " + code);
                         }
                         ip++;
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ehs != null)
-                        {
-                            int addr = (int)(ip - ptr);
-                            var eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, true);
 
-                            if (eh == null)
-                            {
-                                eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, false);
-                            }
-                            if (eh != null)
-                            {
-                                if (ex is ILRuntimeException)
-                                {
-                                    ILRuntimeException ire = (ILRuntimeException)ex;
-                                    var inner = ire.InnerException;
-                                    inner.Data["ThisInfo"] = ire.ThisInfo;
-                                    inner.Data["StackTrace"] = ire.StackTrace;
-                                    inner.Data["LocalInfo"] = ire.LocalInfo;
-                                    ex = inner;
-                                }
-                                else
-                                {
-                                    var debugger = AppDomain.DebugService;
-                                    if (method.HasThis)
-                                        ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
-                                    else
-                                        ex.Data["ThisInfo"] = "";
-                                    ex.Data["StackTrace"] = debugger.GetStackTrace(this);
-                                    ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
-                                }
-                                //Clear call stack
-                                while (stack.Frames.Peek().BasePointer != frame.BasePointer)
-                                {
-                                    var f = stack.Frames.Peek();
-                                    esp = stack.PopFrame(ref f, esp);
-                                    if (f.Method.ReturnType != AppDomain.VoidType)
-                                    {
-                                        Free(esp - 1);
-                                        esp--;
-                                    }
-                                }
-                                lastCaughtEx = ex;
-                                esp = PushObject(esp, mStack, ex);
-                                unhandledException = false;
-                                ip = ptr + eh.HandlerStart;
-                                continue;
-                            }
-                        }
-                        if (unhandledException)
-                        {
-                            throw ex;
-                        }
-
-                        unhandledException = true;
-                        returned = true;
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                        if (!AppDomain.DebugService.Break(this, ex))
-#endif
-                        {
-                            var newEx = new ILRuntimeException(ex.Message, this, method, ex);
-                            throw newEx;
-                        }
-                    }
                 }
             }
 #if DEBUG && !NO_PROFILER
@@ -4736,10 +4669,25 @@ namespace ILRuntime.Runtime.Intepreter
                     if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
                     {
                         CopyStackValueType(esp, v, mStack);
+                        FreeStackValueType(esp);
+                    }
+                    else if(v->ObjectType == ObjectTypes.Object)
+                    {
+                        //直接把地址给到新的变量,所以并不释放esp空间
+                        var dst = ILIntepreter.ResolveReference(esp);
+                        if(dst != null)
+                        {
+                            var ct = domain.GetTypeByIndex(dst->Value) as CLRType;
+                            var binder = ct.ValueTypeBinder;
+                            v->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                            int addr = ((IntPtr)dst).ToInt32();
+                            v->Value = addr;
+                        }
+                        else
+                            throw new NotImplementedException();
                     }
                     else
                         throw new NotImplementedException();
-                    FreeStackValueType(esp);
                     break;
                 default:
                     *v = *esp;
