@@ -945,7 +945,7 @@ namespace ILRuntime.CLR.Method
                         isFirst = false;
                     else
                         sb.Append(", ");
-                    sb.Append(parameters[i].Name);
+                    sb.Append(parameters[i].FullName);
                     sb.Append(' ');
                     sb.Append(def.Parameters[i].Name);
                 }
