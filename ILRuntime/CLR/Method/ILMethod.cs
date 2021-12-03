@@ -562,7 +562,7 @@ namespace ILRuntime.CLR.Method
                         var eh = def.Body.ExceptionHandlers[i];
                         ExceptionHandler e = new ExceptionHandler();
                         e.HandlerStart = addr[eh.HandlerStart];
-                        e.HandlerEnd = addr[eh.HandlerEnd] - 1;
+                        e.HandlerEnd = eh.HandlerEnd != null ? addr[eh.HandlerEnd] - 1 : def.Body.Instructions.Count - 1;
                         e.TryStart = addr[eh.TryStart];
                         e.TryEnd = addr[eh.TryEnd] - 1;
                         switch (eh.HandlerType)

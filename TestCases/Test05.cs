@@ -236,7 +236,45 @@ namespace TestCases
             }
         }
 
-        static string ParseOne(string line)
+        public static void TestFinally()
+        {
+            bool called = false;
+            int cnt = 0;
+            try
+            {
+                try
+                {
+                    throw new Exception();
+                }
+                finally
+                {
+                    cnt++;
+                    called = true;
+                    Console.WriteLine("Finally");
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Catch");
+            }
+            finally
+            {
+                cnt += 2;
+
+                Console.WriteLine("Finally2");
+            }
+            if (!called || cnt != 3)
+                throw new Exception();
+        }
+        static System.Collections.IEnumerator TestForEachIteratorSub(List<object> list)
+        {
+            foreach (var item in list)
+            {
+                yield return null;//只能正常执行一次
+            }
+        }
+
+static string ParseOne(string line)
         {
             Console.WriteLine(line.ToString());            
             throw new NotSupportedException("error");            
@@ -419,7 +457,8 @@ namespace TestCases
                 Console.WriteLine(C5.A);
                 C6.foo();
                 Console.WriteLine(C6.B);
-                TestTryCatch();            
+                TestTryCatch();
+                c5 = null;
             }
         }
         static void TestTryCatch()
@@ -433,6 +472,10 @@ namespace TestCases
                 catch (Exception ex)
                 {
                     Console.WriteLine(string.Format("{0}\n{1}\n{2}", ex.Message, ex.Data["StackTrace"], ex.StackTrace));
+                }
+                finally
+                {
+                    Console.WriteLine("Finally Inner");
                 }
                 c5.bar();
                 throw new NotImplementedException("new exception");
@@ -479,10 +522,10 @@ namespace TestCases
     class C5
     {
         public static int A = 4;
-
+        public int BB = 5;
         public void bar()
         {
-            Console.WriteLine("bar = " + A);
+            Console.WriteLine("bar = " + A + BB);
         }
     }
 }

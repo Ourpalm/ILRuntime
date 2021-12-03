@@ -1927,7 +1927,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         int addr = (int)(ip - ptr);
                                         var sql = from e in ehs
-                                                  where addr >= e.TryStart && addr <=e.TryEnd && e.HandlerType == ExceptionHandlerType.Finally || e.HandlerType == ExceptionHandlerType.Fault
+                                                  where addr >= e.TryStart && addr <= e.TryEnd && (ip->TokenInteger < e.TryStart || ip->TokenInteger > e.TryEnd) && e.HandlerType == ExceptionHandlerType.Finally
                                                   select e;
                                         eh = sql.FirstOrDefault();
                                         if (eh != null)
@@ -1942,9 +1942,18 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                             case OpCodeEnum.Endfinally:
                                 {
-                                    ip = ptr + finallyEndAddress;
-                                    finallyEndAddress = 0;
-                                    continue;
+                                    if (finallyEndAddress < 0)
+                                    {
+                                        unhandledException = true;
+                                        finallyEndAddress = 0;
+                                        throw lastCaughtEx;
+                                    }
+                                    else
+                                    {
+                                        ip = ptr + finallyEndAddress;
+                                        finallyEndAddress = 0;
+                                        continue;
+                                    }
                                 }
                             case OpCodeEnum.Call:
                             case OpCodeEnum.Callvirt:
@@ -4445,6 +4454,10 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
+                        if (unhandledException)
+                        {
+                            throw ex;
+                        }
                         if (ehs != null)
                         {
                             int addr = (int)(ip - ptr);
@@ -4489,13 +4502,31 @@ namespace ILRuntime.Runtime.Intepreter
                                 lastCaughtEx = ex;
                                 esp = PushObject(esp, mStack, ex);
                                 unhandledException = false;
+                                var sql = from e in ehs
+                                          where addr >= e.TryStart && addr <= e.TryEnd && (eh.HandlerStart < e.TryStart || eh.HandlerStart > e.TryEnd) && e.HandlerType == ExceptionHandlerType.Finally
+                                          select e;
+                                var eh2 = sql.FirstOrDefault();
+                                if (eh2 != null)
+                                {
+                                    finallyEndAddress = eh.HandlerStart;
+                                    ip = ptr + eh2.HandlerStart;
+                                    continue;
+                                }
                                 ip = ptr + eh.HandlerStart;
                                 continue;
                             }
-                        }
-                        if (unhandledException)
-                        {
-                            throw ex;
+
+                            eh = GetCorrespondingExceptionHandler(ehs, null, addr, ExceptionHandlerType.Fault, false);
+                            if(eh == null)
+                                eh = GetCorrespondingExceptionHandler(ehs, null, addr, ExceptionHandlerType.Finally, false);
+                            if(eh != null)
+                            {
+                                unhandledException = false;
+                                finallyEndAddress = -1;
+                                lastCaughtEx = new ILRuntimeException(ex.Message, this, method, ex);
+                                ip = ptr + eh.HandlerStart;
+                                continue;
+                            }
                         }
 
                         unhandledException = true;
@@ -5430,6 +5461,8 @@ namespace ILRuntime.Runtime.Intepreter
 
         bool CheckExceptionType(IType catchType, object exception, bool explicitMatch)
         {
+            if (catchType == null)
+                return true;
             if (catchType is CLRType)
             {
                 if (explicitMatch)
