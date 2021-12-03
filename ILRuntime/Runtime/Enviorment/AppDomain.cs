@@ -1412,7 +1412,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }
 
-        ILIntepreter RequestILIntepreter()
+        internal ILIntepreter RequestILIntepreter()
         {
             ILIntepreter inteptreter = null;
             lock (freeIntepreters)

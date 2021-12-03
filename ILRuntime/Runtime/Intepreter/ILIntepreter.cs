@@ -2667,9 +2667,13 @@ namespace ILRuntime.Runtime.Intepreter
                                             a = esp - m.ParameterCount;
                                             obj = null;
                                             bool isValueType = type.IsValueType;
+                                            var tmpIntp = domain.RequestILIntepreter();
+                                            tmpIntp.stack.ResetValueTypePointer();
+                                            esp = tmpIntp.stack.StackBase;
+                                            var tmStack = tmpIntp.stack.ManagedStack;
                                             if (isValueType)
                                             {
-                                                stack.AllocValueType(esp, type);
+                                                tmpIntp.stack.AllocValueType(esp, type);
                                                 objRef = esp + 1;
                                                 objRef->ObjectType = ObjectTypes.StackObjectReference;
                                                 *(long*)&objRef->Value = (long)esp;
@@ -2678,21 +2682,21 @@ namespace ILRuntime.Runtime.Intepreter
                                             else
                                             {
                                                 obj = ((ILType)type).Instantiate(false);
-                                                objRef = PushObject(esp, mStack, obj);//this parameter for constructor
+                                                objRef = PushObject(esp, tmStack, obj);//this parameter for constructor
                                             }
                                             esp = objRef;
                                             for (int i = 0; i < m.ParameterCount; i++)
                                             {
-                                                CopyToStack(esp, a + i, mStack);
+                                                tmpIntp.CopyToStack(esp, a + i, mStack, tmStack);
                                                 esp++;
                                             }
                                             if (((ILMethod)m).ShouldUseRegisterVM)
                                             {
-                                                PrepareRegisterCallStack(esp, mStack, (ILMethod)m);
-                                                esp = ExecuteR((ILMethod)m, esp, out unhandledException);
+                                                PrepareRegisterCallStack(esp, tmStack, (ILMethod)m);
+                                                esp = tmpIntp.ExecuteR((ILMethod)m, esp, out unhandledException);
                                             }
                                             else
-                                                esp = Execute((ILMethod)m, esp, out unhandledException);
+                                                esp = tmpIntp.Execute((ILMethod)m, esp, out unhandledException);
 
                                             ValueTypeBasePointer = bp;
                                             for (int i = m.ParameterCount - 1; i >= 0; i--)
@@ -2701,12 +2705,13 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             if (isValueType)
                                             {
-                                                var ins = objRef - 1 - 1;
-                                                *a = *ins;
+                                                stack.AllocValueType(a, type);
+                                                CopyStackValueType(esp - 1, a, tmpIntp.stack.ManagedStack, mStack);
                                                 esp = a + 1;
                                             }
                                             else
                                                 esp = PushObject(a, mStack, obj);//new constructedObj
+                                            domain.FreeILIntepreter(tmpIntp);
                                         }
                                         if (unhandledException)
                                             returned = true;
@@ -4594,11 +4599,22 @@ namespace ILRuntime.Runtime.Intepreter
             else
                 return false;
         }
-
 #if DEBUG
         public void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack, bool noCheck = false)
 #else
         public void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack)
+#endif
+        {
+#if DEBUG
+            CopyStackValueType(src, dst, mStack, mStack, noCheck);
+#else
+            CopyStackValueType(src, dst, mStack, mStack);
+#endif
+        }
+#if DEBUG
+        public void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack, IList<object> dstmStack, bool noCheck = false)
+#else
+        public void CopyStackValueType(StackObject* src, StackObject* dst, IList<object> mStack, IList<object> dstmStack)
 #endif
         {
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
@@ -4621,10 +4637,10 @@ namespace ILRuntime.Runtime.Intepreter
                     case ObjectTypes.Object:
                     case ObjectTypes.ArrayReference:
                     case ObjectTypes.FieldReference:
-                        mStack[dstVal->Value] = mStack[srcVal->Value];
+                        dstmStack[dstVal->Value] = mStack[srcVal->Value];
                         break;
                     case ObjectTypes.ValueTypeObjectReference:
-                        CopyStackValueType(srcVal, dstVal, mStack);
+                        CopyStackValueType(srcVal, dstVal, mStack, dstmStack);
                         break;
                     default:
                         *dstVal = *srcVal;
@@ -5472,24 +5488,28 @@ namespace ILRuntime.Runtime.Intepreter
             }
             return esp;
         }
-
         public void CopyToStack(StackObject* dst, StackObject* src, IList<object> mStack)
+        {
+            CopyToStack(dst, src, mStack, mStack);
+        }
+
+        void CopyToStack(StackObject* dst, StackObject* src, IList<object> mStack, IList<object> dstmStack)
         {
             if (src->ObjectType == ObjectTypes.ValueTypeObjectReference)
             {
                 var descriptor = ResolveReference(src);
                 var t = domain.GetTypeByIndex(descriptor->Value);
                 AllocValueType(dst, t);
-                CopyStackValueType(src, dst, mStack);
+                CopyStackValueType(src, dst, mStack, dstmStack);
             }
             else
             {
                 *dst = *src;
                 if (dst->ObjectType >= ObjectTypes.Object)
                 {
-                    dst->Value = mStack.Count;
+                    dst->Value = dstmStack.Count;
                     var obj = mStack[src->Value];
-                    mStack.Add(obj);
+                    dstmStack.Add(obj);
                 }
             }
         }

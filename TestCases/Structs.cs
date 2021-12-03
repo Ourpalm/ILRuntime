@@ -364,6 +364,8 @@ namespace TestCases
             {
                 lst.Add(new Anim(i.ToString(), i + 10f));
             }
+            if (Math.Abs(lst[12].duration - 22) > 0.000001f)
+                throw new Exception();
         }
 
         struct Anim
@@ -407,6 +409,21 @@ namespace TestCases
         {
             T ins = new T();
             Console.WriteLine(ins);
+        }
+
+        struct NestedStruct
+        {
+            Vector3 v;
+            public NestedStruct(Vector3 v)
+            {
+                this.v = v;
+            }
+        }
+
+        public static void StructTest14()
+        {
+            List<NestedStruct> lst = new List<NestedStruct>();
+            lst.Add(new NestedStruct(new Vector3(1, 2, 3)));
         }
     }
 }
