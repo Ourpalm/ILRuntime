@@ -45,6 +45,7 @@
     <Compile Include="AsyncAwaitTest.cs" />
     <Compile Include="CLRBindingTest.cs" />
     <Compile Include="DelegateInnerTest.cs" />
+    <Compile Include="DelegateExtTest.cs" />
     <Compile Include="GenericMethodTest.cs" />
     <Compile Include="JsonTest.cs" />
     <Compile Include="StaticTest.cs" />
