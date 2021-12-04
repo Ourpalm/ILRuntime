@@ -4,19 +4,25 @@ namespace TestCases
 {
     public class DelegateExtObj
     {
-
+        public int Value;
+        public void AddValue(int value)
+        {
+            this.Value += value;
+        }
     }
     public static class DelegateExtObjMethod
     {
 
         public static void IntTest(this DelegateExtObj obj, int a)
         {
+            obj.AddValue(1);
             Console.WriteLine(obj + " dele a=" + a);
         }
 
         public static void IntTest2(this DelegateExtObj obj, int a)
         {
-            Console.WriteLine(obj + " dele2 a=" + a);
+            obj.AddValue(123);
+            Console.WriteLine(obj + " dele2 a=" + obj.Value);
         }
 
         public static int IntTest3(this DelegateExtObj obj, int a)
@@ -57,6 +63,7 @@ namespace TestCases
             a += obj.IntTest;
             a += obj.IntTest2;
 
+
             DelegateTestCls cls = new DelegateTestCls(1000);
             a += cls.IntTest;
             a += cls.IntTest2;
@@ -64,7 +71,9 @@ namespace TestCases
             {
                 Console.WriteLine("lambda a=" + i);
             };
-          
+            a.Invoke(124);
+            Console.WriteLine("obj Value=" + obj.Value);
+
         }
         public static void DelegateExtTest03()
         {
