@@ -863,7 +863,7 @@ namespace ILRuntime.Runtime.Intepreter
             if (method.HasThis)
                 esp = ILIntepreter.PushObject(esp, mStack, instance);
             int paramCnt = method.ParameterCount;
-            if (method.IsExtendMethod())
+            if (method.IsExtend)
             {
                 esp = ILIntepreter.PushObject(esp, mStack, instance);
                 paramCnt--;
@@ -897,7 +897,7 @@ namespace ILRuntime.Runtime.Intepreter
         unsafe StackObject* ClearStack(ILIntepreter intp, StackObject* esp, StackObject* ebp, IList<object> mStack)
         {
             int paramCnt = method.ParameterCount;
-            if (method.IsExtendMethod())//如果是拓展方法，退一位
+            if (method.IsExtend)//如果是拓展方法，退一位
             {
                 paramCnt--;
             }

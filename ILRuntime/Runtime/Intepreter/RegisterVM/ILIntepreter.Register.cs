@@ -3263,7 +3263,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                     if (dele == null)
                                                     {
                                                         var invokeMethod = type.GetMethod("Invoke", mi.ParameterCount);
-                                                        if (invokeMethod == null && ilMethod.IsExtendMethod())
+                                                        if (invokeMethod == null && ilMethod.IsExtend)
                                                         {
                                                             invokeMethod = type.GetMethod("Invoke", mi.ParameterCount - 1);
                                                         }
@@ -3380,7 +3380,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                             var invokeMethod =
                                                                 cm.DeclearingType.GetMethod("Invoke",
                                                                     mi.ParameterCount);
-                                                            if (invokeMethod == null && ilMethod.IsExtendMethod())
+                                                            if (invokeMethod == null && ilMethod.IsExtend)
                                                             {
                                                                 invokeMethod = cm.DeclearingType.GetMethod("Invoke", mi.ParameterCount - 1);
                                                             }

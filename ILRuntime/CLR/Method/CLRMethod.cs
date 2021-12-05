@@ -439,5 +439,19 @@ namespace ILRuntime.CLR.Method
                 hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
             return hashCode;
         }
+
+
+        bool? isExtend;
+        public bool IsExtend
+        {
+            get
+            {
+                if (isExtend == null)
+                {
+                    isExtend = this.IsExtendMethod();
+                }
+                return isExtend.Value;
+            }
+        }
     }
 }
