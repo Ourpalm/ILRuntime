@@ -52,7 +52,7 @@ namespace TestCases
             var obj = new DelegateExtObj();
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += obj.IntTest;
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += obj.IntTest2;
-
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest(123);
 
         }
 
