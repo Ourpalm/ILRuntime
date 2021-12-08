@@ -1562,7 +1562,7 @@ namespace ILRuntime.Runtime.Enviorment
                     genericArguments = new IType[gim.GenericArguments.Count];
                     for (int i = 0; i < genericArguments.Length; i++)
                     {
-                        if (gim.GenericArguments[i].IsGenericParameter)
+                        if (gim.GenericArguments[i].ContainsGenericParameter)
                             invalidToken = true;
                         var gt = GetType(gim.GenericArguments[i], contextType, contextMethod);
                         if (gt == null)
