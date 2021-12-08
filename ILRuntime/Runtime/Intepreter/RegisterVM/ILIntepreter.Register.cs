@@ -5087,10 +5087,6 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
-                        if (unhandledException)
-                        {
-                            throw ex;
-                        }
                         if (ehs != null)
                         {
                             int addr = (int)(ip - ptr);
@@ -5161,6 +5157,10 @@ namespace ILRuntime.Runtime.Intepreter
                                 ip = ptr + eh.HandlerStart;
                                 continue;
                             }
+                        }
+                        if (unhandledException)
+                        {
+                            throw ex;
                         }
 
                         unhandledException = true;
