@@ -251,6 +251,77 @@ namespace TestCases
             sw.Stop();
             Console.WriteLine(string.Format("time=" + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
+        const int T12_NOBJS = 100;
+        const int T12_NLOOP = 100000;
+        int A;
+        string B;
+        float C;
+        // 构造10W次脚本对象
+        public static void UnitTest_Performance12()
+        {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            Test01[] arr = new Test01[T12_NOBJS];
+            for (int i = 0; i < T12_NLOOP; i++)
+            {
+                arr[i % T12_NOBJS] = new Test01();
+            }
+
+            sw.Stop();
+            Console.WriteLine("time:" + sw.ElapsedMilliseconds);
+        }
+
+        // 循环修改脚本短字段10W次
+        public static void UnitTest_Performance12_1()
+        {
+            Test01[] arr = new Test01[T12_NOBJS];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                arr[i] = new Test01();
+            }
+
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            for (int i = 0; i < T12_NLOOP; i++)
+            {
+                var obj = arr[i % T12_NOBJS];
+                obj.A = i;
+            }
+
+            sw.Stop();
+            Console.WriteLine("time:" + sw.ElapsedMilliseconds);
+        }
+
+        // 循环修改脚本对象多个字段10W次
+        public static void UnitTest_Performance12_4()
+        {
+            Test01[] arr = new Test01[T12_NOBJS];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                var obj = new Test01();
+                arr[i] = obj;
+                obj.A = i;
+                obj.B = (i + 1).ToString();
+                obj.C = 2 * i;
+            }
+
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            for (int i = 0; i < T12_NLOOP; ++i)
+            {
+                var obj = arr[i % T12_NOBJS];
+                var obj2 = arr[(i + 1) % T12_NOBJS];
+                obj.A = obj2.A;
+                obj.B = obj2.B;
+                obj.C = obj2.C;
+            }
+            sw.Stop();
+            Console.WriteLine("time:" + sw.ElapsedMilliseconds);
+        }
+
         class PerformanceTestCls
         {
             public int A = 1;
@@ -270,7 +341,7 @@ namespace TestCases
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
-            for(int i = 0; i < 100000; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 func(1, 3.6f, 4);
             }
@@ -290,7 +361,7 @@ namespace TestCases
         public static void UnitTest_Cls()
         {
             object obj = new object();
-            Console.WriteLine("UnitTest_Cls"); 
+            Console.WriteLine("UnitTest_Cls");
             Test1098Cls cls = new Test1098Cls();
             Test1098Sub(cls);
 
@@ -313,7 +384,7 @@ namespace TestCases
 
         public static void UnitTest_Generics2()
         {
-            Console.WriteLine("UnitTest_Generics2"); 
+            Console.WriteLine("UnitTest_Generics2");
             SingletonTest.Inst.Test = "bar";
             Console.WriteLine(SingletonTest.Inst.foo());
             SingletonTest2.Inst.Test = 2;
@@ -325,7 +396,7 @@ namespace TestCases
 
         public static void UnitTest_Generics3()
         {
-            Console.WriteLine("UnitTest_Generics3"); 
+            Console.WriteLine("UnitTest_Generics3");
             Console.WriteLine(new List<NestedTest>().ToString());
         }
 
@@ -403,7 +474,7 @@ namespace TestCases
             return Inst.Test.ToString();
         }
     }
-    class Singleton<T> where T : class,new()
+    class Singleton<T> where T : class, new()
     {
         private static T _inst;
         public int testField;

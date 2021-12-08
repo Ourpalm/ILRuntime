@@ -21,9 +21,8 @@ namespace ILRuntime.Runtime.Intepreter
             for (int i = 0; i < fields.Length; i++)
             {
                 var ft = type.StaticFieldTypes[i];
-                var t = ft.TypeForCLR;
                 managedObjs.Add(null);
-                StackObject.Initialized(ref fields[i], i, t, ft, managedObjs);
+                StackObject.Initialized(ref fields[i], i, ft, managedObjs);
             }
             int idx = 0;
             foreach (var i in type.TypeDefinition.Fields)
@@ -176,8 +175,9 @@ namespace ILRuntime.Runtime.Intepreter
         {
             this.type = type;
             fields = new StackObject[type.TotalFieldCount];
-            managedObjs = new List<object>(fields.Length);
-            for (int i = 0; i < fields.Length; i++)
+            var cnt = fields.Length;
+            managedObjs = new List<object>(cnt);
+            for (int i = 0; i < cnt; i++)
             {
                 managedObjs.Add(null);
             }
@@ -406,7 +406,7 @@ namespace ILRuntime.Runtime.Intepreter
             for (int i = 0; i < type.FieldTypes.Length; i++)
             {
                 var ft = type.FieldTypes[i];
-                StackObject.Initialized(ref fields[type.FieldStartIndex + i], type.FieldStartIndex + i, ft.TypeForCLR, ft, managedObjs);
+                StackObject.Initialized(ref fields[type.FieldStartIndex + i], type.FieldStartIndex + i, ft, managedObjs);
             }
             if (type.BaseType != null && type.BaseType is ILType)
                 InitializeFields((ILType)type.BaseType);
@@ -544,7 +544,7 @@ namespace ILRuntime.Runtime.Intepreter
                 if (fieldIdx < maxIdx && fieldIdx >= curType.FieldStartIndex)
                 {
                     var ft = curType.FieldTypes[fieldIdx - curType.FieldStartIndex];
-                    StackObject.Initialized(ref fields[fieldIdx], fieldIdx, ft.TypeForCLR, ft, managedObjs);
+                    StackObject.Initialized(ref fields[fieldIdx], fieldIdx, ft, managedObjs);
                     return;
                 }
                 else
