@@ -2677,13 +2677,24 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            a = esp - m.ParameterCount;
+                                            intVal = m.ParameterCount;
+                                            a = esp - intVal;
                                             obj = null;
-                                            bool isValueType = type.IsValueType;
-                                            var tmpIntp = domain.RequestILIntepreter();
-                                            tmpIntp.stack.ResetValueTypePointer();
-                                            esp = tmpIntp.stack.StackBase;
-                                            var tmStack = tmpIntp.stack.ManagedStack;
+                                            bool isValueType = type.IsValueType;                                            
+                                            ILIntepreter tmpIntp;
+                                            IList<object> tmStack;
+                                            if (isValueType && intVal > 0)
+                                            {
+                                                tmpIntp = domain.RequestILIntepreter();
+                                                tmpIntp.stack.ResetValueTypePointer();
+                                                esp = tmpIntp.stack.StackBase;
+                                                tmStack = tmpIntp.stack.ManagedStack;
+                                            }
+                                            else
+                                            {
+                                                tmpIntp = this;
+                                                tmStack = mStack;
+                                            }
                                             if (isValueType)
                                             {
                                                 tmpIntp.stack.AllocValueType(esp, type);
@@ -2698,7 +2709,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 objRef = PushObject(esp, tmStack, obj);//this parameter for constructor
                                             }
                                             esp = objRef;
-                                            for (int i = 0; i < m.ParameterCount; i++)
+                                            for (int i = 0; i < intVal; i++)
                                             {
                                                 tmpIntp.CopyToStack(esp, a + i, mStack, tmStack);
                                                 esp++;
@@ -2712,19 +2723,28 @@ namespace ILRuntime.Runtime.Intepreter
                                                 esp = tmpIntp.Execute((ILMethod)m, esp, out unhandledException);
 
                                             ValueTypeBasePointer = bp;
-                                            for (int i = m.ParameterCount - 1; i >= 0; i--)
+                                            for (int i = intVal - 1; i >= 0; i--)
                                             {
                                                 Free(Add(a, i));
                                             }
                                             if (isValueType)
                                             {
-                                                stack.AllocValueType(a, type);
-                                                CopyStackValueType(esp - 1, a, tmpIntp.stack.ManagedStack, mStack);
+                                                if (intVal > 0)
+                                                {
+                                                    stack.AllocValueType(a, type);
+                                                    CopyStackValueType(esp - 1, a, tmpIntp.stack.ManagedStack, mStack);
+                                                    domain.FreeILIntepreter(tmpIntp);
+                                                }
+                                                else
+                                                {
+                                                    var ins = objRef - 1 - 1;
+                                                    *a = *ins;
+                                                }
                                                 esp = a + 1;
                                             }
                                             else
                                                 esp = PushObject(a, mStack, obj);//new constructedObj
-                                            domain.FreeILIntepreter(tmpIntp);
+                                            
                                         }
                                         if (unhandledException)
                                             returned = true;
@@ -4462,10 +4482,6 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
-                        if (unhandledException)
-                        {
-                            throw ex;
-                        }
                         if (ehs != null)
                         {
                             int addr = (int)(ip - ptr);
@@ -4535,6 +4551,10 @@ namespace ILRuntime.Runtime.Intepreter
                                 ip = ptr + eh.HandlerStart;
                                 continue;
                             }
+                        }
+                        if (unhandledException)
+                        {
+                            throw ex;
                         }
 
                         unhandledException = true;
