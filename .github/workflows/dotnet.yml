@@ -22,4 +22,4 @@ jobs:
     - name: Build Test Cases Release
       run: dotnet build TestCases/
     - name: Test Debug
-      run: dotnet run --no-build --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
