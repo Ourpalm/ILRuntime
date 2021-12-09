@@ -16,7 +16,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: |
+          5.0.x
+          2.0.x
     - name: Build Test Cases Debug
       run: dotnet build TestCases/
     - name: Build Test Cases Release
