@@ -8,7 +8,7 @@ using AppDomain = ILRuntime.Runtime.Enviorment.AppDomain;
 
 namespace ILRuntimeTest.Test
 {
-    abstract class BaseTestUnit : ITestable
+    public abstract class BaseTestUnit : ITestable
     {
         protected AppDomain App;
         protected string AssemblyName;

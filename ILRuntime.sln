@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRuntimeDebugEngine", "Deb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitJson", "LitJson\LitJson.csproj", "{BEC78343-4BA2-4757-807F-7CDBF1F70C83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRuntimeTestBase", "ILRuntimeTestBase\ILRuntimeTestBase.csproj", "{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -257,6 +259,42 @@ Global
 		{BEC78343-4BA2-4757-807F-7CDBF1F70C83}.netstandard_Release|Any CPU.Build.0 = Release|Any CPU
 		{BEC78343-4BA2-4757-807F-7CDBF1F70C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEC78343-4BA2-4757-807F-7CDBF1F70C83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Debug_ReadOnly|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Debug_ReadOnly|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Release_ReadOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Release_ReadOnly|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_3_5_Release|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Debug_ReadOnly|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Debug_ReadOnly|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Release_ReadOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Release_ReadOnly|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_4_0_Release|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Debug_ReadOnly|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Debug_ReadOnly|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Release_ReadOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Release_ReadOnly|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.net_462_Release|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Debug_ReadOnly|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Debug_ReadOnly|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Release_ReadOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Release_ReadOnly|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.netstandard_Release|Any CPU.Build.0 = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D285C5C9-E0EE-4B3D-991D-59E0C8CE1274}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

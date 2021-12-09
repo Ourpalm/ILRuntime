@@ -3,7 +3,7 @@ using System;
 
 namespace ILRuntimeTest.TestFramework
 {
-    class ILRuntimeHelper
+    public class ILRuntimeHelper
     {
         // manual register
         public static void Init(ILRuntime.Runtime.Enviorment.AppDomain app)

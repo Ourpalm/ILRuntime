@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ILRuntime\ILRuntime.csproj" />
+    <ProjectReference Include="..\LitJson\LitJson.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ILRuntime.Mono.Cecil">
+      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="ILRuntime.Mono.Cecil.Pdb">
+      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -9,7 +9,7 @@ namespace ILRuntimeTest
     /// <summary>
     /// Test Interface
     /// </summary>
-    interface ITestable
+    public interface ITestable
     {
         bool Init(string fileName);
         bool Init(ILRuntime.Runtime.Enviorment.AppDomain app);

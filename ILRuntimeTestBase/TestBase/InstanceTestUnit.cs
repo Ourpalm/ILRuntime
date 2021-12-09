@@ -6,7 +6,7 @@ using ILRuntimeTest.Test;
 
 namespace ILRuntimeTest.TestBase
 {
-    class InstanceTestUnit : BaseTestUnit
+    public class InstanceTestUnit : BaseTestUnit
     {
         public override void Run()
         {

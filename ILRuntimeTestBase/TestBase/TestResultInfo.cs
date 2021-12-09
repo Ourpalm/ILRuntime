@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ILRuntimeTest.TestBase
 {
-    class TestResultInfo
+    public class TestResultInfo
     {
 
 

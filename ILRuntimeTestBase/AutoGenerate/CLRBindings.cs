@@ -90,7 +90,6 @@ namespace ILRuntime.Runtime.Generated
             System_Reflection_FieldInfo_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestCLRAttribute_Binding.Register(app);
             System_Reflection_PropertyInfo_Binding.Register(app);
-            ILRuntimeTest_TestMainForm_Binding.Register(app);
             ILRuntime_Runtime_Enviorment_AppDomain_Binding.Register(app);
             System_Collections_Generic_KeyValuePair_2_String_IType_Binding.Register(app);
             ILRuntime_CLR_TypeSystem_IType_Binding.Register(app);

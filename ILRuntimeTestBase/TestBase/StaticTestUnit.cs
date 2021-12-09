@@ -7,7 +7,7 @@ using ILRuntimeTest.Test;
 
 namespace ILRuntimeTest.TestBase
 {
-    class StaticTestUnit : BaseTestUnit
+    public class StaticTestUnit : BaseTestUnit
     {
         //protected object _returnType;
 
