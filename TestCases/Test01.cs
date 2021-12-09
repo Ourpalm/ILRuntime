@@ -252,7 +252,7 @@ namespace TestCases
             Console.WriteLine(string.Format("time=" + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
         const int T12_NOBJS = 100;
-        const int T12_NLOOP = 100000;
+        const int T12_NLOOP = 1000000;
         int A;
         string B;
         float C;
