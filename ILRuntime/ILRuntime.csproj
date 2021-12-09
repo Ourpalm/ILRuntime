@@ -1,147 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{79EF2F29-89D1-4097-986C-5E4EEFE0FA33}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ILRuntime</RootNamespace>
-    <AssemblyName>ILRuntime</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_4_6;NO_PROFILER;OUTPUT_JIT_RESULT</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NET_4_6</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;NET_4_6;NO_PROFILER;OUTPUT_JIT_RESULT</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="ILRuntime.Mono.Cecil">
-      <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.dll</HintPath>
+      <HintPath>..\Dependencies\netstandard2.0\ILRuntime.Mono.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CLR\Method\CLRMethod.cs" />
-    <Compile Include="CLR\Method\ExceptionHandler.cs" />
-    <Compile Include="CLR\Method\ILMethod.cs" />
-    <Compile Include="CLR\Method\IMethod.cs" />
-    <Compile Include="CLR\Method\IMethodExtensions.cs" />
-    <Compile Include="CLR\TypeSystem\ILGenericParameterType.cs" />
-    <Compile Include="CLR\TypeSystem\ILType.cs" />
-    <Compile Include="CLR\TypeSystem\CLRType.cs" />
-    <Compile Include="Other\ByReferenceKeyComparer.cs" />
-    <Compile Include="Other\DelegateExportAttribute.cs" />
-    <Compile Include="Other\NeedAdaptorAttribute.cs" />
-    <Compile Include="Other\ThreadSafeDictionary.cs" />
-    <Compile Include="Other\UncheckedStack.cs" />
-    <Compile Include="Other\UncheckedList.cs" />
-    <Compile Include="Reflection\Extensions.cs" />
-    <Compile Include="Reflection\ILRuntimeConstructorInfo.cs" />
-    <Compile Include="Reflection\ILRuntimeFieldInfo.cs" />
-    <Compile Include="Reflection\ILRuntimeMethodInfo.cs" />
-    <Compile Include="Reflection\ILRuntimeParameterInfo.cs" />
-    <Compile Include="Reflection\ILRuntimePropertyInfo.cs" />
-    <Compile Include="Reflection\ILRuntimeWrapperType.cs" />
-    <Compile Include="Reflection\ILRuntimeType.cs" />
-    <Compile Include="Runtime\Adaptors\CLRCrossBindingAdaptors.cs" />
-    <Compile Include="Runtime\CLRBinding\BindingGeneratorExtensions.cs" />
-    <Compile Include="Runtime\CLRBinding\CommonBindingGenerator.cs" />
-    <Compile Include="Runtime\CLRBinding\CLRBindingUtils.cs" />
-    <Compile Include="Runtime\CLRBinding\ValueTypeBindingGenerator.cs" />
-    <Compile Include="Runtime\CLRBinding\FieldBindingGenerator.cs" />
-    <Compile Include="Runtime\CLRBinding\MethodBindingGenerator.cs" />
-    <Compile Include="Runtime\CLRBinding\ConstructorBindingGenerator.cs" />
-    <Compile Include="Runtime\CLRBinding\BindingCodeGenerator.cs" />
-    <Compile Include="Runtime\Debugger\BreakpointInfo.cs" />
-    <Compile Include="Runtime\Debugger\DebuggerServer\DebuggerServer.cs" />
-    <Compile Include="Runtime\Debugger\DebugMessageType.cs" />
-    <Compile Include="Runtime\Debugger\DebugSocket.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCEnumChildrenResult.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\CSEnumChildren.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\CSResolveIndexer.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\CSResolveVariable.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\CSStep.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\CSExecute.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\CSDeleteBreakpoint.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\CSBindBreakpoint.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCResolveVariableResult.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCStepComplete.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCThreadStarted.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCBreakpointHit.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCModuleLoaded.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCBindBreakpointResult.cs" />
-    <Compile Include="Runtime\Debugger\Protocol\SCAttachResult.cs" />
-    <Compile Include="Runtime\Debugger\StepTypes.cs" />
-    <Compile Include="Runtime\Debugger\VariableInfo.cs" />
-    <Compile Include="Runtime\Debugger\StackFrameInfo.cs" />
-    <Compile Include="Runtime\Enviorment\CrossBindingCodeGenerator.cs" />
-    <Compile Include="Runtime\Enviorment\CrossBindingMethodInfo.cs" />
-    <Compile Include="Runtime\Enviorment\InvocationContext.cs" />
-    <Compile Include="Runtime\Enviorment\ValueTypeBinder.cs" />
-    <Compile Include="Runtime\Enviorment\CrossBindingAdaptor.cs" />
-    <Compile Include="Runtime\ILRuntimeJITAttribute.cs" />
-    <Compile Include="Runtime\Intepreter\DelegateAdapter.cs" />
-    <Compile Include="Runtime\Enviorment\DelegateManager.cs" />
-    <Compile Include="Runtime\Enviorment\CLRRedirections.cs" />
-    <Compile Include="Runtime\Extensions.cs" />
-    <Compile Include="Runtime\Intepreter\ILRuntimeException.cs" />
-    <Compile Include="Runtime\Intepreter\ILTypeInstance.cs" />
-    <Compile Include="CLR\TypeSystem\IType.cs" />
-    <Compile Include="CLR\Utils\Extensions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime\Debugger\BreakPointContext.cs" />
-    <Compile Include="Runtime\Debugger\DebugService.cs" />
-    <Compile Include="Runtime\Enviorment\AppDomain.cs" />
-    <Compile Include="Runtime\Intepreter\ILIntepreter.cs" />
-    <Compile Include="Runtime\Intepreter\OpCodes\OpCode.cs" />
-    <Compile Include="Runtime\Intepreter\OpCodes\OpCodeREnum.cs" />
-    <Compile Include="Runtime\Intepreter\OpCodes\OpCodeEnum.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\AsyncJITCompileWorker.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.ELDC.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.BCP.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.InlineMethod.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.RegisterCleanup.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.Utils.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\Optimizer.FCP.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\ILIntepreter.Register.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\CodeBasicBlock.cs" />
-    <Compile Include="Runtime\Intepreter\RegisterVM\JITCompiler.cs" />
-    <Compile Include="Runtime\Stack\RuntimeStack.cs" />
-    <Compile Include="Runtime\Stack\StackFrame.cs" />
-    <Compile Include="Runtime\Stack\StackObject.cs" />
-    <Compile Include="Runtime\Stack\StackObjectAllocator.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
