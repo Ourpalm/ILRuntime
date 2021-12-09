@@ -266,15 +266,8 @@ namespace TestCases
             if (!called || cnt != 3)
                 throw new Exception();
         }
-        static System.Collections.IEnumerator TestForEachIteratorSub(List<object> list)
-        {
-            foreach (var item in list)
-            {
-                yield return null;//只能正常执行一次
-            }
-        }
 
-static string ParseOne(string line)
+        static string ParseOne(string line)
         {
             Console.WriteLine(line.ToString());            
             throw new NotSupportedException("error");            

@@ -26,12 +26,12 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("get_One2", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, get_One2_0);
-            args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3), typeof(ILRuntimeTest.TestFramework.TestVector3)};
-            method = type.GetMethod("op_Addition", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, op_Addition_1);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3), typeof(System.Single)};
             method = type.GetMethod("op_Multiply", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, op_Multiply_2);
+            app.RegisterCLRMethodRedirection(method, op_Multiply_1);
+            args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3), typeof(ILRuntimeTest.TestFramework.TestVector3)};
+            method = type.GetMethod("op_Addition", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, op_Addition_2);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3).MakeByRefType(), typeof(System.Single).MakeByRefType()};
             method = type.GetMethod("Test", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Test_3);
@@ -136,7 +136,36 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
-        static StackObject* op_Addition_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* op_Multiply_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Single @b = *(float*)&ptr_of_this_method->Value;
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            ILRuntimeTest.TestFramework.TestVector3 @a = new ILRuntimeTest.TestFramework.TestVector3();
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @a, __intp, ptr_of_this_method, __mStack, true);
+            } else {
+                @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+                __intp.Free(ptr_of_this_method);
+            }
+
+
+            var result_of_this_method = a * b;
+
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
+                return __ret + 1;
+            } else {
+            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+            }
+        }
+
+        static StackObject* op_Addition_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -162,35 +191,6 @@ namespace ILRuntime.Runtime.Generated
 
 
             var result_of_this_method = a + b;
-
-            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);
-                return __ret + 1;
-            } else {
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
-            }
-        }
-
-        static StackObject* op_Multiply_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Single @b = *(float*)&ptr_of_this_method->Value;
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVector3 @a = new ILRuntimeTest.TestFramework.TestVector3();
-            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @a, __intp, ptr_of_this_method, __mStack, true);
-            } else {
-                @a = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
-                __intp.Free(ptr_of_this_method);
-            }
-
-
-            var result_of_this_method = a * b;
 
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
                 ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.PushValue(ref result_of_this_method, __intp, __ret, __mStack);

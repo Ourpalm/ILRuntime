@@ -321,7 +321,33 @@ namespace TestCases
             sw.Stop();
             Console.WriteLine("time:" + sw.ElapsedMilliseconds);
         }
+        public static void UnitTest_Performance13()
+        {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            TestVector3 vec = default;
+            TestVector3 vec2 = TestVector3.One2;
+            for (int i = 0; i < 1000000; i++)
+            {
+                vec += vec2 * 2 + TestVector3.One2;
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("res="+ vec + ",time = " + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
 
+        public static void UnitTest_Performance14()
+        {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            TestVector3NoBinding vec = default;
+            TestVector3NoBinding vec2 = TestVector3NoBinding.one;
+            for (int i = 0; i < 1000000; i++)
+            {
+                vec += vec2 * 2 + TestVector3NoBinding.one;
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("res=" + vec + ",time = " + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
         class PerformanceTestCls
         {
             public int A = 1;

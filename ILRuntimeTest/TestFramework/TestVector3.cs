@@ -23,6 +23,26 @@ namespace ILRuntimeTest.TestFramework
             this.z = z;
         }
 
+
+        public static TestVector3NoBinding operator +(TestVector3NoBinding a, TestVector3NoBinding b)
+        {
+            TestVector3NoBinding res = new TestVector3NoBinding();
+            res.x = a.x + b.x;
+            res.y = a.y + b.y;
+            res.z = a.z + b.z;
+
+            return res;
+        }
+
+        public static TestVector3NoBinding operator *(TestVector3NoBinding a, float b)
+        {
+            TestVector3NoBinding res = new TestVector3NoBinding();
+            res.x = a.x * b;
+            res.y = a.y * b;
+            res.z = a.z * b;
+
+            return res;
+        }
         public override string ToString()
         {
             return $"({x},{y},{z})";
@@ -65,7 +85,7 @@ namespace ILRuntimeTest.TestFramework
         public static TestVector3 operator +(TestVector3 a, TestVector3 b)
         {
             TestVector3 res = new TestVector3();
-            res.X = a.X + b.Y;
+            res.X = a.X + b.X;
             res.Y = a.Y + b.Y;
             res.Z = a.Z + b.Z;
 

@@ -67,6 +67,9 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.String), typeof(System.Reflection.BindingFlags)};
             method = type.GetMethod("GetMethod", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, GetMethod_14);
+            args = new Type[]{typeof(System.Type)};
+            method = type.GetMethod("IsSubclassOf", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, IsSubclassOf_15);
 
             app.RegisterCLRCreateArrayInstance(type, s => new System.Type[s]);
 
@@ -353,6 +356,27 @@ namespace ILRuntime.Runtime.Generated
             var result_of_this_method = instance_of_this_method.GetMethod(@name, @bindingAttr);
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
+        }
+
+        static StackObject* IsSubclassOf_15(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Type @c = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            __intp.Free(ptr_of_this_method);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Type instance_of_this_method = (System.Type)typeof(System.Type).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            __intp.Free(ptr_of_this_method);
+
+            var result_of_this_method = instance_of_this_method.IsSubclassOf(@c);
+
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
         }
 
 
