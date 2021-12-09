@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ILRuntimeTestCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../../TestCases/bin/Debug/TestCases.dll false"
+    }
+  }
+}

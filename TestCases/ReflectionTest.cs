@@ -168,7 +168,6 @@ namespace TestCases
             int aa = 203;
 
             static int bb = 333;
-            [Microsoft.SqlServer.Server.SqlFunction(DataAccess = Microsoft.SqlServer.Server.DataAccessKind.Read)]
             public TestCls foo(int b)
             {
                 Console.WriteLine("foo" + (aa + b));
@@ -354,7 +353,7 @@ namespace TestCases
 
         public static void ReflectionTest12()
         {
-            var types = ILRuntimeTest.TestMainForm._app.LoadedTypes.ToArray();
+            /*var types = ILRuntimeTest.TestMainForm._app.LoadedTypes.ToArray();
             for (int i = 0; i < types.Length; i++)
             {
                 Type type = types[i].Value.ReflectionType;
@@ -367,7 +366,7 @@ namespace TestCases
 
                 object[] attrs = type.GetCustomAttributes(typeof(TestAttribute), false);
             }
-
+            */
         }
 
         public static void ReflectionTest13()

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestCases</RootNamespace>
     <AssemblyName>TestCases</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -69,9 +69,9 @@
     <Compile Include="TestCLREnum.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ILRuntimeTest\ILRuntimeTest.csproj">
-      <Project>{e6dd179d-fa31-4425-bde1-9dd0be0a9be1}</Project>
-      <Name>ILRuntimeTest</Name>
+    <ProjectReference Include="..\ILRuntimeTestBase\ILRuntimeTestBase.csproj">
+      <Project>{d285c5c9-e0ee-4b3d-991d-59e0c8ce1274}</Project>
+      <Name>ILRuntimeTestBase</Name>
     </ProjectReference>
     <ProjectReference Include="..\ILRuntime\ILRuntime.csproj">
       <Project>{79ef2f29-89d1-4097-986c-5e4eefe0fa33}</Project>

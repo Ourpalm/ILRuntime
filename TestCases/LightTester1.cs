@@ -386,7 +386,7 @@ namespace TestCases
 
         public static void UnitTest_1015()
         {
-            Console.WriteLine(ILRuntimeTest.TestMainForm._app.GetCurrentStackTrace());
+            //Console.WriteLine(ILRuntimeTest.TestMainForm._app.GetCurrentStackTrace());
         }
 
         public static void UnitTest_1016()
