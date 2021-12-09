@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntimeTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,6 +84,7 @@ namespace TestCases
             Console.WriteLine(pos[0, 1, 1]);
         }
 
+        [ILRuntimeTest(IsToDo = true)]
         public static void ArrayTest07()
         {
             int[,] a = new int[2, 3];

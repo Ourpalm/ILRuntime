@@ -8,7 +8,7 @@ namespace ILRuntimeTest.TestBase
 {
     public class InstanceTestUnit : BaseTestUnit
     {
-        public override void Run()
+        public override void Run(bool skipPerformance = false)
         {
             //Invoke(TypeName, MethodName);
             var obj = App.Instantiate(TypeName);
@@ -18,12 +18,12 @@ namespace ILRuntimeTest.TestBase
 
         public override bool Check()
         {
-            return Pass;
+            return Pass == TestResults.Pass || Pass == TestResults.Ignored;
         }
 
         public override TestResultInfo CheckResult()
         {
-            return new TestResultInfo(TypeName + "." + MethodName, Pass, Message.ToString());
+            return new TestResultInfo(TypeName + "." + MethodName, Pass, Message.ToString(), IsToDo);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using LitJson;
 using ILRuntimeTest.TestFramework;
+using ILRuntimeTest;
 
 namespace TestCases
 {
@@ -169,6 +170,7 @@ namespace TestCases
             }
         }
 
+        [ILRuntimeTest(IsToDo = true)]
         public static void JsonTest7()
         {
             JsonTestEnum[] arr = new JsonTestEnum[] { JsonTestEnum.Test2, JsonTestEnum.Test3 };

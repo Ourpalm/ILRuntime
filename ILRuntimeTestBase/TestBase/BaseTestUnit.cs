@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ILRuntime.CLR.Method;
 using ILRuntimeTest.TestBase;
 using AppDomain = ILRuntime.Runtime.Enviorment.AppDomain;
 
 namespace ILRuntimeTest.Test
 {
+    public enum TestResults
+    {
+        None,
+        Pass,
+        Failed,
+        Ignored,
+    }
     public abstract class BaseTestUnit : ITestable
     {
         protected AppDomain App;
         protected string AssemblyName;
         protected string TypeName;
         protected string MethodName;
-        protected bool Pass;
+        protected TestResults Pass;
+        protected bool IsToDo;
         protected StringBuilder Message = null;//= new StringBuilder();
 
         public string TestName { get { return TypeName + "." + MethodName; } }
@@ -60,7 +69,7 @@ namespace ILRuntimeTest.Test
         }
 
         //需要子类去实现
-        public abstract void Run();
+        public abstract void Run(bool skipPerformance = false);
 
         public abstract bool Check();
 
@@ -91,40 +100,71 @@ namespace ILRuntimeTest.Test
             Message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
         }
 
-        public void Invoke(string type, string method)
+        public void Invoke(string type, string method, bool skipPerformance)
         {
             Message = new StringBuilder();
+            Type expectingEx = null;
+            IsToDo = false;
             try
             {
                 var sw = new System.Diagnostics.Stopwatch();
                 Console.WriteLine("Invoking {0}.{1}", type, method);
                 sw.Start();
-                var res = App.Invoke(type, method, null); //InstanceTest
+                var im = App.LoadedTypes[type].GetMethod(method, 0) as ILMethod;
+                var attributes = im.ReflectionMethodInfo.GetCustomAttributes(typeof(ILRuntimeTestAttribute), false);
+                if (attributes.Length > 0)
+                {
+                    var attr = attributes[0] as ILRuntimeTestAttribute;
+                    if (attr.Ignored)
+                    {
+                        Pass = TestResults.Ignored;
+                        return;
+                    }
+                    IsToDo = attr.IsToDo;
+                    if(attr.IsPerformanceTest && skipPerformance)
+                    {
+                        Pass = TestResults.Ignored;
+                        return;
+                    }
+                    expectingEx = attr.ExpectException;
+                }
+                var res = App.Invoke(im, null); //InstanceTest
                 sw.Stop();
                 if (res != null)
                     Message.AppendLine("Return:" + res);
                 Message.AppendLine("Elappsed Time:" + sw.ElapsedMilliseconds + "ms\n");
-                Pass = true;
+                if (expectingEx != null)
+                {
+                    Message.AppendLine($"Test ran completed without exception, but expecting {expectingEx}");
+                    Pass = TestResults.Failed;
+                }
+                else
+                    Pass = TestResults.Pass;
             }
             catch (ILRuntime.Runtime.Intepreter.ILRuntimeException e)
             {
-                Message.AppendLine(e.Message);
-                if (!string.IsNullOrEmpty(e.ThisInfo))
+                if (e.InnerException.GetType() != expectingEx)
                 {
-                    Message.AppendLine("this:");
-                    Message.AppendLine(e.ThisInfo);
+                    Message.AppendLine(e.Message);
+                    if (!string.IsNullOrEmpty(e.ThisInfo))
+                    {
+                        Message.AppendLine("this:");
+                        Message.AppendLine(e.ThisInfo);
+                    }
+                    Message.AppendLine("Local Variables:");
+                    Message.AppendLine(e.LocalInfo);
+                    Message.AppendLine(e.StackTrace);
+                    if (e.InnerException != null)
+                        Message.AppendLine(e.InnerException.ToString());
+                    Pass = TestResults.Failed;
                 }
-                Message.AppendLine("Local Variables:");
-                Message.AppendLine(e.LocalInfo);
-                Message.AppendLine(e.StackTrace);
-                if (e.InnerException != null)
-                    Message.AppendLine(e.InnerException.ToString());
-                Pass = false;
+                else
+                    Pass = TestResults.Pass;
             }
             catch (Exception ex)
             {
                 Message.AppendLine(ex.ToString());
-                Pass = false;
+                Pass = TestResults.Pass;
             }
         }
 

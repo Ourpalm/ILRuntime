@@ -80,6 +80,7 @@ namespace ILRuntimeTest.TestBase
         {
             fs?.Close();
             fs2?.Close();
+            _app.Dispose();
             _app = null;
             _testUnitList.Clear();
         }

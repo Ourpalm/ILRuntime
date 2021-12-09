@@ -11,19 +11,19 @@ namespace ILRuntimeTest.TestBase
     {
         //protected object _returnType;
 
-        public override void Run()
+        public override void Run(bool skipPerformance = false)
         {
-            Invoke(TypeName, MethodName);
+            Invoke(TypeName, MethodName, skipPerformance);
         }
 
         public override bool Check()
         {
-            return Pass;
+            return Pass == TestResults.Pass || Pass == TestResults.Ignored;
         }
 
         public override TestResultInfo CheckResult()
         {
-            return new TestResultInfo(TypeName + "." + MethodName, Pass, Message.ToString());
+            return new TestResultInfo(TypeName + "." + MethodName, Pass, Message.ToString(), IsToDo);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntimeTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -286,6 +287,7 @@ namespace TestCases
 
         }
 
+        [ILRuntimeTest(ExpectException = typeof(NullReferenceException))]
         public static bool UnitTest_1009()
         {
             B test = new B();

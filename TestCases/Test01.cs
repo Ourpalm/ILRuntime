@@ -1,4 +1,5 @@
 ﻿using ILRuntime.Runtime;
+using ILRuntimeTest;
 using ILRuntimeTest.TestFramework;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,7 @@ namespace TestCases
             return a + b;
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance2()
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -71,6 +73,7 @@ namespace TestCases
             Console.WriteLine(string.Format("time: {0:0}ms cps:{1:0}, result={2}", sw.ElapsedMilliseconds, (1000000 * 1000 / sw.ElapsedMilliseconds), cnt));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static int UnitTest_PerformanceSimple()
         {
             int cnt = 0;
@@ -84,6 +87,7 @@ namespace TestCases
         /// 性能测试
         /// </summary>
         /// <returns></returns>
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance()
         {
             Console.WriteLine("UnitTest_Performance");
@@ -128,6 +132,7 @@ namespace TestCases
 
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance3()
         {
             Console.WriteLine("UnitTest_Performance3");
@@ -142,6 +147,7 @@ namespace TestCases
 
             Console.WriteLine(string.Format("Elapsed time:{0:0}ms, result = {1}", sw.ElapsedMilliseconds, arr.Length));
         }
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance5()
         {
             PerformanceTestCls obj = new PerformanceTestCls();
@@ -157,6 +163,7 @@ namespace TestCases
             Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance9()
         {
             int[] array = new int[1024];
@@ -181,6 +188,7 @@ namespace TestCases
             Console.WriteLine(string.Format("res=" + total + ", time:{0:0}", sw.ElapsedMilliseconds));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance6()
         {
             PerformanceTestCls obj = new PerformanceTestCls();
@@ -196,6 +204,7 @@ namespace TestCases
             Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance7()
         {
             PerformanceTestCls obj = new PerformanceTestCls();
@@ -211,6 +220,7 @@ namespace TestCases
             Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance8()
         {
             PerformanceTestCls obj = new PerformanceTestCls();
@@ -226,6 +236,7 @@ namespace TestCases
             Console.WriteLine(string.Format("res=" + a + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance10()
         {
             TestVectorClass a = new TestVectorClass();
@@ -239,6 +250,7 @@ namespace TestCases
             Console.WriteLine(string.Format("time=" + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance11()
         {
             TestVectorClass a = new TestVectorClass();
@@ -257,6 +269,7 @@ namespace TestCases
         string B;
         float C;
         // 构造10W次脚本对象
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance12()
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -273,6 +286,7 @@ namespace TestCases
         }
 
         // 循环修改脚本短字段10W次
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance12_1()
         {
             Test01[] arr = new Test01[T12_NOBJS];
@@ -295,6 +309,7 @@ namespace TestCases
         }
 
         // 循环修改脚本对象多个字段10W次
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance12_4()
         {
             Test01[] arr = new Test01[T12_NOBJS];
@@ -321,6 +336,7 @@ namespace TestCases
             sw.Stop();
             Console.WriteLine("time:" + sw.ElapsedMilliseconds);
         }
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance13()
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -335,6 +351,7 @@ namespace TestCases
             Console.WriteLine(string.Format("res="+ vec + ",time = " + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
         }
 
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance14()
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
@@ -353,6 +370,7 @@ namespace TestCases
             public int A = 1;
             public int B { get; set; } = 2;
         }
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance4()
         {
             Func<int, float, short, double> func = (a, b, c) =>
@@ -511,6 +529,7 @@ namespace TestCases
 
         public static T Inst
         {
+            [ILRuntimeTest(Ignored = true)]
             get
             {
                 if (_inst == null)

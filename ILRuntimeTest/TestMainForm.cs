@@ -76,7 +76,7 @@ namespace ILRuntimeTest
             _resList.Clear();
             foreach (var unit in session.TestList)
             {
-                unit.Run();
+                unit.Run(true);
                 _resList.Add(unit.CheckResult());
             }
 
@@ -87,13 +87,25 @@ namespace ILRuntimeTest
                 sb.Append("Test:");
                 sb.AppendLine(resInfo.TestName);
                 sb.Append("TestResult:");
-                sb.AppendLine(resInfo.Result.ToString());
+                sb.AppendLine(resInfo.Result == TestResults.Failed && resInfo.HasTodo ? $"{resInfo.Result}(Has TODO)" : resInfo.Result.ToString());
                 sb.AppendLine("Log:");
                 sb.AppendLine(resInfo.Message);
                 sb.AppendLine("=======================");
                 var item = new ListViewItem(resInfo.TestName);
                 item.SubItems.Add(resInfo.Result.ToString());
-                item.BackColor = resInfo.Result ? Color.Green : Color.Red;
+                switch (resInfo.Result)
+                {
+                    case TestResults.Pass:
+                    case TestResults.Ignored:
+                        item.BackColor = Color.Green;
+                        break;
+                    case TestResults.Failed:
+                        if(resInfo.HasTodo)
+                            item.BackColor = Color.Yellow;
+                        else
+                            item.BackColor = Color.Red;
+                        break;
+                }
                 listView1.Items.Add(item);
             }
             tbLog.Text = sb.ToString();
@@ -117,6 +129,8 @@ namespace ILRuntimeTest
 
             try
             {
+                Properties.Settings.Default["assembly_path"] = txtPath.Text;
+                Properties.Settings.Default.Save();
                 session = new TestSession();
                 session.Load(txtPath.Text, cbEnableRegVM.Checked);
                 _isLoadAssembly = true;
@@ -140,8 +154,20 @@ namespace ILRuntimeTest
             testUnit.Run();
             var res = testUnit.CheckResult();
 
-            _selectItemArgs.Item.SubItems[1].Text = res.Result.ToString();
-            _selectItemArgs.Item.BackColor = res.Result ? Color.Green : Color.Red;
+            _selectItemArgs.Item.SubItems[1].Text = res.Result == TestResults.Failed && res.HasTodo ? $"{res.Result}(Has TODO)" : res.Result.ToString();
+            switch (res.Result)
+            {
+                case TestResults.Pass:
+                case TestResults.Ignored:
+                    _selectItemArgs.Item.BackColor = Color.Green;
+                    break;
+                case TestResults.Failed:
+                    if (res.HasTodo)
+                        _selectItemArgs.Item.BackColor = Color.Yellow;
+                    else
+                        _selectItemArgs.Item.BackColor = Color.Red;
+                    break;
+            }
 
             StringBuilder sb = new StringBuilder();
             sb.Append("Test:");

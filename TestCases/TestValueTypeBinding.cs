@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ILRuntimeTest;
 using ILRuntimeTest.TestFramework;
 
 namespace TestCases
@@ -19,6 +20,7 @@ namespace TestCases
             Console.WriteLine(a.ToString());
         }
 
+        [ILRuntimeTest(IsToDo = true)]
         public static void Test01()
         {
             TestVector3 vec = new TestVector3(100, 1, 0);

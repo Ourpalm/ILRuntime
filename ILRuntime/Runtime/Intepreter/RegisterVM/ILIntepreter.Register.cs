@@ -5153,7 +5153,7 @@ namespace ILRuntime.Runtime.Intepreter
                             {
                                 unhandledException = false;
                                 finallyEndAddress = -1;
-                                lastCaughtEx = new ILRuntimeException(ex.Message, this, method, ex);
+                                lastCaughtEx = ex is ILRuntimeException ? ex : new ILRuntimeException(ex.Message, this, method, ex);
                                 ip = ptr + eh.HandlerStart;
                                 continue;
                             }

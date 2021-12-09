@@ -1,5 +1,6 @@
 ﻿
 //using CSEvilTestor;
+using ILRuntimeTest;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -210,6 +211,7 @@ namespace TestCases
             Console.WriteLine("a = " + a + ", b = " + b.ToString());
         }
 
+        [ILRuntimeTest(ExpectException = typeof(NotSupportedException))]
         public static void TestForEach()
         {
             List<string> a = new List<string>() { "1", "2", "3" };
