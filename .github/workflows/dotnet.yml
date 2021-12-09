@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Build Test Cases Debug
-      run: dotnet build --no-restore TestCases/
+      run: dotnet build TestCases/
     - name: Build Test Cases Release
-      run: dotnet build --no-restore TestCases/
+      run: dotnet build TestCases/
     - name: Test Debug
-      run: dotnet run --no-build --verbosity normal ILRuntimeTestCLI/
+      run: dotnet run --no-build --verbosity normal ILRuntimeTestCLI/ TestCases/bin/Debug/netstandard2.0/TestCases.dll false
