@@ -20,18 +20,22 @@ jobs:
           5.0.x
           2.0.x
     - name: Build Test Cases
-      run: |
-        dotnet build TestCases/
-        dotnet build -c Release TestCases/
-    - name: Test Debug
-      run: |
-        dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
-        dotnet run --no-build --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll true
-        dotnet run --no-build --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll false
-        dotnet run --no-build --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll true
-    - name: Test Release
-      run: |
-        dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
-        dotnet run -c Release --no-build --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll true
-        dotnet run -c Release --no-build --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll false
-        dotnet run -c Release --no-build --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll true
+      run: dotnet build TestCases/
+    - name: Build Test Cases(Release)
+      run: dotnet build -c Release TestCases/
+    - name: Test (I:Debug T:Debug R:false)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
+    - name: Test (I:Debug T:Debug R:true)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll true
+    - name: Test (I:Debug T:Release R:false)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll false
+    - name: Test (I:Debug T:Release R:true)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll true
+    - name: Test (I:Release T:Debug R:false)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
+    - name: Test (I:Release T:Debug R:true)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll true
+    - name: Test (I:Release T:Release R:false)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll false
+    - name: Test (I:Release T:Release R:true)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll true    
