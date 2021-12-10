@@ -161,10 +161,15 @@ namespace ILRuntimeTest.Test
                 else
                     Pass = TestResults.Pass;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Message.AppendLine(ex.ToString());
-                Pass = TestResults.Pass;
+                if (e.GetType() != expectingEx)
+                {
+                    Message.AppendLine(e.ToString());
+                    Pass = TestResults.Failed;
+                }
+                else
+                    Pass = TestResults.Pass;
             }
         }
 

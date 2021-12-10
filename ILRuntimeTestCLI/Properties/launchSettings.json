@@ -2,7 +2,7 @@
   "profiles": {
     "ILRuntimeTestCLI": {
       "commandName": "Project",
-      "commandLineArgs": "../../../../TestCases/bin/Debug/netstandard2.0/TestCases.dll false"
+      "commandLineArgs": "../../../../TestCases/bin/Release/netstandard2.0/TestCases.dll true"
     }
   }
 }
