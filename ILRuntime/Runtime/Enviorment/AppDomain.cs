@@ -980,10 +980,17 @@ namespace ILRuntime.Runtime.Enviorment
                         depth++;
                         if (depth == 1)
                         {
-                            baseType = sb.ToString();
-                            sb.Length = 0;
-                            genericParams = new List<string>();
-                            continue;
+                            if (isArray && sb.Length == 0)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                baseType = sb.ToString();
+                                sb.Length = 0;
+                                genericParams = new List<string>();
+                                continue;
+                            }
                         }
                     }
                     if (i == ',' && depth == 1)

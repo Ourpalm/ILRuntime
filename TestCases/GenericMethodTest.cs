@@ -674,6 +674,18 @@ namespace TestCases
             var e2 = GenericStaticMethodTest14Sub<Vector3>();
             Console.WriteLine(e2);
         }
+
+        public static void GenericTest()
+        {
+            Dictionary<int, string[][]> dic = new Dictionary<int, string[][]>();
+            dic[0] = new string[5][];
+
+            foreach(var i in dic)
+            {
+                if (i.Key != 0 || i.Value.Length != 5)
+                    throw new Exception();
+            }
+        }
     }
 
 
