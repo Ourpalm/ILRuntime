@@ -26,6 +26,12 @@ namespace ILRuntimeTest.TestFramework
 
     public class DelegateTest
     {
+        int val;
+
+        public DelegateTest()
+        {
+            val = 666;
+        }
         public static IntDelegate IntDelegateTest;
         public static event IntDelegate IntDelegateEventTest;
         public event IntDelegate IntDelegateEventTest2;
@@ -67,6 +73,16 @@ namespace ILRuntimeTest.TestFramework
                 default:
                     throw new Exception("Shouldn't be here");
             }
+        }
+
+        public static int TestIntDelegate(int a)
+        {
+            return a + 233;
+        }
+
+        public int TestIntDelegateInstance(int a)
+        {
+            return a + 233 + val;
         }
     }
 

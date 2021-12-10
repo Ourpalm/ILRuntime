@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ILRuntimeTest;
+using ILRuntimeTest.TestFramework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -194,7 +196,7 @@ namespace TestCases
 
         public static void DelegateTest17()
         {
-            Action a = () =>{ };
+            Action a = () => { };
             Console.WriteLine(a.GetHashCode());
         }
 
@@ -390,7 +392,7 @@ namespace TestCases
             }
 
 
-            public int IntTest3(int a)
+            public override int IntTest3(int a)
             {
                 Console.WriteLine("dele5 a=" + a);
                 return a + 200;
@@ -408,6 +410,11 @@ namespace TestCases
             {
                 Console.WriteLine("dele4 a=" + (a + b));
             }
+
+            public virtual int IntTest3(int a)
+            {
+                return a + b;
+            }
         }
 
         public static void DelegateTest24()
@@ -419,6 +426,113 @@ namespace TestCases
             var res = list.Sum(v => v.X);
             Console.WriteLine(res);
             if (res != 6)
+                throw new Exception();
+        }
+
+        public static void DelegateTest25()
+        {
+            testDele = Delegate.CreateDelegate(typeof(TestDelegate), typeof(DelegateTest).GetMethod(nameof(IntTest3))) as TestDelegate;
+
+            var res = testDele(100);
+            if (res != 200)
+                throw new Exception();
+        }
+
+        [ILRuntimeTest(IsToDo = true)]
+        public static void DelegateTest26()
+        {
+            testDele = Delegate.CreateDelegate(typeof(TestDelegate), typeof(ILRuntimeTest.TestFramework.DelegateTest).GetMethod(nameof(ILRuntimeTest.TestFramework.DelegateTest.TestIntDelegate))) as TestDelegate;
+
+            var res = testDele(100);
+            if (res != 200)
+                throw new Exception();
+        }
+
+        [ILRuntimeTest(IsToDo = true)]
+        public static void DelegateTest27()
+        {
+            testDele = ILRuntimeTest.TestFramework.DelegateTest.TestIntDelegate;
+
+            var res = testDele(100);
+            if (res != 200)
+                throw new Exception();
+        }
+
+        public static void DelegateTest28()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = Delegate.CreateDelegate(typeof(IntDelegate2), typeof(DelegateTest).GetMethod(nameof(IntTest3))) as IntDelegate2;
+
+            var res = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(100);
+            if (res != 200)
+                throw new Exception();
+        }
+
+        public static void DelegateTest29()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = Delegate.CreateDelegate(typeof(IntDelegate2), typeof(ILRuntimeTest.TestFramework.DelegateTest).GetMethod(nameof(ILRuntimeTest.TestFramework.DelegateTest.TestIntDelegate))) as IntDelegate2;
+
+            var res = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(100);
+            if (res != 333)
+                throw new Exception();
+        }
+
+        public static void DelegateTest30()
+        {
+            DelegateTestCls cls = new DelegateTestCls(100);
+            testDele = Delegate.CreateDelegate(typeof(TestDelegate), cls, nameof(DelegateTestCls.IntTest3)) as TestDelegate;
+
+            var res = testDele(100);
+            if (res != 300)
+                throw new Exception();
+        }
+
+        public static void DelegateTest31()
+        {
+            DelegateTestCls cls = new DelegateTestCls(100);
+            testDele = Delegate.CreateDelegate(typeof(TestDelegate), cls, typeof(DelegateTestCls).GetMethod(nameof(DelegateTestCls.IntTest3))) as TestDelegate;
+
+            var res = testDele(100);
+            if (res != 300)
+                throw new Exception();
+        }
+
+        public static void DelegateTest32()
+        {
+            DelegateTestCls cls = new DelegateTestCls(100);
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = Delegate.CreateDelegate(typeof(IntDelegate2), cls, nameof(DelegateTestCls.IntTest3)) as IntDelegate2;
+
+            var res = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(100);
+            if (res != 300)
+                throw new Exception();
+        }
+
+        public static void DelegateTest33()
+        {
+            DelegateTestCls cls = new DelegateTestCls(100);
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = Delegate.CreateDelegate(typeof(IntDelegate2), cls, typeof(DelegateTestCls).GetMethod(nameof(DelegateTestCls.IntTest3))) as IntDelegate2;
+
+            var res = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(100);
+            if (res != 300)
+                throw new Exception();
+        }
+
+        public static void DelegateTest34()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest cls = new ILRuntimeTest.TestFramework.DelegateTest();
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = Delegate.CreateDelegate(typeof(IntDelegate2), cls, nameof(ILRuntimeTest.TestFramework.DelegateTest.TestIntDelegateInstance)) as IntDelegate2;
+
+            var res = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(100);
+            if (res != 999)
+                throw new Exception();
+        }
+
+        public static void DelegateTest35()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest cls = new ILRuntimeTest.TestFramework.DelegateTest();
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = Delegate.CreateDelegate(typeof(IntDelegate2), cls, typeof(ILRuntimeTest.TestFramework.DelegateTest).GetMethod(nameof(ILRuntimeTest.TestFramework.DelegateTest.TestIntDelegateInstance))) as IntDelegate2;
+
+            var res = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(100);
+            if (res != 999)
                 throw new Exception();
         }
     }

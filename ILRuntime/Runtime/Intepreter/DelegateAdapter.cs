@@ -35,6 +35,13 @@ namespace ILRuntime.Runtime.Intepreter
             action = InvokeILMethod;
         }
 
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Func<TResult>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -99,7 +106,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Func<T1, TResult>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -167,7 +180,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Func<T1, T2, TResult>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -238,7 +257,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Func<T1, T2, T3, TResult>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -310,7 +335,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Func<T1, T2, T3, T4, TResult>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -380,6 +411,13 @@ namespace ILRuntime.Runtime.Intepreter
             action = InvokeILMethod;
         }
 
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Action<T1>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -444,7 +482,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Action<T1, T2>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -511,7 +555,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Action<T1, T2, T3>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -580,7 +630,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Action<T1, T2, T3, T4>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -652,7 +708,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Action<T1, T2, T3, T4, T5>);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -712,7 +774,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             action = InvokeILMethod;
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                return typeof(Action);
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -764,7 +832,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             
         }
-
+        public override Type NativeDelegateType
+        {
+            get
+            {
+                throw new NotSupportedException();
+            }
+        }
         public override Delegate Delegate
         {
             get
@@ -816,6 +890,8 @@ namespace ILRuntime.Runtime.Intepreter
         protected bool isClone;
 
         public abstract Delegate Delegate { get; }
+
+        public abstract Type NativeDelegateType { get; }
 
         public IDelegateAdapter Next { get { return next; } }
 
@@ -1117,7 +1193,7 @@ namespace ILRuntime.Runtime.Intepreter
     }
 
     unsafe interface IDelegateAdapter
-    {
+    {        Type NativeDelegateType { get; }
         Delegate Delegate { get; }
         IDelegateAdapter Next { get; }
         ILTypeInstance Instance { get; }
