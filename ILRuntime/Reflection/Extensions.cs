@@ -78,7 +78,13 @@ namespace ILRuntime.Reflection
                     foreach (var j in attribute.Properties)
                     {
                         var prop = at.TypeForCLR.GetProperty(j.Name);
-                        prop.SetValue(ins, j.Argument.Value, null);
+                        if (prop.PropertyType == typeof(Type) && j.Argument.Value != null)
+                        {
+                            var type = appdomain.GetType(j.Argument.Value, null, null);
+                            prop.SetValue(ins, type.TypeForCLR, null);
+                        }
+                        else
+                            prop.SetValue(ins, j.Argument.Value, null);
                     }
                 }
                 if(attribute.HasFields)

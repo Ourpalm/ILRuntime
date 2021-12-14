@@ -131,25 +131,6 @@ namespace TestCases
             Console.WriteLine("a=" + a);
             return a.ToString();
         }
-
-        public static string Test07()
-        {
-            if (File.Exists("test.txt"))
-            {
-                File.Delete("test.txt");
-            }
-
-            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Create))
-            {
-                fs.WriteByte(100);
-            }
-
-            using (System.IO.FileStream fs = new System.IO.FileStream("test.txt", System.IO.FileMode.Open))
-            {
-                return fs.ReadByte().ToString();
-            }
-        }
-
         public static void Test08()
         {
             object o = TestEnum.Enum4;
@@ -271,6 +252,18 @@ namespace TestCases
         {
             var a = TestEnum.Enum2;
             Test18Sub(0x123456789, out a);
+            switch(a)
+            {
+                case TestEnum.Enum1:
+                    Console.WriteLine(a + "1");
+                    break;
+                case TestEnum.Enum2:
+                    Console.WriteLine(a + "1");
+                    break;
+                case TestEnum.Enum4:
+                    Console.WriteLine(a + "2");
+                    break;
+            }
             Console.WriteLine(a);
         }
 
@@ -329,6 +322,84 @@ namespace TestCases
             res = b.CompareTo(TestEnum5.Enum4);
             if (res >= 0)
                 throw new Exception();
+        }
+
+        public static void Test30()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test();
+        }
+        public static void Test31()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test1();
+        }
+        public static void Test32()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test2();
+        }
+        public static void Test33()
+        {
+            var test = new TestClass1();
+            for (int i = 0; i < 10; ++i)
+                test.Test3();
+        }
+        private class TestClass1
+        {
+            private TestClass2 TestValue = new TestClass2();
+
+            public void Test()
+            {
+                for (int i = 0; i < 10; ++i)
+                {
+                    TestValue.Test1();
+                    TestValue.Test2();
+                    TestValue.Test3();
+                }
+            }
+            public void Test1()
+            {
+                for (int i = 0; i < 10; ++i)
+                    TestValue.Test1();
+            }
+            public void Test2()
+            {
+                for (int i = 0; i < 10; ++i)
+                    TestValue.Test2();
+            }
+            public void Test3()
+            {
+                for (int i = 0; i < 10; ++i)
+                    TestValue.Test3();
+            }
+        }
+
+        private class TestClass2
+        {
+            private object _testValue = TestEnumFlag.Feature3;
+
+            public void Test1()
+            {
+                if (_testValue is TestEnumFlag.Feature3)
+                    return;
+                throw new System.Exception();
+            }
+            public void Test2()
+            {
+                if (_testValue.Equals(TestEnumFlag.Feature3))
+                    return;
+                throw new System.Exception();
+            }
+            public void Test3()
+            {
+                if (object.Equals(_testValue, TestEnumFlag.Feature3))
+                    return;
+                throw new System.Exception();
+            }
         }
         class SystemType
         {

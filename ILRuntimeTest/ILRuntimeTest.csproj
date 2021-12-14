@@ -9,13 +9,13 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ILRuntimeTest</RootNamespace>
     <AssemblyName>ILRuntimeTest</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -61,35 +61,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adapters\ClassInheritanceTestAdaptor.cs" />
-    <Compile Include="Adapters\IAsyncStateMachineAdaptor.cs" />
-    <Compile Include="Adapters\TestVector3Binder.cs" />
-    <Compile Include="Adapters\helper.cs" />
-    <Compile Include="Adapters\TestClass2Adaptor.cs" />
-    <Compile Include="Adapters\TestClass3Adaptor.cs" />
-    <Compile Include="Adapters\TestClass4Adaptor.cs" />
-    <Compile Include="AutoGenerate\*.cs" />
-    <Compile Include="TestFramework\GenericExtensions.cs" />
-    <Compile Include="TestFramework\TestCLRAttribute.cs" />
-    <Compile Include="TestFramework\TestVector3.cs" />
-    <Compile Include="TestFramework\TestCLREnum.cs" />
     <Compile Include="TestMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="TestMainForm.Designer.cs">
       <DependentUpon>TestMainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="TestBase\BaseTestUnit.cs" />
-    <Compile Include="TestBase\InstanceTestUnit.cs" />
-    <Compile Include="TestBase\ITestable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestBase\StaticTestUnit.cs" />
-    <Compile Include="TestBase\TestResultInfo.cs" />
-    <Compile Include="TestFramework\ClassInheritanceTest.cs" />
-    <Compile Include="TestFramework\DelegateTest.cs" />
-    <Compile Include="TestFramework\TestClass2.cs" />
-    <Compile Include="TestFramework\TestClass3.cs" />
     <EmbeddedResource Include="TestMainForm.resx">
       <DependentUpon>TestMainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -117,6 +96,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ILRuntimeTestBase\ILRuntimeTestBase.csproj">
+      <Project>{d285c5c9-e0ee-4b3d-991d-59e0c8ce1274}</Project>
+      <Name>ILRuntimeTestBase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ILRuntime\ILRuntime.csproj">
       <Project>{79ef2f29-89d1-4097-986c-5e4eefe0fa33}</Project>
       <Name>ILRuntime</Name>

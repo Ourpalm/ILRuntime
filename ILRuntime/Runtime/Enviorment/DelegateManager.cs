@@ -229,6 +229,37 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
+        internal IDelegateAdapter FindDelegateAdapter(CLRType type, ILTypeInstance ins, ILMethod ilMethod)
+        {
+            IDelegateAdapter dele;
+            if (ins != null)
+            {
+                dele = (ins).GetDelegateAdapter(ilMethod);
+                if (dele == null)
+                {
+                    var invokeMethod =
+                        type.GetMethod("Invoke",
+                            ilMethod.ParameterCount);
+                    if (invokeMethod == null && ilMethod.IsExtend)
+                    {
+                        invokeMethod = type.GetMethod("Invoke", ilMethod.ParameterCount - 1);
+                    }
+                    dele = appdomain.DelegateManager.FindDelegateAdapter(
+                        ins, ilMethod, invokeMethod);
+                }
+            }
+            else
+            {
+                if (ilMethod.DelegateAdapter == null)
+                {
+                    var invokeMethod = type.GetMethod("Invoke", ilMethod.ParameterCount);
+                    ilMethod.DelegateAdapter = appdomain.DelegateManager.FindDelegateAdapter(null, ilMethod, invokeMethod);
+                }
+                dele = ilMethod.DelegateAdapter;
+            }
+            return dele;
+        }
+
         /// <summary>
         /// ilMethod代表的delegate会赋值给method对应的delegate，一般两者参数类型都一致，
         /// 但新版本的支持泛型协变之后，有些时候会不一致，所以此处判断是用method判断，而不是用ilMethod判断
@@ -240,9 +271,11 @@ namespace ILRuntime.Runtime.Enviorment
         internal IDelegateAdapter FindDelegateAdapter(ILTypeInstance instance, ILMethod ilMethod, IMethod method)
         {
             IDelegateAdapter res;
+            var parameterCount = method.ParameterCount;
+            var returnTypeForCLR = method.ReturnType.TypeForCLR;
             if (method.ReturnType == appdomain.VoidType)
             {
-                if (method.ParameterCount == 0)
+                if (parameterCount == 0)
                 {
                     res = zeroParamMethodAdapter.Instantiate(appdomain, instance, ilMethod);
                     if (instance != null)
@@ -251,12 +284,13 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 foreach (var i in methods)
                 {
-                    if (i.ParameterTypes.Length == method.ParameterCount)
+                    var parameterTypes = i.ParameterTypes;
+                    if (parameterTypes.Length == parameterCount)
                     {
                         bool match = true;
-                        for (int j = 0; j < method.ParameterCount; j++)
+                        for (int j = 0; j < parameterCount; j++)
                         {
-                            if (i.ParameterTypes[j] != method.Parameters[j].TypeForCLR)
+                            if (parameterTypes[j] != method.Parameters[j].TypeForCLR)
                             {
                                 match = false;
                                 break;
@@ -274,14 +308,16 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
             {
+
                 foreach (var i in functions)
                 {
-                    if (i.ParameterTypes.Length == method.ParameterCount + 1)
+                    var parameterTypes = i.ParameterTypes;
+                    if (parameterTypes.Length == parameterCount + 1)
                     {
                         bool match = true;
-                        for (int j = 0; j < method.ParameterCount; j++)
+                        for (int j = 0; j < parameterCount; j++)
                         {
-                            if (i.ParameterTypes[j] != method.Parameters[j].TypeForCLR)
+                            if (parameterTypes[j] != method.Parameters[j].TypeForCLR)
                             {
                                 match = false;
                                 break;
@@ -289,7 +325,7 @@ namespace ILRuntime.Runtime.Enviorment
                         }
                         if (match)
                         {
-                            if (method.ReturnType.TypeForCLR == i.ParameterTypes[method.ParameterCount])
+                            if (returnTypeForCLR == parameterTypes[parameterCount])
                             {
                                 res = i.Adapter.Instantiate(appdomain, instance, ilMethod);
                                 if (instance != null)

@@ -289,7 +289,7 @@ namespace ILRuntime.Runtime.Stack
         public void AllocValueTypeAndCopy(StackObject* ptr, StackObject* src)
         {
             var dst = ILIntepreter.ResolveReference(src);
-            var type = intepreter.AppDomain.GetType(dst->Value);
+            var type = intepreter.AppDomain.GetTypeByIndex(dst->Value);
             int size, managedCount;
             type.GetValueTypeSize(out size, out managedCount);
             if (allocator == null)
@@ -303,7 +303,7 @@ namespace ILRuntime.Runtime.Stack
                     ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
                     *(long*)&ptr->Value = (long)dst;
                     int managedIdx = alloc.ManagedIndex;
-                    InitializeValueTypeObject(type, dst, true, ref managedIdx);
+                    InitializeValueTypeObject(type, dst, true, ref managedIdx, false);
                     intepreter.CopyStackValueType(src, ptr, managedStack);
                     FreeValueTypeObject(src);
                 }
@@ -327,7 +327,7 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public void AllocValueType(StackObject* ptr, IType type, bool register = false)
+        public void AllocValueType(StackObject* ptr, IType type, bool register = false, bool noInitialize = false)
         {
             if (type.IsValueType)
             {
@@ -355,19 +355,20 @@ namespace ILRuntime.Runtime.Stack
 
                 ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
                 *(long*)&ptr->Value = (long)dst;
-                InitializeValueTypeObject(type, dst, register, ref managedIdx);
+                InitializeValueTypeObject(type, dst, register, ref managedIdx, noInitialize);
             }
             else
                 throw new ArgumentException(type.FullName + " is not a value type.", "type");
         }
 
-        internal void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, ref int managedIdx)
+        internal void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, ref int managedIdx, bool noInitialize)
         {
             ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
-            ptr->Value = type.GetHashCode();
+            ptr->Value = type.TypeIndex;
             ptr->ValueLow = type.TotalFieldCount;
             StackObject* endPtr = ptr - (type.TotalFieldCount + 1);
-            
+            if (noInitialize)
+                return;
             if (type is ILType)
             {
                 ILType t = (ILType)type;
@@ -375,7 +376,9 @@ namespace ILRuntime.Runtime.Stack
                 {
                     var ft = t.FieldTypes[i];
                     StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i + 1);
-                    if (ft.IsPrimitive || ft.IsEnum)
+                    if (ft.IsPrimitive)
+                        *val = ft.DefaultObject;
+                    else if (ft.IsEnum)
                         StackObject.Initialized(val, ft);
                     else
                     {
@@ -385,7 +388,7 @@ namespace ILRuntime.Runtime.Stack
                             {
                                 val->ObjectType = ObjectTypes.ValueTypeObjectReference;
                                 *(long*)&val->Value = (long)endPtr;
-                                InitializeValueTypeObject(ft, endPtr, register, ref managedIdx);
+                                InitializeValueTypeObject(ft, endPtr, register, ref managedIdx, noInitialize);
                                 int size, mCnt;
                                 ft.GetValueTypeSize(out size, out mCnt);
                                 endPtr -= size;
@@ -414,7 +417,7 @@ namespace ILRuntime.Runtime.Stack
                     }
                 }
                 if (type.BaseType != null && type.BaseType is ILType)
-                    InitializeValueTypeObject((ILType)type.BaseType, ptr, register, ref managedIdx);
+                    InitializeValueTypeObject((ILType)type.BaseType, ptr, register, ref managedIdx, noInitialize);
             }
             else
             {
@@ -424,7 +427,9 @@ namespace ILRuntime.Runtime.Stack
                 {
                     var it = t.OrderedFieldTypes[i] as CLRType;
                     StackObject* val = ILIntepreter.Minus(ptr, i + 1);
-                    if (it.IsPrimitive || it.IsEnum)
+                    if (it.IsPrimitive)
+                        *val = it.DefaultObject;
+                    else if (it.IsEnum)
                         StackObject.Initialized(val, it);
                     else
                     {
@@ -434,7 +439,7 @@ namespace ILRuntime.Runtime.Stack
                             {
                                 val->ObjectType = ObjectTypes.ValueTypeObjectReference;
                                 *(long*)&val->Value = (long)endPtr;
-                                InitializeValueTypeObject(it, endPtr, register, ref managedIdx);
+                                InitializeValueTypeObject(it, endPtr, register, ref managedIdx, noInitialize);
                                 int size, mCnt;
                                 it.GetValueTypeSize(out size, out mCnt);
                                 endPtr -= size;

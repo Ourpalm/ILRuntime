@@ -4,6 +4,8 @@ ILRuntime
 [![release](https://img.shields.io/badge/release-v1.6.4-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
 
+![example workflow](https://github.com/Ourpalm/ILRuntime/actions/workflows/dotnet.yml/badge.svg)
+
 [English Document](ReadMe-EN.md "Click here for English documents")
 
 [中文在线文档](https://ourpalm.github.io/ILRuntime/)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntimeTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,6 +84,7 @@ namespace TestCases
             Console.WriteLine(pos[0, 1, 1]);
         }
 
+        [ILRuntimeTest(IsToDo = true)]
         public static void ArrayTest07()
         {
             int[,] a = new int[2, 3];
@@ -175,6 +177,28 @@ namespace TestCases
                     arr[i] = new T[20];
                 }
             }
+        }
+
+        public static void ArrayTest17() //error
+        {
+            TestGenericDelegate<bool>[] array = new TestGenericDelegate<bool>[] { Callback1, Callback2, Callback3 };
+            foreach (var item in array)
+            {
+                item?.Invoke(true);
+            }
+        }
+        public delegate void TestGenericDelegate<T>(T t);
+        static void Callback1(bool b)
+        {
+            Console.WriteLine("Callback1");
+        }
+        static void Callback2(bool b)
+        {
+            Console.WriteLine("Callback2");
+        }
+        static void Callback3(bool b)
+        {
+            Console.WriteLine("Callback3");
         }
     }
 }

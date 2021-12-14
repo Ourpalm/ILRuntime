@@ -562,7 +562,7 @@ namespace ILRuntime.CLR.Method
                         var eh = def.Body.ExceptionHandlers[i];
                         ExceptionHandler e = new ExceptionHandler();
                         e.HandlerStart = addr[eh.HandlerStart];
-                        e.HandlerEnd = addr[eh.HandlerEnd] - 1;
+                        e.HandlerEnd = eh.HandlerEnd != null ? addr[eh.HandlerEnd] - 1 : def.Body.Instructions.Count - 1;
                         e.TryStart = addr[eh.TryStart];
                         e.TryEnd = addr[eh.TryEnd] - 1;
                         switch (eh.HandlerType)
@@ -945,7 +945,7 @@ namespace ILRuntime.CLR.Method
                         isFirst = false;
                     else
                         sb.Append(", ");
-                    sb.Append(parameters[i].Name);
+                    sb.Append(parameters[i].FullName);
                     sb.Append(' ');
                     sb.Append(def.Parameters[i].Name);
                 }
@@ -960,6 +960,20 @@ namespace ILRuntime.CLR.Method
             if (hashCode == -1)
                 hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
             return hashCode;
+        }
+
+
+        bool? isExtend;
+        public bool IsExtend
+        {
+            get
+            {
+                if (isExtend == null)
+                {
+                    isExtend = this.IsExtendMethod();
+                }
+                return isExtend.Value;
+            }
         }
     }
 }

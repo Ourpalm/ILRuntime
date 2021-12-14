@@ -325,6 +325,9 @@ namespace ILRuntime.Runtime.CLRBinding
                                 case "UnaryNegation":
                                     sb.AppendLine(string.Format("-{0};", param[0].Name));
                                     break;
+                                case "LogicalNot":
+                                    sb.AppendLine(string.Format("!{0};", param[0].Name));
+                                    break;
                                 case "Modulus":
                                     sb.AppendLine(string.Format("{0} % {1};", param[0].Name, param[1].Name));
                                     break;
@@ -336,6 +339,12 @@ namespace ILRuntime.Runtime.CLRBinding
                                         i.ReturnType.GetClassName(out clsName, out realClsName, out isByRef);
                                         sb.AppendLine(string.Format("({1}){0};", param[0].Name, realClsName));
                                     }
+                                    break;
+                                case "Increment":
+                                    sb.AppendLine(string.Format("++{0};", param[0].Name));
+                                    break;
+                                case "Decrement":
+                                    sb.AppendLine(string.Format("--{0};", param[0].Name));
                                     break;
                                 default:
                                     throw new NotImplementedException(i.Name);

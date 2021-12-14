@@ -130,6 +130,7 @@ namespace TestCases
         public static void InheritanceTest07()
         {
             TestClass2 cls = new TestCls5();
+            Console.WriteLine(cls);
             cls.VMethod1();
             int val = 0;
             cls.VMethod3(ref val);
@@ -248,6 +249,93 @@ namespace TestCases
             InheritanceTest16SubCls2 cls = new InheritanceTest16SubCls2();
             cls.KKK();
         }
+        public static void InheritanceTest17()
+        {
+            ClassB b = new ClassB();
+            CrossClass crossClass = new CrossClass();
+            if (!b.OutMethod(out crossClass.classA)) return;
+        }
+
+        public static void InheritanceTest18()
+        {
+            TestCls5 obj = new TestCls5();
+            TestClass2.Register(obj);
+
+            TestCls5 res;
+            Alloc<TestCls5>(out res);
+            res.bbbb = 5000;
+            if (res.bbbb != 5000)
+                throw new Exception();
+        }
+
+        public static void InheritanceTest19()
+        {
+            TestExplicitInterface a = new TestExplicitInterface();
+            ((IDisposable)a).Dispose();
+            if (!a.Called)
+                throw new Exception();
+        }
+
+        public static void InheritanceTest20()
+        {
+            var mapa = new MapA();
+            var mapb = new MapB();
+            mapb.Add("11", new BModel());
+            var aList = new System.Collections.Generic.List<AModel>();
+            var bList = new System.Collections.Generic.List<BModel>();
+            mapa.GetAll(aList);
+            mapb.GetAll(bList);
+
+            if (bList.Count < 1)
+            {
+                throw new Exception();
+            }
+        }
+
+        class TestExplicitInterface : IDisposable
+        {
+            public bool Called { get; set; }
+            void IDisposable.Dispose()
+            {
+                Called = true;
+            }
+        }
+
+        static void Alloc<T>(out T value)where T : TestClass2
+        {
+            value = TestClass2.Alloc() as T;
+        }
+
+        class CrossClass : TestClass3
+        {
+            public ClassA classA;
+        }
+
+        class ClassA
+        {
+
+        }
+        class ClassC
+        {
+            public void Init()
+            {
+                ClassB b = new ClassB();
+                CrossClass crossClass = new CrossClass();
+                if (!b.OutMethod(out crossClass.classA)) return;
+            }
+        }
+        class ClassB
+        {
+            public bool OutMethod(out ClassA a)
+            {
+                a = new ClassA();
+                if (a == null)
+                {
+                    throw new Exception("classA is null");
+                }
+                return true;
+            }
+        }
 
         class InheritanceTest16SubCls : TestClass2
         {
@@ -305,6 +393,7 @@ namespace TestCases
 
         class TestCls5 : TestClass2
         {
+            public int bbbb;
             public override void VMethod3(ref int arg)
             {
                 base.VMethod3(ref arg);
@@ -322,6 +411,11 @@ namespace TestCases
             protected override void AbMethod1()
             {
                 
+            }
+
+            public override string ToString()
+            {
+                return base.ToString();
             }
         }
 
@@ -791,5 +885,41 @@ namespace TestCases
 
         }
     }
+    public interface IModel { }
 
+    public class AModel : IModel { }
+    public class BModel : IModel { }
+
+    public abstract class BaseMap<TKey, TModel> where TModel : class, IModel
+    {
+        TestHashMap<TKey, TModel> map = new TestHashMap<TKey, TModel>();
+        public void Add(TKey key, TModel mode)
+        {
+            map.Add(key, mode);
+        }
+        public void BaseGetAll(System.Collections.Generic.List<TModel> list)
+        {
+            foreach (var pair in map)
+            {
+                list.Add(pair.Value);
+            }
+
+        }
+    }
+    //key为int 类型
+    public class MapA : BaseMap<int, AModel>
+    {
+        public void GetAll(System.Collections.Generic.List<AModel> list)
+        {
+            base.BaseGetAll(list);
+        }
+    }
+    //key为string 类型
+    public class MapB : BaseMap<string, BModel>
+    {
+        public void GetAll(System.Collections.Generic.List<BModel> list)
+        {
+            base.BaseGetAll(list);
+        }
+    }
 }

@@ -153,5 +153,11 @@ namespace TestCases
         {
             return card & 0x0F;
         }
+        public static void Test06()
+        {
+            int initial = 2;
+            string res = ILRuntimeTest.TestFramework.TestClass3.getString(ref initial, 2);
+            Console.WriteLine(res);
+        }
     }
 }

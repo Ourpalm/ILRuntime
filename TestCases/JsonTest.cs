@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using LitJson;
 using ILRuntimeTest.TestFramework;
+using ILRuntimeTest;
 
 namespace TestCases
 {
@@ -169,6 +170,7 @@ namespace TestCases
             }
         }
 
+        [ILRuntimeTest(IsToDo = true)]
         public static void JsonTest7()
         {
             JsonTestEnum[] arr = new JsonTestEnum[] { JsonTestEnum.Test2, JsonTestEnum.Test3 };
@@ -239,5 +241,47 @@ namespace TestCases
             Console.WriteLine(gObj2.ToString());
             Console.WriteLine("====================");
         }
+
+        private class A
+        {
+        }
+
+        private class B : A
+        {
+            string name = "";
+        }
+
+        private class C : A
+        {
+            string size = "";
+        }
+        public static void JsonTest9()
+        {
+            Dictionary<string, B> data = Load<B>("{\"test\":{\"name\":\"test\"},\"test2\":{\"name\":\"test\"}}");
+
+            foreach (var item in data)
+            {
+                if (typeof(B).Name != item.Value.GetType().Name)
+                    throw new Exception();
+                Console.WriteLine(typeof(B).Name + "类型" + item.Value.GetType().Name);
+            }
+
+            Dictionary<string, C> data1 = Load<C>("{\"test\":{\"size\":\"test\"},\"test2\":{\"size\":\"test\"}}");
+
+            foreach (var item in data1)
+            {
+                if (typeof(C).Name != item.Value.GetType().Name)
+                    throw new Exception();
+                Console.WriteLine(typeof(C).Name + "类型" + item.Value.GetType().Name);
+            }
+        }
+
+        private static Dictionary<string, T> Load<T>(string json) where T : A
+        {
+            Dictionary<string, T> data = JsonMapper.ToObject<Dictionary<string, T>>(json);
+
+            return data;
+        }
+
     }
 }

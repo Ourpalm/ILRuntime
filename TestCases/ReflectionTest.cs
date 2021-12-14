@@ -42,8 +42,10 @@ namespace TestCases
         public static void ReflectionTest04()
         {
             var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
+            var method = t.GetMethod("foo");
             var obj = Activator.CreateInstance(t);
             Console.WriteLine(obj);
+            method.Invoke(obj, new object[] { 100 });
 
             var arr = t.GetCustomAttributes(typeof(TestAttribute), false);
             foreach (var i in arr)
@@ -122,7 +124,7 @@ namespace TestCases
             }
 
             var attr = (TestCLRAttribute)typeof(TestCls2).GetField("Attribute_field").GetCustomAttributes(typeof(TestCLRAttribute), false)[0];
-            if(attr.Name != "Example")
+            if (attr.Name != "Example")
             {
                 throw new Exception("attr.Name != Example");
             }
@@ -159,14 +161,13 @@ namespace TestCases
             }
         }
         [Obsolete("gasdgas")]
-        class TestCls
+        public class TestCls
         {
             [ContextStatic]
             [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.Collapsed)]
             int aa = 203;
 
             static int bb = 333;
-            [Microsoft.SqlServer.Server.SqlFunction(DataAccess = Microsoft.SqlServer.Server.DataAccessKind.Read)]
             public TestCls foo(int b)
             {
                 Console.WriteLine("foo" + (aa + b));
@@ -185,7 +186,7 @@ namespace TestCases
         [Obsolete]
         [Test(true, TestProp = "1234")]
         [Test]
-        public class TestCls2
+        public class TestCls2 : TestCls
         {
             public TestCls2()
             {
@@ -352,7 +353,7 @@ namespace TestCases
 
         public static void ReflectionTest12()
         {
-            var types = ILRuntimeTest.TestMainForm._app.LoadedTypes.ToArray();
+            /*var types = ILRuntimeTest.TestMainForm._app.LoadedTypes.ToArray();
             for (int i = 0; i < types.Length; i++)
             {
                 Type type = types[i].Value.ReflectionType;
@@ -365,7 +366,7 @@ namespace TestCases
 
                 object[] attrs = type.GetCustomAttributes(typeof(TestAttribute), false);
             }
-
+            */
         }
 
         public static void ReflectionTest13()
@@ -471,7 +472,7 @@ namespace TestCases
         {
             var t = Type.GetType("TestCases.ReflectionTest/TestCls2");
             var obj = Activator.CreateInstance(t, 2, 3);
-            
+
             Console.WriteLine(obj);
         }
 
@@ -481,6 +482,55 @@ namespace TestCases
             var mi = t.GetMethod(nameof(ReflectionTest19));
             if (!mi.IsStatic)
                 throw new Exception();
+        }
+
+        public static void ReflectionTest20()
+        {
+            var t = Type.GetType("System.Action`1<int[]>");
+
+            Console.WriteLine(t);
+        }
+
+        public static void ReflectionTest21()
+        {
+            var type = typeof(TestA<,>);
+            type = type.MakeGenericType(typeof(TestB), typeof(TestC));
+            var a = (ITestA)Activator.CreateInstance(type);
+            a.Display();
+        }
+        interface ITestA
+        {
+            void Display();
+        }
+
+        class TestA<T, U> where T : TestB, new() where U : TestC, new()
+        {
+            public T instanceT;
+            public U instanceU;
+
+            public TestA()
+            {
+                instanceT = new T();
+                instanceU = new U();
+
+                instanceT.Name = "Lori";
+                instanceU.Name = "Chen";
+            }
+
+            public void Display()
+            {
+                Console.WriteLine($"T:{instanceT.Name} U:{instanceU.Name}");
+            }
+        }
+
+        class TestB
+        {
+            public string Name;
+        }
+
+        class TestC
+        {
+            public string Name;
         }
     }
 }

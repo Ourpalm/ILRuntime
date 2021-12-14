@@ -1,93 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BC2C44FC-17FE-4C58-AEEB-FA1CEAF78F55}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestCases</RootNamespace>
-    <AssemblyName>TestCases</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\ILRuntimeTestBase\ILRuntimeTestBase.csproj" />
+    <ProjectReference Include="..\LitJson\LitJson.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="ActivatorCreateInstanceTest.cs" />
-    <Compile Include="AsyncAwaitTest.cs" />
-    <Compile Include="DelegateInnerTest.cs" />
-    <Compile Include="GenericMethodTest.cs" />
-    <Compile Include="JsonTest.cs" />
-    <Compile Include="StaticTest.cs" />
-    <Compile Include="ReflectionTest.cs" />
-    <Compile Include="InheritanceTest.cs" />
-    <Compile Include="DelegateTest.cs" />
-    <Compile Include="LightTester2.cs" />
-    <Compile Include="LightTester1.cs" />
-    <Compile Include="EnumTest.cs" />
-    <Compile Include="ArrayTest.cs" />
-    <Compile Include="RefOutTest.cs" />
-    <Compile Include="SimpleTest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="GCTest.cs" />
-    <Compile Include="Structs.cs" />
-    <Compile Include="Test01.cs" />
-    <Compile Include="Test03.cs" />
-    <Compile Include="Test05.cs" />
-    <Compile Include="TestParam.cs" />
-    <Compile Include="TestValueTypeBinding.cs" />
-    <Compile Include="TestCLREnum.cs" />
+    <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ILRuntimeTest\ILRuntimeTest.csproj">
-      <Project>{e6dd179d-fa31-4425-bde1-9dd0be0a9be1}</Project>
-      <Name>ILRuntimeTest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ILRuntime\ILRuntime.csproj">
-      <Project>{79ef2f29-89d1-4097-986c-5e4eefe0fa33}</Project>
-      <Name>ILRuntime</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LitJson\LitJson.csproj">
-      <Project>{bec78343-4ba2-4757-807f-7cdbf1f70c83}</Project>
-      <Name>LitJson</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

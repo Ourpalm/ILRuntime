@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntimeTest.TestFramework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -354,6 +355,75 @@ namespace TestCases
             object[] arr = new object[] { res };
             Console.WriteLine("vec=" + arr[0]);
             return res;
+        }
+
+        public static void StructTest11()
+        {
+            List<Anim> lst = new List<Anim>();
+            for(int i = 0; i < 50; i++)
+            {
+                lst.Add(new Anim(i.ToString(), i + 10f));
+            }
+            if (Math.Abs(lst[12].duration - 22) > 0.000001f)
+                throw new Exception();
+        }
+
+        struct Anim
+        {
+            public string name;
+            public float duration;
+
+            public Anim(string name, float duration)
+            {
+                this.name = name;
+                this.duration = duration;
+            }
+        }
+
+        public interface ITestStruct
+        {
+            int i { get; set; }
+        }
+        public struct MyStruct2 : ITestStruct
+        {
+            public int i { get; set; }
+        }
+        static void StructTest12Sub<T>() where T : struct, ITestStruct
+        {
+            T ins = new T() { i = 10 };
+            Console.WriteLine(ins.i);
+            if (ins.i != 10) //输出结果为0
+                throw new Exception();
+        }
+        public static void StructTest12()
+        {
+            StructTest12Sub<MyStruct2>();
+        }
+
+        public static void StructTest13()
+        {
+            StructTest13Sub<TestVector3>();
+        }
+
+        static void StructTest13Sub<T>() where T : struct
+        {
+            T ins = new T();
+            Console.WriteLine(ins);
+        }
+
+        struct NestedStruct
+        {
+            Vector3 v;
+            public NestedStruct(Vector3 v)
+            {
+                this.v = v;
+            }
+        }
+
+        public static void StructTest14()
+        {
+            List<NestedStruct> lst = new List<NestedStruct>();
+            lst.Add(new NestedStruct(new Vector3(1, 2, 3)));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 //using CSEvilTestor;
+using ILRuntimeTest;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -210,6 +211,7 @@ namespace TestCases
             Console.WriteLine("a = " + a + ", b = " + b.ToString());
         }
 
+        [ILRuntimeTest(ExpectException = typeof(NotSupportedException))]
         public static void TestForEach()
         {
             List<string> a = new List<string>() { "1", "2", "3" };
@@ -234,6 +236,37 @@ namespace TestCases
                     Console.WriteLine(ex.ToString());
                 }
             }
+        }
+
+        public static void TestFinally()
+        {
+            bool called = false;
+            int cnt = 0;
+            try
+            {
+                try
+                {
+                    throw new Exception();
+                }
+                finally
+                {
+                    cnt++;
+                    called = true;
+                    Console.WriteLine("Finally");
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Catch");
+            }
+            finally
+            {
+                cnt += 2;
+
+                Console.WriteLine("Finally2");
+            }
+            if (!called || cnt != 3)
+                throw new Exception();
         }
 
         static string ParseOne(string line)
@@ -419,7 +452,8 @@ namespace TestCases
                 Console.WriteLine(C5.A);
                 C6.foo();
                 Console.WriteLine(C6.B);
-                TestTryCatch();            
+                TestTryCatch();
+                c5 = null;
             }
         }
         static void TestTryCatch()
@@ -433,6 +467,10 @@ namespace TestCases
                 catch (Exception ex)
                 {
                     Console.WriteLine(string.Format("{0}\n{1}\n{2}", ex.Message, ex.Data["StackTrace"], ex.StackTrace));
+                }
+                finally
+                {
+                    Console.WriteLine("Finally Inner");
                 }
                 c5.bar();
                 throw new NotImplementedException("new exception");
@@ -479,10 +517,10 @@ namespace TestCases
     class C5
     {
         public static int A = 4;
-
+        public int BB = 5;
         public void bar()
         {
-            Console.WriteLine("bar = " + A);
+            Console.WriteLine("bar = " + A + BB);
         }
     }
 }

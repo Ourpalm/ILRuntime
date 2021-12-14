@@ -5,6 +5,7 @@ using System.Text;
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -292,6 +293,22 @@ namespace ILRuntime.Runtime.Enviorment
             get
             {
                 return type.TotalFieldCount;
+            }
+        }
+
+        public StackObject DefaultObject
+        {
+            get
+            {
+                return default(StackObject);
+            }
+        }
+
+        public int TypeIndex
+        {
+            get
+            {
+                return -1;
             }
         }
         #endregion

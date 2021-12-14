@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ILRuntimeTest;
 using ILRuntimeTest.TestFramework;
 
 namespace TestCases
@@ -19,6 +20,7 @@ namespace TestCases
             Console.WriteLine(a.ToString());
         }
 
+        [ILRuntimeTest(IsToDo = true)]
         public static void Test01()
         {
             TestVector3 vec = new TestVector3(100, 1, 0);
@@ -241,7 +243,7 @@ namespace TestCases
         public static void UnitTest_10035()
         {
             TestVector3[] FuncBtnsPos1 = new TestVector3[3] { TestVector3.One, TestVector3.One, TestVector3.One };
-            foreach(var i in FuncBtnsPos1)
+            foreach (var i in FuncBtnsPos1)
             {
                 Console.WriteLine(i.ToString());
             }
@@ -292,7 +294,7 @@ namespace TestCases
             rawPos.y = 1122333;
 
             Console.WriteLine(rawPos.y);
-            if(rawPos.y != 1122333)
+            if (rawPos.y != 1122333)
                 throw new AccessViolationException();
         }
 
@@ -431,6 +433,51 @@ namespace TestCases
         {
 
             IntA a = new IntA(100);
+        }
+
+        public static void UnitTest_10045()
+        {
+            JInt i = new JInt();
+            if (i++ != 0)
+                throw new Exception();
+            if (++i != 2)
+                throw new Exception();
+            if (i-- != 2)
+                throw new Exception();
+            i -= 10;
+            if (i != -9)
+                throw new Exception();
+            --i;
+            Console.WriteLine(i);
+
+            for (JInt x = 20; x > 0; x--)
+            {
+                Console.WriteLine($"forÄÚ: x = {x}");
+            }
+        }
+
+        public static void UnitTest_10046()
+        {
+            TestVector3.TestDelegate2 = UnitTest_10046Sub;
+            TestVector3.DoTest2();
+        }
+
+        static void UnitTest_10046Sub(TestVector3 a)
+        {
+            a = a + TestVector3.One2;
+            Console.WriteLine(a);
+            if (a.X != 2)
+                throw new Exception();
+        }
+
+        public static void UnitTest_10047()
+        {
+            TestVector3[] arr2 = new TestVector3[10];
+            arr2[0].X = 1243;
+            arr2[0] += TestVector3.One;
+
+            if(Math.Abs(arr2[0].X - 1244)>0.001f)
+                throw new Exception();
         }
     }
 }

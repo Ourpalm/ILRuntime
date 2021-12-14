@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntimeTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -286,6 +287,7 @@ namespace TestCases
 
         }
 
+        [ILRuntimeTest(ExpectException = typeof(NullReferenceException))]
         public static bool UnitTest_1009()
         {
             B test = new B();
@@ -386,7 +388,7 @@ namespace TestCases
 
         public static void UnitTest_1015()
         {
-            Console.WriteLine(ILRuntimeTest.TestMainForm._app.GetCurrentStackTrace());
+            //Console.WriteLine(ILRuntimeTest.TestMainForm._app.GetCurrentStackTrace());
         }
 
         public static void UnitTest_1016()
@@ -462,6 +464,14 @@ namespace TestCases
                     retDict[key] = data;
                 }
             }
+        }
+
+        static int a = 0;
+        public static void UnitTest_1019()
+        {
+            uint x = 1000;
+            int xx = (int)x;
+            a = xx;
         }
     }
 }

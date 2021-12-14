@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.CLR.TypeSystem
 {
@@ -47,6 +48,10 @@ namespace ILRuntime.CLR.TypeSystem
         bool HasGenericParameter { get; }
 
         bool IsGenericParameter { get; }
+
+        StackObject DefaultObject { get; }
+
+        int TypeIndex { get; }
 
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
 

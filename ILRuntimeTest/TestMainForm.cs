@@ -19,11 +19,9 @@ namespace ILRuntimeTest
 {
     public partial class TestMainForm : Form
     {
-        public static ILRuntime.Runtime.Enviorment.AppDomain _app;
+        TestSession session;
         private Assembly _assembly;
-        FileStream fs, fs2;
         private List<TestResultInfo> _resList = new List<TestResultInfo>();
-        private List<BaseTestUnit> _testUnitList = new List<BaseTestUnit>();
 
         private ListViewItemSelectionChangedEventArgs _selectItemArgs = null;
         private bool _isLoadAssembly;
@@ -70,15 +68,15 @@ namespace ILRuntimeTest
             //    }
             //}
 
-            if (_app == null)
+            if (session == null)
                 return;
 
-            if (_testUnitList.Count <= 0)
+            if (session.TestList.Count <= 0)
                 return;
             _resList.Clear();
-            foreach (var unit in _testUnitList)
+            foreach (var unit in session.TestList)
             {
-                unit.Run();
+                unit.Run(true);
                 _resList.Add(unit.CheckResult());
             }
 
@@ -89,13 +87,25 @@ namespace ILRuntimeTest
                 sb.Append("Test:");
                 sb.AppendLine(resInfo.TestName);
                 sb.Append("TestResult:");
-                sb.AppendLine(resInfo.Result.ToString());
+                sb.AppendLine(resInfo.Result == TestResults.Failed && resInfo.HasTodo ? $"{resInfo.Result}(Has TODO)" : resInfo.Result.ToString());
                 sb.AppendLine("Log:");
                 sb.AppendLine(resInfo.Message);
                 sb.AppendLine("=======================");
                 var item = new ListViewItem(resInfo.TestName);
                 item.SubItems.Add(resInfo.Result.ToString());
-                item.BackColor = resInfo.Result ? Color.Green : Color.Red;
+                switch (resInfo.Result)
+                {
+                    case TestResults.Pass:
+                    case TestResults.Ignored:
+                        item.BackColor = Color.Green;
+                        break;
+                    case TestResults.Failed:
+                        if(resInfo.HasTodo)
+                            item.BackColor = Color.Yellow;
+                        else
+                            item.BackColor = Color.Red;
+                        break;
+                }
                 listView1.Items.Add(item);
             }
             tbLog.Text = sb.ToString();
@@ -103,10 +113,7 @@ namespace ILRuntimeTest
 
         private void OnBtnLoad(object sender, EventArgs e)
         {
-            if (fs != null)
-                fs.Close();
-            if (fs2 != null)
-                fs2.Close();
+            session?.Dispose();
             if (txtPath.Text == "")
             {
                 if (OD.ShowDialog() == DialogResult.OK)
@@ -122,37 +129,13 @@ namespace ILRuntimeTest
 
             try
             {
-                fs = new FileStream(txtPath.Text, FileMode.Open, FileAccess.Read);
-                {
-                    var path = Path.GetDirectoryName(txtPath.Text);
-                    var name = Path.GetFileNameWithoutExtension(txtPath.Text);
-                    var pdbPath = Path.Combine(path, name) + ".pdb";
-                    if (!File.Exists(pdbPath)) {
-                        name = Path.GetFileName(txtPath.Text);
-                        pdbPath = Path.Combine(path, name) + ".mdb";
-                    }
-
-                    _app = new ILRuntime.Runtime.Enviorment.AppDomain(cbEnableRegVM.Checked ? ILRuntime.Runtime.ILRuntimeJITFlags.JITImmediately : ILRuntime.Runtime.ILRuntimeJITFlags.None);
-                    _app.DebugService.StartDebugService(56000);
-                    fs2 = new System.IO.FileStream(pdbPath, FileMode.Open);
-                    {
-                        ILRuntime.Mono.Cecil.Cil.ISymbolReaderProvider symbolReaderProvider = null;
-                        if (pdbPath.EndsWith (".pdb")) {
-                            symbolReaderProvider = new ILRuntime.Mono.Cecil.Pdb.PdbReaderProvider ();
-                        }/* else if (pdbPath.EndsWith (".mdb")) {
-                            symbolReaderProvider = new Mono.Cecil.Mdb.MdbReaderProvider ();
-                        }*/
-
-                        _app.LoadAssembly(fs, fs2, symbolReaderProvider);
-                        _isLoadAssembly = true;
-                    }
-
-                    ILRuntimeHelper.Init(_app);
-                    ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
-
-                    LoadTest();
-                    UpdateBtnState();
-                }
+                Properties.Settings.Default["assembly_path"] = txtPath.Text;
+                Properties.Settings.Default.Save();
+                session = new TestSession();
+                session.Load(txtPath.Text, cbEnableRegVM.Checked);
+                _isLoadAssembly = true;
+                LoadTest();
+                UpdateBtnState();
             }
             catch (Exception ex)
             {
@@ -166,13 +149,25 @@ namespace ILRuntimeTest
             if (_selectItemArgs == null)
                 return;
 
-            var testUnit = _testUnitList[_selectItemArgs.ItemIndex];
+            var testUnit = session.TestList[_selectItemArgs.ItemIndex];
 
             testUnit.Run();
             var res = testUnit.CheckResult();
 
-            _selectItemArgs.Item.SubItems[1].Text = res.Result.ToString();
-            _selectItemArgs.Item.BackColor = res.Result ? Color.Green : Color.Red;
+            _selectItemArgs.Item.SubItems[1].Text = res.Result == TestResults.Failed && res.HasTodo ? $"{res.Result}(Has TODO)" : res.Result.ToString();
+            switch (res.Result)
+            {
+                case TestResults.Pass:
+                case TestResults.Ignored:
+                    _selectItemArgs.Item.BackColor = Color.Green;
+                    break;
+                case TestResults.Failed:
+                    if (res.HasTodo)
+                        _selectItemArgs.Item.BackColor = Color.Yellow;
+                    else
+                        _selectItemArgs.Item.BackColor = Color.Red;
+                    break;
+            }
 
             StringBuilder sb = new StringBuilder();
             sb.Append("Test:");
@@ -195,7 +190,7 @@ namespace ILRuntimeTest
 
         private void OnItemSelectChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            if (e.ItemIndex > _testUnitList.Count - 1)
+            if (e.ItemIndex > session.TestList.Count - 1)
             {
                 Console.WriteLine("select index out of range");
                 return;
@@ -208,32 +203,9 @@ namespace ILRuntimeTest
 
         private void LoadTest()
         {
-            _testUnitList.Clear();
             _resList.Clear();
-
-            var types = _app.LoadedTypes.Values.ToList();
-            foreach (var type in types)
-            {
-                var ilType = type as ILType;
-                if (ilType == null)
-                    continue;
-                var methods = ilType.GetMethods();
-                foreach (var methodInfo in methods)
-                {
-                    string fullName = ilType.FullName;
-                    //Console.WriteLine("call the method:{0},return type {1},params count{2}", fullName + "." + methodInfo.Name, methodInfo.ReturnType, methodInfo.GetParameters().Length);
-                    //目前只支持无参数，无返回值测试
-                    if (methodInfo.ParameterCount == 0 && methodInfo.IsStatic && ((ILRuntime.CLR.Method.ILMethod)methodInfo).Definition.IsPublic)
-                    {
-                        var testUnit = new StaticTestUnit();
-                        testUnit.Init(_app, fullName, methodInfo.Name);
-                        _testUnitList.Add(testUnit);
-                    }
-                }
-            }
-
             listView1.Items.Clear();
-            foreach (var testUnit in _testUnitList)
+            foreach (var testUnit in session.TestList)
             {
                 var item = new ListViewItem(testUnit.TestName);
                 item.SubItems.Add("--");
@@ -278,7 +250,7 @@ namespace ILRuntimeTest
 
                 //Crossbind Adapter is needed to generate the correct binding code
                 ILRuntimeHelper.Init(domain);
-                string outputPath = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "AutoGenerate"; // "..\\..\\AutoGenerate"
+                string outputPath = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "ILRuntimeTestBase/AutoGenerate"; // "..\\..\\AutoGenerate"
                 ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, outputPath);
             }
         }

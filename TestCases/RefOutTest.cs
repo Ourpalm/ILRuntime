@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntimeTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -291,6 +292,7 @@ namespace TestCases
                     throw new Exception();
             }
         }
+        [ILRuntimeTest(IsToDo = true)]
         public static void UnitTest_RefReturn()
         {
             RefReturnTest obj = new RefReturnTest();

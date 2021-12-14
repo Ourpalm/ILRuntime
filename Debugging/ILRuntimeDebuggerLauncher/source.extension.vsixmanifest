@@ -8,8 +8,9 @@
         <License>LICENSE.TXT</License>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[12.0,17.0]" />
-        <InstallationTarget Version="[12.0,17.0]" Id="Microsoft.VisualStudio.Pro" />
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[12.0,)" />
+        <InstallationTarget Version="[12.0,)" Id="Microsoft.VisualStudio.Pro" />
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[12.0,)" />
     </Installation>
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
@@ -21,6 +22,6 @@
         <Asset Type="Microsoft.VisualStudio.VsPackage" Path="EngineRegistration.pkgdef" />
     </Assets>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[14.0,17.0)" DisplayName="Visual Studio 核心编辑器" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[14.0,)" DisplayName="Visual Studio 核心编辑器" />
     </Prerequisites>
 </PackageManifest>
