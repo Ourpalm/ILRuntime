@@ -62,8 +62,15 @@ namespace ILRuntime.Reflection
             get
             {
                 MethodAttributes ma = MethodAttributes.Public;
+                if (definition.IsPrivate)
+                    ma = MethodAttributes.Private;
+                else if (definition.IsFamily)
+                    ma = MethodAttributes.Family;
                 if (method.IsStatic)
                     ma |= MethodAttributes.Static;
+                if (method.IsVirtual)
+                    ma |= MethodAttributes.Virtual;
+            
                 return ma;
             }
         }
