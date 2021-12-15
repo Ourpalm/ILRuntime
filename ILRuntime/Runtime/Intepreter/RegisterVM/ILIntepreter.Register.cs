@@ -4178,6 +4178,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeREnum.Isinst:
+                            case OpCodeREnum.Castclass:
                                 {
                                     reg2 = (r + ip->Register2);
                                     type = domain.GetType(ip->Operand);

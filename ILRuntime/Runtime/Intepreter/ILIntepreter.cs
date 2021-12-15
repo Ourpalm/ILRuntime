@@ -3520,6 +3520,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeEnum.Isinst:
+                            case OpCodeEnum.Castclass:
                                 {
                                     objRef = esp - 1;
                                     var oriRef = objRef;
@@ -4448,7 +4449,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                             case OpCodeEnum.Nop:
                             case OpCodeEnum.Volatile:
-                            case OpCodeEnum.Castclass:
+                        //    case OpCodeEnum.Castclass:
                             case OpCodeEnum.Readonly:
                                 break;
                             default:
