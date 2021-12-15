@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Mono.Cecil.Cil;
 
@@ -508,7 +507,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Nop:
                 case OpCodeREnum.InlineStart:
                 case OpCodeREnum.InlineEnd:
-                case OpCodeREnum.Castclass:
                 case OpCodeREnum.Readonly:
                 case OpCodeREnum.Leave:
                 case OpCodeREnum.Leave_S:
@@ -805,7 +803,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stfld:
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Throw:
-                case OpCodeREnum.Castclass:
                 case OpCodeREnum.Readonly:
                 case OpCodeREnum.Leave:
                 case OpCodeREnum.Leave_S:
