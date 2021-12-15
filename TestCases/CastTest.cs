@@ -48,12 +48,10 @@ namespace TestCases
             Func<Cast<CastSubObj>, CastSubObj> action2 = obj as Func<Cast<CastSubObj>, CastSubObj>;
 
             Func<Cast<CastSubObj>, CastSubObj2> action3 = obj as Func<Cast<CastSubObj>, CastSubObj2>;
-            var action4 = obj as ILRuntimeTest.TestFramework.DelegateCLRTestExtendMethod<Cast<CastSubObj>, CastSubObj2>;
             var action5 = obj as Action<Cast<CastSubObj>, CastSubObj2>;
 
             Console.WriteLine(action2 != null);
             Console.WriteLine(action3 != null);
-            Console.WriteLine(action4 != null);
             Console.WriteLine(action5 != null);
 
         }
