@@ -37,6 +37,7 @@ namespace TestCases
         delegate CastSubObj2 Cast_Func2(Cast<CastSubObj> a);
         delegate CastSubObj2 Cast_Func3(Cast<CastSubObj> a);
         delegate void Cast_Action4(Cast<CastSubObj> a);
+        public delegate object Cast_Func5(CastSubObj2 A);
 
         public static void CastTest1()
         {
