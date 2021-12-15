@@ -1099,9 +1099,8 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     return false;
                 }
-                var isFunc = im.ReturnType != appdomain.VoidType && type.IsGenericInstance;
                 var ret_type = im.ReturnType;
-                if (IsFunc && type.IsGenericInstance)
+                if (im.ReturnType != appdomain.VoidType && type.IsGenericInstance)
                 {
                     ret_type = type.GenericArguments[im.ParameterCount].Value;
                 }
