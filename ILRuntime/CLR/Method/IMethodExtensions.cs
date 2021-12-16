@@ -2,14 +2,25 @@
 {
     public static class IMethodExtensions
     {
-        public static bool IsExtendMethod(this IMethod iLMethod)
+        public static bool IsExtendMethod(this ILMethod im)
         {
-            if (!iLMethod.IsStatic)
+            if (!im.IsStatic || im.ParameterCount == 0)
             {
                 return false;
             }
-            return iLMethod.ParameterCount > 0 && iLMethod.DeclearingType.ReflectionType.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false);
-        }
 
+            return im.ReflectionMethodInfo.GetCustomAttributes(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false).Length > 0;
+
+        }
+        public static bool IsExtendMethod(this CLRMethod cm)
+        {
+            if (!cm.IsStatic || cm.ParameterCount == 0)
+            {
+                return false;
+            }
+
+            return cm.MethodInfo.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false);
+
+        }
     }
 }

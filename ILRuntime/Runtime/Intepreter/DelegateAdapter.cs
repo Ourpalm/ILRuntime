@@ -1093,16 +1093,40 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (type.IsDelegate)
             {
-                var im = type.GetMethod("Invoke", method.ParameterCount);
+                var method_count = method.IsExtend ? method.ParameterCount - 1 : method.ParameterCount;
+                var im = type.GetMethod("Invoke", method_count);
+                if (im == null)
+                {
+                    return false;
+                }
+                var ret_type = im.ReturnType;
+                if (im.ReturnType != appdomain.VoidType && type.IsGenericInstance)
+                {
+                    ret_type = type.GenericArguments[im.ParameterCount].Value;
+                }
                 if (im.IsDelegateInvoke)
                 {
-                    if (im.ParameterCount == method.ParameterCount && im.ReturnType == method.ReturnType)
+                    if (im.ParameterCount == method_count && ret_type == method.ReturnType)
                     {
-                        for (int i = 0; i < im.ParameterCount; i++)
-                        {
-                            if (im.Parameters[i] != method.Parameters[i])
-                                return false;
-                        }
+                            
+                            for (int i = 0; i < im.ParameterCount; i++)
+                            {
+                                var index = method.IsExtend ? i + 1 : i;
+                                if (type.IsGenericInstance)
+                                {
+                                    if (method.Parameters[index] != type.GenericArguments[i].Value)
+                                    {
+                                        return false;
+                                    }
+                                }
+                                else
+                                {
+                                    if (im.Parameters[i] != method.Parameters[index])
+                                        return false;
+                                }
+                              
+                            }
+
                         return true;
                     }
                     else
