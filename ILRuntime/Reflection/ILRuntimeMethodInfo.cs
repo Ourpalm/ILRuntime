@@ -209,10 +209,13 @@ namespace ILRuntime.Reflection
             {
                 iDelegate = appdomain.DelegateManager.FindDelegateAdapter(ilTypeInstance, method, method);
                 del = iDelegate;
+               
             }
             else
             {
                 del = iDelegate.Instantiate(appdomain, ilTypeInstance, iDelegate.Method);
+                del.RawMethod = method;
+
             }
             return del.GetConvertor(delegateType);
         }
