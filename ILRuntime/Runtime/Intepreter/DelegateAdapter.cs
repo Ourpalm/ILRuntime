@@ -899,6 +899,8 @@ namespace ILRuntime.Runtime.Intepreter
 
         public ILMethod Method { get { return method; } }
 
+        public IMethod RawMethod { get; set; }
+
         protected DelegateAdapter() { }
 
         protected DelegateAdapter(Enviorment.AppDomain appdomain, ILTypeInstance instance, ILMethod method)
@@ -1093,22 +1095,25 @@ namespace ILRuntime.Runtime.Intepreter
         {
             if (type.IsDelegate)
             {
-                var method_count = method.IsExtend ? method.ParameterCount - 1 : method.ParameterCount;
-                var im = type.GetMethod("Invoke", method_count);
-                if (im == null)
+                var need_judge = RawMethod.DeclearingType == type;
+                if (need_judge)
                 {
-                    return false;
-                }
-                var ret_type = im.ReturnType;
-                if (im.ReturnType != appdomain.VoidType && type.IsGenericInstance)
-                {
-                    ret_type = type.GenericArguments[im.ParameterCount].Value;
-                }
-                if (im.IsDelegateInvoke)
-                {
-                    if (im.ParameterCount == method_count && ret_type == method.ReturnType)
+                    var method_count = method.IsExtend ? method.ParameterCount - 1 : method.ParameterCount;
+                    var im = type.GetMethod("Invoke", method_count);
+                    if (im == null)
                     {
-                            
+                        return false;
+                    }
+                    var ret_type = im.ReturnType;
+                    if (im.ReturnType != appdomain.VoidType && type.IsGenericInstance)
+                    {
+                        ret_type = type.GenericArguments[im.ParameterCount].Value;
+                    }
+                    if (im.IsDelegateInvoke)
+                    {
+                        if (im.ParameterCount == method_count && ret_type == method.ReturnType)
+                        {
+
                             for (int i = 0; i < im.ParameterCount; i++)
                             {
                                 var index = method.IsExtend ? i + 1 : i;
@@ -1124,16 +1129,20 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (im.Parameters[i] != method.Parameters[index])
                                         return false;
                                 }
-                              
+
                             }
 
-                        return true;
+                            return true;
+                        }
+                        else
+                            return false;
                     }
                     else
                         return false;
                 }
-                else
-                    return false;
+
+
+                return false;
             }
             else
                 return false;
@@ -1233,5 +1242,8 @@ namespace ILRuntime.Runtime.Intepreter
         void Remove(Delegate dele);
         bool Equals(IDelegateAdapter adapter);
         bool Equals(Delegate dele);
+
+
+        IMethod RawMethod { get; set; }
     }
 }

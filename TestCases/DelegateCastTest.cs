@@ -53,21 +53,26 @@ namespace TestCases
             Func<DelegateCast<CastSubObj>, CastSubObj2> action3 = obj as Func<DelegateCast<CastSubObj>, CastSubObj2>;
             var action4 = obj as Cast_Func2;
             var action5 = obj as Action<DelegateCast<CastSubObj>, CastSubObj2>;
+            var action6 = obj as Cast_Func3;
 
 
             if (action2 != null)
             {
                 throw new Exception();
             }
-            if (action3 == null)
+            if (action3 != null)
             {
                 throw new Exception();
             }
-            if (action4 == null)
+            if (action4 != null)
             {
                 throw new Exception();
             }
             if (action5 != null)
+            {
+                throw new Exception();
+            }
+            if (action6 == null)
             {
                 throw new Exception();
             }
@@ -93,7 +98,9 @@ namespace TestCases
 
             var action7 = obj as Func<DelegateCast<CastSubObj>, CastSubObj2>;
 
+            var action8 = obj as Cast_Func2;
 
+            var action9 = obj as Cast_Func3;
 
 
 
@@ -114,11 +121,51 @@ namespace TestCases
                 throw new Exception();
             }
 
-            if (action7 == null)
+            if (action7 != null)
             {
                 throw new Exception();
             }
 
+            if (action8 == null)
+            {
+                throw new Exception();
+            }
+
+            if (action9 != null)
+            {
+                throw new Exception();
+            }
+
+
+            Func<DelegateCast<CastSubObj>,CastSubObj2> bfunc = (x) => { return null; };
+            obj = bfunc;
+
+            var action10 = obj as Cast_Func3;
+            var action11 = obj as Func<DelegateCast<CastSubObj>, CastSubObj2>;
+
+            if (action10 != null)
+            {
+                throw new Exception();
+            }
+            if (action11 == null)
+            {
+                throw new Exception();
+            }
+
+            ILRuntimeTest.TestFramework.IntDelegate intDelegate = (x) => { };
+            obj = intDelegate;
+
+            var action12 = obj as ILRuntimeTest.TestFramework.IntDelegate;
+            var action13 = obj as Action<int>;
+
+            if (action12 == null)
+            {
+                throw new Exception();
+            }
+            if (action13 != null)
+            {
+                throw new Exception();
+            }
 
         }
         [ILRuntimeTest.ILRuntimeTest(IsToDo = true)]

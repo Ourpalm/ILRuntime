@@ -278,6 +278,7 @@ namespace ILRuntime.Runtime.Enviorment
                 if (parameterCount == 0)
                 {
                     res = zeroParamMethodAdapter.Instantiate(appdomain, instance, ilMethod);
+                    res.RawMethod = method;
                     if (instance != null)
                         instance.SetDelegateAdapter(ilMethod, res);
                     return res;
@@ -299,6 +300,7 @@ namespace ILRuntime.Runtime.Enviorment
                         if (match)
                         {
                             res = i.Adapter.Instantiate(appdomain, instance, ilMethod);
+                            res.RawMethod = method;
                             if (instance != null)
                                 instance.SetDelegateAdapter(ilMethod, res);
                             return res;
@@ -328,6 +330,7 @@ namespace ILRuntime.Runtime.Enviorment
                             if (returnTypeForCLR == parameterTypes[parameterCount])
                             {
                                 res = i.Adapter.Instantiate(appdomain, instance, ilMethod);
+                                res.RawMethod = method;
                                 if (instance != null)
                                     instance.SetDelegateAdapter(ilMethod, res);
                                 return res;
@@ -338,6 +341,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
 
             res = dummyAdapter.Instantiate(appdomain, instance, ilMethod);
+            res.RawMethod = method;
             if (instance != null)
                 instance.SetDelegateAdapter(ilMethod, res);
             return res;
