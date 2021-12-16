@@ -54,13 +54,23 @@ namespace TestCases
             var action4 = obj as Cast_Func2;
             var action5 = obj as Action<DelegateCast<CastSubObj>, CastSubObj2>;
 
-            Console.WriteLine(action2 != null);
-            Console.WriteLine(action3 != null);
-            Console.WriteLine(action4 != null);
-            Console.WriteLine(action5 != null);
 
-
-
+            if (action2 != null)
+            {
+                throw new Exception();
+            }
+            if (action3 == null)
+            {
+                throw new Exception();
+            }
+            if (action4 == null)
+            {
+                throw new Exception();
+            }
+            if (action5 != null)
+            {
+                throw new Exception();
+            }
         }
         public static void DelegateCastTest2()
         {
@@ -80,21 +90,51 @@ namespace TestCases
             Action action4 = obj as Action;
 
             var action5 = obj as Action<DelegateCast<CastSubObj>, CastSubObj>;
-            var action6 = (Action<DelegateCast<CastSubObj>, CastSubObj>)obj;
+
             var action7 = obj as Func<DelegateCast<CastSubObj>, CastSubObj2>;
 
-            Console.WriteLine(action2 != null);
-            Console.WriteLine(action3 != null);
-
-            Console.WriteLine(action4 != null);
-            Console.WriteLine(action5 != null);
-
-            Console.WriteLine(action6 != null);
-            Console.WriteLine(action7 != null);
 
 
 
 
+            if (action2 != null)
+            {
+                throw new Exception();
+            }
+            if (action3 != null)
+            {
+                throw new Exception();
+            }
+            if (action4 != null)
+            {
+                throw new Exception();
+            }
+            if (action5 != null)
+            {
+                throw new Exception();
+            }
+
+            if (action7 == null)
+            {
+                throw new Exception();
+            }
+
+
+        }
+        [ILRuntimeTest.ILRuntimeTest(IsToDo = true)]
+        public static void DelegateCastTest3()
+        {
+            Cast_Func2 afunc = (x) => { return null; };
+
+
+            object obj = afunc;
+
+            var action6 = (Action<DelegateCast<CastSubObj>, CastSubObj>)obj;
+
+            if (action6 != null)//TODO:cast后应为空
+            {
+                throw new Exception();
+            }
         }
     }
 }
