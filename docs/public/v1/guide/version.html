@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+    <title>更新记录 — ILRuntime</title>
+    <meta charset="utf-8">
+    <meta name="description" content="ILRuntime">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
+
+    <script src="/ILRuntime/public/js/vue.js"></script>
+    <script src="/ILRuntime/public/js/jquery.js"></script>
+    <meta name="generator" content="Hexo 5.4.0"></head>
+
+    <body>
+        
+            <nav class="nav">
+    <div class="border">
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.0</button>
+        <button id="btn-menu" class="hiden-in-pc">菜单</button>
+        <ul class="nav-link hiden-in-phone">
+            <!--li>
+                <form id="search-form">
+                    <input type="text" id="search-query" class="search-query">
+                </form>
+            </li!-->
+            <li><a target="_blank" rel="noopener" href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li current">更新记录</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div id="container" class="container clear">
+    <section class="sidebar clearfix">
+    <ul>
+        
+    </ul>
+</section>
+    <article class="clearfix">
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V2-0-0"><a href="#V2-0-0" class="headerlink" title="V2.0.0"></a>V2.0.0</h3><ul>
+<li>加入寄存器运行模式，可大幅提升热更内数值计算性能</li>
+<li>执行性能整体提升，传统非寄存器模式执行效率也得到一定幅度提升</li>
+<li>修正热更内finnaly块在一些情况下不正确的bug，连带修复了yield return和async/await的一些异常情况</li>
+<li>修正值对类型绑定后的数组进行操作时的异常</li>
+<li>修正热更内Enum一些情况下Equals结果错误的bug</li>
+<li>修正跨域继承接口时的一些异常情况</li>
+<li>修正跨域继承时子类无法调用到子类方法的问题</li>
+<li>修正值类型绑定在一些情况下构造函数执行失败的bug</li>
+<li>修正反射接口无法获取父类public方法的bug</li>
+<li>修正嵌套数组在一些情况CLR绑定失败的bug</li>
+<li>修复值类型绑定后的值类型作为委托参数在一些情况下出现异常的Bug</li>
+<li>修正byte[]一些情况下取值出现强转失败的bug</li>
+<li>修正子类型在一些情况下调用+=，-=等重载操作符时异常的bug</li>
+<li>修正重载!操作符CLR绑定报错的bug</li>
+<li>修正值类型实现接口后new T时报错的bug</li>
+<li>修正一些情况下泛型匹配失败的Bug</li>
+<li>修正在try catch时重新抛出异常出错的Bug</li>
+<li>修正将委托保存在数组中可能出现调用异常的Bug</li>
+</ul>
+<h3 id="V1-6-7"><a href="#V1-6-7" class="headerlink" title="V1.6.7"></a>V1.6.7</h3><ul>
+<li>Appdomain.Prewarm接口加入递归预热的选项</li>
+<li>优化ILRuntime遇到异常时输出的日志，可在Unity的Console中直接点击前往源码</li>
+<li>增加CLRBinding在处理遇到同名类型时的容错</li>
+<li>修正跨域继承适配器自动生成工具生成的代码部分情况无法正常编译的问题</li>
+<li>完善Debug模式下部分异常的错误日志输出，方便定位问题</li>
+<li>修正个别情况下，为值类型方法this赋值时导致栈损坏的问题</li>
+<li>修正一个泛型方法匹配的Bug</li>
+<li>修正将ILRuntime中的多播委托实例存入List等容器时，只有最后一个挂接的回调被执行的Bug</li>
+<li>修正一个ref/out操作枚举变量时的Bug</li>
+<li>修正在泛型方法中转换Action等泛型委托失败的Bug</li>
+<li>增加CLRBindingUtils，使得应用可以同时兼容有CLR绑定和无CLR绑定的情况（直接删除CLR绑定自动生成代码也不会造成编译错误）</li>
+<li>给Litjson加入JsonIgnore特性</li>
+<li>修正FieldInfo，PropertyInfo等反射类型调用GetCustomAttributes时出错的问题</li>
+<li>修正ILRuntime中获取Attributes无法获取部分参数值的Bug</li>
+<li>修正一个导致async await中断的Bug</li>
+<li>修正一个跨域继承访问基类protected变量出错的Bug</li>
+<li>升级Mono.Cecil到0.11.3</li>
+</ul>
+<h3 id="V1-6-6"><a href="#V1-6-6" class="headerlink" title="V1.6.6"></a>V1.6.6</h3><ul>
+<li>Appdomain.Prewarm接口加入预热指定方法的参数</li>
+<li>AppDomain新增GetCurrentStackTrace接口获取当前调用栈，仅支持从热更中调用</li>
+<li>修改Profiler宏，以简化Unity平台上报Profiler数据</li>
+<li>修复一个基类包含值类型字段的类型报错的Bug</li>
+<li>修复热更中调用自定义Attribute后，自动分析绑定生成的代码编译不过的问题</li>
+<li>修复几个CLR自动分析绑定生成的代码出错的问题</li>
+<li>修复几个泛型方法匹配的Bug</li>
+<li>修复在基类实现接口的虚方法上有不必要开销的问题</li>
+<li>修复GetCustomAttributes接口当inherit为true时不包含基类Attribute的Bug</li>
+<li>修复CLR自动分析绑定无法自动生成event调用的绑定代码的问题</li>
+<li>修复在热更内调用Enum.CompareTo和Enum.ToObject的问题</li>
+</ul>
+<h3 id="V1-6-5"><a href="#V1-6-5" class="headerlink" title="V1.6.5"></a>V1.6.5</h3><ul>
+<li>提升了Release环境下（非Development Build）大约25%的执行效率</li>
+<li>修复了一个泛型类型中泛型变量无法置null的Bug</li>
+<li>修复一个default关键字作用于枚举或者值类型时报错的Bug</li>
+<li>修复一个导致带条件的await语句失效的Bug</li>
+<li>修复一个Enum.ToObject返回的Enum值不正确的Bug</li>
+<li>修复一个泛型方法中out到一个值类型报错的Bug</li>
+<li>修复一个由自动生成产生的跨域继承适配器，虚方法未被重载时不执行的Bug</li>
+<li>修复Litjson集成反序列化枚举数组时崩溃的Bug</li>
+</ul>
+<h3 id="V1-6-4"><a href="#V1-6-4" class="headerlink" title="V1.6.4"></a>V1.6.4</h3><ul>
+<li>修正一个使用委托返回经过值类型绑定过的值类型时造成的栈损坏问题</li>
+<li>修正一个自动生成跨域继承适配器代码时，无参数虚函数适配代码执行的报错</li>
+<li>修正一个自动生成跨域继承适配器代码对接口方法生成后，某些情况下导致StackOverflow无限递归的Bug</li>
+<li>修正Type.ToString结果和原生不一致的问题</li>
+<li>修正泛型嵌套数组T[][]字段初始化时的报错问题</li>
+<li>修正一个泛型方法匹配的Bug</li>
+<li>修正一个泛型数组作为参数时方法匹配的错误</li>
+<li>删掉一个C#7语法使用以提高兼容性</li>
+</ul>
+<h3 id="V1-6-3"><a href="#V1-6-3" class="headerlink" title="V1.6.3"></a>V1.6.3</h3><ul>
+<li>修复对泛型字段赋值导致栈损坏的Bug</li>
+<li>修复由跨域继承适配器代码生成器自动生成的代码，导致运行时进入错误的类方法的Bug</li>
+<li>修复一个在静态方法中实例化对象导致运行出错的Bug</li>
+<li>修复一个某些情况下静态构造函数没有执行的Bug</li>
+<li>修复一个加载多DLL，引用字段导致的运行时报错</li>
+<li>修复值类型绑定Enum字段分配内存时被意外装箱的Bug</li>
+<li>修复一个CLR自动分析绑定在某个特定情况下遗漏分析的Bug</li>
+<li>移除所有编译警告</li>
+<li>修复一个由于Unity的Bug导致的导入ILRuntime包时的报错</li>
+</ul>
+<h3 id="V1-6-2"><a href="#V1-6-2" class="headerlink" title="V1.6.2"></a>V1.6.2</h3><ul>
+<li>修正值类型部分情况下++, +=之类操作符失效的Bug</li>
+<li>修正将值类型成员变量传入方法，并在该方法里对这个参数赋值报错的Bug</li>
+<li>修复一个Async Await卡主的bug</li>
+</ul>
+<h3 id="V1-6-1"><a href="#V1-6-1" class="headerlink" title="V1.6.1"></a>V1.6.1</h3><ul>
+<li>去掉部分C#7的用法以增加unity2019以前版本的兼容性</li>
+</ul>
+<h3 id="V1-6"><a href="#V1-6" class="headerlink" title="V1.6"></a>V1.6</h3><ul>
+<li>增加了跨域继承适配器的工具类，简化适配器编写</li>
+<li>增加了跨域继承适配器的自动生成模版，做到半自动生成</li>
+<li>优化了热更存取主工程类字段的性能</li>
+<li>优化了热更内方法调用的性能</li>
+<li>累积Bug修复</li>
+</ul>
+<h3 id="V1-5"><a href="#V1-5" class="headerlink" title="V1.5"></a>V1.5</h3><ul>
+<li>更新了Mono.Cecil的版本，以支持Unity2018以上使用的.net standard2格式的DLL，以及Mac版VS编译的dll</li>
+<li>累积Bug修复</li>
+</ul>
+<h3 id="V1-4"><a href="#V1-4" class="headerlink" title="V1.4"></a>V1.4</h3><ul>
+<li>完整实现了断点调试和VS调试插件</li>
+<li>自动CLR绑定增加了值类型Binder的使用</li>
+<li>增加了泛型方法的CLR绑定</li>
+<li>多维数组的支持</li>
+<li>修复了若干关于泛型方法匹配的Bug</li>
+</ul>
+<h3 id="V1-3"><a href="#V1-3" class="headerlink" title="V1.3"></a>V1.3</h3><ul>
+<li>增加栈上分配值类型的机制，值类型可以不再强制装箱而直接在栈上分配。</li>
+<li>增加值类型绑定（ValueTypeBinding）机制，可以将ILRuntime外部的CLR值类型在栈上分配，大幅提升相关操作性能</li>
+<li>修复若干泛型方法寻找方法的bug</li>
+<li>改善委托缺少适配器或者转换器时自动生成的代码提示</li>
+</ul>
+<h3 id="V1-2"><a href="#V1-2" class="headerlink" title="V1.2"></a>V1.2</h3><ul>
+<li>完善系统反射接口的支持，并且提供获取ILRuntime中定义的类型作为泛型参数的接口</li>
+<li>集成Litjson库</li>
+<li>增加了字段，值类型复制，创建默认实例等操作的CLR绑定，改善这些操作的性能</li>
+<li>加入一种新的CLR绑定代码生成方式，可根据指定的DLL自动生成所需的CLR绑定代码，<br>无需再手动指定需要生成的类型</li>
+<li>修复若干泛型方法的Bug</li>
+<li>修复若干类型判断的Bug</li>
+</ul>
+<h3 id="V1-11"><a href="#V1-11" class="headerlink" title="V1.11"></a>V1.11</h3><ul>
+<li>修复了几个bug</li>
+<li>现在在Dictionary或者List等容器中存ILRuntime里定义的委托类型不在算跨域调用了</li>
+</ul>
+<h3 id="V1-1"><a href="#V1-1" class="headerlink" title="V1.1"></a>V1.1</h3><ul>
+<li>修复了个别IL2CPP下的bug</li>
+<li>减少了一些内存占用</li>
+<li>修复了几个跟泛型方法相关的bug</li>
+<li>增加了属性以及构造函数的反射支持</li>
+</ul>
+<h3 id="V1-0"><a href="#V1-0" class="headerlink" title="V1.0"></a>V1.0</h3><ul>
+<li>ILRuntime的第一个正式版本</li>
+<li>这次加上了完整的Unity示例工程</li>
+<li>VS调试插件暂时还没更新，如需要请用0.85版里的那个</li>
+</ul>
+
+    <div class="footer">
+        发现错误？想参与编辑？ 
+        <a href="https://github.com/Ourpalm/ILRuntime/tree/master/docs/source/src/v1/guide/version.md" target="_blank">
+            在 Github 上编辑此页！
+        </a>
+    </div>
+</article>
+
+<div class="sub-nav hiden-in-phone">
+    <dl id="sub-nav">
+        <dt>本文内容</dt>
+        <dd v-for="(ele, index) in sub_nav">
+           <a v-bind:href="ele.href">{{ ele.name }}</a>
+        </dd>
+    </dl>
+</div> 
+</div>
+
+<footer>
+    <div>
+        <p>© Copyright 2017 Ourpalm All Rights Reserved</p>
+        <p>掌趣科技2017</p>
+    </div>
+</footer>
+
+
+<script>
+var vm = new Vue({
+    el : '#container',
+    data: {
+        sub_nav : [ ]
+    },
+    created:function(){
+        var obj = [];
+        $("article h3").each(function(){
+            obj.push({name :  $(this).find("a").attr("title") , href : "#"+$(this).attr("id") });
+        });
+
+        this.sub_nav = obj;       
+    }
+});
+
+var isShow = false;
+$("nav").on("click","#btn-menu" , function(){
+
+    if(!isShow){
+        
+        if($(document).scrollTop() > $(".sidebar").height() - 100){
+
+            $('html, body').animate({scrollTop:0} , 300, "swing",function(){
+
+                $(".sidebar").fadeIn();
+                $(".container").animate({"left" : "15rem"}, 500,"swing");
+            });
+        }else{
+
+                $(".sidebar").fadeIn();
+                $(".container").animate({"left" : "15rem"}, 500,"swing");
+
+        }
+
+    }else{
+        $(".sidebar").fadeOut();
+        $(".container").animate({"left" : "0rem"}, 500,"swing");
+    }
+    isShow = !isShow;
+
+});
+
+$(".container").on("click" , "article" , function(){
+
+    if(isShow){
+        $(".sidebar").fadeOut();
+        $(".container").animate({"left" : "0rem"}, 500,"swing");
+        isShow = false;    
+    }
+
+});
+</script>
+        
+    </body>
+</html>
