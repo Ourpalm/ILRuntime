@@ -49,7 +49,7 @@
 <h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>在使用LitJson前，需要对LitJson进行注册，注册方法很简单，只需要在ILRuntime初始化阶段，在注册CLR绑定之前，执行下面这行代码即可：</p>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(appdomain);</span><br></pre></td></tr></table></figure>
 <h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>LitJson的使用非常简单，将一个对象转换成json字符串，只需要下面这行代码即可</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">string</span> json = JsonMapper.ToJson(obj);</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">string</span> json = JsonMapper.ToJson(obj);</span><br></pre></td></tr></table></figure>
 <p>将json字符串反序列化成对象也同样只需要一行代码</p>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">JsonTestClass obj = JsonMapper.ToObject&lt;JsonTestClass&gt;(json);</span><br></pre></td></tr></table></figure>
 <p>其他具体使用方法请参考LitJson库的文档即可</p>
