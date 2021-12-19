@@ -24,6 +24,10 @@ ILRuntime的性能跟编译模式和Unity发布选项有着非常大的关系，
 
 为了解决这个问题，ILRuntime在1.3.0版中增加了值类型绑定（ValueTypeBinding）机制，通过对这些值类型添加绑定器，可以大幅增加值类型的执行效率，以及避免GC Alloc内存分配。具体用法请参考ILRuntime的Unity3D示例工程或者ILRuntime的TestCases测试用例工程。
 
+### 大规模数值计算
+
+如果在热更内需要进行大规模数值计算，则可以开启ILRuntime在2.0版中加入的[寄存器模式](https://ourpalm.github.io/ILRuntime/public/v1/guide/register-vm.html)来进行优化
+
 ### 接口调用建议
 为了调用方便，ILRuntime的很多接口使用了params可变参数，但是有可能会无意间忽视这个操作带来的GCAlloc，例如下面的操作：
 ```csharp

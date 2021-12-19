@@ -9,6 +9,7 @@ order: 1030
 
 [CLR自动分析绑定]:https://ourpalm.github.io/ILRuntime/public/v1/guide/bind.html
 [U3D Demo工程]:https://github.com/Ourpalm/ILRuntimeU3D/
+[寄存器模式]:https://ourpalm.github.io/ILRuntime/public/v1/guide/register-vm.html
 <!--参考链接-->  
 
 ## 版本
@@ -25,7 +26,8 @@ order: 1030
 
 ### 我要怎么才能在Profiler里看见热更内的方法耗时情况呢？
 
->- 在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用
+> 在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用
+
 ```csharp
 #if DEBUG && !NO_PROFILER
         //由于Unity的Profiler接口只允许在主线程使用，为了避免出异常，需要告诉ILRuntime主线程的线程ID才能正确将函数运行耗时报告给Profiler
@@ -72,7 +74,7 @@ order: 1030
 >- 请确保热更DLL是使用Release方式编译的，Debug编译的DLL会慢3-5倍
 >- 请发布非Development Build真机包后再测试耗时，编辑器中和Development Build执行速度会比最终Release包慢几倍
 >- 请确保注册了常使用的值类型的值类型绑定
->- 如果需要大规模数学运算，可以通过2.0新加入的寄存器模式对方法进行优化，或将耗时的工具方法放入主工程辅助
+>- 如果需要大规模数学运算，可以通过2.0新加入的[寄存器模式]对方法进行优化，或将耗时的工具方法放入主工程辅助
 
 ## 疑难杂症
 
