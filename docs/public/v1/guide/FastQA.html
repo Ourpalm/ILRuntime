@@ -14,7 +14,7 @@
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    <meta name="generator" content="Hexo 5.4.0"></head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
@@ -29,7 +29,7 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a target="_blank" rel="noopener" href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -42,21 +42,149 @@
     <section class="sidebar clearfix">
     <ul>
         
+            
+            
+                <li><h3>基础</h3></li>
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/index.html" class="sidebar-link">介绍</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/contribution.html" class="sidebar-link">贡献指南</a></p>
+            </li>
+        
+            
+            
+            
+                <li><h3>教程</h3></li>
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">ILRuntime中使用委托</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">ILRuntime中跨域继承</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">ILRuntime中的反射</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">CLR重定向</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">CLR绑定</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/litjson.html" class="sidebar-link">LitJson集成</a></p>
+            </li>
+        
+            
+            
+            
+            
+                <li><h3>其他</h3></li>
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包注意事项</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRuntime的性能优化</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRuntime的实现原理</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/FastQA.html" class="sidebar-link current">常见问题解答</a></p>
+            </li>
+        
     </ul>
 </section>
     <article class="clearfix">
     <!--参考链接-->  
 <!--参考链接-->  
+
 <h2 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h2><blockquote>
-<p>Unity2018.3以上需要用最新ILRuntime。<br>最新的发布版本为V2.0，Unity2018以上可通过Package Manager方式安装<br>V1.4已过时，示例工程内的版本已过时，当前最新版本为<a target="_blank" rel="noopener" href="https://github.com/Ourpalm/ILRuntime">master</a>分支。</p>
+<p>Unity2018.3以上需要用最新ILRuntime。<br>最新的发布版本为V2.0，Unity2018以上可通过Package Manager方式安装<br>V1.4已过时，示例工程内的版本已过时，当前最新版本为<a href="https://github.com/Ourpalm/ILRuntime" target="_blank" rel="noopener">master</a>分支。</p>
 </blockquote>
 <h2 id="ILRuntime的性能到底怎么样"><a href="#ILRuntime的性能到底怎么样" class="headerlink" title="ILRuntime的性能到底怎么样"></a>ILRuntime的性能到底怎么样</h2><blockquote>
-<p>最新版ILRuntime在若干若干测试用例中，包括大规模数值计算的场景，均已超过Lua53版xlua，详细测试可参考 <a target="_blank" rel="noopener" href="https://github.com/Ourpalm/ILRuntimeU3D/">U3D Demo工程</a></p>
+<p>最新版ILRuntime在若干若干测试用例中，包括大规模数值计算的场景，均已超过Lua53版xlua，详细测试可参考 <a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener">U3D Demo工程</a></p>
 </blockquote>
 <h2 id="编辑器内的常见问题"><a href="#编辑器内的常见问题" class="headerlink" title="编辑器内的常见问题"></a>编辑器内的常见问题</h2><h3 id="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"><a href="#我要怎么才能在Profiler里看见热更内的方法耗时情况呢？" class="headerlink" title="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"></a>我要怎么才能在Profiler里看见热更内的方法耗时情况呢？</h3><blockquote>
 <p>在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用</p>
 </blockquote>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> DEBUG &amp;&amp; !NO_PROFILER</span></span><br><span class="line">        <span class="comment">//由于Unity的Profiler接口只允许在主线程使用，为了避免出异常，需要告诉ILRuntime主线程的线程ID才能正确将函数运行耗时报告给Profiler</span></span><br><span class="line">        appdomain.UnityMainThreadID = System.Threading.Thread.CurrentThread.ManagedThreadId;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
 <h3 id="运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream"><a href="#运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream" class="headerlink" title="运行出现报错ObjectDisposedException: Cannot access a closed Stream"></a>运行出现报错ObjectDisposedException: Cannot access a closed Stream</h3><blockquote>
 <p>加载dll的流被关闭了。新版要求流不能关闭，也不能用using写法。新的用法请参见Demo示例</p>
 </blockquote>

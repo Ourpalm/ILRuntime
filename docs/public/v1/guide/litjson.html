@@ -14,7 +14,7 @@
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    <meta name="generator" content="Hexo 5.4.0"></head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
@@ -29,7 +29,7 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a target="_blank" rel="noopener" href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
             <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
             <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
@@ -42,16 +42,145 @@
     <section class="sidebar clearfix">
     <ul>
         
+            
+            
+                <li><h3>基础</h3></li>
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/index.html" class="sidebar-link">介绍</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/version.html" class="sidebar-link">更新记录</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/contribution.html" class="sidebar-link">贡献指南</a></p>
+            </li>
+        
+            
+            
+            
+                <li><h3>教程</h3></li>
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/delegate.html" class="sidebar-link">ILRuntime中使用委托</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/cross-domain.html" class="sidebar-link">ILRuntime中跨域继承</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/reflection.html" class="sidebar-link">ILRuntime中的反射</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/redirection.html" class="sidebar-link">CLR重定向</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/bind.html" class="sidebar-link">CLR绑定</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/litjson.html" class="sidebar-link current">LitJson集成</a></p>
+            </li>
+        
+            
+            
+            
+            
+                <li><h3>其他</h3></li>
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/il2cpp.html" class="sidebar-link">IL2CPP打包注意事项</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/performance-optimization.html" class="sidebar-link">ILRuntime的性能优化</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/principle.html" class="sidebar-link">ILRuntime的实现原理</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/FastQA.html" class="sidebar-link">常见问题解答</a></p>
+            </li>
+        
     </ul>
 </section>
     <article class="clearfix">
     <h2 id="LitJson集成"><a href="#LitJson集成" class="headerlink" title="LitJson集成"></a>LitJson集成</h2><p>Json序列化是开发中非常经常需要用到的功能，考虑到其通用性，因此ILRuntime对LitJson这个序列化库进行了集成</p>
 <h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>在使用LitJson前，需要对LitJson进行注册，注册方法很简单，只需要在ILRuntime初始化阶段，在注册CLR绑定之前，执行下面这行代码即可：</p>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(appdomain);</span><br></pre></td></tr></table></figure>
+
 <h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>LitJson的使用非常简单，将一个对象转换成json字符串，只需要下面这行代码即可</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">string</span> json = JsonMapper.ToJson(obj);</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">string</span> json = JsonMapper.ToJson(obj);</span><br></pre></td></tr></table></figure>
+
 <p>将json字符串反序列化成对象也同样只需要一行代码</p>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">JsonTestClass obj = JsonMapper.ToObject&lt;JsonTestClass&gt;(json);</span><br></pre></td></tr></table></figure>
+
 <p>其他具体使用方法请参考LitJson库的文档即可</p>
 
     <div class="footer">
