@@ -51,7 +51,8 @@ namespace ILRuntime.Reflection
                 {
                     foreach (var j in attribute.Fields)
                     {
-                        var field = it.GetField(j.Name, out int index);
+                        int index;
+                        var field = it.GetField(j.Name, out index);
                         if (field != null)
                             ((ILRuntime.Runtime.Intepreter.ILTypeInstance)ins)[index] = j.Argument.Value;
                     }

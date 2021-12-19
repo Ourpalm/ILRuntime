@@ -417,7 +417,7 @@ namespace ILRuntime.CLR.Method
                 }
 
                 argString = argString.Substring(0, argString.Length - 2);
-                throw new Exception($"MakeGenericMethod failed : {def.DeclaringType.FullName}.{def.Name}<{argString}>");
+                throw new Exception(string.Format("MakeGenericMethod failed : {0}.{1}<{}>", def.DeclaringType.FullName, def.Name, argString));
             }
 #endif
             var res = new CLRMethod(t, declaringType, appdomain);

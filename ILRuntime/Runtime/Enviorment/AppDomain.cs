@@ -801,7 +801,7 @@ namespace ILRuntime.Runtime.Enviorment
                     UnityEngine.Debug.Log("CLRBindingUtils.Initialize Done in thread..");
 #endif
                 });
-                thread.Name = $"CLRBindings-Thread #{thread.ManagedThreadId}";
+                thread.Name = string.Format("CLRBindings-Thread #{0}",thread.ManagedThreadId);
                 thread.Start();
             }
             else
@@ -853,8 +853,9 @@ namespace ILRuntime.Runtime.Enviorment
                     for (int i = 0; i < genericArguments.Length; i++)
                     {
                         string key = null;
-                        if (bt is ILType ilt)
+                        if (bt is ILType)
                         {
+                            ILType ilt = (ILType)bt;
                             key = ilt.TypeDefinition.GenericParameters[i].FullName;
                         }
                         else
