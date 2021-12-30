@@ -37,8 +37,9 @@ namespace TestCases
         }
         public static string Extend(this DelegateExtObj obj,string str)
         {
-         
-            return "Extend";
+            if (obj == null) 
+                throw new Exception();
+            return "Extend" + str;
         }
     }
     public class DelegateExtTest
@@ -54,6 +55,10 @@ namespace TestCases
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest += obj.IntTest2;
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest(123);
 
+            Func<DelegateExtObj,string,string> func = DelegateExtObjMethod.Extend;
+            var ret = func.Invoke(obj,"1");
+            if(!ret.Equals("Extend1"))
+               throw new Exception();
         }
 
         public static void DelegateExtTest02()
