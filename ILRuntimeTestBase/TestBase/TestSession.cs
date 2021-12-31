@@ -46,7 +46,7 @@ namespace ILRuntimeTest.TestBase
                 }
 
                 ILRuntimeHelper.Init(_app);
-                //ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
+                ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
                 _app.InitializeBindings(true);
                 LoadTest();
             }
