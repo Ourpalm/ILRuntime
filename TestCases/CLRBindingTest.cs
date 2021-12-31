@@ -25,5 +25,50 @@ namespace TestCases
             int[][][] val = new int[10][][];
             ILRuntimeTest.TestBase.StaticGenericMethods.ArrayMethod(val);
         }
+        public static void CLRBindingTest04()
+        {
+            ILRuntimeTest.TestBase.TestSession.LastSession.Appdomain.AllowUnboundCLRMethod = false;
+        }
+        public static void CLRBindingTest05()
+        {            
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            binding.Emit(binding);
+        }
+
+        public static void CLRBindingTest06()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            CLRBindingTest06Sub(binding, binding);
+        }
+        static void CLRBindingTest06Sub<T>(ILRuntimeTest.TestFramework.TestCLRBinding binding, T obj)
+        {
+            binding.LoadAsset("222", obj);
+        }
+
+        public static void CLRBindingTest07()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            CLRBindingTest07Sub(binding, "");
+        }
+
+        public static void CLRBindingTest08()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            CLRBindingTest07Sub2(binding, 12334);
+        }
+        static void CLRBindingTest07Sub<T>(ILRuntimeTest.TestFramework.TestCLRBinding binding, T obj)
+        {
+            CLRBindingTest06Sub(binding, obj);
+        }
+
+        static void CLRBindingTest07Sub2<K,V>(K binding, V obj) where K: ILRuntimeTest.TestFramework.TestCLRBinding
+        {
+            CLRBindingTest07Sub(binding, obj);
+        }
+
+        public static void CLRBindingTestEnd()
+        {
+            ILRuntimeTest.TestBase.TestSession.LastSession.Appdomain.AllowUnboundCLRMethod = true;
+        }
     }
 }

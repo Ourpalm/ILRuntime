@@ -110,6 +110,7 @@ namespace ILRuntime.Runtime.Intepreter
         }
         internal StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
         {
+            allowUnboundCLRMethod = domain.AllowUnboundCLRMethod;
 #if DEBUG
             if (method == null)
                 throw new NullReferenceException();
