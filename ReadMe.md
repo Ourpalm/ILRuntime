@@ -13,4 +13,6 @@ ILRuntime
 
 [Unity Demo Project, Unity示例工程](https://github.com/Ourpalm/ILRuntimeU3D/)
 
+[Video Tutorial(Chinese), 视频教程](https://learn.u3d.cn/tutorial/ilruntime)
+
 QQ群：512079820
