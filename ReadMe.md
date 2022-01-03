@@ -1,7 +1,7 @@
 ILRuntime
 ==========
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT)
-[![release](https://img.shields.io/badge/release-v2.0.0-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases)
+[![release](https://img.shields.io/badge/release-v2.0.2-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
 
 ![example workflow](https://github.com/Ourpalm/ILRuntime/actions/workflows/dotnet.yml/badge.svg)

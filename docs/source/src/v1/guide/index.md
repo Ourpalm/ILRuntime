@@ -6,7 +6,7 @@ order: 0
 
 ## ILRuntime
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT) [![release](https://img.shields.io/badge/release-v2.0.0-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT) [![release](https://img.shields.io/badge/release-v2.0.2-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
 
 ILRuntime项目为基于C#的平台（例如Unity）提供了一个`纯C#实现`，`快速`、`方便`且`可靠`的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新
 
@@ -42,4 +42,4 @@ Lua的优势在于解决方案足够成熟，之前的C++团队可能比起C#，
 >ILRuntime设计上为了在开发时提供更多的调试支持，在Unity Editor中运行会有很多额外的性能开销，
 因此在Unity Editor中直接测试并不能代表ILRuntime的实际运行性能。
 
-最新2.0版本的ILRuntime，在10多项测试用例当中的性能，均已超过lua53版xlua，详细测试代码可参见ILRuntime的[U3D Demo工程](https://github.com/Ourpalm/ILRuntimeU3D/)
+最新2.0版本的ILRuntime，加入了[寄存器模式](https://ourpalm.github.io/ILRuntime/public/v1/guide/register-vm.html)，在10多项测试用例当中的性能，均已超过lua53版xlua，详细测试代码可参见ILRuntime的[U3D Demo工程](https://github.com/Ourpalm/ILRuntimeU3D/)以及[视频教程](https://learn.u3d.cn/tutorial/ilruntime)
