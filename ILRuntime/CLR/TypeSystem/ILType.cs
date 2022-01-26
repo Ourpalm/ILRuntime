@@ -993,7 +993,10 @@ namespace ILRuntime.CLR.TypeSystem
             }
             return null;
         }
-
+        public IMethod GetConstructor(List<IType> param)
+        {
+            return GetConstructor(param, true);
+        }
         public IMethod GetConstructor(List<IType> param, bool exactMatch = true)
         {
             if (constructors == null)
