@@ -690,16 +690,21 @@ namespace TestCases
         public static void GenericStaticMethodTest19()
         {
             GenericStaticMethodTest19Sub(new testConstrainsA());
+            GenericStaticMethodTest19Sub2(new testConstrainsA());
         }
 
         class testConstrainsA
         {
         }
-
         static void GenericStaticMethodTest19Sub<T>(T a) where T : testConstrainsA
         {
             object test = null;
             var testB = test as T; // 此行报空指针
+            Console.WriteLine(testB);
+        }
+        static void GenericStaticMethodTest19Sub2<T>(T a) where T : testConstrainsA
+        {
+            var testB = a as T; // 此行报空指针
             Console.WriteLine(testB);
         }
     }
