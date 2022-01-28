@@ -487,6 +487,7 @@ namespace TestCases
             for (int i = 0; i < 3; i++)
             {
                 cls.Vector2 = cls2.Vector2 = new TestVector3(3, 4, i);
+                Console.WriteLine(cls.Vector2);
             }
 
             if (cls.Vector2.Z != 2)

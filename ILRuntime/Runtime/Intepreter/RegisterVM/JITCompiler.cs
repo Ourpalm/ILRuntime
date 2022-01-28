@@ -1004,7 +1004,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 pCnt = m.ParameterCount;
                 if (!m.IsStatic && op.Code != OpCodeREnum.Newobj)
                     pCnt++;
-                hasReturn = m.ReturnType != appdomain.VoidType;
+                hasReturn = m.ReturnType != appdomain.VoidType && !(m.IsConstructor && op.Code == OpCodeREnum.Call);
                 if (m is ILMethod)
                 {
                     isILMethod = !m.IsDelegateInvoke;
