@@ -1340,6 +1340,11 @@ namespace ILRuntime.Runtime.Enviorment
             IType t = GetType(type);
             if (t == null || t is CLRType)
                 return;
+            ILType ilType = (ILType)t;
+            foreach(var i in ilType.TypeDefinition.NestedTypes)
+            {
+                Prewarm(i.FullName, recursive);
+            }
             var methods = t.GetMethods();
             foreach (var i in methods)
             {

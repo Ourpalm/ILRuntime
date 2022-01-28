@@ -211,5 +211,28 @@ namespace TestCases
                 return 0;
             }
         }
+
+        public static void TestRun8()
+        {
+            Console.WriteLine("a");
+            Task.Run(() => Foo1());
+            Console.WriteLine("b");
+            Task.Run(() => Foo2());
+            Console.WriteLine("c");
+        }
+
+        private static async Task Foo1()
+        {
+            Console.WriteLine("1");
+            await Task.Delay(1000);
+            Console.WriteLine("2");
+        }
+
+        private static async Task Foo2()
+        {
+            Console.WriteLine("3");
+            await Task.Delay(1000);
+            Console.WriteLine("4");
+        }
     }
 }

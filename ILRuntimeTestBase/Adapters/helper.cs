@@ -139,6 +139,8 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task<System.Int32>>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task<System.Int32>>();
 
+            app.Prewarm("TestCases.AsyncAwaitTest", false);
+            //app.Prewarm("ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType");
         }
     }
 }
