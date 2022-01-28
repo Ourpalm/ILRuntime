@@ -686,6 +686,22 @@ namespace TestCases
                     throw new Exception();
             }
         }
+
+        public static void GenericStaticMethodTest19()
+        {
+            GenericStaticMethodTest19Sub(new testConstrainsA());
+        }
+
+        class testConstrainsA
+        {
+        }
+
+        static void GenericStaticMethodTest19Sub<T>(T a) where T : testConstrainsA
+        {
+            object test = null;
+            var testB = test as T; // 此行报空指针
+            Console.WriteLine(testB);
+        }
     }
 
 
