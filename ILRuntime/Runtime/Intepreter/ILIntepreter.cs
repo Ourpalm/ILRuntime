@@ -4798,10 +4798,24 @@ namespace ILRuntime.Runtime.Intepreter
                     if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
                     {
                         CopyStackValueType(esp, v, mStack);
+                        FreeStackValueType(esp);
+                    }
+                    else if(v->ObjectType == ObjectTypes.Object)
+                    {
+                        var dst = ILIntepreter.ResolveReference(esp);
+                        if(dst != null)
+                        {
+                            var ct = domain.GetTypeByIndex(dst->Value) as CLRType;
+                            var binder = ct.ValueTypeBinder;
+                            v->ObjectType = ObjectTypes.ValueTypeObjectReference;
+                            int addr = ((IntPtr)dst).ToInt32();
+                            v->Value = addr;
+                        }
+                        else
+                            throw new NotImplementedException();
                     }
                     else
                         throw new NotImplementedException();
-                    FreeStackValueType(esp);
                     break;
                 default:
                     *v = *esp;
