@@ -292,6 +292,26 @@ namespace TestCases
             }
         }
 
+        CrossClass crossClass;
+        public static void InheritanceTest21()
+        {
+            var inheritanceTest = new InheritanceTest();
+            var dic = new Dictionary<int, CrossClass>();
+            dic.Add(1, new CrossClass());
+            dic.TryGetValue(1, out inheritanceTest.crossClass);
+            Console.WriteLine("InheritanceTest21:classA is " + inheritanceTest.crossClass.classA);
+        }
+
+        public static void InheritanceTest22()
+        {
+            var inheritanceTest = new InheritanceTest();
+            var dic = new Dictionary<int, CrossClass>();
+            dic.Add(1, new CrossClass());
+            dic.TryGetValue(1, out inheritanceTest.crossClass);
+            inheritanceTest.crossClass.classA = new ClassA();
+            Console.WriteLine("InheritanceTest21:classA is " + inheritanceTest.crossClass.classA);
+        }
+
         class TestExplicitInterface : IDisposable
         {
             public bool Called { get; set; }

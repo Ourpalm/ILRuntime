@@ -2105,9 +2105,13 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         if (obj != null)
                                         {
-                                            if (obj is ILTypeInstance)
+                                            ILTypeInstance instance = null;
+                                            if (obj is ILTypeInstance ilTypeInstance)
+                                                instance = ilTypeInstance;
+                                            else if (obj is CrossBindingAdaptorType crossBindingAdaptorType)
+                                                instance = crossBindingAdaptorType.ILInstance;
+                                            if (instance != null)
                                             {
-                                                ILTypeInstance instance = obj as ILTypeInstance;
                                                 val = esp - 1;
                                                 instance.AssignFromStack((int)ip->TokenLong, val, AppDomain, mStack);
                                             }
@@ -2237,11 +2241,13 @@ namespace ILRuntime.Runtime.Intepreter
                                         Free(ret);
                                         if (obj != null)
                                         {
-                                            if (obj is ILTypeInstance)
-                                            {
-                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                            ILTypeInstance instance = null;
+                                            if (obj is ILTypeInstance ilTypeInstance)
+                                                instance = ilTypeInstance;
+                                            else if (obj is CrossBindingAdaptorType crossBindingAdaptorType)
+                                                instance = crossBindingAdaptorType.ILInstance;
+                                            if (instance != null)
                                                 instance.PushToStack((int)ip->TokenLong, ret, this, mStack);
-                                            }
                                             else
                                             {
                                                 //var t = obj.GetType();
