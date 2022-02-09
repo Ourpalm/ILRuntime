@@ -1504,5 +1504,58 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return ILIntepreter.PushObject(ret, mStack, Delegate.CreateDelegate(t, obj, mi), true);
         }
+
+        public static StackObject* TypeMakeGenericType(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = esp - 2;
+            AppDomain domain = intp.AppDomain;
+
+            var p = esp - 1;
+            Type[] param = (Type[])StackObject.ToObject(p, domain, mStack);
+            intp.Free(p);
+
+            p = esp - 2;
+            Type type = (Type)StackObject.ToObject(p, domain, mStack);
+            IType t = ToIType(type);
+            intp.Free(p);
+
+            if (!t.HasGenericParameter)
+                throw new NotSupportedException(string.Format("{0} is not a generic type", t.FullName));
+            ILType iltype = t as ILType;
+            if(iltype != null)
+            {
+                KeyValuePair<string, IType>[] arr = new KeyValuePair<string, IType>[iltype.TypeDefinition.GenericParameters.Count];
+                for(int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = new KeyValuePair<string, IType>(iltype.TypeDefinition.GenericParameters[i].Name, ToIType(param[i]));
+                }
+                return ILIntepreter.PushObject(ret, mStack, t.MakeGenericInstance(arr).ReflectionType, true);
+            }
+            CLRType clrType = t as CLRType;
+            if(clrType != null)
+            {
+                KeyValuePair<string, IType>[] arr = new KeyValuePair<string, IType>[param.Length];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = new KeyValuePair<string, IType>("!", ToIType(param[i]));
+                }
+                return ILIntepreter.PushObject(ret, mStack, t.MakeGenericInstance(arr).ReflectionType, true);
+            }
+            throw new NotImplementedException();
+        }
+
+        static IType ToIType(Type type)
+        {
+            if (type is ILRuntimeType)
+            {
+                return ((ILRuntimeType)type).ILType;
+            }
+            else if (type is ILRuntimeWrapperType)
+            {
+                return ((ILRuntimeWrapperType)type).CLRType;
+            }
+            else
+                throw new NotSupportedException();
+        }
     }
 }

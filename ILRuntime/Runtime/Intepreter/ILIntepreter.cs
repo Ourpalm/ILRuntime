@@ -2025,6 +2025,22 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = StackObject.ToObject((Minus(esp, cm.ParameterCount + 1)), domain, mStack);
                                                 if (instance is IDelegateAdapter)
                                                 {
+                                                    if (cm.IsDelegateDynamicInvoke)
+                                                    {
+                                                        arrRef = esp - 1;
+                                                        object[] objArr = StackObject.ToObject(arrRef, domain, mStack) as object[];
+                                                        Free(arrRef);
+                                                        if (objArr != null)
+                                                        {
+                                                            if (objArr.Length != cm.ParameterCount)
+                                                                throw new ArgumentException(string.Format("{0}.{1} has {2} arguments, but got {3}", cm.DeclearingType.FullName, cm.Name, cm.ParameterCount, objArr.Length));
+                                                            esp = arrRef;
+                                                            for (intVal = 0; intVal < objArr.Length; intVal++)
+                                                            {
+                                                                esp = PushObject(esp, mStack, objArr[intVal], cm.Parameters[intVal] == domain.ObjectType);
+                                                            }
+                                                        }
+                                                    }
                                                     esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
                                                     processed = true;
                                                 }

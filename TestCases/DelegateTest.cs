@@ -3,6 +3,7 @@ using ILRuntimeTest.TestFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace TestCases
@@ -534,6 +535,38 @@ namespace TestCases
             var res = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2(100);
             if (res != 999)
                 throw new Exception();
+        }
+
+        class B
+        {
+
+        }
+
+        class A
+        {
+            private void test(B b)
+            {
+                if (b != null && b.GetType() == typeof(B))
+                    Console.WriteLine("OK");
+                else
+                    throw new Exception();
+            }
+        }
+
+        public static void DelegateTest36()
+        {
+            A target = new A();
+            Type type = target.GetType();
+
+            MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Instance);
+            for (int methodInfoIndex = 0; methodInfoIndex < methodInfos.Length; methodInfoIndex++)
+            {
+                MethodInfo methodInfo = methodInfos[methodInfoIndex];
+                ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+                Type actionType = typeof(Action<>).MakeGenericType(parameterInfos[0].ParameterType);
+                Delegate action = Delegate.CreateDelegate(actionType, target, methodInfo);
+                action.DynamicInvoke(new B());
+            }
         }
     }
 }
