@@ -544,15 +544,16 @@ namespace TestCases
 
         class A
         {
+            public int a = 123;
             private void test(B b)
             {
-                if (b != null && b.GetType() == typeof(B))
+                if (b != null && b.GetType() == typeof(B) && a == 123)
                     Console.WriteLine("OK");
                 else
                     throw new Exception();
             }
         }
-
+        delegate void TestDele(B a);
         public static void DelegateTest36()
         {
             A target = new A();
@@ -564,6 +565,21 @@ namespace TestCases
                 MethodInfo methodInfo = methodInfos[methodInfoIndex];
                 ParameterInfo[] parameterInfos = methodInfo.GetParameters();
                 Type actionType = typeof(Action<>).MakeGenericType(parameterInfos[0].ParameterType);
+                Delegate action = Delegate.CreateDelegate(actionType, target, methodInfo);
+                action.DynamicInvoke(new B());
+            }
+        }
+
+        public static void DelegateTest37()
+        {
+            A target = new A();
+            Type type = target.GetType();
+
+            MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Instance);
+            for (int methodInfoIndex = 0; methodInfoIndex < methodInfos.Length; methodInfoIndex++)
+            {
+                MethodInfo methodInfo = methodInfos[methodInfoIndex];
+                Type actionType = typeof(TestDele);
                 Delegate action = Delegate.CreateDelegate(actionType, target, methodInfo);
                 action.DynamicInvoke(new B());
             }

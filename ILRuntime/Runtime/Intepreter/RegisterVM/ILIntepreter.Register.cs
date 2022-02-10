@@ -2802,22 +2802,29 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
                                             intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
-                                            for (int i = 0; i < intVal; i++)
+                                            if (intVal > 0)
                                             {
-                                                switch (i)
+                                                reg1 = (r + ip->Register2);
+                                                CopyToStack(esp, reg1, mStack);
+                                                if (useRegister && reg1->ObjectType < ObjectTypes.Object)
                                                 {
-                                                    case 0:
-                                                        reg1 = (r + ip->Register2);
-                                                        break;
-                                                    case 1:
-                                                        reg1 = (r + ip->Register3);
-                                                        break;
-                                                    case 2:
-                                                        reg1 = (r + ip->Register4);
-                                                        break;
-                                                    default:
-                                                        throw new NotSupportedException();
+                                                    mStack.Add(null);
                                                 }
+                                                esp++;
+                                            }
+                                            if (intVal > 1)
+                                            {
+                                                reg1 = (r + ip->Register3);
+                                                CopyToStack(esp, reg1, mStack);
+                                                if (useRegister && reg1->ObjectType < ObjectTypes.Object)
+                                                {
+                                                    mStack.Add(null);
+                                                }
+                                                esp++;
+                                            }
+                                            if (intVal > 2)
+                                            {
+                                                reg1 = (r + ip->Register4);
                                                 CopyToStack(esp, reg1, mStack);
                                                 if (useRegister && reg1->ObjectType < ObjectTypes.Object)
                                                 {
@@ -2880,6 +2887,23 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var instance = StackObject.ToObject((esp - (cm.ParameterCount + 1)), domain, mStack);
                                                 if (instance is IDelegateAdapter)
                                                 {
+                                                    if (cm.IsDelegateDynamicInvoke)
+                                                    {
+                                                        objRef = esp - 1;
+                                                        object[] objArr = StackObject.ToObject(objRef, domain, mStack) as object[];
+                                                        Free(objRef);
+                                                        if (objArr != null)
+                                                        {
+                                                            if (objArr.Length != cm.ParameterCount)
+                                                                throw new ArgumentException(string.Format("{0}.{1} has {2} arguments, but got {3}", cm.DeclearingType.FullName, cm.Name, cm.ParameterCount, objArr.Length));
+                                                            esp = objRef;
+                                                            for (intVal = 0; intVal < objArr.Length; intVal++)
+                                                            {
+                                                                esp = PushObject(esp, mStack, objArr[intVal], cm.Parameters[intVal] == domain.ObjectType);
+                                                            }
+                                                        }
+                                                    }
+
                                                     esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
                                                     processed = true;
                                                 }
@@ -3215,24 +3239,22 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         intVal = m.ParameterCount;
                                         intVal = intVal - Math.Max((intVal - RegisterVM.JITCompiler.CallRegisterParamCount), 0);
-                                        for (int i = 0; i < intVal; i++)
+                                        if (intVal > 0)
                                         {
-                                            switch (i)
-                                            {
-                                                case 0:
-                                                    reg1 = (r + ip->Register2);
-                                                    break;
-                                                case 1:
-                                                    reg1 = (r + ip->Register3);
-                                                    break;
-                                                case 2:
-                                                    reg1 = (r + ip->Register4);
-                                                    break;
-                                                default:
-                                                    throw new NotSupportedException();
-                                            }
+                                            reg1 = (r + ip->Register2);
                                             CopyToStack(esp, reg1, mStack);
                                             esp++;
+                                        }
+                                        if (intVal > 1)
+                                        {
+                                            reg1 = (r + ip->Register3);
+                                            CopyToStack(esp, reg1, mStack);
+                                            esp++;
+                                        }
+                                        if (intVal > 2)
+                                        {
+                                            reg1 = (r + ip->Register4);
+                                            CopyToStack(esp, reg1, mStack);
                                         }
                                     }
                                     if (m is ILMethod)
