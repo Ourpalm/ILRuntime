@@ -3255,6 +3255,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             reg1 = (r + ip->Register4);
                                             CopyToStack(esp, reg1, mStack);
+                                            esp++;
                                         }
                                     }
                                     if (m is ILMethod)
