@@ -2965,11 +2965,13 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         if (obj != null)
                                         {
+                                            ILTypeInstance instance = null;
                                             if (obj is ILTypeInstance)
-                                            {
-                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                instance = obj as ILTypeInstance;
+                                            else if (obj is CrossBindingAdaptorType)
+                                                instance = (obj as CrossBindingAdaptorType).ILInstance;
+                                            if (instance != null)
                                                 instance.AssignFromStack((int)ip->OperandLong, reg2, AppDomain, mStack);
-                                            }
                                             else
                                             {
                                                 var t = obj.GetType();
@@ -3068,11 +3070,13 @@ namespace ILRuntime.Runtime.Intepreter
                                         obj = RetriveObject(objRef, mStack);
                                         if (obj != null)
                                         {
+                                            ILTypeInstance instance = null;
                                             if (obj is ILTypeInstance)
-                                            {
-                                                ILTypeInstance instance = obj as ILTypeInstance;
+                                                instance = obj as ILTypeInstance;
+                                            else if (obj is CrossBindingAdaptorType)
+                                                instance = (obj as CrossBindingAdaptorType).ILInstance;
+                                            if (instance != null)
                                                 instance.CopyToRegister((int)ip->OperandLong, ref info, ip->Register1);//Check #345
-                                            }
                                             else
                                             {
                                                 //var t = obj.GetType();

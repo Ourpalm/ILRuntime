@@ -2106,10 +2106,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (obj != null)
                                         {
                                             ILTypeInstance instance = null;
-                                            if (obj is ILTypeInstance ilTypeInstance)
-                                                instance = ilTypeInstance;
-                                            else if (obj is CrossBindingAdaptorType crossBindingAdaptorType)
-                                                instance = crossBindingAdaptorType.ILInstance;
+                                            if (obj is ILTypeInstance)
+                                                instance = obj as ILTypeInstance;
+                                            else if (obj is CrossBindingAdaptorType)
+                                                instance = (obj as CrossBindingAdaptorType).ILInstance;
                                             if (instance != null)
                                             {
                                                 val = esp - 1;
@@ -2242,10 +2242,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (obj != null)
                                         {
                                             ILTypeInstance instance = null;
-                                            if (obj is ILTypeInstance ilTypeInstance)
-                                                instance = ilTypeInstance;
-                                            else if (obj is CrossBindingAdaptorType crossBindingAdaptorType)
-                                                instance = crossBindingAdaptorType.ILInstance;
+                                            if (obj is ILTypeInstance)
+                                                instance = obj as ILTypeInstance;
+                                            else if (obj is CrossBindingAdaptorType)
+                                                instance = (obj as CrossBindingAdaptorType).ILInstance;
                                             if (instance != null)
                                                 instance.PushToStack((int)ip->TokenLong, ret, this, mStack);
                                             else
