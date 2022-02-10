@@ -279,6 +279,14 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        internal List<ILType> GenericInstances
+        {
+            get
+            {
+                return genericInstances;
+            }
+        }
+
         /// <summary>
         /// 初始化IL类型
         /// </summary>
