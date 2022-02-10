@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntimeTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -86,6 +87,7 @@ namespace TestCases
             /// <returns></returns>
             public static T Instance
             {
+                [ILRuntimeTest(Ignored = true)]
                 get
                 {
                     if (_Instance == null)
