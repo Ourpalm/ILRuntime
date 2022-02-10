@@ -1516,7 +1516,7 @@ namespace ILRuntime.Runtime.Enviorment
 
             p = esp - 2;
             Type type = (Type)StackObject.ToObject(p, domain, mStack);
-            IType t = ToIType(type);
+            IType t = ToIType(type, domain);
             intp.Free(p);
 
             if (!t.HasGenericParameter)
@@ -1527,7 +1527,7 @@ namespace ILRuntime.Runtime.Enviorment
                 KeyValuePair<string, IType>[] arr = new KeyValuePair<string, IType>[iltype.TypeDefinition.GenericParameters.Count];
                 for(int i = 0; i < arr.Length; i++)
                 {
-                    arr[i] = new KeyValuePair<string, IType>(iltype.TypeDefinition.GenericParameters[i].Name, ToIType(param[i]));
+                    arr[i] = new KeyValuePair<string, IType>(iltype.TypeDefinition.GenericParameters[i].Name, ToIType(param[i], domain));
                 }
                 return ILIntepreter.PushObject(ret, mStack, t.MakeGenericInstance(arr).ReflectionType, true);
             }
@@ -1537,14 +1537,14 @@ namespace ILRuntime.Runtime.Enviorment
                 KeyValuePair<string, IType>[] arr = new KeyValuePair<string, IType>[param.Length];
                 for (int i = 0; i < arr.Length; i++)
                 {
-                    arr[i] = new KeyValuePair<string, IType>("!", ToIType(param[i]));
+                    arr[i] = new KeyValuePair<string, IType>("!", ToIType(param[i], domain));
                 }
                 return ILIntepreter.PushObject(ret, mStack, t.MakeGenericInstance(arr).ReflectionType, true);
             }
             throw new NotImplementedException();
         }
 
-        static IType ToIType(Type type)
+        static IType ToIType(Type type, AppDomain domain)
         {
             if (type is ILRuntimeType)
             {
@@ -1555,7 +1555,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ((ILRuntimeWrapperType)type).CLRType;
             }
             else
-                throw new NotSupportedException();
+                return domain.GetType(type);
         }
     }
 }
