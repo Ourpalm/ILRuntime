@@ -100,6 +100,7 @@ namespace ILRuntimeDebuggerLauncher
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<挂起>")]
         private void LaunchDebugTarget(string filePath)
         {
             var debugger = (IVsDebugger4)this.ServiceProvider.GetService(typeof(IVsDebugger));
@@ -114,7 +115,7 @@ namespace ILRuntimeDebuggerLauncher
             {
                 debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
             }
-            catch (Exception ex)
+            catch /*(Exception ex)*/
             {
                 var shell = (IVsUIShell)this.ServiceProvider.GetService(typeof(SVsUIShell));
                 string msg;
