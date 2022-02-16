@@ -35,6 +35,7 @@ namespace ILRuntime.Runtime.Debugger
 
         public bool IsAttached { get { return clientSocket != null && !clientSocket.Disconnected; } }
 
+        private Socket udpSocket; // 用于广播本地信息(计算机名，进程名，TcpListener监听端口等)的udp socket
         public DebuggerServer(DebugService ds)
         {
             this.ds = ds;
@@ -55,6 +56,14 @@ namespace ILRuntime.Runtime.Debugger
             }
             isUp = true;
             return true;
+        }
+
+        public static Socket CreateUdpSocket()
+        {
+            Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
+            udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            return udpSocket;
         }
 
         public virtual void Stop()
