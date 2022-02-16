@@ -8,16 +8,22 @@
         <License>LICENSE.TXT</License>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[12.0,)" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0,)" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[12.0,)" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[12.0,)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,)">
+            <ProductArchitecture>x86</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[17.0,)">
+            <ProductArchitecture>x86</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,)">
+            <ProductArchitecture>x86</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
-        <InstallationTarget Version="[12.0,)" Id="Microsoft.VisualStudio.Pro">
+        <InstallationTarget Version="[17.0,)" Id="Microsoft.VisualStudio.Pro">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
-        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[12.0,)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
