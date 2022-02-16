@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1800
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestCase", "TestCase", "{FA42778E-C31B-49E8-A235-9C69EECD9427}"
 EndProject
@@ -38,6 +38,8 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Debugging\SharedEngine\SharedEngine.projitems*{164587ca-78d9-4aec-82c2-acbabba26626}*SharedItemsImports = 13
+		Debugging\SharedEngine\SharedEngine.projitems*{217ae15b-840c-4f8f-93cd-9d331aa4c81a}*SharedItemsImports = 4
+		Debugging\SharedLauncher\SharedLauncher.projitems*{2455aafb-521f-484f-b00d-8a9bb7377a5e}*SharedItemsImports = 4
 		Debugging\SharedLauncher\SharedLauncher.projitems*{355e61c1-0bfa-4ff8-98a1-0457dfe595e1}*SharedItemsImports = 4
 		Debugging\SharedEngine\SharedEngine.projitems*{ad304835-4dba-49f3-a13d-f173bc828ebf}*SharedItemsImports = 4
 		Debugging\SharedLauncher\SharedLauncher.projitems*{e10fdbd8-f948-41f9-a99f-3c50ccbba145}*SharedItemsImports = 13

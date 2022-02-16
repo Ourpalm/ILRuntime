@@ -6,7 +6,12 @@
 
 using System;
 using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Windows.Forms;
+using ILRuntimeDebugEngine;
+using Microsoft;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -15,7 +20,7 @@ namespace ILRuntimeDebuggerLauncher
     /// <summary>
     /// Command handler
     /// </summary>
-    internal sealed class AttachToILRuntime
+    internal sealed class AttachToILRuntime : IVsDebuggerEvents
     {
         /// <summary>
         /// Command ID.
@@ -31,6 +36,8 @@ namespace ILRuntimeDebuggerLauncher
         /// VS Package that provides this command, not null.
         /// </summary>
         private readonly Package package;
+
+        private MenuCommand menuItem;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AttachToILRuntime"/> class.
@@ -50,9 +57,17 @@ namespace ILRuntimeDebuggerLauncher
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(CommandSet, CommandId);
-                var menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
+                menuItem = new MenuCommand(this.MenuItemCallback, menuCommandID);
                 commandService.AddCommand(menuItem);
             }
+
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var debugger = (IVsDebugger)this.ServiceProvider.GetService(typeof(IVsDebugger));
+            if (debugger != null)
+                debugger.AdviseDebuggerEvents(this, out _);
+
+            LauncherForm.StartFetchRemoteDebugger();
         }
 
         /// <summary>
@@ -93,26 +108,32 @@ namespace ILRuntimeDebuggerLauncher
         /// <param name="e">Event args.</param>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            FrmLauncher launcher = new ILRuntimeDebuggerLauncher.FrmLauncher();
-            if(launcher.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            LauncherForm launcher = new LauncherForm();
+            if(launcher.ShowDialog() == DialogResult.OK)
             {
-                LaunchDebugTarget(launcher.Host);
+                LaunchDebugTarget(launcher.Debugger);
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<挂起>")]
-        private void LaunchDebugTarget(string filePath)
+        private RemoteDebuggerInfo currentDebuggerInfo;
+        [SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<挂起>")]
+        private void LaunchDebugTarget(RemoteDebuggerInfo debuggerInfo)
         {
+            if (debuggerInfo == null || string.IsNullOrWhiteSpace(debuggerInfo.Host))
+                return;
+          
             var debugger = (IVsDebugger4)this.ServiceProvider.GetService(typeof(IVsDebugger));
+            ((IVsDebugger)debugger).AdviseDebuggerEvents(this, out _);
             VsDebugTargetInfo4[] debugTargets = new VsDebugTargetInfo4[1];
             debugTargets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
-            debugTargets[0].bstrExe = filePath;
+            debugTargets[0].bstrExe = debuggerInfo.Host;
             //debugTargets[0].bstrPortName = "1243";
             //debugTargets[0].guidPortSupplier = new Guid(ILRuntimeDebugEngine.EngineConstants.PortSupplier);
-            debugTargets[0].guidLaunchDebugEngine = new Guid(ILRuntimeDebugEngine.EngineConstants.EngineGUID);
+            debugTargets[0].guidLaunchDebugEngine = new Guid(EngineConstants.EngineGUID);
             VsDebugTargetProcessInfo[] processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
             try
             {
+                currentDebuggerInfo = debuggerInfo;
                 debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
             }
             catch /*(Exception ex)*/
@@ -121,6 +142,41 @@ namespace ILRuntimeDebuggerLauncher
                 string msg;
                 shell.GetErrorInfo(out msg);
             }
+        }
+
+        int IVsDebuggerEvents.OnModeChange(DBGMODE dbgmodeNew)
+        {
+            if (menuItem != null)
+            {
+                menuItem.Enabled = dbgmodeNew == DBGMODE.DBGMODE_Design;
+                if (menuItem.Enabled)
+                    ClearVsStatusbarText();
+                else
+                    SetVsStatusbarText($"ILRuntime Debugger:已附加至{currentDebuggerInfo.ProjectName}({currentDebuggerInfo.Host})");
+            }
+            return VSConstants.S_OK;
+        }
+
+        private void SetVsStatusbarText(string text)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            IVsStatusbar statusBar = (IVsStatusbar)ServiceProvider.GetService(typeof(SVsStatusbar));
+
+            int frozen;
+            statusBar.IsFrozen(out frozen);
+            if (frozen != 0)
+                statusBar.FreezeOutput(0);
+
+            statusBar.SetText(text);
+            statusBar.FreezeOutput(1);
+        }
+
+        private void ClearVsStatusbarText()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            IVsStatusbar statusBar = (IVsStatusbar)ServiceProvider.GetService(typeof(SVsStatusbar));
+            statusBar.FreezeOutput(0);
+            statusBar.Clear();
         }
     }
 }

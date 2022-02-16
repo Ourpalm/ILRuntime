@@ -7,6 +7,9 @@ using System.Net.Sockets;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Debugger.Protocol;
+using UnityEngine;
+using System.IO;
+using System.Net;
 
 namespace ILRuntime.Runtime.Debugger
 {
@@ -14,6 +17,7 @@ namespace ILRuntime.Runtime.Debugger
     public class DebuggerServer
     {
         public const int Version = 2;
+        private static readonly int currentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
         TcpListener listener;
         //HashSet<Session<T>> clients = new HashSet<Session<T>>();
         bool isUp = false;
@@ -30,30 +34,57 @@ namespace ILRuntime.Runtime.Debugger
         /// 服务器监听的端口
         /// </summary>
         public int Port { get { return port; } set { this.port = value; } }
+        EndPoint boardcastEndPoint;
 
         public DebugSocket Client { get { return clientSocket; } }
 
         public bool IsAttached { get { return clientSocket != null && !clientSocket.Disconnected; } }
 
+        //private static bool IsOSX => Application.platform == RuntimePlatform.OSXEditor;
+        //private static bool IsWindows => !IsOSX && Path.DirectorySeparatorChar == '\\' && Environment.NewLine == "\r\n";
+        private Socket udpSocket; // 用于广播本地信息(计算机名，进程名，TcpListener监听端口等)的udp socket
         public DebuggerServer(DebugService ds)
         {
             this.ds = ds;
             bw = new System.IO.BinaryWriter(sendStream);
+            bwForUdp = new System.IO.BinaryWriter(sendStreamForUdp);
         }
 
-        public virtual bool Start()
+        private int tcpListenerPort;
+        public virtual bool Start() 
         {
             shutdown = false;
             mainLoop = new Thread(new ThreadStart(this.NetworkLoop));
             mainLoop.Start();
 
-            this.listener = new TcpListener(port);
+            boardcastEndPoint = new IPEndPoint(IPAddress.Broadcast, port);
+            tcpListenerPort = port + System.Diagnostics.Process.GetCurrentProcess().Id;
+            if (tcpListenerPort > 65535)
+                tcpListenerPort = tcpListenerPort % (65535 - 1024) + 1024;
+            this.listener = new TcpListener(IPAddress.Any, tcpListenerPort);
+            //this.listener = new TcpListener(IPAddress.Any, port);
             try { listener.Start(); }
             catch
             {
                 return false;
             }
             isUp = true;
+
+            var _udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            _udpSocket.EnableBroadcast = true;
+            //if (IsWindows)
+            //{
+            //    try
+            //    {
+            //        const int SIO_UDP_CONNRESET = -1744830452;
+            //        _udpSocket.IOControl(SIO_UDP_CONNRESET, new byte[] { 0 }, new byte[0]);
+            //    }
+            //    catch { }
+            //}
+            _udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
+            _udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            udpSocket = _udpSocket;
+
             return true;
         }
 
@@ -66,12 +97,45 @@ namespace ILRuntime.Runtime.Debugger
             mainLoop = null;
             if (clientSocket != null)
                 clientSocket.Close();
+
+            if (udpSocket != null)
+            {
+                var _socket = udpSocket;
+                udpSocket = null;
+                _socket.Close();
+            }
         }
 
+        System.IO.MemoryStream sendStreamForUdp = new System.IO.MemoryStream(64 * 1024);
+        System.IO.BinaryWriter bwForUdp;
+        DateTime udpSendTime = DateTime.MinValue;
+        public static Func<string> GetProjectNameFunction;
         void NetworkLoop()
         {
             while (!shutdown)
             {
+                try
+                {
+                    if (clientSocket == null && udpSocket != null)
+                    {
+                        var now = DateTime.Now;
+                        if ((now - udpSendTime).TotalSeconds >= 0.5)
+                        {
+                            sendStreamForUdp.Position = 0;
+                            bwForUdp.Write(GetProjectNameFunction != null ? GetProjectNameFunction() : "");
+                            bwForUdp.Write(System.Environment.MachineName);
+                            bwForUdp.Write(currentProcessId);
+                            bwForUdp.Write(tcpListenerPort);
+                            udpSocket.SendTo(sendStreamForUdp.GetBuffer(), (int)sendStreamForUdp.Position, SocketFlags.None, boardcastEndPoint);
+                            udpSendTime = now;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+
+                }
+
                 try
                 {
                     // let new clients (max 10) connect
