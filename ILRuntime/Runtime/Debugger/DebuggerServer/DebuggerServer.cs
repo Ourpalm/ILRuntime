@@ -7,7 +7,6 @@ using System.Net.Sockets;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Debugger.Protocol;
-using UnityEngine;
 using System.IO;
 using System.Net;
 
