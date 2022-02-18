@@ -17,6 +17,12 @@ namespace ILRuntimeTest.TestBase
 
         public List<BaseTestUnit> TestList => _testUnitList;
 
+        static TestSession lastSession;
+
+        public static TestSession LastSession => lastSession;
+
+        public ILRuntime.Runtime.Enviorment.AppDomain Appdomain => _app;
+
         public void Load(string assemblyPath, bool useRegister)
         {
             fs = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read);
@@ -46,10 +52,11 @@ namespace ILRuntimeTest.TestBase
                 }
 
                 ILRuntimeHelper.Init(_app);
-                //ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
+                ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
                 _app.InitializeBindings(true);
                 LoadTest();
             }
+            lastSession = this;
         }
 
         void LoadTest()

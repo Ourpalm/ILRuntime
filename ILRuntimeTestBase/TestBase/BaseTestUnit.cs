@@ -145,15 +145,7 @@ namespace ILRuntimeTest.Test
             {
                 if (e.InnerException.GetType() != expectingEx)
                 {
-                    Message.AppendLine(e.Message);
-                    if (!string.IsNullOrEmpty(e.ThisInfo))
-                    {
-                        Message.AppendLine("this:");
-                        Message.AppendLine(e.ThisInfo);
-                    }
-                    Message.AppendLine("Local Variables:");
-                    Message.AppendLine(e.LocalInfo);
-                    Message.AppendLine(e.StackTrace);
+                    Message.AppendLine(e.ToString());
                     if (e.InnerException != null)
                         Message.AppendLine(e.InnerException.ToString());
                     Pass = TestResults.Failed;

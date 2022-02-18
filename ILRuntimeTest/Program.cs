@@ -18,10 +18,16 @@ namespace ILRuntimeTest
         static void Main()
         {
             TestAllocator();
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             Console.BufferHeight = 3000;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TestMainForm());
+            Application.Run(new TestMainForm()); 
+        }
+
+        private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            Console.WriteLine(e.ToString());
         }
 
         static StackObject* basePtr;
