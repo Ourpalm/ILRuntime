@@ -4257,6 +4257,57 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+
+                            case OpCodeREnum.Castclass:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    type = domain.GetType(ip->Operand);
+                                    if (type != null)
+                                    {
+                                        objRef = GetObjectAndResolveReference(reg2);
+                                        if (objRef->ObjectType <= ObjectTypes.Double)
+                                        {
+                                            throw new NotImplementedException();
+                                        }
+                                        else
+                                        {
+                                            obj = RetriveObject(objRef, mStack);
+
+                                            if (obj != null)
+                                            {
+                                                if (obj is ILTypeInstance)
+                                                {
+                                                    if (((ILTypeInstance)obj).CanAssignTo(type))
+                                                    {
+                                                        AssignToRegister(ref info, ip->Register1, obj);
+                                                    }
+                                                    else
+                                                    {
+                                                        throw new InvalidCastException(string.Format("Cannot Cast {0} to {1}", ((ILTypeInstance)obj).Type.FullName, type.FullName));
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (type.TypeForCLR.IsAssignableFrom(obj.GetType()))
+                                                    {
+                                                        AssignToRegister(ref info, ip->Register1, obj, true);
+                                                    }
+                                                    else
+                                                    {
+                                                        throw new InvalidCastException(string.Format("Cannot Cast {0} to {1}", obj.GetType().FullName, type.FullName));
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                WriteNull(ref info, ip->Register1);
+                                            }
+                                        }
+                                    }
+                                    else
+                                        throw new NullReferenceException();
+                                }
+                                break;
                             case OpCodeREnum.Isinst:
                                 {
                                     reg2 = (r + ip->Register2);

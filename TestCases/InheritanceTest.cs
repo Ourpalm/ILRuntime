@@ -312,6 +312,7 @@ namespace TestCases
             Console.WriteLine("InheritanceTest21:classA is " + inheritanceTest.crossClass.classA);
         }
 
+        [ILRuntimeTest.ILRuntimeTest(ExpectException = typeof(InvalidCastException))]
         public static void InheritanceTest23()
         {
             TestClass cls = new TestClass();
@@ -320,9 +321,15 @@ namespace TestCases
             InterfaceTest2 cls2 = cls as InterfaceTest2;
             if (cls2 is InterfaceTest2)
                 throw new Exception();
-
-            InterfaceTest2 cls3 = (InterfaceTest2)cls;
-            if (cls3 is InterfaceTest2)
+            TestClass3 cls3 = (TestClass3)(cls as InterfaceTest2);
+            if(cls3 != null)
+                throw new Exception();
+            cls2 = new TestCls3();
+            var cls4 = (TestCls3)cls2;
+            if(cls4 == null)
+                throw new Exception();
+            InterfaceTest2 cls5 = (InterfaceTest2)cls;
+            if (cls5 is InterfaceTest2)
                 throw new Exception();
         }
 
