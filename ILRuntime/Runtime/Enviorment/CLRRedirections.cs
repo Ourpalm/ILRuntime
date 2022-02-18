@@ -1424,7 +1424,6 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return ILIntepreter.PushObject(ret, mStack, Delegate.CreateDelegate(t, obj, name), true);
         }
-
         public static StackObject* DelegateCreateDelegate3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 3;

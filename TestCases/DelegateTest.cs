@@ -552,6 +552,14 @@ namespace TestCases
                 else
                     throw new Exception();
             }
+
+            public static void Test2(B b)
+            {
+                if (b != null && b.GetType() == typeof(B))
+                    Console.WriteLine("OK2");
+                else
+                    throw new Exception();
+            }
         }
         delegate void TestDele(B a);
         public static void DelegateTest36()
@@ -581,6 +589,51 @@ namespace TestCases
                 MethodInfo methodInfo = methodInfos[methodInfoIndex];
                 Type actionType = typeof(TestDele);
                 Delegate action = Delegate.CreateDelegate(actionType, target, methodInfo);
+                action.DynamicInvoke(new B());
+            }
+        }
+
+        public static void DelegateTest38()
+        {
+            A target = new A();
+            Type type = target.GetType();
+
+            MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Instance);
+            for (int methodInfoIndex = 0; methodInfoIndex < methodInfos.Length; methodInfoIndex++)
+            {
+                MethodInfo methodInfo = methodInfos[methodInfoIndex];
+                Type actionType = typeof(TestDele);
+                Delegate action = methodInfo.CreateDelegate(actionType, target);
+                action.DynamicInvoke(new B());
+            }
+        }
+
+        public static void DelegateTest39()
+        {
+            A target = new A();
+            Type type = target.GetType();
+
+            MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Static);
+            for (int methodInfoIndex = 0; methodInfoIndex < methodInfos.Length; methodInfoIndex++)
+            {
+                MethodInfo methodInfo = methodInfos[methodInfoIndex];
+                Type actionType = typeof(TestDele);
+                Delegate action = methodInfo.CreateDelegate(actionType, null);
+                action.DynamicInvoke(new B());
+            }
+        }
+
+        public static void DelegateTest40()
+        {
+            A target = new A();
+            Type type = target.GetType();
+
+            MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Static);
+            for (int methodInfoIndex = 0; methodInfoIndex < methodInfos.Length; methodInfoIndex++)
+            {
+                MethodInfo methodInfo = methodInfos[methodInfoIndex];
+                Type actionType = typeof(TestDele);
+                Delegate action = methodInfo.CreateDelegate(actionType);
                 action.DynamicInvoke(new B());
             }
         }
