@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Shell;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,33 +17,61 @@ namespace ILRuntimeDebuggerLauncher
 {
     public partial class LauncherForm : Form
     {
-        private static Socket udpSocket;
+        private static SocketAsyncEventArgs socketAsyncEventArgs;
+        private static byte[] buffer = new byte[64 * 1024];
         private static MemoryStream bufferStream;
         private static BinaryReader bufferReader;
         private static System.Threading.Timer checkRemoteDebugersHealthyTimer;
-        //private SocketAsyncEventArgs socketAsyncEventArgs;
+        
+        static LauncherForm()
+        {
+            bufferStream = new MemoryStream(buffer);
+            bufferReader = new BinaryReader(bufferStream);
+            checkRemoteDebugersHealthyTimer = new System.Threading.Timer(CheckRemoteDebugersHealthy, null, 1000, 1000);
+        }
+
         public LauncherForm()
         {
             InitializeComponent();
         }
 
-        public static void StartFetchRemoteDebugger()
+        public static void StartFetchRemoteDebugger(Package package)
         {
-            udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            DebuggerSettingPage.PortChanged += (p) => CreateUdpSocketAndBeginReceive(p);
+
+            var port = ((DebuggerSettingPage)package.GetDialogPage(typeof(DebuggerSettingPage))).Port;
+            CreateUdpSocketAndBeginReceive(port);
+        }
+
+        private static void CreateUdpSocketAndBeginReceive(int port)
+        {
+            if (socketAsyncEventArgs != null)
+            {
+                var socket = (Socket)socketAsyncEventArgs.UserToken;
+                if (socket != null)
+                {
+                    try
+                    {
+                        socket.Close();
+                    }
+                    catch { }
+                }
+                socketAsyncEventArgs.UserToken = null;
+                socketAsyncEventArgs.Dispose();
+                socketAsyncEventArgs = null;
+            }
+
+            var udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
             udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            udpSocket.Bind(new IPEndPoint(IPAddress.Any, 56000));
+            udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
 
-            var buffer = new byte[64 * 1024];
-            bufferStream = new MemoryStream(buffer);
-            bufferReader = new BinaryReader(bufferStream);
-            var socketAsyncEventArgs = new SocketAsyncEventArgs();
+            socketAsyncEventArgs = new SocketAsyncEventArgs();
             socketAsyncEventArgs.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            socketAsyncEventArgs.SetBuffer(buffer, 0, 64 * 1024);
+            socketAsyncEventArgs.SetBuffer(buffer, 0, buffer.Length);
             socketAsyncEventArgs.Completed += SocketAsyncEventArgs_Completed;
+            socketAsyncEventArgs.UserToken = udpSocket;
             BeginReceive(socketAsyncEventArgs);
-
-            checkRemoteDebugersHealthyTimer = new System.Threading.Timer(CheckRemoteDebugersHealthy, null, 1000, 1000);
         }
 
         private static void BeginReceive(SocketAsyncEventArgs e)
@@ -51,7 +80,10 @@ namespace ILRuntimeDebuggerLauncher
             {
                 try
                 {
-                    if (!udpSocket.ReceiveFromAsync(e))
+                    var socket = (Socket)e.UserToken;
+                    if (socket == null)
+                        return;
+                    if (!socket.ReceiveFromAsync(e))
                         SocketAsyncEventArgs_Completed(null, e);
                 }
                 catch /*(Exception ex)*/

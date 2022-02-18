@@ -133,4 +133,10 @@
   <data name="1400" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\AttachToILRuntimePackage.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="120" xml:space="preserve">
+    <value>ILRuntime</value>
+  </data>
+  <data name="121" xml:space="preserve">
+    <value>调试器</value>
+  </data>
 </root>

@@ -67,7 +67,7 @@ namespace ILRuntimeDebuggerLauncher
             if (debugger != null)
                 debugger.AdviseDebuggerEvents(this, out _);
 
-            LauncherForm.StartFetchRemoteDebugger();
+            LauncherForm.StartFetchRemoteDebugger(package);
         }
 
         /// <summary>

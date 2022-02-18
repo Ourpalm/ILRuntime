@@ -39,6 +39,7 @@ namespace ILRuntimeDebuggerLauncher
     [InstalledProductRegistration("#1110", "#1112", "1.0", IconResourceID = 1400)] // Info on this package for Help/About
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(AttachToILRuntimePackage.PackageGuidString)]
+    [ProvideOptionPage(typeof(DebuggerSettingPage), "ILRuntime", "Debugger", 120, 121, true)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     public sealed class AttachToILRuntimePackage : Package
     {

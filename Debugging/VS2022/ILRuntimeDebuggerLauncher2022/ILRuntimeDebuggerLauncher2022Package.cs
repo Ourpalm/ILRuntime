@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using ILRuntimeDebuggerLauncher;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -27,6 +28,7 @@ namespace ILRuntimeDebuggerLauncher2022
     [InstalledProductRegistration("#1110", "#1112", "1.0", IconResourceID = 1400)] // Info on this package for Help/About
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(ILRuntimeDebuggerLauncher2022Package.PackageGuidString)]
+    [ProvideOptionPage(typeof(DebuggerSettingPage), "ILRuntime", "Debugger", 120, 121, true)]
     public sealed class ILRuntimeDebuggerLauncher2022Package : AsyncPackage
     {
         /// <summary>

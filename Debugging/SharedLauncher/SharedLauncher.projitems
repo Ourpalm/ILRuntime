@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AttachToILRuntime.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebuggerSettingPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Resources\AttachToILRuntime.png" />
