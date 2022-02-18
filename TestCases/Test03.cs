@@ -203,5 +203,34 @@ namespace TestCases
                 throw new Exception();
 
         }
+
+        public static void TestUsingForeach()
+        {
+            var cls = new TestUsingCls();
+            int[] arr = new int[10];
+            int res = 0;
+            using (cls)
+            {
+                foreach(var i in arr)
+                {
+                    res += i;
+                }
+            }
+
+            if (!cls.Disposed)
+            {
+                throw new Exception();
+            }
+        }
+
+        class TestUsingCls : IDisposable
+        {
+            public bool Disposed { get; set; }
+
+            public void Dispose()
+            {
+                Disposed = true;
+            }
+        }
     }
 }

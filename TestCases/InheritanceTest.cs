@@ -312,6 +312,20 @@ namespace TestCases
             Console.WriteLine("InheritanceTest21:classA is " + inheritanceTest.crossClass.classA);
         }
 
+        public static void InheritanceTest23()
+        {
+            TestClass cls = new TestClass();
+            if (cls is InterfaceTest2)
+                throw new Exception();
+            InterfaceTest2 cls2 = cls as InterfaceTest2;
+            if (cls2 is InterfaceTest2)
+                throw new Exception();
+
+            InterfaceTest2 cls3 = (InterfaceTest2)cls;
+            if (cls3 is InterfaceTest2)
+                throw new Exception();
+        }
+
         class TestExplicitInterface : IDisposable
         {
             public bool Called { get; set; }
