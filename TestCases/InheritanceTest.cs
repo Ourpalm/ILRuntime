@@ -195,8 +195,8 @@ namespace TestCases
 
             if (list.Count != 1)
                 throw new Exception("Error");
-            c1 = (Child2)c2;
-            Console.WriteLine(c1.ToString());
+            var c3 = (Child3)c2;
+            Console.WriteLine(c3.ToString());
             c1 = c2 as Child2;
             Console.WriteLine(c1 == null);
         }
