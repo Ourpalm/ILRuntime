@@ -131,6 +131,7 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterMethodDelegate<System.Exception>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>();
             app.DelegateManager.RegisterMethodDelegate<System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance>(); 
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Int32>();
@@ -139,6 +140,8 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task<System.Int32>>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task<System.Int32>>();
 
+            app.Prewarm("TestCases.AsyncAwaitTest", false);
+            //app.Prewarm("ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType");
         }
     }
 }
