@@ -61,6 +61,13 @@
           <ButtonText>Attach to ILRuntime</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidAttachToILRuntimePackageCmdSet" id="AttachToILRuntimeInLANId" priority="0x0101" type="Button">
+        <Parent guid="guidAttachToILRuntimePackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages" id="bmpPicX" />
+        <Strings>
+          <ButtonText>Attach to ILRuntime In LAN</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -82,6 +89,7 @@
     <GuidSymbol name="guidAttachToILRuntimePackageCmdSet" value="{dfb95cf4-1984-41e4-96f9-942063fb4b4c}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="AttachToILRuntimeId" value="0x0100" />
+      <IDSymbol name="AttachToILRuntimeInLANId" value="0x0101" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{3bbc94f3-5b4d-4499-a609-2b5865330c86}" >

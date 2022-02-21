@@ -64,7 +64,14 @@ namespace ILRuntimeDebuggerLauncher
             var udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
             udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+            try
+            {
+                udpSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+            }
+            catch /*(Exception e)*/
+            {
+                MessageBox.Show($"ILRuntime Debugger:Unable to bind udp port to {port}");
+            }
 
             socketAsyncEventArgs = new SocketAsyncEventArgs();
             socketAsyncEventArgs.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);

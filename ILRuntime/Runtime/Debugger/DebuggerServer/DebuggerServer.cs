@@ -50,18 +50,22 @@ namespace ILRuntime.Runtime.Debugger
         }
 
         private int tcpListenerPort;
-        public virtual bool Start() 
+        public virtual bool Start(bool boardcastDebuggerInfo) 
         {
             shutdown = false;
             mainLoop = new Thread(new ThreadStart(this.NetworkLoop));
             mainLoop.Start();
 
             boardcastEndPoint = new IPEndPoint(IPAddress.Broadcast, port);
-            tcpListenerPort = port + System.Diagnostics.Process.GetCurrentProcess().Id;
-            if (tcpListenerPort > 65535)
-                tcpListenerPort = tcpListenerPort % (65535 - 1024) + 1024;
-            this.listener = new TcpListener(IPAddress.Any, tcpListenerPort);
-            //this.listener = new TcpListener(IPAddress.Any, port);
+            if (boardcastDebuggerInfo)
+            {
+                tcpListenerPort = port + System.Diagnostics.Process.GetCurrentProcess().Id;
+                if (tcpListenerPort > 65535)
+                    tcpListenerPort = tcpListenerPort % (65535 - 1024) + 1024;
+                this.listener = new TcpListener(IPAddress.Any, tcpListenerPort);
+            }
+            else
+                this.listener = new TcpListener(IPAddress.Any, port);
             try { listener.Start(); }
             catch
             {
@@ -69,20 +73,14 @@ namespace ILRuntime.Runtime.Debugger
             }
             isUp = true;
 
-            var _udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            _udpSocket.EnableBroadcast = true;
-            //if (IsWindows)
-            //{
-            //    try
-            //    {
-            //        const int SIO_UDP_CONNRESET = -1744830452;
-            //        _udpSocket.IOControl(SIO_UDP_CONNRESET, new byte[] { 0 }, new byte[0]);
-            //    }
-            //    catch { }
-            //}
-            _udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
-            _udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            udpSocket = _udpSocket;
+            if (boardcastDebuggerInfo)
+            {
+                var _udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _udpSocket.EnableBroadcast = true;
+                _udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, false);
+                _udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                udpSocket = _udpSocket;
+            }
 
             return true;
         }
@@ -115,7 +113,7 @@ namespace ILRuntime.Runtime.Debugger
             {
                 try
                 {
-                    if (clientSocket == null && udpSocket != null)
+                    if (udpSocket != null && clientSocket == null)
                     {
                         var now = DateTime.Now;
                         if ((now - udpSendTime).TotalSeconds >= 0.5)

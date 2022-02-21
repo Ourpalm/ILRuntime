@@ -12,8 +12,8 @@ namespace ILRuntimeDebuggerLauncher
 
         private int port = 56000;
         [Category("Debugger")]
-        [DisplayName("Port")]
-        [Description("调试器网络端口，远端须使用此值调用方法ILRuntime.Runtime.Enviorment.AppDomain.DebugService.StartDebugService()以开启调式服务")]
+        [DisplayName("广播监听端口")]
+        [Description("调试器监听的广播网络端口")]
         public int Port { get { return port; } set { port = value; } }
 
         public override void SaveSettingsToStorage()
