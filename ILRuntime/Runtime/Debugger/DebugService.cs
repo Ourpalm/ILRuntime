@@ -54,12 +54,15 @@ namespace ILRuntime.Runtime.Debugger
         /// </summary>
         /// <param name="port">Port to listen on</param>
         /// <param name="boardcastDebuggerInfo">true表示使用udp在参数port表示的端口上广播本地调试器信息，调试器使用动态端口。false表示本地调试器使用参数port表示的固定端口。默认值为false</param>
-        public void StartDebugService(int port, bool boardcastDebuggerInfo = false)
+        /// <returns>错误描述，null表示没有错误</returns>
+        public string StartDebugService(int port, bool boardcastDebuggerInfo = false)
         {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             server = new Debugger.DebuggerServer(this);
             server.Port = port;
-            server.Start(boardcastDebuggerInfo);
+            return server.Start(boardcastDebuggerInfo);
+#else
+            return null;
 #endif
         }
 

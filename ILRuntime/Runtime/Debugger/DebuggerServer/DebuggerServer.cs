@@ -50,7 +50,7 @@ namespace ILRuntime.Runtime.Debugger
         }
 
         private int tcpListenerPort;
-        public virtual bool Start(bool boardcastDebuggerInfo) 
+        public virtual string Start(bool boardcastDebuggerInfo) 
         {
             shutdown = false;
             mainLoop = new Thread(new ThreadStart(this.NetworkLoop));
@@ -62,14 +62,14 @@ namespace ILRuntime.Runtime.Debugger
                 tcpListenerPort = port + System.Diagnostics.Process.GetCurrentProcess().Id;
                 if (tcpListenerPort > 65535)
                     tcpListenerPort = tcpListenerPort % (65535 - 1024) + 1024;
-                this.listener = new TcpListener(IPAddress.Any, tcpListenerPort);
             }
             else
-                this.listener = new TcpListener(IPAddress.Any, port);
+                tcpListenerPort = port;
+            this.listener = new TcpListener(IPAddress.Any, tcpListenerPort);
             try { listener.Start(); }
             catch
-            {
-                return false;
+            {               
+                return $"ILRuntime Debugger Error: Unable to use network port {tcpListenerPort}.";
             }
             isUp = true;
 
@@ -82,7 +82,7 @@ namespace ILRuntime.Runtime.Debugger
                 udpSocket = _udpSocket;
             }
 
-            return true;
+            return null;
         }
 
         public virtual void Stop()
