@@ -290,7 +290,16 @@ namespace ILRuntimeDebugEngine.AD7
             bw.Write(msg.MethodName);
             bw.Write(msg.StartLine);
             bw.Write(msg.EndLine);
+            bw.Write(msg.Enabled);
             socket.Send(DebugMessageType.CSBindBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        public void SendSetBreakpointEnabled(int bpHash, bool enabled)
+        {
+            sendStream.Position = 0;
+            bw.Write(bpHash);
+            bw.Write(enabled);
+            socket.Send(DebugMessageType.CSSetBreakpointEnabled, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
         public void SendDeleteBreakpoint(int bpHash)

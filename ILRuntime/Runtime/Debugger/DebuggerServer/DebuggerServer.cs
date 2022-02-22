@@ -198,7 +198,13 @@ namespace ILRuntime.Runtime.Debugger
                         msg.MethodName = br.ReadString();
                         msg.StartLine = br.ReadInt32();
                         msg.EndLine = br.ReadInt32();
+                        msg.Enabled = br.ReadBoolean();
                         TryBindBreakpoint(msg);
+                    }
+                    break;
+                case DebugMessageType.CSSetBreakpointEnabled:
+                    {
+                        ds.SetBreakpointEnabled(br.ReadInt32(), br.ReadBoolean());
                     }
                     break;
                 case DebugMessageType.CSDeleteBreakpoint:
@@ -400,7 +406,7 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 if (found != null)
                 {
-                    ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine);
+                    ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine, msg.Enabled);
                     res.Result = BindBreakpointResults.OK;
                 }
                 else
@@ -457,7 +463,7 @@ namespace ILRuntime.Runtime.Debugger
                         }
                         if (found != null)
                         {
-                            ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine);
+                            ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine, msg.Enabled);
                             res.Result = BindBreakpointResults.OK;
                         }
                         else

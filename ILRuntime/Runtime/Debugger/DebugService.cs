@@ -281,7 +281,7 @@ namespace ILRuntime.Runtime.Debugger
                 server.NotifyModuleLoaded(moduleName);
         }
 
-        internal void SetBreakPoint(int methodHash, int bpHash, int startLine)
+        internal void SetBreakPoint(int methodHash, int bpHash, int startLine, bool enabled)
         {
             lock (activeBreakpoints)
             {
@@ -296,9 +296,20 @@ namespace ILRuntime.Runtime.Debugger
                 bpInfo.BreakpointHashCode = bpHash;
                 bpInfo.MethodHashCode = methodHash;
                 bpInfo.StartLine = startLine;
+                bpInfo.Enabled = enabled;
 
                 lst.AddLast(bpInfo);
                 breakpointMapping[bpHash] = bpInfo;
+            }
+        }
+
+        internal void SetBreakpointEnabled(int bpHash, bool enabled)
+        {
+            lock (activeBreakpoints)
+            {
+                BreakpointInfo bpInfo;
+                if (breakpointMapping.TryGetValue(bpHash, out bpInfo))
+                    bpInfo.Enabled = enabled;
             }
         }
 
@@ -429,7 +440,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         foreach (var i in lst)
                         {
-                            if ((i.StartLine + 1) == sp.StartLine)
+                            if ((i.StartLine + 1) == sp.StartLine && i.Enabled)
                             {
                                 DoBreak(intp, i.BreakpointHashCode, false);
                                 return;

@@ -26,8 +26,8 @@ namespace ILRuntimeDebugEngine.AD7
         public int StartColumn { get; private set; }
         public int EndLine { get; private set; }
         public int EndColumn { get; private set; }
-        public string DocumentName { get; set; }
-
+        public string DocumentName { get; private set; }
+        public enum_BP_STATE State { get; private set; }
         public bool IsBound { get { return _boundBreakpoint != null; } }
 
         public AD7PendingBreakPoint(AD7Engine engine, IDebugBreakpointRequest2 pBPRequest)
@@ -56,6 +56,7 @@ namespace ILRuntimeDebugEngine.AD7
             EndLine = (int)endPosition[0].dwLine;
             EndColumn = (int)endPosition[0].dwColumn;
         }
+
         public int Bind()
         {
             TryBind();
@@ -71,11 +72,15 @@ namespace ILRuntimeDebugEngine.AD7
         {
             if (_engine != null && _engine.DebuggedProcess != null)
                 _engine.DebuggedProcess.SendDeleteBreakpoint(GetHashCode());
+            State = enum_BP_STATE.BPS_DELETED;
             return Constants.S_OK;
         }
 
         public int Enable(int fEnable)
         {
+            State = fEnable != 0 ? enum_BP_STATE.BPS_ENABLED : enum_BP_STATE.BPS_DISABLED;
+            if (bindRequest != null)
+                _engine.DebuggedProcess.SendSetBreakpointEnabled(GetHashCode(), State == enum_BP_STATE.BPS_ENABLED);
             return Constants.S_OK;
         }
 
@@ -105,7 +110,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int GetState(PENDING_BP_STATE_INFO[] pState)
         {
-            pState[0].state = enum_PENDING_BP_STATE.PBPS_ENABLED;
+            pState[0].state = (enum_PENDING_BP_STATE)State;
             return Constants.S_OK;
         }
 
@@ -175,6 +180,7 @@ namespace ILRuntimeDebugEngine.AD7
                         bindRequest.MethodName = methodName;
                         bindRequest.StartLine = StartLine;
                         bindRequest.EndLine = EndLine;
+                        bindRequest.Enabled = State == enum_BP_STATE.BPS_ENABLED;
                     }
                 }
 

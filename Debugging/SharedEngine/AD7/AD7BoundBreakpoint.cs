@@ -20,12 +20,12 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int Delete()
         {
-            return _pendingBreakpoint.Delete();
+            return Constants.S_OK;
         }
 
         public int Enable(int fEnable)
         {
-            return _pendingBreakpoint.Enable(fEnable);
+            return Constants.S_OK;
         }
 
         public int GetBreakpointResolution(out IDebugBreakpointResolution2 ppBPResolution)
@@ -48,19 +48,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int GetState(enum_BP_STATE[] pState)
         {
-            pState[0] = 0;
-            /*if (_pendingBreakpoint.Deleted)
-            {
-                pState[0] = enum_BP_STATE.BPS_DELETED;
-            }
-            else if (_pendingBreakpoint.Enabled)
-            {*/
-                pState[0] = enum_BP_STATE.BPS_ENABLED;
-            /*}
-            else if (!_pendingBreakpoint.Enabled)
-            {
-                pState[0] = enum_BP_STATE.BPS_DISABLED;
-            }*/
+            pState[0] = _pendingBreakpoint.State;
             return Constants.S_OK;
         }
 

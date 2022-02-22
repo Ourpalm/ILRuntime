@@ -13,5 +13,6 @@ namespace ILRuntime.Runtime.Debugger.Protocol
         public string MethodName { get; set; }
         public int StartLine { get; set; }
         public int EndLine { get; set; }
+        public bool Enabled { get; set; }
     }
 }

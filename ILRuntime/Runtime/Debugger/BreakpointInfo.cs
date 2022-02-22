@@ -10,5 +10,6 @@ namespace ILRuntime.Runtime.Debugger
         public int BreakpointHashCode { get; set; }
         public int MethodHashCode { get; set; }
         public int StartLine { get; set; }
+        public bool Enabled { get; set; }
     }
 }
