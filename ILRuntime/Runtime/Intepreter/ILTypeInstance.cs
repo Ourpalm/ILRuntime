@@ -193,7 +193,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     clrInstance = this;
                 }
-                if(type.FirstCLRInterface is Enviorment.CrossBindingAdaptor)
+                if(type.FirstCLRInterface is Enviorment.CrossBindingAdaptor && type.FirstCLRBaseType != type.FirstCLRInterface)
                 {
                     if (clrInstance != this)//Only one CLRInstance is allowed atm, so implementing multiple interfaces is not supported
                     {

@@ -29,11 +29,12 @@ namespace ILRuntimeDebugEngine.AD7
         public string DocumentName { get; private set; }
         public enum_BP_STATE State { get; private set; }
         public bool IsBound { get { return _boundBreakpoint != null; } }
+        public string ConditionExpression { get { return _bpRequestInfo.bpCondition.bstrCondition; } }
 
         public AD7PendingBreakPoint(AD7Engine engine, IDebugBreakpointRequest2 pBPRequest)
         {
             var requestInfo = new BP_REQUEST_INFO[1];
-            pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo);
+            pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo);
             _bpRequestInfo = requestInfo[0];
             _pBPRequest = pBPRequest;
             _engine = engine;
@@ -116,7 +117,9 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int SetCondition(BP_CONDITION bpCondition)
         {
-            throw new NotImplementedException();
+            _bpRequestInfo.bpCondition = bpCondition;
+            _engine.DebuggedProcess.SendSetBreakpointCondition(this.GetHashCode(), bpCondition.styleCondition, bpCondition.bstrCondition);
+            return Constants.S_OK;
         }
 
         public int SetPassCount(BP_PASSCOUNT bpPassCount)
@@ -181,6 +184,9 @@ namespace ILRuntimeDebugEngine.AD7
                         bindRequest.StartLine = StartLine;
                         bindRequest.EndLine = EndLine;
                         bindRequest.Enabled = State == enum_BP_STATE.BPS_ENABLED;
+                        bindRequest.Condition = new BreakpointCondition();
+                        bindRequest.Condition.Style = (BreakpointConditionStyle)_bpRequestInfo.bpCondition.styleCondition;
+                        bindRequest.Condition.Expression = _bpRequestInfo.bpCondition.bstrCondition;
                     }
                 }
 

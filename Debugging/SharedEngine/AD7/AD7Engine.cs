@@ -15,6 +15,8 @@ namespace ILRuntimeDebugEngine.AD7
     [Guid("552856E6-0F4F-4D79-83A5-9AF4A1A7A4B0")]
     public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3
     {
+        public static Action<string, string> ShowErrorMessageBoxAction;
+
         EngineCallback callback;
         IDebugProcess2 process;
         DebuggedProcess debugged;

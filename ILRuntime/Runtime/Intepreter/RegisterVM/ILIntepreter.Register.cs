@@ -3952,9 +3952,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                 throw new TypeLoadException();
                                         }
                                         else
-                                        {
-                                            //Nothing to do with null
-                                        }
+                                            throw new NullReferenceException();
                                     }
                                     else if (objRef->ObjectType < ObjectTypes.StackObjectReference)
                                     {

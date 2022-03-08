@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using ILRuntime.Runtime.Debugger;
 using ILRuntime.Runtime.Debugger.Protocol;
+using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace ILRuntimeDebugEngine.AD7
 {
@@ -31,6 +33,13 @@ namespace ILRuntimeDebugEngine.AD7
         public bool Connecting { get; set; }
         
         int RemoteDebugVersion { get; set; }
+
+        private readonly string BreakpointErrorMsg = 
+            "不能设置下面的断点:" +
+            Environment.NewLine +
+            "于{0}, 行{1}字符{2}, 条件是\"{3}\"为true" +
+            Environment.NewLine +
+            "断点的条件未能执行。错误是\"{4}\"。";
 
         public DebuggedProcess(AD7Engine engine, string host, int port)
         {
@@ -167,9 +176,8 @@ namespace ILRuntimeDebugEngine.AD7
                                 SCBreakpointHit msg = new SCBreakpointHit();
                                 msg.BreakpointHashCode = br.ReadInt32();
                                 msg.ThreadHashCode = br.ReadInt32();
-                                msg.StackFrame = ReadStackFrames(br);
-                                
-                                OnReceiveSCBreakpointHit(msg);
+                                msg.StackFrame = ReadStackFrames(br);                               
+                                OnReceiveSCBreakpointHit(msg, br.ReadString());
                             }
                             break;
 
@@ -291,7 +299,20 @@ namespace ILRuntimeDebugEngine.AD7
             bw.Write(msg.StartLine);
             bw.Write(msg.EndLine);
             bw.Write(msg.Enabled);
+            bw.Write((byte)msg.Condition.Style);
+            if (msg.Condition.Style != BreakpointConditionStyle.None)
+                bw.Write(msg.Condition.Expression);
             socket.Send(DebugMessageType.CSBindBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
+        }
+
+        public void SendSetBreakpointCondition(int bpHash, enum_BP_COND_STYLE style, string expression)
+        {
+            sendStream.Position = 0;
+            bw.Write(bpHash);
+            bw.Write((byte)style);
+            if (style != enum_BP_COND_STYLE.BP_COND_NONE)
+                bw.Write(expression);
+            socket.Send(DebugMessageType.CSSetBreakpointCondition, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
         public void SendSetBreakpointEnabled(int bpHash, bool enabled)
@@ -438,7 +459,7 @@ namespace ILRuntimeDebugEngine.AD7
             }
         }
 
-        void OnReceiveSCBreakpointHit(SCBreakpointHit msg)
+        void OnReceiveSCBreakpointHit(SCBreakpointHit msg, string error)
         {
             AD7PendingBreakPoint bp;
             AD7Thread t, bpThread = null;
@@ -454,7 +475,17 @@ namespace ILRuntimeDebugEngine.AD7
                     }
                 }
                 if (bpThread != null)
+                {
                     engine.Callback.BreakpointHit(bp, bpThread);
+                    if (!string.IsNullOrWhiteSpace(error))
+                    {
+                        var errorMsg = string.Format(BreakpointErrorMsg, System.IO.Path.GetFileName(bp.DocumentName), bp.StartLine + 1, bp.StartColumn, bp.ConditionExpression, error);
+                        if (AD7Engine.ShowErrorMessageBoxAction != null)
+                            AD7Engine.ShowErrorMessageBoxAction("ILRuntime Debugger", errorMsg);
+                        else
+                            MessageBox.Show(errorMsg, "ILRuntime Debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
         }
 

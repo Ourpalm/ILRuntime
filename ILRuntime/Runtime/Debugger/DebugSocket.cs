@@ -52,10 +52,10 @@ namespace ILRuntime.Runtime.Debugger
         public void Connect(string ip, int port)
         {
             Close();
-            //Socket socket;
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            _socket.BeginConnect(ip, port, new AsyncCallback(onConnected), this);
-            //_socket = socket;
+            Socket socket;
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.BeginConnect(ip, port, new AsyncCallback(onConnected), this);
+            _socket = socket;
             _ready = false;
         }
 

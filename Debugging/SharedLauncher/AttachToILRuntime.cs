@@ -14,6 +14,7 @@ using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
 
 namespace ILRuntimeDebuggerLauncher
 {
@@ -53,6 +54,9 @@ namespace ILRuntimeDebuggerLauncher
             }
 
             this.package = package;
+
+            ILRuntimeDebugEngine.AD7.AD7Engine.ShowErrorMessageBoxAction = (title, text) =>
+                ShowShellMessageBox(title, text, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGICON.OLEMSGICON_CRITICAL);
 
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
@@ -97,12 +101,14 @@ namespace ILRuntimeDebuggerLauncher
             }
         }
 
+        public static JoinableTaskFactory JoinableTaskFactory { get; private set; }
         /// <summary>
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        public static void Initialize(Package package)
+        public static void Initialize(Package package, JoinableTaskFactory joinableTaskFactory)
         {
+            JoinableTaskFactory = joinableTaskFactory;
             Instance = new AttachToILRuntime(package);
         }
 
@@ -161,6 +167,7 @@ namespace ILRuntimeDebuggerLauncher
 
         int IVsDebuggerEvents.OnModeChange(DBGMODE dbgmodeNew)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (menuItem != null)
             {
                 menuItem.Enabled = dbgmodeNew == DBGMODE.DBGMODE_Design;
@@ -193,6 +200,24 @@ namespace ILRuntimeDebuggerLauncher
             Assumes.Present(statusBar);
             statusBar.FreezeOutput(0);
             statusBar.Clear();
+        }
+
+        private async void ShowShellMessageBox(string title, string text, OLEMSGBUTTON button, OLEMSGICON icon)
+        {
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            try
+            {
+                var VsUiShell = (IVsUIShell)ServiceProvider.GetService(typeof(SVsUIShell));
+                Guid tempGuid = Guid.Empty;
+                int result = 0;
+                if (VsUiShell != null)
+                {
+                    VsUiShell.ShowMessageBox(0, ref tempGuid, title, text, null, 0,
+                        button, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
+                        icon, 0, out result);
+                }
+            }
+            catch { }
         }
     }
 }

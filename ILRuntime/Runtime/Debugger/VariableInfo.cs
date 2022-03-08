@@ -21,6 +21,7 @@ namespace ILRuntime.Runtime.Debugger
         NotFound,
         Timeout,
         Pending,
+        Value,
     }
 
     public enum ValueTypes
@@ -40,6 +41,9 @@ namespace ILRuntime.Runtime.Debugger
         public string Name { get; set; }
         public VariableReference Parent { get; set; }
         public VariableReference[] Parameters { get; set; }
+
+        public Type ValueType { get; set; }
+        public object Value { get; set; }
 
         public string FullName
         {
@@ -139,6 +143,7 @@ namespace ILRuntime.Runtime.Debugger
         public bool IsPrivate { get; set; }
         public bool IsProtected { get; set; }
         public int Offset { get; set;}
+        public Type ValueObjType { get; set; }
 
         public static VariableInfo FromObject(object obj, bool retriveType = false)
         {
@@ -192,6 +197,17 @@ namespace ILRuntime.Runtime.Debugger
             TypeName = "",
             Value = "NullReferenceException"
         };
+
+        public static VariableInfo NullReferenceExeptionWithName(string name)
+        {
+            return new VariableInfo
+            {
+                Type = VariableTypes.Error,
+                Name = "",
+                TypeName = "",
+                Value = name + "is Null"
+            };
+        }
 
         public static VariableInfo RequestTimeout = new VariableInfo
         {

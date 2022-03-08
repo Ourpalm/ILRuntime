@@ -14,5 +14,19 @@ namespace ILRuntime.Runtime.Debugger.Protocol
         public int StartLine { get; set; }
         public int EndLine { get; set; }
         public bool Enabled { get; set; }
+        public BreakpointCondition Condition { get; set; }
+    }
+
+    public enum BreakpointConditionStyle
+    {
+        None,
+        WhenTrue,
+        WhenChanged,
+    }
+
+    public class BreakpointCondition
+    {
+        public BreakpointConditionStyle Style { get; set; }
+        public string Expression { get; set; }
     }
 }
