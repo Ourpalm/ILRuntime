@@ -294,6 +294,7 @@ namespace ILRuntimeDebugEngine.AD7
             sendStream.Position = 0;
             bw.Write(msg.BreakpointHashCode);
             bw.Write(msg.IsLambda);
+            bw.Write(msg.NamespaceName);
             bw.Write(msg.TypeName);
             bw.Write(msg.MethodName);
             bw.Write(msg.StartLine);
@@ -302,6 +303,12 @@ namespace ILRuntimeDebugEngine.AD7
             bw.Write((byte)msg.Condition.Style);
             if (msg.Condition.Style != BreakpointConditionStyle.None)
                 bw.Write(msg.Condition.Expression);
+            bw.Write(msg.UsingInfos.Length);
+            foreach (var usingInfo in msg.UsingInfos)
+            {
+                bw.Write(usingInfo.Alias);
+                bw.Write(usingInfo.Name);
+            }
             socket.Send(DebugMessageType.CSBindBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
@@ -368,10 +375,11 @@ namespace ILRuntimeDebugEngine.AD7
         }
 
         //VariableInfo resolved;
-        public VariableInfo ResolveVariable(VariableReference parent, string name, int threadId, uint dwTimeout)
+        public VariableInfo ResolveVariable(VariableReference parent, string name, int threadId, int frameId, uint dwTimeout)
         {
             CSResolveVariable msg = new CSResolveVariable();
             msg.ThreadHashCode = threadId;
+            msg.FrameIndex = frameId;
             msg.Variable = VariableReference.GetMember(name, parent);
             SendResolveVariable(msg);
 
@@ -386,16 +394,18 @@ namespace ILRuntimeDebugEngine.AD7
         {
             sendStream.Position = 0;
             bw.Write(msg.ThreadHashCode);
+            bw.Write(msg.FrameIndex);
             WriteVariableReference(msg.Variable);
             socket.Send(DebugMessageType.CSResolveVariable, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
-        public VariableInfo ResolveIndexAccess(VariableReference body, VariableReference idx, int threadId, uint dwTimeout)
+        public VariableInfo ResolveIndexAccess(VariableReference body, VariableReference idx, int threadId, int frameId, uint dwTimeout)
         {
             CSResolveIndexer msg = new CSResolveIndexer();
             msg.Body = body;
             msg.Index = idx;
             msg.ThreadHashCode = threadId;
+            msg.FrameIndex = frameId;
             SendResolveIndexAccess(msg);
 
             bool aborted;
@@ -414,10 +424,11 @@ namespace ILRuntimeDebugEngine.AD7
             socket.Send(DebugMessageType.CSResolveIndexAccess, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
-        public VariableInfo[] EnumChildren(VariableReference parent, int threadId, uint dwTimeout)
+        public VariableInfo[] EnumChildren(VariableReference parent, int threadId, int frameId, uint dwTimeout)
         {
             CSEnumChildren msg = new CSEnumChildren();
             msg.ThreadHashCode = threadId;
+            msg.FrameIndex = frameId;
             msg.Parent = parent;
             SendEnumChildren(msg);
 

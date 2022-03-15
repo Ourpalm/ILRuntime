@@ -30,7 +30,7 @@ namespace ILRuntimeDebugEngine.AD7
         public enum_BP_STATE State { get; private set; }
         public bool IsBound { get { return _boundBreakpoint != null; } }
         public string ConditionExpression { get { return _bpRequestInfo.bpCondition.bstrCondition; } }
-
+        
         public AD7PendingBreakPoint(AD7Engine engine, IDebugBreakpointRequest2 pBPRequest)
         {
             var requestInfo = new BP_REQUEST_INFO[1];
@@ -171,15 +171,19 @@ namespace ILRuntimeDebugEngine.AD7
 
                         string className = GetClassName(method);
 
-                        var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
-                        string nsname = ns != null ? ns.Name.ToString() : null;
+                        //var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
+                        //string nsname = ns != null ? ns.Name.ToString() : null;
 
-                        string name = ns != null ? string.Format("{0}.{1}", nsname, className) : className;
+                        //string name = ns != null ? string.Format("{0}.{1}", nsname, className) : className;
+                        var nameSpaceStack = new Stack<string>();
+                        var usingSyntaxList = new List<UsingDirectiveSyntax>(syntaxTree.GetCompilationUnitRoot().Usings);
+                        GetCurrentNameSpaceDeclaration(node.Parent, nameSpaceStack, usingSyntaxList);
 
                         bindRequest = new CSBindBreakpoint();
                         bindRequest.BreakpointHashCode = this.GetHashCode();
                         bindRequest.IsLambda = isLambda;
-                        bindRequest.TypeName = name;
+                        bindRequest.NamespaceName = string.Join(".", nameSpaceStack);
+                        bindRequest.TypeName = className;
                         bindRequest.MethodName = methodName;
                         bindRequest.StartLine = StartLine;
                         bindRequest.EndLine = EndLine;
@@ -187,6 +191,11 @@ namespace ILRuntimeDebugEngine.AD7
                         bindRequest.Condition = new BreakpointCondition();
                         bindRequest.Condition.Style = (BreakpointConditionStyle)_bpRequestInfo.bpCondition.styleCondition;
                         bindRequest.Condition.Expression = _bpRequestInfo.bpCondition.bstrCondition;
+                        bindRequest.UsingInfos = usingSyntaxList.Select(n => new UsingInfo
+                        {
+                            Alias = n.Alias != null ? n.Alias.Name.ToString() : "",
+                            Name = n.Name.ToString(),
+                        }).ToArray();
                     }
                 }
 
@@ -223,6 +232,20 @@ namespace ILRuntimeDebugEngine.AD7
             if (node is T)
                 return node as T;
             return GetParentMethod<T>(node.Parent);
+        }
+
+        private void GetCurrentNameSpaceDeclaration(SyntaxNode node, Stack<string> namespaceList, List<UsingDirectiveSyntax> usingSyntaxList)
+        {
+            if (node == null)
+                return;
+
+            if (node is NamespaceDeclarationSyntax)
+            {
+                var namespaceDeclarationSyntax = node as NamespaceDeclarationSyntax;
+                namespaceList.Push(namespaceDeclarationSyntax.Name.ToString());
+                usingSyntaxList.AddRange(namespaceDeclarationSyntax.Usings);
+            }
+            GetCurrentNameSpaceDeclaration(node.Parent, namespaceList, usingSyntaxList);
         }
 
         public void Bound(BindBreakpointResults result)
