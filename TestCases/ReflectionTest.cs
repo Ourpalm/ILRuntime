@@ -160,6 +160,31 @@ namespace TestCases
                 throw new Exception("attr.Name != Example");
             }
         }
+
+        public static void TestPropertyIndexParametersInfo()
+        {
+            var pi = typeof(TestCls).GetProperty("Ccc");
+            List<string> parametersInfo = new List<string>();
+            foreach (var p in pi.GetIndexParameters())
+            {
+                parametersInfo.Add(string.Format("[{0}, type:{1}, default value:{2}]", p.Name, p.ParameterType.FullName, p.DefaultValue));
+            }
+            Console.WriteLine("Property:TestCls.Ccc, parameters:" + string.Join(",", parametersInfo));
+        }
+
+        public static void TestMethodParametersInfo()
+        {
+            var md = typeof(TestCls).GetMethod("Do");
+            List<string> parametersInfo = new List<string>();
+            foreach (var p in md.GetParameters())
+            {
+                parametersInfo.Add(string.Format("[{0}, type:{1}, is out:{2}, default value:{3}]", p.Name, p.ParameterType.FullName, p.IsOut, p.DefaultValue));
+            }
+            var att = md.GetParameters()[0].GetCustomAttributes(true);
+            Console.WriteLine("Method:TestCls.Do, parameters:" + string.Join(",", parametersInfo));
+            Console.WriteLine("Method:TestCls.Do, first parameter has custom attribute:" + ((Attribute)att[0]).GetType().FullName);
+        }
+
         [Obsolete("gasdgas")]
         public class TestCls
         {
@@ -178,6 +203,17 @@ namespace TestCases
             public static void bar()
             {
                 Console.WriteLine("bar");
+            }
+
+            [System.Runtime.CompilerServices.IndexerName("Ccc")]
+            public int this[int i]
+            {
+                get { return aa % i; }
+            }
+
+            public static void Do([Test] int i, out int ii, string s = "123")
+            {
+                ii = 0;
             }
         }
 
