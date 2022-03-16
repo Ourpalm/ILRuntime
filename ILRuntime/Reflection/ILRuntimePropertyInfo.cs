@@ -270,5 +270,10 @@ namespace ILRuntime.Reflection
             else
                 throw new ArgumentException("Index count mismatch");
         }
+
+        public override string ToString()
+        {
+            return definition == null ? base.ToString() : definition.ToString();
+        }
     }
 }

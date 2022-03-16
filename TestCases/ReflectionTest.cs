@@ -163,13 +163,18 @@ namespace TestCases
 
         public static void TestPropertyIndexParametersInfo()
         {
-            var pi = typeof(TestCls).GetProperty("Ccc");
-            List<string> parametersInfo = new List<string>();
-            foreach (var p in pi.GetIndexParameters())
+            foreach (var pi in typeof(TestCls).GetProperties())
             {
-                parametersInfo.Add(string.Format("[{0}, type:{1}, default value:{2}]", p.Name, p.ParameterType.FullName, p.DefaultValue));
+                if (pi.GetIndexParameters().Length <= 0) // 只获取索引器
+                    continue;
+
+                List<string> parametersInfo = new List<string>();
+                foreach (var p in pi.GetIndexParameters())
+                {
+                    parametersInfo.Add(string.Format("[{0}, type:{1}, default value:{2}]", p.Name, p.ParameterType.FullName, p.DefaultValue));
+                }
+                Console.WriteLine(string.Format("Property:{0}.{1}, parameters:{2}, getter:{3}", pi.DeclaringType.FullName, pi.Name, string.Join(",", parametersInfo), pi.GetMethod.ToString()));
             }
-            Console.WriteLine("Property:TestCls.Ccc, parameters:" + string.Join(",", parametersInfo));
         }
 
         public static void TestMethodParametersInfo()
@@ -206,9 +211,15 @@ namespace TestCases
             }
 
             [System.Runtime.CompilerServices.IndexerName("Ccc")]
-            public int this[int i]
+            public bool this[int i]
             {
-                get { return aa % i; }
+                get { return true; }
+            }
+
+            [System.Runtime.CompilerServices.IndexerName("Ccc")]
+            public bool this[string s]
+            {
+                get { return false; }
             }
 
             public static void Do([Test] int i, out int ii, string s = "123")

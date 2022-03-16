@@ -100,5 +100,10 @@ namespace ILRuntime.Reflection
             var result = GetCustomAttributes(attributeType, inherit);
             return result != null && result.Length > 0;
         }
+
+        public override string ToString()
+        {
+            return definition == null ? base.ToString() : definition.ToString();
+        }
     }
 }

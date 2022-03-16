@@ -250,5 +250,10 @@ namespace ILRuntime.Reflection
             return del.Delegate;
         }
 #endif
+
+        public override string ToString()
+        {
+            return definition == null ? base.ToString() : definition.ToString();
+        }
     }
 }

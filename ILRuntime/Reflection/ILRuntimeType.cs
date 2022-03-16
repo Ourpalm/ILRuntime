@@ -72,9 +72,13 @@ namespace ILRuntime.Reflection
                 ILRuntimePropertyInfo pi = new ILRuntimePropertyInfo(pd, type);
                 properties[i] = pi;
                 if (pd.GetMethod != null)
-                    pi.Getter = type.GetMethod(pd.GetMethod.Name, pd.GetMethod.Parameters.Count) as ILMethod;
+                {
+                    pi.Getter = type.GetMethod(pd.GetMethod.Name, pd.GetMethod.Parameters.Select(p => type.AppDomain.GetType(p.ParameterType, null, null)).ToList(), null) as ILMethod;
+                }
                 if (pd.SetMethod != null)
-                    pi.Setter = type.GetMethod(pd.SetMethod.Name, pd.SetMethod.Parameters.Count) as ILMethod;
+                {
+                    pi.Setter = type.GetMethod(pd.SetMethod.Name, pd.SetMethod.Parameters.Select(p => type.AppDomain.GetType(p.ParameterType, null, null)).ToList(), null) as ILMethod;
+                }
             }
         }
 
