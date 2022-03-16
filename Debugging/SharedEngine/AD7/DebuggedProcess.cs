@@ -419,6 +419,7 @@ namespace ILRuntimeDebugEngine.AD7
         {
             sendStream.Position = 0;
             bw.Write(msg.ThreadHashCode);
+            bw.Write(msg.FrameIndex);
             WriteVariableReference(msg.Body);
             WriteVariableReference(msg.Index);
             socket.Send(DebugMessageType.CSResolveIndexAccess, sendStream.GetBuffer(), (int)sendStream.Position);
@@ -443,6 +444,7 @@ namespace ILRuntimeDebugEngine.AD7
         {
             sendStream.Position = 0;
             bw.Write(msg.ThreadHashCode);
+            bw.Write(msg.FrameIndex);
             WriteVariableReference(msg.Parent);
             socket.Send(DebugMessageType.CSEnumChildren, sendStream.GetBuffer(), (int)sendStream.Position);
         }
