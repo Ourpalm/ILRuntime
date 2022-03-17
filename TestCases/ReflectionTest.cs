@@ -503,7 +503,7 @@ namespace TestCases
             void Display();
         }
 
-        class TestA<T, U> where T : TestB, new() where U : TestC, new()
+        class TestA<T, U> : ITestA where T : TestB, new() where U : TestC, new()
         {
             public T instanceT;
             public U instanceU;
