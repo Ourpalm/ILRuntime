@@ -117,26 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="110" xml:space="preserve">
-    <value>DebugLauncher Extension</value>
-  </data>
-  <data name="112" xml:space="preserve">
-    <value>DebugLauncher Visual Studio Extension Detailed Info</value>
-  </data>
-  <data name="1110" xml:space="preserve">
-    <value>AttachToILRuntime Extension</value>
-  </data>
-  <data name="1112" xml:space="preserve">
-    <value>AttachToILRuntime Visual Stuido Extension Detailed Info</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="1400" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\AttachToILRuntimePackage.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="120" xml:space="preserve">
-    <value>ILRuntime</value>
-  </data>
-  <data name="121" xml:space="preserve">
-    <value>调试器</value>
-  </data>
 </root>

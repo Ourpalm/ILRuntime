@@ -10,17 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AttachToILRuntime.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FrmLauncher.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)FrmLauncher.Designer.cs">
-      <DependentUpon>FrmLauncher.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)FrmLauncher.resx">
-      <DependentUpon>FrmLauncher.cs</DependentUpon>
-    </EmbeddedResource>
+    <Compile Include="$(MSBuildThisFileDirectory)DebuggerSettingPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Resources\AttachToILRuntime.png" />

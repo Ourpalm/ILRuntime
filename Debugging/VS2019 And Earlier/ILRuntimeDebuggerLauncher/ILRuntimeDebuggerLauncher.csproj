@@ -58,6 +58,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\SharedLauncher\FrmLauncher.cs">
+      <Link>FrmLauncher.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\SharedLauncher\FrmLauncher.designer.cs">
+      <Link>FrmLauncher.designer.cs</Link>
+      <DependentUpon>FrmLauncher.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\SharedLauncher\LauncherForm.cs">
+      <Link>LauncherForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\SharedLauncher\LauncherForm.designer.cs">
+      <Link>LauncherForm.designer.cs</Link>
+      <DependentUpon>LauncherForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AttachToILRuntimePackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -197,6 +213,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\..\SharedLauncher\FrmLauncher.resx">
+      <Link>FrmLauncher.resx</Link>
+      <DependentUpon>FrmLauncher.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\SharedLauncher\LauncherForm.resx">
+      <Link>LauncherForm.resx</Link>
+      <DependentUpon>LauncherForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\..\SharedLauncher\VSPackage.resx">
       <Link>VSPackage.resx</Link>
       <MergeWithCTO>true</MergeWithCTO>
