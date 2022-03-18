@@ -37,6 +37,7 @@
             this.btn_Cancle = new System.Windows.Forms.Button();
             this.btn_OK = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.btn_EnterIpAndPort = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listView1
@@ -84,7 +85,7 @@
             // btn_Refresh
             // 
             this.btn_Refresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btn_Refresh.Location = new System.Drawing.Point(12, 182);
+            this.btn_Refresh.Location = new System.Drawing.Point(140, 182);
             this.btn_Refresh.Name = "btn_Refresh";
             this.btn_Refresh.Size = new System.Drawing.Size(90, 30);
             this.btn_Refresh.TabIndex = 2;
@@ -127,6 +128,17 @@
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // btn_EnterIpAndPort
+            // 
+            this.btn_EnterIpAndPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btn_EnterIpAndPort.Location = new System.Drawing.Point(12, 182);
+            this.btn_EnterIpAndPort.Name = "btn_EnterIpAndPort";
+            this.btn_EnterIpAndPort.Size = new System.Drawing.Size(122, 30);
+            this.btn_EnterIpAndPort.TabIndex = 6;
+            this.btn_EnterIpAndPort.Text = "指定地址与端口...";
+            this.btn_EnterIpAndPort.UseVisualStyleBackColor = true;
+            this.btn_EnterIpAndPort.Click += new System.EventHandler(this.btn_EnterIpAndPort_Click);
+            // 
             // LauncherForm
             // 
             this.AcceptButton = this.btn_OK;
@@ -134,6 +146,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btn_Cancle;
             this.ClientSize = new System.Drawing.Size(533, 224);
+            this.Controls.Add(this.btn_EnterIpAndPort);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.btn_OK);
             this.Controls.Add(this.btn_Cancle);
@@ -159,5 +172,6 @@
         private System.Windows.Forms.ColumnHeader ProcessId;
         private System.Windows.Forms.ColumnHeader EndPoint;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Button btn_EnterIpAndPort;
     }
 }

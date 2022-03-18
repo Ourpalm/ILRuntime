@@ -25,7 +25,7 @@ namespace ILRuntimeDebuggerLauncher
         /// <summary>
         /// Command ID.
         /// </summary>
-        public const int CommandId = 0x0100;
+        //public const int CommandId = 0x0100;
         public const int AttachToILRuntimeInLANId = 0x0101;
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace ILRuntimeDebuggerLauncher
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                AddCommand(commandService, CommandId, this.MenuItemCallback);
+                //AddCommand(commandService, CommandId, this.MenuItemCallback);
                 AddCommand(commandService, AttachToILRuntimeInLANId, this.MenuAttachToILRuntimeInLANCallback);
             }
 
@@ -106,28 +106,35 @@ namespace ILRuntimeDebuggerLauncher
             Instance = new AttachToILRuntime(package);
         }
 
-        /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
-        /// </summary>
-        /// <param name="sender">Event sender.</param>
-        /// <param name="e">Event args.</param>
-        private void MenuItemCallback(object sender, EventArgs e)
-        {
-            FrmLauncher launcher = new FrmLauncher();
-            if(launcher.ShowDialog() == DialogResult.OK)
-            {
-                LaunchDebugTarget(launcher.Host, launcher.Host);
-            }
-        }
+        ///// <summary>
+        ///// This function is the callback used to execute the command when the menu item is clicked.
+        ///// See the constructor to see how the menu item is associated with this function using
+        ///// OleMenuCommandService service and MenuCommand class.
+        ///// </summary>
+        ///// <param name="sender">Event sender.</param>
+        ///// <param name="e">Event args.</param>
+        //private void MenuItemCallback(object sender, EventArgs e)
+        //{
+        //    FrmLauncher launcher = new FrmLauncher();
+        //    if(launcher.ShowDialog() == DialogResult.OK)
+        //    {
+        //        LaunchDebugTarget(launcher.Host, launcher.Host);
+        //    }
+        //}
 
         private void MenuAttachToILRuntimeInLANCallback(object sender, EventArgs e)
         {
             LauncherForm launcher = new LauncherForm();
             if (launcher.ShowDialog() == DialogResult.OK)
             {
-                LaunchDebugTarget(launcher.Debugger.Host, $"{launcher.Debugger.ProjectName}({launcher.Debugger.Host})");
+                if (launcher.ShowEnterIpAndPortForm)
+                {
+                    FrmLauncher enterIpAndPortForm = new FrmLauncher();
+                    if (enterIpAndPortForm.ShowDialog() == DialogResult.OK)
+                        LaunchDebugTarget(enterIpAndPortForm.Host, enterIpAndPortForm.Host);
+                }
+                else
+                    LaunchDebugTarget(launcher.Debugger.Host, $"{launcher.Debugger.ProjectName}({launcher.Debugger.Host})");
             }
         }
 
