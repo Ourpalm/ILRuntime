@@ -16,12 +16,13 @@ namespace ILRuntime.Runtime.Debugger
         Integer,
         Boolean,
         String,
+        Value,
+        Class,
         Null,
         Error,
         NotFound,
         Timeout,
-        Pending,
-        Value,
+        Pending,        
     }
 
     public enum ValueTypes
