@@ -184,6 +184,8 @@ namespace ILRuntime.Runtime.Enviorment
             }
             mi = typeof(System.Type).GetMethod("GetTypeFromHandle");
             RegisterCLRMethodRedirection(mi, CLRRedirections.GetTypeFromHandle);
+            mi = typeof(System.Type).GetMethod("MakeGenericType");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.TypeMakeGenericType);
             mi = typeof(object).GetMethod("GetType");
             RegisterCLRMethodRedirection(mi, CLRRedirections.ObjectGetType);
             mi = typeof(Delegate).GetMethod("CreateDelegate", new Type[] { typeof(Type), typeof(MethodInfo) });

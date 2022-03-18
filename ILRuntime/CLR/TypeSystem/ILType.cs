@@ -279,6 +279,14 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+        internal List<ILType> GenericInstances
+        {
+            get
+            {
+                return genericInstances;
+            }
+        }
+
         /// <summary>
         /// 初始化IL类型
         /// </summary>
@@ -1082,6 +1090,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 fieldTypes = new IType [ 0 ];
                 fieldDefinitions = new FieldDefinition [ 0 ];
+                return;
             }
             fieldTypes = new IType [ definition.Fields.Count ];
             fieldDefinitions = new FieldDefinition [ definition.Fields.Count ];
