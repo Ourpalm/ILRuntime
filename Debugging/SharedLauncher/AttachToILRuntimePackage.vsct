@@ -54,18 +54,18 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidAttachToILRuntimePackageCmdSet" id="AttachToILRuntimeId" priority="0x0100" type="Button">
+      <!--<Button guid="guidAttachToILRuntimePackageCmdSet" id="AttachToILRuntimeId" priority="0x0100" type="Button">
         <Parent guid="guidAttachToILRuntimePackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPicSearch" />
         <Strings>
           <ButtonText>Attach to ILRuntime</ButtonText>
         </Strings>
-      </Button>
+      </Button>-->
       <Button guid="guidAttachToILRuntimePackageCmdSet" id="AttachToILRuntimeInLANId" priority="0x0101" type="Button">
         <Parent guid="guidAttachToILRuntimePackageCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPicX" />
+        <Icon guid="guidImages" id="bmpPicSearch" />
         <Strings>
-          <ButtonText>Attach to ILRuntime In LAN</ButtonText>
+          <ButtonText>Attach to ILRuntime</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -88,7 +88,7 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidAttachToILRuntimePackageCmdSet" value="{dfb95cf4-1984-41e4-96f9-942063fb4b4c}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="AttachToILRuntimeId" value="0x0100" />
+      <!--<IDSymbol name="AttachToILRuntimeId" value="0x0100" />-->
       <IDSymbol name="AttachToILRuntimeInLANId" value="0x0101" />
     </GuidSymbol>
 

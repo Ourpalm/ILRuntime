@@ -711,7 +711,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     baseRegIdx--;
                     break;
                 case Code.Nop:
-                case Code.Castclass:
                 case Code.Readonly:
                 case Code.Volatile:
                 case Code.Endfinally:
@@ -924,6 +923,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Unbox:
                 case Code.Unbox_Any:
                 case Code.Isinst:
+                case Code.Castclass:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     op.Operand = method.GetTypeTokenHashCode(token);

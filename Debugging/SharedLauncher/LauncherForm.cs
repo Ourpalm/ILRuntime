@@ -188,6 +188,13 @@ namespace ILRuntimeDebuggerLauncher
                 DialogResult = DialogResult.OK;
             }
         }
+
+        public bool ShowEnterIpAndPortForm { get; private set; }
+        private void btn_EnterIpAndPort_Click(object sender, EventArgs e)
+        {
+            ShowEnterIpAndPortForm = true;
+            DialogResult = DialogResult.OK;
+        }
     }
 
     public class RemoteDebuggerInfo
