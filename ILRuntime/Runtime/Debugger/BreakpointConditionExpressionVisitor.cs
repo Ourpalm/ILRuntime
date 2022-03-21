@@ -1,5 +1,7 @@
 ﻿using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Utils;
 using ILRuntime.Reflection;
+using ILRuntime.Runtime.Debugger.Protocol;
 using ILRuntime.Runtime.Intepreter;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -54,7 +56,10 @@ namespace ILRuntime.Runtime.Debugger
         {
             DebugService = debugService;
             Intepreter = intp;
-            LocalVariables = localVariables.ToDictionary(i => i.Name);
+            if (localVariables == null)
+                LocalVariables = new Dictionary<string, VariableInfo>();
+            else
+                LocalVariables = localVariables.ToDictionary(i => i.Name);
         }
 
         private TempComputeResult CreateComputeResult(object value, Type type)
@@ -64,7 +69,7 @@ namespace ILRuntime.Runtime.Debugger
 
         public override TempComputeResult DefaultVisit(SyntaxNode node)
         {
-            throw new NotSupportedException("Unknown Expression Type:" + node.GetType().Name);
+            throw new NotSupportedException("Unsupport Expression:" + node.GetText());
         }
 
         public override TempComputeResult VisitLiteralExpression(LiteralExpressionSyntax node)
@@ -74,69 +79,190 @@ namespace ILRuntime.Runtime.Debugger
         }
 
         public override TempComputeResult VisitParenthesizedExpression(ParenthesizedExpressionSyntax node)
-        {
+        {   
+            //ConditionalAccessExpressionSyntax
+            //MemberBindingExpressionSyntax
             PassVariableReference(node, node.Expression);
             return Visit(node.Expression);
         }
 
+        public override TempComputeResult VisitConditionalExpression(ConditionalExpressionSyntax node)
+        {
+            var tuple = GetOrCreateVariableReference(node, "");
+            tuple.Top.Type = VariableTypes.Value;
+
+            bool conditionValue;
+            var conditionResult = Visit(node.Condition);
+            if (conditionResult.Value is bool)
+                conditionValue = (bool)conditionResult.Value;
+            else
+            {
+                // true运算符重载
+                var overloadTrueMethod = DebugService.GetMethod(conditionResult.Type, "op_True", BindingFlags.Public | BindingFlags.Static, methodInfo => CheckConditionalOperatorUnaryMethodParameters(conditionResult.Type, methodInfo));
+                if (overloadTrueMethod != null)
+                    conditionValue = (bool)overloadTrueMethod.Invoke(null, new object[1] { conditionResult.Value });
+                else
+                {
+                    throw new InvalidOperationException(string.Format("\"{0}\" is not conditional expression", node.Condition.ToString()));
+                }
+            }
+
+            TempComputeResult result;
+            if (conditionValue)
+                result = Visit(node.WhenTrue);
+            else
+                result = Visit(node.WhenFalse);
+
+            tuple.Top.Value = result.Value;
+            tuple.Top.ValueType = result.Type;
+
+            return ResolveVariable(tuple.Bottom);
+        }
+
+        public override TempComputeResult VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
+        {
+            return VisitUnaryExpression(node.Operand, node.OperatorToken.Text, true, node.ToString());
+        }
+
+        public override TempComputeResult VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
+        {
+            return VisitUnaryExpression(node.Operand, node.OperatorToken.Text, false, node.ToString());
+        }
+
+        public TempComputeResult VisitUnaryExpression(ExpressionSyntax operand, string operatorText, bool isPrefix, string nodeText)
+        {
+            var operandResult = Visit(operand);
+            if (operandResult.Type == null)
+                return CreateComputeResult(null, null);
+
+            string methodName;
+            if (dic_UnaryOperator_MethodName.TryGetValue(operatorText, out methodName))
+            {
+                var bindingFlags = BindingFlags.Public | BindingFlags.Static;
+                var overloadOperatorMethod = DebugService.GetMethod(operandResult.Type, methodName, bindingFlags, true, operandResult.Type);
+                if (overloadOperatorMethod != null) // 有运算符重载
+                {
+                    var result = overloadOperatorMethod.Invoke(null, new object[1] { operandResult.Value });
+                    return CreateComputeResult(result, overloadOperatorMethod.ReturnType);
+                }
+            }
+
+            try
+            {
+                var expressionText = isPrefix ? "{0}x" : "x{0}";
+                var func = new DynamicExpresso.Interpreter().Parse(string.Format(expressionText, operatorText), new DynamicExpresso.Parameter("x", operandResult.Type.UnWrapper()));
+                var result = func.Invoke(operandResult.Value);
+                return CreateComputeResult(result, result == null ? null : result.GetType());
+            }
+            catch
+            {
+                throw new Exception(string.Format("Fail to calculate '{0}'", nodeText));
+            }
+        }
+
         public override TempComputeResult VisitBinaryExpression(BinaryExpressionSyntax node)
         {
+            var left = Visit(node.Left);
+            var right = Visit(node.Right);
             var operatorText = node.OperatorToken.Text;
-            if (operatorText == "&&") // TODO:用户定义的条件逻辑运算符
+            if (left.Type == null && right.Type == null)
             {
-
+                if (operatorText == "==")
+                    return CreateComputeResult(true, typeof(bool));
+                else
+                    return CreateComputeResult(null, null);
             }
-            else if (operatorText == "||")
-            {
 
+            var leftType = left.Type;
+            var rightType = right.Type;
+            string methodName;
+            if (dic_BinaryOperator_MethodName.TryGetValue(operatorText, out methodName))
+            {
+                var bindingFlags = BindingFlags.Public | BindingFlags.Static;
+                var overloadOperatorMethod = DebugService.GetMethod(leftType, methodName, bindingFlags, true, leftType, rightType);
+                if (overloadOperatorMethod == null)
+                    overloadOperatorMethod = DebugService.GetMethod(rightType, methodName, bindingFlags, true, leftType, rightType);
+                if (overloadOperatorMethod != null) // 有运算符重载
+                {
+                    var result = overloadOperatorMethod.Invoke(null, new object[2] { left.Value, right.Value });
+                    return CreateComputeResult(result, overloadOperatorMethod.ReturnType);
+                }
+                else
+                {
+                    return ComputeBinaryNative(leftType, rightType, left.Value, right.Value, operatorText, node);
+                }
             }
             else
             {
-                var left = Visit(node.Left);
-                var right = Visit(node.Right);
-                if (left.Type == null && right.Type == null)
-                    return CreateComputeResult(null, null);
-
-                string methodName;
-                if (dic_BinaryOperator_MethodName.TryGetValue(operatorText, out methodName))
-                {
-                    var leftType = left.Type;
-                    var rightType = right.Type;
-                    var bindingFlags = BindingFlags.Public | BindingFlags.Static;
-                    var overloadOperatorMethod = DebugService.GetMethod(leftType, methodName, bindingFlags, leftType, rightType);
-                    if (overloadOperatorMethod == null)
-                        overloadOperatorMethod = DebugService.GetMethod(rightType, methodName, bindingFlags, leftType, rightType);
-                    if (overloadOperatorMethod != null) // 有运算符重载
-                    {
-                        var result = overloadOperatorMethod.Invoke(null, new object[2] { left.Value, right.Value });
-                        return CreateComputeResult(result, overloadOperatorMethod.ReturnType);
-                    }
-                    else // 数学运算, 依赖动态编译lambda表达式，只能JIT
-                    {
-                        try
-                        {
-                            var func = new DynamicExpresso.Interpreter().Parse(string.Format("x{0}y", operatorText), new DynamicExpresso.Parameter("x", UnWrapper(leftType)), new DynamicExpresso.Parameter("y", UnWrapper(rightType)));
-                            var result = func.Invoke(left.Value, right.Value);
-                            return CreateComputeResult(result, result == null ? null : result.GetType());
-                        }
-                        catch
-                        {
-                            throw new Exception(string.Format("Fail to calculate '{0}'", node.ToString()));
-                        }
-                    }
-                }
-                else
-                    throw new NotSupportedException("Unknown Binary Operator:" + operatorText);
+                var result = ComputeCustomConditionalLogicOperator(leftType, rightType, left.Value, right.Value, operatorText); // 用户定义的条件逻辑运算符，规则为https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/language-specification/expressions#conditional-logical-operators
+                if (result != null)
+                    return result;
+                return ComputeBinaryNative(leftType, rightType, left.Value, right.Value, operatorText, node);
+                //throw new NotSupportedException("Unknown Binary Operator:" + operatorText);
             }
+        }
 
+        private TempComputeResult ComputeCustomConditionalLogicOperator(Type leftType, Type rightType, object leftValue, object rightValue, string operatorText)
+        {
+            if (operatorText != "&&" && operatorText != "||")
+                return null;
+            if (leftType != rightType)
+                return null;
+            if (operatorText == "&&") // T.false(x) ? x : T.& (x, y)
+            {
+                return ComputeCustomConditionalLogic(leftType, "op_False", "op_BitwiseAnd", leftValue, rightValue);
+            }
+            else if (operatorText == "||") // T.true(x) ? x : T.| (x, y)
+            {
+                return ComputeCustomConditionalLogic(leftType, "op_True", "op_BitwiseOr", leftValue, rightValue);
+            }
             return null;
         }
 
-        private static Type UnWrapper(Type type)
+        private TempComputeResult ComputeCustomConditionalLogic(Type type, string methodXName, string methodYName, object leftValue, object rightValue)
         {
-            if (type is ILRuntimeWrapperType)
-                return (type as ILRuntimeWrapperType).RealType;
-            return type;
+            var methodX = DebugService.GetMethod(type, methodXName, BindingFlags.Public | BindingFlags.Static, methodInfo => CheckConditionalOperatorUnaryMethodParameters(type, methodInfo));
+            if (methodX == null)
+                return null;
+            var methodY = DebugService.GetMethod(type, methodYName, BindingFlags.Public | BindingFlags.Static, methodInfo => CheckConditionalOperatorBinaryMethodParameters(type, methodInfo));
+            if (methodY == null)
+                return null;
+
+            var condition = (bool)methodX.Invoke(null, new object[1] { leftValue });
+            object obj = leftValue;
+            if (!condition)
+                obj = methodY.Invoke(null, new object[2] { leftValue, rightValue });
+            return CreateComputeResult(obj, type);
+        }
+
+        private bool CheckConditionalOperatorUnaryMethodParameters(Type type, MethodInfo methodInfo)
+        {
+            if (methodInfo.ReturnType.UnWrapper() != typeof(bool))
+                return false;
+            var parameterInfos = methodInfo.GetParameters();
+            return parameterInfos.Length == 1 && parameterInfos[0].ParameterType == type;
+        }
+
+        private bool CheckConditionalOperatorBinaryMethodParameters(Type type, MethodInfo methodInfo)
+        {
+            if (methodInfo.ReturnType.UnWrapper() != type)
+                return false;
+            var parameterInfos = methodInfo.GetParameters();
+            return parameterInfos.Length == 2 && parameterInfos[0].ParameterType == type && parameterInfos[1].ParameterType == type;
+        }
+
+        private TempComputeResult ComputeBinaryNative(Type leftType, Type rightType, object leftValue, object rightValue, string operatorText, ExpressionSyntax node) // 数学运算, 依赖动态编译lambda表达式，只能JIT
+        {
+            try
+            {
+                var func = new DynamicExpresso.Interpreter().Parse(string.Format("x{0}y", operatorText), new DynamicExpresso.Parameter("x", leftType.UnWrapper()), new DynamicExpresso.Parameter("y", rightType.UnWrapper()));
+                var result = func.Invoke(leftValue, rightValue);
+                return CreateComputeResult(result, result == null ? null : result.GetType());
+            }
+            catch (Exception e)
+            {
+                throw new Exception(string.Format("Fail to calculate '{0}'", node.ToString()), e);
+            }
         }
 
         public override TempComputeResult VisitThisExpression(ThisExpressionSyntax node)
@@ -146,7 +272,7 @@ namespace ILRuntime.Runtime.Debugger
                 return ResolveVariable(tuple.Bottom);
 
             ILMethod currentMethod;
-            var v = DebugService.GetThis(Intepreter, out currentMethod);
+            var v = DebugService.GetThis(Intepreter, 0, out currentMethod);
             return CreateComputeResult(v, currentMethod.DeclearingType.ReflectionType);
         }
 
@@ -176,20 +302,68 @@ namespace ILRuntime.Runtime.Debugger
         private TempComputeResult ResolveVariable(VariableReference variableReference)
         {
             object variableValue;
-            var variableInfo = DebugService.ResolveVariable(Intepreter.GetHashCode(), variableReference, out variableValue);
+            var variableInfo = DebugService.ResolveVariable(Intepreter.GetHashCode(), 0, variableReference, out variableValue);
             HandleResolveVariableError(variableInfo);
             return CreateComputeResult(variableValue, variableInfo.ValueObjType);
+        }
+
+        private Dictionary<ExpressionSyntax, object> dic_Expression_Conditional = new Dictionary<ExpressionSyntax, object>();
+        public override TempComputeResult VisitConditionalAccessExpression(ConditionalAccessExpressionSyntax node)
+        {
+            if (node.WhenNotNull is MemberBindingExpressionSyntax) // x?.y
+            {
+                var memberBindingExpressionSyntax = node.WhenNotNull as MemberBindingExpressionSyntax;
+                var memberAccessExpressionSyntax = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, node.Expression, memberBindingExpressionSyntax.OperatorToken, memberBindingExpressionSyntax.Name);
+                PassVariableReference(node, memberAccessExpressionSyntax);
+                dic_Expression_Conditional[memberAccessExpressionSyntax] = null;
+                return VisitMemberAccessExpression(memberAccessExpressionSyntax);
+            }
+            else if (node.WhenNotNull is InvocationExpressionSyntax) // x?.y()
+            {
+                var invocationExpressionSyntax = node.WhenNotNull as InvocationExpressionSyntax;
+                if (invocationExpressionSyntax.Expression is MemberBindingExpressionSyntax)
+                {
+                    var memberBindingExpressionSyntax = invocationExpressionSyntax.Expression as MemberBindingExpressionSyntax;
+                    var memberAccessExpressionSyntax = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, node.Expression, memberBindingExpressionSyntax.OperatorToken, memberBindingExpressionSyntax.Name);
+                    invocationExpressionSyntax = invocationExpressionSyntax.WithExpression(memberAccessExpressionSyntax);
+                    PassVariableReference(node, invocationExpressionSyntax);
+                    dic_Expression_Conditional[invocationExpressionSyntax] = null;
+                    return VisitInvocationExpression(invocationExpressionSyntax);
+                }
+            }
+            else if (node.WhenNotNull is ElementBindingExpressionSyntax) // x?[y]
+            {
+                var elementBindingExpressionSyntax = node.WhenNotNull as ElementBindingExpressionSyntax;
+                var elementAccessExpressionSyntax = SyntaxFactory.ElementAccessExpression(node.Expression, elementBindingExpressionSyntax.ArgumentList);
+                PassVariableReference(node, elementAccessExpressionSyntax);
+                dic_Expression_Conditional[elementAccessExpressionSyntax] = null;
+                return VisitElementAccessExpression(elementAccessExpressionSyntax);
+            }
+            else
+                throw new NotSupportedException(string.Format("unknown expression \"{0}\" in Conditional Access Expression", node.WhenNotNull.ToString()));
+
+            return base.VisitConditionalAccessExpression(node);
         }
 
         public override TempComputeResult VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             PassVariableReference(node, node.Expression);
+            if (dic_Expression_Conditional.ContainsKey(node))
+            {
+                dic_Expression_Conditional.Remove(node);
+                dic_Expression_Conditional[node.Expression] = null;
+            }
             return Visit(node.Expression);
         }
 
         public override TempComputeResult VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
             var tuple = GetOrCreateVariableReference(node, node.Name.ToString());
+            if (dic_Expression_Conditional.ContainsKey(node))
+            {
+                tuple.Top.Conditional = true;
+                dic_Expression_Conditional.Remove(node);
+            }
             if (node.Parent is InvocationExpressionSyntax)
                 HandleInvocationExpressionSyntax(tuple, node.Parent as InvocationExpressionSyntax);
             else
@@ -198,11 +372,30 @@ namespace ILRuntime.Runtime.Debugger
             return Visit(node.Expression);
         }
 
+        public override TempComputeResult VisitElementAccessExpression(ElementAccessExpressionSyntax node)
+        {
+            var tuple = GetOrCreateVariableReference(node, null);
+            if (dic_Expression_Conditional.ContainsKey(node))
+            {
+                tuple.Top.Conditional = true;
+                dic_Expression_Conditional.Remove(node);
+            }
+            tuple.Top.Type = VariableTypes.IndexAccess;
+            tuple.Top.Parameters = HandleParameters(node.ArgumentList);
+            dic_Expression_Variable.Add(node.Expression, tuple);
+            return Visit(node.Expression);
+        }
+
         private void HandleInvocationExpressionSyntax(VariableReferenceTuple tuple, InvocationExpressionSyntax invocationExpressionSyntax)
         {
             tuple.Top.Type = VariableTypes.Invocation;
+            tuple.Top.Parameters = HandleParameters(invocationExpressionSyntax.ArgumentList);
+        }
+
+        private VariableReference[] HandleParameters(BaseArgumentListSyntax argumentListSyntax)
+        {
             var variableReferenceList = new List<VariableReference>();
-            foreach (var argument in invocationExpressionSyntax.ArgumentList.Arguments)
+            foreach (var argument in argumentListSyntax.Arguments)
             {
                 var argumentResult = Visit(argument.Expression);
                 variableReferenceList.Add(new VariableReference
@@ -212,7 +405,7 @@ namespace ILRuntime.Runtime.Debugger
                     ValueType = argumentResult.Type,
                 });
             }
-            tuple.Top.Parameters = variableReferenceList.ToArray();
+            return variableReferenceList.ToArray();
         }
 
         private void HandleResolveVariableError(VariableInfo variableInfo)

@@ -194,7 +194,9 @@ namespace ILRuntime.Runtime.Debugger
                         CSBindBreakpoint msg = new Protocol.CSBindBreakpoint();
                         msg.BreakpointHashCode = br.ReadInt32();
                         msg.IsLambda = br.ReadBoolean();
-                        msg.TypeName = br.ReadString();
+                        msg.NamespaceName = br.ReadString();
+                        var typeName = br.ReadString();
+                        msg.TypeName = String.IsNullOrWhiteSpace(msg.NamespaceName) ? typeName : msg.NamespaceName + "." + typeName;
                         msg.MethodName = br.ReadString();
                         msg.StartLine = br.ReadInt32();
                         msg.EndLine = br.ReadInt32();
@@ -203,6 +205,12 @@ namespace ILRuntime.Runtime.Debugger
                         msg.Condition.Style = (BreakpointConditionStyle)br.ReadByte();
                         if (msg.Condition.Style != BreakpointConditionStyle.None)
                             msg.Condition.Expression = br.ReadString();
+                        msg.UsingInfos = new UsingInfo[br.ReadInt32() + 1];
+                        msg.UsingInfos[0] = new UsingInfo() { Alias = null, Name = msg.NamespaceName }; //当前命名空间具有最高优先级 
+                        for (int i = 1; i < msg.UsingInfos.Length; i++)
+                        {
+                            msg.UsingInfos[i] = new UsingInfo() { Alias = br.ReadString(), Name = br.ReadString() };
+                        }
                         TryBindBreakpoint(msg);
                     }
                     break;
@@ -245,12 +253,13 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         CSResolveVariable msg = new CSResolveVariable();
                         msg.ThreadHashCode = br.ReadInt32();
+                        msg.FrameIndex = br.ReadInt32();
                         msg.Variable = ReadVariableReference(br);
                         VariableInfo info;
                         try
                         {
                             object res;
-                            info = ds.ResolveVariable(msg.ThreadHashCode, msg.Variable, out res);
+                            info = ds.ResolveVariable(msg.ThreadHashCode, msg.FrameIndex, msg.Variable, out res);
                         }
                         catch (Exception ex)
                         {
@@ -264,6 +273,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         CSResolveIndexer msg = new CSResolveIndexer();
                         msg.ThreadHashCode = br.ReadInt32();
+                        msg.FrameIndex = br.ReadInt32();
                         msg.Body = ReadVariableReference(br);
                         msg.Index = ReadVariableReference(br);
 
@@ -271,7 +281,7 @@ namespace ILRuntime.Runtime.Debugger
                         try
                         {
                             object res;
-                            info = ds.ResolveIndexAccess(msg.ThreadHashCode, msg.Body, msg.Index, out res);
+                            info = ds.ResolveIndexAccess(msg.ThreadHashCode, msg.FrameIndex, new VariableReference { Parent = msg.Body, Parameters = new VariableReference[1] { msg.Index } }, out res);
                         }
                         catch(Exception ex)
                         {
@@ -284,12 +294,13 @@ namespace ILRuntime.Runtime.Debugger
                 case DebugMessageType.CSEnumChildren:
                     {
                         int thId = br.ReadInt32();
+                        int frameId = br.ReadInt32();
                         var parent = ReadVariableReference(br);
 
                         VariableInfo[] info = null;
                         try
                         {
-                            info = ds.EnumChildren(thId, parent);
+                            info = ds.EnumChildren(thId, frameId, parent);
                         }
                         catch(Exception ex)
                         {
@@ -418,7 +429,7 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 if (found != null)
                 {
-                    ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine, msg.Enabled, msg.Condition);
+                    ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine, msg.Enabled, msg.Condition, msg.UsingInfos);
                     res.Result = BindBreakpointResults.OK;
                 }
                 else
@@ -475,7 +486,7 @@ namespace ILRuntime.Runtime.Debugger
                         }
                         if (found != null)
                         {
-                            ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine, msg.Enabled, msg.Condition);
+                            ds.SetBreakPoint(found.GetHashCode(), msg.BreakpointHashCode, msg.StartLine, msg.Enabled, msg.Condition, msg.UsingInfos);
                             res.Result = BindBreakpointResults.OK;
                         }
                         else

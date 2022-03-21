@@ -15,14 +15,21 @@ namespace ILRuntime.Runtime.Debugger
         public int StartLine { get; set; }
         public bool Enabled { get; set; }
         public BreakpointConditionDetails Condition { get; set; }
+        public UsingInfo[] UsingInfos { get; set; }
 
         public bool CheckCondition(DebugService debugService, ILIntepreter intp, ref StackFrameInfo[] stackFrameInfos, ref string error)
         {
-            if (Condition == null || Condition.Style == BreakpointConditionStyle.None || Condition.ExpressionError)
+            if (Condition == null || Condition.Style == BreakpointConditionStyle.None)
                 return true;
+            if (Condition.ExpressionError)
+            {
+                error = "the expression is not conditional expression";
+                return true;
+            }
             stackFrameInfos = debugService.GetStackFrameInfo(intp);
             try
             {
+                debugService.UsingInfosContext = UsingInfos;
                 var visitor = new BreakpointConditionExpressionVisitor(debugService, intp, stackFrameInfos.Length < 1 ? null : stackFrameInfos[0].LocalVariables);
                 var finalResult = visitor.Visit(Condition.ExpressionSyntax);
                 if (finalResult.Value is bool)
@@ -35,6 +42,10 @@ namespace ILRuntime.Runtime.Debugger
             catch (Exception ex)
             {
                 error = ex.Message;
+            }
+            finally
+            {
+                debugService.UsingInfosContext = null;
             }
             return true;
         }

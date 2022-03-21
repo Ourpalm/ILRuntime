@@ -30,7 +30,7 @@ namespace ILRuntime.Reflection
             for (int i = 0; i < m.ParameterCount; i++)
             {
                 var pd = m.Definition.Parameters[i];
-                parameters[i] = new ILRuntimeParameterInfo(pd, m.Parameters[i], this);
+                parameters[i] = new ILRuntimeParameterInfo(pd, m.Parameters[i], this, appdomain);
             }
         }
 
@@ -132,7 +132,7 @@ namespace ILRuntime.Reflection
         {
             if (customAttributes == null)
                 InitializeCustomAttribute();
-            List<object> res = new List<object>();
+            List<Attribute> res = new List<Attribute>();
             for (int i = 0; i < customAttributes.Length; i++)
             {
                 if (attributeTypes[i].Equals(attributeType))

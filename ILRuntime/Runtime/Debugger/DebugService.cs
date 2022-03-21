@@ -4,7 +4,7 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading;
-
+using System.Linq;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
@@ -24,11 +24,12 @@ namespace ILRuntime.Runtime.Debugger
         Runtime.Enviorment.AppDomain domain;
         Dictionary<int, LinkedList<BreakpointInfo>> activeBreakpoints = new Dictionary<int, LinkedList<BreakpointInfo>>();
         Dictionary<int, BreakpointInfo> breakpointMapping = new Dictionary<int, BreakpointInfo>();
-        Queue<KeyValuePair<int, VariableReference>> pendingReferences = new Queue<KeyValuePair<int, VariableReference>>();
-        Queue<KeyValuePair<int, VariableReference>> pendingEnuming = new Queue<KeyValuePair<int, VariableReference>>();
-        Queue<KeyValuePair<int, KeyValuePair<VariableReference, VariableReference>>> pendingIndexing = new Queue<KeyValuePair<int, KeyValuePair<VariableReference, VariableReference>>>();
+        Queue<Tuple<int, int, VariableReference>> pendingReferences = new Queue<Tuple<int, int, VariableReference>>();
+        Queue<Tuple<int, int, VariableReference>> pendingEnuming = new Queue<Tuple<int, int, VariableReference>>();
+        Queue<Tuple<int, int, VariableReference>> pendingIndexing = new Queue<Tuple<int, int, VariableReference>>();
         AutoResetEvent evt = new AutoResetEvent(false);
-        string breakpointParseCode = "void Method() {{ {0} }}";
+        string breakpointParseCode = "void Method() {{ ({0}) }}";  // ()是因为a?b:c会被解析为可空类型a的类型变量声明，加小括号才会解析为条件表达式
+        public UsingInfo[] UsingInfosContext { get; set; }
 
         public Action<string> OnBreakPoint;
         public Action<string> OnILRuntimeException;
@@ -57,10 +58,10 @@ namespace ILRuntime.Runtime.Debugger
         /// <summary>
         /// Start Debugger Server
         /// </summary>
-        /// <param name="port">Port to listen on</param>
-        /// <param name="boardcastDebuggerInfo">true表示使用udp在参数port表示的端口上广播本地调试器信息，调试器使用动态端口。false表示本地调试器使用参数port表示的固定端口。默认值为false</param>
+        /// <param name="port">Port to listen on. default value is 56000</param>
+        /// <param name="boardcastDebuggerInfo">true表示使用udp在参数port表示的端口上广播本地调试器信息，调试器使用动态端口。false表示本地调试器使用参数port表示的固定端口。默认值为true</param>
         /// <returns>错误描述，null表示没有错误</returns>
-        public string StartDebugService(int port, bool boardcastDebuggerInfo = false)
+        public string StartDebugService(int port = 56000, bool boardcastDebuggerInfo = true)
         {
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             server = new Debugger.DebuggerServer(this);
@@ -286,7 +287,7 @@ namespace ILRuntime.Runtime.Debugger
                 server.NotifyModuleLoaded(moduleName);
         }
 
-        internal void SetBreakPoint(int methodHash, int bpHash, int startLine, bool enabled, BreakpointCondition breakpointCondition)
+        internal void SetBreakPoint(int methodHash, int bpHash, int startLine, bool enabled, BreakpointCondition breakpointCondition, UsingInfo[] usingInfos)
         {
             lock (activeBreakpoints)
             {
@@ -303,6 +304,7 @@ namespace ILRuntime.Runtime.Debugger
                 bpInfo.StartLine = startLine;
                 bpInfo.Enabled = enabled;
                 ParseBreakpointCondition(bpInfo, breakpointCondition);
+                bpInfo.UsingInfos = usingInfos;
 
                 lst.AddLast(bpInfo);
                 breakpointMapping[bpHash] = bpInfo;
@@ -648,27 +650,28 @@ namespace ILRuntime.Runtime.Debugger
                 string typeName = null;
                 var val = Add(arg, i);
                 v = StackObject.ToObject(val, intp.AppDomain, intp.Stack.ManagedStack);
-                Type vType;
+                CLR.TypeSystem.IType vType;
                 if (argIdx >= 0)
                 {
                     var lv = m.Definition.Parameters[argIdx];
                     name = string.IsNullOrEmpty(lv.Name) ? "arg" + lv.Index : lv.Name;
                     typeName = lv.ParameterType.FullName;
-                    vType = m.Parameters[argIdx].ReflectionType;
+                    vType = m.Parameters[argIdx];
                 }
                 else
                 {
                     name = "this";
                     typeName = m.DeclearingType.FullName;
-                    vType = m.DeclearingType.ReflectionType;
+                    vType = m.DeclearingType;
                 }
 
+                v = vType.TypeForCLR.CheckCLRTypes(v);
                 VariableInfo vinfo = VariableInfo.FromObject(v);
                 vinfo.Address = (long)val;
                 vinfo.Name = name;
                 vinfo.TypeName = typeName;
                 vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
-                vinfo.ValueObjType = vType;
+                vinfo.ValueObjType = vType.ReflectionType;
 
                 info.LocalVariables[i] = vinfo;
             }
@@ -682,6 +685,7 @@ namespace ILRuntime.Runtime.Debugger
                 string vName = null;
                 m.Definition.DebugInformation.TryGetName(lv, out vName);
                 string name = string.IsNullOrEmpty(vName) ? "v" + lv.Index : vName;
+                v = type.TypeForCLR.CheckCLRTypes(v);
                 VariableInfo vinfo = VariableInfo.FromObject(v);
                 vinfo.Address = (long)val;
                 vinfo.Name = name;
@@ -704,7 +708,7 @@ namespace ILRuntime.Runtime.Debugger
             return frameInfos.ToArray();
         }
 
-        internal unsafe VariableInfo[] EnumChildren(int threadHashCode, VariableReference parent)
+        internal unsafe VariableInfo[] EnumChildren(int threadHashCode, int frameIndex, VariableReference parent)
         {
             ILIntepreter intepreter;
             if (AppDomain.Intepreters.TryGetValue(threadHashCode, out intepreter))
@@ -714,13 +718,13 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     lock (pendingEnuming)
                     {
-                        pendingEnuming.Enqueue(new KeyValuePair<int, VariableReference>(threadHashCode, parent));
+                        pendingEnuming.Enqueue(new Tuple<int, int, VariableReference>(threadHashCode, frameIndex, parent));
                     }
                     return null;
                 }
 #endif
                 object obj;
-                var info = ResolveVariable(threadHashCode, parent, out obj);
+                var info = ResolveVariable(threadHashCode, frameIndex, parent, out obj);
                 if (obj != null)
                 {
                     if(obj is Array)
@@ -737,11 +741,13 @@ namespace ILRuntime.Runtime.Debugger
                     }
                     else if(obj is ILTypeInstance)
                     {
-                        return EnumILTypeInstance((ILTypeInstance)obj, intepreter);
+                        return EnumObject(((ILTypeInstance)obj).CLRInstance, ((ILTypeInstance)obj).Type.ReflectionType);
+                        //return EnumILTypeInstance((ILTypeInstance)obj, intepreter);
                     }
                     else if(obj is ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)
                     {
-                        return EnumILTypeInstance(((Enviorment.CrossBindingAdaptorType)obj).ILInstance, intepreter);
+                        return EnumObject(obj, ((Enviorment.CrossBindingAdaptorType)obj).ILInstance.Type.ReflectionType);
+                        //return EnumILTypeInstance(((Enviorment.CrossBindingAdaptorType)obj).ILInstance, intepreter);
                     }
                     else
                     {
@@ -925,7 +931,7 @@ namespace ILRuntime.Runtime.Debugger
             return lst.ToArray();
         }
 
-        internal unsafe VariableInfo ResolveIndexAccess(int threadHashCode, VariableReference body, VariableReference idx, out object res)
+        internal unsafe VariableInfo ResolveIndexAccess(int threadHashCode, int frameIndex, VariableReference indexAccess, out object res)
         {
             ILIntepreter intepreter;
             res = null;
@@ -936,96 +942,140 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     lock (pendingIndexing)
                     {
-                        pendingIndexing.Enqueue(new KeyValuePair<int, KeyValuePair<VariableReference, VariableReference>>(threadHashCode, new KeyValuePair<VariableReference, VariableReference>(body, idx)));
+                        pendingIndexing.Enqueue(new Tuple<int, int, VariableReference>(threadHashCode, frameIndex, indexAccess));
                     }
                     res = null;
                     return new VariableInfo() { Type = VariableTypes.Pending };
                 }
 #endif
+                var body = indexAccess.Parent;
+                var idx = indexAccess.Parameters[0];
                 object obj;
-                var info = ResolveVariable(threadHashCode, body, out obj);
+                var info = ResolveVariable(threadHashCode, frameIndex, body, out obj);
+                var objType = info.ValueObjType;
                 if (obj != null)
                 {
                     object idxObj;
-                    info = ResolveVariable(threadHashCode, idx, out idxObj);
-                    if(obj is Array)
+                    info = ResolveVariable(threadHashCode, frameIndex, idx, out idxObj);
+                    if (obj is Array)
                     {
                         res = ((Array)obj).GetValue((int)idxObj);
                         info = VariableInfo.FromObject(res);
                         info.Type = VariableTypes.IndexAccess;
                         info.TypeName = obj.GetType().GetElementType().FullName;
                         info.Expandable = res != null && !obj.GetType().GetElementType().IsPrimitive;
+                        info.ValueObjType = objType.GetElementType();
 
                         return info;
                     }
                     else
                     {
-                        if(obj is ILTypeInstance)
-                        {
-                            var m = ((ILTypeInstance)obj).Type.GetMethod("get_Item");
-                            if (m != null)
-                            {
-                                res = intepreter.AppDomain.Invoke(m, obj, idxObj);
-                                info = VariableInfo.FromObject(res);
-                                info.Type = VariableTypes.IndexAccess;
-                                info.TypeName = m.ReturnType.FullName;
-                                info.Expandable = res != null && !m.ReturnType.IsPrimitive;
+                        //if(obj is ILTypeInstance)
+                        //{
+                        //    var m = ((ILTypeInstance)obj).Type.GetMethod("get_Item");
+                        //    if (m != null)
+                        //    {
+                        //        res = intepreter.AppDomain.Invoke(m, obj, idxObj);
+                        //        info = VariableInfo.FromObject(res);
+                        //        info.Type = VariableTypes.IndexAccess;
+                        //        info.TypeName = m.ReturnType.FullName;
+                        //        info.Expandable = res != null && !m.ReturnType.IsPrimitive;
 
-                                return info;
-                            }
-                            else
-                                return VariableInfo.NullReferenceExeption;
+                        //        return info;
+                        //    }
+                        //    else
+                        //        return VariableInfo.NullReferenceExeption;
+                        //}
+                        //else
+                        //{
+                        //if(obj is ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)
+                        //{
+                        //    throw new NotImplementedException();
+                        //}
+                        //else
+                        //{
+                        //if (obj is IDictionary && idxObj is int)
+                        //{
+                        //    IDictionary dic = (IDictionary)obj;
+                        //    var keys = GetArray(dic.Keys);
+                        //    if (keys[0].GetType() != typeof(int))
+                        //    {
+                        //        int index = (int)idxObj;
+                        //        var values = GetArray(dic.Values);
+                        //        var t = typeof(KeyValuePair<,>).MakeGenericType(keys[index].GetType(), values[index].GetType());
+                        //        var ctor = t.GetConstructor(new Type[] { keys[index].GetType(), values[index].GetType() });
+                        //        res = ctor.Invoke(new object[] { keys[index], values[index] });
+                        //        info = VariableInfo.FromObject(res);
+                        //        info.Type = VariableTypes.IndexAccess;
+                        //        info.Offset = index;
+                        //        info.TypeName = t.FullName;
+                        //        info.Expandable = true;
+                        //        info.ValueObjType = t;
+
+                        //        return info;
+                        //    }
+                        //}
+
+                        var pi = GetOverrideIndexer(objType, info.ValueObjType);
+                        //var pi = obj.GetType().GetProperty("Item");
+                        if (pi != null)
+                        {
+                            res = pi.GetValue(obj, new object[] { idxObj });
+                            info = VariableInfo.FromObject(res);
+                            info.Type = VariableTypes.IndexAccess;
+                            info.TypeName = pi.PropertyType.FullName;
+                            info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
+                            info.ValueObjType = pi.PropertyType;
+                            return info;
                         }
                         else
-                        {
-                            if(obj is ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)
-                            {
-                                throw new NotImplementedException();
-                            }
-                            else
-                            {
-                                if(obj is IDictionary && idxObj is int)
-                                {
-                                    IDictionary dic = (IDictionary)obj;
-                                    var keys = GetArray(dic.Keys);                                    
-                                    if (keys[0].GetType() != typeof(int))
-                                    {
-                                        int index = (int)idxObj;
-                                        var values = GetArray(dic.Values);
-                                        var t = typeof(KeyValuePair<,>).MakeGenericType(keys[index].GetType(), values[index].GetType());
-                                        var ctor = t.GetConstructor(new Type[] { keys[index].GetType(), values[index].GetType() });
-                                        res = ctor.Invoke(new object[] { keys[index], values[index] });
-                                        info = VariableInfo.FromObject(res);
-                                        info.Type = VariableTypes.IndexAccess;
-                                        info.Offset = index;
-                                        info.TypeName = t.FullName;
-                                        info.Expandable = true;
-
-                                        return info;
-                                    }
-                                }
-                                var pi = obj.GetType().GetProperty("Item");
-                                if (pi != null)
-                                {
-                                    res = pi.GetValue(obj, new object[] { idxObj });
-                                    info = VariableInfo.FromObject(res);
-                                    info.Type = VariableTypes.IndexAccess;
-                                    info.TypeName = pi.PropertyType.FullName;
-                                    info.Expandable = res != null && !pi.PropertyType.IsPrimitive;
-
-                                    return info;
-                                }
-                                else
-                                    return VariableInfo.NullReferenceExeption;
-                            }
-                        }
+                            return VariableInfo.GetError(string.Format("无法将带[] 的索引应用于“{0}”类型的表达式", objType.FullName));
+                        //}
+                        //}
                     }
                 }
                 else
-                    return VariableInfo.NullReferenceExeption;
+                {
+                    if (indexAccess.Conditional)
+                    {
+                        if (objType.IsArray)
+                        {
+                            info.ValueObjType = objType.GetElementType();
+                            info.TypeName = info.ValueObjType.FullName;
+                            return info;
+                        }
+                        else
+                        {
+                            object idxObj;
+                            info = ResolveVariable(threadHashCode, frameIndex, idx, out idxObj);
+                            var pi = GetOverrideIndexer(objType, info.ValueObjType);
+                            if (pi != null)
+                            {
+                                info.ValueObjType = pi.PropertyType;
+                                info.TypeName = pi.PropertyType.FullName;
+                                return info;
+                            }
+                            else
+                                return VariableInfo.GetError(string.Format("无法将带[] 的索引应用于“{0}”类型的表达式", objType.FullName));
+                        }
+                    }
+                    return VariableInfo.NullReferenceExeptionWithName(body.FullName);
+                }
             }
             else
                 return VariableInfo.NullReferenceExeption;
+        }
+
+        private PropertyInfo GetOverrideIndexer(Type bodyType, Type indexType)
+        {
+            var checkedTypes = new Type[1] { indexType };
+            foreach (var property in bodyType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var indexParameters = property.GetIndexParameters();
+                if (CheckParameters(indexParameters, checkedTypes, true))
+                    return property;
+            }
+            return null;
         }
 
         internal void ResolvePendingRequests()
@@ -1039,7 +1089,7 @@ namespace ILRuntime.Runtime.Debugger
                     try
                     {
                         object res;
-                        info = ResolveVariable(r.Key, r.Value, out res);
+                        info = ResolveVariable(r.Item1, r.Item2, r.Item3, out res);
                     }
                     catch (Exception ex)
                     {
@@ -1056,7 +1106,7 @@ namespace ILRuntime.Runtime.Debugger
                     var r = pendingEnuming.Dequeue();
                     try
                     {
-                        info = EnumChildren(r.Key, r.Value);
+                        info = EnumChildren(r.Item1, r.Item2, r.Item3);
                     }
                     catch (Exception ex)
                     {
@@ -1074,7 +1124,7 @@ namespace ILRuntime.Runtime.Debugger
                     try
                     {
                         object res;
-                        info = ResolveIndexAccess(r.Key, r.Value.Key, r.Value.Value, out res);
+                        info = ResolveIndexAccess(r.Item1, r.Item2, r.Item3, out res);
                     }
                     catch (Exception ex)
                     {
@@ -1085,15 +1135,15 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
-        public unsafe static object GetThis(ILIntepreter intepreter)
+        public unsafe static object GetThis(ILIntepreter intepreter, int frameIndex)
         {
             ILMethod currentMethod;
-            return GetThis(intepreter, out currentMethod);
+            return GetThis(intepreter, frameIndex, out currentMethod);
         }
 
-        public unsafe static object GetThis(ILIntepreter intepreter, out ILMethod currentMethod)
+        public unsafe static object GetThis(ILIntepreter intepreter, int frameIndex, out ILMethod currentMethod)
         {
-            var frame = intepreter.Stack.Frames.Peek();
+            var frame = intepreter.Stack.Frames.ToArray()[frameIndex];
             var m = frame.Method;
             currentMethod = m;
             if (m.HasThis)
@@ -1104,14 +1154,14 @@ namespace ILRuntime.Runtime.Debugger
             return null;
         }
 
-        private void GetVariableReferenceParameters(int threadHashCode, VariableReference[] parameters, out Type[] paramterTypes, out object[] paramterObjs)
+        private void GetVariableReferenceParameters(int threadHashCode, int frameIndex, VariableReference[] parameters, out Type[] paramterTypes, out object[] paramterObjs)
         {
             var paramterTypeList = new List<Type>();
             var paramterObjsList = new List<object>();
             foreach (var parameterReference in parameters)
             {
                 object parameterValue;
-                var info = ResolveVariable(threadHashCode, parameterReference, out parameterValue);
+                var info = ResolveVariable(threadHashCode, frameIndex, parameterReference, out parameterValue);
                 paramterTypeList.Add(info == null ? null : info.ValueObjType);
                 paramterObjsList.Add(parameterValue);
             }
@@ -1119,7 +1169,7 @@ namespace ILRuntime.Runtime.Debugger
             paramterObjs = paramterObjsList.ToArray();
         }
 
-        internal unsafe VariableInfo ResolveVariable(int threadHashCode, VariableReference variable, out object res)
+        internal unsafe VariableInfo ResolveVariable(int threadHashCode, int frameIndex, VariableReference variable, out object res)
         {
             ILIntepreter intepreter;
             res = null;
@@ -1132,7 +1182,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         lock (pendingReferences)
                         {
-                            pendingReferences.Enqueue(new KeyValuePair<int, VariableReference>(threadHashCode, variable));
+                            pendingReferences.Enqueue(new Tuple<int, int, VariableReference>(threadHashCode, frameIndex, variable));
                         }
                         res = null;
                         return new VariableInfo() { Type = VariableTypes.Pending };
@@ -1144,9 +1194,10 @@ namespace ILRuntime.Runtime.Debugger
                             {
                                 StackObject* ptr = (StackObject*)variable.Address;
                                 object obj = StackObject.ToObject(ptr, AppDomain, intepreter.Stack.ManagedStack);
-                                if (obj != null)
-                                {
-                                    //return ResolveMember(obj, name, out res);   
+                                //if (obj != null)
+                                //{
+                                    if (variable.ValueType != null && obj != null)
+                                        obj = variable.ValueType.UnWrapper().CheckCLRTypes(obj);
                                     res = obj;
                                     VariableInfo info = VariableInfo.FromObject(res);
                                     info.Address = variable.Address;
@@ -1155,11 +1206,11 @@ namespace ILRuntime.Runtime.Debugger
                                     info.TypeName = variable.ValueType == null ? "" : variable.ValueType.FullName;
                                     info.ValueObjType = variable.ValueType;
                                     return info;
-                                }
-                                else
-                                {
-                                    return VariableInfo.Null;
-                                }
+                                //}
+                                //else
+                                //{
+                                //    return VariableInfo.Null;
+                                //}
                             }
                         case VariableTypes.FieldReference:
                         case VariableTypes.PropertyReference:
@@ -1170,30 +1221,44 @@ namespace ILRuntime.Runtime.Debugger
                                 object[] paramterObjs = null;
                                 if (variable.Parent != null)
                                 {
-                                    ResolveVariable(threadHashCode, variable.Parent, out obj);
+                                    var parentVariableInfo = ResolveVariable(threadHashCode, frameIndex, variable.Parent, out obj);
+                                    if (parentVariableInfo.Type == VariableTypes.NotFound || parentVariableInfo.Type == VariableTypes.Error)
+                                        return parentVariableInfo;
+                                    if (variable.Type == VariableTypes.Invocation)
+                                    {
+                                        GetVariableReferenceParameters(threadHashCode, frameIndex, variable.Parameters, out paramterTypes, out paramterObjs);
+                                    }
                                     if (obj != null)
                                     {
-                                        if (variable.Type == VariableTypes.Invocation)
-                                        {
-                                            GetVariableReferenceParameters(threadHashCode, variable.Parameters, out paramterTypes, out paramterObjs);
-                                        }
-                                        return ResolveMember(obj, variable.Name, paramterTypes, paramterObjs, out res);
+                                        return ResolveMember(obj, null, variable.Name, paramterTypes, paramterObjs, out res);
                                     }
                                     else
                                     {
+                                        if (parentVariableInfo.Type == VariableTypes.Class)
+                                        {
+                                            return ResolveMember(null, parentVariableInfo.ValueObjType, variable.Name, paramterTypes, paramterObjs, out res);
+                                        }
+                                        if (variable.Conditional)
+                                        {
+                                            parentVariableInfo.ValueObjType = GetMemberType(parentVariableInfo.ValueObjType, variable.Name, paramterTypes); // 返回的应是成员类型。例如a为复杂类型，b为a的string类型的成员，那么a?.b返回string
+                                            if (parentVariableInfo.ValueObjType == null)
+                                                return VariableInfo.GetCannotFind(variable.Name);
+                                            return parentVariableInfo;
+                                        }
                                         return VariableInfo.NullReferenceExeptionWithName(variable.Parent.FullName);
                                     }
                                 }
                                 else
                                 {
-                                    var v = GetThis(intepreter);
+                                    VariableInfo result = null;
+                                    var v = GetThis(intepreter, frameIndex);
                                     if (v != null)
                                     {
                                         if (variable.Type == VariableTypes.Invocation)
                                         {
-                                            GetVariableReferenceParameters(threadHashCode, variable.Parameters, out paramterTypes, out paramterObjs);
+                                            GetVariableReferenceParameters(threadHashCode, frameIndex, variable.Parameters, out paramterTypes, out paramterObjs);
                                         }
-                                        var result = ResolveMember(v, variable.Name, paramterTypes, paramterObjs, out res);
+                                        result = ResolveMember(v, null, variable.Name, paramterTypes, paramterObjs, out res);
                                         if (result.Type == VariableTypes.NotFound)
                                         {
                                             ILTypeInstance ins = v as ILTypeInstance;
@@ -1205,24 +1270,63 @@ namespace ILRuntime.Runtime.Debugger
                                                 {
                                                     if (f.Name.Contains("_this"))
                                                     {
-                                                        result = ResolveMember(f.GetValue(v), variable.Name, null, null, out res);
+                                                        result = ResolveMember(f.GetValue(v), null, variable.Name, null, null, out res);
                                                         if (result.Type != VariableTypes.NotFound)
                                                             return result;
                                                     }
                                                 }
                                             }
                                         }
+                                        //return result;
+                                    }
+                                    //else
+                                    //{
+                                    //    return VariableInfo.GetCannotFind(variable.Name);
+                                    //}
+                                    if (result != null && result.Type != VariableTypes.NotFound)
                                         return result;
-                                    }
-                                    else
+
+                                    // variable.Name有可能表示一个类型
+                                    CLR.TypeSystem.IType targetIType = null;
+                                    string typeFullName = null;
+                                    if (UsingInfosContext != null)
                                     {
-                                        return VariableInfo.GetCannotFind(variable.Name);
+                                        foreach (var usingInfo in UsingInfosContext)
+                                        {
+                                            typeFullName = null;
+                                            if (string.IsNullOrWhiteSpace(usingInfo.Alias)) // 用每个using+类型名称 进行匹配
+                                                typeFullName = usingInfo.Name + "." + variable.Name;
+                                            else if (usingInfo.Alias == variable.Name) // 有别名的情况直接使用对应的名称
+                                                typeFullName = usingInfo.Name;
+                                            if (typeFullName != null)
+                                            {
+                                                var iType = AppDomain.GetType(typeFullName);
+                                                if (iType != null)
+                                                {
+                                                    targetIType = iType;
+                                                    break;
+                                                }
+                                            }
+                                        }
                                     }
+                                    if (targetIType == null)
+                                    {
+                                        typeFullName = variable.Name;
+                                        targetIType = AppDomain.GetType(typeFullName);
+                                    }
+                                    if (targetIType != null)
+                                    {
+                                        return new VariableInfo { Name = typeFullName, Type = VariableTypes.Class, ValueObjType = targetIType.ReflectionType };
+                                    }
+
+                                    if (result != null)
+                                        return result;
+                                    return VariableInfo.GetCannotFind(variable.Name);
                                 }
                             }
                         case VariableTypes.IndexAccess:
                             {
-                                return ResolveIndexAccess(threadHashCode, variable.Parent, variable.Parameters[0], out res);
+                                return ResolveIndexAccess(threadHashCode, frameIndex, variable, out res);
                             }
                         case VariableTypes.Value:
                             {
@@ -1272,22 +1376,50 @@ namespace ILRuntime.Runtime.Debugger
                 return VariableInfo.NullReferenceExeption;
         }
 
-        VariableInfo ResolveMember(object obj, string name, Type[] parameterTypes, object[] parameters, out object res)
+        Type GetMemberType(Type type, string name, Type[] parameterTypes)
         {
-            res = null;
-            Type type = null;
-            if (obj is ILTypeInstance)
-            {
-                type = ((ILTypeInstance)obj).Type.ReflectionType;
-            }
-            else if (obj is Enviorment.CrossBindingAdaptorType)
-                type = ((Enviorment.CrossBindingAdaptorType)obj).ILInstance.Type.ReflectionType;
-            else
-                type = obj.GetType();
-
+            var bindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
             if (parameterTypes == null)
             {
-                var fi = type.GetField(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var fi = type.GetField(name, bindingFlag);
+                if (fi != null)
+                    return fi.FieldType;
+                var pi = type.GetProperty(name, bindingFlag);
+                if (pi != null)
+                    return pi.PropertyType;
+            }
+            else
+            {
+                var m = GetMethod(type, name, bindingFlag, false, parameterTypes);
+                if (m != null)
+                    return m.ReturnType;
+            }
+            return null;
+        }
+
+        VariableInfo ResolveMember(object obj, Type objType, string name, Type[] parameterTypes, object[] parameters, out object res)
+        {
+            res = null;
+            Type type;
+            if (obj == null)
+                type = objType;
+            else
+            {
+                if (obj is ILTypeInstance)
+                {
+                    type = ((ILTypeInstance)obj).Type.ReflectionType;
+                    obj = ((ILTypeInstance)obj).CLRInstance; // 如果CLRInstance表示一个适配器，那么一定要用适配器实例作反射，否则得不到CLR成员的值
+                }
+                else if (obj is Enviorment.CrossBindingAdaptorType)
+                    type = ((Enviorment.CrossBindingAdaptorType)obj).ILInstance.Type.ReflectionType;
+                else
+                    type = obj.GetType();
+            }
+
+            var bindingFlag = BindingFlags.Public | BindingFlags.NonPublic | (obj == null ? BindingFlags.Static : BindingFlags.Instance);
+            if (parameterTypes == null)
+            {
+                var fi = type.GetField(name, bindingFlag);
                 if (fi != null)
                 {
                     res = fi.GetValue(obj);
@@ -1306,7 +1438,7 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 else
                 {
-                    var fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var fields = type.GetFields(bindingFlag);
                     string match = string.Format("<{0}>", name);
                     foreach (var f in fields)
                     {
@@ -1329,7 +1461,7 @@ namespace ILRuntime.Runtime.Debugger
                     }
                 }
 
-                var pi = type.GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var pi = type.GetProperty(name, bindingFlag);
                 if (pi != null)
                 {
                     res = pi.GetValue(obj, null);
@@ -1348,7 +1480,7 @@ namespace ILRuntime.Runtime.Debugger
             }
             else
             {
-                var method = GetMethod(type, name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, parameterTypes);
+                var method = GetMethod(type, name, bindingFlag, false, parameterTypes);
                 if (method != null)
                 {
                     res = method.Invoke(obj, parameters);
@@ -1369,24 +1501,37 @@ namespace ILRuntime.Runtime.Debugger
             return VariableInfo.GetCannotFind(name);
         }
 
-        public static MethodInfo GetMethod(Type searchType, string methodName, BindingFlags bindingFlags, params Type[] parameterTypes)
+        public static MethodInfo GetMethod(Type searchType, string methodName, BindingFlags bindingFlags, bool exactlyParametersCount, params Type[] parameterTypes)
+        {
+            if (searchType == null)
+                return null;
+            return GetMethod(searchType, methodName, bindingFlags, (methodInfo) =>
+            {
+                var parameterInfos = methodInfo.GetParameters();
+                if (parameterInfos.Length < parameterTypes.Length)
+                    return false;
+                return CheckParameters(parameterInfos, parameterTypes, exactlyParametersCount);
+            });
+        }
+
+        public static MethodInfo GetMethod(Type searchType, string methodName, BindingFlags bindingFlags, Func<MethodInfo, bool> parameterPredicate)
         {
             var methods = searchType.GetMethods(bindingFlags);
             foreach (var method in methods)
             {
                 if (method.Name != methodName)
                     continue;
-                var parameters = method.GetParameters();
-                if (parameters.Length < parameterTypes.Length)
-                    continue;
-                if (CheckParameters(parameters, parameterTypes))
+                if (parameterPredicate(method))
                     return method;
             }
             return null;
         }
 
-        private static bool CheckParameters(ParameterInfo[] parameters, Type[] checkTypes)
+        private static bool CheckParameters(ParameterInfo[] parameters, Type[] checkTypes, bool exactlyParametersCount)
         {
+            if (exactlyParametersCount && parameters.Length != checkTypes.Length)
+                return false;
+
             for (int i = 0; i < parameters.Length; ++i)
             {
                 if (i < checkTypes.Length)
