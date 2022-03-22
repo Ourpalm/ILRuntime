@@ -23,7 +23,7 @@ namespace ILRuntimeDebugEngine.AD7
                 frames = new AD7StackFrame[value.Length];
                 for(int i = 0; i < value.Length; i++)
                 {
-                    AD7StackFrame f = new AD7StackFrame(_engine, this, value[i]);
+                    AD7StackFrame f = new AD7StackFrame(_engine, this, value[i], i);
                     frames[i] = f;
                 }
             }

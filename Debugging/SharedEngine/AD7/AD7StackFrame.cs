@@ -15,6 +15,7 @@ namespace ILRuntimeDebugEngine.AD7
         public AD7Engine Engine { get; private set; }
         public AD7Thread Thread { get; private set; }
         public StackFrameInfo StackFrameInfo { get; private set; }
+        public int Index { get; private set; }
         ILProperty[] localVars;
         Dictionary<string, ILProperty> propertyMapping = new Dictionary<string, ILProperty>();
 
@@ -24,12 +25,12 @@ namespace ILRuntimeDebugEngine.AD7
 
         private readonly AD7DocumentContext docContext;
 
-        public AD7StackFrame(AD7Engine engine, AD7Thread thread, StackFrameInfo info)
+        public AD7StackFrame(AD7Engine engine, AD7Thread thread, StackFrameInfo info, int index)
         {
-
             Engine = engine;
             this.Thread = thread;
             this.StackFrameInfo = info;
+            Index = index;
 
             _functionName = info.MethodName;
             if (info.LocalVariables != null)
@@ -37,7 +38,7 @@ namespace ILRuntimeDebugEngine.AD7
                 localVars = new ILProperty[info.LocalVariables.Length];
                 for (int i = 0; i < localVars.Length; i++)
                 {
-                    localVars[i] = new ILProperty(engine, thread, info.LocalVariables[i]);
+                    localVars[i] = new ILProperty(engine, thread, info.LocalVariables[i], this);
                     propertyMapping[info.LocalVariables[i].Name] = localVars[i];
                 }
             }
