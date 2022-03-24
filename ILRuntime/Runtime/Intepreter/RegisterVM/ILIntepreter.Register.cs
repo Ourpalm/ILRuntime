@@ -4043,6 +4043,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         //Nothing to do with primitive types
                                     }
+                                    else if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        //Nothing to do with ValueTypeReference
+                                    }
                                     else
                                         throw new InvalidCastException();
                                 }
