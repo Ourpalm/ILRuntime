@@ -159,7 +159,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     if (b.PreviousBlocks.Count == 0)
                     {
                         var lt = def.Body.Variables[r - locVarRegStart];
-                        var needInitOjb = lt.VariableType.IsValueType && !lt.VariableType.IsPrimitive;
+                        bool needInitOjb = false;
+                        if (lt.VariableType.IsGenericParameter)
+                        {
+                            var gt = method.FindGenericArgument(lt.VariableType.Name);
+                            needInitOjb = gt.IsValueType && !gt.IsPrimitive;
+                        }
+                        else
+                            needInitOjb = lt.VariableType.IsValueType && !lt.VariableType.IsPrimitive;
                         if (needInitOjb || CheckNeedInitObj(b, r, method.ReturnType != method.AppDomain.VoidType, visitedBlocks))
                         {
                             OpCodeR code = new OpCodeR();
