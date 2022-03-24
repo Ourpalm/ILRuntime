@@ -473,5 +473,20 @@ namespace TestCases
             int xx = (int)x;
             a = xx;
         }
+
+        public static void UnitTest_1020()
+        {
+            var res = UnitTest_1020Sub(20176515, 2400000000);
+            Console.WriteLine($"res={res}");
+            if (Math.Abs(res - 0.008406881f) > 0.00001)
+                throw new Exception();
+        }
+
+        static float UnitTest_1020Sub(long exp, long maxExp)
+        {
+            float percent = (float)exp / maxExp;
+            Console.WriteLine("maxExp:" + maxExp + ",exp:" + exp + ", exp / maxExp:" + percent);
+            return percent;
+        }
     }
 }

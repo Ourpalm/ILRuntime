@@ -21,6 +21,7 @@ namespace ILRuntime.Runtime.Intepreter
         public int LocalManagedBase;
         public StackObject* StackBase;
         public StackObject* RegisterStart;
+        public StackObject* StackRegisterStart;
         public StackObject* RegisterEnd;
         public IList<object> ManagedStack;
     }
@@ -149,6 +150,7 @@ namespace ILRuntime.Runtime.Intepreter
             info.LocalManagedBase = locBase;
             info.FrameManagedBase = frame.ManagedStackBase;
             info.RegisterStart = r;
+            info.StackRegisterStart = stackRegStart + locCnt;
             info.ManagedStack = mStack;
 
             object obj;
@@ -5466,7 +5468,8 @@ namespace ILRuntime.Runtime.Intepreter
                     else
                     {
                         *v = *val;
-                        mStack[idx] = CheckAndCloneValueType(mStackSrc[v->Value], domain);
+                        bool isLocal = v >= info.RegisterStart && v < info.StackRegisterStart;
+                        mStack[idx] = isLocal ? CheckAndCloneValueType(mStackSrc[v->Value], domain) :  mStackSrc[v->Value];
                         v->Value = idx;
                     }
                     break;
