@@ -541,8 +541,8 @@ namespace ILRuntime.Runtime.Debugger
                 bw.Write(i.Value.Length);
                 foreach (var j in i.Value)
                 {
-                    bw.Write(j.MethodName);
-                    bw.Write(j.DocumentName);
+                    WriteString(j.MethodName);
+                    WriteString(j.DocumentName);
                     bw.Write(j.StartLine);
                     bw.Write(j.StartColumn);
                     bw.Write(j.EndLine);
@@ -556,15 +556,20 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
+        void WriteString(string val)
+        {
+            bw.Write(val != null ? val : "");
+        }
+
         void WriteVariableInfo(VariableInfo k)
         {
             bw.Write(k.Address);
             bw.Write((byte)k.Type);
             bw.Write(k.Offset);
-            bw.Write(k.Name);
-            bw.Write(k.Value);
+            WriteString(k.Name);
+            WriteString(k.Value);
             bw.Write((byte)k.ValueType);
-            bw.Write(k.TypeName);
+            WriteString(k.TypeName);
             bw.Write(k.Expandable);
             bw.Write(k.IsPrivate);
             bw.Write(k.IsProtected);
@@ -587,7 +592,7 @@ namespace ILRuntime.Runtime.Debugger
         public void NotifyModuleLoaded(string modulename)
         {
             sendStream.Position = 0;
-            bw.Write(modulename);
+            WriteString(modulename);
             DoSend(DebugMessageType.SCModuleLoaded);
         }
     }
