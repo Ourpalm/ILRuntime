@@ -118,24 +118,14 @@ namespace TestCases
         {
             Vector3 pos = Vector3.One;
 
-            pos.x += 1;
-            pos.y += 2;
-
-            if (pos.x > 10)
-                pos.x = 10;
-            if (pos.x < -10)
-                pos.x = -10;
-            if (pos.y > 10)
-                pos.y = 10;
-            if (pos.y < -10)
-                pos.y = -10;
-
             var pos2 = tttt(pos);
-            Console.WriteLine("pos.x = " + pos.x);
-            Console.WriteLine("pos2.x = " + pos2.x);
-
             if (pos.x == pos2.x)
+            {
+                Console.WriteLine("pos.x = " + pos.x);
+                Console.WriteLine("pos2.x = " + pos2.x);
+
                 throw new Exception("Value Type Violation");
+            }
         }
 
         public static void UnitTest_10023()
