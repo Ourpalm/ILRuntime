@@ -67,7 +67,10 @@ namespace ILRuntimeDebuggerLauncher
         /// </summary>
         protected override void Initialize()
         {
-            AttachToILRuntime.Initialize(this);
+            var joinableTaskCollection = ThreadHelper.JoinableTaskContext.CreateCollection();
+            joinableTaskCollection.DisplayName = GetType().FullName;
+            var joinableTaskFactory = ThreadHelper.JoinableTaskContext.CreateFactory(joinableTaskCollection);
+            AttachToILRuntime.Initialize(this, joinableTaskFactory);
             base.Initialize();
         }
 
