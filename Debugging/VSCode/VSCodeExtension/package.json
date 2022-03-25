@@ -79,24 +79,15 @@
     "menus": {
       "editor/title/run": [
         {
-          "command": "extension.ilruntime-debug.runEditorContents",
-          "when": "resourceLangId == markdown",
-          "group": "navigation@1"
-        },
-        {
           "command": "extension.ilruntime-debug.debugEditorContents",
-          "when": "resourceLangId == markdown",
+          "when": "resourceLangId == csharp",
           "group": "navigation@2"
         }
       ],
       "commandPalette": [
         {
           "command": "extension.ilruntime-debug.debugEditorContents",
-          "when": "resourceLangId == markdown"
-        },
-        {
-          "command": "extension.ilruntime-debug.runEditorContents",
-          "when": "resourceLangId == markdown"
+          "when": "resourceLangId == csharp"
         }
       ],
       "debug/variables/context": [
@@ -109,17 +100,10 @@
     "commands": [
       {
         "command": "extension.ilruntime-debug.debugEditorContents",
-        "title": "Debug File",
-        "category": "Mock Debug",
+        "title": "Attach to ILRuntime",
+        "category": "ILRuntime Debug",
         "enablement": "!inDebugMode",
         "icon": "$(debug-alt)"
-      },
-      {
-        "command": "extension.ilruntime-debug.runEditorContents",
-        "title": "Run File",
-        "category": "Mock Debug",
-        "enablement": "!inDebugMode",
-        "icon": "$(play)"
       },
       {
         "command": "extension.ilruntime-debug.toggleFormatting",
@@ -137,9 +121,8 @@
         "languages": [
           "csharp"
         ],
-        "label": "Mock Debug",
-        "program": "./out/debugAdapter.js",
-        "runtime": "node",
+        "label": "Attach to ILRuntime",
+        "program": "./out/win-x86/VSCodeDAILRuntime.exe",
         "configurationAttributes": {
           "launch": {
             "required": [
@@ -180,7 +163,7 @@
         },
         "initialConfigurations": [
           {
-            "type": "mock",
+            "type": "ilruntime",
             "request": "launch",
             "name": "Ask for file name",
             "program": "${workspaceFolder}/${command:AskForProgramName}",

@@ -14,7 +14,7 @@
  */
 
 'use strict';
-
+//import * as DGram from 'dgram'
 import * as Net from 'net';
 import * as vscode from 'vscode';
 import { randomBytes } from 'crypto';
@@ -29,11 +29,12 @@ import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
  * The compile time flag 'runMode' controls how the debug adapter is run.
  * Please note: the test suite only supports 'external' mode.
  */
-const runMode: 'external' | 'server' | 'namedPipeServer' | 'inline' = 'inline';
-
+const runMode: 'external' | 'server' | 'namedPipeServer' | 'inline' = 'external';
+//let socket : DGram.Socket;
 export function activate(context: vscode.ExtensionContext) {
-
-	// debug adapters can be run in different ways by using a vscode.DebugAdapterDescriptorFactory:
+	//socket = DGram.createSocket("udp4");
+	
+    // debug adapters can be run in different ways by using a vscode.DebugAdapterDescriptorFactory:
 	switch (runMode) {
 		case 'server':
 			// run the debug adapter as a server inside the extension and communicate via a socket

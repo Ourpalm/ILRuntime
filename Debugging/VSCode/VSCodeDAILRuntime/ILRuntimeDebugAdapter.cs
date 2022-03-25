@@ -17,7 +17,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Ookii.CommandLine;
 //using SampleDebugAdapter.Directives;
-using static System.FormattableString;
 using SysThread = System.Threading.Thread;
 namespace ILRuntime.VSCode
 {
@@ -89,6 +88,7 @@ namespace ILRuntime.VSCode
 
         protected override LaunchResponse HandleLaunchRequest(LaunchArguments arguments)
         {
+            Protocol.SendEvent(new OutputEvent("Launching..."));
             string fileName = arguments.ConfigurationProperties.GetValueAsString("program");
             if (String.IsNullOrEmpty(fileName))
             {
@@ -100,7 +100,7 @@ namespace ILRuntime.VSCode
             {
                 throw new ProtocolException("Launch failed because 'program' files does not exist.");
             }
-
+            
             this.stopAtEntry = arguments.ConfigurationProperties.GetValueAsBool("stopAtEntry") ?? false;
             this.hyperStepSpeed = arguments.ConfigurationProperties.GetValueAsInt("hyperStepSpeed") ?? 0;
 
@@ -206,7 +206,7 @@ namespace ILRuntime.VSCode
 
             this.Protocol.SendEvent(new OutputEvent()
             {
-                Output = Invariant($"{outputText}{Environment.NewLine}"),
+                Output = ($"{outputText}{Environment.NewLine}"),
                 Category = OutputEvent.CategoryValue.Stdout
             });
         }
@@ -218,7 +218,7 @@ namespace ILRuntime.VSCode
         protected override SetBreakpointsResponse HandleSetBreakpointsRequest(SetBreakpointsArguments arguments)
         {
             //return this.BreakpointManager.HandleSetBreakpointsRequest(arguments);
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         #endregion

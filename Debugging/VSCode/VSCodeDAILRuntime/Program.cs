@@ -9,8 +9,6 @@ using System.Net.Sockets;
 using System.Threading;
 using Ookii.CommandLine;
 
-using static System.FormattableString;
-
 namespace ILRuntime.VSCode
 {
     internal class ProgramArgs
@@ -29,6 +27,7 @@ namespace ILRuntime.VSCode
     {
         private static void Main(string[] args)
         {
+            System.IO.StreamWriter sw = new StreamWriter("out.log");
             CommandLineParser parser = new CommandLineParser(typeof(ProgramArgs));
             ProgramArgs arguments = null;
 
@@ -67,14 +66,18 @@ namespace ILRuntime.VSCode
             {
                 // Standard mode - run with the adapter connected to the process's stdin and stdout
                 ILRuntimeDebugAdapter adapter = new ILRuntimeDebugAdapter(Console.OpenStandardInput(), Console.OpenStandardOutput());
-                adapter.Protocol.LogMessage += (sender, e) => Debug.WriteLine(e.Message);
+                adapter.Protocol.LogMessage += (sender, e) =>
+                {
+                    sw.WriteLine(e.Message);
+                    Debug.WriteLine(e.Message);
+                };
                 adapter.Run();
             }
         }
 
         private static void RunServer(ProgramArgs args)
         {
-            Console.WriteLine(Invariant($"Waiting for connections on port {args.ServerPort}..."));
+            Console.WriteLine(($"Waiting for connections on port {args.ServerPort}..."));
             ILRuntimeDebugAdapter adapter = null;
 
             Thread listenThread = new Thread(() =>
