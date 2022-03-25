@@ -7,7 +7,7 @@
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/sampleWorkspace"
+				"${workspaceFolder}/../../../TestCases"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
@@ -22,7 +22,7 @@
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"--extensionDevelopmentKind=web",
-				"${workspaceFolder}/sampleWorkspace"
+				"${workspaceFolder}/../../../TestCases"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"

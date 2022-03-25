@@ -1,11 +1,11 @@
 {
-  "name": "mock-debug",
-  "displayName": "Mock Debug",
-  "version": "0.49.6",
-  "publisher": "ms-vscode",
-  "description": "Starter extension for developing debug adapters for VS Code.",
+  "name": "ilruntime-debug",
+  "displayName": "ILRuntime Debug",
+  "version": "0.5.0",
+  "publisher": "liiir",
+  "description": "Debugger extension for ILRuntime",
   "author": {
-    "name": "Microsoft Corporation"
+    "name": "liiir"
   },
   "license": "MIT",
   "keywords": [
@@ -21,10 +21,10 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-mock-debug.git"
+    "url": "https://github.com/Ourpalm/ILRuntime.git"
   },
   "bugs": {
-    "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+    "url": "https://github.com/Ourpalm/ILRuntime/issues"
   },
   "scripts": {
     "compile": "tsc -p ./",
@@ -66,11 +66,11 @@
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
   "activationEvents": [
-    "onDebugResolve:mock",
-    "onDebugDynamicConfigurations:mock",
-    "onCommand:extension.mock-debug.getProgramName",
-    "onCommand:extension.mock-debug.runEditorContents",
-    "onCommand:extension.mock-debug.debugEditorContents"
+    "onDebugResolve:ilruntime",
+    "onDebugDynamicConfigurations:ilruntime",
+    "onCommand:extension.ilruntime-debug.getProgramName",
+    "onCommand:extension.ilruntime-debug.runEditorContents",
+    "onCommand:extension.ilruntime-debug.debugEditorContents"
   ],
   "workspaceTrust": {
     "request": "never"
@@ -79,63 +79,63 @@
     "menus": {
       "editor/title/run": [
         {
-          "command": "extension.mock-debug.runEditorContents",
+          "command": "extension.ilruntime-debug.runEditorContents",
           "when": "resourceLangId == markdown",
           "group": "navigation@1"
         },
         {
-          "command": "extension.mock-debug.debugEditorContents",
+          "command": "extension.ilruntime-debug.debugEditorContents",
           "when": "resourceLangId == markdown",
           "group": "navigation@2"
         }
       ],
       "commandPalette": [
         {
-          "command": "extension.mock-debug.debugEditorContents",
+          "command": "extension.ilruntime-debug.debugEditorContents",
           "when": "resourceLangId == markdown"
         },
         {
-          "command": "extension.mock-debug.runEditorContents",
+          "command": "extension.ilruntime-debug.runEditorContents",
           "when": "resourceLangId == markdown"
         }
       ],
       "debug/variables/context": [
         {
-          "command": "extension.mock-debug.toggleFormatting",
+          "command": "extension.ilruntime-debug.toggleFormatting",
           "when": "debugType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
         }
       ]
     },
     "commands": [
       {
-        "command": "extension.mock-debug.debugEditorContents",
+        "command": "extension.ilruntime-debug.debugEditorContents",
         "title": "Debug File",
         "category": "Mock Debug",
         "enablement": "!inDebugMode",
         "icon": "$(debug-alt)"
       },
       {
-        "command": "extension.mock-debug.runEditorContents",
+        "command": "extension.ilruntime-debug.runEditorContents",
         "title": "Run File",
         "category": "Mock Debug",
         "enablement": "!inDebugMode",
         "icon": "$(play)"
       },
       {
-        "command": "extension.mock-debug.toggleFormatting",
+        "command": "extension.ilruntime-debug.toggleFormatting",
         "title": "Toggle between decimal and hex formatting"
       }
     ],
     "breakpoints": [
       {
-        "language": "markdown"
+        "language": "csharp"
       }
     ],
     "debuggers": [
       {
-        "type": "mock",
+        "type": "ilruntime",
         "languages": [
-          "markdown"
+          "csharp"
         ],
         "label": "Mock Debug",
         "program": "./out/debugAdapter.js",
@@ -201,7 +201,7 @@
           }
         ],
         "variables": {
-          "AskForProgramName": "extension.mock-debug.getProgramName"
+          "AskForProgramName": "extension.ilruntime-debug.getProgramName"
         }
       }
     ]
