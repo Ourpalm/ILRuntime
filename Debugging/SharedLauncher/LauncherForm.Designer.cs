@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LauncherForm));
             this.listView1 = new System.Windows.Forms.ListView();
             this.ProcessName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.MachineName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -42,9 +43,7 @@
             // 
             // listView1
             // 
-            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.listView1, "listView1");
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ProcessName,
             this.MachineName,
@@ -52,100 +51,72 @@
             this.EndPoint});
             this.listView1.FullRowSelect = true;
             this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(12, 35);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(509, 133);
             this.listView1.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDoubleClick);
             // 
             // ProcessName
             // 
-            this.ProcessName.Text = "项目";
-            this.ProcessName.Width = 126;
+            resources.ApplyResources(this.ProcessName, "ProcessName");
             // 
             // MachineName
             // 
-            this.MachineName.Text = "计算机";
-            this.MachineName.Width = 126;
+            resources.ApplyResources(this.MachineName, "MachineName");
             // 
             // ProcessId
             // 
-            this.ProcessId.Text = "进程标识";
-            this.ProcessId.Width = 126;
+            resources.ApplyResources(this.ProcessId, "ProcessId");
             // 
             // EndPoint
             // 
-            this.EndPoint.Text = "地址端口";
-            this.EndPoint.Width = 126;
+            resources.ApplyResources(this.EndPoint, "EndPoint");
             // 
             // btn_Refresh
             // 
-            this.btn_Refresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btn_Refresh.Location = new System.Drawing.Point(140, 182);
+            resources.ApplyResources(this.btn_Refresh, "btn_Refresh");
             this.btn_Refresh.Name = "btn_Refresh";
-            this.btn_Refresh.Size = new System.Drawing.Size(90, 30);
-            this.btn_Refresh.TabIndex = 2;
-            this.btn_Refresh.Text = "刷新";
             this.btn_Refresh.UseVisualStyleBackColor = true;
             this.btn_Refresh.Click += new System.EventHandler(this.btn_Refresh_Click);
             // 
             // btn_Cancle
             // 
-            this.btn_Cancle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.btn_Cancle, "btn_Cancle");
             this.btn_Cancle.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btn_Cancle.Location = new System.Drawing.Point(431, 182);
             this.btn_Cancle.Name = "btn_Cancle";
-            this.btn_Cancle.Size = new System.Drawing.Size(90, 30);
-            this.btn_Cancle.TabIndex = 3;
-            this.btn_Cancle.Text = "取消";
             this.btn_Cancle.UseVisualStyleBackColor = true;
             // 
             // btn_OK
             // 
-            this.btn_OK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.btn_OK, "btn_OK");
             this.btn_OK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btn_OK.Location = new System.Drawing.Point(335, 182);
             this.btn_OK.Name = "btn_OK";
-            this.btn_OK.Size = new System.Drawing.Size(90, 30);
-            this.btn_OK.TabIndex = 4;
-            this.btn_OK.Text = "确定";
             this.btn_OK.UseVisualStyleBackColor = true;
             // 
             // checkBox1
             // 
-            this.checkBox1.AutoSize = true;
+            resources.ApplyResources(this.checkBox1, "checkBox1");
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(13, 13);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(108, 16);
-            this.checkBox1.TabIndex = 5;
-            this.checkBox1.Text = "只显示本机实例";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // btn_EnterIpAndPort
             // 
-            this.btn_EnterIpAndPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btn_EnterIpAndPort.Location = new System.Drawing.Point(12, 182);
+            resources.ApplyResources(this.btn_EnterIpAndPort, "btn_EnterIpAndPort");
             this.btn_EnterIpAndPort.Name = "btn_EnterIpAndPort";
-            this.btn_EnterIpAndPort.Size = new System.Drawing.Size(122, 30);
-            this.btn_EnterIpAndPort.TabIndex = 6;
-            this.btn_EnterIpAndPort.Text = "指定地址与端口...";
             this.btn_EnterIpAndPort.UseVisualStyleBackColor = true;
             this.btn_EnterIpAndPort.Click += new System.EventHandler(this.btn_EnterIpAndPort_Click);
             // 
             // LauncherForm
             // 
             this.AcceptButton = this.btn_OK;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btn_Cancle;
-            this.ClientSize = new System.Drawing.Size(533, 224);
             this.Controls.Add(this.btn_EnterIpAndPort);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.btn_OK);
@@ -155,8 +126,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "LauncherForm";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "选择一个ILRuntime实例";
             this.ResumeLayout(false);
             this.PerformLayout();
 

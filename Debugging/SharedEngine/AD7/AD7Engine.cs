@@ -239,7 +239,7 @@ namespace ILRuntimeDebugEngine.AD7
                 else
                 {
                     debugged.Close();
-                    MessageBox.Show("ILRuntime Debugger version mismatch", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(String.Format("ILRuntime Debugger version mismatch\n Expected version:{0}\n Actual version:{1}", DebuggerServer.Version, DebuggedProcess.RemoteDebugVersion), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     debugged = null;
                     ppProcess = null;
                     return Constants.S_FALSE;

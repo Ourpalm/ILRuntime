@@ -102,6 +102,10 @@
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\..\SharedLauncher\LauncherForm.zh-Hans.resx">
+      <Link>LauncherForm.zh-Hans.resx</Link>
+      <DependentUpon>LauncherForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\SharedLauncher\LICENSE.TXT">

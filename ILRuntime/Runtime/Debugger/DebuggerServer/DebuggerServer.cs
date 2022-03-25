@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Debugger
 #pragma warning disable
     public class DebuggerServer
     {
-        public const int Version = 2;
+        public const int Version = 3;
         private static readonly int currentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
         TcpListener listener;
         //HashSet<Session<T>> clients = new HashSet<Session<T>>();

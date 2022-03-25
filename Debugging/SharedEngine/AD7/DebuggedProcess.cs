@@ -32,7 +32,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         public bool Connecting { get; set; }
 
-        int RemoteDebugVersion { get; set; }
+        public int RemoteDebugVersion { get; set; }
 
         private readonly string BreakpointErrorMsg =
             "不能设置下面的断点:" +

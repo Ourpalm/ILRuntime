@@ -227,6 +227,10 @@
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\..\SharedLauncher\LauncherForm.zh-Hans.resx">
+      <Link>LauncherForm.zh-Hans.resx</Link>
+      <DependentUpon>LauncherForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="..\..\SharedLauncher\SharedLauncher.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
