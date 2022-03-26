@@ -85,6 +85,14 @@ namespace ILRuntime.Runtime.Debugger
             return null;
         }
 
+        byte[] stringBuffer = new byte[1024];
+        void WriteUTF8String(BinaryWriter bw, string val)
+        {
+            var length = Encoding.UTF8.GetBytes(val, 0, Math.Min(val.Length, 256), stringBuffer, 0);
+            bw.Write((short)length);
+            bw.Write(stringBuffer, 0, length);
+        }
+
         public virtual void Stop()
         {
             isUp = false;
@@ -119,8 +127,8 @@ namespace ILRuntime.Runtime.Debugger
                         if ((now - udpSendTime).TotalSeconds >= 0.5)
                         {
                             sendStreamForUdp.Position = 0;
-                            bwForUdp.Write(GetProjectNameFunction != null ? GetProjectNameFunction() : "");
-                            bwForUdp.Write(System.Environment.MachineName);
+                            WriteUTF8String(bwForUdp, GetProjectNameFunction != null ? GetProjectNameFunction() : "");
+                            WriteUTF8String(bwForUdp, System.Environment.MachineName != null ? System.Environment.MachineName : "");
                             bwForUdp.Write(currentProcessId);
                             bwForUdp.Write(tcpListenerPort);
                             udpSocket.SendTo(sendStreamForUdp.GetBuffer(), (int)sendStreamForUdp.Position, SocketFlags.None, boardcastEndPoint);

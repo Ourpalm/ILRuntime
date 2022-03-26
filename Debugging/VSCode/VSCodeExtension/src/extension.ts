@@ -14,7 +14,7 @@
  */
 
 'use strict';
-//import * as DGram from 'dgram'
+import * as DGram from 'dgram';
 import * as Net from 'net';
 import * as vscode from 'vscode';
 import { randomBytes } from 'crypto';
@@ -30,9 +30,82 @@ import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
  * Please note: the test suite only supports 'external' mode.
  */
 const runMode: 'external' | 'server' | 'namedPipeServer' | 'inline' = 'external';
-//let socket : DGram.Socket;
+let socket : DGram.Socket;
+const maximumActiveTime : number  = 10000;
+let activeServers :Map<string, ServerInfo> = new Map<string, ServerInfo>();
+
+class BufferReader{
+	private buffer: Buffer;
+    private	offset: number = 0;
+
+	constructor(buffer:Buffer){
+		this.buffer = buffer;
+	}
+
+	readString():string{
+		let len = this.buffer.readInt16LE(this.offset);
+		this.offset= this.offset + 2;
+		let res= this.buffer.toString(undefined, this.offset, this.offset+len);
+		this.offset= this.offset + len;
+		return res;
+	}
+
+	readInt():number{
+		let res = this.buffer.readInt32LE(this.offset);
+		this.offset = this.offset + 4;
+		return res;
+	}
+}
+class ServerInfo{
+	private address : string;
+	private lastActive : number;
+	private project : string;
+	private machineName : string;
+	private processId : number;
+	private port : number;
+	
+	constructor(msg:Buffer, rInfo : DGram.RemoteInfo){
+		let reader = new BufferReader(msg);
+		this.project = reader.readString();
+		this.machineName = reader.readString();
+		this.processId = reader.readInt();
+		this.port = reader.readInt();
+		this.address = rInfo.address + ":" + this.port;
+		this.lastActive = Date.now();
+	}
+
+	getAddress():string{
+		return this.address;
+	}
+
+	getProject():string{
+		return this.project;
+	}
+
+	getMachine():string{
+		return this.machineName;
+	}
+
+	getProcessId():number{
+		return this.processId;
+	}
+
+	isExipired():boolean{
+		let pastTime = Date.now() - this.lastActive;
+		return pastTime > maximumActiveTime;
+	}
+}
+
 export function activate(context: vscode.ExtensionContext) {
-	//socket = DGram.createSocket("udp4");
+	let config = vscode.workspace.getConfiguration('ilruntime');
+	activeServers.clear();
+	socket = DGram.createSocket("udp4");
+	socket.on("message", function (msg, rinfo) {
+		let serverInfo = new ServerInfo(msg, rinfo);
+		activeServers.set(serverInfo.getAddress(), serverInfo);
+	  });
+	let port = config.get("broadcastPort") as number;
+	socket.bind(port);
 	
     // debug adapters can be run in different ways by using a vscode.DebugAdapterDescriptorFactory:
 	switch (runMode) {
@@ -60,6 +133,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
 	// nothing to do
+	if(socket !== null){
+		socket.close();
+	}
+	activeServers.clear();	
 }
 
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
