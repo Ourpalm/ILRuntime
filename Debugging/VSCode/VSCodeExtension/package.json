@@ -68,7 +68,7 @@
   "activationEvents": [
     "onDebugResolve:ilruntime",
     "onDebugDynamicConfigurations:ilruntime",
-    "onCommand:extension.ilruntime-debug.getProgramName",
+    "onCommand:extension.ilruntime-debug.getAddress",
     "onCommand:extension.ilruntime-debug.runEditorContents",
     "onCommand:extension.ilruntime-debug.debugEditorContents"
   ],
@@ -131,18 +131,18 @@
         "languages": [
           "csharp"
         ],
-        "label": "Attach to ILRuntime",
+        "label": "ILRuntime Debugger",
         "program": "./out/win-x86/VSCodeDAILRuntime.exe",
         "configurationAttributes": {
           "launch": {
             "required": [
-              "program"
+              "address"
             ],
             "properties": {
-              "program": {
+              "address": {
                 "type": "string",
-                "description": "Absolute path to a text file.",
-                "default": "${workspaceFolder}/${command:AskForProgramName}"
+                "description": "Target address for ilruntime instance.",
+                "default": "${command:AskForAddress}"
               },
               "debug" :{
                 "type": "boolean",
@@ -180,27 +180,27 @@
           {
             "type": "ilruntime",
             "request": "launch",
-            "name": "Ask for file name",
-            "program": "${workspaceFolder}/${command:AskForProgramName}",
+            "name": "Attach to ILRuntime",
+            "address": "${command:AskForAddress}",
             "debug" : true,
             "stopOnEntry": true
           }
         ],
         "configurationSnippets": [
           {
-            "label": "Mock Debug: Launch",
+            "label": "ILRuntime Debugger: Attach to ILRuntime",
             "description": "A new configuration for 'debugging' a user selected markdown file.",
             "body": {
-              "type": "mock",
+              "type": "ilruntime",
               "request": "launch",
-              "name": "Ask for file name",
-              "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
+              "name": "Attach to ILRuntime",
+              "program": "^\"\\${command:AskForAddress}\"",
               "stopOnEntry": true
             }
           }
         ],
         "variables": {
-          "AskForProgramName": "extension.ilruntime-debug.getProgramName"
+          "AskForAddress": "extension.ilruntime-debug.getAddress"
         }
       }
     ]

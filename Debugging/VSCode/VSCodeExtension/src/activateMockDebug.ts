@@ -11,8 +11,9 @@ import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
 import { MockDebugSession } from './mockDebug';
 import { FileAccessor } from './mockRuntime';
+import { ServerInfo } from './extension';
 
-export function activateMockDebug(context: vscode.ExtensionContext, factory?: vscode.DebugAdapterDescriptorFactory) {
+export function activateMockDebug(context: vscode.ExtensionContext, servers : Map<string, ServerInfo>, factory?: vscode.DebugAdapterDescriptorFactory) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.ilruntime-debug.debugEditorContents', (resource: vscode.Uri) => {
@@ -38,7 +39,8 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 		})
 	);
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.ilruntime-debug.getProgramName', config => {
+	context.subscriptions.push(vscode.commands.registerCommand('extension.ilruntime-debug.getAddress', config => {
+		let quickTip = vscode.window.createQuickPick();
 		return vscode.window.showInputBox({
 			placeHolder: "Please enter the name of a markdown file in the workspace folder",
 			value: "readme.md"
@@ -151,12 +153,12 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 				config.type = 'ilruntime';
 				config.name = 'Launch';
 				config.request = 'launch';
-				config.program = '${file}';
+				config.address = '${command:AskForAddress}';
 				config.stopOnEntry = true;
 			}
 		}
 
-		if (!config.program) {
+		if (!config.address) {
 			return vscode.window.showInformationMessage("Cannot find a program to debug").then(_ => {
 				return undefined;	// abort launch
 			});

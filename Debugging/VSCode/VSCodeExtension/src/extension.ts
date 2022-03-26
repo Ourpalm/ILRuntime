@@ -56,7 +56,7 @@ class BufferReader{
 		return res;
 	}
 }
-class ServerInfo{
+export class ServerInfo{
 	private address : string;
 	private lastActive : number;
 	private project : string;
