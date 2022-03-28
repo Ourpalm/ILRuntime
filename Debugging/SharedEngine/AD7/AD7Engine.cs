@@ -77,7 +77,7 @@ namespace ILRuntimeDebugEngine.AD7
         public int EnumThreads(out IEnumDebugThreads2 ppEnum)
         {
             var threads = debugged.Threads.Values.ToArray();
-            ppEnum = new AD7ThreadEnum(threads);
+            ppEnum = new AD7ThreadEnum(threads as IDebugThread2[]);
             return Constants.S_OK;
         }
 
@@ -221,7 +221,7 @@ namespace ILRuntimeDebugEngine.AD7
         {
             string[] p = pszExe.Split(':');
             callback = new AD7.EngineCallback(this, pCallback);
-            debugged = new AD7.DebuggedProcess(this, p[0], int.Parse(p[1]));
+            debugged = new AD7.DebuggedProcessVS(this, p[0], int.Parse(p[1]));
             while (debugged.Connecting)
             {
                 System.Threading.Thread.Sleep(10);

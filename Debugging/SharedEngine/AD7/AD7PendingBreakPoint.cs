@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 using ILRuntime.Runtime.Debugger.Protocol;
 namespace ILRuntimeDebugEngine.AD7
 {
-    class AD7PendingBreakPoint : IDebugPendingBreakpoint2
+    class AD7PendingBreakPoint : IDebugPendingBreakpoint2, IBreakPoint
     {
         private readonly AD7Engine _engine;
         private readonly IDebugBreakpointRequest2 _pBPRequest;
@@ -118,7 +118,7 @@ namespace ILRuntimeDebugEngine.AD7
         public int SetCondition(BP_CONDITION bpCondition)
         {
             _bpRequestInfo.bpCondition = bpCondition;
-            _engine.DebuggedProcess.SendSetBreakpointCondition(this.GetHashCode(), bpCondition.styleCondition, bpCondition.bstrCondition);
+            _engine.DebuggedProcess.SendSetBreakpointCondition(this.GetHashCode(), (BreakpointConditionStyle)bpCondition.styleCondition, bpCondition.bstrCondition);
             return Constants.S_OK;
         }
 
@@ -132,7 +132,7 @@ namespace ILRuntimeDebugEngine.AD7
             return Constants.S_OK;
         }
 
-        internal bool TryBind()
+        public bool TryBind()
         {
             try
             {

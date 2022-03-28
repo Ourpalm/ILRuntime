@@ -26,7 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7StackFrame.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Thread.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AD7\Constants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AD7\DebuggedProcess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\DebuggedProcessVS.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AD7\EngineCallback.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AD7\ILProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EngineConstants.cs" />

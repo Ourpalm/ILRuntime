@@ -2,27 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using ILRuntime.Runtime.Debugger;
 using ILRuntime.Runtime.Debugger.Protocol;
-using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace ILRuntimeDebugEngine.AD7
+namespace ILRuntimeDebugEngine
 {
-    class DebuggedProcess
+    abstract class DebuggedProcess
     {
         System.IO.MemoryStream sendStream = new System.IO.MemoryStream(64 * 1024);
         System.IO.BinaryWriter bw;
         bool closed;
         DebugSocket socket;
-        AD7Engine engine;
         bool rpcStarted = false;
         bool rpcCompleted = false;
         object rpcResult;
-        Dictionary<int, AD7PendingBreakPoint> breakpoints = new Dictionary<int, AD7PendingBreakPoint>();
-        Dictionary<int, AD7Thread> threads = new Dictionary<int, AD7Thread>();
-        public Dictionary<int, AD7Thread> Threads { get { return threads; } }
+        Dictionary<int, IBreakPoint> breakpoints = new Dictionary<int, IBreakPoint>();
+        Dictionary<int, IThread> threads = new Dictionary<int, IThread>();
+        public Dictionary<int, IThread> Threads { get { return threads; } }
 
         public Action OnDisconnected { get; set; }
 
@@ -41,9 +37,8 @@ namespace ILRuntimeDebugEngine.AD7
             Environment.NewLine +
             "断点的条件未能执行。错误是\"{4}\"。";
 
-        public DebuggedProcess(AD7Engine engine, string host, int port)
+        public DebuggedProcess(string host, int port)
         {
-            this.engine = engine;
             bw = new System.IO.BinaryWriter(sendStream);
             socket = new DebugSocket();
             socket.OnConnect = OnConnected;
@@ -284,7 +279,7 @@ namespace ILRuntimeDebugEngine.AD7
 
             return vinfo;
         }
-        public void AddPendingBreakpoint(AD7PendingBreakPoint bp)
+        public void AddPendingBreakpoint(IBreakPoint bp)
         {
             breakpoints[bp.GetHashCode()] = bp;
         }
@@ -312,12 +307,12 @@ namespace ILRuntimeDebugEngine.AD7
             socket.Send(DebugMessageType.CSBindBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
         }
 
-        public void SendSetBreakpointCondition(int bpHash, enum_BP_COND_STYLE style, string expression)
+        public void SendSetBreakpointCondition(int bpHash, BreakpointConditionStyle style, string expression)
         {
             sendStream.Position = 0;
             bw.Write(bpHash);
             bw.Write((byte)style);
-            if (style != enum_BP_COND_STYLE.BP_COND_NONE)
+            if (style != BreakpointConditionStyle.None)
                 bw.Write(expression);
             socket.Send(DebugMessageType.CSSetBreakpointCondition, sendStream.GetBuffer(), (int)sendStream.Position);
         }
@@ -354,7 +349,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         void OnReceivSendSCBindBreakpointResult(SCBindBreakpointResult msg)
         {
-            AD7PendingBreakPoint bp;
+            IBreakPoint bp;
             if (breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
             {
                 bp.Bound(msg.Result);
@@ -363,8 +358,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         void OnReceiveSCModuleLoaded(SCModuleLoaded msg)
         {
-            engine.Callback.ModuleLoaded(new AD7Module(msg.ModuleName));
-
+            HandleModuleLoaded(msg.ModuleName);
             foreach (var i in breakpoints)
             {
                 if (!i.Value.IsBound)
@@ -373,6 +367,8 @@ namespace ILRuntimeDebugEngine.AD7
                 }
             }
         }
+
+        protected abstract void HandleModuleLoaded(string moduleName);
 
         //VariableInfo resolved;
         public VariableInfo ResolveVariable(VariableReference parent, string name, int threadId, int frameId, uint dwTimeout)
@@ -472,10 +468,20 @@ namespace ILRuntimeDebugEngine.AD7
             }
         }
 
+        protected abstract void HandleBreakpointHit(IBreakPoint bp, IThread bpThread);
+
+        protected abstract void HandleShowErrorMessageBox(string title, string errorMsg);
+
+        protected abstract void HandleStepCompelte(IThread bpThread);
+
+        protected abstract IThread HandleTheadStarted(int threadHash);
+
+        protected abstract void HandleThreadEnded(IThread t);
+
         void OnReceiveSCBreakpointHit(SCBreakpointHit msg, string error)
         {
-            AD7PendingBreakPoint bp;
-            AD7Thread t, bpThread = null;
+            IBreakPoint bp;
+            IThread t, bpThread = null;
             if (breakpoints.TryGetValue(msg.BreakpointHashCode, out bp))
             {
                 foreach (var i in msg.StackFrame)
@@ -489,14 +495,11 @@ namespace ILRuntimeDebugEngine.AD7
                 }
                 if (bpThread != null)
                 {
-                    engine.Callback.BreakpointHit(bp, bpThread);
+                    
                     if (!string.IsNullOrWhiteSpace(error))
                     {
                         var errorMsg = string.Format(BreakpointErrorMsg, System.IO.Path.GetFileName(bp.DocumentName), bp.StartLine + 1, bp.StartColumn, bp.ConditionExpression, error);
-                        if (AD7Engine.ShowErrorMessageBoxAction != null)
-                            AD7Engine.ShowErrorMessageBoxAction("ILRuntime Debugger", errorMsg);
-                        else
-                            MessageBox.Show(errorMsg, "ILRuntime Debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        
                     }
                 }
             }
@@ -504,7 +507,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         void OnReceiveSCStepComplete(SCStepComplete msg)
         {
-            AD7Thread t, bpThread = null;
+            IThread t, bpThread = null;
 
             foreach (var i in msg.StackFrame)
             {
@@ -516,22 +519,22 @@ namespace ILRuntimeDebugEngine.AD7
                 }
             }
             if (bpThread != null)
-                engine.Callback.StepCompleted(bpThread);
+                HandleStepCompelte(bpThread);
 
         }
         void OnReceiveSCThreadStarted(SCThreadStarted msg)
         {
-            AD7Thread t = new AD7Thread(engine, msg.ThreadHashCode);
+            var t = HandleTheadStarted(msg.ThreadHashCode);
             threads[msg.ThreadHashCode] = t;
-            engine.Callback.ThreadStarted(t);
+            
         }
 
         void OnReceiveSCThreadEnded(SCThreadEnded msg)
         {
-            AD7Thread t;
+            IThread t;
             if (threads.TryGetValue(msg.ThreadHashCode, out t))
             {
-                engine.Callback.ThreadEnded(t);
+                HandleThreadEnded(t);
                 threads.Remove(msg.ThreadHashCode);
             }
         }

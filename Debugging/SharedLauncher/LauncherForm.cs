@@ -19,7 +19,7 @@ namespace ILRuntimeDebuggerLauncher
     {
         private static SocketAsyncEventArgs socketAsyncEventArgs;
         private static byte[] buffer = new byte[64 * 1024];
-        private byte[] stringBuffer = new byte[1024];
+        private static byte[] stringBuffer = new byte[1024];
         private static MemoryStream bufferStream;
         private static BinaryReader bufferReader;
         private static System.Threading.Timer checkRemoteDebugersHealthyTimer;
