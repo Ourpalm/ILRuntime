@@ -51,6 +51,7 @@ Global
 		Debugging\SharedDebuggerCommon\SharedDebuggerCommon.projitems*{8c767f83-2663-405c-b6a0-ec71b90b60ca}*SharedItemsImports = 13
 		Debugging\SharedDebuggerCommon\SharedDebuggerCommon.projitems*{ad304835-4dba-49f3-a13d-f173bc828ebf}*SharedItemsImports = 4
 		Debugging\SharedEngine\SharedEngine.projitems*{ad304835-4dba-49f3-a13d-f173bc828ebf}*SharedItemsImports = 4
+		Debugging\SharedDebuggerCommon\SharedDebuggerCommon.projitems*{c26be57f-02a0-4df1-b8a6-e99e948673a8}*SharedItemsImports = 5
 		Debugging\SharedLauncher\SharedLauncher.projitems*{e10fdbd8-f948-41f9-a99f-3c50ccbba145}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

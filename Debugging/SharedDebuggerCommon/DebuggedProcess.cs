@@ -470,7 +470,7 @@ namespace ILRuntimeDebugEngine
 
         protected abstract void HandleBreakpointHit(IBreakPoint bp, IThread bpThread);
 
-        protected abstract void HandleShowErrorMessageBox(string title, string errorMsg);
+        protected abstract void HandleShowErrorMessageBox(string errorMsg);
 
         protected abstract void HandleStepCompelte(IThread bpThread);
 
@@ -495,11 +495,11 @@ namespace ILRuntimeDebugEngine
                 }
                 if (bpThread != null)
                 {
-                    
+                    HandleBreakpointHit(bp, bpThread);
                     if (!string.IsNullOrWhiteSpace(error))
                     {
                         var errorMsg = string.Format(BreakpointErrorMsg, System.IO.Path.GetFileName(bp.DocumentName), bp.StartLine + 1, bp.StartColumn, bp.ConditionExpression, error);
-                        
+                        HandleShowErrorMessageBox(errorMsg);
                     }
                 }
             }

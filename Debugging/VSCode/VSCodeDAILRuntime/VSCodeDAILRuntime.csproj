@@ -12,4 +12,10 @@
     <PackageReference Include="Ookii.CommandLine" Version="2.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ILRuntime\ILRuntime.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\SharedDebuggerCommon\SharedDebuggerCommon.projitems" Label="Shared" />
+
 </Project>

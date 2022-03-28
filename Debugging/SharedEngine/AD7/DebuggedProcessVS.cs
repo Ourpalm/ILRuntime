@@ -26,7 +26,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         }
 
-        protected override void HandleShowErrorMessageBox(string title, string errorMsg)
+        protected override void HandleShowErrorMessageBox(string errorMsg)
         {
             if (AD7Engine.ShowErrorMessageBoxAction != null)
                 AD7Engine.ShowErrorMessageBoxAction("ILRuntime Debugger", errorMsg);
