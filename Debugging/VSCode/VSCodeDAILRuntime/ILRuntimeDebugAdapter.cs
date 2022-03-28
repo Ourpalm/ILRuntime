@@ -89,10 +89,10 @@ namespace ILRuntime.VSCode
         protected override LaunchResponse HandleLaunchRequest(LaunchArguments arguments)
         {
             Protocol.SendEvent(new OutputEvent("Launching..."));
-            string fileName = arguments.ConfigurationProperties.GetValueAsString("program");
+            string fileName = arguments.ConfigurationProperties.GetValueAsString("address");
             if (String.IsNullOrEmpty(fileName))
             {
-                throw new ProtocolException("Launch failed because launch configuration did not specify 'program'.");
+                throw new ProtocolException("Launch failed because launch configuration did not specify 'address'.");
             }
 
             fileName = Path.GetFullPath(fileName);

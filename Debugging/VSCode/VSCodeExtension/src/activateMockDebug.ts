@@ -12,9 +12,63 @@ import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken 
 import { MockDebugSession } from './mockDebug';
 import { FileAccessor } from './mockRuntime';
 import { ServerInfo } from './extension';
+import * as path from 'path';
+
+let extensionPath:string;
+function getExtensionFilePath(extensionfile: string): string {
+    return path.resolve(extensionPath, extensionfile);
+}
+
+class InstanceEntry implements vscode.QuickPickItem{
+	label: string;
+	kind?: vscode.QuickPickItemKind | undefined;
+	description?: string | undefined;
+	detail?: string | undefined;
+	picked?: boolean | undefined;
+	alwaysShow?: boolean | undefined;
+	buttons?: readonly vscode.QuickInputButton[] | undefined;
+	address:string;
+
+	constructor(address:string, machineName:string, project:string, processId:number){
+		this.label = `${project}(${machineName}:${processId})`;
+		this.detail = address;
+		this.address = address;
+	}
+}
+class RefreshButton implements vscode.QuickInputButton {
+    get iconPath(): { dark: vscode.Uri; light: vscode.Uri } {
+        const refreshImagePathDark: string = getExtensionFilePath("images/Refresh_inverse.svg");
+        const refreshImagePathLight: string = getExtensionFilePath("images/Refresh.svg");
+
+        return {
+            dark: vscode.Uri.file(refreshImagePathDark),
+            light: vscode.Uri.file(refreshImagePathLight)
+        };
+    }
+
+    get tooltip(): string {
+        return "Refresh instance list";
+    }
+}
+function buildInstanceEntries(servers : Map<string, ServerInfo>) : InstanceEntry[]{
+	let res = new Array<InstanceEntry>();
+	let expired :string[] = [];
+	servers.forEach((value, key, map)=>{
+		if(value.isExipired()){
+			expired.push(key);
+		}
+		else{
+			res.push(new InstanceEntry(value.getAddress(), value.getMachine(), value.getProject(), value.getProcessId()));
+		}
+	});
+	expired.forEach((value, index, arr)=>{
+		servers.delete(value);
+	});
+	return res;
+}
 
 export function activateMockDebug(context: vscode.ExtensionContext, servers : Map<string, ServerInfo>, factory?: vscode.DebugAdapterDescriptorFactory) {
-
+	extensionPath = context.extensionPath;
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.ilruntime-debug.debugEditorContents', (resource: vscode.Uri) => {
 			let targetResource = resource;
@@ -39,12 +93,48 @@ export function activateMockDebug(context: vscode.ExtensionContext, servers : Ma
 		})
 	);
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.ilruntime-debug.getAddress', config => {
-		let quickTip = vscode.window.createQuickPick();
-		return vscode.window.showInputBox({
-			placeHolder: "Please enter the name of a markdown file in the workspace folder",
-			value: "readme.md"
+	context.subscriptions.push(vscode.commands.registerCommand('extension.ilruntime-debug.getAddress', config => {		
+		let result = new Promise<string>((resolve, reject)=>{
+			let quickPick = vscode.window.createQuickPick<InstanceEntry>();
+			quickPick.title = "Attach to ILRuntime instance";
+			quickPick.items = buildInstanceEntries(servers);
+			quickPick.canSelectMany = false;
+			quickPick.matchOnDescription = true;
+			quickPick.matchOnDetail = true;
+			quickPick.placeholder = "Select the instance to attach to";
+			quickPick.buttons = [new RefreshButton()];
+			let disposables: vscode.Disposable[] = [];
+
+			quickPick.onDidTriggerButton(button => {
+				quickPick.items = buildInstanceEntries(servers);
+			}, undefined, disposables);
+	
+			quickPick.onDidAccept(() => {
+				if (quickPick.selectedItems.length !== 1) {
+					reject(new Error("Process not selected"));
+				}
+	
+				let address: string = quickPick.selectedItems[0].address;
+	
+				disposables.forEach(item => item.dispose());
+				quickPick.dispose();
+	
+				resolve(address);
+			}, undefined, disposables);
+	
+			quickPick.onDidHide(() => {
+				disposables.forEach(item => item.dispose());
+				quickPick.dispose();
+	
+				reject(new Error("Process not selected."));
+			}, undefined, disposables);
+	
+			quickPick.show();
 		});
+
+		
+			
+		return result;
 	}));
 
 	// register a configuration provider for 'mock' debug type

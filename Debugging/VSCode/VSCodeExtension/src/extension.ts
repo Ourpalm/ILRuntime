@@ -31,7 +31,7 @@ import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
  */
 const runMode: 'external' | 'server' | 'namedPipeServer' | 'inline' = 'external';
 let socket : DGram.Socket;
-const maximumActiveTime : number  = 10000;
+const maximumActiveTime : number  = 3000;
 let activeServers :Map<string, ServerInfo> = new Map<string, ServerInfo>();
 
 class BufferReader{
@@ -111,22 +111,22 @@ export function activate(context: vscode.ExtensionContext) {
 	switch (runMode) {
 		case 'server':
 			// run the debug adapter as a server inside the extension and communicate via a socket
-			activateMockDebug(context, new MockDebugAdapterServerDescriptorFactory());
+			activateMockDebug(context, activeServers, new MockDebugAdapterServerDescriptorFactory());
 			break;
 
 		case 'namedPipeServer':
 			// run the debug adapter as a server inside the extension and communicate via a named pipe (Windows) or UNIX domain socket (non-Windows)
-			activateMockDebug(context, new MockDebugAdapterNamedPipeServerDescriptorFactory());
+			activateMockDebug(context, activeServers, new MockDebugAdapterNamedPipeServerDescriptorFactory());
 			break;
 
 		case 'external': default:
 			// run the debug adapter as a separate process
-			activateMockDebug(context, new DebugAdapterExecutableFactory());
+			activateMockDebug(context, activeServers, new DebugAdapterExecutableFactory());
 			break;
 
 		case 'inline':
 			// run the debug adapter inside the extension and directly talk to it
-			activateMockDebug(context);
+			activateMockDebug(context, activeServers);
 			break;
 	}
 }

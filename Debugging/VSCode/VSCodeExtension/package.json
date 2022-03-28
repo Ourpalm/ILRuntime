@@ -194,7 +194,7 @@
               "type": "ilruntime",
               "request": "launch",
               "name": "Attach to ILRuntime",
-              "program": "^\"\\${command:AskForAddress}\"",
+              "address": "^\"\\${command:AskForAddress}\"",
               "stopOnEntry": true
             }
           }
