@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ILRuntimeDebugEngine.Expressions
+namespace ILRuntime.Runtime.Debugger.Expressions
 {
-    abstract class EvalExpression
+    public abstract class EvalExpression
     {
         public virtual bool Completed { get { return true; } }
-        public abstract bool Parse(Token curToken, Lexer lexer);
+        internal abstract bool Parse(Token curToken, Lexer lexer);
 
         public bool IsRoot { get; set; }
     }
 
-    class NameExpression : EvalExpression
+    public class NameExpression : EvalExpression
     {
         string content;
         public string Content => content;
@@ -24,13 +24,13 @@ namespace ILRuntimeDebugEngine.Expressions
             this.content = content;
         }
 
-        public override bool Parse(Token curToken, Lexer lexer)
+        internal override bool Parse(Token curToken, Lexer lexer)
         {
             return false;
         }
     }
 
-    class StringLiteralExpression : EvalExpression
+    public class StringLiteralExpression : EvalExpression
     {
         string content;
         public string Content => content;
@@ -40,13 +40,13 @@ namespace ILRuntimeDebugEngine.Expressions
             this.content = content;
         }
 
-        public override bool Parse(Token curToken, Lexer lexer)
+        internal override bool Parse(Token curToken, Lexer lexer)
         {
             return false;
         }
     }
 
-    class MemberAcessExpression : EvalExpression
+    public class MemberAcessExpression : EvalExpression
     {
         EvalExpression body;
         string member;
@@ -62,7 +62,7 @@ namespace ILRuntimeDebugEngine.Expressions
                 throw new NotSupportedException("Cannot retrive member for " + body);
         }
 
-        public override bool Parse(Token curToken, Lexer lexer)
+        internal override bool Parse(Token curToken, Lexer lexer)
         {
             if (member == null)
             {
@@ -79,7 +79,7 @@ namespace ILRuntimeDebugEngine.Expressions
         }
     }
 
-    class IndexAccessExpression : EvalExpression
+    public class IndexAccessExpression : EvalExpression
     {
         EvalExpression body;
         EvalExpression index;
@@ -99,7 +99,7 @@ namespace ILRuntimeDebugEngine.Expressions
                 throw new NotSupportedException("Cannot get index for " + body);
         }
 
-        public override bool Parse(Token curToken, Lexer lexer)
+        internal override bool Parse(Token curToken, Lexer lexer)
         {
             if (index == null)
             {
@@ -148,7 +148,7 @@ namespace ILRuntimeDebugEngine.Expressions
         }
     }
 
-    class InvocationExpression : EvalExpression
+    public class InvocationExpression : EvalExpression
     {
         EvalExpression body;        
         List<EvalExpression> parameters = new List<EvalExpression>();
@@ -169,7 +169,7 @@ namespace ILRuntimeDebugEngine.Expressions
                 throw new NotSupportedException("Cannot make invocation  for " + body);
         }
 
-        public override bool Parse(Token curToken, Lexer lexer)
+        internal override bool Parse(Token curToken, Lexer lexer)
         {
             if (curParam == null)
             {

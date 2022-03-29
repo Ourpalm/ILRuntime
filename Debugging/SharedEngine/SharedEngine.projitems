@@ -30,10 +30,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)AD7\EngineCallback.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AD7\ILProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EngineConstants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Expressions\EvalExpression.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Expressions\Lexer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Expressions\Parser.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Expressions\Token.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\EngineUtils.cs" />
   </ItemGroup>
   <ItemGroup>

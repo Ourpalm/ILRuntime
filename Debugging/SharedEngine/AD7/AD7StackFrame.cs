@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 using ILRuntime.Runtime.Debugger;
-using ILRuntimeDebugEngine.Expressions;
+using ILRuntime.Runtime.Debugger.Expressions;
 
 namespace ILRuntimeDebugEngine.AD7
 {
@@ -55,9 +55,8 @@ namespace ILRuntimeDebugEngine.AD7
             pichError = 0;
             ppExpr = null;
 
-            Expressions.Lexer lexer = new Expressions.Lexer(pszCode);
-            Expressions.Parser parser = new Expressions.Parser(lexer);
-            Expressions.EvalExpression exp = null;
+            Parser parser = new Parser(pszCode);
+            EvalExpression exp = null;
             try
             {
                 exp = parser.Parse();
