@@ -75,10 +75,8 @@ namespace ILRuntime.VSCode
 
         protected override DisconnectResponse HandleDisconnectRequest(DisconnectArguments arguments)
         {
-            this.Continue(step: false);
-
-            // Ensure the debug thread has stopped before sending the response
-            this.debugThread.Join();
+            debugged.Close();
+            debugged = null;
 
             return new DisconnectResponse();
         }
@@ -162,25 +160,25 @@ namespace ILRuntime.VSCode
 
         protected override ContinueResponse HandleContinueRequest(ContinueArguments arguments)
         {
-            this.Continue(step: false);
+            //this.Continue(step: false);
             return new ContinueResponse();
         }
 
         protected override StepInResponse HandleStepInRequest(StepInArguments arguments)
         {
-            this.Continue(step: true);
+            //this.Continue(step: true);
             return new StepInResponse();
         }
 
         protected override StepOutResponse HandleStepOutRequest(StepOutArguments arguments)
         {
-            this.Continue(step: true);
+            //this.Continue(step: true);
             return new StepOutResponse();
         }
 
         protected override NextResponse HandleNextRequest(NextArguments arguments)
         {
-            this.Continue(step: true);
+            //this.Continue(step: true);
             return new NextResponse();
         }
 
@@ -337,7 +335,27 @@ namespace ILRuntime.VSCode
 
         protected override StackTraceResponse HandleStackTraceRequest(StackTraceArguments arguments)
         {
-            throw new ProtocolException("Not Implemented");
+            List<StackFrame> result = new List<StackFrame>();
+            if(debugged.Threads.TryGetValue(arguments.ThreadId, out IThread t))
+            {
+                var thread = t as VSCodeThread;
+                foreach(var i in thread.StackFrames)
+                {
+                    StackFrame frame = new StackFrame()
+                    {
+                        Name = i.MethodName,
+                        Source = new Source() { Name = Path.GetFileName(i.DocumentName), Path = i.DocumentName },
+                        Line = i.StartLine,
+                        EndLine = i.EndLine,
+                        Column = i.StartColumn,
+                        EndColumn = i.EndColumn,
+                        Id = i.GetHashCode()
+                    };
+                    result.Add(frame);
+                }
+            }
+
+            return new StackTraceResponse(result);
         }
 
         protected override VariablesResponse HandleVariablesRequest(VariablesArguments arguments)

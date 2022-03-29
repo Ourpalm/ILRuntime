@@ -56,7 +56,14 @@ namespace ILRuntime.VSCode
         }
         protected override void HandleBreakpointHit(IBreakPoint bp, IThread bpThread)
         {
-            throw new NotImplementedException();
+            VSCodeBreakPoint codeBp = (VSCodeBreakPoint)bp;
+            da.Protocol.SendEvent(new StoppedEvent()
+            {
+                AllThreadsStopped = true,
+                HitBreakpointIds = new List<int>() { codeBp.GetHashCode() },
+                Reason = StoppedEvent.ReasonValue.Breakpoint,
+                ThreadId = bpThread.ThreadID,                
+            });             
         }
 
         protected override void HandleModuleLoaded(string moduleName)

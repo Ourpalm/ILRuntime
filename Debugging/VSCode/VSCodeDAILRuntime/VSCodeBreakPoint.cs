@@ -31,6 +31,7 @@ namespace ILRuntime.VSCode
         {
             this.debugged = debugged;
             bp = new Breakpoint(false);
+            bp.Id = GetHashCode();
             bp.Source = source;
             bp.Line = line;
             bp.Column = column;

@@ -28,7 +28,9 @@ namespace ILRuntimeDebugEngine.AD7
                 }
             }
         }
-       
+
+        public int ThreadID => threadHash;
+
         public AD7Thread(AD7Engine engine, int threadHash)//ThreadMirror threadMirror)
         {
             _engine = engine;

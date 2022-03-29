@@ -41,7 +41,7 @@ namespace ILRuntime.VSCode
                 return;
             }
 
-            //if (arguments.Debug)
+            if (arguments.Debug)
             {
                 Console.WriteLine("Waiting for debugger...");
                 while (true)

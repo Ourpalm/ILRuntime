@@ -20,7 +20,9 @@ namespace ILRuntime.VSCode
 
         public Thread Thread => thread;
 
-        public StackFrameInfo[] StackFrames { set { frames = value; } }
+        public StackFrameInfo[] StackFrames { get => frames; set { frames = value; } }
+
+        public int ThreadID => thread.Id;
 
         public VSCodeThread(int id, string threadName)
         {

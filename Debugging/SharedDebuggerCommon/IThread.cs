@@ -8,6 +8,7 @@ namespace ILRuntimeDebugEngine
 {
     interface IThread
     {
+        int ThreadID { get; }
         StackFrameInfo[] StackFrames { set; }
     }
 }
