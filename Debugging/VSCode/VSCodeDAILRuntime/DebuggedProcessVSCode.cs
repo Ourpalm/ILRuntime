@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -16,6 +17,38 @@ namespace ILRuntime.VSCode
     class DebuggedProcessVSCode : DebuggedProcess
     {
         ILRuntimeDebugAdapter da;
+        Dictionary<string, HashSet<VSCodeBreakPoint>> currentBreakpoints = new Dictionary<string, HashSet<VSCodeBreakPoint>>();
+
+        public ILRuntimeDebugAdapter Adapter => da;
+        public Dictionary<string, HashSet<VSCodeBreakPoint>> BreakPoints => currentBreakpoints;
+
+        public VSCodeBreakPoint FindBreakpoint(string document, int line)
+        {
+            if (currentBreakpoints.TryGetValue(document, out HashSet<VSCodeBreakPoint> breakpoints))
+            {
+                foreach(var i in breakpoints)
+                {
+                    if (i.StartLine == line)
+                        return i;
+                }
+            }
+            return null;
+        }
+
+        public void UpdateBreakpoints(string document, HashSet<VSCodeBreakPoint> validBPs)
+        {            
+            if (currentBreakpoints.TryGetValue(document, out HashSet<VSCodeBreakPoint> breakpoints))
+            {
+                foreach(var i in breakpoints)
+                {
+                    if (!validBPs.Contains(i))
+                    {
+                        SendDeleteBreakpoint(i.GetHashCode());
+                    }
+                }
+            }
+            currentBreakpoints[document] = validBPs;
+        }
         public DebuggedProcessVSCode(ILRuntimeDebugAdapter da, string host, int port)
             : base(host, port)
         {

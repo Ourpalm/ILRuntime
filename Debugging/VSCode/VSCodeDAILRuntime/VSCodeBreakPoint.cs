@@ -45,7 +45,22 @@ namespace ILRuntime.VSCode
 
         public override void Bound(BindBreakpointResults res)
         {
-            throw new NotImplementedException();
+            switch (res)
+            {
+                case BindBreakpointResults.OK:
+                    bp.Verified = true;
+                    break;
+                case BindBreakpointResults.CodeNotFound:
+                case BindBreakpointResults.TypeNotFound:
+                    bp.Verified = false;
+                    bp.Message = "Code not loaded";
+                    break;                    
+            }
+            debugged.Adapter.Protocol.SendEvent(new BreakpointEvent()
+            {
+                Breakpoint = bp,
+                Reason = BreakpointEvent.ReasonValue.Changed
+            });
         }
 
         public override bool TryBind()
@@ -62,6 +77,8 @@ namespace ILRuntime.VSCode
             }
             catch (Exception ex)
             {
+                bp.Verified = false;
+                bp.Message = ex.ToString();
                 System.Diagnostics.Debug.WriteLine(ex.ToString());
             }
             return false;

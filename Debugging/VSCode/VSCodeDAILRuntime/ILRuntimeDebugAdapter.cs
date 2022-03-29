@@ -229,14 +229,14 @@ namespace ILRuntime.VSCode
             }
         }
 
-        private void SendOutput(string message)
+        private void SendOutput(string message, bool isError = false)
         {
             string outputText = !String.IsNullOrEmpty(message) ? message.Trim() : String.Empty;
 
             this.Protocol.SendEvent(new OutputEvent()
             {
                 Output = ($"{outputText}{Environment.NewLine}"),
-                Category = OutputEvent.CategoryValue.Stdout
+                Category = isError ? OutputEvent.CategoryValue.Stderr : OutputEvent.CategoryValue.Stdout
             });
         }
 
@@ -247,13 +247,41 @@ namespace ILRuntime.VSCode
         protected override SetBreakpointsResponse HandleSetBreakpointsRequest(SetBreakpointsArguments arguments)
         {
             List<Breakpoint> result = new List<Breakpoint>();
+            HashSet<VSCodeBreakPoint> validBPs = new HashSet<VSCodeBreakPoint>();
             foreach(var i in arguments.Breakpoints)
             {
-                VSCodeBreakPoint bp = new VSCodeBreakPoint(debugged, arguments.Source, i.Line, i.Column.Value, i.Condition);
-                debugged.AddPendingBreakpoint(bp);
-                result.Add(bp.BreakPoint);
+                try
+                {
+                    VSCodeBreakPoint bp = debugged.FindBreakpoint(arguments.Source.Path, i.Line);
+                    if (bp != null)
+                    {
+                        if(bp.ConditionExpression != i.Condition)
+                        {
+                            debugged.SendSetBreakpointCondition(bp.GetHashCode(),
+                                string.IsNullOrEmpty(i.Condition) ? Runtime.Debugger.Protocol.BreakpointConditionStyle.None : Runtime.Debugger.Protocol.BreakpointConditionStyle.WhenTrue,
+                                i.Condition);
+                        }
+                    }
+                    else
+                    {
+                        bp = new VSCodeBreakPoint(debugged, arguments.Source, i.Line, i.Column.GetValueOrDefault(), i.Condition);
+                    }
+                    validBPs.Add(bp);
+
+                    if (!bp.IsBound && bp.TryBind())
+                    {
+                        debugged.AddPendingBreakpoint(bp);
+                        result.Add(bp.BreakPoint);
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+                    SendOutput(ex.ToString());
+                }
             }
-            
+
+            debugged.UpdateBreakpoints(arguments.Source.Path, validBPs);
             return new SetBreakpointsResponse(result);
         }
         #endregion

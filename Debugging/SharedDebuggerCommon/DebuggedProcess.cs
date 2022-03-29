@@ -279,7 +279,7 @@ namespace ILRuntimeDebugEngine
 
             return vinfo;
         }
-        public void AddPendingBreakpoint(IBreakPoint bp)
+        public virtual void AddPendingBreakpoint(IBreakPoint bp)
         {
             breakpoints[bp.GetHashCode()] = bp;
         }
@@ -327,6 +327,7 @@ namespace ILRuntimeDebugEngine
 
         public void SendDeleteBreakpoint(int bpHash)
         {
+            breakpoints.Remove(bpHash);
             sendStream.Position = 0;
             bw.Write(bpHash);
             socket.Send(DebugMessageType.CSDeleteBreakpoint, sendStream.GetBuffer(), (int)sendStream.Position);
