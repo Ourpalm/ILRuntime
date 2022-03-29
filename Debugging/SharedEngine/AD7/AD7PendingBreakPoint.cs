@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 using ILRuntime.Runtime.Debugger.Protocol;
 namespace ILRuntimeDebugEngine.AD7
 {
-    class AD7PendingBreakPoint : IDebugPendingBreakpoint2, IBreakPoint
+    class AD7PendingBreakPoint : IBreakPoint, IDebugPendingBreakpoint2
     {
         private readonly AD7Engine _engine;
         private readonly IDebugBreakpointRequest2 _pBPRequest;
@@ -22,14 +22,9 @@ namespace ILRuntimeDebugEngine.AD7
         private AD7BoundBreakpoint _boundBreakpoint;
         private AD7ErrorBreakpoint _errorBreakpoint;
         CSBindBreakpoint bindRequest;
-        public int StartLine { get; private set; }
-        public int StartColumn { get; private set; }
-        public int EndLine { get; private set; }
-        public int EndColumn { get; private set; }
-        public string DocumentName { get; private set; }
         public enum_BP_STATE State { get; private set; }
-        public bool IsBound { get { return _boundBreakpoint != null; } }
-        public string ConditionExpression { get { return _bpRequestInfo.bpCondition.bstrCondition; } }
+        public override bool IsBound { get { return _boundBreakpoint != null; } }
+        public override string ConditionExpression { get { return _bpRequestInfo.bpCondition.bstrCondition; } }
 
         public AD7PendingBreakPoint(AD7Engine engine, IDebugBreakpointRequest2 pBPRequest)
         {
@@ -132,71 +127,13 @@ namespace ILRuntimeDebugEngine.AD7
             return Constants.S_OK;
         }
 
-        public bool TryBind()
+        public override bool TryBind()
         {
             try
             {
                 if (bindRequest == null)
                 {
-                    using (var stream = File.OpenRead(DocumentName))
-                    {
-                        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: DocumentName);
-                        TextLine textLine = syntaxTree.GetText().Lines[StartLine];
-                        Location location = syntaxTree.GetLocation(textLine.Span);
-                        SyntaxTree sourceTree = location.SourceTree;
-                        SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
-
-                        bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
-                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
-                        string methodName = null;
-                        if (method != null)
-                            methodName = ((MethodDeclarationSyntax)method).Identifier.Text;
-                        else
-                        {
-                            method = GetParentMethod<ConstructorDeclarationSyntax>(node.Parent);
-                            if (method != null)
-                            {
-                                bool isStatic = false;
-                                foreach (var i in method.Modifiers)
-                                {
-                                    if (i.Text == "static")
-                                        isStatic = true;
-                                }
-                                if (isStatic)
-                                    methodName = ".cctor";
-                                else
-                                    methodName = ".ctor";
-                            }
-                        }
-
-                        string className = GetClassName(method);
-
-                        //var ns = GetParentMethod<NamespaceDeclarationSyntax>(method);
-                        //string nsname = ns != null ? ns.Name.ToString() : null;
-
-                        //string name = ns != null ? string.Format("{0}.{1}", nsname, className) : className;
-                        var nameSpaceStack = new Stack<string>();
-                        var usingSyntaxList = new List<UsingDirectiveSyntax>(syntaxTree.GetCompilationUnitRoot().Usings);
-                        GetCurrentNameSpaceDeclaration(node.Parent, nameSpaceStack, usingSyntaxList);
-
-                        bindRequest = new CSBindBreakpoint();
-                        bindRequest.BreakpointHashCode = this.GetHashCode();
-                        bindRequest.IsLambda = isLambda;
-                        bindRequest.NamespaceName = string.Join(".", nameSpaceStack);
-                        bindRequest.TypeName = className;
-                        bindRequest.MethodName = methodName;
-                        bindRequest.StartLine = StartLine;
-                        bindRequest.EndLine = EndLine;
-                        bindRequest.Enabled = State == enum_BP_STATE.BPS_ENABLED;
-                        bindRequest.Condition = new BreakpointCondition();
-                        bindRequest.Condition.Style = (BreakpointConditionStyle)_bpRequestInfo.bpCondition.styleCondition;
-                        bindRequest.Condition.Expression = _bpRequestInfo.bpCondition.bstrCondition;
-                        bindRequest.UsingInfos = usingSyntaxList.Select(n => new UsingInfo
-                        {
-                            Alias = n.Alias != null ? n.Alias.Name.ToString() : "",
-                            Name = n.Name.ToString(),
-                        }).ToArray();
-                    }
+                    bindRequest = CreateBindRequest(State == enum_BP_STATE.BPS_ENABLED, (BreakpointConditionStyle)_bpRequestInfo.bpCondition.styleCondition, _bpRequestInfo.bpCondition.bstrCondition);
                 }
 
                 _engine.DebuggedProcess.SendBindBreakpoint(bindRequest);
@@ -209,46 +146,7 @@ namespace ILRuntimeDebugEngine.AD7
             return false;
         }
 
-        string GetClassName(BaseMethodDeclarationSyntax method)
-        {
-            ClassDeclarationSyntax cur = GetParentMethod<ClassDeclarationSyntax>(method);
-            string clsName = null;
-            while (cur != null)
-            {
-                if (clsName == null)
-                    clsName = cur.Identifier.Text;
-                else
-                    clsName = string.Format("{0}/{1}", cur.Identifier.Text, clsName);
-                cur = GetParentMethod<ClassDeclarationSyntax>(cur.Parent);
-            }
-
-            return clsName;
-        }
-        private T GetParentMethod<T>(SyntaxNode node) where T : SyntaxNode
-        {
-            if (node == null)
-                return null;
-
-            if (node is T)
-                return node as T;
-            return GetParentMethod<T>(node.Parent);
-        }
-
-        private void GetCurrentNameSpaceDeclaration(SyntaxNode node, Stack<string> namespaceList, List<UsingDirectiveSyntax> usingSyntaxList)
-        {
-            if (node == null)
-                return;
-
-            if (node is NamespaceDeclarationSyntax)
-            {
-                var namespaceDeclarationSyntax = node as NamespaceDeclarationSyntax;
-                namespaceList.Push(namespaceDeclarationSyntax.Name.ToString());
-                usingSyntaxList.AddRange(namespaceDeclarationSyntax.Usings);
-            }
-            GetCurrentNameSpaceDeclaration(node.Parent, namespaceList, usingSyntaxList);
-        }
-
-        public void Bound(BindBreakpointResults result)
+        public override void Bound(BindBreakpointResults result)
         {
             if (result == BindBreakpointResults.OK)
             {

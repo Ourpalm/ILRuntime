@@ -9,6 +9,8 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
+using ILRuntime.Runtime.Debugger;
+using ILRuntimeDebugEngine;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Serialization;
@@ -22,7 +24,7 @@ namespace ILRuntime.VSCode
 {
     internal class ILRuntimeDebugAdapter : DebugAdapterBase
     {
-        private int currentLineNum;
+        DebuggedProcessVSCode debugged;
         private bool stopAtEntry;
         private int hyperStepSpeed;
         private bool stopped;
@@ -73,7 +75,6 @@ namespace ILRuntime.VSCode
 
         protected override DisconnectResponse HandleDisconnectRequest(DisconnectArguments arguments)
         {
-            this.currentLineNum = this.lines.Count + 1;
             this.Continue(step: false);
 
             // Ensure the debug thread has stopped before sending the response
@@ -89,22 +90,59 @@ namespace ILRuntime.VSCode
         protected override LaunchResponse HandleLaunchRequest(LaunchArguments arguments)
         {
             Protocol.SendEvent(new OutputEvent("Launching..."));
-            string fileName = arguments.ConfigurationProperties.GetValueAsString("address");
-            if (String.IsNullOrEmpty(fileName))
+            string address = arguments.ConfigurationProperties.GetValueAsString("address");
+            if (String.IsNullOrEmpty(address))
             {
                 throw new ProtocolException("Launch failed because launch configuration did not specify 'address'.");
             }
 
-            fileName = Path.GetFullPath(fileName);
-            if (!File.Exists(fileName))
+            string[] token = address.Split(':');
+            
+            if (token.Length < 2)
             {
-                throw new ProtocolException("Launch failed because 'program' files does not exist.");
+                throw new ProtocolException($"Launch failed because 'address' is invalid({address}).");
+            }
+            string host = token[0];
+            int port;
+            if(!int.TryParse(token[1], out port))
+            {
+                throw new ProtocolException($"Launch failed because 'address' is invalid({address}).");
             }
             
             this.stopAtEntry = arguments.ConfigurationProperties.GetValueAsBool("stopAtEntry") ?? false;
             this.hyperStepSpeed = arguments.ConfigurationProperties.GetValueAsInt("hyperStepSpeed") ?? 0;
+            
+            debugged = new DebuggedProcessVSCode(this, host, port);
+            while (debugged.Connecting)
+            {
+                System.Threading.Thread.Sleep(10);
+            }
 
-            return new LaunchResponse();
+            if (debugged.Connected)
+            {
+                if (debugged.CheckDebugServerVersion())
+                {
+                    debugged.OnDisconnected = OnDisconnected;
+                    return new LaunchResponse();
+                }
+                else
+                {
+                    debugged.Close();
+                    debugged = null;
+                    throw new ProtocolException(String.Format("ILRuntime Debugger version mismatch\n Expected version:{0}\n Actual version:{1}", DebuggerServer.Version, debugged.RemoteDebugVersion));
+                }
+            }
+            else
+            {
+                debugged = null;
+                throw new ProtocolException("Cannot connect to ILRuntime");                
+            }
+        }
+
+        void OnDisconnected()
+        {
+            this.Protocol.SendEvent(new ExitedEvent());
+            this.Protocol.SendEvent(new TerminatedEvent());
         }
 
         #endregion
@@ -116,12 +154,8 @@ namespace ILRuntime.VSCode
             if (this.stopAtEntry)
             {
                 // Clear the event so we'll break at startup
-                this.RequestStop(StoppedEvent.ReasonValue.Step);
+                //this.RequestStop(StoppedEvent.ReasonValue.Step);
             }
-
-            this.debugThread = new SysThread(this.DebugThreadProc);
-            this.debugThread.Name = "Debug Loop Thread";
-            this.debugThread.Start();
 
             return new ConfigurationDoneResponse();
         }
@@ -176,19 +210,14 @@ namespace ILRuntime.VSCode
 
         protected override PauseResponse HandlePauseRequest(PauseArguments arguments)
         {
-            this.RequestStop(StoppedEvent.ReasonValue.Pause);
-            return new PauseResponse();
+            throw new ProtocolException("Not supported");
+            //this.RequestStop(StoppedEvent.ReasonValue.Pause);
+            //return new PauseResponse();
         }
 
         #endregion
 
         #region Debug Thread
-
-        private void DebugThreadProc()
-        {
-            this.Protocol.SendEvent(new ExitedEvent(exitCode: 0));
-            this.Protocol.SendEvent(new TerminatedEvent());
-        }
 
         private void RequestStop(StoppedEvent.ReasonValue reason, int threadId = 0)
         {
@@ -214,13 +243,19 @@ namespace ILRuntime.VSCode
         #endregion
 
         #region Breakpoints
-
+       
         protected override SetBreakpointsResponse HandleSetBreakpointsRequest(SetBreakpointsArguments arguments)
         {
-            //return this.BreakpointManager.HandleSetBreakpointsRequest(arguments);
-            throw new ProtocolException("Not Implemented");
+            List<Breakpoint> result = new List<Breakpoint>();
+            foreach(var i in arguments.Breakpoints)
+            {
+                VSCodeBreakPoint bp = new VSCodeBreakPoint(debugged, arguments.Source, i.Line, i.Column.Value, i.Condition);
+                debugged.AddPendingBreakpoint(bp);
+                result.Add(bp.BreakPoint);
+            }
+            
+            return new SetBreakpointsResponse(result);
         }
-
         #endregion
 
         #region Debugger Properties
@@ -258,37 +293,43 @@ namespace ILRuntime.VSCode
 
         protected override ThreadsResponse HandleThreadsRequest(ThreadsArguments arguments)
         {
-            throw new NotImplementedException();
+            ThreadsResponse res = new ThreadsResponse();
+            foreach(var i in debugged.Threads)
+            {
+                VSCodeThread t = (VSCodeThread)i.Value;
+                res.Threads.Add(t.Thread);
+            }
+            return res;
         }
 
         protected override ScopesResponse HandleScopesRequest(ScopesArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         protected override StackTraceResponse HandleStackTraceRequest(StackTraceArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         protected override VariablesResponse HandleVariablesRequest(VariablesArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         protected override SetVariableResponse HandleSetVariableRequest(SetVariableArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         protected override EvaluateResponse HandleEvaluateRequest(EvaluateArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         protected override SetExpressionResponse HandleSetExpressionRequest(SetExpressionArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         #endregion
@@ -297,7 +338,7 @@ namespace ILRuntime.VSCode
 
         protected override ModulesResponse HandleModulesRequest(ModulesArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         #endregion
@@ -306,7 +347,7 @@ namespace ILRuntime.VSCode
 
         protected override SourceResponse HandleSourceRequest(SourceArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         #endregion
@@ -315,12 +356,12 @@ namespace ILRuntime.VSCode
 
         protected override ExceptionInfoResponse HandleExceptionInfoRequest(ExceptionInfoArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         protected override SetExceptionBreakpointsResponse HandleSetExceptionBreakpointsRequest(SetExceptionBreakpointsArguments arguments)
         {
-            throw new NotImplementedException();
+            throw new ProtocolException("Not Implemented");
         }
 
         #endregion

@@ -27,7 +27,6 @@ namespace ILRuntime.VSCode
     {
         private static void Main(string[] args)
         {
-            System.IO.StreamWriter sw = new StreamWriter("out.log");
             CommandLineParser parser = new CommandLineParser(typeof(ProgramArgs));
             ProgramArgs arguments = null;
 
@@ -42,7 +41,7 @@ namespace ILRuntime.VSCode
                 return;
             }
 
-            if (arguments.Debug)
+            //if (arguments.Debug)
             {
                 Console.WriteLine("Waiting for debugger...");
                 while (true)
@@ -68,7 +67,6 @@ namespace ILRuntime.VSCode
                 ILRuntimeDebugAdapter adapter = new ILRuntimeDebugAdapter(Console.OpenStandardInput(), Console.OpenStandardOutput());
                 adapter.Protocol.LogMessage += (sender, e) =>
                 {
-                    sw.WriteLine(e.Message);
                     Debug.WriteLine(e.Message);
                 };
                 adapter.Run();
