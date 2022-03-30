@@ -93,7 +93,7 @@ namespace ILRuntime.VSCode
 
         protected override IThread HandleTheadStarted(int threadHash)
         {
-            var t = new VSCodeThread(threadHash, null);
+            var t = new VSCodeThread(this, threadHash, null);
             da.Protocol.SendEvent(new ThreadEvent()
             {
                 Reason = ThreadEvent.ReasonValue.Started,

@@ -126,7 +126,6 @@ namespace ILRuntime.VSCode
                 else
                 {
                     debugged.Close();
-                    debugged = null;
                     throw new ProtocolException(String.Format("ILRuntime Debugger version mismatch\n Expected version:{0}\n Actual version:{1}", DebuggerServer.Version, debugged.RemoteDebugVersion));
                 }
             }
@@ -324,7 +323,7 @@ namespace ILRuntime.VSCode
                     return res;
                 }
             }
-            throw new ProtocolException($"Cannot find stack frame:{arguments.FrameId}");
+            return new ScopesResponse();
         }
 
         protected override StackTraceResponse HandleStackTraceRequest(StackTraceArguments arguments)
@@ -358,8 +357,20 @@ namespace ILRuntime.VSCode
                     }
                     return new VariablesResponse(res);
                 }
+                var variable = thread.FindVariable(arguments.VariablesReference);
+                if (variable != null)
+                {
+                    var children = variable.EnumChildren(arguments.Timeout.GetValueOrDefault());
+                    List<Variable> res = new List<Variable>();
+                    foreach (var i in children)
+                    {
+                        res.Add(i.Variable);
+                    }
+
+                    return new VariablesResponse(res);
+                }
             }
-            throw new ProtocolException($"Cannot find scope:{arguments.VariablesReference}");
+            return new VariablesResponse();
         }
 
         protected override SetVariableResponse HandleSetVariableRequest(SetVariableArguments arguments)

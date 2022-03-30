@@ -10,6 +10,10 @@ using ILRuntime.Runtime.Debugger;
 using ILRuntimeDebugEngine;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Ookii.CommandLine;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ILRuntime.VSCode
 {
@@ -17,11 +21,16 @@ namespace ILRuntime.VSCode
     {
         Variable variable;
         VariableInfo info;
-
+        VSCodeStackFrame frame;
         public Variable Variable => variable;
-        public VSCodeVariable(VariableInfo info)
+
+        public VSCodeVariable Parent { get; set; }
+        public VariableReference[] Parameters { get; set; }
+
+        public VSCodeVariable(VSCodeStackFrame frame, VariableInfo info)
         {
             this.info = info;
+            this.frame = frame;
 
             variable = new Variable()
             {
@@ -45,37 +54,97 @@ namespace ILRuntime.VSCode
                 hint.Attributes |= VariablePresentationHint.AttributesValue.RawString;
             if (info.Expandable)
                 variable.VariablesReference = GetHashCode();
+            variable.EvaluateName = info.Name;
             variable.PresentationHint = hint;
 
+        }
+
+        public VSCodeVariable[] EnumChildren(int dwTimeout)
+        {
+            var thread = frame.Thread;
+            var c = thread.Engine.EnumChildren(GetVariableReference(), thread.ThreadID, frame.Index, (uint)Math.Max(dwTimeout, 5000));
+            var children = new VSCodeVariable[c.Length];
+            for (int i = 0; i < c.Length; i++)
+            {
+                var vi = c[i];
+                VSCodeVariable v = new VSCodeVariable(frame, vi);
+                if (vi.Type == VariableTypes.IndexAccess)
+                    v.Parameters = new VariableReference[] { VariableReference.GetInteger(vi.Offset) };
+                v.Parent = this;
+                frame.RegisterVariable(v);
+                children[i] = v;
+            }
+
+            return children;
+        }
+
+        public VariableReference GetVariableReference()
+        {
+            if (info != null)
+            {
+                VariableReference res = new VariableReference();
+                res.Address = info.Address;
+                res.Name = info.Name;
+                res.Type = info.Type;
+                res.Offset = info.Offset;
+                if (Parent != null)
+                    res.Parent = Parent.GetVariableReference();
+                res.Parameters = Parameters;
+
+                return res;
+            }
+            else
+                return null;
         }
     }
     class VSCodeScope
     {
         Scope scope;
-        StackFrameInfo info;
+        VSCodeStackFrame info;
         List<VSCodeVariable> variables = new List<VSCodeVariable>();
-
+        Dictionary<int, VSCodeVariable> variableMapping = new Dictionary<int, VSCodeVariable>();
         public List<VSCodeVariable> Variables => variables;
 
         public Scope Scope => scope;
-        public VSCodeScope(StackFrameInfo info, StackFrame frame, string name, int varCnt, int varOffset)
+        public VSCodeScope(VSCodeStackFrame info, StackFrame frame, Scope.PresentationHintValue name, int varCnt, int varOffset, FileLinePositionSpan span)
         {
             this.info = info;
             scope = new Scope();
-            scope.Name = name;
+            scope.Name = name.ToString();
+            scope.PresentationHint = name;
             scope.Source = frame.Source;
-            scope.Line = frame.Line;
-            scope.Column = frame.Column;
-            scope.EndLine = frame.EndLine;
-            scope.EndColumn = frame.EndColumn;
+            if (span.IsValid)
+            {
+                scope.Line = span.StartLinePosition.Line + 1;
+                scope.Column = span.StartLinePosition.Character + 1;
+                scope.EndLine = span.EndLinePosition.Line + 1;
+                scope.EndColumn = span.EndLinePosition.Character + 1;
+            }
+            else
+            {
+                scope.Line = frame.Line;
+                scope.Column = frame.Column;
+                scope.EndLine = frame.EndLine;
+                scope.EndColumn = frame.EndColumn;
+            }
             scope.NamedVariables = varCnt;
             scope.VariablesReference = GetHashCode();
 
             for(int i = 0; i < varCnt; i++)
             {
-                var v = info.LocalVariables[varOffset + i];
-                variables.Add(new VSCodeVariable(v));
+                var v = info.Info.LocalVariables[varOffset + i];
+                var variable = new VSCodeVariable(info, v);
+                variables.Add(variable);
+                if (v.Expandable)
+                    variableMapping[variable.GetHashCode()] = variable;
             }
+        }
+
+        public VSCodeVariable FindVariable(int id)
+        {
+            if (variableMapping.TryGetValue(id, out var v))
+                return v;
+            return null;
         }
     }
     class VSCodeStackFrame
@@ -83,20 +152,29 @@ namespace ILRuntime.VSCode
         StackFrameInfo info;
         VSCodeScope locals, args;
         StackFrame frame;
-
+        VSCodeThread thread;
+        Dictionary<int, VSCodeVariable> variableMapping = new Dictionary<int, VSCodeVariable>();
         public StackFrame Frame => frame;
         public VSCodeScope LocalVariables => locals;
 
         public VSCodeScope Arguments => args;
 
-        public VSCodeStackFrame(StackFrameInfo info)
+        public StackFrameInfo Info => info;
+
+        public VSCodeThread Thread => thread;
+
+        public int Index { get; private set; }
+        public VSCodeStackFrame(StackFrameInfo info, VSCodeThread thread, int index)
         {
             this.info = info;
+            this.thread = thread;
+            this.Index = index;
             frame = new StackFrame()
             {
                 Name = info.MethodName,
                 Id = GetHashCode()
             };
+            FileLinePositionSpan span = default;
             if (!string.IsNullOrEmpty(info.DocumentName))
             {
                 frame.Source = new Source() { Name = Path.GetFileName(info.DocumentName), Path = info.DocumentName };
@@ -104,15 +182,60 @@ namespace ILRuntime.VSCode
                 frame.EndLine = info.EndLine + 1;
                 frame.Column = info.StartColumn + 1;
                 frame.EndColumn = info.EndColumn + 1;
-            }
-            
 
-            args = new VSCodeScope(info, frame, "Arguments", info.ArgumentCount, 0);
-            locals = new VSCodeScope(info, frame, "Locals", info.LocalVariables != null ? info.LocalVariables.Length - info.ArgumentCount : 0, info.ArgumentCount);
+                if (File.Exists(info.DocumentName))
+                {
+                    using (var stream = File.OpenRead(info.DocumentName))
+                    {
+                        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: info.DocumentName);
+                        TextLine textLine = syntaxTree.GetText().Lines[info.StartLine];
+                        Location location = syntaxTree.GetLocation(textLine.Span);
+                        SyntaxTree sourceTree = location.SourceTree;
+                        SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
+
+                        bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
+                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
+                        if (method == null)
+                        {
+                            method = GetParentMethod<ConstructorDeclarationSyntax>(node.Parent);
+                        }
+                        if (method != null)
+                            span = syntaxTree.GetLineSpan(method.FullSpan);
+                    }
+                }
+            }
+            args = new VSCodeScope(this, frame, Scope.PresentationHintValue.Arguments, info.ArgumentCount, 0, span);
+            locals = new VSCodeScope(this, frame, Scope.PresentationHintValue.Locals, info.LocalVariables != null ? info.LocalVariables.Length - info.ArgumentCount : 0, info.ArgumentCount, span);
+        }
+        protected T GetParentMethod<T>(SyntaxNode node) where T : SyntaxNode
+        {
+            if (node == null)
+                return null;
+
+            if (node is T)
+                return node as T;
+            return GetParentMethod<T>(node.Parent);
+        }
+
+        public void RegisterVariable(VSCodeVariable variable)
+        {
+            variableMapping[variable.GetHashCode()] = variable;
+        }
+
+        public VSCodeVariable FindVariable(int id)
+        {
+            var res = Arguments.FindVariable(id);
+            if (res == null)
+                res = LocalVariables.FindVariable(id);
+            if (res == null)
+                variableMapping.TryGetValue(id, out res);
+
+            return res;
         }
     }
     class VSCodeThread : IThread
     {
+        DebuggedProcessVSCode engine;
         Thread thread;
         VSCodeStackFrame[] frames;
         Dictionary<int, VSCodeStackFrame> frameMapping = new Dictionary<int, VSCodeStackFrame>();
@@ -121,6 +244,8 @@ namespace ILRuntime.VSCode
         public Thread Thread => thread;
 
         public VSCodeStackFrame[] VSCodeStackFrames => frames;
+
+        public DebuggedProcessVSCode Engine => engine;
 
         public StackFrameInfo[] StackFrames
         {
@@ -131,7 +256,7 @@ namespace ILRuntime.VSCode
                 frames = new VSCodeStackFrame[value.Length];
                 for(int i = 0; i < value.Length; i++)
                 {
-                    var frame = new VSCodeStackFrame(value[i]);
+                    var frame = new VSCodeStackFrame(value[i], this, i);
                     frames[i] = frame;
                     frameMapping[frame.GetHashCode()] = frame;
                     scopeMapping[frame.Arguments.GetHashCode()] = frame.Arguments;
@@ -150,14 +275,26 @@ namespace ILRuntime.VSCode
         public VSCodeScope FindScope(int scopeID)
         {
             if (scopeMapping.TryGetValue(scopeID, out var scope))
-                return scope;
+                return scope;            
+            return null;
+        }
+
+        public VSCodeVariable FindVariable(int variableID)
+        {
+            foreach (var i in frames)
+            {
+                var v = i.FindVariable(variableID);
+                if (v != null)
+                    return v;
+            }
             return null;
         }
 
         public int ThreadID => thread.Id;
 
-        public VSCodeThread(int id, string threadName)
+        public VSCodeThread(DebuggedProcessVSCode engine, int id, string threadName)
         {
+            this.engine = engine;
             thread = new Thread(id, threadName);
         }
     }
