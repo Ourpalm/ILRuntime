@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ILRuntime.Runtime.Debugger;
+using ILRuntime.Runtime.Debugger.Expressions;
 using ILRuntime.Runtime.Debugger.Protocol;
 
 namespace ILRuntimeDebugEngine
@@ -528,7 +529,7 @@ namespace ILRuntimeDebugEngine
         {
             var t = HandleTheadStarted(msg.ThreadHashCode);
             threads[msg.ThreadHashCode] = t;
-            
+
         }
 
         void OnReceiveSCThreadEnded(SCThreadEnded msg)
@@ -539,6 +540,181 @@ namespace ILRuntimeDebugEngine
                 HandleThreadEnded(t);
                 threads.Remove(msg.ThreadHashCode);
             }
+        }
+
+        protected abstract IProperty CreateProperty(IStackFrame frame, VariableInfo info);
+
+        public IProperty Resolve(IStackFrame frame, EvalExpression exp, uint dwTimeout)
+        {
+            if (exp != null)
+            {
+                if (exp is NameExpression)
+                {
+                    return ResolveNameExpression(frame, (NameExpression)exp, dwTimeout);
+                }
+                if (exp is MemberAcessExpression)
+                {
+                    return ResolveMemberAccessExpression(frame, (MemberAcessExpression)exp, dwTimeout);
+                }
+                if (exp is IndexAccessExpression)
+                {
+                    return ResolveIndexAccessExpression(frame, (IndexAccessExpression)exp, dwTimeout);
+                }
+            }
+            return null;
+        }
+
+        IProperty ResolveNameExpression(IStackFrame frame, NameExpression exp, uint dwTimeout)
+        {
+            IProperty res = frame.GetPropertyByName(exp.Content);
+            if (res != null)
+                return res;
+            if (exp.IsRoot)
+            {
+                var info = ResolveVariable(null, exp.Content, frame.ThreadID, frame.Index, dwTimeout);
+                if (info == null)
+                {
+                    info = new VariableInfo();
+                    info.Name = exp.Content;
+                    info.Value = "null";
+                    info.TypeName = "null";
+                }
+                return CreateProperty(frame, info);
+            }
+            else
+            {
+                var info = VariableInfo.FromObject(null);
+                info.Type = VariableTypes.FieldReference;
+                info.Name = exp.Content;
+                return CreateProperty(frame, info);
+            }
+        }
+
+        IProperty ResolveMemberAccessExpression(IStackFrame frame, MemberAcessExpression exp, uint dwTimeout)
+        {
+            IProperty body = Resolve(frame, exp.Body, dwTimeout);
+            string member = exp.Member;
+            IProperty prop = null;
+            if (body != null)
+            {
+                VariableReference reference = body.GetVariableReference();
+                if (reference != null)
+                {
+                    if (reference.Type < VariableTypes.Error)
+                    {
+                        if (exp.IsRoot)
+                        {
+                            var info = ResolveVariable(reference, member, frame.ThreadID, frame.Index, dwTimeout);
+                            prop = CreateProperty(frame, info);
+                            prop.Parent = body;
+                        }
+                        else
+                        {
+                            var info = VariableInfo.FromObject(null);
+                            info.Type = VariableTypes.FieldReference;
+                            info.Name = member;
+                            prop = CreateProperty(frame, info);
+                            prop.Parent = body;
+                        }
+                    }
+                    else if (reference.Type == VariableTypes.NotFound)
+                    {
+                        if (exp.IsRoot)
+                        {
+                            var info = ResolveVariable(null, reference.Name + "." + member, frame.ThreadID, frame.Index, dwTimeout);
+                            prop = CreateProperty(frame, info);
+                        }
+                        else
+                        {
+                            var info = VariableInfo.FromObject(null);
+                            info.Type = VariableTypes.FieldReference;
+                            info.Name = reference.Name + "." + member;
+                            prop = CreateProperty(frame, info);
+                        }
+                    }
+                }
+
+            }
+            else
+                prop = CreateProperty(frame, VariableInfo.NullReferenceExeption);
+            return prop;
+        }
+
+        IProperty ResolveIndexAccessExpression(IStackFrame frame, IndexAccessExpression exp, uint dwTimeout)
+        {
+            IProperty body = Resolve(frame, exp.Body, dwTimeout);
+            IProperty prop = null;
+            if (body != null)
+            {
+                VariableReference reference = body.GetVariableReference();
+                if (reference != null)
+                {
+                    uint threadHash;
+
+                    if (reference.Type < VariableTypes.Error)
+                    {
+                        var idxExp = exp.Index;
+                        VariableReference idx = null;
+                        if (idxExp is NameExpression)
+                        {
+                            int idxInt;
+                            var content = ((NameExpression)idxExp).Content;
+                            if (content == "true")
+                            {
+                                idx = VariableReference.True;
+                            }
+                            else if (content == "false")
+                            {
+                                idx = VariableReference.False;
+                            }
+                            else if (content == "null")
+                            {
+                                idx = VariableReference.Null;
+                            }
+                            else if (int.TryParse(content, out idxInt))
+                            {
+                                idx = VariableReference.GetInteger(idxInt);
+                            }
+                            else
+                            {
+                                var info = ResolveNameExpression(frame, (NameExpression)idxExp, dwTimeout);
+                                idx = info.GetVariableReference();
+                            }
+                        }
+                        else if (idxExp is StringLiteralExpression)
+                        {
+                            idx = VariableReference.GetString(((StringLiteralExpression)idxExp).Content);
+                        }
+                        else
+                        {
+                            var info = Resolve(frame, idxExp, dwTimeout);
+                            idx = info.GetVariableReference();
+                        }
+                        if (idx != null && idx.Type < VariableTypes.Error)
+                        {
+                            if (exp.IsRoot)
+                            {
+                                var info = ResolveIndexAccess(reference, idx, frame.ThreadID, frame.Index, dwTimeout);
+                                prop = CreateProperty(frame, info);
+                                prop.Parent = body;
+                                prop.Parameters = new VariableReference[] { idx };
+                            }
+                            else
+                            {
+                                var info = VariableInfo.FromObject(null);
+                                info.Type = VariableTypes.IndexAccess;
+                                prop = CreateProperty(frame, info);
+                                prop.Parent = body;
+                                prop.Parameters = new VariableReference[] { idx };
+                            }
+                        }
+                    }
+                }
+            }
+            else
+                prop = CreateProperty(frame, VariableInfo.NullReferenceExeption);
+            return prop;
+
         }
     }
 }

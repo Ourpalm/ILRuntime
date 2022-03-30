@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using ILRuntime.Runtime.Debugger;
+using ILRuntime.Runtime.Debugger.Expressions;
 using ILRuntimeDebugEngine;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -507,7 +508,37 @@ namespace ILRuntime.VSCode
 
         protected override EvaluateResponse HandleEvaluateRequest(EvaluateArguments arguments)
         {
-            throw new ProtocolException("Not Implemented");
+            Parser parser = new Parser(arguments.Expression);
+            EvalExpression exp = null;
+            try
+            {
+                exp = parser.Parse();
+            }
+            catch (Exception ex)
+            {
+                throw new ProtocolException(ex.ToString());
+            }
+            VSCodeStackFrame frame;
+            foreach (var t in debugged.Threads)
+            {
+                var thread = t.Value as VSCodeThread;
+                frame = thread.FindFrame(arguments.FrameId.GetValueOrDefault());
+                if (frame != null)
+                {
+                    var prop = debugged.Resolve(frame, exp, (uint)Math.Max(arguments.Timeout.GetValueOrDefault(), 5000)) as VSCodeVariable;
+                    if (prop.Info.Expandable)
+                    {
+                        frame.RegisterVariable(prop);
+                    }
+                    return new EvaluateResponse()
+                    {
+                        Result = prop.Info.Value,
+                        Type = prop.Info.TypeName,
+                        VariablesReference = prop.Info.Expandable ? prop.GetHashCode() : 0
+                    };
+                }
+            }
+            throw new ProtocolException($"Evaluation failed:{arguments.Expression}");
         }
 
         protected override SetExpressionResponse HandleSetExpressionRequest(SetExpressionArguments arguments)

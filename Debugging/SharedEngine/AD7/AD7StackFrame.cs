@@ -10,7 +10,7 @@ using ILRuntime.Runtime.Debugger.Expressions;
 
 namespace ILRuntimeDebugEngine.AD7
 {
-    class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2
+    class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2, IStackFrame
     {
         public AD7Engine Engine { get; private set; }
         public AD7Thread Thread { get; private set; }
@@ -21,6 +21,8 @@ namespace ILRuntimeDebugEngine.AD7
 
         public Dictionary<string, ILProperty> Properties { get { return propertyMapping; } }
 
+        public int ThreadID { get; private set; }
+
         private string _functionName;
 
         private readonly AD7DocumentContext docContext;
@@ -28,6 +30,9 @@ namespace ILRuntimeDebugEngine.AD7
         public AD7StackFrame(AD7Engine engine, AD7Thread thread, StackFrameInfo info, int index)
         {
             Engine = engine;
+            uint tId;
+            thread.GetThreadId(out tId);
+            ThreadID = (int)tId;
             this.Thread = thread;
             this.StackFrameInfo = info;
             Index = index;
@@ -189,6 +194,13 @@ namespace ILRuntimeDebugEngine.AD7
             frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUGINFO;
             frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             return frameInfo;
+        }
+
+        public IProperty GetPropertyByName(string name)
+        {
+            if (propertyMapping.TryGetValue(name, out var p))
+                return p;
+            return null;
         }
     }
 }

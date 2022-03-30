@@ -8,6 +8,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using ILRuntime.Runtime.Debugger;
 using ILRuntimeDebugEngine;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Ookii.CommandLine;
@@ -109,7 +110,11 @@ namespace ILRuntime.VSCode
                 Reason = ThreadEvent.ReasonValue.Exited,
                 ThreadId = ((VSCodeThread)t).Thread.Id
             }) ;
-            throw new NotImplementedException();
+        }
+
+        protected override IProperty CreateProperty(IStackFrame frame, VariableInfo info)
+        {
+            return new VSCodeVariable((VSCodeStackFrame)frame, info);
         }
     }
 }

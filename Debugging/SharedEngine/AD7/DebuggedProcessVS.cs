@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILRuntime.Runtime.Debugger;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
@@ -13,6 +14,12 @@ namespace ILRuntimeDebugEngine.AD7
             : base(host, port)
         {
             this.engine = engine;
+        }
+
+        protected override IProperty CreateProperty(IStackFrame frame, VariableInfo info)
+        {
+            return new ILProperty(engine, ((AD7StackFrame)frame).Thread, info, (AD7StackFrame)frame);
+               
         }
 
         protected override void HandleBreakpointHit(IBreakPoint bp, IThread bpThread)

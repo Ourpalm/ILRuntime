@@ -17,14 +17,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ILRuntime.VSCode
 {
-    class VSCodeVariable
+    class VSCodeVariable : IProperty
     {
         Variable variable;
         VariableInfo info;
         VSCodeStackFrame frame;
         public Variable Variable => variable;
 
-        public VSCodeVariable Parent { get; set; }
+        public IProperty Parent { get; set; }
+
+        public VariableInfo Info => info;
         public VariableReference[] Parameters { get; set; }
 
         public VSCodeVariable(VSCodeStackFrame frame, VariableInfo info)
@@ -55,7 +57,7 @@ namespace ILRuntime.VSCode
             if (info.Expandable)
                 variable.VariablesReference = GetHashCode();
             variable.EvaluateName = info.Name;
-            //variable.PresentationHint = hint;
+            variable.PresentationHint = hint;
 
         }
 
@@ -111,7 +113,7 @@ namespace ILRuntime.VSCode
             this.info = info;
             scope = new Scope();
             scope.Name = name.ToString();
-            //scope.PresentationHint = name;
+            scope.PresentationHint = name;
             scope.Source = frame.Source;
             if (span.IsValid)
             {
@@ -147,13 +149,15 @@ namespace ILRuntime.VSCode
             return null;
         }
     }
-    class VSCodeStackFrame
+    class VSCodeStackFrame: IStackFrame
     {
         StackFrameInfo info;
         VSCodeScope locals, args;
         StackFrame frame;
         VSCodeThread thread;
         Dictionary<int, VSCodeVariable> variableMapping = new Dictionary<int, VSCodeVariable>();
+        Dictionary<string, IProperty> propertyMapping = new Dictionary<string, IProperty>();
+
         public StackFrame Frame => frame;
         public VSCodeScope LocalVariables => locals;
 
@@ -164,6 +168,9 @@ namespace ILRuntime.VSCode
         public VSCodeThread Thread => thread;
 
         public int Index { get; private set; }
+
+        public int ThreadID => thread.ThreadID;
+
         public VSCodeStackFrame(StackFrameInfo info, VSCodeThread thread, int index)
         {
             this.info = info;
@@ -206,6 +213,11 @@ namespace ILRuntime.VSCode
             }
             args = new VSCodeScope(this, frame, Scope.PresentationHintValue.Arguments, info.ArgumentCount, 0, span);
             locals = new VSCodeScope(this, frame, Scope.PresentationHintValue.Locals, info.LocalVariables != null ? info.LocalVariables.Length - info.ArgumentCount : 0, info.ArgumentCount, span);
+
+            foreach (var i in args.Variables)
+                propertyMapping[i.Variable.Name] = i;
+            foreach (var i in locals.Variables)
+                propertyMapping[i.Variable.Name] = i;
         }
         protected T GetParentMethod<T>(SyntaxNode node) where T : SyntaxNode
         {
@@ -231,6 +243,12 @@ namespace ILRuntime.VSCode
                 variableMapping.TryGetValue(id, out res);
 
             return res;
+        }
+        public IProperty GetPropertyByName(string name)
+        {
+            if (propertyMapping.TryGetValue(name, out var p))
+                return p;
+            return null;
         }
     }
     class VSCodeThread : IThread
