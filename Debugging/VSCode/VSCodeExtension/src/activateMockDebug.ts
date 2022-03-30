@@ -11,8 +11,9 @@ import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
 import { MockDebugSession } from './mockDebug';
 import { FileAccessor } from './mockRuntime';
-import { ServerInfo } from './extension';
+import { ServerInfo, currentSession } from './extension';
 import * as path from 'path';
+import { promises } from 'dns';
 
 let extensionPath:string;
 function getExtensionFilePath(extensionfile: string): string {
@@ -65,6 +66,31 @@ function buildInstanceEntries(servers : Map<string, ServerInfo>) : InstanceEntry
 		servers.delete(value);
 	});
 	return res;
+}
+
+class InlineValueRequest
+{
+	documentName : string;
+	line: number;
+	character: number;
+
+	constructor(file : string, line :number, character : number){
+		this.documentName = file;
+		this.line = line;
+		this.character = character;
+	}
+}
+
+class InlineValue{
+	name : string | undefined;
+	line :number = 0;
+	endLine:number = 0;
+	column:number = 0;
+	endColumn:number=0;
+}
+
+class InlineValueResponse{
+	variables : InlineValue[] | undefined;
 }
 
 export function activateMockDebug(context: vscode.ExtensionContext, servers : Map<string, ServerInfo>, factory?: vscode.DebugAdapterDescriptorFactory) {
@@ -175,55 +201,27 @@ export function activateMockDebug(context: vscode.ExtensionContext, servers : Ma
 		context.subscriptions.push(factory);
 	}
 
-	// override VS Code's default implementation of the debug hover
-	// here we match only Mock "variables", that are words starting with an '$'
-	context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('csharp', {
-		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
-
-			const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/ig;
-			const line = document.lineAt(position.line).text;
-
-			let m: RegExpExecArray | null;
-			while (m = VARIABLE_REGEXP.exec(line)) {
-				const varRange = new vscode.Range(position.line, m.index, position.line, m.index + m[0].length);
-
-				if (varRange.contains(position)) {
-					return new vscode.EvaluatableExpression(varRange);
-				}
-			}
-			return undefined;
-		}
-	}));
-
 	// override VS Code's default implementation of the "inline values" feature"
 	context.subscriptions.push(vscode.languages.registerInlineValuesProvider('csharp', {
 
 		provideInlineValues(document: vscode.TextDocument, viewport: vscode.Range, context: vscode.InlineValueContext) : vscode.ProviderResult<vscode.InlineValue[]> {
 
-			const allValues: vscode.InlineValue[] = [];
+			let req : InlineValueRequest = new  InlineValueRequest(document.fileName, context.stoppedLocation.end.line, context.stoppedLocation.end.character);
+			let vars = currentSession.customRequest("inlineVariables", req) as Thenable<InlineValueResponse>;
+			let result : Thenable<vscode.InlineValue[]> = new Promise<vscode.InlineValue[]>((resolve, reject)=>{
+				vars.then((response)=>{
+					let allValues: vscode.InlineValue[] = new Array<vscode.InlineValue>();
+					response.variables?.forEach((val,index,arr)=>{
+						let varRange = new vscode.Range(val.line, val.column, val.endLine, val.endColumn);
+						allValues.push(new vscode.InlineValueVariableLookup(varRange, val.name, true));
+					});
+					resolve(allValues);
+				},()=>{
+					reject();
+				});
+			});
 
-			for (let l = viewport.start.line; l <= context.stoppedLocation.end.line; l++) {
-				const line = document.lineAt(l);
-				var regExp = /\$([a-z][a-z0-9]*)/ig;	// variables are words starting with '$'
-				do {
-					var m = regExp.exec(line.text);
-					if (m) {
-						const varName = m[1];
-						const varRange = new vscode.Range(l, m.index, l, m.index + varName.length);
-
-						// some literal text
-						//allValues.push(new vscode.InlineValueText(varRange, `${varName}: ${viewport.start.line}`));
-
-						// value found via variable lookup
-						allValues.push(new vscode.InlineValueVariableLookup(varRange, varName, false));
-
-						// value determined via expression evaluation
-						//allValues.push(new vscode.InlineValueEvaluatableExpression(varRange, varName));
-					}
-				} while (m);
-			}
-
-			return allValues;
+			return result;
 		}
 	}));
 }

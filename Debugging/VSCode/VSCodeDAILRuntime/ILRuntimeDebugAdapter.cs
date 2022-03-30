@@ -11,6 +11,10 @@ using System.Text;
 using System.Threading;
 using ILRuntime.Runtime.Debugger;
 using ILRuntimeDebugEngine;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Serialization;
@@ -55,11 +59,10 @@ namespace ILRuntime.VSCode
             if (arguments.LinesStartAt1 == true)
                 this.clientsFirstLine = 1;
 
-            this.Protocol.SendEvent(new InitializedEvent());
             var res = new InitializeResponse()
             {
                 SupportsConfigurationDoneRequest = true,
-                SupportsSetVariable = false,
+                SupportsSetVariable = true,
                 SupportsConditionalBreakpoints = true,
                 SupportsDebuggerProperties = true,
                 SupportsSetExpression = true,
@@ -85,8 +88,132 @@ namespace ILRuntime.VSCode
 
         #region Launch
 
+        class InlineVariableArguments
+        {
+            [JsonProperty("documentName")]
+            public string DocumentName { get; set; }
+            [JsonProperty("line")]
+            public int Line { get; set; }
+            [JsonProperty("character")]
+            public int Character { get; set; }
+        }
+
+        class InlineVariableResponse : ResponseBody
+        {
+            [JsonProperty("variables")] 
+            public List<InlineVaiable> Variables { get; set; }
+        }
+
+        class InlineVaiable
+        {
+            [JsonProperty("name")]
+            public string Name { get; set; }
+            [JsonProperty("line")]
+            public int Line { get; set; }
+            [JsonProperty("endLine")]
+            public int EndLine { get; set; }
+            [JsonProperty("column")]
+            public int Column { get; set; }
+            [JsonProperty("endColumn")]
+            public int EndColumn { get; set; }
+
+            public static InlineVaiable FromIdentifier(SyntaxToken identifier)
+            {
+                var span = identifier.SyntaxTree.GetLineSpan(identifier.Span);
+                InlineVaiable res = new InlineVaiable()
+                {
+                    Name = identifier.Text,
+                    Line = span.StartLinePosition.Line,
+                    Column = span.StartLinePosition.Character,
+                    EndLine = span.EndLinePosition.Line,
+                    EndColumn = span.EndLinePosition.Character
+                };
+                return res;
+            }
+        }
+        class InlineVairaleRequest : DebugRequest<InlineVariableArguments>
+        {
+            public InlineVairaleRequest() : base("inlineVariables")
+            {
+            }
+        }
+
+        void HandleInlineVariable(IRequestResponder<InlineVariableArguments> handler)
+        {
+            List<InlineVaiable> res = new List<InlineVaiable>();
+            var DocumentName = handler.Arguments.DocumentName;
+            try
+            {
+                if (File.Exists(DocumentName))
+                {
+                    using (var stream = File.OpenRead(DocumentName))
+                    {
+                        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: DocumentName);
+                        TextLine textLine = syntaxTree.GetText().Lines[handler.Arguments.Line];
+                        Location location = syntaxTree.GetLocation(textLine.Span);
+                        SyntaxTree sourceTree = location.SourceTree;
+                        SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
+
+                        bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
+                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
+                        if (method == null)
+                        {
+                            method = GetParentMethod<ConstructorDeclarationSyntax>(node.Parent);
+                        }
+
+                        foreach (var i in method.ParameterList.Parameters)
+                        {
+                            var span = syntaxTree.GetLineSpan(i.Identifier.Span);
+                            res.Add(InlineVaiable.FromIdentifier(i.Identifier));
+                        }
+
+                        foreach(var i in method.Body.Statements)
+                        {
+                            if(i is LocalDeclarationStatementSyntax local)
+                            {
+                                foreach(var j in local.Declaration.Variables)
+                                {
+                                    res.Add(InlineVaiable.FromIdentifier(j.Identifier));
+                                }
+                            }
+                            if(i is ForStatementSyntax fore)
+                            {
+                                foreach (var j in fore.Declaration.Variables)
+                                {
+                                    res.Add(InlineVaiable.FromIdentifier(j.Identifier));
+                                }
+                            }
+                            if(i is ForEachStatementSyntax fore2)
+                            {
+                                
+                            }
+                        }
+                    }
+                }
+                handler.SetResponse(new InlineVariableResponse()
+                {
+                    Variables = res
+                });
+            }
+            catch (Exception ex)
+            {
+                handler.SetError(new ProtocolException(ex.ToString()));
+            }
+        }
+        protected T GetParentMethod<T>(SyntaxNode node) where T : SyntaxNode
+        {
+            if (node == null)
+                return null;
+
+            if (node is T)
+                return node as T;
+            return GetParentMethod<T>(node.Parent);
+        }
+
         protected override LaunchResponse HandleLaunchRequest(LaunchArguments arguments)
         {
+            Protocol.RegisterRequestType<InlineVairaleRequest, InlineVariableArguments>(HandleInlineVariable);
+            this.Protocol.SendEvent(new InitializedEvent());
             Protocol.SendEvent(new OutputEvent("Launching..."));
             string address = arguments.ConfigurationProperties.GetValueAsString("address");
             if (String.IsNullOrEmpty(address))
@@ -199,16 +326,6 @@ namespace ILRuntime.VSCode
 
         #region Debug Thread
 
-        private void RequestStop(StoppedEvent.ReasonValue reason, int threadId = 0)
-        {
-            lock (this.syncObject)
-            {
-                this.stopReason = reason;
-                this.stopThreadId = threadId;
-                this.runEvent.Reset();
-            }
-        }
-
         public void SendOutput(string message, bool isError = false)
         {
             string outputText = !String.IsNullOrEmpty(message) ? message.Trim() : String.Empty;
@@ -319,7 +436,7 @@ namespace ILRuntime.VSCode
                 if (frame != null)
                 {
                     ScopesResponse res = new ScopesResponse();
-                    res.Scopes = new List<Scope>() { frame.Arguments.Scope, frame.LocalVariables.Scope };
+                    res.Scopes = new List<Scope>() { frame.LocalVariables.Scope, frame.Arguments.Scope };
                     return res;
                 }
             }
@@ -370,6 +487,7 @@ namespace ILRuntime.VSCode
                     return new VariablesResponse(res);
                 }
             }
+            
             return new VariablesResponse();
         }
 
@@ -387,7 +505,6 @@ namespace ILRuntime.VSCode
         {
             throw new ProtocolException("Not Implemented");
         }
-
         #endregion
 
         #region Modules

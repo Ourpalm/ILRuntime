@@ -24,6 +24,7 @@ import { platform } from 'process';
 import { ProviderResult } from 'vscode';
 import { MockDebugSession } from './mockDebug';
 import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
+import { DebugSession } from '@vscode/debugadapter';
 
 /*
  * The compile time flag 'runMode' controls how the debug adapter is run.
@@ -138,7 +139,7 @@ export function deactivate() {
 	}
 	activeServers.clear();	
 }
-
+export let currentSession : vscode.DebugSession;
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
 
 	// The following use of a DebugAdapter factory shows how to control what debug adapter executable is used.
@@ -146,7 +147,7 @@ class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFact
 
 	createDebugAdapterDescriptor(_session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): ProviderResult<vscode.DebugAdapterDescriptor> {
 		// param "executable" contains the executable optionally specified in the package.json (if any)
-
+		currentSession = _session;
 		// use the executable specified in the package.json if it exists or determine it based on some other information (e.g. the session)
 		if (!executable) {
 			const command = "absolute path to my DA executable";

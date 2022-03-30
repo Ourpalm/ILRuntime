@@ -55,7 +55,7 @@ namespace ILRuntime.VSCode
             if (info.Expandable)
                 variable.VariablesReference = GetHashCode();
             variable.EvaluateName = info.Name;
-            variable.PresentationHint = hint;
+            //variable.PresentationHint = hint;
 
         }
 
@@ -111,7 +111,7 @@ namespace ILRuntime.VSCode
             this.info = info;
             scope = new Scope();
             scope.Name = name.ToString();
-            scope.PresentationHint = name;
+            //scope.PresentationHint = name;
             scope.Source = frame.Source;
             if (span.IsValid)
             {
