@@ -160,50 +160,33 @@ namespace ILRuntime.VSCode
 
         protected override ContinueResponse HandleContinueRequest(ContinueArguments arguments)
         {
+            debugged.SendExecute(arguments.ThreadId);
             //this.Continue(step: false);
-            return new ContinueResponse();
+            return new ContinueResponse()
+            {
+                AllThreadsContinued = true
+            };
         }
 
         protected override StepInResponse HandleStepInRequest(StepInArguments arguments)
         {
-            //this.Continue(step: true);
+            debugged.SendStep(arguments.ThreadId, StepTypes.Into);
             return new StepInResponse();
         }
 
         protected override StepOutResponse HandleStepOutRequest(StepOutArguments arguments)
         {
             //this.Continue(step: true);
+            debugged.SendStep(arguments.ThreadId, StepTypes.Out);
+
             return new StepOutResponse();
         }
 
         protected override NextResponse HandleNextRequest(NextArguments arguments)
         {
+            debugged.SendStep(arguments.ThreadId, StepTypes.Over);
             //this.Continue(step: true);
             return new NextResponse();
-        }
-
-        /// <summary>
-        /// Continues "debugging". This will either step or run until the next breakpoint or until
-        /// the end of the file.
-        /// </summary>
-        private void Continue(bool step)
-        {
-            lock (this.syncObject)
-            {
-                // Reset all state before continuing
-                
-                if (step)
-                {
-                    this.stopReason = StoppedEvent.ReasonValue.Step;
-                }
-                else
-                {
-                    this.stopReason = null;
-                }
-            }
-
-            this.stopped = false;
-            this.runEvent.Set();
         }
 
         protected override PauseResponse HandlePauseRequest(PauseArguments arguments)
@@ -227,7 +210,7 @@ namespace ILRuntime.VSCode
             }
         }
 
-        private void SendOutput(string message, bool isError = false)
+        public void SendOutput(string message, bool isError = false)
         {
             string outputText = !String.IsNullOrEmpty(message) ? message.Trim() : String.Empty;
 
@@ -330,7 +313,18 @@ namespace ILRuntime.VSCode
 
         protected override ScopesResponse HandleScopesRequest(ScopesArguments arguments)
         {
-            throw new ProtocolException("Not Implemented");
+            foreach (var t in debugged.Threads)
+            {
+                var thread = t.Value as VSCodeThread;
+                var frame = thread.FindFrame(arguments.FrameId);
+                if (frame != null)
+                {
+                    ScopesResponse res = new ScopesResponse();
+                    res.Scopes = new List<Scope>() { frame.Arguments.Scope, frame.LocalVariables.Scope };
+                    return res;
+                }
+            }
+            throw new ProtocolException($"Cannot find stack frame:{arguments.FrameId}");
         }
 
         protected override StackTraceResponse HandleStackTraceRequest(StackTraceArguments arguments)
@@ -339,19 +333,9 @@ namespace ILRuntime.VSCode
             if(debugged.Threads.TryGetValue(arguments.ThreadId, out IThread t))
             {
                 var thread = t as VSCodeThread;
-                foreach(var i in thread.StackFrames)
+                foreach(var i in thread.VSCodeStackFrames)
                 {
-                    StackFrame frame = new StackFrame()
-                    {
-                        Name = i.MethodName,
-                        Source = new Source() { Name = Path.GetFileName(i.DocumentName), Path = i.DocumentName },
-                        Line = i.StartLine,
-                        EndLine = i.EndLine,
-                        Column = i.StartColumn,
-                        EndColumn = i.EndColumn,
-                        Id = i.GetHashCode()
-                    };
-                    result.Add(frame);
+                    result.Add(i.Frame);
                 }
             }
 
@@ -359,8 +343,23 @@ namespace ILRuntime.VSCode
         }
 
         protected override VariablesResponse HandleVariablesRequest(VariablesArguments arguments)
+
         {
-            throw new ProtocolException("Not Implemented");
+            foreach (var t in debugged.Threads)
+            {
+                var thread = t.Value as VSCodeThread;
+                var scope = thread.FindScope(arguments.VariablesReference);
+                if (scope != null)
+                {
+                    List<Variable> res = new List<Variable>();
+                    foreach(var i in scope.Variables)
+                    {
+                        res.Add(i.Variable);
+                    }
+                    return new VariablesResponse(res);
+                }
+            }
+            throw new ProtocolException($"Cannot find scope:{arguments.VariablesReference}");
         }
 
         protected override SetVariableResponse HandleSetVariableRequest(SetVariableArguments arguments)

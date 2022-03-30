@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Debugger
 #pragma warning disable
     public class DebuggerServer
     {
-        public const int Version = 3;
+        public const int Version = 4;
         private static readonly int currentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
         TcpListener listener;
         //HashSet<Session<T>> clients = new HashSet<Session<T>>();
@@ -585,6 +585,7 @@ namespace ILRuntime.Runtime.Debugger
                     bw.Write(j.StartColumn);
                     bw.Write(j.EndLine);
                     bw.Write(j.EndColumn);
+                    bw.Write(j.ArgumentCount);
                     bw.Write(j.LocalVariables.Length);
                     foreach (var k in j.LocalVariables)
                     {

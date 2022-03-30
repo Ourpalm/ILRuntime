@@ -37,8 +37,8 @@ namespace ILRuntime.VSCode
             bp.Column = column;
             this.condition = condition;
             DocumentName = source.Path;
-            StartLine = line;
-            StartColumn = column;
+            StartLine = line - 1;
+            StartColumn = column > 0 ? column - 1 : 0;
         }
         public override string ConditionExpression => condition;
 

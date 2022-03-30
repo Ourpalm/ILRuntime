@@ -245,6 +245,7 @@ namespace ILRuntimeDebugEngine
                     info.StartColumn = br.ReadInt32();
                     info.EndLine = br.ReadInt32();
                     info.EndColumn = br.ReadInt32();
+                    info.ArgumentCount = br.ReadInt32();
                     int vcnt = br.ReadInt32();
                     info.LocalVariables = new VariableInfo[vcnt];
                     for (int k = 0; k < vcnt; k++)

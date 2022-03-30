@@ -639,6 +639,7 @@ namespace ILRuntime.Runtime.Debugger
             int argumentCount = m.ParameterCount;
             if (m.HasThis)
                 argumentCount++;
+            info.ArgumentCount = argumentCount;
             info.LocalVariables = new VariableInfo[argumentCount + m.LocalVariableCount];
             for (int i = 0; i < argumentCount; i++)
             {

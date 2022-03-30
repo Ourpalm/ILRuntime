@@ -83,7 +83,12 @@ namespace ILRuntime.VSCode
 
         protected override void HandleStepCompelte(IThread bpThread)
         {
-            throw new NotImplementedException();
+            da.Protocol.SendEvent(new StoppedEvent()
+            {
+                AllThreadsStopped = true,
+                Reason = StoppedEvent.ReasonValue.Step,
+                ThreadId = bpThread.ThreadID,
+            });
         }
 
         protected override IThread HandleTheadStarted(int threadHash)
