@@ -164,6 +164,8 @@ namespace ILRuntime.VSCode
                         foreach (var i in method.ParameterList.Parameters)
                         {
                             var span = syntaxTree.GetLineSpan(i.Identifier.Span);
+                            if (span.StartLinePosition.Line > handler.Arguments.Line)
+                                continue;
                             res.Add(InlineVaiable.FromIdentifier(i.Identifier));
                         }
 
@@ -173,6 +175,9 @@ namespace ILRuntime.VSCode
                             {
                                 foreach(var j in local.Declaration.Variables)
                                 {
+                                    var span = syntaxTree.GetLineSpan(j.Identifier.Span);
+                                    if (span.StartLinePosition.Line > handler.Arguments.Line)
+                                        continue;
                                     res.Add(InlineVaiable.FromIdentifier(j.Identifier));
                                 }
                             }
@@ -180,6 +185,10 @@ namespace ILRuntime.VSCode
                             {
                                 foreach (var j in fore.Declaration.Variables)
                                 {
+                                    var span = syntaxTree.GetLineSpan(j.Identifier.Span);
+                                    if (span.StartLinePosition.Line > handler.Arguments.Line)
+                                        continue;
+
                                     res.Add(InlineVaiable.FromIdentifier(j.Identifier));
                                 }
                             }
