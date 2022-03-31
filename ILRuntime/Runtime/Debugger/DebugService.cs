@@ -10,8 +10,10 @@ using ILRuntime.Runtime.Stack;
 using ILRuntime.CLR.Utils;
 using ILRuntime.Runtime.Intepreter.RegisterVM;
 using ILRuntime.Runtime.Debugger.Protocol;
+#if ILRUNTIME_ENABLE_ROSYLN
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+#endif
 using System.Reflection;
 
 namespace ILRuntime.Runtime.Debugger
@@ -312,6 +314,7 @@ namespace ILRuntime.Runtime.Debugger
 
         private bool ParseBreakpointCondition(BreakpointInfo bpInfo, BreakpointCondition condition)
         {
+#if ILRUNTIME_ENABLE_ROSYLN
             bpInfo.Condition = new BreakpointConditionDetails { Style = condition.Style, Expression = condition.Expression };
 
             if (condition.Style == BreakpointConditionStyle.None)
@@ -328,6 +331,7 @@ namespace ILRuntime.Runtime.Debugger
                 return false;
             }
             bpInfo.Condition.ExpressionSyntax = expressionStatementSyntax.Expression;
+#endif
             return true;
         }
 

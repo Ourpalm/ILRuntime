@@ -1,4 +1,5 @@
-﻿using ILRuntime.CLR.Method;
+﻿#if ILRUNTIME_ENABLE_ROSYLN
+using ILRuntime.CLR.Method;
 using ILRuntime.CLR.Utils;
 using ILRuntime.Reflection;
 using ILRuntime.Runtime.Debugger.Protocol;
@@ -468,3 +469,4 @@ namespace ILRuntime.Runtime.Debugger
         }
     }
 }
+#endif

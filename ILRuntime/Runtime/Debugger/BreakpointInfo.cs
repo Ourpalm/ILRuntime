@@ -1,6 +1,8 @@
 ﻿using ILRuntime.Runtime.Debugger.Protocol;
 using ILRuntime.Runtime.Intepreter;
+#if ILRUNTIME_ENABLE_ROSYLN
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,7 @@ namespace ILRuntime.Runtime.Debugger
 
         public bool CheckCondition(DebugService debugService, ILIntepreter intp, ref StackFrameInfo[] stackFrameInfos, ref string error)
         {
+#if ILRUNTIME_ENABLE_ROSYLN
             if (Condition == null || Condition.Style == BreakpointConditionStyle.None)
                 return true;
             if (Condition.ExpressionError)
@@ -47,13 +50,16 @@ namespace ILRuntime.Runtime.Debugger
             {
                 debugService.UsingInfosContext = null;
             }
+#endif
             return true;
         }
     }
 
     public class BreakpointConditionDetails : BreakpointCondition
     {
+#if ILRUNTIME_ENABLE_ROSYLN
         public ExpressionSyntax ExpressionSyntax { get; set; }
+#endif
         public bool ExpressionError { get; set; }
         public Exception Exception { get; set; }
     }
