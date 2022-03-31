@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>ILRuntime.VSCode</RootNamespace>
+    <StartupObject>ILRuntime.VSCode.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Shared.VSCodeDebugProtocol" Version="17.0.60104.1" />
+    <PackageReference Include="Ookii.CommandLine" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ILRuntime\ILRuntime.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\SharedDebuggerCommon\SharedDebuggerCommon.projitems" Label="Shared" />
+
+</Project>

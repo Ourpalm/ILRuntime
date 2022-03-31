@@ -19,6 +19,7 @@ namespace ILRuntimeDebuggerLauncher
     {
         private static SocketAsyncEventArgs socketAsyncEventArgs;
         private static byte[] buffer = new byte[64 * 1024];
+        private static byte[] stringBuffer = new byte[1024];
         private static MemoryStream bufferStream;
         private static BinaryReader bufferReader;
         private static System.Threading.Timer checkRemoteDebugersHealthyTimer;
@@ -101,6 +102,14 @@ namespace ILRuntimeDebuggerLauncher
         }
 
         private static ConcurrentDictionary<Tuple<string, int>, RemoteDebuggerInfo> remoteDebuggerInfoList = new ConcurrentDictionary<Tuple<string, int>, RemoteDebuggerInfo>();
+        
+        static string ReadUTF8String(BinaryReader br)
+        {
+            int len = br.ReadInt16();
+            br.Read(stringBuffer, 0, len);
+            return Encoding.UTF8.GetString(stringBuffer, 0, len);
+        }
+
         private static void SocketAsyncEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
             try
@@ -108,8 +117,8 @@ namespace ILRuntimeDebuggerLauncher
                 if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
                 {
                     bufferStream.Position = 0;
-                    var projectName = bufferReader.ReadString();
-                    var machineName = bufferReader.ReadString();
+                    var projectName = ReadUTF8String(bufferReader);
+                    var machineName = ReadUTF8String(bufferReader);
                     var processId = bufferReader.ReadInt32();
                     var port = bufferReader.ReadInt32();
                     var ip = ((IPEndPoint)e.RemoteEndPoint).Address.ToString();

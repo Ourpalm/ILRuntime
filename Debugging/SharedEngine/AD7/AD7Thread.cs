@@ -9,7 +9,7 @@ using ILRuntime.Runtime.Debugger;
 
 namespace ILRuntimeDebugEngine.AD7
 {
-    class AD7Thread : IDebugThread2
+    class AD7Thread : IDebugThread2, IThread
     {
         private readonly AD7Engine _engine;
         private string _threadName = "ILRuntime Thread";
@@ -28,7 +28,9 @@ namespace ILRuntimeDebugEngine.AD7
                 }
             }
         }
-       
+
+        public int ThreadID => threadHash;
+
         public AD7Thread(AD7Engine engine, int threadHash)//ThreadMirror threadMirror)
         {
             _engine = engine;

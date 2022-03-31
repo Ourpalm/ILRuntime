@@ -639,6 +639,7 @@ namespace ILRuntime.Runtime.Debugger
             int argumentCount = m.ParameterCount;
             if (m.HasThis)
                 argumentCount++;
+            info.ArgumentCount = argumentCount;
             info.LocalVariables = new VariableInfo[argumentCount + m.LocalVariableCount];
             for (int i = 0; i < argumentCount; i++)
             {
@@ -669,7 +670,7 @@ namespace ILRuntime.Runtime.Debugger
                 vinfo.Address = (long)val;
                 vinfo.Name = name;
                 vinfo.TypeName = typeName;
-                vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
+                vinfo.Expandable = GetValueExpandable(intp, val, intp.Stack.ManagedStack);
                 vinfo.ValueObjType = vType.ReflectionType;
 
                 info.LocalVariables[i] = vinfo;
@@ -689,7 +690,7 @@ namespace ILRuntime.Runtime.Debugger
                 vinfo.Address = (long)val;
                 vinfo.Name = name;
                 vinfo.TypeName = lv.VariableType.FullName;
-                vinfo.Expandable = GetValueExpandable(val, intp.Stack.ManagedStack);
+                vinfo.Expandable = GetValueExpandable(intp, val, intp.Stack.ManagedStack);
                 vinfo.ValueObjType = type.ReflectionType;
                 info.LocalVariables[i] = vinfo;
             }
@@ -1549,13 +1550,19 @@ namespace ILRuntime.Runtime.Debugger
             return true;
         }
 
-        unsafe bool GetValueExpandable(StackObject* esp, IList<object> mStack)
+        unsafe bool GetValueExpandable(ILIntepreter intp, StackObject* esp, IList<object> mStack)
         {
-            if (esp->ObjectType < ObjectTypes.Object)
+            if (esp->ObjectType < ObjectTypes.ValueTypeObjectReference)
                 return false;
             else
             {
-                var obj = mStack[esp->Value];
+                object obj;
+                if(esp->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                {
+                    obj = StackObject.ToObject(esp, intp.AppDomain, mStack);   
+                }
+                else
+                    obj = mStack[esp->Value];
                 if (obj == null)
                     return false;
                 if (obj is ILTypeInstance)

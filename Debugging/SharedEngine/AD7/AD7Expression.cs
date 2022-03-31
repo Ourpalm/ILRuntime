@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Debugger.Interop;
+﻿using Microsoft.VisualStudio.Debugger.Interop;
 
 using ILRuntime.Runtime.Debugger;
-using ILRuntimeDebugEngine.Expressions;
+using ILRuntime.Runtime.Debugger.Expressions;
 
 namespace ILRuntimeDebugEngine.AD7
 {
@@ -52,7 +47,7 @@ namespace ILRuntimeDebugEngine.AD7
             }
             else
             {
-                property = Resolve(exp, dwTimeout);
+                property = frame.Engine.DebuggedProcess.Resolve(frame, exp, dwTimeout) as ILProperty;
                 ppResult = property;
                 if (property != null)
                 {
@@ -64,191 +59,6 @@ namespace ILRuntimeDebugEngine.AD7
                     return Constants.E_FAIL;
             }
         }
-
-        ILProperty Resolve(EvalExpression exp, uint dwTimeout)
-        {
-            if (exp != null)
-            {
-                if (exp is NameExpression)
-                {
-                    return ResolveNameExpression((NameExpression)exp, dwTimeout);
-                }
-                if (exp is MemberAcessExpression)
-                {
-                    return ResolveMemberAccessExpression((MemberAcessExpression)exp, dwTimeout);
-                }
-                if (exp is IndexAccessExpression)
-                {
-                    return ResolveIndexAccessExpression((IndexAccessExpression)exp, dwTimeout);
-                }
-            }
-            return null;
-        }
-
-        ILProperty ResolveNameExpression(NameExpression exp, uint dwTimeout)
-        {
-            ILProperty res = null;
-            if (frame.Properties.TryGetValue(exp.Content, out res))
-                return res;
-            uint threadHash;
-            frame.Thread.GetThreadId(out threadHash);
-
-            if (exp.IsRoot)
-            {
-                var info = frame.Engine.DebuggedProcess.ResolveVariable(null, exp.Content, (int)threadHash, frame.Index, dwTimeout);
-                if (info == null)
-                {
-                    info = new VariableInfo();
-                    info.Name = exp.Content;
-                    info.Value = "null";
-                    info.TypeName = "null";
-                }
-                res = new AD7.ILProperty(frame.Engine, frame.Thread, info, frame);
-            }
-            else
-            {
-                var info = VariableInfo.FromObject(null);
-                info.Type = VariableTypes.FieldReference;
-                info.Name = exp.Content;
-                res = new ILProperty(frame.Engine, frame.Thread, info, frame);
-            }
-            return res;
-        }
-
-        ILProperty ResolveMemberAccessExpression(MemberAcessExpression exp, uint dwTimeout)
-        {
-            ILProperty body = Resolve(exp.Body, dwTimeout);
-            string member = exp.Member;
-            ILProperty prop;
-            if (body != null)
-            {
-                if (!body.Children.TryGetValue(member, out prop))
-                {
-                    VariableReference reference = body.GetVariableReference();
-                    if (reference != null)
-                    {
-                        uint threadHash;
-                        frame.Thread.GetThreadId(out threadHash);
-
-                        if (reference.Type < VariableTypes.Error)
-                        {
-                            if (exp.IsRoot)
-                            {
-                                var info = frame.Engine.DebuggedProcess.ResolveVariable(reference, member, (int)threadHash, frame.Index, dwTimeout);
-                                prop = new AD7.ILProperty(frame.Engine, frame.Thread, info, frame);
-                                prop.Parent = body;
-                                body.Children[member] = prop;
-                            }
-                            else
-                            {
-                                var info = VariableInfo.FromObject(null);
-                                info.Type = VariableTypes.FieldReference;
-                                info.Name = member;
-                                prop = new ILProperty(frame.Engine, frame.Thread, info, frame);
-                                prop.Parent = body;
-                            }
-                        }
-                        else if (reference.Type == VariableTypes.NotFound)
-                        {
-                            if (exp.IsRoot)
-                            {
-                                var info = frame.Engine.DebuggedProcess.ResolveVariable(null, reference.Name + "." + member, (int)threadHash, frame.Index, dwTimeout);
-                                prop = new AD7.ILProperty(frame.Engine, frame.Thread, info, frame);
-                            }
-                            else
-                            {
-                                var info = VariableInfo.FromObject(null);
-                                info.Type = VariableTypes.FieldReference;
-                                info.Name = reference.Name + "." + member;
-                                prop = new ILProperty(frame.Engine, frame.Thread, info, frame);
-                            }
-                        }
-
-                    }
-                }
-            }
-            else
-                prop = new ILProperty(frame.Engine, frame.Thread, VariableInfo.NullReferenceExeption, frame);
-            return prop;
-        }
-
-        ILProperty ResolveIndexAccessExpression(IndexAccessExpression exp, uint dwTimeout)
-        {
-            ILProperty body = Resolve(exp.Body, dwTimeout);
-            ILProperty prop = null;
-            if (body != null)
-            {
-                VariableReference reference = body.GetVariableReference();
-                if (reference != null)
-                {
-                    uint threadHash;
-                    frame.Thread.GetThreadId(out threadHash);
-
-                    if (reference.Type < VariableTypes.Error)
-                    {
-                        var idxExp = exp.Index;
-                        VariableReference idx = null;
-                        if (idxExp is NameExpression)
-                        {
-                            int idxInt;
-                            var content = ((NameExpression)idxExp).Content;
-                            if (content == "true")
-                            {
-                                idx = VariableReference.True;
-                            }
-                            else if (content == "false")
-                            {
-                                idx = VariableReference.False;
-                            }
-                            else if (content == "null")
-                            {
-                                idx = VariableReference.Null;
-                            }
-                            else if (int.TryParse(content, out idxInt))
-                            {
-                                idx = VariableReference.GetInteger(idxInt);
-                            }
-                            else
-                            {
-                                var info = ResolveNameExpression((NameExpression)idxExp, dwTimeout);
-                                idx = info.GetVariableReference();
-                            }
-                        }
-                        else if (idxExp is StringLiteralExpression)
-                        {
-                            idx = VariableReference.GetString(((StringLiteralExpression)idxExp).Content);
-                        }
-                        else
-                        {
-                            var info = Resolve(idxExp, dwTimeout);
-                            idx = info.GetVariableReference();
-                        }
-                        if (idx != null && idx.Type < VariableTypes.Error)
-                        {
-                            if (exp.IsRoot)
-                            {
-                                var info = frame.Engine.DebuggedProcess.ResolveIndexAccess(reference, idx, (int)threadHash, frame.Index, dwTimeout);
-                                prop = new AD7.ILProperty(frame.Engine, frame.Thread, info, frame);
-                                prop.Parent = body;
-                                prop.Parameters = new VariableReference[] { idx };
-                            }
-                            else
-                            {
-                                var info = VariableInfo.FromObject(null);
-                                info.Type = VariableTypes.IndexAccess;
-                                prop = new ILProperty(frame.Engine, frame.Thread, info, frame);
-                                prop.Parent = body;
-                                prop.Parameters = new VariableReference[] { idx };
-                            }
-                        }
-                    }
-                }
-            }
-            else
-                prop = new ILProperty(frame.Engine, frame.Thread, VariableInfo.NullReferenceExeption, frame);
-            return prop;
-        }
-
         /*public void DoResolve()
         {
             string member = names[curIdx];

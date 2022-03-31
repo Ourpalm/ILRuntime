@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ILRuntimeDebugEngine.Expressions
+namespace ILRuntime.Runtime.Debugger.Expressions
 {
-    class Parser
+    public class Parser
     {
         Lexer lexer;
-        public Parser(Lexer lexer)
+        public Parser(string exp)
         {
-            this.lexer = lexer;
+            this.lexer = new Lexer(exp);
         }
 
         public EvalExpression Parse()

@@ -15,7 +15,7 @@ namespace ILRuntime.Runtime.Debugger
 #pragma warning disable
     public class DebuggerServer
     {
-        public const int Version = 3;
+        public const int Version = 4;
         private static readonly int currentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
         TcpListener listener;
         //HashSet<Session<T>> clients = new HashSet<Session<T>>();
@@ -85,6 +85,14 @@ namespace ILRuntime.Runtime.Debugger
             return null;
         }
 
+        byte[] stringBuffer = new byte[1024];
+        void WriteUTF8String(BinaryWriter bw, string val)
+        {
+            var length = Encoding.UTF8.GetBytes(val, 0, Math.Min(val.Length, 256), stringBuffer, 0);
+            bw.Write((short)length);
+            bw.Write(stringBuffer, 0, length);
+        }
+
         public virtual void Stop()
         {
             isUp = false;
@@ -119,8 +127,8 @@ namespace ILRuntime.Runtime.Debugger
                         if ((now - udpSendTime).TotalSeconds >= 0.5)
                         {
                             sendStreamForUdp.Position = 0;
-                            bwForUdp.Write(GetProjectNameFunction != null ? GetProjectNameFunction() : "");
-                            bwForUdp.Write(System.Environment.MachineName);
+                            WriteUTF8String(bwForUdp, GetProjectNameFunction != null ? GetProjectNameFunction() : "");
+                            WriteUTF8String(bwForUdp, System.Environment.MachineName != null ? System.Environment.MachineName : "");
                             bwForUdp.Write(currentProcessId);
                             bwForUdp.Write(tcpListenerPort);
                             udpSocket.SendTo(sendStreamForUdp.GetBuffer(), (int)sendStreamForUdp.Position, SocketFlags.None, boardcastEndPoint);
@@ -577,6 +585,7 @@ namespace ILRuntime.Runtime.Debugger
                     bw.Write(j.StartColumn);
                     bw.Write(j.EndLine);
                     bw.Write(j.EndColumn);
+                    bw.Write(j.ArgumentCount);
                     bw.Write(j.LocalVariables.Length);
                     foreach (var k in j.LocalVariables)
                     {

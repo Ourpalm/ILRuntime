@@ -39,7 +39,8 @@ namespace ILRuntimeTest.TestBase
                 _app = new ILRuntime.Runtime.Enviorment.AppDomain(useRegister ? ILRuntime.Runtime.ILRuntimeJITFlags.JITImmediately : ILRuntime.Runtime.ILRuntimeJITFlags.None);
                 try
                 {
-                    _app.DebugService.StartDebugService(56000, false);
+                    ILRuntime.Runtime.Debugger.DebuggerServer.GetProjectNameFunction = () => "ILRuntimeTest";
+                    _app.DebugService.StartDebugService(56000);
                 }
                 catch { }
                 fs2 = new System.IO.FileStream(pdbPath, FileMode.Open);

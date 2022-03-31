@@ -8,17 +8,19 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using ILRuntime.Runtime.Debugger;
 namespace ILRuntimeDebugEngine.AD7
 {
-    class ILProperty : IDebugProperty2
+    class ILProperty : IDebugProperty2, IProperty
     {
         AD7Engine engine;
         AD7Thread thread;
         AD7StackFrame frame;
         VariableInfo info;
-        Dictionary<string, ILProperty> children = new Dictionary<string, ILProperty>();
+        Dictionary<string, IProperty> children = new Dictionary<string, IProperty>();
 
-        public Dictionary<string, ILProperty> Children { get { return children; } }
-        public ILProperty Parent { get; set; }
+        public Dictionary<string, IProperty> Children { get { return children; } }
+        public IProperty Parent { get; set; }
         public VariableReference[] Parameters { get; set; }
+
+        public VariableInfo Info => info;
         public string Name { get { return info.Name; } set { info.Name = value; } }
 
         public string FullName
@@ -31,9 +33,9 @@ namespace ILRuntimeDebugEngine.AD7
                     {
                         case VariableTypes.FieldReference:
                         case VariableTypes.PropertyReference:
-                            return string.Format("{0}.{1}", Parent.FullName, Name);
+                            return string.Format("{0}.{1}", ((ILProperty)Parent).FullName, Name);
                         case VariableTypes.IndexAccess:
-                            return string.Format("{0}[{1}]", Parent.FullName, Parameters[0].FullName);
+                            return string.Format("{0}[{1}]", ((ILProperty)Parent).FullName, Parameters[0].FullName);
                         case VariableTypes.Error:
                         case VariableTypes.NotFound:
                         case VariableTypes.Timeout:
@@ -112,7 +114,7 @@ namespace ILRuntimeDebugEngine.AD7
 
         public int GetParent(out IDebugProperty2 ppParent)
         {
-            ppParent = Parent;
+            ppParent = Parent as IDebugProperty2;
             return Constants.S_OK;
         }
 
