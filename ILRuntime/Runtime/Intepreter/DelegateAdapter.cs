@@ -1112,14 +1112,14 @@ namespace ILRuntime.Runtime.Intepreter
                             for (int i = 0; i < im.ParameterCount; i++)
                             {
                                 var index = method.IsExtend ? i + 1 : i;
-                                if (type.IsGenericInstance)
+                                /*if (type.IsGenericInstance)
                                 {
                                     if (method.Parameters[index] != type.GenericArguments[i].Value)
                                     {
                                         return false;
                                     }
                                 }
-                                else
+                                else*/
                                 {
                                     if (im.Parameters[i] != method.Parameters[index])
                                         return false;

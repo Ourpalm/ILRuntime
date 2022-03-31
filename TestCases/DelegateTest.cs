@@ -637,5 +637,18 @@ namespace TestCases
                 action.DynamicInvoke(new B());
             }
         }
+        public static void DelegateTest41()
+        {
+            BindableProperty<long> t = new BindableProperty<long>(10000);
+            t.OnChangeWithOldVal += Message;
+            t.Value = 1234;
+        }
+
+        static void Message<T>(T oldVal, T newVal)
+        {
+            Console.WriteLine(typeof(T));
+            Console.WriteLine(oldVal);
+            Console.WriteLine(newVal);
+        }
     }
 }
