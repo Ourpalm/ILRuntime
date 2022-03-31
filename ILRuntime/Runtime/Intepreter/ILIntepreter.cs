@@ -4561,7 +4561,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     ILRuntimeException ire = (ILRuntimeException)ex;
                                     var inner = ire.InnerException;
                                     inner.Data["ThisInfo"] = ire.ThisInfo;
-                                    inner.Data["StackTrace"] = ire.StackTrace;
+                                    inner.Data["StackTrace"] = inner.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", ire.StackTrace, inner.Data["StackTrace"]) : ire.StackTrace;
                                     inner.Data["LocalInfo"] = ire.LocalInfo;
                                     ex = inner;
                                 }
@@ -4572,7 +4572,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
                                     else
                                         ex.Data["ThisInfo"] = "";
-                                    ex.Data["StackTrace"] = debugger.GetStackTrace(this);
+                                    ex.Data["StackTrace"] = ex.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", debugger.GetStackTrace(this), ex.Data["StackTrace"]) : debugger.GetStackTrace(this);
                                     ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
                                 }
                                 //Clear call stack
