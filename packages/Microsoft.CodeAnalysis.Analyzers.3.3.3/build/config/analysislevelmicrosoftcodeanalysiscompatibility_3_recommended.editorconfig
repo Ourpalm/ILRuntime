@@ -1,0 +1,12 @@
+# NOTE: Requires **VS2019 16.7** or later
+
+# 'MicrosoftCodeAnalysisCompatibility' Rules from '3.0.0' release with 'Recommended' analysis mode
+# Description: 'MicrosoftCodeAnalysisCompatibility' Rules with enabled-by-default state from '3.0.0' release with 'Recommended' analysis mode. Rules that are first released in a version later than '3.0.0' are disabled.
+
+is_global = true
+
+global_level = -99
+
+
+# RS1009: Only internal implementations of this interface are allowed
+dotnet_diagnostic.RS1009.severity = warning
