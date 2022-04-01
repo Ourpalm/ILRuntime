@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>介绍 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li current">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -161,7 +172,7 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="ILRuntime"><a href="#ILRuntime" class="headerlink" title="ILRuntime"></a>ILRuntime</h2><p><a href="https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="license"></a> <a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/release-v1.6.7-blue.svg" alt="release"></a> <a href="https://github.com/Ourpalm/ILRuntime/pulls" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg" alt="PRs Welcome"></a></p>
+    <h2 id="ILRuntime"><a href="#ILRuntime" class="headerlink" title="ILRuntime"></a>ILRuntime</h2><p><a href="https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="license"></a> <a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/release-v2.0.2-blue.svg" alt="release"></a> <a href="https://github.com/Ourpalm/ILRuntime/pulls" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg" alt="PRs Welcome"></a></p>
 <p>ILRuntime项目为基于C#的平台（例如Unity）提供了一个<code>纯C#实现</code>，<code>快速</code>、<code>方便</code>且<code>可靠</code>的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新</p>
 <h3 id="ILRuntime的优势"><a href="#ILRuntime的优势" class="headerlink" title="ILRuntime的优势"></a>ILRuntime的优势</h3><p>同市面上的其他热更方案相比，ILRuntime主要有以下优点：</p>
 <ul>
@@ -172,6 +183,7 @@
 <li>支持跨域继承</li>
 <li>完整的泛型支持</li>
 <li>拥有Visual Studio的调试插件，可以实现真机源码级调试。支持Visual Studio 2015 Update3 以及Visual Studio 2017和Visual Studio 2019</li>
+<li>最新的2.0版引入的寄存器模式将数学运算性能进行了大幅优化</li>
 </ul>
 <h3 id="C-vs-Lua"><a href="#C-vs-Lua" class="headerlink" title="C# vs Lua"></a>C# vs Lua</h3><p>目前市面上主流的热更方案，主要分为Lua的实现和用C#的实现，两种实现方式各有各的优缺点。</p>
 <p>Lua是一个已经非常成熟的解决方案，但是对于Unity项目而言，也有非常明显的缺点。就是如果使用Lua来进行逻辑开发，就势必要求团队当中的人员需要同时对Lua和C#都特别熟悉，或者将团队中的人员分成C#小组和Lua小组。不管哪一种方案，对于中小型团队都是非常痛苦的一件事情。</p>
@@ -179,15 +191,17 @@
 <p>Lua的优势在于解决方案足够成熟，之前的C++团队可能比起C#，更加习惯使用Lua来进行逻辑开发。此外借助luajit，在某些情况下的执行效率会非常不错，但是luajit现在维护情况也不容乐观，官方还是推荐使用公版Lua来开发。</p>
 <blockquote>
 <p>如果需要测试ILRuntime对比Lua的性能Benchmark，需要确认以下几点：</p>
+</blockquote>
 <ul>
 <li>ILRuntime加载的dll文件是<code>Release</code>模式编译的</li>
 <li>dll中对外部API的调用都进行了<code>CLR绑定</code></li>
 <li>确保<code>没有勾选Development Build</code>的情况下发布成正式真机运行包，而<code>不是在Editor中直接运行</code></li>
+<li>可以直接使用Demo工程中提供的性能测试进行对比</li>
 </ul>
-</blockquote>
 <blockquote>
 <p>ILRuntime设计上为了在开发时提供更多的调试支持，在Unity Editor中运行会有很多额外的性能开销，<br>因此在Unity Editor中直接测试并不能代表ILRuntime的实际运行性能。</p>
 </blockquote>
+<p>最新2.0版本的ILRuntime，加入了<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/register-vm.html">寄存器模式</a>，在10多项测试用例当中的性能，均已超过lua53版xlua，详细测试代码可参见ILRuntime的<a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener">U3D Demo工程</a>以及<a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener">视频教程</a></p>
 
     <div class="footer">
         发现错误？想参与编辑？ 

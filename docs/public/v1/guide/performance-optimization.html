@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>ILRuntime的性能优化 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -172,11 +183,16 @@
 </blockquote>
 <h3 id="值类型"><a href="#值类型" class="headerlink" title="值类型"></a>值类型</h3><p>由于值类型的特殊和ILRuntime的实现原理，使用ILRuntime外部定义的值类型（例如UnityEngine.Vector3）在默认情况下会造成额外的装箱拆箱开销，以及相对应的GC Alloc内存分配。</p>
 <p>为了解决这个问题，ILRuntime在1.3.0版中增加了值类型绑定（ValueTypeBinding）机制，通过对这些值类型添加绑定器，可以大幅增加值类型的执行效率，以及避免GC Alloc内存分配。具体用法请参考ILRuntime的Unity3D示例工程或者ILRuntime的TestCases测试用例工程。</p>
-<h3 id="接口调用建议"><a href="#接口调用建议" class="headerlink" title="接口调用建议"></a>接口调用建议</h3><p>为了调用方便，ILRuntime的很多接口使用了params可变参数，但是有可能会无意间忽视这个操作带来的GCAlloc，例如下面的操作：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Initialize"</span>, <span class="literal">null</span>);</span><br><span class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Start"</span>, <span class="literal">null</span>, <span class="number">100</span>, <span class="number">200</span>);</span><br></pre></td></tr></table></figure></p>
-<p>这两个操作在调用的时候，会分别生成一个<code>object[0]</code>和<code>object[2]</code>，从而产生GC Alloc，这一点很容易被忽略。所以如果你需要在Update等性能关键的地方调用热更DLL中的方法，应该按照以下方式缓存这个参数数组：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">object</span>[] param0 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">object</span>[] param2 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">2</span>];</span><br><span class="line">IMethod m, m2;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"Update"</span>, <span class="number">0</span>);</span><br><span class="line">	m2 = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"SomethingAfterUpdate"</span>, <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    appdomain.Invoke(m, <span class="literal">null</span>, param0);</span><br><span class="line">	param2[<span class="number">0</span>] = <span class="keyword">this</span>;</span><br><span class="line">	param2[<span class="number">1</span>] = appdomain;</span><br><span class="line">	appdomain.Invoke(m2, <span class="literal">null</span>, param2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>通过缓存IMethod实例以及参数列表数组，可以做到这个Update操作不会产生任何额外的GC Alloc，并且以最高的性能来执行</p>
-<p>如果需要传递的参数或返回值中包含int, float等基础类型，那使用上面的方法依然无法消除GC Alloc，为了更高效率的调用，ILRuntime提供了InvocationContext这种调用方式，需要按照如下方式调用<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">using</span>(<span class="keyword">var</span> ctx = appdomain.BeginInvoke(m))</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//依次将参数压入栈，如果为成员方法，第一个参数固定为对象实例</span></span><br><span class="line">    ctx.PushObject(<span class="keyword">this</span>);</span><br><span class="line">	ctx.PushInteger(<span class="number">123</span>);</span><br><span class="line">	<span class="comment">//开始调用</span></span><br><span class="line">	ctx.Invoke();</span><br><span class="line">	<span class="comment">//调用完毕后使用对应的Read方法获取返回值</span></span><br><span class="line">	result = ctx.ReadInteger();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="大规模数值计算"><a href="#大规模数值计算" class="headerlink" title="大规模数值计算"></a>大规模数值计算</h3><p>如果在热更内需要进行大规模数值计算，则可以开启ILRuntime在2.0版中加入的<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/register-vm.html">寄存器模式</a>来进行优化</p>
+<h3 id="接口调用建议"><a href="#接口调用建议" class="headerlink" title="接口调用建议"></a>接口调用建议</h3><p>为了调用方便，ILRuntime的很多接口使用了params可变参数，但是有可能会无意间忽视这个操作带来的GCAlloc，例如下面的操作：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Initialize"</span>, <span class="literal">null</span>);</span><br><span class="line">appdomain.Invoke(<span class="string">"MyGame.Main"</span>, <span class="string">"Start"</span>, <span class="literal">null</span>, <span class="number">100</span>, <span class="number">200</span>);</span><br></pre></td></tr></table></figure>
 
+<p>这两个操作在调用的时候，会分别生成一个<code>object[0]</code>和<code>object[2]</code>，从而产生GC Alloc，这一点很容易被忽略。所以如果你需要在Update等性能关键的地方调用热更DLL中的方法，应该按照以下方式缓存这个参数数组：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">object</span>[] param0 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">object</span>[] param2 = <span class="keyword">new</span> <span class="keyword">object</span>[<span class="number">2</span>];</span><br><span class="line">IMethod m, m2;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"Update"</span>, <span class="number">0</span>);</span><br><span class="line">	m2 = appdomain.LoadedTypes[<span class="string">"MyGame.SomeUI"</span>].GetMethod(<span class="string">"SomethingAfterUpdate"</span>, <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    appdomain.Invoke(m, <span class="literal">null</span>, param0);</span><br><span class="line">	param2[<span class="number">0</span>] = <span class="keyword">this</span>;</span><br><span class="line">	param2[<span class="number">1</span>] = appdomain;</span><br><span class="line">	appdomain.Invoke(m2, <span class="literal">null</span>, param2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过缓存IMethod实例以及参数列表数组，可以做到这个Update操作不会产生任何额外的GC Alloc，并且以最高的性能来执行</p>
+<p>如果需要传递的参数或返回值中包含int, float等基础类型，那使用上面的方法依然无法消除GC Alloc，为了更高效率的调用，ILRuntime提供了InvocationContext这种调用方式，需要按照如下方式调用</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">using</span>(<span class="keyword">var</span> ctx = appdomain.BeginInvoke(m))</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//依次将参数压入栈，如果为成员方法，第一个参数固定为对象实例</span></span><br><span class="line">    ctx.PushObject(<span class="keyword">this</span>);</span><br><span class="line">	ctx.PushInteger(<span class="number">123</span>);</span><br><span class="line">	<span class="comment">//开始调用</span></span><br><span class="line">	ctx.Invoke();</span><br><span class="line">	<span class="comment">//调用完毕后使用对应的Read方法获取返回值</span></span><br><span class="line">	result = ctx.ReadInteger();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
     <div class="footer">
         发现错误？想参与编辑？ 
         <a href="https://github.com/Ourpalm/ILRuntime/tree/master/docs/source/src/v1/guide/performance-optimization.md" target="_blank">

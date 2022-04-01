@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>ILRuntime中跨域继承 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -163,7 +174,9 @@
     <article class="clearfix">
     <h2 id="ILRuntime中跨域继承"><a href="#ILRuntime中跨域继承" class="headerlink" title="ILRuntime中跨域继承"></a>ILRuntime中跨域继承</h2><p>如果你想在热更DLL项目当中<code>继承一个Unity主工程里的类</code>，或者<code>实现一个主工程里的接口</code>，你需要在Unity主工程中实现一个继承适配器。<br>方法如下：</p>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TestClass2Adapter</span> : <span class="title">CrossBindingAdaptor</span></span><br><span class="line">    &#123;</span><br><span class="line">	    <span class="comment">//定义访问方法的方法信息</span></span><br><span class="line">        <span class="keyword">static</span> CrossBindingMethodInfo mVMethod1_0 = <span class="keyword">new</span> CrossBindingMethodInfo(<span class="string">"VMethod1"</span>);</span><br><span class="line">        <span class="keyword">static</span> CrossBindingFunctionInfo&lt;System.Boolean&gt; mVMethod2_1 = <span class="keyword">new</span> CrossBindingFunctionInfo&lt;System.Boolean&gt;(<span class="string">"VMethod2"</span>);</span><br><span class="line">        <span class="keyword">static</span> CrossBindingMethodInfo mAbMethod1_3 = <span class="keyword">new</span> CrossBindingMethodInfo(<span class="string">"AbMethod1"</span>);</span><br><span class="line">        <span class="keyword">static</span> CrossBindingFunctionInfo&lt;System.Int32, System.Single&gt; mAbMethod2_4 = <span class="keyword">new</span> CrossBindingFunctionInfo&lt;System.Int32, System.Single&gt;(<span class="string">"AbMethod2"</span>);</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">override</span> Type BaseCLRType</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">typeof</span>(ILRuntimeTest.TestFramework.TestClass2);<span class="comment">//这里是你想继承的类型</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">override</span> Type AdaptorType</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">typeof</span>(Adapter);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">object</span> <span class="title">CreateCLRInstance</span>(<span class="params">ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Adapter(appdomain, instance);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public class Adapter : ILRuntimeTest.TestFramework.TestClass2, CrossBindingAdaptorType</span><br><span class="line">        &#123;</span><br><span class="line">            ILTypeInstance instance;</span><br><span class="line">            ILRuntime.Runtime.Enviorment.AppDomain appdomain;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//必须要提供一个无参数的构造函数</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="title">Adapter</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="title">Adapter</span>(<span class="params">ILRuntime.Runtime.Enviorment.AppDomain appdomain, ILTypeInstance instance</span>)</span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line">                <span class="keyword">this</span>.appdomain = appdomain;</span><br><span class="line">                <span class="keyword">this</span>.instance = instance;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">public</span> ILTypeInstance ILInstance &#123; <span class="keyword">get</span> &#123; <span class="keyword">return</span> instance; &#125; &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//下面将所有虚函数都重载一遍，并中转到热更内</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VMethod1</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line">                <span class="keyword">if</span> (mVMethod1_0.CheckShouldInvokeBase(<span class="keyword">this</span>.instance))</span><br><span class="line">                    <span class="keyword">base</span>.VMethod1();</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    mVMethod1_0.Invoke(<span class="keyword">this</span>.instance);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">override</span> System.<span class="function">Boolean <span class="title">VMethod2</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line">                <span class="keyword">if</span> (mVMethod2_1.CheckShouldInvokeBase(<span class="keyword">this</span>.instance))</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">base</span>.VMethod2();</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    <span class="keyword">return</span> mVMethod2_1.Invoke(<span class="keyword">this</span>.instance);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">AbMethod1</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line">                mAbMethod1_3.Invoke(<span class="keyword">this</span>.instance);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">override</span> System.<span class="function">Single <span class="title">AbMethod2</span>(<span class="params">System.Int32 arg1</span>)</span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line">                <span class="keyword">return</span> mAbMethod2_4.Invoke(<span class="keyword">this</span>.instance, arg1);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> <span class="title">ToString</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line">                IMethod m = appdomain.ObjectType.GetMethod(<span class="string">"ToString"</span>, <span class="number">0</span>);</span><br><span class="line">                m = instance.Type.GetVirtualMethod(m);</span><br><span class="line">                <span class="keyword">if</span> (m == <span class="literal">null</span> || m <span class="keyword">is</span> ILMethod)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">return</span> instance.ToString();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    <span class="keyword">return</span> instance.Type.FullName;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>因为跨域继承必须要注册适配器。 如果是热更DLL里面继承热更里面的类型，不需要任何注册。<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appdomain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> ClassInheritanceAdaptor());</span><br></pre></td></tr></table></figure></p>
+
+<p>因为跨域继承必须要注册适配器。 如果是热更DLL里面继承热更里面的类型，不需要任何注册。</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appdomain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> ClassInheritanceAdaptor());</span><br></pre></td></tr></table></figure>
 
     <div class="footer">
         发现错误？想参与编辑？ 

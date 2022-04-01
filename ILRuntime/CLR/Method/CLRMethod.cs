@@ -21,7 +21,7 @@ namespace ILRuntime.CLR.Method
         IType[] genericArguments;
         Type[] genericArgumentsCLR;
         object[] invocationParam;
-        bool isDelegateInvoke;
+        bool isDelegateInvoke, isDelegateDynamicInvoke;
         int hashCode = -1;
         static int instance_id = 0x20000000;
 
@@ -76,6 +76,14 @@ namespace ILRuntime.CLR.Method
             get
             {
                 return isDelegateInvoke;
+            }
+        }
+
+        public bool IsDelegateDynamicInvoke
+        {
+            get
+            {
+                return isDelegateDynamicInvoke;
             }
         }
 
@@ -150,8 +158,17 @@ namespace ILRuntime.CLR.Method
                     ReturnType = domain.GetType(def.ReturnType.AssemblyQualifiedName);
                 }
             }
-            if (type.IsDelegate && def.Name == "Invoke")
-                isDelegateInvoke = true;
+            if (type.IsDelegate)
+            {
+                if (def.Name == "Invoke")
+                    isDelegateInvoke = true;
+                if (def.Name == "DynamicInvoke")
+                {
+                    isDelegateInvoke = true;
+                    isDelegateDynamicInvoke = true;
+                }
+
+            }
             isConstructor = false;
         }
         internal CLRMethod(ConstructorInfo def, CLRType type, ILRuntime.Runtime.Enviorment.AppDomain domain)
@@ -417,7 +434,7 @@ namespace ILRuntime.CLR.Method
                 }
 
                 argString = argString.Substring(0, argString.Length - 2);
-                throw new Exception($"MakeGenericMethod failed : {def.DeclaringType.FullName}.{def.Name}<{argString}>");
+                throw new Exception(string.Format("MakeGenericMethod failed : {0}.{1}<{2}>", def.DeclaringType.FullName, def.Name, argString));
             }
 #endif
             var res = new CLRMethod(t, declaringType, appdomain);

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>164587ca-78d9-4aec-82c2-acbabba26626</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SharedEngine</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7BoundBreakpoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7DocumentContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Engine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7ErrorBreakpoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Events.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Expression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Module.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7PendingBreakPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Port.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7PortSupplier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Process.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7ProgramNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7ProgramProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7StackFrame.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\AD7Thread.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\Constants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\DebuggedProcessVS.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\EngineCallback.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AD7\ILProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EngineConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\EngineUtils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)EngineRegistration.pkgdef">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

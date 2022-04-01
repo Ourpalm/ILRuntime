@@ -194,6 +194,13 @@ namespace TestCases
                 Console.WriteLine(val.Value.ToString());
         }
 
+        public static void NullableTest2()
+        {
+            int? val = null;
+            if (val.HasValue)
+                Console.WriteLine(val.Value.ToString());
+        }
+
         static void foo4() { }
         static Action act1 = null;
         class Test4

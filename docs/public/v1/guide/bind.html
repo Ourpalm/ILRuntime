@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>CLR绑定 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -165,10 +176,12 @@
 <p>但是这种方式有着明显的弊端，最突出的一点就是通过反射来调用接口调用效率会比直接调用低很多，再加上反射传递函数参数时需要使用<code>object[]</code>数组，这样不可避免的每次调用都会产生不少GC Alloc。众所周知GC Alloc高意味着在Unity中执行会存在较大的性能问题。</p>
 <p>ILRuntime通过CLR方法绑定机制，可以<code>选择性</code>的对经常使用的CLR接口进行直接调用，从而尽可能的消除反射调用开销以及额外的<code>GC Alloc</code></p>
 <h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><p>CLR绑定借助了ILRuntime的CLR重定向机制来实现，因为实质上也是将对CLR方法的反射调用重定向到我们自己定义的方法里面来。但是手动编写CLR重定向方法是个工作量非常巨大的事，而且要求对ILRuntime底层机制非常了解（比如如何装拆箱基础类型，怎么处理Ref/Out引用等等），因此ILRuntime提供了一个代码生成工具来自动生成CLR绑定代码。</p>
-<p>CLR绑定代码的自动生成工具使用方法如下：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">[<span class="meta">MenuItem(<span class="meta-string">"ILRuntime/Generate CLR Binding Code by Analysis"</span>)</span>]</span><br><span class="line"> <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">GenerateCLRBindingByAnalysis</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span> &#123;</span><br><span class="line">     <span class="comment">//用新的分析热更dll调用引用来生成绑定代码</span></span><br><span class="line">     ILRuntime.Runtime.Enviorment.AppDomain domain = <span class="keyword">new</span> ILRuntime.Runtime.Enviorment.AppDomain();</span><br><span class="line">     <span class="keyword">using</span> (System.IO.FileStream fs = <span class="keyword">new</span> System.IO.FileStream(<span class="string">"Assets/StreamingAssets/HotFix_Project.dll"</span>, System.IO.FileMode.Open, System.IO.FileAccess.Read))</span><br><span class="line">     &#123;</span><br><span class="line">         domain.LoadAssembly(fs);</span><br><span class="line"></span><br><span class="line">         <span class="comment">//Crossbind Adapter is needed to generate the correct binding code</span></span><br><span class="line">         InitILRuntime(domain);</span><br><span class="line">         ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, <span class="string">"Assets/ILRuntime/Generated"</span>);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     AssetDatabase.Refresh();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">InitILRuntime</span>(<span class="params">ILRuntime.Runtime.Enviorment.AppDomain domain</span>)</span></span><br><span class="line"><span class="function"></span> &#123;</span><br><span class="line">     <span class="comment">//这里需要注册所有热更DLL中用到的跨域继承Adapter，否则无法正确抓取引用</span></span><br><span class="line">     domain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> MonoBehaviourAdapter());</span><br><span class="line">     domain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> CoroutineAdapter());</span><br><span class="line">     domain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> TestClassBaseAdapter());</span><br><span class="line">     domain.RegisterValueTypeBinder(<span class="keyword">typeof</span>(Vector3), <span class="keyword">new</span> Vector3Binder());</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
-<p>在CLR绑定代码生成之后，需要将这些绑定代码注册到AppDomain中才能使CLR绑定生效，但是一定要记得将CLR绑定的注册写在CLR重定向的注册后面，因为同一个方法只能被重定向一次，只有先注册的那个才能生效。</p>
-<p>注册方法如下：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">ILRuntime.Runtime.Generated.CLRBindings.Initialize(appdomain);</span><br></pre></td></tr></table></figure></p>
+<p>CLR绑定代码的自动生成工具使用方法如下：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">[<span class="meta">MenuItem(<span class="meta-string">"ILRuntime/Generate CLR Binding Code by Analysis"</span>)</span>]</span><br><span class="line"> <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">GenerateCLRBindingByAnalysis</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span> &#123;</span><br><span class="line">     <span class="comment">//用新的分析热更dll调用引用来生成绑定代码</span></span><br><span class="line">     ILRuntime.Runtime.Enviorment.AppDomain domain = <span class="keyword">new</span> ILRuntime.Runtime.Enviorment.AppDomain();</span><br><span class="line">     <span class="keyword">using</span> (System.IO.FileStream fs = <span class="keyword">new</span> System.IO.FileStream(<span class="string">"Assets/StreamingAssets/HotFix_Project.dll"</span>, System.IO.FileMode.Open, System.IO.FileAccess.Read))</span><br><span class="line">     &#123;</span><br><span class="line">         domain.LoadAssembly(fs);</span><br><span class="line"></span><br><span class="line">         <span class="comment">//Crossbind Adapter is needed to generate the correct binding code</span></span><br><span class="line">         InitILRuntime(domain);</span><br><span class="line">         ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, <span class="string">"Assets/ILRuntime/Generated"</span>);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     AssetDatabase.Refresh();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">InitILRuntime</span>(<span class="params">ILRuntime.Runtime.Enviorment.AppDomain domain</span>)</span></span><br><span class="line"><span class="function"></span> &#123;</span><br><span class="line">     <span class="comment">//这里需要注册所有热更DLL中用到的跨域继承Adapter，否则无法正确抓取引用</span></span><br><span class="line">     domain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> MonoBehaviourAdapter());</span><br><span class="line">     domain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> CoroutineAdapter());</span><br><span class="line">     domain.RegisterCrossBindingAdaptor(<span class="keyword">new</span> TestClassBaseAdapter());</span><br><span class="line">     domain.RegisterValueTypeBinder(<span class="keyword">typeof</span>(Vector3), <span class="keyword">new</span> Vector3Binder());</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 
+<p>在CLR绑定代码生成之后，需要将这些绑定代码注册到AppDomain中才能使CLR绑定生效，但是一定要记得将CLR绑定的注册写在CLR重定向的注册后面，因为同一个方法只能被重定向一次，只有先注册的那个才能生效。</p>
+<p>注册方法如下：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">ILRuntime.Runtime.Generated.CLRBindings.Initialize(appdomain);</span><br></pre></td></tr></table></figure>
     <div class="footer">
         发现错误？想参与编辑？ 
         <a href="https://github.com/Ourpalm/ILRuntime/tree/master/docs/source/src/v1/guide/bind.md" target="_blank">

@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>更新记录 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li current">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -161,7 +172,33 @@
     </ul>
 </section>
     <article class="clearfix">
-    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V1-6-7"><a href="#V1-6-7" class="headerlink" title="V1.6.7"></a>V1.6.7</h3><ul>
+    <h2 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h2><h3 id="V2-0-2"><a href="#V2-0-2" class="headerlink" title="V2.0.2"></a>V2.0.2</h3><ul>
+<li>修复意外引入的GC Alloc</li>
+<li>增加CLR自动生成参数，以应对泛型嵌套过深导致没有正确被自动分析捕捉</li>
+<li>修复一个类字段数量超过64个后一些情况下报错的Bug</li>
+<li>修复将扩展方法用于委托时的一个报错</li>
+</ul>
+<h3 id="V2-0-0"><a href="#V2-0-0" class="headerlink" title="V2.0.0"></a>V2.0.0</h3><ul>
+<li>加入寄存器运行模式，可大幅提升热更内数值计算性能</li>
+<li>执行性能整体提升，传统非寄存器模式执行效率也得到一定幅度提升</li>
+<li>修正热更内finnaly块在一些情况下不正确的bug，连带修复了yield return和async/await的一些异常情况</li>
+<li>修正值对类型绑定后的数组进行操作时的异常</li>
+<li>修正热更内Enum一些情况下Equals结果错误的bug</li>
+<li>修正跨域继承接口时的一些异常情况</li>
+<li>修正跨域继承时子类无法调用到子类方法的问题</li>
+<li>修正值类型绑定在一些情况下构造函数执行失败的bug</li>
+<li>修正反射接口无法获取父类public方法的bug</li>
+<li>修正嵌套数组在一些情况CLR绑定失败的bug</li>
+<li>修复值类型绑定后的值类型作为委托参数在一些情况下出现异常的Bug</li>
+<li>修正byte[]一些情况下取值出现强转失败的bug</li>
+<li>修正子类型在一些情况下调用+=，-=等重载操作符时异常的bug</li>
+<li>修正重载!操作符CLR绑定报错的bug</li>
+<li>修正值类型实现接口后new T时报错的bug</li>
+<li>修正一些情况下泛型匹配失败的Bug</li>
+<li>修正在try catch时重新抛出异常出错的Bug</li>
+<li>修正将委托保存在数组中可能出现调用异常的Bug</li>
+</ul>
+<h3 id="V1-6-7"><a href="#V1-6-7" class="headerlink" title="V1.6.7"></a>V1.6.7</h3><ul>
 <li>Appdomain.Prewarm接口加入递归预热的选项</li>
 <li>优化ILRuntime遇到异常时输出的日志，可在Unity的Console中直接点击前往源码</li>
 <li>增加CLRBinding在处理遇到同名类型时的容错</li>

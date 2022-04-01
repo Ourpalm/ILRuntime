@@ -425,5 +425,23 @@ namespace TestCases
             List<NestedStruct> lst = new List<NestedStruct>();
             lst.Add(new NestedStruct(new Vector3(1, 2, 3)));
         }
+
+        class EventArgs
+        {
+            public object[] args;
+        }
+        public static void StructTest15()
+        {
+            EventArgs arg = new EventArgs();
+            arg.args = new object[] { new Vector3() };
+
+            if(arg.args[0] is Vector3)
+            {
+                Vector3 a = (Vector3)arg.args[0];
+                Console.WriteLine(a.ToString());
+            }
+        }
+
+
     }
 }

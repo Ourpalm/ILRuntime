@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>从零开始 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link current">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -166,9 +177,12 @@
 <blockquote>
 <p>如果你使用的是<code>中国特别版</code>Unity，那直接打开Package Manager即可找到ILRuntime<br>如果你使用的是<code>国际版</code>Unity，或者无法在PackageManager中找到ILRuntime，则需要按照以下步骤设置项目</p>
 </blockquote>
-<p>首先需要在项目的Packages/manifest.json中，添加ILRuntime的源信息，在这个文件的dependencies节点前增加以下代码<br><figure class="highlight"><table><tr><td class="code"><pre><span class="line">"scopedRegistries": [</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"ILRuntime"</span>,</span><br><span class="line">    <span class="attr">"url"</span>: <span class="string">"https://registry.npmjs.org"</span>,</span><br><span class="line">    <span class="attr">"scopes"</span>: [</span><br><span class="line">      <span class="string">"com.ourpalm"</span></span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">],</span><br></pre></td></tr></table></figure></p>
+<p>首先需要在项目的Packages/manifest.json中，添加ILRuntime的源信息，在这个文件的dependencies节点前增加以下代码</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">"scopedRegistries": [</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"ILRuntime"</span>,</span><br><span class="line">    <span class="attr">"url"</span>: <span class="string">"https://registry.npmjs.org"</span>,</span><br><span class="line">    <span class="attr">"scopes"</span>: [</span><br><span class="line">      <span class="string">"com.ourpalm"</span></span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
 <p>然后通过Unity的<code>Window-&gt;Package Manager</code>菜单，打开Package Manager，将上部标签页选项选择为All Packages，Advanced里勾上Show Preview Packages，等待Unity加载完包信息，应该就能在左侧列表中找到ILRuntime，点击安装即可</p>
-<p>部分Unity版本可以无法直接在列表中刷出ILRuntime，如果左边列表找不着，那就在项目的manifest.json中的dependencies段的开头，增加如下代码手动将ILRuntime添加进项目<br><figure class="highlight"><table><tr><td class="code"><pre><span class="line">"com.ourpalm.ilruntime": "1.6.0",</span><br></pre></td></tr></table></figure></p>
+<p>部分Unity版本可以无法直接在列表中刷出ILRuntime，如果左边列表找不着，那就在项目的manifest.json中的dependencies段的开头，增加如下代码手动将ILRuntime添加进项目</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">"com.ourpalm.ilruntime": "1.6.0",</span><br></pre></td></tr></table></figure>
+
 <p>ILRuntime包安装完毕后，在Package Manager中选中ILRuntime， 右边详细页面中有Samples，点击右方的<code>Import to project</code>可以将ILRuntime的示例Demo直接导入当前工程。</p>
 <blockquote>
 <p>示例导入工程后有可能因为没开启unsafe导致编译报错，可以在PlayerSettings中勾选Allow unsafe code解决编译问题。</p>
@@ -196,7 +210,7 @@
 <blockquote>
 <ul>
 <li>如果你使用的是<code>Unity5.4</code>及以前的版本，并且使用的编译设置是<code>.Net 2.0</code>而不是<code>.Net 2.0 Subset</code>的话，你需要将上述说明中的<code>smcs.rsp</code>文件名改成<code>gmcs.rsp</code>。</li>
-<li>如果你使用的是<code>Unity5.5</code>以上的版本，你需要将上述说明中的<code>smcs.rsp</code>文件名改成<code>mcs.rsp</code></li>
+<li>如果你使用的是<code>Unity5.5 </code>以上的版本，你需要将上述说明中的<code>smcs.rsp</code>文件名改成<code>mcs.rsp</code></li>
 </ul>
 </blockquote>
 <h4 id="从Visual-Studio开始"><a href="#从Visual-Studio开始" class="headerlink" title="从Visual Studio开始"></a><strong>从Visual Studio开始</strong></h4><p>如果你希望在VisualStudio的C#项目中使用ILRuntime， 你只需要引用编译好的<code>ILRuntime.dll</code>，<code>ILRuntim.Mono.Cecil.dll</code>以及<code>ILRuntime.Mono.Cecil.Pdb.dll</code>即可。</p>
@@ -204,13 +218,15 @@
 <p>ILRuntime项目提供了一个测试用例工程ILRuntimeTest，用来验证ILRuntime的正常运行，在运行测试用例前，需要手动生成一下TestCases里面的工程，生成DLL文件。</p>
 <h3 id="开始使用"><a href="#开始使用" class="headerlink" title="开始使用"></a>开始使用</h3><p>使用ILRuntime非常简单，只需要以下这些代码即可运行一个完整的例子：</p>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">ILRuntime.Runtime.Enviorment.AppDomain appdomain;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    StartCoroutine(LoadILRuntime());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">IEnumerator <span class="title">LoadILRuntime</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    appdomain = <span class="keyword">new</span> ILRuntime.Runtime.Enviorment.AppDomain();</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_ANDROID</span></span><br><span class="line">    WWW www = <span class="keyword">new</span> WWW(Application.streamingAssetsPath + <span class="string">"/Hotfix.dll"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">    WWW www = <span class="keyword">new</span> WWW(<span class="string">"file:///"</span> + Application.streamingAssetsPath + <span class="string">"/Hotfix.dll"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    <span class="keyword">while</span> (!www.isDone)</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(www.error))</span><br><span class="line">        Debug.LogError(www.error);</span><br><span class="line">    <span class="keyword">byte</span>[] dll = www.bytes;</span><br><span class="line">    www.Dispose();</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_ANDROID</span></span><br><span class="line">    www = <span class="keyword">new</span> WWW(Application.streamingAssetsPath + <span class="string">"/Hotfix.pdb"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">    www = <span class="keyword">new</span> WWW(<span class="string">"file:///"</span> + Application.streamingAssetsPath + <span class="string">"/Hotfix.pdb"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    <span class="keyword">while</span> (!www.isDone)</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(www.error))</span><br><span class="line">        Debug.LogError(www.error);</span><br><span class="line">    <span class="keyword">byte</span>[] pdb = www.bytes;</span><br><span class="line">    System.IO.MemoryStream fs = <span class="keyword">new</span> MemoryStream(dll);</span><br><span class="line">    System.IO.MemoryStream p = <span class="keyword">new</span> MemoryStream(pdb);</span><br><span class="line">    appdomain.LoadAssembly(fs, p, <span class="keyword">new</span> Mono.Cecil.Pdb.PdbReaderProvider());    </span><br><span class="line">    </span><br><span class="line">    OnILRuntimeInitialized();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnILRuntimeInitialized</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    appdomain.Invoke(<span class="string">"Hotfix.Game"</span>, <span class="string">"Initialize"</span>, <span class="literal">null</span>, <span class="literal">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>这个例子为了演示方便，直接从StreamingAssets目录里读取了脚本DLL文件以及调试符号PDB文件， 实际发布的时候，如果要热更，肯定是将DLL和PDB文件打包到Assetbundle中进行动态加载的，这个不是ILRuntime的范畴，故不具体演示了。</p>
 <h3 id="调试插件"><a href="#调试插件" class="headerlink" title="调试插件"></a>调试插件</h3><p>ILRuntime提供了一个支持Visual Studio 2015、Visual Studio 2017和Visual Studio 2019的调试插件，用来源码级调试你的热更脚本。</p>
 <p>你可以在<a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener">这里</a>下载到最新的Visual Studio调试插件。</p>
 <p><strong>使用方法如下：</strong></p>
 <ul>
 <li>安装ILRuntime调试插件，并重新启动VS2015或VS2017、VS2019</li>
-<li>运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器,一定要确保dll和pdb都加载完毕再调用此接口。</li>
+<li>确保dll和pdb都加载完毕。</li>
+<li>运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器</li>
 <li>用VisualStudio打开热更DLL项目</li>
 <li>点击菜单中的Debug-&gt;Attach to ILRuntime按钮。注意,不是“附加Unity调试程序”</li>
 <li>在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口</li>

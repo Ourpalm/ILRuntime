@@ -7,8 +7,6 @@ namespace ILRuntimeTest.TestFramework
 {
     public class IAsyncStateMachineClassInheritanceAdaptor : CrossBindingAdaptor
     {
-        static CrossBindingMethodInfo mMoveNext_0 = new CrossBindingMethodInfo("MoveNext");
-        static CrossBindingMethodInfo<System.Runtime.CompilerServices.IAsyncStateMachine> mSetStateMachine_1 = new CrossBindingMethodInfo<System.Runtime.CompilerServices.IAsyncStateMachine>("SetStateMachine");
         public override Type BaseCLRType
         {
             get
@@ -34,6 +32,8 @@ namespace ILRuntimeTest.TestFramework
         {
             ILTypeInstance instance;
             ILRuntime.Runtime.Enviorment.AppDomain appdomain;
+            CrossBindingMethodInfo mMoveNext_0 = new CrossBindingMethodInfo("MoveNext");
+            CrossBindingMethodInfo<System.Runtime.CompilerServices.IAsyncStateMachine> mSetStateMachine_1 = new CrossBindingMethodInfo<System.Runtime.CompilerServices.IAsyncStateMachine>("SetStateMachine");
 
             public IAsyncStateMachineAdaptor()
             {

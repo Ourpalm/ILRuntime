@@ -479,12 +479,16 @@ namespace ILRuntime.Runtime.Intepreter
                 var obj = managedObjs[fieldIdx];
                 if (obj != null && (fieldIdx >= 64 || ((valueTypeMask & ((ulong)1 << fieldIdx)) != 0)))
                 {
-                    if (obj is ILTypeInstance ili)
+                    if (obj is ILTypeInstance)
                     {
-                        intp.AllocValueType(esp, ili.type);
-                        var dst = ILIntepreter.ResolveReference(esp);
-                        ili.CopyValueTypeToStack(dst, managedStack);
-                        return;
+                        ILTypeInstance ili = (ILTypeInstance)obj;
+                        if (ili.type != null && ili.type.IsValueType)
+                        {
+                            intp.AllocValueType(esp, ili.type);
+                            var dst = ILIntepreter.ResolveReference(esp);
+                            ili.CopyValueTypeToStack(dst, managedStack);
+                            return;
+                        }
                     }
                     else
                     {

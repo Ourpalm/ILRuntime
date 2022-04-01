@@ -479,5 +479,19 @@ namespace TestCases
             if(Math.Abs(arr2[0].X - 1244)>0.001f)
                 throw new Exception();
         }
+
+        public static void UnitTest_10048()
+        {
+            TestVectorClass cls = new TestVectorClass();
+            TestVectorClass cls2 = new TestVectorClass();
+            for (int i = 0; i < 3; i++)
+            {
+                cls.Vector2 = cls2.Vector2 = new TestVector3(3, 4, i);
+                Console.WriteLine(cls.Vector2);
+            }
+
+            if (cls.Vector2.Z != 2)
+                throw new Exception($"cls.Vector2.Z == {cls.Vector2.Z}");
+        }
     }
 }

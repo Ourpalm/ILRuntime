@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>常见问题解答 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -163,15 +174,18 @@
     <article class="clearfix">
     <!--参考链接-->  
 <!--参考链接-->  
+
 <h2 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h2><blockquote>
-<p>Unity2018.3以上需要用最新ILruntime。<br>最新的发布版本为V1.6，Unity2018以上可通过Package Manager方式安装<br>V1.4已过时，示例工程内的版本已过时，当前最新版本为<a href="https://github.com/Ourpalm/ILRuntime" target="_blank" rel="noopener">master</a>分支。</p>
+<p>Unity2018.3以上需要用最新ILRuntime。<br>最新的发布版本为V2.0，Unity2018以上可通过Package Manager方式安装<br>V1.4已过时，示例工程内的版本已过时，当前最新版本为<a href="https://github.com/Ourpalm/ILRuntime" target="_blank" rel="noopener">master</a>分支。</p>
+</blockquote>
+<h2 id="ILRuntime的性能到底怎么样"><a href="#ILRuntime的性能到底怎么样" class="headerlink" title="ILRuntime的性能到底怎么样"></a>ILRuntime的性能到底怎么样</h2><blockquote>
+<p>最新版ILRuntime在若干若干测试用例中，包括大规模数值计算的场景，均已超过Lua53版xlua，详细测试可参考 <a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener">U3D Demo工程</a></p>
 </blockquote>
 <h2 id="编辑器内的常见问题"><a href="#编辑器内的常见问题" class="headerlink" title="编辑器内的常见问题"></a>编辑器内的常见问题</h2><h3 id="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"><a href="#我要怎么才能在Profiler里看见热更内的方法耗时情况呢？" class="headerlink" title="我要怎么才能在Profiler里看见热更内的方法耗时情况呢？"></a>我要怎么才能在Profiler里看见热更内的方法耗时情况呢？</h3><blockquote>
-<ul>
-<li>在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> DEBUG &amp;&amp; (UNITY_EDITOR || UNITY_ANDROID || UNITY_IPHONE)</span></span><br><span class="line">        <span class="comment">//由于Unity的Profiler接口只允许在主线程使用，为了避免出异常，需要告诉ILRuntime主线程的线程ID才能正确将函数运行耗时报告给Profiler</span></span><br><span class="line">        appdomain.UnityMainThreadID = System.Threading.Thread.CurrentThread.ManagedThreadId;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
+<p>在ILRuntime的初始化处加入以下代码即可在Profiler中看见热更内方法的耗时情况，无需开启DeepProfile，真机上也可使用</p>
 </blockquote>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> DEBUG &amp;&amp; !NO_PROFILER</span></span><br><span class="line">        <span class="comment">//由于Unity的Profiler接口只允许在主线程使用，为了避免出异常，需要告诉ILRuntime主线程的线程ID才能正确将函数运行耗时报告给Profiler</span></span><br><span class="line">        appdomain.UnityMainThreadID = System.Threading.Thread.CurrentThread.ManagedThreadId;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
 <h3 id="运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream"><a href="#运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream" class="headerlink" title="运行出现报错ObjectDisposedException: Cannot access a closed Stream"></a>运行出现报错ObjectDisposedException: Cannot access a closed Stream</h3><blockquote>
 <p>加载dll的流被关闭了。新版要求流不能关闭，也不能用using写法。新的用法请参见Demo示例</p>
 </blockquote>
@@ -188,6 +202,11 @@
 <ul>
 <li>检查是否做了<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/bind.html">CLR自动分析绑定</a>。</li>
 <li>CLRBindings.Initialize(appdomain); 要调用这一句，放在最后.是否漏了这句。</li>
+</ul>
+</blockquote>
+<h3 id="KeyNotFoundException-Cannot-find-Type-System-Boolean-modreq-System-Runtime-CompilerServices-IsVolatile-，-在使用了volatile关键字后报这个错"><a href="#KeyNotFoundException-Cannot-find-Type-System-Boolean-modreq-System-Runtime-CompilerServices-IsVolatile-，-在使用了volatile关键字后报这个错" class="headerlink" title="KeyNotFoundException: Cannot find Type:System.Boolean modreq(System.Runtime.CompilerServices.IsVolatile)， 在使用了volatile关键字后报这个错"></a>KeyNotFoundException: Cannot find Type:System.Boolean modreq(System.Runtime.CompilerServices.IsVolatile)， 在使用了volatile关键字后报这个错</h3><blockquote>
+<ul>
+<li>ILRuntime不支持直接跟操作系统或者硬件资源打交道的用法，包括unsafe, volatile, P/Invoke，请删除volatile 关键字</li>
 </ul>
 </blockquote>
 <h3 id="真机上调试或运行时出现随机闪退"><a href="#真机上调试或运行时出现随机闪退" class="headerlink" title="真机上调试或运行时出现随机闪退"></a>真机上调试或运行时出现随机闪退</h3><blockquote>
@@ -209,7 +228,7 @@
 <li>请确保热更DLL是使用Release方式编译的，Debug编译的DLL会慢3-5倍</li>
 <li>请发布非Development Build真机包后再测试耗时，编辑器中和Development Build执行速度会比最终Release包慢几倍</li>
 <li>请确保注册了常使用的值类型的值类型绑定</li>
-<li>由于热更都是解译执行，所以执行效率跟直接执行天然就有20-100倍的差距，因此不大适合需要进行大量遍历计算的操作，可将耗时的工具方法放入主工程辅助</li>
+<li>如果需要大规模数学运算，可以通过2.0新加入的<a href="https://ourpalm.github.io/ILRuntime/public/v1/guide/register-vm.html">寄存器模式</a>对方法进行优化，或将耗时的工具方法放入主工程辅助</li>
 </ul>
 </blockquote>
 <h2 id="疑难杂症"><a href="#疑难杂症" class="headerlink" title="疑难杂症"></a>疑难杂症</h2>

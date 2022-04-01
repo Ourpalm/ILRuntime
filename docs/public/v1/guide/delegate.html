@@ -1,25 +1,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta name="generator" content="Hexo 3.9.0">
+    <head>
 
     <title>ILRuntime中使用委托 — ILRuntime</title>
     <meta charset="utf-8">
     <meta name="description" content="ILRuntime">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+    
+<link rel="stylesheet" href="/ILRuntime/public/css/page.css">
+
 
     <script src="/ILRuntime/public/js/vue.js"></script>
     <script src="/ILRuntime/public/js/jquery.js"></script>
-    </head>
+    <meta name="generator" content="Hexo 4.2.1"></head>
 
     <body>
         
             <nav class="nav">
     <div class="border">
-        <img src="/ILRuntime/public/images/logo.png">
-        <button class="hiden-in-phone">V1.6.7</button>
+        <img src="/ILRuntime/public/images/logo.png" />
+        <button class="hiden-in-phone">V2.0.2</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -27,10 +29,11 @@
                     <input type="text" id="search-query" class="search-query">
                 </form>
             </li!-->
-            <li><a href="https://github.com/Ourpalm/ILRuntime" class="nav-link-li">下载项目</a></li>
+            <li><a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener" class="nav-link-li">下载项目</a></li>
             <li><a href="/ILRuntime/public/v1/guide/version.html" class="nav-link-li">更新记录</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</a></li>
-            <li><a href="/ILRuntime/public/v1/guide/index.html" class="nav-link-li">教程</a></li>
+            <li><a href="/ILRuntime/public/v1/guide/contribution.html" class="nav-link-li">贡献指南</li>
+            <li><a href="https://github.com/Ourpalm/ILRuntimeU3D/" target="_blank" rel="noopener" class="nav-link-li">U3D示例</a></li>
+            <li><a href="https://learn.u3d.cn/tutorial/ilruntime" target="_blank" rel="noopener" class="nav-link-li">视频教程</a></li>
             <li><a href="/ILRuntime/public/" class="nav-link-li current">首页</a></li>
         </ul>
     </div>
@@ -74,6 +77,14 @@
             
             <li>
                 <p><a href="/ILRuntime/public/v1/guide/tutorial.html" class="sidebar-link">从零开始</a></p>
+            </li>
+        
+            
+            
+            
+            
+            <li>
+                <p><a href="/ILRuntime/public/v1/guide/register-vm.html" class="sidebar-link">寄存器模式</a></p>
             </li>
         
             
@@ -176,6 +187,7 @@
 <p>这两个委托都只需要注册一个适配器即可。 注册方法如下</p>
 </blockquote>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appDomain.DelegateManager.RegisterMethodDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;();</span><br></pre></td></tr></table></figure>
+
 <blockquote>
 <p>如果是带返回类型的委托，例如：</p>
 </blockquote>
@@ -184,8 +196,11 @@
 <p>需要按照以下方式注册</p>
 </blockquote>
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">appDomain.DelegateManager.RegisterFunctionDelegate&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;();</span><br></pre></td></tr></table></figure>
+
 <h3 id="委托转换器（DelegateConvertor）"><a href="#委托转换器（DelegateConvertor）" class="headerlink" title="委托转换器（DelegateConvertor）"></a><strong>委托转换器（DelegateConvertor）</strong></h3><p>ILRuntime内部是使用Action,以及Func这两个系统自带委托类型来生成的委托实例，所以如果你需要将一个<code>不是Action或者Func类型</code>的委托实例传到ILRuntime外部使用的话，除了委托适配器，还需要额外写一个转换器，将Action和Func转换成你真正需要的那个委托类型。</p>
-<p>比如上面例子中的SomeFunction类型的委托，其所需的Convertor应如下实现：<br><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">app.DelegateManager.RegisterDelegateConvertor&lt;SomeFunction&gt;((action) =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> SomeFunction((a, b) =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">       <span class="keyword">return</span> ((Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;)action)(a, b);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>比如上面例子中的SomeFunction类型的委托，其所需的Convertor应如下实现：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">app.DelegateManager.RegisterDelegateConvertor&lt;SomeFunction&gt;((action) =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> SomeFunction((a, b) =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">       <span class="keyword">return</span> ((Func&lt;<span class="keyword">int</span>, <span class="keyword">float</span>, <span class="keyword">bool</span>&gt;)action)(a, b);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
 <h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a><strong>建议</strong></h3><p>为了避免不必要的麻烦，以及后期热更出现问题，建议项目遵循以下几点：</p>
 <ul>
 <li>尽量<code>避免不必要的</code>跨域委托调用</li>

@@ -1,0 +1,208 @@
+{
+  "name": "ilruntime-debug",
+  "displayName": "ILRuntime Debug",
+  "version": "0.5.0",
+  "publisher": "liiir",
+  "description": "Debugger extension for ILRuntime",
+  "author": {
+    "name": "liiir"
+  },
+  "license": "MIT",
+  "keywords": [
+    "multi-root ready"
+  ],
+  "engines": {
+    "vscode": "^1.64.0"
+  },
+  "icon": "images/mock-debug-icon.png",
+  "categories": [
+    "Debuggers"
+  ],
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ourpalm/ILRuntime.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ourpalm/ILRuntime/issues"
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
+    "watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
+    "esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
+    "watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch",
+    "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "publish-pre-release": "vsce publish --pre-release",
+    "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
+    "test": "npm run typecheck"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "^14.14.37",
+    "@types/vscode": "^1.64.0",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "@vscode/debugadapter": "^1.55.0-pre.1",
+    "@vscode/debugadapter-testsupport": "^1.55.0-pre.1",
+    "await-notify": "1.0.1",
+    "base64-js": "^1.5.1",
+    "esbuild": "^0.14.21",
+    "eslint": "^8.9.0",
+    "events": "^3.3.0",
+    "glob": "^7.2.0",
+    "mocha": "^9.2.0",
+    "path-browserify": "^1.0.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.5",
+    "url": "^0.11.0",
+    "vsce": "^2.6.7"
+  },
+  "main": "./dist/extension.js",
+  "browser": "./dist/web-extension.js",
+  "activationEvents": [
+    "onDebugResolve:ilruntime",
+    "onDebugDynamicConfigurations:ilruntime",
+    "onCommand:extension.ilruntime-debug.getAddress",
+    "onCommand:extension.ilruntime-debug.runEditorContents",
+    "onCommand:extension.ilruntime-debug.debugEditorContents"
+  ],
+  "workspaceTrust": {
+    "request": "never"
+  },
+  "contributes": {
+    "configuration":{
+      "title": "ILRuntime Debugger",
+      "properties": {
+        "ilruntime.broadcastPort":{
+          "type":"number",
+          "default":56000,
+          "description": "UDP broadcast port for debugger server"
+        }
+      }
+    },
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "extension.ilruntime-debug.debugEditorContents",
+          "when": "resourceLangId == csharp",
+          "group": "navigation@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "extension.ilruntime-debug.debugEditorContents",
+          "when": "resourceLangId == csharp"
+        }
+      ],
+      "debug/variables/context": [
+        {
+          "command": "extension.ilruntime-debug.toggleFormatting",
+          "when": "debugType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "extension.ilruntime-debug.debugEditorContents",
+        "title": "Attach to ILRuntime",
+        "category": "ILRuntime Debug",
+        "enablement": "!inDebugMode",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "extension.ilruntime-debug.toggleFormatting",
+        "title": "Toggle between decimal and hex formatting"
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "csharp"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "ilruntime",
+        "languages": [
+          "csharp"
+        ],
+        "label": "ILRuntime Debugger",
+        "program": "./out/win-x86/VSCodeDAILRuntime.exe",
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "address"
+            ],
+            "properties": {
+              "address": {
+                "type": "string",
+                "description": "Target address for ilruntime instance.",
+                "default": "${command:AskForAddress}"
+              },
+              "debug" :{
+                "type": "boolean",
+                "description": "Wait for debugger to be attached.",
+                "default": false
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Automatically stop after launch.",
+                "default": true
+              },
+              "trace": {
+                "type": "boolean",
+                "description": "Enable logging of the Debug Adapter Protocol.",
+                "default": true
+              },
+              "compileError": {
+                "type": "string",
+                "description": "Simulates a compile error in 'launch' request.",
+                "enum": [
+                  "default",
+                  "show",
+                  "hide"
+                ],
+                "enumDescriptions": [
+                  "default: show fake compile error to user",
+                  "show fake compile error to user",
+                  "do not show fake compile error to user"
+                ]
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "ilruntime",
+            "request": "launch",
+            "name": "Attach to ILRuntime",
+            "address": "${command:AskForAddress}",
+            "debug" : true,
+            "stopOnEntry": true
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "ILRuntime Debugger: Attach to ILRuntime",
+            "description": "A new configuration for 'debugging' a user selected markdown file.",
+            "body": {
+              "type": "ilruntime",
+              "request": "launch",
+              "name": "Attach to ILRuntime",
+              "address": "^\"\\${command:AskForAddress}\"",
+              "stopOnEntry": true
+            }
+          }
+        ],
+        "variables": {
+          "AskForAddress": "extension.ilruntime-debug.getAddress"
+        }
+      }
+    ]
+  }
+}

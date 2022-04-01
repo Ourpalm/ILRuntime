@@ -184,6 +184,8 @@ namespace ILRuntime.Runtime.Enviorment
             }
             mi = typeof(System.Type).GetMethod("GetTypeFromHandle");
             RegisterCLRMethodRedirection(mi, CLRRedirections.GetTypeFromHandle);
+            mi = typeof(System.Type).GetMethod("MakeGenericType");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.TypeMakeGenericType);
             mi = typeof(object).GetMethod("GetType");
             RegisterCLRMethodRedirection(mi, CLRRedirections.ObjectGetType);
             mi = typeof(Delegate).GetMethod("CreateDelegate", new Type[] { typeof(Type), typeof(MethodInfo) });
@@ -801,7 +803,7 @@ namespace ILRuntime.Runtime.Enviorment
                     UnityEngine.Debug.Log("CLRBindingUtils.Initialize Done in thread..");
 #endif
                 });
-                thread.Name = $"CLRBindings-Thread #{thread.ManagedThreadId}";
+                thread.Name = string.Format("CLRBindings-Thread #{0}",thread.ManagedThreadId);
                 thread.Start();
             }
             else
@@ -853,8 +855,9 @@ namespace ILRuntime.Runtime.Enviorment
                     for (int i = 0; i < genericArguments.Length; i++)
                     {
                         string key = null;
-                        if (bt is ILType ilt)
+                        if (bt is ILType)
                         {
+                            ILType ilt = (ILType)bt;
                             key = ilt.TypeDefinition.GenericParameters[i].FullName;
                         }
                         else
@@ -1339,6 +1342,11 @@ namespace ILRuntime.Runtime.Enviorment
             IType t = GetType(type);
             if (t == null || t is CLRType)
                 return;
+            ILType ilType = (ILType)t;
+            foreach(var i in ilType.TypeDefinition.NestedTypes)
+            {
+                Prewarm(i.FullName, recursive);
+            }
             var methods = t.GetMethods();
             foreach (var i in methods)
             {

@@ -17,8 +17,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="DynamicExpresso.Core">
+      <HintPath>..\Dependencies\netstandard2.0\DynamicExpresso.Core.dll</HintPath>
+    </Reference>
     <Reference Include="ILRuntime.Mono.Cecil">
       <HintPath>..\Dependencies\netstandard2.0\ILRuntime.Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>..\Dependencies\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>..\Dependencies\netstandard2.0\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
 

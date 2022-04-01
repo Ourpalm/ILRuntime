@@ -119,7 +119,13 @@ namespace ILRuntimeTest.TestFramework
                     return ((Func<Int32,Single,String>)action)(a,b);
                 });
             });
-
+            app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal>((act) =>
+            {
+                return new ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal((oldVal, newVal) =>
+                {
+                    ((Action<System.Int64, System.Int64>)act)(oldVal, newVal);
+                });
+            });
             // LitJson register
             LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(app);
 
@@ -131,14 +137,18 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterMethodDelegate<System.Exception>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>();
             app.DelegateManager.RegisterMethodDelegate<System.ArgumentException>();
+            app.DelegateManager.RegisterMethodDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance>(); 
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass>();
+            app.DelegateManager.RegisterMethodDelegate<System.Int64, System.Int64>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Int32>();
             app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task>();
             app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task<System.Int32>>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task<System.Int32>>();
 
+            app.Prewarm("TestCases.AsyncAwaitTest", false);
+            //app.Prewarm("ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType");
         }
     }
 }

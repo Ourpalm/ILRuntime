@@ -17,6 +17,12 @@ namespace ILRuntimeTest.TestBase
 
         public List<BaseTestUnit> TestList => _testUnitList;
 
+        static TestSession lastSession;
+
+        public static TestSession LastSession => lastSession;
+
+        public ILRuntime.Runtime.Enviorment.AppDomain Appdomain => _app;
+
         public void Load(string assemblyPath, bool useRegister)
         {
             fs = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read);
@@ -31,7 +37,12 @@ namespace ILRuntimeTest.TestBase
                 }
 
                 _app = new ILRuntime.Runtime.Enviorment.AppDomain(useRegister ? ILRuntime.Runtime.ILRuntimeJITFlags.JITImmediately : ILRuntime.Runtime.ILRuntimeJITFlags.None);
-                _app.DebugService.StartDebugService(56000);
+                try
+                {
+                    ILRuntime.Runtime.Debugger.DebuggerServer.GetProjectNameFunction = () => "ILRuntimeTest";
+                    _app.DebugService.StartDebugService(56000);
+                }
+                catch { }
                 fs2 = new System.IO.FileStream(pdbPath, FileMode.Open);
                 {
                     ILRuntime.Mono.Cecil.Cil.ISymbolReaderProvider symbolReaderProvider = null;
@@ -46,10 +57,11 @@ namespace ILRuntimeTest.TestBase
                 }
 
                 ILRuntimeHelper.Init(_app);
-                //ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
+                ILRuntime.Runtime.Generated.CLRBindings.Initialize(_app);
                 _app.InitializeBindings(true);
                 LoadTest();
             }
+            lastSession = this;
         }
 
         void LoadTest()

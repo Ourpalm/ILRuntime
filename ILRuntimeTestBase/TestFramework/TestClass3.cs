@@ -92,4 +92,17 @@ namespace ILRuntimeTest.TestFramework
             return true;
         }
     }
+
+    public class TestCLRBinding
+    {
+        public void LoadAsset<T>(string name, T obj)
+        {
+
+        }
+        public void Emit<T>(T obj)
+        {
+            LoadAsset("123", obj);
+        }
+    }
+
 }
