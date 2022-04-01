@@ -194,20 +194,27 @@ namespace ILRuntime.VSCode
                 {
                     using (var stream = File.OpenRead(info.DocumentName))
                     {
-                        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: info.DocumentName);
-                        TextLine textLine = syntaxTree.GetText().Lines[info.StartLine];
-                        Location location = syntaxTree.GetLocation(textLine.Span);
-                        SyntaxTree sourceTree = location.SourceTree;
-                        SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
-
-                        bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
-                        BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
-                        if (method == null)
+                        try
                         {
-                            method = GetParentMethod<ConstructorDeclarationSyntax>(node.Parent);
+                            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(SourceText.From(stream), path: info.DocumentName);
+                            TextLine textLine = syntaxTree.GetText().Lines[info.StartLine];
+                            Location location = syntaxTree.GetLocation(textLine.Span);
+                            SyntaxTree sourceTree = location.SourceTree;
+                            SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
+
+                            bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
+                            BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
+                            if (method == null)
+                            {
+                                method = GetParentMethod<ConstructorDeclarationSyntax>(node.Parent);
+                            }
+                            if (method != null)
+                                span = syntaxTree.GetLineSpan(method.FullSpan);
                         }
-                        if (method != null)
-                            span = syntaxTree.GetLineSpan(method.FullSpan);
+                        catch
+                        {
+
+                        }
                     }
                 }
             }
@@ -279,6 +286,10 @@ namespace ILRuntime.VSCode
                     frameMapping[frame.GetHashCode()] = frame;
                     scopeMapping[frame.Arguments.GetHashCode()] = frame.Arguments;
                     scopeMapping[frame.LocalVariables.GetHashCode()] = frame.LocalVariables;
+                }
+                if (frames.Length > 0)
+                {
+                    thread.Name = frames[0].Info.MethodName;
                 }
             }
         }
