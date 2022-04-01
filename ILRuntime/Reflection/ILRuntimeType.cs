@@ -304,7 +304,7 @@ namespace ILRuntime.Reflection
                 if (i.Name == name)
                     return i;
             }
-            if (BaseType != null /*&& BaseType is ILRuntimeWrapperType*/)
+            if (BaseType != null && BaseType is ILRuntimeWrapperType)
             {
                 return BaseType.GetField(name, bindingAttr);
             }
@@ -330,7 +330,7 @@ namespace ILRuntime.Reflection
             }
             if ((bindingAttr & BindingFlags.DeclaredOnly) != BindingFlags.DeclaredOnly)
             {
-                if (BaseType != null /*&& (BaseType is ILRuntimeWrapperType)*/)
+                if (BaseType != null && (BaseType is ILRuntimeWrapperType))
                 {
                     res.AddRange(BaseType.GetFields(bindingAttr));
                 }
