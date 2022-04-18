@@ -1,7 +1,7 @@
 {
   "name": "ilruntime-debug",
   "displayName": "ILRuntime Debug",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "publisher": "liiir",
   "description": "Debugger extension for ILRuntime",
   "author": {
@@ -38,7 +38,7 @@
     "package": "vsce package",
     "publish": "vsce publish",
     "publish-pre-release": "vsce publish --pre-release",
-    "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
+    "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify",
     "test": "npm run typecheck"
   },
   "devDependencies": {
@@ -64,7 +64,6 @@
     "vsce": "^2.6.7"
   },
   "main": "./dist/extension.js",
-  "browser": "./dist/web-extension.js",
   "activationEvents": [
     "onDebugResolve:ilruntime",
     "onDebugDynamicConfigurations:ilruntime",
@@ -76,12 +75,12 @@
     "request": "never"
   },
   "contributes": {
-    "configuration":{
+    "configuration": {
       "title": "ILRuntime Debugger",
       "properties": {
-        "ilruntime.broadcastPort":{
-          "type":"number",
-          "default":56000,
+        "ilruntime.broadcastPort": {
+          "type": "number",
+          "default": 56000,
           "description": "UDP broadcast port for debugger server"
         }
       }
@@ -132,7 +131,12 @@
           "csharp"
         ],
         "label": "ILRuntime Debugger",
-        "program": "./out/win-x86/VSCodeDAILRuntime.exe",
+        "windows": {
+          "program": "./out/win-x86/VSCodeDAILRuntime.exe"
+        },
+        "osx": {
+          "program": "./out/osx-x86/VSCodeDAILRuntime"
+        },
         "configurationAttributes": {
           "launch": {
             "required": [
@@ -144,7 +148,7 @@
                 "description": "Target address for ilruntime instance.",
                 "default": "${command:AskForAddress}"
               },
-              "debug" :{
+              "debug": {
                 "type": "boolean",
                 "description": "Wait for debugger to be attached.",
                 "default": false
@@ -182,7 +186,7 @@
             "request": "launch",
             "name": "Attach to ILRuntime",
             "address": "${command:AskForAddress}",
-            "debug" : true,
+            "debug": true,
             "stopOnEntry": true
           }
         ],
