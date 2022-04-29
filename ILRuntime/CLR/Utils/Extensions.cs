@@ -11,12 +11,28 @@ using ILRuntime.Runtime.Intepreter;
 using System.Reflection;
 using ILRuntime.Reflection;
 
+using AppDomain = ILRuntime.Runtime.Enviorment.AppDomain;
+
 namespace ILRuntime.CLR.Utils
 {
     public delegate TResult Func<T1, T2, T3, T4, T5, TResult>(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5);
 
     public static class Extensions
     {
+
+        [Flags]
+        public enum TypeFlags
+        {
+            Default = 0,
+            IsPrimitive = 0x1,
+            IsByRef = 0x2,
+            IsEnum = 0x4,
+            IsDelegate = 0x8,
+            IsValueType = 0x10,
+        }
+
+        private static readonly Dictionary<Type, TypeFlags> runtimeTypeFlags = new Dictionary<Type, TypeFlags>();
+        private static readonly Dictionary<AppDomain, Dictionary<Type, TypeFlags>> ilrTypeFlags = new Dictionary<AppDomain, Dictionary<Type, TypeFlags>>();
         public static List<IType> EmptyParamList = new List<IType>();
         public static List<IType> GetParamList(this MethodReference def, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IType contextType, IMethod contextMethod, IType[] genericArguments)
         {
@@ -158,19 +174,6 @@ namespace ILRuntime.CLR.Utils
             return sb.ToString();
         }
 
-        [Flags]
-        public enum TypeFlags
-        {
-            Default = 0,
-            IsPrimitive = 0x1,
-            IsByRef = 0x2,
-            IsEnum = 0x4,
-            IsDelegate = 0x8,
-            IsValueType = 0x10,
-        }
-
-        private static readonly Dictionary<Type, TypeFlags> typeFlags = new Dictionary<Type, TypeFlags>(new ByReferenceKeyComparer<Type>());
-
         public static bool FastIsEnum(this Type pt)
         {
             return (pt.GetTypeFlags() & TypeFlags.IsEnum) != 0;
@@ -201,9 +204,20 @@ namespace ILRuntime.CLR.Utils
 
         public static TypeFlags GetTypeFlags(this Type pt)
         {
+            Dictionary<Type, TypeFlags> dict;
             var result = TypeFlags.Default;
-
-            if (!typeFlags.TryGetValue(pt, out result))
+            AppDomain appDomain = null;
+            if (pt is ILRuntimeWrapperType ilrtwt)
+                appDomain = ilrtwt.CLRType.AppDomain;
+            if (appDomain == null)
+                dict = runtimeTypeFlags;
+            else if (!ilrTypeFlags.TryGetValue(appDomain, out dict))
+            {
+                dict = new Dictionary<Type, TypeFlags>();
+                ilrTypeFlags.Add(appDomain, dict);
+            }
+            
+            if (!dict.TryGetValue(pt, out result))
             {
                 if (pt.IsPrimitive)
                 {
@@ -230,10 +244,16 @@ namespace ILRuntime.CLR.Utils
                     result |= TypeFlags.IsValueType;
                 }
 
-                typeFlags[pt] = result;
+                dict[pt] = result;
             }
 
             return result;
+        }
+
+        public static void ClearTypeFlags(this AppDomain appDomain)
+        {
+            if (appDomain == null) return;
+            ilrTypeFlags.Remove(appDomain);
         }
 
         public static object CheckCLRTypes(this Type pt, object obj)

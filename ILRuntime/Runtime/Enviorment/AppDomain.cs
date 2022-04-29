@@ -208,6 +208,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void Dispose()
         {
+            this.ClearTypeFlags();
             debugService.StopDebugService();
             jitWorker.Dispose();
         }
