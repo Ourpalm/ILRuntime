@@ -643,7 +643,29 @@ namespace TestCases
             t.OnChangeWithOldVal += Message;
             t.Value = 1234;
         }
+        public static void DelegateTest42()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest cls = new ILRuntimeTest.TestFramework.DelegateTest();
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = cls.TestIntDelegateInstance;
 
+            if (ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2.Target != cls)
+                throw new Exception();
+
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = ILRuntimeTest.TestFramework.DelegateTest.TestIntDelegate;
+            if (ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2.Target != null)
+                throw new Exception();
+
+            DelegateTestCls cls2 = new DelegateTestCls(100);
+            testDele = cls2.IntTest3;
+
+            if (testDele.Target != cls2)
+                throw new Exception();
+
+            testDele = IntTest3;
+            if (testDele.Target != null)
+                throw new Exception();
+
+        }
         static void Message<T>(T oldVal, T newVal)
         {
             Console.WriteLine(typeof(T));
