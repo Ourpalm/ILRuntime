@@ -691,6 +691,27 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return null;
         }*/
+        public unsafe static StackObject* DelegateGetTarget(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            var ret = esp - 1;
+            AppDomain domain = intp.AppDomain;
+            var param = esp - 1;
+            object dele = StackObject.ToObject(param, domain, mStack);
+            intp.Free(param);
+            if (dele != null)
+            {
+                if (dele is IDelegateAdapter)
+                {
+                    return ILIntepreter.PushObject(ret, mStack, ((IDelegateAdapter)dele).Instance);
+                }
+                else
+                {
+                    return ILIntepreter.PushObject(ret, mStack, ((Delegate)dele).Target);
+                }
+            }
+            else
+                throw new NullReferenceException();
+        }
 
         public unsafe static StackObject* DelegateEqulity(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
         {

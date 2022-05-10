@@ -194,6 +194,8 @@ namespace ILRuntime.Runtime.Enviorment
             RegisterCLRMethodRedirection(mi, CLRRedirections.DelegateCreateDelegate2);
             mi = typeof(Delegate).GetMethod("CreateDelegate", new Type[] { typeof(Type), typeof(object), typeof(MethodInfo) });
             RegisterCLRMethodRedirection(mi, CLRRedirections.DelegateCreateDelegate3);
+            mi = typeof(Delegate).GetMethod("get_Target");
+            RegisterCLRMethodRedirection(mi, CLRRedirections.DelegateGetTarget);
             dMgr = new DelegateManager(this);
             dMgr.RegisterDelegateConvertor<Action>((dele) =>
             {
