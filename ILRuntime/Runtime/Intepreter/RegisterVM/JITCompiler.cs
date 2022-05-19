@@ -342,7 +342,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
             switchTargets = jumptables;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
-            stackRegisterCnt = totalRegCnt - baseRegStart;
+            stackRegisterCnt = Math.Max(totalRegCnt - baseRegStart, 0);
 #if OUTPUT_JIT_RESULT
             Console.WriteLine($"Final Results for {method}:");
 
