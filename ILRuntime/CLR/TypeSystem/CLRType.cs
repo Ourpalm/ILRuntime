@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -575,7 +576,7 @@ namespace ILRuntime.CLR.TypeSystem
             fieldMapping = new Dictionary<string, int>();
             fieldInfoCache = new Dictionary<int, FieldInfo>();
 
-            var fields = clrType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+            var fields = clrType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static).ToList();
             int idx = 0;
             bool hasValueTypeBinder = ValueTypeBinder != null;
             if (hasValueTypeBinder)
@@ -584,8 +585,13 @@ namespace ILRuntime.CLR.TypeSystem
             }
             if (hasValueTypeBinder || isEnum)
             {
-                orderedFieldTypes = new IType[fields.Length];
+                orderedFieldTypes = new IType[fields.Count];
             }
+
+            fields.Sort((a, b) =>
+            {
+                return a.MetadataToken - b.MetadataToken;
+            });
             foreach (var i in fields)
             {
                 int hashCode = i.GetHashCode();
