@@ -202,7 +202,10 @@ namespace ILRuntime.CLR.Utils
         public static TypeFlags GetTypeFlags(this Type pt)
         {
             var result = TypeFlags.Default;
-
+            if(pt is ILRuntimeWrapperType)
+            {
+                pt = ((ILRuntimeWrapperType)pt).RealType;
+            }
             if (!typeFlags.TryGetValue(pt, out result))
             {
                 if (pt.IsPrimitive)
