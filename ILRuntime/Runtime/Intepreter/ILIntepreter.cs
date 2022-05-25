@@ -1948,6 +1948,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
+                                        intVal = (int)(ip - ptr);
+                                        var eh = FindExceptionHandlerByBranchTarget(intVal, finallyEndAddress, ehs);
+                                        if (eh != null)
+                                        {
+                                            ip = ptr + eh.HandlerStart;
+                                            continue;
+                                        }
                                         ip = ptr + finallyEndAddress;
                                         finallyEndAddress = 0;
                                         continue;
@@ -4648,8 +4655,8 @@ namespace ILRuntime.Runtime.Intepreter
                 var e = ehs[i];
                 if (addr >= e.TryStart && addr <= e.TryEnd && (branchTarget < e.TryStart || branchTarget > e.TryEnd) && e.HandlerType == ExceptionHandlerType.Finally)
                 {
-                    eh = e;
-                    break;
+                    if (eh == null || e.TryStart > eh.TryStart)
+                        eh = e;
                 }
             }
             return eh;
