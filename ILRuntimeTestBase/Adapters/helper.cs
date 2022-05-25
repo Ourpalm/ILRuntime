@@ -27,13 +27,15 @@ namespace ILRuntimeTest.TestFramework
             app.RegisterCrossBindingAdaptor(new IDisposableAdapter());
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTest2Adaptor());
             app.RegisterCrossBindingAdaptor(new IAsyncStateMachineClassInheritanceAdaptor());
-
             // value type register
 
             app.RegisterValueTypeBinder(typeof(TestVector3), new TestVector3Binder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct), new TestVectorStructBinder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct2), new TestVectorStruct2Binder());
             app.RegisterValueTypeBinder(typeof(System.Collections.Generic.KeyValuePair<uint, ILRuntime.Runtime.Intepreter.ILTypeInstance>), new KeyValuePairUInt32ILTypeInstanceBinder());
+
+            app.RegisterValueTypeBinder(typeof(TestStructA), new TestStructABinder());
+            app.RegisterValueTypeBinder(typeof(TestStructB), new TestStructBBinder());
 
             // delegate register 
 

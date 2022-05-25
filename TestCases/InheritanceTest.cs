@@ -54,6 +54,7 @@ namespace TestCases
             cls2.TestAbstract();
             cls2.TestVirtual();
             cls2.TestField();
+            cls2.AA1();
 
             Console.WriteLine("----------------------------------");
 
@@ -598,13 +599,19 @@ namespace TestCases
         }
     }
 
-    class TestCls2 : ClassInheritanceTest
+    class TestCls2 : ClassInheritanceTest, IAs1
     {
         public TestCls2()
             : base(4, 5)
         {
             testVal = 2;
         }
+
+        public void AA1()
+        {
+            Console.WriteLine("This is TestCls2.AA1");
+        }
+
         public override void TestAbstract()
         {
             Console.WriteLine("This is TestCls2.TestAbstract");

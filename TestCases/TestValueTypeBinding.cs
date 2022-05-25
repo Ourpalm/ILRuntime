@@ -493,5 +493,35 @@ namespace TestCases
             if (cls.Vector2.Z != 2)
                 throw new Exception($"cls.Vector2.Z == {cls.Vector2.Z}");
         }
+        static TestStructB mAttr;
+        public static void UnitTest_10049()
+        {
+            MinCirclePath path = new MinCirclePath();
+            path.Test();
+        }
+
+        public class MinCirclePath
+        {
+            private TestStructB mAttr;
+
+            public void Test()
+            {
+                mAttr = GetAttr();
+
+                Console.WriteLine(mAttr);
+            }
+
+            private TestStructB GetAttr()
+            {
+                var a = new TestStructA() { value = 5 };
+
+                //这样写不会错
+                //var ret = TestStructB.GetOne(a);
+                //return ret;
+
+                //这样直接返回就会错
+                return TestStructB.GetOne(a);
+            }
+        }
     }
 }

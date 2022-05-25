@@ -207,19 +207,40 @@ namespace TestCases
         public static void TestUsingForeach()
         {
             var cls = new TestUsingCls();
+            var cls2 = new TestUsingCls();
             int[] arr = new int[10];
             int res = 0;
             using (cls)
             {
-                foreach(var i in arr)
+                using (cls2)
                 {
-                    res += i;
+                    foreach (var i in arr)
+                    {
+                        res += i;
+                    }
                 }
             }
 
-            if (!cls.Disposed)
+            if (!cls.Disposed || !cls2.Disposed)
             {
                 throw new Exception();
+            }
+        }
+
+        public static void TestUsingNested()  // 在外部 dll 中调用此过程
+        {
+            int len = 8;
+            using (var o = new SampleDisposableClass<int>(len))
+            {
+                using (var p = new SampleDisposableClass<float>(len))
+                {
+                    for (int i = 0; i < len; i++)
+                    {
+                        o[i] = i;
+                        p[i] = o[i] * 0.5f;
+                    }
+                    Console.WriteLine(p[len - 1]);
+                }
             }
         }
 
@@ -230,6 +251,51 @@ namespace TestCases
             public void Dispose()
             {
                 Disposed = true;
+            }
+        }
+
+        public class SampleDisposableClass<T> : IDisposable
+        {
+            readonly T[] arr;
+
+            public SampleDisposableClass(int length = 8)
+            {
+                arr = new T[length];
+            }
+
+            public T this[int index]
+            {
+                get => arr[index];
+                set => arr[index] = value;
+            }
+
+            private bool disposedValue;
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    Console.WriteLine($"Dispose({disposing}) -> {typeof(T)}");
+                    if (disposing)
+                    {
+                        // pass
+                    }
+                    disposedValue = true;
+                }
+            }
+
+            ~SampleDisposableClass()
+            {
+                Dispose(disposing: false);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"Finalizer -> {typeof(T)}");
+#endif
+            }
+
+            public void Dispose()
+            {
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
             }
         }
     }

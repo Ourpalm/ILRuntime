@@ -1618,7 +1618,7 @@ namespace ILRuntime.Runtime.Debugger
             var valuePointerEnd = stack.ValueTypeStackPointer;
             StringBuilder final = new StringBuilder();
             HashSet<long> leakVObj = new HashSet<long>();
-            for (var i = stack.ValueTypeStackBase; i > stack.ValueTypeStackPointer;)
+            for (var i = stack.ValueTypeStackBase; i > stack.ValueTypeStackPointer && i <= stack.ValueTypeStackBase;)
             {
                 leakVObj.Add((long)i);
                 i = Minus(i, i->ValueLow + 1);
@@ -1743,9 +1743,16 @@ namespace ILRuntime.Runtime.Debugger
                         {
                             if (esp->ObjectType < ObjectTypes.Object || esp->Value < mStack.Count)
                             {
-                                var obj = StackObject.ToObject(esp, domain, mStack);
-                                if (obj != null)
-                                    text = obj.ToString();
+                                try
+                                {
+                                    var obj = StackObject.ToObject(esp, domain, mStack);
+                                    if (obj != null)
+                                        text = obj.ToString();
+                                }
+                                catch
+                                {
+                                    text = "Invalid Object";
+                                }
                             }
                         }
 
