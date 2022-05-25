@@ -3546,6 +3546,11 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                     PushNull(objRef);
                                             }
+                                            else
+                                            {
+                                                if (objRef->ObjectType >= ObjectTypes.Object)
+                                                    mStack[objRef->Value] = ((CLRType)type).CreateDefaultInstance();
+                                            }
                                         }
                                     }
 

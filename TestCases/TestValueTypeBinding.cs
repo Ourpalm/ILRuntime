@@ -523,5 +523,33 @@ namespace TestCases
                 return TestStructB.GetOne(a);
             }
         }
+
+        public static void UnitTest_10050()
+        {
+            // 热更工程使用
+            List<TestVector3NoBinding> structs = new List<TestVector3NoBinding>();
+            for (int i = 0; i < 5; i++)
+            {
+                TestVector3NoBinding t = new TestVector3NoBinding();
+                if (i % 2 != 0)
+                    t.x = i;
+                structs.Add(t);
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                var item = structs[i];
+                Console.WriteLine(item.x);
+                if (i % 2 != 0)
+                {
+                    if (item.x != i)
+                        throw new Exception();
+                }
+                else
+                {
+                    if (item.x != 0)
+                        throw new Exception();
+                }
+            }
+        }
     }
 }
