@@ -187,13 +187,12 @@ namespace ILRuntime.Runtime.Stack
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
             if (descriptor > dst)
                 throw new StackOverflowException();
-            *dst = *descriptor;
             IType type = intepreter.AppDomain.GetTypeByIndex(descriptor->Value);
             int cnt, mCnt;
             type.GetValueTypeSize(out cnt, out mCnt);
-            StackObject* startAddr = descriptor - 1;
+            StackObject* startAddr = descriptor;
             StackObject* endAddr = descriptor - cnt;
-            StackObject* tarStartAddr = dst - 1;
+            StackObject* tarStartAddr = dst ;
             StackObject* tarEndAddr = dst - cnt;
             for(int i = 0; i < cnt; i++)
             {
