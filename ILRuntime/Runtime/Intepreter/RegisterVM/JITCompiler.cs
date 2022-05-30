@@ -158,7 +158,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 {
                     if (b.PreviousBlocks.Count == 0)
                     {
-                        if (CheckNeedInitObj(b, r, method.ReturnType != method.AppDomain.VoidType, visitedBlocks))
+                        var lt = def.Body.Variables[r - locVarRegStart];
+                        bool needInitOjb = false;
+                        if (lt.VariableType.IsGenericParameter)
+                        {
+                            var gt = method.FindGenericArgument(lt.VariableType.Name);
+                            needInitOjb = gt.IsValueType && !gt.IsPrimitive;
+                        }
+                        else
+                            needInitOjb = lt.VariableType.IsValueType && !lt.VariableType.IsPrimitive;
+                        if (needInitOjb || CheckNeedInitObj(b, r, method.ReturnType != method.AppDomain.VoidType, visitedBlocks))
                         {
                             OpCodeR code = new OpCodeR();
                             code.Code = OpCodeREnum.Initobj;
@@ -333,7 +342,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
             switchTargets = jumptables;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
-            stackRegisterCnt = totalRegCnt - baseRegStart;
+            stackRegisterCnt = Math.Max(totalRegCnt - baseRegStart, 0);
 #if OUTPUT_JIT_RESULT
             Console.WriteLine($"Final Results for {method}:");
 

@@ -118,24 +118,14 @@ namespace TestCases
         {
             Vector3 pos = Vector3.One;
 
-            pos.x += 1;
-            pos.y += 2;
-
-            if (pos.x > 10)
-                pos.x = 10;
-            if (pos.x < -10)
-                pos.x = -10;
-            if (pos.y > 10)
-                pos.y = 10;
-            if (pos.y < -10)
-                pos.y = -10;
-
             var pos2 = tttt(pos);
-            Console.WriteLine("pos.x = " + pos.x);
-            Console.WriteLine("pos2.x = " + pos2.x);
-
             if (pos.x == pos2.x)
+            {
+                Console.WriteLine("pos.x = " + pos.x);
+                Console.WriteLine("pos2.x = " + pos2.x);
+
                 throw new Exception("Value Type Violation");
+            }
         }
 
         public static void UnitTest_10023()
@@ -472,6 +462,21 @@ namespace TestCases
             uint x = 1000;
             int xx = (int)x;
             a = xx;
+        }
+
+        public static void UnitTest_1020()
+        {
+            var res = UnitTest_1020Sub(20176515, 2400000000);
+            Console.WriteLine($"res={res}");
+            if (Math.Abs(res - 0.008406881f) > 0.00001)
+                throw new Exception();
+        }
+
+        static float UnitTest_1020Sub(long exp, long maxExp)
+        {
+            float percent = (float)exp / maxExp;
+            Console.WriteLine("maxExp:" + maxExp + ",exp:" + exp + ", exp / maxExp:" + percent);
+            return percent;
         }
     }
 }

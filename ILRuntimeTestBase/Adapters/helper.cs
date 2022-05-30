@@ -27,13 +27,15 @@ namespace ILRuntimeTest.TestFramework
             app.RegisterCrossBindingAdaptor(new IDisposableAdapter());
             app.RegisterCrossBindingAdaptor(new ClassInheritanceTest2Adaptor());
             app.RegisterCrossBindingAdaptor(new IAsyncStateMachineClassInheritanceAdaptor());
-
             // value type register
 
             app.RegisterValueTypeBinder(typeof(TestVector3), new TestVector3Binder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct), new TestVectorStructBinder());
             app.RegisterValueTypeBinder(typeof(TestVectorStruct2), new TestVectorStruct2Binder());
             app.RegisterValueTypeBinder(typeof(System.Collections.Generic.KeyValuePair<uint, ILRuntime.Runtime.Intepreter.ILTypeInstance>), new KeyValuePairUInt32ILTypeInstanceBinder());
+
+            app.RegisterValueTypeBinder(typeof(TestStructA), new TestStructABinder());
+            app.RegisterValueTypeBinder(typeof(TestStructB), new TestStructBBinder());
 
             // delegate register 
 
@@ -119,7 +121,13 @@ namespace ILRuntimeTest.TestFramework
                     return ((Func<Int32,Single,String>)action)(a,b);
                 });
             });
-
+            app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal>((act) =>
+            {
+                return new ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal((oldVal, newVal) =>
+                {
+                    ((Action<System.Int64, System.Int64>)act)(oldVal, newVal);
+                });
+            });
             // LitJson register
             LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(app);
 
@@ -134,6 +142,7 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterMethodDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance>(); 
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestBase.ExtensionClass>();
+            app.DelegateManager.RegisterMethodDelegate<System.Int64, System.Int64>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Int32>();
             app.DelegateManager.RegisterFunctionDelegate<System.Threading.Tasks.Task>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestBase.ExtensionClass, System.Threading.Tasks.Task>();

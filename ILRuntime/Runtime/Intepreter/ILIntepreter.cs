@@ -1948,6 +1948,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
+                                        intVal = (int)(ip - ptr);
+                                        var eh = FindExceptionHandlerByBranchTarget(intVal, finallyEndAddress, ehs);
+                                        if (eh != null)
+                                        {
+                                            ip = ptr + eh.HandlerStart;
+                                            continue;
+                                        }
                                         ip = ptr + finallyEndAddress;
                                         finallyEndAddress = 0;
                                         continue;
@@ -3375,6 +3382,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         //Nothing to do with primitive types
                                     }
+                                    else if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        //Nothing to do with ValueTypeReference
+                                    }
                                     else
                                         throw new InvalidCastException();
                                 }
@@ -3534,6 +3545,11 @@ namespace ILRuntime.Runtime.Intepreter
                                                     mStack[objRef->Value] = null;
                                                 else
                                                     PushNull(objRef);
+                                            }
+                                            else
+                                            {
+                                                if (objRef->ObjectType >= ObjectTypes.Object)
+                                                    mStack[objRef->Value] = ((CLRType)type).CreateDefaultInstance();
                                             }
                                         }
                                     }
@@ -4557,7 +4573,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     ILRuntimeException ire = (ILRuntimeException)ex;
                                     var inner = ire.InnerException;
                                     inner.Data["ThisInfo"] = ire.ThisInfo;
-                                    inner.Data["StackTrace"] = ire.StackTrace;
+                                    inner.Data["StackTrace"] = inner.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", ire.StackTrace, inner.Data["StackTrace"]) : ire.StackTrace;
                                     inner.Data["LocalInfo"] = ire.LocalInfo;
                                     ex = inner;
                                 }
@@ -4568,7 +4584,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
                                     else
                                         ex.Data["ThisInfo"] = "";
-                                    ex.Data["StackTrace"] = debugger.GetStackTrace(this);
+                                    ex.Data["StackTrace"] = ex.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", debugger.GetStackTrace(this), ex.Data["StackTrace"]) : debugger.GetStackTrace(this);
                                     ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
                                 }
                                 //Clear call stack
@@ -4644,8 +4660,8 @@ namespace ILRuntime.Runtime.Intepreter
                 var e = ehs[i];
                 if (addr >= e.TryStart && addr <= e.TryEnd && (branchTarget < e.TryStart || branchTarget > e.TryEnd) && e.HandlerType == ExceptionHandlerType.Finally)
                 {
-                    eh = e;
-                    break;
+                    if (eh == null || e.TryStart > eh.TryStart)
+                        eh = e;
                 }
             }
             return eh;

@@ -234,5 +234,31 @@ namespace TestCases
             await Task.Delay(1000);
             Console.WriteLine("4");
         }
+
+        public static void TestRun9()
+        {
+            var list = new List<int>();
+            for (var i = 0; i < 3; i++)
+            {
+                list.Add(i + 1);
+            }
+            TestRun9Sub(list.AsReadOnly());
+        }
+
+        static async void TestRun9Sub(System.Collections.ObjectModel.ReadOnlyCollection<int> roc)
+        {
+            int cnt = 0;
+            // 1. must be ReadOnlyCollection<T>
+            foreach (var val in roc)
+            {
+                cnt++;
+                if (cnt > 3)
+                    throw new Exception();
+                Console.WriteLine(val);
+                // 2. must await a async task
+                await Task.Delay(1);
+            }
+            // it will stuck at some point, and becomes a infinite loop
+        }
     }
 }

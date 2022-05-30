@@ -187,8 +187,49 @@ namespace ILRuntime.Runtime.Stack
             StackObject* descriptor = ILIntepreter.ResolveReference(src);
             if (descriptor > dst)
                 throw new StackOverflowException();
-            *dst = *descriptor;
-            int cnt = descriptor->ValueLow;
+            IType type = intepreter.AppDomain.GetTypeByIndex(descriptor->Value);
+            int cnt, mCnt;
+            type.GetValueTypeSize(out cnt, out mCnt);
+            StackObject* startAddr = descriptor;
+            StackObject* endAddr = descriptor - cnt;
+            StackObject* tarStartAddr = dst ;
+            StackObject* tarEndAddr = dst - cnt;
+            for(int i = 0; i < cnt; i++)
+            {
+                StackObject* addr = startAddr - i;
+                StackObject* tarVal = tarStartAddr - i;
+
+                *tarVal = *addr;
+                switch(addr->ObjectType)
+                {
+                    case ObjectTypes.Object:
+                    case ObjectTypes.ArrayReference:
+                    case ObjectTypes.FieldReference:
+                        if (tarVal->Value >= mStackBase)
+                        {
+                            int oldIdx = addr->Value;
+                            tarVal->Value = mStackBase;
+                            managedStack[mStackBase] = managedStack[oldIdx];
+                            mStackBase++;
+                        }
+                        break;
+                    case ObjectTypes.ValueTypeObjectReference:
+                        {
+                            StackObject* curVal = *(StackObject**)&tarVal->Value;
+                            if (curVal <= startAddr && curVal > endAddr)
+                            {
+                                long diff = startAddr - curVal;
+                                StackObject* newAddr = tarStartAddr - diff;
+                                *(StackObject**)&tarVal->Value = newAddr;
+                            }
+                            else
+                                throw new StackOverflowException();
+                        }
+                        break;
+                }
+            }
+            dst = tarEndAddr;
+            /*int cnt = descriptor->ValueLow;
             StackObject* endAddr = ILIntepreter.Minus(dst, cnt + 1);
             for(int i = 0; i < cnt; i++)
             {
@@ -215,7 +256,7 @@ namespace ILRuntime.Runtime.Stack
                         break;
                 }
             }
-            dst = endAddr;
+            dst = endAddr;*/
         }
 
         int CountValueTypeManaged(IType type)

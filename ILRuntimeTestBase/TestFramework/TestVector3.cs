@@ -242,4 +242,43 @@ namespace ILRuntimeTest.TestFramework
 
         public override bool Equals(object obj) => Value.Equals((obj is JInt ? (JInt)obj : default).Value);
     }
+
+    public struct TestStructA
+    {
+        public long value;
+    }
+
+    public struct TestStructB
+    {
+        public TestStructA m1;
+        public TestStructA m2;
+        public TestStructA m3;
+        public TestStructA m4;
+        public TestStructA m5;
+        public TestStructA m6;
+        public TestStructA m7;
+        public TestStructA m8;
+        public TestStructA m9;
+
+        public static TestStructB GetOne(TestStructA a)
+        {
+            TestStructB ret = default;
+            ret.m1 = new TestStructA { value = 1 };
+            ret.m2 = new TestStructA { value = 2 };
+            ret.m3 = new TestStructA { value = 3 };
+            ret.m4 = new TestStructA { value = 4 };
+            ret.m5 = new TestStructA { value = 5 };
+            ret.m6 = new TestStructA { value = 6 };
+            ret.m7 = new TestStructA { value = 7 };
+            ret.m8 = new TestStructA { value = 8 };
+            ret.m9 = new TestStructA { value = 9 };
+
+            return ret;
+        }
+
+        public override string ToString()
+        {
+            return $"{m1.value}|{m2.value}|{ m3.value}|{ m4.value}|{ m5.value}|{ m6.value}|{ m7.value}|{ m8.value}|{ m9.value}";
+        }
+    }
 }

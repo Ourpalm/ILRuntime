@@ -31,7 +31,7 @@ namespace ILRuntime.Reflection
             for (int i = 0; i < m.ParameterCount; i++)
             {
                 var pd = m.Definition.Parameters[i];
-                parameters[i] = new ILRuntimeParameterInfo(pd, m.Parameters[i], this);
+                parameters[i] = new ILRuntimeParameterInfo(pd, m.Parameters[i], this, appdomain);
             }
         }
 
@@ -261,5 +261,10 @@ namespace ILRuntime.Reflection
             return del.Delegate;
         }
 #endif
+
+        public override string ToString()
+        {
+            return definition == null ? base.ToString() : definition.ToString();
+        }
     }
 }

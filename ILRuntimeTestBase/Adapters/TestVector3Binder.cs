@@ -9,6 +9,138 @@ using ILRuntime.Runtime.Stack;
 
 namespace ILRuntimeTest.TestFramework
 {
+    public unsafe class TestStructABinder : ValueTypeBinder<TestStructA>
+    {
+        public override unsafe void CopyValueTypeToStack(ref TestStructA ins, StackObject* ptr, IList<object> stack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            *(long*)&v->Value = ins.value;
+        }
+
+        public override unsafe void AssignFromStack(ref TestStructA ins, StackObject* ptr, IList<object> stack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            ins.value = *(long*)&v->Value;
+        }
+
+        public static TestStructA OnlyParseTestStructA(StackObject* ptr, IList<object> mStack)
+        {
+            TestStructA value;
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            //Debug.Log("执行ParseFP的时候指针地址类型：" + a->ObjectType);
+
+            switch (a->ObjectType)
+            {
+                case ObjectTypes.ValueTypeObjectReference:
+                    {
+                        var src = ILIntepreter.ResolveReference(a);
+                        value.value = *(long*)&ILIntepreter.Minus(src, 1)->Value;
+                        //intp.FreeStackValueType(ptr);
+                    }
+                    break;
+                case ObjectTypes.Object:
+                    {
+                        value = (TestStructA)mStack[a->Value];
+                    }
+                    break;
+                case ObjectTypes.Integer:
+                    {
+                        value.value = a->Value;
+                    }
+                    break;
+                case ObjectTypes.Long:
+                    {
+                        value.value = *(long*)&a->Value;
+                    }
+                    break;
+                //case ObjectTypes.Float:
+                //    {
+                //        value.a = *(float*)&a->Value;
+                //    }
+                //    break;
+                //case ObjectTypes.Double:
+                //    {
+                //        value.a = *(double*)&a->Value;
+                //    }
+                //    break;
+                default:
+                    {
+                        throw new NotSupportedException("执行ParseTestStructA的时候出错，指针地址类型超出预期,需补充：" + a->ObjectType);
+                        value.value = -999999;
+                    }
+                    break;
+            }
+
+            return value;
+        }
+
+        public static void OnlyPushTestStructA(TestStructA value, StackObject* ptr)
+        {
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = ILIntepreter.ResolveReference(a);
+                *(long*)&ILIntepreter.Minus(src, 1)->Value = value.value;
+                //intp.FreeStackValueType(ptr);
+            }
+            else
+            {
+                throw new NotSupportedException("执行SetTestStructA的时候出错，指针地址不是valueType");
+                //intp.Free(ptr);
+            }
+        }
+    }
+
+
+    public unsafe class TestStructBBinder : ValueTypeBinder<TestStructB>
+    {
+        public override unsafe void AssignFromStack(ref TestStructB ins, StackObject* ptr, IList<object> mStack)
+        {
+            //Debug.Log("Assign From Stack");
+            var v = ILIntepreter.Minus(ptr, 1);
+            ins.m1 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 2);
+            ins.m2 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 3);
+            ins.m3 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 4);
+            ins.m4 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 5);
+            ins.m5 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 6);
+            ins.m6 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 7);
+            ins.m7 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 8);
+            ins.m8 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+            v = ILIntepreter.Minus(ptr, 9);
+            ins.m9 = TestStructABinder.OnlyParseTestStructA(v, mStack);
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref TestStructB ins, StackObject* ptr, IList<object> mStack)
+        {
+            //Debug.Log("Copy Value To Stack");
+            var v = ILIntepreter.Minus(ptr, 1);
+            TestStructABinder.OnlyPushTestStructA(ins.m1, v);
+            v = ILIntepreter.Minus(ptr, 2);
+            TestStructABinder.OnlyPushTestStructA(ins.m2, v);
+            v = ILIntepreter.Minus(ptr, 3);
+            TestStructABinder.OnlyPushTestStructA(ins.m3, v);
+            v = ILIntepreter.Minus(ptr, 4);
+            TestStructABinder.OnlyPushTestStructA(ins.m4, v);
+            v = ILIntepreter.Minus(ptr, 5);
+            TestStructABinder.OnlyPushTestStructA(ins.m5, v);
+            v = ILIntepreter.Minus(ptr, 6);
+            TestStructABinder.OnlyPushTestStructA(ins.m6, v);
+            v = ILIntepreter.Minus(ptr, 7);
+            TestStructABinder.OnlyPushTestStructA(ins.m7, v);
+            v = ILIntepreter.Minus(ptr, 8);
+            TestStructABinder.OnlyPushTestStructA(ins.m8, v);
+            v = ILIntepreter.Minus(ptr, 9);
+            TestStructABinder.OnlyPushTestStructA(ins.m9, v);
+        }
+    }
+
     public unsafe class TestVector3Binder : ValueTypeBinder<TestVector3>
     {
         public override unsafe void CopyValueTypeToStack(ref TestVector3 ins, StackObject* ptr, IList<object> mStack)

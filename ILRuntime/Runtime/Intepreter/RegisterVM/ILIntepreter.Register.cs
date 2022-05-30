@@ -21,6 +21,7 @@ namespace ILRuntime.Runtime.Intepreter
         public int LocalManagedBase;
         public StackObject* StackBase;
         public StackObject* RegisterStart;
+        public StackObject* StackRegisterStart;
         public StackObject* RegisterEnd;
         public IList<object> ManagedStack;
     }
@@ -149,6 +150,7 @@ namespace ILRuntime.Runtime.Intepreter
             info.LocalManagedBase = locBase;
             info.FrameManagedBase = frame.ManagedStackBase;
             info.RegisterStart = r;
+            info.StackRegisterStart = stackRegStart + locCnt;
             info.ManagedStack = mStack;
 
             object obj;
@@ -2774,6 +2776,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
+                                        intVal = (int)(ip - ptr);
+                                        var eh = FindExceptionHandlerByBranchTarget(intVal, finallyEndAddress, ehs);
+                                        if (eh != null)
+                                        {
+                                            ip = ptr + eh.HandlerStart;
+                                            continue;
+                                        }
                                         ip = ptr + finallyEndAddress;
                                         finallyEndAddress = 0;
                                         continue;
@@ -2858,6 +2867,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         dst = *(StackObject**)&objRef->Value;
                                                         var ft = domain.GetTypeByIndex(dst->Value) as ILType;
                                                         ilm = ft.GetVirtualMethod(ilm) as ILMethod;
+                                                        useRegister = ilm.ShouldUseRegisterVM;
                                                     }
                                                     else
                                                     {
@@ -2865,6 +2875,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         if (obj == null)
                                                             throw new NullReferenceException();
                                                         ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                                        useRegister = ilm.ShouldUseRegisterVM;
                                                     }
                                                 }
                                                 if (useRegister)
@@ -4041,6 +4052,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         //Nothing to do with primitive types
                                     }
+                                    else if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        //Nothing to do with ValueTypeReference
+                                    }
                                     else
                                         throw new InvalidCastException();
                                 }
@@ -5210,7 +5225,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     ILRuntimeException ire = (ILRuntimeException)ex;
                                     var inner = ire.InnerException;
                                     inner.Data["ThisInfo"] = ire.ThisInfo;
-                                    inner.Data["StackTrace"] = ire.StackTrace;
+                                    inner.Data["StackTrace"] = inner.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", ire.StackTrace, inner.Data["StackTrace"]) : ire.StackTrace;
                                     inner.Data["LocalInfo"] = ire.LocalInfo;
                                     ex = inner;
                                 }
@@ -5221,7 +5236,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
                                     else
                                         ex.Data["ThisInfo"] = "";
-                                    ex.Data["StackTrace"] = debugger.GetStackTrace(this);
+                                    ex.Data["StackTrace"] = ex.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", debugger.GetStackTrace(this), ex.Data["StackTrace"]) : debugger.GetStackTrace(this);
                                     ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
                                 }
                                 //Clear call stack
@@ -5345,7 +5360,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                 {
                                     var dst = *(StackObject**)&v->Value;
-                                    if (dst->Value != st.GetHashCode())
+                                    if (dst->Value != st.TypeIndex)
                                     {
                                         stack.FreeRegisterValueType(v);
                                         stack.AllocValueType(v, st, true);
@@ -5373,7 +5388,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                 {
                                     var dst = *(StackObject**)&v->Value;
-                                    if (dst->Value != st.GetHashCode())
+                                    if (dst->Value != st.TypeIndex)
                                     {
                                         stack.FreeRegisterValueType(v);
                                         stack.AllocValueType(v, st, true);
@@ -5418,12 +5433,13 @@ namespace ILRuntime.Runtime.Intepreter
                             if (st != null && st.IsValueType)
                             {
                                 var dst = *(StackObject**)&v->Value;
-                                if (dst->Value != st.GetHashCode())
+                                if (dst->Value != st.TypeIndex)
                                 {
                                     stack.FreeRegisterValueType(v);
                                     stack.AllocValueType(v, st, true);
+                                    dst = *(StackObject**)&v->Value;
                                 }
-                                ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStackSrc);
+                                ((ILTypeInstance)obj).CopyValueTypeToStack(dst, mStack);
                             }
                             else
                             {
@@ -5441,12 +5457,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 if (binder != null)
                                 {
                                     var dst = *(StackObject**)&v->Value;
-                                    if (dst->Value != st.GetHashCode())
+                                    if (dst->Value != st.TypeIndex)
                                     {
                                         stack.FreeRegisterValueType(v);
                                         stack.AllocValueType(v, st, true);
+                                        dst = *(StackObject**)&v->Value;
                                     }
-                                    binder.CopyValueTypeToStack(obj, dst, mStackSrc);
+                                    binder.CopyValueTypeToStack(obj, dst, mStack);
                                 }
                                 else
                                 {
@@ -5466,7 +5483,8 @@ namespace ILRuntime.Runtime.Intepreter
                     else
                     {
                         *v = *val;
-                        mStack[idx] = CheckAndCloneValueType(mStackSrc[v->Value], domain);
+                        bool isLocal = v >= info.RegisterStart && v < info.StackRegisterStart;
+                        mStack[idx] = isLocal ? CheckAndCloneValueType(mStackSrc[v->Value], domain) : mStackSrc[v->Value];
                         v->Value = idx;
                     }
                     break;
@@ -5474,7 +5492,7 @@ namespace ILRuntime.Runtime.Intepreter
                     if (v->ObjectType == ObjectTypes.ValueTypeObjectReference)
                     {
                         bool noCheck = false;
-                        if(!CanCopyStackValueType(val,v))
+                        if (!CanCopyStackValueType(val, v))
                         {
                             var dst = *(StackObject**)&val->Value;
                             var ct = domain.GetTypeByIndex(dst->Value);
