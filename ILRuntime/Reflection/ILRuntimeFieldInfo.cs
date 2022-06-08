@@ -172,6 +172,8 @@ namespace ILRuntime.Reflection
                 ILTypeInstance ins;
                 if (isStatic)
                 {
+                    if (definition.HasConstant)
+                        return definition.Constant;
                     ins = ilType.StaticInstance;
                 }
                 else
