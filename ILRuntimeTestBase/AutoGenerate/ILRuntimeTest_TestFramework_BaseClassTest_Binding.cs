@@ -11,7 +11,11 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
 using ILRuntime.CLR.Utils;
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Generated
 {
     unsafe class ILRuntimeTest_TestFramework_BaseClassTest_Binding
@@ -36,7 +40,7 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
-        static StackObject* DoTest_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* DoTest_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
@@ -53,7 +57,7 @@ namespace ILRuntime.Runtime.Generated
             return ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField;
         }
 
-        static StackObject* CopyToStack_testField_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_testField_0(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField;
             __ret->ObjectType = ObjectTypes.Integer;
@@ -66,7 +70,7 @@ namespace ILRuntime.Runtime.Generated
             ((ILRuntimeTest.TestFramework.BaseClassTest)o).testField = (System.Boolean)v;
         }
 
-        static StackObject* AssignFromStack_testField_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_testField_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Boolean @testField = ptr_of_this_method->Value == 1;

@@ -6,6 +6,12 @@ using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Other;
 using ILRuntime.Runtime.Intepreter;
+
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Stack
 {
     unsafe class RuntimeStack : IDisposable
@@ -17,11 +23,7 @@ namespace ILRuntime.Runtime.Stack
         StackObjectAllocator allocator;
         IntPtr nativePointer;
 
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-        IList<object> managedStack = new List<object>(32);
-#else
-        IList<object> managedStack = new UncheckedList<object>(32);
-#endif
+        AutoList managedStack = new AutoList(32);
         UncheckedStack<StackFrame> frames = new UncheckedStack<StackFrame>();
         public const int MAXIMAL_STACK_OBJECTS = 1024 * 16;
 
@@ -71,7 +73,7 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public IList<object> ManagedStack { get { return managedStack; } }
+        public AutoList ManagedStack { get { return managedStack; } }
 
         public void ResetValueTypePointer()
         {

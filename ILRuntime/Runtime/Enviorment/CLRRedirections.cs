@@ -11,19 +11,23 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
 using System.Collections;
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Enviorment
 {
     unsafe static class CLRRedirections
     {
-        public static StackObject* GetCurrentStackTrace(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* GetCurrentStackTrace(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             StackObject* ret = esp - 1 - 1;
             intp.Free(esp - 1);
 
             return ILIntepreter.PushObject(ret, mStack, intp.AppDomain.DebugService.GetStackTrace(intp));
         }
-        public static StackObject* CreateInstance(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* CreateInstance(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             IType[] genericArguments = method.GenericArguments;
             if (genericArguments != null && genericArguments.Length == 1)
@@ -69,7 +73,7 @@ namespace ILRuntime.Runtime.Enviorment
                 throw new EntryPointNotFoundException();
         }*/
 
-        public static StackObject* CreateInstance2(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* CreateInstance2(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var p = esp - 1;
             var t = mStack[p->Value] as Type;
@@ -103,7 +107,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }*/
 
-        public static StackObject* CreateInstance3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* CreateInstance3(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var p = esp - 1 - 1;
             var t = mStack[p->Value] as Type;
@@ -131,7 +135,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushNull(p);
         }
 
-        public static StackObject* GetType(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* GetType(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var p = esp - 1;
             AppDomain dommain = intp.AppDomain;
@@ -144,7 +148,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushNull(p);
         }
 
-        public static StackObject* TypeEquals(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* TypeEquals(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = ILIntepreter.Minus(esp, 2);
             var p = esp - 1;
@@ -184,7 +188,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return null;
         }*/
 
-        public static StackObject* IsAssignableFrom(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* IsAssignableFrom(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = ILIntepreter.Minus(esp, 2);
             var p = esp - 1;
@@ -225,7 +229,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
-        public unsafe static StackObject* InitializeArray(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* InitializeArray(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
@@ -499,7 +503,7 @@ namespace ILRuntime.Runtime.Enviorment
             return null;
         }*/
 
-        public unsafe static StackObject* DelegateCombine(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* DelegateCombine(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -606,7 +610,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2;
         }*/
 
-        public unsafe static StackObject* DelegateRemove(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* DelegateRemove(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -691,7 +695,7 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return null;
         }*/
-        public unsafe static StackObject* DelegateGetTarget(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* DelegateGetTarget(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1;
             AppDomain domain = intp.AppDomain;
@@ -713,7 +717,7 @@ namespace ILRuntime.Runtime.Enviorment
                 throw new NullReferenceException();
         }
 
-        public unsafe static StackObject* DelegateEqulity(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* DelegateEqulity(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -798,7 +802,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2 == null;
         }*/
 
-        public unsafe static StackObject* DelegateInequlity(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* DelegateInequlity(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
             var ret = esp - 1 - 1;
@@ -878,7 +882,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return dele2 != null;
         }*/
 
-        public static StackObject* GetTypeFromHandle(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* GetTypeFromHandle(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Nothing to do
             return esp;
@@ -889,7 +893,7 @@ namespace ILRuntime.Runtime.Enviorment
             return param[0];
         }*/
 
-        public unsafe static StackObject* MethodInfoInvoke(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* MethodInfoInvoke(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             AppDomain domain = intp.AppDomain;
             //Don't ask me why not esp - 3, unity won't return the right result
@@ -995,7 +999,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ((MethodInfo)instance).Invoke(obj, (object[])p);
         }*/
 
-        public unsafe static StackObject* ObjectGetType(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public unsafe static StackObject* ObjectGetType(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             AppDomain domain = intp.AppDomain;
             var ret = esp - 1;
@@ -1022,7 +1026,7 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return type;
         }*/
-        public static StackObject* EnumParse(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* EnumParse(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
@@ -1083,7 +1087,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(ret, mStack, Enum.Parse(t, name), true);
         }
 
-        public static StackObject* EnumGetValues(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* EnumGetValues(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1;
             AppDomain domain = intp.AppDomain;
@@ -1141,7 +1145,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(ret, mStack, Enum.GetValues(t), true);
         }
 
-        public static StackObject* EnumGetNames(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* EnumGetNames(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1;
             AppDomain domain = intp.AppDomain;
@@ -1176,7 +1180,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(ret, mStack, Enum.GetNames(t), true);
         }
 
-        public static StackObject* EnumGetName(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* EnumGetName(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
@@ -1221,7 +1225,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(ret, mStack, Enum.GetName(t, val), true);
         }
 
-        public static StackObject* EnumToObject(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* EnumToObject(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
@@ -1256,7 +1260,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(ret, mStack, Enum.GetName(t, val), true);
         }
 #if NET_4_6 || NET_STANDARD_2_0
-        public static StackObject* EnumHasFlag(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* EnumHasFlag(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
@@ -1287,7 +1291,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushZero(ret);
         }
 
-        public static StackObject* EnumCompareTo(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* EnumCompareTo(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 1 - 1;
             AppDomain domain = intp.AppDomain;
@@ -1319,7 +1323,7 @@ namespace ILRuntime.Runtime.Enviorment
         }
 #endif
 
-        public static StackObject* DelegateCreateDelegate(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* DelegateCreateDelegate(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
@@ -1378,7 +1382,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(ret, mStack, Delegate.CreateDelegate(t, mi), true);
         }
 
-        public static StackObject* DelegateCreateDelegate2(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* DelegateCreateDelegate2(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 3;
             AppDomain domain = intp.AppDomain;
@@ -1445,7 +1449,7 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 return ILIntepreter.PushObject(ret, mStack, Delegate.CreateDelegate(t, obj, name), true);
         }
-        public static StackObject* DelegateCreateDelegate3(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* DelegateCreateDelegate3(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 3;
             AppDomain domain = intp.AppDomain;
@@ -1525,7 +1529,7 @@ namespace ILRuntime.Runtime.Enviorment
                 return ILIntepreter.PushObject(ret, mStack, Delegate.CreateDelegate(t, obj, mi), true);
         }
 
-        public static StackObject* TypeMakeGenericType(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        public static StackObject* TypeMakeGenericType(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             var ret = esp - 2;
             AppDomain domain = intp.AppDomain;

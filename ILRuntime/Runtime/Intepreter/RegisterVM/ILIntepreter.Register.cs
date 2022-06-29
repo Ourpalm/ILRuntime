@@ -12,6 +12,12 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Utils;
 
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
+
 namespace ILRuntime.Runtime.Intepreter
 {
     unsafe struct RegisterFrameInfo
@@ -23,7 +29,7 @@ namespace ILRuntime.Runtime.Intepreter
         public StackObject* RegisterStart;
         public StackObject* StackRegisterStart;
         public StackObject* RegisterEnd;
-        public IList<object> ManagedStack;
+        public AutoList ManagedStack;
     }
     public unsafe partial class ILIntepreter
     {
@@ -93,7 +99,7 @@ namespace ILRuntime.Runtime.Intepreter
 
             var stackRegStart = frame.LocalVarPointer;
             StackObject* r = frame.LocalVarPointer - method.ParameterCount;
-            IList<object> mStack = stack.ManagedStack;
+            AutoList mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
             if (method.HasThis)//this parameter is always object reference
             {
@@ -5028,7 +5034,8 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg2 = (r + ip->Register2);
                                     reg3 = (r + ip->Register3);
                                     Array arr = mStack[reg2->Value] as Array;
-                                    obj = arr.GetValue(reg3->Value);
+                                    ILTypeInstance[] arr2 = arr as ILTypeInstance[];
+                                    obj = arr2 != null ? arr2[reg3->Value] : arr.GetValue(reg3->Value);
                                     if (obj is CrossBindingAdaptorType)
                                         obj = ((CrossBindingAdaptorType)obj).ILInstance;
 
@@ -5333,7 +5340,7 @@ namespace ILRuntime.Runtime.Intepreter
 #if NET_4_6 || NET_STANDARD_2_0
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, IList<object> mStackSrc = null)
+        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, AutoList mStackSrc = null)
         {
             var mStack = info.ManagedStack;
 

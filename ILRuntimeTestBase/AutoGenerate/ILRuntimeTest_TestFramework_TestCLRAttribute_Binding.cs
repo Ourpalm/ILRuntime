@@ -11,7 +11,11 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
 using ILRuntime.CLR.Utils;
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Generated
 {
     unsafe class ILRuntimeTest_TestFramework_TestCLRAttribute_Binding
@@ -38,7 +42,7 @@ namespace ILRuntime.Runtime.Generated
             return ((ILRuntimeTest.TestFramework.TestCLRAttribute)o).Name;
         }
 
-        static StackObject* CopyToStack_Name_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_Name_0(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ((ILRuntimeTest.TestFramework.TestCLRAttribute)o).Name;
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -49,7 +53,7 @@ namespace ILRuntime.Runtime.Generated
             ((ILRuntimeTest.TestFramework.TestCLRAttribute)o).Name = (System.String)v;
         }
 
-        static StackObject* AssignFromStack_Name_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_Name_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.String @Name = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);

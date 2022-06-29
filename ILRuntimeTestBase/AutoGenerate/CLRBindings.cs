@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Generated
 {
     class CLRBindings
@@ -188,6 +192,7 @@ namespace ILRuntime.Runtime.Generated
             System_AccessViolationException_Binding.Register(app);
             System_Func_1_TestVector3_Binding.Register(app);
             ILRuntimeTest_TestFramework_JInt_Binding.Register(app);
+            System_Collections_Generic_List_1_TestVector3NoBinding_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStructA_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStructB_Binding.Register(app);
 
