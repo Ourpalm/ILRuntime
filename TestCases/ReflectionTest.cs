@@ -601,5 +601,23 @@ namespace TestCases
                 throw new Exception($"Field count mismatch,detail: {string.Join(",", fs.Select(f => f.Name))}");
             }
         }
+        public class HotBehaviour<T>
+        {
+            public T csObj { get; protected set; }
+        }
+
+        class XX : HotBehaviour<int>
+        {
+
+        }
+        public static void ReflectionTest23()
+        {
+            XX x = new XX();
+            var type = typeof(XX);
+            var value = type.GetProperty("csObj").GetValue(x);
+            type.GetProperty("csObj").SetValue(x, 11);
+            if (x.csObj != 11)
+                throw new Exception();
+        }
     }
 }
