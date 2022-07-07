@@ -64,8 +64,8 @@ namespace TestCases
 
         public static void ReflectionTest05()
         {
-            var fi = typeof(TestCls).GetField("aa");
-            var fi2 = typeof(TestCls).GetField("bb");
+            var fi = typeof(TestCls).GetField("aa", BindingFlags.NonPublic | BindingFlags.Instance);
+            var fi2 = typeof(TestCls).GetField("bb", BindingFlags.NonPublic | BindingFlags.Static);
 
             var a = new TestCls();
 
