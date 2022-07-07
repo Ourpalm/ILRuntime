@@ -544,7 +544,12 @@ namespace ILRuntime.Runtime.Intepreter
                                                     }
                                                     else
                                                     {
-                                                        *objRef = *val;
+                                                        if (val->ObjectType == ObjectTypes.Null && objRef->ObjectType == ObjectTypes.Object)
+                                                        {
+                                                            mStack[objRef->Value] = null;
+                                                        }
+                                                        else
+                                                            *objRef = *val;
                                                     }
                                                 }
                                             }
