@@ -25,7 +25,7 @@ namespace ILRuntime.Reflection
             this.AppDomain = appdomain;
 
             AttrsImpl = (ParameterAttributes)definition.Attributes;
-            ClassImpl = type.ReflectionType;
+            ClassImpl = type is ILGenericParameterType ? typeof(ILGenericParameterType) : type.ReflectionType;
             DefaultValueImpl = definition.Constant;
             MemberImpl = member;
             NameImpl = definition.Name;

@@ -610,6 +610,16 @@ namespace TestCases
         {
 
         }
+        public class YY
+        {
+            public Type CurType { get; set; }
+            public object Value { get; set; }
+            public void a<T>(int a, T t)
+            {
+                CurType = typeof(T);
+                Value = t;
+            }
+        }
         public static void ReflectionTest23()
         {
             XX x = new XX();
@@ -618,6 +628,21 @@ namespace TestCases
             type.GetProperty("csObj").SetValue(x, 11);
             if (x.csObj != 11)
                 throw new Exception();
+        }
+
+        public static void ReflectionTest24()
+        {
+            YY yy = new YY();
+            var method = typeof(YY).GetMethod("a");
+            if(!method.IsGenericMethodDefinition || !method.IsGenericMethod)
+                throw new Exception();
+            var mi = method.MakeGenericMethod(typeof(int));
+            mi.Invoke(yy,new object[] { 11 , 12});
+
+            if(yy.CurType != typeof(int) || (int)yy.Value != 12)
+            {
+                throw new Exception($"CurType = {yy.CurType}, Value = {yy.Value}");
+            }
         }
     }
 }

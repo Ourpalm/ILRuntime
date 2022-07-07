@@ -152,6 +152,32 @@ namespace ILRuntime.Reflection
             return parameters;
         }
 
+        public override bool IsGenericMethod
+        {
+            get
+            {
+                return method.IsGenericInstance || method.GenericParameterCount > 0;
+            }
+        }
+
+        public override bool IsGenericMethodDefinition
+        {
+            get
+            {
+                return method.GenericParameterCount > 0;
+            }
+        }
+
+        public override MethodInfo MakeGenericMethod(params Type[] typeArguments)
+        {
+            IType[] arg = new IType[typeArguments.Length];
+            for (int i = 0; i < arg.Length; i++)
+            {
+                arg[i] = appdomain.GetType(typeArguments[i]);
+            }
+            return ((ILMethod)method.MakeGenericMethod(arg)).ReflectionMethodInfo;
+        }
+
         public override object Invoke(object obj, BindingFlags invokeAttr, Binder binder, object[] parameters, CultureInfo culture)
         {
             if (method.HasThis)
