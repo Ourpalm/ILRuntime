@@ -579,5 +579,27 @@ namespace TestCases
         {
             public string Name;
         }
+
+        public class Base
+        {
+            public int BaseIntVal;
+        }
+
+        public class Impl : Base
+        {
+            public bool ImplBoolVal;
+        }
+
+        public static void ReflectionTest22()
+        {
+            var t = typeof(Impl);
+            var flag = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic |
+                                       BindingFlags.SetProperty;
+            var fs = t.GetFields(flag).ToList();
+            if (fs.Count != 1)
+            {
+                throw new Exception($"Field count mismatch,detail: {string.Join(",", fs.Select(f => f.Name))}");
+            }
+        }
     }
 }
