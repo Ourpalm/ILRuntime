@@ -14,7 +14,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.CLR.Method
 {
-    public class CLRMethod : IMethod
+    public sealed class CLRMethod : IMethod
     {
         MethodInfo def;
         ConstructorInfo cDef;

@@ -13,7 +13,7 @@ using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.CLR.TypeSystem
 {
-    public class ILType : IType
+    public sealed class ILType : IType
     {
         Dictionary<string, List<ILMethod>> methods;
         TypeReference typeRef;

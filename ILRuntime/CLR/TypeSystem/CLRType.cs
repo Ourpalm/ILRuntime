@@ -18,7 +18,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.CLR.TypeSystem
 {
-    public unsafe class CLRType : IType
+    public sealed unsafe class CLRType : IType
     {
         Type clrType;
         bool isPrimitive, isValueType, isEnum;

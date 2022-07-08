@@ -14,7 +14,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Reflection;
 namespace ILRuntime.CLR.Method
 {
-    public class ILMethod : IMethod
+    public sealed class ILMethod : IMethod
     {
         OpCode[] body;
         OpCodeR[] bodyRegister;
