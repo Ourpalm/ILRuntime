@@ -410,10 +410,11 @@ namespace ILRuntime.Runtime.Stack
 
         internal void InitializeValueTypeObject(IType type, StackObject* ptr, bool register, ref int managedIdx, bool noInitialize)
         {
+            var tFCnt = type.TotalFieldCount;
             ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
             ptr->Value = type.TypeIndex;
-            ptr->ValueLow = type.TotalFieldCount;
-            StackObject* endPtr = ptr - (type.TotalFieldCount + 1);
+            ptr->ValueLow = tFCnt;
+            StackObject* endPtr = ptr - (tFCnt + 1);
             if (noInitialize)
                 return;
             if (type is ILType)
@@ -469,7 +470,7 @@ namespace ILRuntime.Runtime.Stack
             else
             {
                 CLRType t = (CLRType)type;
-                var cnt = t.TotalFieldCount;
+                var cnt = tFCnt;
                 var arr = t.OrderedFieldTypes;
                 for (int i = 0; i < cnt; i++)
                 {

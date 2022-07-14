@@ -4913,7 +4913,11 @@ namespace ILRuntime.Runtime.Intepreter
                     break;
             }
         }
-
+        [Obsolete]
+        public object RetriveObject(StackObject* esp, IList<object> mStack)
+        {
+            return RetriveObject(esp, (AutoList)mStack);
+        }
         public object RetriveObject(StackObject* esp, AutoList mStack)
         {
             StackObject* objRef = GetObjectAndResolveReference(esp);
@@ -5728,6 +5732,12 @@ namespace ILRuntime.Runtime.Intepreter
             return esp + 1;
         }
 
+        [Obsolete]
+        public static void UnboxObject(StackObject* esp, object obj, IList<object> mStack = null, Enviorment.AppDomain domain = null)
+        {
+            UnboxObject(esp, obj, (AutoList)mStack, domain);
+        }
+
         public static void UnboxObject(StackObject* esp, object obj, AutoList mStack = null, Enviorment.AppDomain domain = null)
         {
             if (esp->ObjectType == ObjectTypes.ValueTypeObjectReference && domain != null)
@@ -5825,6 +5835,11 @@ namespace ILRuntime.Runtime.Intepreter
                 throw new NotImplementedException();
         }
 
+        [Obsolete]
+        public static StackObject* PushObject(StackObject* esp, IList<object> mStack, object obj, bool isBox = false)
+        {
+            return PushObject(esp, (AutoList)mStack, obj, isBox);
+        }
         public static StackObject* PushObject(StackObject* esp, AutoList mStack, object obj, bool isBox = false)
         {
             if (obj != null)
