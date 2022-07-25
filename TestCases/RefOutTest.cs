@@ -295,6 +295,25 @@ namespace TestCases
             Console.WriteLine(arr[1]);
         }
 
+        public static void Set(ref long x)
+        {
+            x++;
+        }
+
+        public static void UnitTest_RefTest4()
+        {
+            long srcX = 10;
+
+            for (var index = 0; index < 10; index++)
+            {
+                long x = srcX;
+                Console.WriteLine(x);
+                if (x != 10)
+                    throw new Exception();
+                Set(ref x);
+            }
+        }
+
         static void Func(ref int[] arr)
         {
             arr[1] = 2;
