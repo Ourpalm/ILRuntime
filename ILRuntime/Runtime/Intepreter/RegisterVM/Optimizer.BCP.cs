@@ -111,17 +111,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         GetOpcodeDestRegister(ref Z, out zDst);
                                         if (GetOpcodeSourceRegister(ref Z, hasReturn, out zSrc, out zSrc2, out zSrc3))
                                         {
-                                            if(zSrc == yDst && CanReplaceOpcodeSource(ref Z, 0))
+                                            if(zSrc == yDst)
                                             {
                                                 replaced = true;
                                                 ReplaceOpcodeSource(ref Z, 0, xDst);
                                             }
-                                            if (zSrc2 == yDst && CanReplaceOpcodeSource(ref Z, 1))
+                                            if (zSrc2 == yDst)
                                             {
                                                 replaced = true;
                                                 ReplaceOpcodeSource(ref Z, 1, xDst);
                                             }
-                                            if (zSrc3 == yDst && CanReplaceOpcodeSource(ref Z, 2))
+                                            if (zSrc3 == yDst)
                                             {
                                                 replaced = true;
                                                 ReplaceOpcodeSource(ref Z, 2, xDst);

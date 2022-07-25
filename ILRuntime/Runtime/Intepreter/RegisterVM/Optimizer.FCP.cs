@@ -73,7 +73,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
                             {
                                 bool replaced = false;
-                                if (ySrc >= 0 && ySrc == xDst && CanReplaceOpcodeSource(ref Y, 0))
+                                if (ySrc >= 0 && ySrc == xDst)
                                 {
                                     if (postPropagation)
                                     {
@@ -86,10 +86,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         ended = true;
                                         break;
                                     }
-                                    ReplaceOpcodeSource(ref Y, 0, xSrc);
-                                    replaced = true;
+                                    if (CanReplaceOpcodeSource(ref Y, 0))
+                                    {
+                                        ReplaceOpcodeSource(ref Y, 0, xSrc);
+                                        replaced = true;
+                                    }
+                                    else
+                                    {
+                                        ended = true;
+                                        break;
+                                    }
                                 }
-                                if (ySrc2 >= 0 && ySrc2 == xDst && CanReplaceOpcodeSource(ref Y, 1))
+                                if (ySrc2 >= 0 && ySrc2 == xDst)
                                 {
                                     if (postPropagation)
                                     {
@@ -102,10 +110,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         ended = true;
                                         break;
                                     }
-                                    ReplaceOpcodeSource(ref Y, 1, xSrc);
-                                    replaced = true;
+                                    if (CanReplaceOpcodeSource(ref Y, 1))
+                                    {
+                                        ReplaceOpcodeSource(ref Y, 1, xSrc);
+                                        replaced = true;
+                                    }
+                                    else
+                                    {
+                                        ended = true;
+                                        break;
+                                    }
                                 }
-                                if (ySrc3 >= 0 && ySrc3 == xDst && CanReplaceOpcodeSource(ref Y, 2))
+                                if (ySrc3 >= 0 && ySrc3 == xDst)
                                 {
                                     if (postPropagation)
                                     {
@@ -118,8 +134,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         ended = true;
                                         break;
                                     }
-                                    ReplaceOpcodeSource(ref Y, 2, xSrc);
-                                    replaced = true;
+                                    if (CanReplaceOpcodeSource(ref Y, 2))
+                                    {
+                                        ReplaceOpcodeSource(ref Y, 2, xSrc);
+                                        replaced = true;
+                                    }
+                                    else
+                                    {
+                                        ended = true;
+                                        break;
+                                    }
                                 }
 
                                 if (replaced)
@@ -208,35 +232,59 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
                                 {
                                     bool replaced = false;
-                                    if (ySrc == xDst && CanReplaceOpcodeSource(ref Y, 0))
+                                    if (ySrc == xDst)
                                     {
                                         if (propagationInline || cur.PreviousBlocks.Count > 1)
                                         {
                                             cannotRemove = true;
                                             break;
                                         }
-                                        replaced = true;
-                                        ReplaceOpcodeSource(ref Y, 0, xSrc);
+                                        if (CanReplaceOpcodeSource(ref Y, 0))
+                                        {
+                                            replaced = true;
+                                            ReplaceOpcodeSource(ref Y, 0, xSrc);
+                                        }
+                                        else
+                                        {
+                                            cannotRemove = true;
+                                            break;
+                                        }
                                     }
-                                    if (ySrc2 == xDst && CanReplaceOpcodeSource(ref Y, 1))
+                                    if (ySrc2 == xDst)
                                     {
                                         if (propagationInline || cur.PreviousBlocks.Count > 1)
                                         {
                                             cannotRemove = true;
                                             break;
                                         }
-                                        replaced = true;
-                                        ReplaceOpcodeSource(ref Y, 1, xSrc);
+                                        if (CanReplaceOpcodeSource(ref Y, 1))
+                                        {
+                                            replaced = true;
+                                            ReplaceOpcodeSource(ref Y, 1, xSrc);
+                                        }
+                                        else
+                                        {
+                                            cannotRemove = true;
+                                            break;
+                                        }
                                     }
-                                    if (ySrc3 == xDst && CanReplaceOpcodeSource(ref Y, 2))
+                                    if (ySrc3 == xDst)
                                     {
                                         if (propagationInline || cur.PreviousBlocks.Count > 1)
                                         {
                                             cannotRemove = true;
                                             break;
                                         }
-                                        replaced = true;
-                                        ReplaceOpcodeSource(ref Y, 2, xSrc);
+                                        if (CanReplaceOpcodeSource(ref Y, 2))
+                                        {
+                                            replaced = true;
+                                            ReplaceOpcodeSource(ref Y, 2, xSrc);
+                                        }
+                                        else
+                                        {
+                                            cannotRemove = true;
+                                            break;
+                                        }
                                     }
 
                                     if (replaced)
