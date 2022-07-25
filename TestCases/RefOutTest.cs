@@ -297,6 +297,8 @@ namespace TestCases
 
         public static void Set(ref long x)
         {
+            if (x != 10)
+                throw new Exception();
             x++;
         }
 
@@ -307,9 +309,6 @@ namespace TestCases
             for (var index = 0; index < 10; index++)
             {
                 long x = srcX;
-                Console.WriteLine(x);
-                if (x != 10)
-                    throw new Exception();
                 Set(ref x);
             }
         }

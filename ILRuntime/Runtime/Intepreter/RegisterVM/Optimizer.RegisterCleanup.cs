@@ -25,7 +25,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             {
                 var X = ins[i];
                 short xSrc, xSrc2, xSrc3, xDst;
-                if(GetOpcodeSourceRegister(ref X, hasReturn, out xSrc, out xSrc2, out xSrc3))
+                if(GetOpcodeSourceRegister(ref X, hasReturn, out xSrc, out xSrc2, out xSrc3, true))
                 {
                     if (xSrc >= 0)
                     {
@@ -74,7 +74,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     short xSrc, xSrc2, xSrc3, xDst;
                     bool replaced = false;
 
-                    if (GetOpcodeSourceRegister(ref X, hasReturn, out xSrc, out xSrc2, out xSrc3))
+                    if (GetOpcodeSourceRegister(ref X, hasReturn, out xSrc, out xSrc2, out xSrc3, true))
                     {
                         if (xSrc > r)
                         {
