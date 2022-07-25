@@ -73,7 +73,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
                             {
                                 bool replaced = false;
-                                if (ySrc >= 0 && ySrc == xDst)
+                                if (ySrc >= 0 && ySrc == xDst && CanReplaceOpcodeSource(ref Y, 0))
                                 {
                                     if (postPropagation)
                                     {
@@ -89,7 +89,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     ReplaceOpcodeSource(ref Y, 0, xSrc);
                                     replaced = true;
                                 }
-                                if (ySrc2 >= 0 && ySrc2 == xDst)
+                                if (ySrc2 >= 0 && ySrc2 == xDst && CanReplaceOpcodeSource(ref Y, 1))
                                 {
                                     if (postPropagation)
                                     {
@@ -105,7 +105,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     ReplaceOpcodeSource(ref Y, 1, xSrc);
                                     replaced = true;
                                 }
-                                if (ySrc3 >= 0 && ySrc3 == xDst)
+                                if (ySrc3 >= 0 && ySrc3 == xDst && CanReplaceOpcodeSource(ref Y, 2))
                                 {
                                     if (postPropagation)
                                     {
@@ -208,7 +208,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
                                 {
                                     bool replaced = false;
-                                    if (ySrc == xDst)
+                                    if (ySrc == xDst && CanReplaceOpcodeSource(ref Y, 0))
                                     {
                                         if (propagationInline || cur.PreviousBlocks.Count > 1)
                                         {
@@ -218,7 +218,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         replaced = true;
                                         ReplaceOpcodeSource(ref Y, 0, xSrc);
                                     }
-                                    if (ySrc2 == xDst)
+                                    if (ySrc2 == xDst && CanReplaceOpcodeSource(ref Y, 1))
                                     {
                                         if (propagationInline || cur.PreviousBlocks.Count > 1)
                                         {
@@ -228,7 +228,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         replaced = true;
                                         ReplaceOpcodeSource(ref Y, 1, xSrc);
                                     }
-                                    if (ySrc3 == xDst)
+                                    if (ySrc3 == xDst && CanReplaceOpcodeSource(ref Y, 2))
                                     {
                                         if (propagationInline || cur.PreviousBlocks.Count > 1)
                                         {

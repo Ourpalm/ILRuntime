@@ -387,7 +387,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             return false;
         }
-        public static bool GetOpcodeSourceRegister(ref OpCodeR op, bool hasReturn, out short r1, out short r2, out short r3, bool ignoreRef = false)
+        public static bool GetOpcodeSourceRegister(ref OpCodeR op, bool hasReturn, out short r1, out short r2, out short r3)
         {
             r1 = -1;
             r2 = -1;
@@ -445,7 +445,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldind_U4:
                 case OpCodeREnum.Ldind_Ref:
                 case OpCodeREnum.Ldobj:
+                case OpCodeREnum.Ldloca:
+                case OpCodeREnum.Ldloca_S:
                 case OpCodeREnum.Ldarg_S:
+                case OpCodeREnum.Ldarga:
+                case OpCodeREnum.Ldarga_S:
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
@@ -455,17 +459,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Castclass:
                     r1 = op.Register2;
                     return true;
-                case OpCodeREnum.Ldloca:
-                case OpCodeREnum.Ldloca_S:
-                case OpCodeREnum.Ldarga:
-                case OpCodeREnum.Ldarga_S:
-                    if (ignoreRef)
-                    {
-                        r1 = op.Register2;
-                        return true;
-                    }
-                    else
-                        return false;
                 case OpCodeREnum.Stind_I:
                 case OpCodeREnum.Stind_I1:
                 case OpCodeREnum.Stind_I2:
@@ -874,6 +867,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        static bool CanReplaceOpcodeSource(ref OpCodes.OpCodeR op, int idx)
+        {
+            switch (op.Code)
+            {
+                case OpCodeREnum.Ldloca:
+                case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldarga:
+                case OpCodeREnum.Ldarga_S:
+                    return false;
+            }
+            return true;
         }
 
         static void ReplaceOpcodeSource(ref OpCodes.OpCodeR op, int idx, short src)
