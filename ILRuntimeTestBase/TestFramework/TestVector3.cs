@@ -247,6 +247,70 @@ namespace ILRuntimeTest.TestFramework
     {
         public long value;
     }
+    public struct Fixed64Vector2
+    {
+        public Fixed64 x;
+        public Fixed64 y;
+
+        public static readonly Fixed64Vector2 Zero2;
+
+        public Fixed64Vector2(int x, int y)
+        {
+            this.x = new Fixed64(x);
+            this.y = new Fixed64(y);
+        }
+
+        static Fixed64Vector2()
+        {
+            Zero2 = new Fixed64Vector2(0, 0);
+        }
+    }
+
+
+    public struct Fixed64
+    {
+        private long m_rawValue;
+
+        public static readonly Fixed64 Zero;
+
+        public Fixed64(long value)
+        {
+            m_rawValue = value;
+        }
+
+        public long RawValue
+        {
+            get
+            {
+                return m_rawValue;
+            }
+        }
+
+        static Fixed64()
+        {
+            Zero = new Fixed64(0);
+        }
+
+        public static bool operator <(Fixed64 x, Fixed64 y)
+        {
+            return x.m_rawValue < y.m_rawValue;
+        }
+
+        public static bool operator >(Fixed64 x, Fixed64 y)
+        {
+            return x.m_rawValue > y.m_rawValue;
+        }
+
+        public static bool operator ==(Fixed64 x, Fixed64 y)
+        {
+            return x.m_rawValue == y.m_rawValue;
+        }
+
+        public static bool operator !=(Fixed64 x, Fixed64 y)
+        {
+            return x.m_rawValue != y.m_rawValue;
+        }
+    }
 
     public struct TestStructB
     {

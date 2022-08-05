@@ -551,5 +551,65 @@ namespace TestCases
                 }
             }
         }
+
+        public static void UnitTest_10051()
+        {
+            var trts = new TestRunTimeStack();
+            trts.Run();
+            //Debug.LogFormat("RunTest4");
+        }
+
+
+        public class BaseObj
+        {
+            private Fixed64Vector2 fv2;
+
+            public BaseObj()
+            {
+                int x, y;
+                x = 123;
+                y = 456;
+                fv2 = new Fixed64Vector2(x, y);
+            }
+
+            public Fixed64Vector2 V2
+            {
+                get
+                {
+                    return fv2;
+                }
+            }
+        }
+
+        public class TestObj : BaseObj
+        {
+            private int n;
+        }
+
+        public class TestRunTimeStack
+        {
+            public TestRunTimeStack()
+            {
+            }
+
+            public void Run()
+            {
+                List<TestObj> list = new List<TestObj>();
+                for (int i = 0; i < 10000; i++)
+                {
+                    var obj = new TestObj();
+                    list.Add(obj);
+                }
+
+                list.Sort((a, b) => {
+                    if (a.V2.x > b.V2.x)
+                        return 1;
+                    else if (a.V2.x < b.V2.x)
+                        return -1;
+                    return 0;
+                });
+            }
+        }
+
     }
 }

@@ -36,6 +36,8 @@ namespace ILRuntimeTest.TestFramework
 
             app.RegisterValueTypeBinder(typeof(TestStructA), new TestStructABinder());
             app.RegisterValueTypeBinder(typeof(TestStructB), new TestStructBBinder());
+            app.RegisterValueTypeBinder(typeof(Fixed64), new Fixed64Binder());
+            app.RegisterValueTypeBinder(typeof(Fixed64Vector2), new FixedVector2Binder());
 
             // delegate register 
 
@@ -63,7 +65,15 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterFunctionDelegate<ILRuntimeTest.TestFramework.TestVector3, System.Single>();
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.TestVector3>();
             app.DelegateManager.RegisterFunctionDelegate<System.Reflection.FieldInfo, System.String>();
+            app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>();
             // delegate convertor
+            app.DelegateManager.RegisterDelegateConvertor<System.Comparison<ILRuntime.Runtime.Intepreter.ILTypeInstance>>((act) =>
+            {
+                return new System.Comparison<ILRuntime.Runtime.Intepreter.ILTypeInstance>((x, y) =>
+                {
+                    return ((Func<ILRuntime.Runtime.Intepreter.ILTypeInstance, ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>)act)(x, y);
+                });
+            });
             app.DelegateManager.RegisterDelegateConvertor<ILRuntimeTest.TestFramework.TestValueTypeDelegate>((act) =>
             {
                 return new ILRuntimeTest.TestFramework.TestValueTypeDelegate((vec) =>
