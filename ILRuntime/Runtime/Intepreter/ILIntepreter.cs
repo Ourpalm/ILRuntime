@@ -4672,11 +4672,33 @@ namespace ILRuntime.Runtime.Intepreter
             }
             return eh;
         }
+
+        void RelocateValueTypeManagedObj(StackObject* esp, AutoList mStack, ref int curIdx)
+        {
+            StackObject* descripter = ResolveReference(esp);
+            for (int i = descripter->ValueLow; i > 0; i--)
+            {
+                StackObject* cur = descripter - i;
+                if (cur->ObjectType >= ObjectTypes.Object)
+                {
+                    mStack[curIdx] = mStack[cur->Value];
+                    cur->Value = curIdx;
+                    curIdx--;
+                }
+                else
+                {
+                    if (cur->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                    {
+                        RelocateValueTypeManagedObj(cur, mStack, ref curIdx);
+                    }
+                }
+            }
+        }
+
         void PrepareRegisterCallStack(StackObject* esp, AutoList mStack, ILMethod method)
         {
             var pCnt = method.HasThis ? method.ParameterCount + 1 : method.ParameterCount;
             StackObject* basePointer = esp - pCnt;
-            int mBase = mStack.Count;
             int existing = 0;
             for (int i = 0; i < pCnt; i++)
             {
@@ -4690,24 +4712,29 @@ namespace ILRuntime.Runtime.Intepreter
             }
             if (existing > 0)
             {
-                mBase = mBase - existing;
+                int curIdx = mStack.Count - 1;
                 for (int i = pCnt - 1; i >= 0; i--)
                 {
                     StackObject* cur = basePointer + i;
                     if (cur->ObjectType >= ObjectTypes.Object)
                     {
-                        mStack[mBase + i] = mStack[cur->Value];
-                        cur->Value = mBase + i;
+                        mStack[curIdx] = mStack[cur->Value];
+                        cur->Value = curIdx;
                     }
                     else
                     {
                         if (cur->ObjectType == ObjectTypes.Null)
                         {
                             cur->ObjectType = ObjectTypes.Object;
-                            cur->Value = mBase + i;                            
+                            cur->Value = curIdx;
                         }
-                        mStack[mBase + i] = null;
+                        else if (cur->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                        {
+                            RelocateValueTypeManagedObj(cur, mStack, ref curIdx);
+                        }
+                        mStack[curIdx] = null;
                     }
+                    curIdx--;
                 }
             }
         }
