@@ -53,6 +53,10 @@ namespace ILRuntime.CLR.Utils
                                 {
                                     name = t.FullName + "[]";
                                 }
+                                else if (name == gp.Name + "[0...,0...]")
+                                {
+                                    name = t.FullName + "[,]";
+                                }
                                 else
                                 {
                                     /*name = name.Replace("<" + gp.Name + ">", "<" + ga.FullName + ">");
