@@ -564,6 +564,11 @@ namespace TestCases
         {
             private Fixed64Vector2 fv2;
 
+            public void SetPos(int x, int y)
+            {
+                fv2.x = new ILRuntimeTest.TestFramework.Fixed64(x);
+            }
+
             public BaseObj()
             {
                 int x, y;
@@ -595,19 +600,23 @@ namespace TestCases
             public void Run()
             {
                 List<TestObj> list = new List<TestObj>();
-                for (int i = 0; i < 10000; i++)
+                for (int i = 0; i < 1000; i++)
                 {
                     var obj = new TestObj();
+                    obj.SetPos(i, i);
                     list.Add(obj);
                 }
 
                 list.Sort((a, b) => {
-                    if (a.V2.x > b.V2.x)
+                    if (a.V2.x < b.V2.x)
                         return 1;
-                    else if (a.V2.x < b.V2.x)
+                    else if (a.V2.x > b.V2.x)
                         return -1;
                     return 0;
                 });
+
+                if (list[0].V2.x.RawValue != 999)
+                    throw new Exception();
             }
         }
 

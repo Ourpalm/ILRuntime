@@ -38,7 +38,7 @@ namespace ILRuntimeTest.TestFramework
             StackObject* ret;
             if (isNewObj)
             {
-                ret = ILIntepreter.Minus(esp, 1);
+                ret = esp;
                 Fixed64 vec;
                 var ptr = ILIntepreter.Minus(esp, 1);
                 var val = *(long*)&ptr->Value;

@@ -4214,7 +4214,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference && IsValueTypeReferenceValid(objRef, type))
                                         {
                                             stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
                                         }
@@ -5312,6 +5312,20 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp);
+        }
+
+        bool IsValueTypeReferenceValid(StackObject* ptr, IType type)
+        {
+            ptr = ResolveReference(ptr);
+            if (ptr->ObjectType == ObjectTypes.ValueTypeDescriptor)
+            {
+                if (ptr->Value == type.TypeIndex)
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
         }
 
         void LoadFromFieldReferenceToRegister(ref RegisterFrameInfo info, object obj, int idx, short reg)
