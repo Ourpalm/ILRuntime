@@ -66,6 +66,7 @@ namespace ILRuntimeTest.TestFramework
             app.DelegateManager.RegisterMethodDelegate<ILRuntimeTest.TestFramework.TestVector3>();
             app.DelegateManager.RegisterFunctionDelegate<System.Reflection.FieldInfo, System.String>();
             app.DelegateManager.RegisterFunctionDelegate<ILRuntime.Runtime.Intepreter.ILTypeInstance, ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>();
+            app.DelegateManager.RegisterMethodDelegate<System.Single, System.Double, System.Int32>();
             // delegate convertor
             app.DelegateManager.RegisterDelegateConvertor<System.Comparison<ILRuntime.Runtime.Intepreter.ILTypeInstance>>((act) =>
             {

@@ -690,5 +690,19 @@ namespace TestCases
                 throw new Exception();
             Console.WriteLine($"a={a}, b={b}, c={c}");
         }
+        public static void DelegateTest44()
+        {
+            ILRuntimeTest.TestBase.TestSession.LastSession.Appdomain.AllowUnboundCLRMethod = false;
+        }
+
+        public static void DelegateTest45()
+        {
+            ILRuntimeTest.TestFramework.DelegateTest.OnIntEvent += DelegateTest43Sub;
+            ILRuntimeTest.TestFramework.DelegateTest.TestEvent3(1, 2, 3);
+            ILRuntimeTest.TestFramework.DelegateTest.OnIntEvent -= DelegateTest43Sub;
+            ILRuntimeTest.TestBase.TestSession.LastSession.Appdomain.AllowUnboundCLRMethod = true;
+            if (!ILRuntimeTest.TestFramework.DelegateTest.TestEvent4())
+                throw new Exception();
+        }
     }
 }
