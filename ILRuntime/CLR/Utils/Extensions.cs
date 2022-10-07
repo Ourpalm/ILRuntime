@@ -50,7 +50,7 @@ namespace ILRuntime.CLR.Utils
                                 if (t == null && genericArguments != null)
                                     t = genericArguments[j];
                                 int nameLength = gp.Name.Length;
-                                if (name == nameLength + 2 &&  name.StartWith(gp.Name) &&  name.EndWith("[]"))
+                                if (name.Length == nameLength + 2 &&  name.StartWith(gp.Name) &&  name.EndWith("[]"))
                                 {
                                     name = t.FullName + "[]";
                                 }
