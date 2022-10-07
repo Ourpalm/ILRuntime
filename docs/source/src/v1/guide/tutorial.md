@@ -132,20 +132,31 @@ void OnILRuntimeInitialized()
 
 ### 调试插件
 
-ILRuntime提供了一个支持Visual Studio 2015、Visual Studio 2017和Visual Studio 2019的调试插件，用来源码级调试你的热更脚本。
+ILRuntime提供了一个支持Visual Studio 2015、Visual Studio 2017、Visual Studio 2019、Visual Studio 2022和VSCode的调试插件，用来源码级调试你的热更脚本。
 
-你可以在[这里](https://github.com/Ourpalm/ILRuntime/releases)下载到最新的Visual Studio调试插件。
+你可以在Visual Studio和VS Code的插件商店中搜索ILRuntime安装调试插件。
 
-**使用方法如下：**
+**Visual Studio调试插件使用方法如下：**
 
-- 安装ILRuntime调试插件，并重新启动VS2015或VS2017、VS2019
+- 安装ILRuntime调试插件，并重新启动Visual Studio
 - 确保dll和pdb都加载完毕。
-- 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器
+- 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService();来启动调试服务器
 - 用VisualStudio打开热更DLL项目
 - 点击菜单中的Debug->Attach to ILRuntime按钮。注意,不是“附加Unity调试程序”
-- 在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口
-- 点击Attach按钮后，即可像UnityVS一样下断点调试
+- 在弹出来的窗口中会列出可以调试的实例，如果没有显示想要调试的实例可以点击刷新按钮进行刷新
+- 点击OK按钮后，即可像UnityVS一样下断点调试
+
+**VS Code调试插件使用方法如下：**
+
+- 从VS Code插件商店安装调试插件
+- 确保dll和pdb都加载完毕。
+- 运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService();来启动调试服务器
+- 用VS Code打开热更DLL项目
+- F5新建调试Profile
+- 在弹出来的窗口中会列出可以调试的实例，如果没有显示想要调试的实例可以点击刷新按钮进行刷新
+- 选择需要调试的实例按确定，即可像UnityVS一样下断点调试
 
 **注意事项：**
 
+- 在Visual Studio和VS Code中安装的调试器要求2.1.0以上版本的ILRuntime运行时
 - 如果使用VS2015的话需要`Visual Studio 2015 Update3`以上版本

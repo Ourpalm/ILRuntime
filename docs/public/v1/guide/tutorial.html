@@ -21,7 +21,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V2.0.2</button>
+        <button class="hiden-in-phone">V2.1.0</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -220,20 +220,31 @@
 <figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">ILRuntime.Runtime.Enviorment.AppDomain appdomain;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    StartCoroutine(LoadILRuntime());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">IEnumerator <span class="title">LoadILRuntime</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    appdomain = <span class="keyword">new</span> ILRuntime.Runtime.Enviorment.AppDomain();</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_ANDROID</span></span><br><span class="line">    WWW www = <span class="keyword">new</span> WWW(Application.streamingAssetsPath + <span class="string">"/Hotfix.dll"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">    WWW www = <span class="keyword">new</span> WWW(<span class="string">"file:///"</span> + Application.streamingAssetsPath + <span class="string">"/Hotfix.dll"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    <span class="keyword">while</span> (!www.isDone)</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(www.error))</span><br><span class="line">        Debug.LogError(www.error);</span><br><span class="line">    <span class="keyword">byte</span>[] dll = www.bytes;</span><br><span class="line">    www.Dispose();</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_ANDROID</span></span><br><span class="line">    www = <span class="keyword">new</span> WWW(Application.streamingAssetsPath + <span class="string">"/Hotfix.pdb"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">    www = <span class="keyword">new</span> WWW(<span class="string">"file:///"</span> + Application.streamingAssetsPath + <span class="string">"/Hotfix.pdb"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    <span class="keyword">while</span> (!www.isDone)</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(www.error))</span><br><span class="line">        Debug.LogError(www.error);</span><br><span class="line">    <span class="keyword">byte</span>[] pdb = www.bytes;</span><br><span class="line">    System.IO.MemoryStream fs = <span class="keyword">new</span> MemoryStream(dll);</span><br><span class="line">    System.IO.MemoryStream p = <span class="keyword">new</span> MemoryStream(pdb);</span><br><span class="line">    appdomain.LoadAssembly(fs, p, <span class="keyword">new</span> Mono.Cecil.Pdb.PdbReaderProvider());    </span><br><span class="line">    </span><br><span class="line">    OnILRuntimeInitialized();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnILRuntimeInitialized</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    appdomain.Invoke(<span class="string">"Hotfix.Game"</span>, <span class="string">"Initialize"</span>, <span class="literal">null</span>, <span class="literal">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这个例子为了演示方便，直接从StreamingAssets目录里读取了脚本DLL文件以及调试符号PDB文件， 实际发布的时候，如果要热更，肯定是将DLL和PDB文件打包到Assetbundle中进行动态加载的，这个不是ILRuntime的范畴，故不具体演示了。</p>
-<h3 id="调试插件"><a href="#调试插件" class="headerlink" title="调试插件"></a>调试插件</h3><p>ILRuntime提供了一个支持Visual Studio 2015、Visual Studio 2017和Visual Studio 2019的调试插件，用来源码级调试你的热更脚本。</p>
-<p>你可以在<a href="https://github.com/Ourpalm/ILRuntime/releases" target="_blank" rel="noopener">这里</a>下载到最新的Visual Studio调试插件。</p>
-<p><strong>使用方法如下：</strong></p>
+<h3 id="调试插件"><a href="#调试插件" class="headerlink" title="调试插件"></a>调试插件</h3><p>ILRuntime提供了一个支持Visual Studio 2015、Visual Studio 2017、Visual Studio 2019、Visual Studio 2022和VSCode的调试插件，用来源码级调试你的热更脚本。</p>
+<p>你可以在Visual Studio和VS Code的插件商店中搜索ILRuntime安装调试插件。</p>
+<p><strong>Visual Studio调试插件使用方法如下：</strong></p>
 <ul>
-<li>安装ILRuntime调试插件，并重新启动VS2015或VS2017、VS2019</li>
+<li>安装ILRuntime调试插件，并重新启动Visual Studio</li>
 <li>确保dll和pdb都加载完毕。</li>
-<li>运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService(56000);来启动调试服务器</li>
+<li>运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService();来启动调试服务器</li>
 <li>用VisualStudio打开热更DLL项目</li>
 <li>点击菜单中的Debug-&gt;Attach to ILRuntime按钮。注意,不是“附加Unity调试程序”</li>
-<li>在弹出来的窗口中填入被调试的主机的IP地址以及调试服务器的端口</li>
-<li>点击Attach按钮后，即可像UnityVS一样下断点调试</li>
+<li>在弹出来的窗口中会列出可以调试的实例，如果没有显示想要调试的实例可以点击刷新按钮进行刷新</li>
+<li>点击OK按钮后，即可像UnityVS一样下断点调试</li>
+</ul>
+<p><strong>VS Code调试插件使用方法如下：</strong></p>
+<ul>
+<li>从VS Code插件商店安装调试插件</li>
+<li>确保dll和pdb都加载完毕。</li>
+<li>运行Unity工程，并保证执行过appdomain.DebugService.StartDebugService();来启动调试服务器</li>
+<li>用VS Code打开热更DLL项目</li>
+<li>F5新建调试Profile</li>
+<li>在弹出来的窗口中会列出可以调试的实例，如果没有显示想要调试的实例可以点击刷新按钮进行刷新</li>
+<li>选择需要调试的实例按确定，即可像UnityVS一样下断点调试</li>
 </ul>
 <p><strong>注意事项：</strong></p>
 <ul>
+<li>在Visual Studio和VS Code中安装的调试器要求2.1.0以上版本的ILRuntime运行时</li>
 <li>如果使用VS2015的话需要<code>Visual Studio 2015 Update3</code>以上版本</li>
 </ul>
 
