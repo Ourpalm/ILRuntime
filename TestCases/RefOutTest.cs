@@ -63,6 +63,46 @@ namespace TestCases
             if (aaa != null)
                 throw new Exception();
         }
+        class TestClass222
+        {
+            public TestClass222()
+            {
+                t = s++;
+            }
+            public int t;
+            static int s = 1;
+        }
+        class TestRefOut2Cls
+        {
+            public TestRefOut2Cls()
+            {
+                p = null;
+                //非null就不会有问题
+                //p = new TestClass();
+            }
+            public bool TryGetObject<T>(out T res) where T : TestClass222, new()
+            {
+                //用局部变量中转没问题
+                //var tmp = p as T;
+                //res = null;
+                //res = tmp;
+                //这一句现在没什么用（比如用来if判断）但没有这一句不会报错。
+                res = p as T;
+                res = new T();//这里解析器越界异常
+                              //res = p as T;//这样也会解析器越界异常
+                Console.WriteLine("!!! new T");
+                return true;
+            }
+            TestClass222 p;
+        }
+        public static void UnitTest_RefOutNull2()
+        {
+            TestClass222 res;
+            TestRefOut2Cls obj = new TestRefOut2Cls();
+            obj.TryGetObject(out res);
+            if (res == null)
+                throw new Exception();
+        }
         public static void UnitTest_Typeof()
         {
             object obj = 1;
@@ -253,6 +293,24 @@ namespace TestCases
             var arr = new int[3];
             Func(ref arr);
             Console.WriteLine(arr[1]);
+        }
+
+        public static void Set(ref long x)
+        {
+            if (x != 10)
+                throw new Exception();
+            x++;
+        }
+
+        public static void UnitTest_RefTest4()
+        {
+            long srcX = 10;
+
+            for (var index = 0; index < 10; index++)
+            {
+                long x = srcX;
+                Set(ref x);
+            }
         }
 
         static void Func(ref int[] arr)

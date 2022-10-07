@@ -73,11 +73,11 @@ namespace ILRuntime.Reflection
                 properties[i] = pi;
                 if (pd.GetMethod != null)
                 {
-                    pi.Getter = type.GetMethod(pd.GetMethod.Name, pd.GetMethod.Parameters.Select(p => type.AppDomain.GetType(p.ParameterType, null, null)).ToList(), null) as ILMethod;
+                    pi.Getter = type.GetMethod(pd.GetMethod.Name, pd.GetMethod.Parameters.Select(p => type.AppDomain.GetType(p.ParameterType, type, null)).ToList(), null) as ILMethod;
                 }
                 if (pd.SetMethod != null)
                 {
-                    pi.Setter = type.GetMethod(pd.SetMethod.Name, pd.SetMethod.Parameters.Select(p => type.AppDomain.GetType(p.ParameterType, null, null)).ToList(), null) as ILMethod;
+                    pi.Setter = type.GetMethod(pd.SetMethod.Name, pd.SetMethod.Parameters.Select(p => type.AppDomain.GetType(p.ParameterType, type, null)).ToList(), null) as ILMethod;
                 }
             }
         }
@@ -303,10 +303,22 @@ namespace ILRuntime.Reflection
         {
             if (fields == null)
                 InitializeFields();
-            foreach(var i in fields)
+            bool isPublic = (bindingAttr & BindingFlags.Public) == BindingFlags.Public;
+            bool isPrivate = (bindingAttr & BindingFlags.NonPublic) == BindingFlags.NonPublic;
+            bool isStatic = (bindingAttr & BindingFlags.Static) == BindingFlags.Static;
+            bool isInstance = (bindingAttr & BindingFlags.Instance) == BindingFlags.Instance;
+            bool isDeclaredOnly = (bindingAttr & BindingFlags.DeclaredOnly) == BindingFlags.DeclaredOnly;
+            for (int i = 0; i < fields.Length; i++)
             {
-                if (i.Name == name)
-                    return i;
+                FieldInfo fi = fields[i];
+                if (isPublic != fi.IsPublic && isPrivate != !fi.IsPublic)
+                    continue;
+                if ((isStatic != fi.IsStatic) && (isInstance != !fi.IsStatic))
+                    continue;
+                if (isDeclaredOnly && i < type.FieldStartIndex)
+                    continue;
+                if (fi.Name == name)
+                    return fi;
             }
             if (BaseType != null && BaseType is ILRuntimeWrapperType)
             {
@@ -323,14 +335,18 @@ namespace ILRuntime.Reflection
             bool isPrivate = (bindingAttr & BindingFlags.NonPublic) == BindingFlags.NonPublic;
             bool isStatic = (bindingAttr & BindingFlags.Static) == BindingFlags.Static;
             bool isInstance = (bindingAttr & BindingFlags.Instance) == BindingFlags.Instance;
+            bool isDeclaredOnly = (bindingAttr & BindingFlags.DeclaredOnly) == BindingFlags.DeclaredOnly;
             List<FieldInfo> res = new List<FieldInfo>();
-            foreach(var i in fields)
+            for (int i = 0; i < fields.Length; i++)
             {
-                if (isPublic != i.IsPublic && isPrivate != !i.IsPublic)
+                FieldInfo fi = fields[i];
+                if (isPublic != fi.IsPublic && isPrivate != !fi.IsPublic)
                     continue;
-                if ((isStatic != i.IsStatic) && (isInstance != !i.IsStatic))
+                if ((isStatic != fi.IsStatic) && (isInstance != !fi.IsStatic))
                     continue;
-                res.Add(i);
+                if (isDeclaredOnly && i < type.FieldStartIndex)
+                    continue;
+                res.Add(fi);
             }
             if ((bindingAttr & BindingFlags.DeclaredOnly) != BindingFlags.DeclaredOnly)
             {

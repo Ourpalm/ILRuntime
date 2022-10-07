@@ -6,6 +6,11 @@ using System.Text;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Stack
 {
 #pragma warning disable CS0660
@@ -28,8 +33,13 @@ namespace ILRuntime.Runtime.Stack
             return (a.ObjectType != b.ObjectType) || (a.Value != b.Value) || (a.ValueLow == b.ValueLow);
         }
 
-        //IL2CPP can't process esp->ToObject() properly, so I can only use static function for this
+        [Obsolete]
         public static unsafe object ToObject(StackObject* esp, ILRuntime.Runtime.Enviorment.AppDomain appdomain, IList<object> mStack)
+        {
+            return ToObject(esp, appdomain, (AutoList)mStack);
+        }
+        //IL2CPP can't process esp->ToObject() properly, so I can only use static function for this
+        public static unsafe object ToObject(StackObject* esp, ILRuntime.Runtime.Enviorment.AppDomain appdomain, AutoList mStack)
         {
             switch (esp->ObjectType)
             {
@@ -120,7 +130,7 @@ namespace ILRuntime.Runtime.Stack
             }
         }
 
-        public unsafe static void Initialized(ref StackObject esp, int idx, IType fieldType, IList<object> mStack)
+        public unsafe static void Initialized(ref StackObject esp, int idx, IType fieldType, AutoList mStack)
         {
             if (fieldType.IsPrimitive)
             {

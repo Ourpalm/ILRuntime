@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Generated
 {
     class CLRBindings
@@ -22,6 +26,8 @@ namespace ILRuntime.Runtime.Generated
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<System.Collections.Generic.KeyValuePair<System.UInt32, ILRuntime.Runtime.Intepreter.ILTypeInstance>> s_System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding_Binder = null;
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestStructA> s_ILRuntimeTest_TestFramework_TestStructA_Binding_Binder = null;
         internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestStructB> s_ILRuntimeTest_TestFramework_TestStructB_Binding_Binder = null;
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.Fixed64> s_ILRuntimeTest_TestFramework_Fixed64_Binding_Binder = null;
+        internal static ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.Fixed64Vector2> s_ILRuntimeTest_TestFramework_Fixed64Vector2_Binding_Binder = null;
 
         /// <summary>
         /// Initialize the CLR binding, please invoke this AFTER CLR Redirection registration
@@ -99,6 +105,8 @@ namespace ILRuntime.Runtime.Generated
             System_Reflection_ParameterInfo_Binding.Register(app);
             System_Reflection_MethodInfo_Binding.Register(app);
             ILRuntimeTest_TestFramework_BindableProperty_1_Int64_Binding.Register(app);
+            System_Threading_Interlocked_Binding.Register(app);
+            System_Action_3_Single_Double_Int32_Binding.Register(app);
             System_Action_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int64_Int32_Binding.Register(app);
             System_Enum_Binding.Register(app);
@@ -151,6 +159,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_TestCLRAttribute_Binding.Register(app);
             System_Reflection_PropertyInfo_Binding.Register(app);
             System_Collections_Generic_List_1_String_Binding.Register(app);
+            System_Collections_Generic_List_1_FieldInfo_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestCLREnumClass_Binding.Register(app);
             System_Nullable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_List_1_String_Binding.Register(app);
@@ -188,8 +197,11 @@ namespace ILRuntime.Runtime.Generated
             System_AccessViolationException_Binding.Register(app);
             System_Func_1_TestVector3_Binding.Register(app);
             ILRuntimeTest_TestFramework_JInt_Binding.Register(app);
+            System_Collections_Generic_List_1_TestVector3NoBinding_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStructA_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestStructB_Binding.Register(app);
+            ILRuntimeTest_TestFramework_Fixed64_Binding.Register(app);
+            ILRuntimeTest_TestFramework_Fixed64Vector2_Binding.Register(app);
 
             ILRuntime.CLR.TypeSystem.CLRType __clrType = null;
             __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestVector3));
@@ -204,6 +216,10 @@ namespace ILRuntime.Runtime.Generated
             s_ILRuntimeTest_TestFramework_TestStructA_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestStructA>;
             __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.TestStructB));
             s_ILRuntimeTest_TestFramework_TestStructB_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.TestStructB>;
+            __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.Fixed64));
+            s_ILRuntimeTest_TestFramework_Fixed64_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.Fixed64>;
+            __clrType = (ILRuntime.CLR.TypeSystem.CLRType)app.GetType (typeof(ILRuntimeTest.TestFramework.Fixed64Vector2));
+            s_ILRuntimeTest_TestFramework_Fixed64Vector2_Binding_Binder = __clrType.ValueTypeBinder as ILRuntime.Runtime.Enviorment.ValueTypeBinder<ILRuntimeTest.TestFramework.Fixed64Vector2>;
         }
 
         /// <summary>
@@ -217,6 +233,8 @@ namespace ILRuntime.Runtime.Generated
             s_System_Collections_Generic_KeyValuePair_2_UInt32_ILTypeInstance_Binding_Binder = null;
             s_ILRuntimeTest_TestFramework_TestStructA_Binding_Binder = null;
             s_ILRuntimeTest_TestFramework_TestStructB_Binding_Binder = null;
+            s_ILRuntimeTest_TestFramework_Fixed64_Binding_Binder = null;
+            s_ILRuntimeTest_TestFramework_Fixed64Vector2_Binding_Binder = null;
         }
     }
 }

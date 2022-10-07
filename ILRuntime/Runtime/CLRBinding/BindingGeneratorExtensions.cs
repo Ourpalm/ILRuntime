@@ -39,8 +39,8 @@ namespace ILRuntime.Runtime.CLRBinding
             if (i.IsSpecialName)
             {
                 string[] t = i.Name.Split('_');
-                //if (t[0] == "add" || t[0] == "remove")
-                //    return true;
+                if (t[0] == "add" || t[0] == "remove")
+                    return false;
                 if (t[0] == "get" || t[0] == "set")
                 {
                     Type[] ts;

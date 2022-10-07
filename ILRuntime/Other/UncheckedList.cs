@@ -13,7 +13,7 @@ namespace ILRuntime.Other
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public class UncheckedList<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, IList, ICollection
+    public sealed class UncheckedList<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, IList, ICollection
     {
 
        private const int _defaultCapacity = 4;

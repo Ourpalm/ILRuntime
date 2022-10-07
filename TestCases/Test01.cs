@@ -251,6 +251,20 @@ namespace TestCases
         }
 
         [ILRuntimeTest(IsPerformanceTest = true)]
+        public static void UnitTest_Performance10_2()
+        {
+            TestVectorClass a = new TestVectorClass();
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1000000; i++)
+            {
+                a.Vector2 = a.Vector2;
+            }
+            sw.Stop();
+            Console.WriteLine(string.Format("time=" + sw.ElapsedMilliseconds + ", cps:{0:0}", (1000000 * 1000 / sw.ElapsedMilliseconds)));
+        }
+
+        [ILRuntimeTest(IsPerformanceTest = true)]
         public static void UnitTest_Performance11()
         {
             TestVectorClass a = new TestVectorClass();

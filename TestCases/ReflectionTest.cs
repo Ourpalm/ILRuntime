@@ -64,9 +64,9 @@ namespace TestCases
 
         public static void ReflectionTest05()
         {
-            var fi = typeof(TestCls).GetField("aa");
-            var fi2 = typeof(TestCls).GetField("bb");
-            var fi3 = typeof(TestCls).GetField("cc");
+            var fi = typeof(TestCls).GetField("aa", BindingFlags.NonPublic | BindingFlags.Instance);
+            var fi2 = typeof(TestCls).GetField("bb", BindingFlags.NonPublic | BindingFlags.Static);            
+            var fi3 = typeof(TestCls).GetField("cc", BindingFlags.NonPublic | BindingFlags.Static);
 
             var a = new TestCls();
 
@@ -587,6 +587,71 @@ namespace TestCases
         class TestC
         {
             public string Name;
+        }
+
+        public class Base
+        {
+            public int BaseIntVal;
+        }
+
+        public class Impl : Base
+        {
+            public bool ImplBoolVal;
+        }
+
+        public static void ReflectionTest22()
+        {
+            var t = typeof(Impl);
+            var flag = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic |
+                                       BindingFlags.SetProperty;
+            var fs = t.GetFields(flag).ToList();
+            if (fs.Count != 1)
+            {
+                throw new Exception($"Field count mismatch,detail: {string.Join(",", fs.Select(f => f.Name))}");
+            }
+        }
+        public class HotBehaviour<T>
+        {
+            public T csObj { get; protected set; }
+        }
+
+        class XX : HotBehaviour<int>
+        {
+
+        }
+        public class YY
+        {
+            public Type CurType { get; set; }
+            public object Value { get; set; }
+            public void a<T>(int a, T t)
+            {
+                CurType = typeof(T);
+                Value = t;
+            }
+        }
+        public static void ReflectionTest23()
+        {
+            XX x = new XX();
+            var type = typeof(XX);
+            var value = type.GetProperty("csObj").GetValue(x);
+            type.GetProperty("csObj").SetValue(x, 11);
+            if (x.csObj != 11)
+                throw new Exception();
+        }
+
+        public static void ReflectionTest24()
+        {
+            YY yy = new YY();
+            var method = typeof(YY).GetMethod("a");
+            if(!method.IsGenericMethodDefinition || !method.IsGenericMethod)
+                throw new Exception();
+            var mi = method.MakeGenericMethod(typeof(int));
+            mi.Invoke(yy,new object[] { 11 , 12});
+
+            if(yy.CurType != typeof(int) || (int)yy.Value != 12)
+            {
+                throw new Exception($"CurType = {yy.CurType}, Value = {yy.Value}");
+            }
         }
     }
 }

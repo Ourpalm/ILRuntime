@@ -9,6 +9,205 @@ using ILRuntime.Runtime.Stack;
 
 namespace ILRuntimeTest.TestFramework
 {
+    public unsafe class Fixed64Binder : ValueTypeBinder<Fixed64>
+    {
+        public override unsafe void AssignFromStack(ref Fixed64 ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            ins = new Fixed64(*(long*)&v->Value);
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref Fixed64 ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            *(long*)&v->Value = ins.RawValue;
+        }
+        public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+        {
+            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+            MethodBase method;
+            Type[] args;
+            Type type = typeof(Fixed64);
+            args = new Type[] { typeof(long) };
+            method = type.GetConstructor(flag, null, args, null);
+            appdomain.RegisterCLRMethodRedirection(method, NewFixed64);
+        }
+
+        StackObject* NewFixed64(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            StackObject* ret;
+            if (isNewObj)
+            {
+                ret = esp;
+                Fixed64 vec;
+                var ptr = ILIntepreter.Minus(esp, 1);
+                var val = *(long*)&ptr->Value;
+                vec = new Fixed64(val);
+                PushFixed64(ref vec, intp, ptr, mStack);
+            }
+            else
+            {
+                ret = ILIntepreter.Minus(esp, 2);
+                var instance = ILIntepreter.GetObjectAndResolveReference(ret);
+                var dst = *(StackObject**)&instance->Value;
+                var f = ILIntepreter.Minus(dst, 1);
+                var v = ILIntepreter.Minus(esp, 1);
+                var val = *(long*)&v->Value;
+                Fixed64 vec = new Fixed64(val);
+                *(long*)&f->Value = vec.RawValue;
+            }
+            return ret;
+        }
+
+        public static void ParseFixed64(out Fixed64 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
+        {
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                long value = *(long*)&ILIntepreter.Minus(src, 1)->Value;
+                vec = new Fixed64(value);
+                intp.FreeStackValueType(ptr);
+            }
+            else
+            {
+                vec = (Fixed64)StackObject.ToObject(a, intp.AppDomain, mStack);
+                intp.Free(ptr);
+            }
+        }
+
+        public void PushFixed64(ref Fixed64 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
+        {
+            intp.AllocValueType(ptr, CLRType);
+            var dst = *((StackObject**)&ptr->Value);
+            CopyValueTypeToStack(ref vec, dst, mStack);
+        }
+    }
+
+    public unsafe class FixedVector2Binder : ValueTypeBinder<Fixed64Vector2>
+    {
+        public override unsafe void AssignFromStack(ref Fixed64Vector2 ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            ins.x = GetFixed64(v, mStack);
+            v = ILIntepreter.Minus(ptr, 2);
+            ins.y = GetFixed64(v, mStack);
+        }
+
+        private Fixed64 GetFixed64(StackObject* ptr, IList<object> mStack)
+        {
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            Fixed64 res;
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                var val = *(long*)&ILIntepreter.Minus(src, 1)->Value;
+                res = new Fixed64(val);
+            }
+            else
+            {
+                var raw = (Fixed64)StackObject.ToObject(a, domain, mStack);
+                res = raw;
+            }
+            return res;
+        }
+
+        public override unsafe void CopyValueTypeToStack(ref Fixed64Vector2 ins, StackObject* ptr, IList<object> mStack)
+        {
+            var v = ILIntepreter.Minus(ptr, 1);
+            var fix64Ptr = GetFix64Ptr(v, mStack);
+            *(long*)&fix64Ptr->Value = ins.x.RawValue;
+
+            v = ILIntepreter.Minus(ptr, 2);
+            fix64Ptr = GetFix64Ptr(v, mStack);
+            *(long*)&fix64Ptr->Value = ins.y.RawValue;
+        }
+
+        private StackObject* GetFix64Ptr(StackObject* ptr, IList<object> mStack)
+        {
+            StackObject* res = null;
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                res = ILIntepreter.Minus(src, 1);
+            }
+            return res;
+        }
+
+        public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+        {
+            BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+            MethodBase method;
+            Type[] args;
+            Type type = typeof(Fixed64Vector2);
+            args = new Type[] { typeof(int), typeof(int) };
+            method = type.GetConstructor(flag, null, args, null);
+            appdomain.RegisterCLRMethodRedirection(method, NewFixed64Vector2);
+        }
+
+        StackObject* NewFixed64Vector2(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            StackObject* ret;
+            if (isNewObj)
+            {
+                ret = ILIntepreter.Minus(esp, 1);
+                Fixed64Vector2 vec;
+                var ptr = ILIntepreter.Minus(esp, 1);
+                var y = ptr->Value;
+                ptr = ILIntepreter.Minus(esp, 2);
+                var x = ptr->Value;
+                vec = new Fixed64Vector2(x, y);
+
+                PushVector2(ref vec, intp, ptr, mStack);
+            }
+            else
+            {
+                ret = ILIntepreter.Minus(esp, 3);
+                var instance = ILIntepreter.GetObjectAndResolveReference(ret);
+                var dst = *(StackObject**)&instance->Value;
+                var ptr = ILIntepreter.Minus(dst, 1);
+                var f = GetFix64Ptr(ptr, mStack);
+                var v = ILIntepreter.Minus(esp, 2);
+                Fixed64 fix = new Fixed64(v->Value);
+                *(long*)&f->Value = fix.RawValue;
+
+                ptr = ILIntepreter.Minus(dst, 2);
+                f = GetFix64Ptr(ptr, mStack);
+                v = ILIntepreter.Minus(esp, 1);
+                fix = new Fixed64(v->Value);
+                *(long*)&f->Value = fix.RawValue;
+            }
+            return ret;
+        }
+
+        public void ParseFixed64Vector2(out Fixed64Vector2 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
+        {
+            var a = ILIntepreter.GetObjectAndResolveReference(ptr);
+            if (a->ObjectType == ObjectTypes.ValueTypeObjectReference)
+            {
+                var src = *(StackObject**)&a->Value;
+                var fixPtr = ILIntepreter.Minus(src, 1);
+                vec.x = GetFixed64(fixPtr, mStack);
+                fixPtr = ILIntepreter.Minus(src, 2);
+                vec.y = GetFixed64(fixPtr, mStack);
+
+                intp.FreeStackValueType(ptr);
+            }
+            else
+            {
+                vec = (Fixed64Vector2)StackObject.ToObject(a, intp.AppDomain, mStack);
+                intp.Free(ptr);
+            }
+        }
+
+        public void PushVector2(ref Fixed64Vector2 vec, ILIntepreter intp, StackObject* ptr, IList<object> mStack)
+        {
+            intp.AllocValueType(ptr, CLRType);
+            var dst = *((StackObject**)&ptr->Value);
+            CopyValueTypeToStack(ref vec, dst, mStack);
+        }
+    }
     public unsafe class TestStructABinder : ValueTypeBinder<TestStructA>
     {
         public override unsafe void CopyValueTypeToStack(ref TestStructA ins, StackObject* ptr, IList<object> stack)

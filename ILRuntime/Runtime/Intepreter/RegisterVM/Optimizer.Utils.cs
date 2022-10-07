@@ -869,6 +869,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
         }
 
+        static bool CanReplaceOpcodeSource(ref OpCodes.OpCodeR op, int idx)
+        {
+            switch (op.Code)
+            {
+                case OpCodeREnum.Ldloca:
+                case OpCodeREnum.Ldloca_S:
+                case OpCodeREnum.Ldarga:
+                case OpCodeREnum.Ldarga_S:
+                    return false;
+            }
+            return true;
+        }
+
         static void ReplaceOpcodeSource(ref OpCodes.OpCodeR op, int idx, short src)
         {
             switch (op.Code)

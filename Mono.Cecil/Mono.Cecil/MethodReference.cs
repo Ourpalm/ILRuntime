@@ -17,7 +17,7 @@ namespace ILRuntime.Mono.Cecil {
 
 	public class MethodReference : MemberReference, IMethodSignature, IGenericParameterProvider, IGenericContext {
         int hashCode = -1;
-        static int instance_id;
+        static int instance_id = 0x1000000;
         internal ParameterDefinitionCollection parameters;
 		MethodReturnType return_type;
 

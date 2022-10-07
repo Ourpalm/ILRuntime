@@ -15,6 +15,8 @@ namespace ILRuntime.Mono.Cecil {
 	public class FieldReference : MemberReference {
 
 		TypeReference field_type;
+		int hashCode = -1;
+		static int instance_id = 0x2000000;
 
 		public TypeReference FieldType {
 			get { return field_type; }
@@ -63,6 +65,13 @@ namespace ILRuntime.Mono.Cecil {
 				throw new NotSupportedException ();
 
 			return module.Resolve (this);
+		}
+
+		public override int GetHashCode()
+		{
+			if (hashCode == -1)
+				hashCode = System.Threading.Interlocked.Add(ref instance_id, 1);
+			return hashCode;
 		}
 	}
 }
