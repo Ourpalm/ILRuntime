@@ -1997,24 +1997,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else if (ilm.IsEventAdd)
                                             {
-                                                instance = null;
-                                                var dele = StackObject.ToObject(esp - 1, domain, mStack);
-                                                Free(esp - 1);
-                                                if (ilm.IsStatic)
-                                                {
-                                                    instance = ((ILType)ilm.DeclearingType).StaticInstance;
-                                                    objRef = esp - 1;
-                                                }
-                                                else
-                                                {
-                                                    objRef = esp - 2;
-                                                    instance = StackObject.ToObject(objRef, domain, mStack) as ILTypeInstance;
-                                                    Free(objRef);
-                                                }
-                                                obj = instance[ilm.EventFieldIndex];
-                                                
-                                                objRef = PushObject(objRef, mStack, obj);
-                                                objRef = PushObject(objRef, mStack, dele);
+                                                objRef = PrepareEventHandler(esp, ilm, mStack, out instance);
 
                                                 esp = CLRRedirections.DelegateCombine(this, objRef, mStack, null, false);
                                                 obj = StackObject.ToObject(esp - 1, domain, mStack);
@@ -2025,23 +2008,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             else if (ilm.IsEventRemove)
                                             {
-                                                instance = null;
-                                                var dele = StackObject.ToObject(esp - 1, domain, mStack);
-                                                Free(esp - 1);
-                                                if (ilm.IsStatic)
-                                                {
-                                                    instance = ((ILType)ilm.DeclearingType).StaticInstance;
-                                                    objRef = esp - 1;
-                                                }
-                                                else
-                                                {
-                                                    objRef = esp - 2;
-                                                    instance = StackObject.ToObject(objRef, domain, mStack) as ILTypeInstance;
-                                                    Free(objRef);
-                                                }
-                                                obj = instance[ilm.EventFieldIndex];
-                                                objRef = PushObject(objRef, mStack, obj);
-                                                objRef = PushObject(objRef, mStack, dele);
+                                                objRef = PrepareEventHandler(esp, ilm, mStack, out instance);
 
                                                 esp = CLRRedirections.DelegateRemove(this, objRef, mStack, null, false);
                                                 obj = StackObject.ToObject(esp - 1, domain, mStack);
@@ -4712,6 +4679,30 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp);
+        }
+
+        StackObject* PrepareEventHandler(StackObject* esp, ILMethod ilm, AutoList mStack, out ILTypeInstance instance)
+        {
+            instance = null;
+            StackObject* objRef;
+            var dele = StackObject.ToObject(esp - 1, domain, mStack);
+            Free(esp - 1);
+            if (ilm.IsStatic)
+            {
+                instance = ((ILType)ilm.DeclearingType).StaticInstance;
+                objRef = esp - 1;
+            }
+            else
+            {
+                objRef = esp - 2;
+                instance = StackObject.ToObject(objRef, domain, mStack) as ILTypeInstance;
+                Free(objRef);
+            }
+            var obj = instance[ilm.EventFieldIndex];
+
+            objRef = PushObject(objRef, mStack, obj);
+            objRef = PushObject(objRef, mStack, dele);
+            return objRef;
         }
         ExceptionHandler FindExceptionHandlerByBranchTarget(int addr, int branchTarget, ExceptionHandler[] ehs)
         {
