@@ -54,7 +54,7 @@ namespace ILRuntime.CLR.Utils
                                 {
                                     name = t.FullName + "[]";
                                 }
-                                else if (name.Length == nameLength + 11 && name.StartWith(gp.Name) &&  name.EndWith("[0...,0...]"))
+                                else if (name.Length == nameLength + 11 && name.StartsWith(gp.Name) &&  name.EndsWith("[0...,0...]"))
                                 {
                                     name = t.FullName + "[,]";
                                 }
