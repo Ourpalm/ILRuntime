@@ -165,6 +165,11 @@ namespace ILRuntime.Reflection
             return res.ToArray();
         }
 
+        public override object GetRawConstantValue()
+        {
+            return definition.Constant;
+        }
+
         public override object GetValue(object obj)
         {
             unsafe
