@@ -27,6 +27,7 @@ namespace ILRuntime.CLR.Method
         ExceptionHandler[] exceptionHandler, exceptionHandlerR;
         KeyValuePair<string, IType>[] genericParameters;
         IType[] genericArguments;
+        ILMethod genericDefinition;
         Dictionary<int, int[]> jumptables, jumptablesR;
         bool isDelegateInvoke;
         bool isEventAdd, isEventRemove;
@@ -159,6 +160,7 @@ namespace ILRuntime.CLR.Method
 
         public IType[] GenericArugmentsArray { get { return genericArguments; } }
 
+        public ILMethod GenericDefinition { get { return genericDefinition; } } 
         public bool ShouldUseRegisterVM
         {
             get
@@ -958,6 +960,7 @@ namespace ILRuntime.CLR.Method
             ILMethod m = new ILMethod(def, declaringType, appdomain, jitFlags);
             m.genericParameters = genericParameters;
             m.genericArguments = genericArguments;
+            m.genericDefinition = this;
             if (m.def.ReturnType.IsGenericParameter)
             {
                 m.ReturnType = m.FindGenericArgument(m.def.ReturnType.Name);
