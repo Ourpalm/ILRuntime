@@ -666,11 +666,29 @@ namespace TestCases
                 throw new Exception();
 
         }
+
+        static event Action<float, double, int> OnIntEvent;
         static void Message<T>(T oldVal, T newVal)
         {
             Console.WriteLine(typeof(T));
             Console.WriteLine(oldVal);
             Console.WriteLine(newVal);
+        }
+
+        public static void DelegateTest43()
+        {
+            OnIntEvent += DelegateTest43Sub;
+            OnIntEvent(1, 2, 3);
+            OnIntEvent -= DelegateTest43Sub;
+            if (OnIntEvent != null)
+                throw new Exception();
+        }
+
+        static void DelegateTest43Sub(float a, double b, int c)
+        {
+            if (a != 1 || b != 2 || c != 3)
+                throw new Exception();
+            Console.WriteLine($"a={a}, b={b}, c={c}");
         }
     }
 }

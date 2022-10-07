@@ -29,6 +29,8 @@ namespace ILRuntime.CLR.Method
         IType[] genericArguments;
         Dictionary<int, int[]> jumptables, jumptablesR;
         bool isDelegateInvoke;
+        bool isEventAdd, isEventRemove;
+        int eventFieldIndex;
         bool jitPending;
         ILRuntimeMethodInfo refletionMethodInfo;
         ILRuntimeConstructorInfo reflectionCtorInfo;
@@ -345,6 +347,27 @@ namespace ILRuntime.CLR.Method
             {
                 return isDelegateInvoke;
             }
+        }
+
+        public bool IsEventAdd
+        {
+            get
+            {
+                return isEventAdd;
+            }
+        }
+
+        public bool IsEventRemove
+        {
+            get
+            {
+                return isEventRemove;
+            }
+        }
+
+        public int EventFieldIndex
+        {
+            get { return eventFieldIndex; }
         }
 
         public bool IsStatic
@@ -795,6 +818,13 @@ namespace ILRuntime.CLR.Method
                     }
                     break;
             }
+        }
+
+        public void SetEventAddOrRemove(bool isEventAdd, bool isEventRemove, int fieldIdx)
+        {
+            this.isEventRemove = isEventRemove;
+            this.isEventAdd = isEventAdd;
+            eventFieldIndex = fieldIdx;
         }
 
         internal int GetTypeTokenHashCode(object token)
