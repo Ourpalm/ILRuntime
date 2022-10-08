@@ -92,6 +92,7 @@ namespace ILRuntimeTest.TestFramework
         public static Func<int, float, short, double> DelegatePerformanceTest;
         public static Action<TestCLREnum> EnumDelegateTest;
         public static Func<TestCLREnum> EnumDelegateTest2;
+        public static event Action<float, double, int> OnIntEvent;
 
         public static void TestEvent()
         {
@@ -101,6 +102,16 @@ namespace ILRuntimeTest.TestFramework
         public void TestEvent2()
         {
             IntDelegateEventTest2(22222);
+        }
+
+        public static void TestEvent3(float a, double b, int c)
+        {
+            OnIntEvent(a, b, c);
+        }
+
+        public static bool TestEvent4()
+        {
+            return OnIntEvent == null;
         }
 
         public static void TestEnumDelegate()

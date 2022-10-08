@@ -469,7 +469,7 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 StackObject* basePointer = ResolveCurrentFrameBasePointer(intp, method, ip);
 
-                int methodHash = m.GetHashCode();
+                int methodHash = m.IsGenericInstance ? m.GenericDefinition.GetHashCode() : m.GetHashCode();
                 BreakpointInfo[] lst = null;
 
                 lock (activeBreakpoints)

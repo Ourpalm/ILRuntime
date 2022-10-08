@@ -165,6 +165,11 @@ namespace ILRuntime.Reflection
             return res.ToArray();
         }
 
+        public override object GetRawConstantValue()
+        {
+            return definition.Constant;
+        }
+
         public override object GetValue(object obj)
         {
             unsafe
@@ -172,6 +177,8 @@ namespace ILRuntime.Reflection
                 ILTypeInstance ins;
                 if (isStatic)
                 {
+                    if (definition.HasConstant)
+                        return definition.Constant;
                     ins = ilType.StaticInstance;
                 }
                 else

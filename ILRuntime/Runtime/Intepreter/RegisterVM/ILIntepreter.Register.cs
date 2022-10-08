@@ -2854,12 +2854,34 @@ namespace ILRuntime.Runtime.Intepreter
                                             bool processed = false;
                                             if (m.IsDelegateInvoke)
                                             {
-                                                var instance = StackObject.ToObject((esp - (m.ParameterCount + 1)), domain, mStack);
-                                                if (instance is IDelegateAdapter)
+                                                obj = StackObject.ToObject((esp - (m.ParameterCount + 1)), domain, mStack);
+                                                if (obj is IDelegateAdapter)
                                                 {
-                                                    esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
+                                                    esp = ((IDelegateAdapter)obj).ILInvoke(this, esp, mStack);
                                                     processed = true;
                                                 }
+                                            }
+                                            else if (ilm.IsEventAdd)
+                                            {
+                                                objRef = PrepareEventHandler(esp, ilm, mStack, out var instance);
+
+                                                esp = CLRRedirections.DelegateCombine(this, objRef, mStack, null, false);
+                                                obj = StackObject.ToObject(esp - 1, domain, mStack);
+                                                instance[ilm.EventFieldIndex] = obj;
+                                                Free(esp - 1);
+                                                esp--;
+                                                processed = true;
+                                            }
+                                            else if (ilm.IsEventRemove)
+                                            {
+                                                objRef = PrepareEventHandler(esp, ilm, mStack, out var instance);
+
+                                                esp = CLRRedirections.DelegateRemove(this, objRef, mStack, null, false);
+                                                obj = StackObject.ToObject(esp - 1, domain, mStack);
+                                                instance[ilm.EventFieldIndex] = obj;
+                                                Free(esp - 1);
+                                                esp--;
+                                                processed = true;
                                             }
                                             if (!processed)
                                             {
@@ -4214,7 +4236,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference && IsValueTypeReferenceValid(objRef, type))
                                         {
                                             stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
                                         }
@@ -5312,6 +5334,20 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             //ClearStack
             return stack.PopFrame(ref frame, esp);
+        }
+
+        bool IsValueTypeReferenceValid(StackObject* ptr, IType type)
+        {
+            ptr = ResolveReference(ptr);
+            if (ptr->ObjectType == ObjectTypes.ValueTypeDescriptor)
+            {
+                if (ptr->Value == type.TypeIndex)
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
         }
 
         void LoadFromFieldReferenceToRegister(ref RegisterFrameInfo info, object obj, int idx, short reg)

@@ -6,7 +6,7 @@ order: 0
 
 ## ILRuntime
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT) [![release](https://img.shields.io/badge/release-v2.0.2-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Ourpalm/ILRuntime/blob/master/LICENSE.TXT) [![release](https://img.shields.io/badge/release-v2.1.0-blue.svg)](https://github.com/Ourpalm/ILRuntime/releases) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/Ourpalm/ILRuntime/pulls)
 
 ILRuntime项目为基于C#的平台（例如Unity）提供了一个`纯C#实现`，`快速`、`方便`且`可靠`的IL运行时，使得能够在不支持JIT的硬件环境（如iOS）能够实现代码的热更新
 
@@ -20,7 +20,8 @@ ILRuntime项目为基于C#的平台（例如Unity）提供了一个`纯C#实现`
 - 选择性的CLR绑定使跨域调用更快速，绑定后跨域调用的性能能达到slua的2倍左右（从脚本调用GameObject之类的接口）
 - 支持跨域继承
 - 完整的泛型支持
-- 拥有Visual Studio的调试插件，可以实现真机源码级调试。支持Visual Studio 2015 Update3 以及Visual Studio 2017和Visual Studio 2019
+- 拥有Visual Studio的调试插件，可以实现真机源码级调试。支持Visual Studio 2015 Update3、Visual Studio 2017、Visual Studio 2019和Visual Studio 2022
+- 支持VS Code源码级调试，支持Mac OSX
 - 最新的2.0版引入的寄存器模式将数学运算性能进行了大幅优化
 
 ### C# vs Lua

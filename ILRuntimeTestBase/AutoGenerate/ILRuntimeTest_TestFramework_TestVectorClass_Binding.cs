@@ -33,15 +33,15 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{typeof(System.Int32), typeof(System.String), typeof(ILRuntimeTest.TestFramework.TestVector3), typeof(ILRuntimeTest.TestFramework.TestVectorClass)};
             method = type.GetMethod("ValueTypePerfTest", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, ValueTypePerfTest_1);
-            args = new Type[]{};
-            method = type.GetMethod("get_Obj", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, get_Obj_2);
-            args = new Type[]{typeof(System.Int32), typeof(System.String), typeof(ILRuntimeTest.TestFramework.TestVectorClass), typeof(ILRuntimeTest.TestFramework.TestVectorClass)};
-            method = type.GetMethod("ValueTypePerfTest2", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, ValueTypePerfTest2_3);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3)};
             method = type.GetMethod("set_Vector2", flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, set_Vector2_4);
+            app.RegisterCLRMethodRedirection(method, set_Vector2_2);
+            args = new Type[]{};
+            method = type.GetMethod("get_Obj", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, get_Obj_3);
+            args = new Type[]{typeof(System.Int32), typeof(System.String), typeof(ILRuntimeTest.TestFramework.TestVectorClass), typeof(ILRuntimeTest.TestFramework.TestVectorClass)};
+            method = type.GetMethod("ValueTypePerfTest2", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, ValueTypePerfTest2_4);
 
             field = type.GetField("vector", flag);
             app.RegisterCLRFieldGetter(field, get_vector_0);
@@ -107,7 +107,31 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* get_Obj_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* set_Vector2_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ILRuntimeTest.TestFramework.TestVector3 @value = new ILRuntimeTest.TestFramework.TestVector3();
+            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
+                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @value, __intp, ptr_of_this_method, __mStack, true);
+            } else {
+                @value = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+                __intp.Free(ptr_of_this_method);
+            }
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            __intp.Free(ptr_of_this_method);
+
+            instance_of_this_method.Vector2 = value;
+
+            return __ret;
+        }
+
+        static StackObject* get_Obj_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -122,7 +146,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
-        static StackObject* ValueTypePerfTest2_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* ValueTypePerfTest2_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -145,30 +169,6 @@ namespace ILRuntime.Runtime.Generated
 
 
             ILRuntimeTest.TestFramework.TestVectorClass.ValueTypePerfTest2(@a, @b, @c, @d);
-
-            return __ret;
-        }
-
-        static StackObject* set_Vector2_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestVector3 @value = new ILRuntimeTest.TestFramework.TestVector3();
-            if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
-                ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @value, __intp, ptr_of_this_method, __mStack, true);
-            } else {
-                @value = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
-                __intp.Free(ptr_of_this_method);
-            }
-
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
-            __intp.Free(ptr_of_this_method);
-
-            instance_of_this_method.Vector2 = value;
 
             return __ret;
         }

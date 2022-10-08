@@ -65,12 +65,18 @@ namespace TestCases
         public static void ReflectionTest05()
         {
             var fi = typeof(TestCls).GetField("aa", BindingFlags.NonPublic | BindingFlags.Instance);
-            var fi2 = typeof(TestCls).GetField("bb", BindingFlags.NonPublic | BindingFlags.Static);
+            var fi2 = typeof(TestCls).GetField("bb", BindingFlags.NonPublic | BindingFlags.Static);            
+            var fi3 = typeof(TestCls).GetField("cc", BindingFlags.NonPublic | BindingFlags.Static);
 
             var a = new TestCls();
 
             Console.WriteLine("aa=" + fi.GetValue(a));
             Console.WriteLine("bb=" + fi2.GetValue(null));
+
+            var cc = (int)fi3.GetValue(null);
+            Console.WriteLine("cc=" + cc);
+            if(cc!=444)
+                throw new Exception("worng value");
 
             fi.SetValue(a, 123);
             fi2.SetValue(null, 233);
@@ -198,6 +204,9 @@ namespace TestCases
             int aa = 203;
 
             static int bb = 333;
+
+            const int cc = 444;
+
             public TestCls foo(int b)
             {
                 Console.WriteLine("foo" + (aa + b));
