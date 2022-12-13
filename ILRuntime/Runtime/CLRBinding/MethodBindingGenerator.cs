@@ -331,6 +331,12 @@ namespace ILRuntime.Runtime.CLRBinding
                                 case "Modulus":
                                     sb.AppendLine(string.Format("{0} % {1};", param[0].Name, param[1].Name));
                                     break;
+                                case "LeftShift":
+                                    sb.AppendLine(string.Format("{0} << {1};", param[0].Name, param[1].Name));
+                                    break;
+                                case "RightShift":
+                                    sb.AppendLine(string.Format("{0} >> {1};", param[0].Name, param[1].Name));
+                                    break;
                                 case "Implicit":
                                 case "Explicit":
                                     {
