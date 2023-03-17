@@ -903,7 +903,7 @@ namespace ILRuntime.CLR.TypeSystem
                 if (type is ILType)
                     return false;
                 Type cT = type != null ? type.TypeForCLR : typeof(object);
-                return TypeForCLR.IsAssignableFrom(cT);
+                return cT.IsAssignableFrom(TypeForCLR);
             }
         }
 
