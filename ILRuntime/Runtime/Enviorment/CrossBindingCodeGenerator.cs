@@ -531,7 +531,7 @@ namespace ");
             sb.AppendLine("                    }");
             if (hasReturn)
                 sb.AppendLine(@"                    else
-                        return default(TResult);");
+                        return default;");
             sb.AppendLine(@"                }
 
                 public override void Invoke(ILTypeInstance instance)
