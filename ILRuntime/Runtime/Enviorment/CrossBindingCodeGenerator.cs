@@ -593,7 +593,8 @@ namespace ");
             {
                 if (p.IsOut)
                 {
-                    sb.AppendLine(string.Format("                    {0} = default({1});", p.Name, p.ParameterType.GetElementType().FullName));
+                    p.ParameterType.GetClassName(out var clsName, out var realClsName, out var isByRef, true);
+                    sb.AppendLine(string.Format("                    {0} = default({1});", p.Name, realClsName));
                 }
             }
         }
