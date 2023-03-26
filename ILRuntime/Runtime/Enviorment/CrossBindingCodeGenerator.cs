@@ -322,7 +322,7 @@ namespace ");
             var returnType = info.ReturnType;
             if (returnType.IsByRef)
                 returnType = returnType.GetElementType();
-            if (returnType.IsNotPublic || returnType.IsNested && !returnType.IsNestedPublic)
+            if (returnType.IsNotPublic || returnType.IsNested && !returnType.IsNestedPublic && !returnType.IsNestedFamily && !returnType.IsNestedFamORAssem)
                 return true;
 
             return false;
