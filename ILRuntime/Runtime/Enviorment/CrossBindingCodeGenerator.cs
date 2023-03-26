@@ -373,15 +373,6 @@ namespace ");
                 if (isByRef)
                     sb.Append(".MakeByRefType()");
             }
-            if (returnType != typeof(void))
-            {
-                if (!first)
-                    sb.Append(", ");
-                string clsName, realClsName;
-                bool isByRef;
-                returnType.GetClassName(out clsName, out realClsName, out isByRef, true);
-                sb.Append(realClsName);
-            }
             return sb.ToString();
         }
 
