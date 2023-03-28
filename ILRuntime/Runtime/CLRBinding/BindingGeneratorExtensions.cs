@@ -56,7 +56,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     else
                         ts = new Type[0];
-                    var prop = type.GetProperty(t[1], ts);
+                    var prop = type.GetProperties().FirstOrDefault(p => p.Name == t[1] && p.GetIndexParameters().Select(pp => pp.ParameterType).SequenceEqual(ts));
                     if (prop == null)
                     {
                         return true;
