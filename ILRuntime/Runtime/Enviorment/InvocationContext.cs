@@ -7,7 +7,11 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Utils;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Enviorment
 {
     public static class PrimitiveConverter<T>
@@ -103,7 +107,7 @@ namespace ILRuntime.Runtime.Enviorment
         AppDomain domain;
         ILIntepreter intp;
         ILMethod method;
-        IList<object> mStack;
+        AutoList mStack;
         bool invocated;
         int paramCnt;
         bool hasReturn;
@@ -233,7 +237,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
-        internal IList<object> ManagedStack
+        internal AutoList ManagedStack
         {
             get
             {

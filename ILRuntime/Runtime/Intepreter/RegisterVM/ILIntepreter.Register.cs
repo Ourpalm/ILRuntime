@@ -12,6 +12,12 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Utils;
 
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
+
 namespace ILRuntime.Runtime.Intepreter
 {
     unsafe struct RegisterFrameInfo
@@ -23,7 +29,7 @@ namespace ILRuntime.Runtime.Intepreter
         public StackObject* RegisterStart;
         public StackObject* StackRegisterStart;
         public StackObject* RegisterEnd;
-        public IList<object> ManagedStack;
+        public AutoList ManagedStack;
     }
     public unsafe partial class ILIntepreter
     {
@@ -93,7 +99,7 @@ namespace ILRuntime.Runtime.Intepreter
 
             var stackRegStart = frame.LocalVarPointer;
             StackObject* r = frame.LocalVarPointer - method.ParameterCount;
-            IList<object> mStack = stack.ManagedStack;
+            AutoList mStack = stack.ManagedStack;
             int paramCnt = method.ParameterCount;
             if (method.HasThis)//this parameter is always object reference
             {
@@ -2848,12 +2854,34 @@ namespace ILRuntime.Runtime.Intepreter
                                             bool processed = false;
                                             if (m.IsDelegateInvoke)
                                             {
-                                                var instance = StackObject.ToObject((esp - (m.ParameterCount + 1)), domain, mStack);
-                                                if (instance is IDelegateAdapter)
+                                                obj = StackObject.ToObject((esp - (m.ParameterCount + 1)), domain, mStack);
+                                                if (obj is IDelegateAdapter)
                                                 {
-                                                    esp = ((IDelegateAdapter)instance).ILInvoke(this, esp, mStack);
+                                                    esp = ((IDelegateAdapter)obj).ILInvoke(this, esp, mStack);
                                                     processed = true;
                                                 }
+                                            }
+                                            else if (ilm.IsEventAdd)
+                                            {
+                                                objRef = PrepareEventHandler(esp, ilm, mStack, out var instance);
+
+                                                esp = CLRRedirections.DelegateCombine(this, objRef, mStack, null, false);
+                                                obj = StackObject.ToObject(esp - 1, domain, mStack);
+                                                instance[ilm.EventFieldIndex] = obj;
+                                                Free(esp - 1);
+                                                esp--;
+                                                processed = true;
+                                            }
+                                            else if (ilm.IsEventRemove)
+                                            {
+                                                objRef = PrepareEventHandler(esp, ilm, mStack, out var instance);
+
+                                                esp = CLRRedirections.DelegateRemove(this, objRef, mStack, null, false);
+                                                obj = StackObject.ToObject(esp - 1, domain, mStack);
+                                                instance[ilm.EventFieldIndex] = obj;
+                                                Free(esp - 1);
+                                                esp--;
+                                                processed = true;
                                             }
                                             if (!processed)
                                             {
@@ -4208,7 +4236,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                        if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference && IsValueTypeReferenceValid(objRef, type))
                                         {
                                             stack.ClearValueTypeObject(type, ILIntepreter.ResolveReference(objRef));
                                         }
@@ -5028,7 +5056,8 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg2 = (r + ip->Register2);
                                     reg3 = (r + ip->Register3);
                                     Array arr = mStack[reg2->Value] as Array;
-                                    obj = arr.GetValue(reg3->Value);
+                                    ILTypeInstance[] arr2 = arr as ILTypeInstance[];
+                                    obj = arr2 != null ? arr2[reg3->Value] : arr.GetValue(reg3->Value);
                                     if (obj is CrossBindingAdaptorType)
                                         obj = ((CrossBindingAdaptorType)obj).ILInstance;
 
@@ -5307,6 +5336,20 @@ namespace ILRuntime.Runtime.Intepreter
             return stack.PopFrame(ref frame, esp);
         }
 
+        bool IsValueTypeReferenceValid(StackObject* ptr, IType type)
+        {
+            ptr = ResolveReference(ptr);
+            if (ptr->ObjectType == ObjectTypes.ValueTypeDescriptor)
+            {
+                if (ptr->Value == type.TypeIndex)
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
         void LoadFromFieldReferenceToRegister(ref RegisterFrameInfo info, object obj, int idx, short reg)
         {
             if (obj is ILTypeInstance)
@@ -5333,7 +5376,7 @@ namespace ILRuntime.Runtime.Intepreter
 #if NET_4_6 || NET_STANDARD_2_0
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, IList<object> mStackSrc = null)
+        internal void CopyToRegister(ref RegisterFrameInfo info, short reg, StackObject* val, AutoList mStackSrc = null)
         {
             var mStack = info.ManagedStack;
 

@@ -16,6 +16,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 #endif
 using System.Reflection;
 
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Debugger
 {
     public class DebugService
@@ -464,7 +469,7 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 StackObject* basePointer = ResolveCurrentFrameBasePointer(intp, method, ip);
 
-                int methodHash = m.GetHashCode();
+                int methodHash = m.IsGenericInstance ? m.GenericDefinition.GetHashCode() : m.GetHashCode();
                 BreakpointInfo[] lst = null;
 
                 lock (activeBreakpoints)
@@ -1554,7 +1559,7 @@ namespace ILRuntime.Runtime.Debugger
             return true;
         }
 
-        unsafe bool GetValueExpandable(ILIntepreter intp, StackObject* esp, IList<object> mStack)
+        unsafe bool GetValueExpandable(ILIntepreter intp, StackObject* esp, AutoList mStack)
         {
             if (esp->ObjectType < ObjectTypes.ValueTypeObjectReference)
                 return false;
@@ -1726,7 +1731,7 @@ namespace ILRuntime.Runtime.Debugger
 #endif
         }
 
-        unsafe void GetStackObjectText(StringBuilder sb, StackObject* esp, IList<object> mStack, StackObject* valueTypeEnd)
+        unsafe void GetStackObjectText(StringBuilder sb, StackObject* esp, AutoList mStack, StackObject* valueTypeEnd)
         {
             string text = "null";
             switch (esp->ObjectType)

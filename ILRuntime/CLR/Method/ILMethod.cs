@@ -14,7 +14,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Reflection;
 namespace ILRuntime.CLR.Method
 {
-    public class ILMethod : IMethod
+    public sealed class ILMethod : IMethod
     {
         OpCode[] body;
         OpCodeR[] bodyRegister;
@@ -27,8 +27,11 @@ namespace ILRuntime.CLR.Method
         ExceptionHandler[] exceptionHandler, exceptionHandlerR;
         KeyValuePair<string, IType>[] genericParameters;
         IType[] genericArguments;
+        ILMethod genericDefinition;
         Dictionary<int, int[]> jumptables, jumptablesR;
         bool isDelegateInvoke;
+        bool isEventAdd, isEventRemove;
+        int eventFieldIndex;
         bool jitPending;
         ILRuntimeMethodInfo refletionMethodInfo;
         ILRuntimeConstructorInfo reflectionCtorInfo;
@@ -157,6 +160,7 @@ namespace ILRuntime.CLR.Method
 
         public IType[] GenericArugmentsArray { get { return genericArguments; } }
 
+        public ILMethod GenericDefinition { get { return genericDefinition; } } 
         public bool ShouldUseRegisterVM
         {
             get
@@ -345,6 +349,27 @@ namespace ILRuntime.CLR.Method
             {
                 return isDelegateInvoke;
             }
+        }
+
+        public bool IsEventAdd
+        {
+            get
+            {
+                return isEventAdd;
+            }
+        }
+
+        public bool IsEventRemove
+        {
+            get
+            {
+                return isEventRemove;
+            }
+        }
+
+        public int EventFieldIndex
+        {
+            get { return eventFieldIndex; }
         }
 
         public bool IsStatic
@@ -797,6 +822,13 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        public void SetEventAddOrRemove(bool isEventAdd, bool isEventRemove, int fieldIdx)
+        {
+            this.isEventRemove = isEventRemove;
+            this.isEventAdd = isEventAdd;
+            eventFieldIndex = fieldIdx;
+        }
+
         internal int GetTypeTokenHashCode(object token)
         {
             var t = appdomain.GetType(token, declaringType, this);
@@ -928,6 +960,7 @@ namespace ILRuntime.CLR.Method
             ILMethod m = new ILMethod(def, declaringType, appdomain, jitFlags);
             m.genericParameters = genericParameters;
             m.genericArguments = genericArguments;
+            m.genericDefinition = this;
             if (m.def.ReturnType.IsGenericParameter)
             {
                 m.ReturnType = m.FindGenericArgument(m.def.ReturnType.Name);

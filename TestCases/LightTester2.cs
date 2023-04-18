@@ -183,9 +183,9 @@ namespace TestCases
         {
             var array = UnitTest_TestFCP2Sub();
             int count = array.Count;
-            for(int i=0;i< count; ++i)
+            for (int i = 0; i < count; ++i)
             {
-                for(int j = 0; j < CachePosSnDic.Length; j++)
+                for (int j = 0; j < CachePosSnDic.Length; j++)
                 {
                     if (CachePosSnDic[j] == null)
                         CachePosSnDic[j] = new Dictionary<int, int>();
@@ -195,7 +195,7 @@ namespace TestCases
 
             var tabarray = UnitTest_TestFCP2Sub2();
             int tabCount = tabarray.Count;
-            for(int i = 0; i < tabCount; ++i)
+            for (int i = 0; i < tabCount; ++i)
             {
                 tabHasItemDic.Add(tabarray[i].TestVal2, false);
             }
@@ -238,13 +238,13 @@ namespace TestCases
 
         public static void UnitTest_TestFCP3()
         {
-            for(int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++)
             {
                 try
                 {
                     throw new Exception("test");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine($"{ex.Message}\r\n{ex.Data["StackTrace"]}");
                 }
@@ -316,6 +316,44 @@ namespace TestCases
                 t3.DoSomething(t2, (i & 1) == 1, t1, list);
             }
 
+        }
+
+        struct TransitionTest
+        {
+            public int A;
+            public string B;
+            public float C;
+            public TransitionTestSub D;
+        }
+        struct TransitionTestSub
+        {
+            public string A;
+            public int B;
+            public float C;
+        }
+        class TransitionTest2
+        {
+            public void Test(TransitionTest arg)
+            {
+                if (arg.A != 1 || arg.B != "2" || arg.C != 3)
+                    throw new Exception();
+                if(arg.D.A != "4" || arg.D.B != 5 || arg.D.C != 6)
+                    throw new Exception();
+            }
+        }
+        [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
+        public static void UnitTest_TestStackRegisterTransition3()
+        {
+            TransitionTest t = new TransitionTest();
+            t.A = 1;
+            t.B = "2";
+            t.C = 3;
+            t.D.A = "4";
+            t.D.B = 5;
+            t.D.C = 6;
+
+            TransitionTest2 cls = new TransitionTest2();
+            cls.Test(t);
         }
     }
 }

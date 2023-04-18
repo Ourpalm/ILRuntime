@@ -6,9 +6,15 @@ using ILRuntime.Runtime.Stack;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.CLR.Method
 {
-    public class CLRMethod : IMethod
+    public sealed class CLRMethod : IMethod
     {
         MethodInfo def;
         ConstructorInfo cDef;
@@ -270,7 +276,7 @@ namespace ILRuntime.CLR.Method
             return (StackObject*)((long)a - sizeof(StackObject) * b);
         }
 
-        public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, IList<object> mStack, bool isNewObj = false)
+        public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, AutoList mStack, bool isNewObj = false)
         {
             if (parameters == null)
             {
@@ -346,7 +352,7 @@ namespace ILRuntime.CLR.Method
             }
         }
 
-        unsafe void FixReference(int paramCount, StackObject* esp, object[] param, IList<object> mStack, object instance, bool hasThis)
+        unsafe void FixReference(int paramCount, StackObject* esp, object[] param, AutoList mStack, object instance, bool hasThis)
         {
             var cnt = hasThis ? paramCount + 1 : paramCount;
             for (int i = cnt; i >= 1; i--)

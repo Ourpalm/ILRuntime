@@ -39,6 +39,10 @@ order: 1030
 
 > 加载dll的流被关闭了。新版要求流不能关闭，也不能用using写法。新的用法请参见Demo示例
 
+### 调试时提示ILRuntime Debugger version mismatch Expected version:4 Actual version:2
+
+> 所使用的调试插件和运行时不匹配，2.1.0运行时需要搭配VS和VS Code插件商店里的调试器进行调试，2.0.2及以前版本的运行时需要搭配随包发布的调试插件使用
+
 ### 运行时出现Cannot find Adaptor for: xxxxxxxxx
 > 热更当中跨域继承了xxxxxxx类型，但是没有注册对应的适配器
 

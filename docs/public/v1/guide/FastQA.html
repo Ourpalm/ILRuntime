@@ -21,7 +21,7 @@
             <nav class="nav">
     <div class="border">
         <img src="/ILRuntime/public/images/logo.png" />
-        <button class="hiden-in-phone">V2.0.2</button>
+        <button class="hiden-in-phone">V2.1.0</button>
         <button id="btn-menu" class="hiden-in-pc">菜单</button>
         <ul class="nav-link hiden-in-phone">
             <!--li>
@@ -188,6 +188,9 @@
 
 <h3 id="运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream"><a href="#运行出现报错ObjectDisposedException-Cannot-access-a-closed-Stream" class="headerlink" title="运行出现报错ObjectDisposedException: Cannot access a closed Stream"></a>运行出现报错ObjectDisposedException: Cannot access a closed Stream</h3><blockquote>
 <p>加载dll的流被关闭了。新版要求流不能关闭，也不能用using写法。新的用法请参见Demo示例</p>
+</blockquote>
+<h3 id="调试时提示ILRuntime-Debugger-version-mismatch-Expected-version-4-Actual-version-2"><a href="#调试时提示ILRuntime-Debugger-version-mismatch-Expected-version-4-Actual-version-2" class="headerlink" title="调试时提示ILRuntime Debugger version mismatch Expected version:4 Actual version:2"></a>调试时提示ILRuntime Debugger version mismatch Expected version:4 Actual version:2</h3><blockquote>
+<p>所使用的调试插件和运行时不匹配，2.1.0运行时需要搭配VS和VS Code插件商店里的调试器进行调试，2.0.2及以前版本的运行时需要搭配随包发布的调试插件使用</p>
 </blockquote>
 <h3 id="运行时出现Cannot-find-Adaptor-for-xxxxxxxxx"><a href="#运行时出现Cannot-find-Adaptor-for-xxxxxxxxx" class="headerlink" title="运行时出现Cannot find Adaptor for: xxxxxxxxx"></a>运行时出现Cannot find Adaptor for: xxxxxxxxx</h3><blockquote>
 <p>热更当中跨域继承了xxxxxxx类型，但是没有注册对应的适配器</p>

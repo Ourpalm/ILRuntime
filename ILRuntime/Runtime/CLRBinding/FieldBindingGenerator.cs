@@ -62,7 +62,7 @@ namespace ILRuntime.Runtime.CLRBinding
                 }
                 sb.AppendLine("        }");
                 sb.AppendLine();
-                sb.AppendLine(string.Format("        static StackObject* CopyToStack_{0}_{1}(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)", i.Name, idx));
+                sb.AppendLine(string.Format("        static StackObject* CopyToStack_{0}_{1}(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)", i.Name, idx));
                 sb.AppendLine("        {");
                 if (i.IsStatic)
                 {
@@ -118,7 +118,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     }
                     sb.AppendLine("        }");
                     sb.AppendLine();
-                    sb.AppendLine(string.Format("        static StackObject* AssignFromStack_{0}_{1}(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)", i.Name, idx));
+                    sb.AppendLine(string.Format("        static StackObject* AssignFromStack_{0}_{1}(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)", i.Name, idx));
                     sb.AppendLine("        {");
                     sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                     i.FieldType.AppendArgumentCode(sb, 0, i.Name, valueTypeBinders, false, false, false);

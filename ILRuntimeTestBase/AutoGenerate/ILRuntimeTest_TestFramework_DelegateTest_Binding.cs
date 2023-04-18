@@ -11,7 +11,11 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
 using ILRuntime.CLR.Utils;
-
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+using AutoList = System.Collections.Generic.List<object>;
+#else
+using AutoList = ILRuntime.Other.UncheckedList<object>;
+#endif
 namespace ILRuntime.Runtime.Generated
 {
     unsafe class ILRuntimeTest_TestFramework_DelegateTest_Binding
@@ -47,6 +51,18 @@ namespace ILRuntime.Runtime.Generated
             args = new Type[]{};
             method = type.GetMethod("TestEnumDelegate2", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, TestEnumDelegate2_7);
+            args = new Type[]{typeof(System.Action<System.Single, System.Double, System.Int32>)};
+            method = type.GetMethod("add_OnIntEvent", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, add_OnIntEvent_8);
+            args = new Type[]{typeof(System.Single), typeof(System.Double), typeof(System.Int32)};
+            method = type.GetMethod("TestEvent3", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TestEvent3_9);
+            args = new Type[]{typeof(System.Action<System.Single, System.Double, System.Int32>)};
+            method = type.GetMethod("remove_OnIntEvent", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, remove_OnIntEvent_10);
+            args = new Type[]{};
+            method = type.GetMethod("TestEvent4", flag, null, args, null);
+            app.RegisterCLRMethodRedirection(method, TestEvent4_11);
 
             field = type.GetField("IntDelegateTest", flag);
             app.RegisterCLRFieldGetter(field, get_IntDelegateTest_0);
@@ -80,7 +96,7 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
-        static StackObject* add_IntDelegateEventTest_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* add_IntDelegateEventTest_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -96,7 +112,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* TestEvent_1(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* TestEvent_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
@@ -107,7 +123,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* remove_IntDelegateEventTest_2(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* remove_IntDelegateEventTest_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -123,7 +139,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* add_IntDelegateEventTest2_3(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* add_IntDelegateEventTest2_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -142,7 +158,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* TestEvent2_4(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* TestEvent2_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -157,7 +173,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* remove_IntDelegateEventTest2_5(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* remove_IntDelegateEventTest2_5(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
@@ -176,7 +192,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* TestEnumDelegate_6(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* TestEnumDelegate_6(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
@@ -187,7 +203,7 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
-        static StackObject* TestEnumDelegate2_7(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* TestEnumDelegate2_7(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
@@ -198,13 +214,79 @@ namespace ILRuntime.Runtime.Generated
             return __ret;
         }
 
+        static StackObject* add_OnIntEvent_8(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Action<System.Single, System.Double, System.Int32> @value = (System.Action<System.Single, System.Double, System.Int32>)typeof(System.Action<System.Single, System.Double, System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            __intp.Free(ptr_of_this_method);
+
+
+            ILRuntimeTest.TestFramework.DelegateTest.OnIntEvent += value;
+
+            return __ret;
+        }
+
+        static StackObject* TestEvent3_9(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Int32 @c = ptr_of_this_method->Value;
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            System.Double @b = *(double*)&ptr_of_this_method->Value;
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            System.Single @a = *(float*)&ptr_of_this_method->Value;
+
+
+            ILRuntimeTest.TestFramework.DelegateTest.TestEvent3(@a, @b, @c);
+
+            return __ret;
+        }
+
+        static StackObject* remove_OnIntEvent_10(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+
+            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            System.Action<System.Single, System.Double, System.Int32> @value = (System.Action<System.Single, System.Double, System.Int32>)typeof(System.Action<System.Single, System.Double, System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            __intp.Free(ptr_of_this_method);
+
+
+            ILRuntimeTest.TestFramework.DelegateTest.OnIntEvent -= value;
+
+            return __ret;
+        }
+
+        static StackObject* TestEvent4_11(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+
+
+            var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.TestEvent4();
+
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method ? 1 : 0;
+            return __ret + 1;
+        }
+
 
         static object get_IntDelegateTest_0(ref object o)
         {
             return ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest;
         }
 
-        static StackObject* CopyToStack_IntDelegateTest_0(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_IntDelegateTest_0(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest;
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -215,7 +297,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest = (ILRuntimeTest.TestFramework.IntDelegate)v;
         }
 
-        static StackObject* AssignFromStack_IntDelegateTest_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_IntDelegateTest_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             ILRuntimeTest.TestFramework.IntDelegate @IntDelegateTest = (ILRuntimeTest.TestFramework.IntDelegate)typeof(ILRuntimeTest.TestFramework.IntDelegate).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
@@ -228,7 +310,7 @@ namespace ILRuntime.Runtime.Generated
             return ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2;
         }
 
-        static StackObject* CopyToStack_IntDelegateTest2_1(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_IntDelegateTest2_1(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2;
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -239,7 +321,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.DelegateTest.IntDelegateTest2 = (ILRuntimeTest.TestFramework.IntDelegate2)v;
         }
 
-        static StackObject* AssignFromStack_IntDelegateTest2_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_IntDelegateTest2_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             ILRuntimeTest.TestFramework.IntDelegate2 @IntDelegateTest2 = (ILRuntimeTest.TestFramework.IntDelegate2)typeof(ILRuntimeTest.TestFramework.IntDelegate2).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
@@ -252,7 +334,7 @@ namespace ILRuntime.Runtime.Generated
             return ILRuntimeTest.TestFramework.DelegateTest.GenericDelegateTest;
         }
 
-        static StackObject* CopyToStack_GenericDelegateTest_2(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_GenericDelegateTest_2(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.GenericDelegateTest;
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -263,7 +345,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.DelegateTest.GenericDelegateTest = (System.Action<ILRuntimeTest.TestFramework.BaseClassTest>)v;
         }
 
-        static StackObject* AssignFromStack_GenericDelegateTest_2(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_GenericDelegateTest_2(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Action<ILRuntimeTest.TestFramework.BaseClassTest> @GenericDelegateTest = (System.Action<ILRuntimeTest.TestFramework.BaseClassTest>)typeof(System.Action<ILRuntimeTest.TestFramework.BaseClassTest>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
@@ -276,7 +358,7 @@ namespace ILRuntime.Runtime.Generated
             return ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest;
         }
 
-        static StackObject* CopyToStack_EnumDelegateTest_3(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_EnumDelegateTest_3(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest;
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -287,7 +369,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest = (System.Action<ILRuntimeTest.TestFramework.TestCLREnum>)v;
         }
 
-        static StackObject* AssignFromStack_EnumDelegateTest_3(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_EnumDelegateTest_3(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Action<ILRuntimeTest.TestFramework.TestCLREnum> @EnumDelegateTest = (System.Action<ILRuntimeTest.TestFramework.TestCLREnum>)typeof(System.Action<ILRuntimeTest.TestFramework.TestCLREnum>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
@@ -300,7 +382,7 @@ namespace ILRuntime.Runtime.Generated
             return ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest2;
         }
 
-        static StackObject* CopyToStack_EnumDelegateTest2_4(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_EnumDelegateTest2_4(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest2;
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -311,7 +393,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.DelegateTest.EnumDelegateTest2 = (System.Func<ILRuntimeTest.TestFramework.TestCLREnum>)v;
         }
 
-        static StackObject* AssignFromStack_EnumDelegateTest2_4(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_EnumDelegateTest2_4(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Func<ILRuntimeTest.TestFramework.TestCLREnum> @EnumDelegateTest2 = (System.Func<ILRuntimeTest.TestFramework.TestCLREnum>)typeof(System.Func<ILRuntimeTest.TestFramework.TestCLREnum>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
@@ -324,7 +406,7 @@ namespace ILRuntime.Runtime.Generated
             return ILRuntimeTest.TestFramework.DelegateTest.DelegatePerformanceTest;
         }
 
-        static StackObject* CopyToStack_DelegatePerformanceTest_5(ref object o, ILIntepreter __intp, StackObject* __ret, IList<object> __mStack)
+        static StackObject* CopyToStack_DelegatePerformanceTest_5(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)
         {
             var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.DelegatePerformanceTest;
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
@@ -335,7 +417,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest.TestFramework.DelegateTest.DelegatePerformanceTest = (System.Func<System.Int32, System.Single, System.Int16, System.Double>)v;
         }
 
-        static StackObject* AssignFromStack_DelegatePerformanceTest_5(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, IList<object> __mStack)
+        static StackObject* AssignFromStack_DelegatePerformanceTest_5(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             System.Func<System.Int32, System.Single, System.Int16, System.Double> @DelegatePerformanceTest = (System.Func<System.Int32, System.Single, System.Int16, System.Double>)typeof(System.Func<System.Int32, System.Single, System.Int16, System.Double>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
@@ -344,7 +426,7 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
-        static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, IList<object> __mStack, CLRMethod __method, bool isNewObj)
+        static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = ILIntepreter.Minus(__esp, 0);
