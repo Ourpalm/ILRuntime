@@ -2829,6 +2829,8 @@ namespace ILRuntime.Runtime.Intepreter
                                                 var ilMethod = mi as ILMethod;
                                                 if (ilMethod != null)
                                                 {
+                                                    if (ins is CrossBindingAdaptorType)
+                                                        ins = ((CrossBindingAdaptorType)ins).ILInstance;
                                                     dele = domain.DelegateManager.FindDelegateAdapter((CLRType)cm.DeclearingType, (ILTypeInstance)ins, ilMethod);
                                                 }
                                                 else
