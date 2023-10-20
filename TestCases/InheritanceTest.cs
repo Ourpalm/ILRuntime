@@ -333,6 +333,44 @@ namespace TestCases
             if (cls5 is InterfaceTest2)
                 throw new Exception();
         }
+        public static void InheritanceTest24()
+        {
+            ListSub list = new ListSub();
+            float res = list.Update(0, 1);
+            if (res < 10)
+                throw new Exception();
+        }
+        class ListSub : AbstractBase
+        {
+            List<AbstractBase> children = new List<AbstractBase>();
+            public ListSub()
+            {
+                for (int i = 0; i < 10; i++)
+                    children.Add(new ListSub2());
+            }
+
+            public override float Update(float a, float b)
+            {
+                float baseVal = a;
+                foreach (var i in children)
+                {
+                    baseVal += i.Update(baseVal, b);
+                }
+                return baseVal;
+            }
+        }
+
+        class ListSub2 : AbstractBase
+        {
+            public override float Update(float a, float b)
+            {
+                return a + b;
+            }
+        }
+        abstract class AbstractBase
+        {
+            public abstract float Update(float a, float b);
+        }
 
         class TestExplicitInterface : IDisposable
         {
@@ -552,7 +590,7 @@ namespace TestCases
             T obj = Activator.CreateInstance(typeof(T)) as T; //这样写错误
                                                               //MyClass obj = Activator.CreateInstance(typeof(T)) as  MyClass; //这样写正确
             obj.Reg();
-        }
+        }        
 
         interface IMy
         {
