@@ -2813,6 +2813,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         bool isILMethod = m is ILMethod;
                                         bool useRegister = isILMethod && ((ILMethod)m).ShouldUseRegisterVM;
+                                        int objCnt = 0;
                                         if (ip->Operand4 == 0)
                                         {
                                             intVal = m.HasThis ? m.ParameterCount + 1 : m.ParameterCount;
@@ -2821,9 +2822,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 reg1 = (r + ip->Register2);
                                                 CopyToStack(esp, reg1, mStack);
-                                                if (useRegister && reg1->ObjectType < ObjectTypes.Object)
+                                                if (reg1->ObjectType < ObjectTypes.Object)
                                                 {
-                                                    mStack.Add(null);
+                                                    objCnt++;
+                                                    if (useRegister)
+                                                        mStack.Add(null);
                                                 }
                                                 esp++;
                                             }
@@ -2831,9 +2834,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 reg1 = (r + ip->Register3);
                                                 CopyToStack(esp, reg1, mStack);
-                                                if (useRegister && reg1->ObjectType < ObjectTypes.Object)
+                                                if (reg1->ObjectType < ObjectTypes.Object)
                                                 {
-                                                    mStack.Add(null);
+                                                    objCnt++;
+                                                    if (useRegister)
+                                                        mStack.Add(null);
                                                 }
                                                 esp++;
                                             }
@@ -2841,9 +2846,11 @@ namespace ILRuntime.Runtime.Intepreter
                                             {
                                                 reg1 = (r + ip->Register4);
                                                 CopyToStack(esp, reg1, mStack);
-                                                if (useRegister && reg1->ObjectType < ObjectTypes.Object)
+                                                if (reg1->ObjectType < ObjectTypes.Object)
                                                 {
-                                                    mStack.Add(null);
+                                                    objCnt++;
+                                                    if (useRegister)
+                                                        mStack.Add(null);
                                                 }
                                                 esp++;
                                             }
@@ -2885,6 +2892,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             }
                                             if (!processed)
                                             {
+                                                bool shouldFix = false;
                                                 if (code == OpCodeREnum.Callvirt)
                                                 {
                                                     objRef = GetObjectAndResolveReference(esp - (ilm.ParameterCount + 1));
@@ -2895,6 +2903,7 @@ namespace ILRuntime.Runtime.Intepreter
                                                         dst = *(StackObject**)&objRef->Value;
                                                         var ft = domain.GetTypeByIndex(dst->Value) as ILType;
                                                         ilm = ft.GetVirtualMethod(ilm) as ILMethod;
+                                                        shouldFix = useRegister != ilm.ShouldUseRegisterVM;
                                                         useRegister = ilm.ShouldUseRegisterVM;
                                                     }
                                                     else
@@ -2903,8 +2912,21 @@ namespace ILRuntime.Runtime.Intepreter
                                                         if (obj == null)
                                                             throw new NullReferenceException();
                                                         ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
+                                                        shouldFix = useRegister != ilm.ShouldUseRegisterVM;
                                                         useRegister = ilm.ShouldUseRegisterVM;
                                                     }
+                                                }
+                                                if (shouldFix)
+                                                {
+                                                    if (useRegister)
+                                                    {
+                                                        for (intVal = 0; intVal < objCnt; intVal++)
+                                                        {
+                                                            mStack.Add(null);
+                                                        }
+                                                    }
+                                                    else
+                                                        mStack.RemoveRange(mStack.Count - objCnt, objCnt);
                                                 }
                                                 if (useRegister)
                                                     esp = ExecuteR(ilm, esp, out unhandledException);

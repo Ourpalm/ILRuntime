@@ -339,6 +339,9 @@ namespace TestCases
             float res = list.Update(0, 1);
             if (res < 10)
                 throw new Exception();
+            res = list.Update2(0, 1);
+            if (res < 10)
+                throw new Exception();
         }
         class ListSub : AbstractBase
         {
@@ -358,6 +361,16 @@ namespace TestCases
                 }
                 return baseVal;
             }
+
+            public override float Update2(float a, float b)
+            {
+                float baseVal = a;
+                foreach (var i in children)
+                {
+                    baseVal += i.Update2(baseVal, b);
+                }
+                return baseVal;
+            }
         }
 
         class ListSub2 : AbstractBase
@@ -366,11 +379,19 @@ namespace TestCases
             {
                 return a + b;
             }
+
+            [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
+            public override float Update2(float a, float b)
+            {
+                return a + b;
+            }
         }
         abstract class AbstractBase
         {
             [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
             public abstract float Update(float a, float b);
+
+            public abstract float Update2(float a, float b);
         }
 
         class TestExplicitInterface : IDisposable
