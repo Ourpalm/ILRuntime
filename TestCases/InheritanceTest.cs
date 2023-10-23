@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using ILRuntime.Runtime;
 using ILRuntimeTest.TestFramework;
 
 namespace TestCases
@@ -369,6 +369,7 @@ namespace TestCases
         }
         abstract class AbstractBase
         {
+            [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
             public abstract float Update(float a, float b);
         }
 
