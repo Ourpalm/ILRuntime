@@ -56,6 +56,7 @@ namespace ILRuntime.Runtime.Enviorment
         List<IType> typesByIndex = new List<IType>();
         ThreadSafeDictionary<int, IType> mapTypeToken = new ThreadSafeDictionary<int, IType>();
         ThreadSafeDictionary<int, IMethod> mapMethod = new ThreadSafeDictionary<int, IMethod>();
+        ThreadSafeDictionary<int, Exception> mapException = new ThreadSafeDictionary<int, Exception>();
         ThreadSafeDictionary<long, string> mapString = new ThreadSafeDictionary<long, string>();
         Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate> redirectMap = new Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate>();
         Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate> fieldGetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate>();
@@ -1543,6 +1544,18 @@ namespace ILRuntime.Runtime.Enviorment
                 return true;
             }
             return false;
+        }
+
+        internal void CacheException(Exception ex)
+        {
+            mapException[ex.GetHashCode()] = ex;
+        }
+
+        internal Exception GetException(int token)
+        {
+            if (mapException.TryGetValue(token, out var ex))
+                return ex;
+            return null;
         }
         
         

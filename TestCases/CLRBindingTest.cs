@@ -1,4 +1,7 @@
-﻿using ILRuntimeTest;
+﻿using ILRuntime.Runtime.CLRBinding;
+using ILRuntime.Runtime.Intepreter;
+using ILRuntimeTest;
+using ILRuntimeTest.TestFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -138,6 +141,48 @@ namespace TestCases
         public static void CLRBindingTestEnd()
         {
             ILRuntimeTest.TestBase.TestSession.LastSession.Appdomain.AllowUnboundCLRMethod = true;
+        }
+
+        [ILRuntimeTest.ILRuntimeTest(ExpectException = typeof(ILRuntimeException))]
+        public static void CLRBindingTestMissing01()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            binding.MissingMethod();
+        }
+
+        [ILRuntimeTest.ILRuntimeTest(ExpectException = typeof(ILRuntimeException))]
+        public static void CLRBindingTestMissing02()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            binding.MissingMethodGeneric<TestCls2>(null);
+        }
+
+        [ILRuntimeTest.ILRuntimeTest(ExpectException = typeof(ILRuntimeException))]
+        public static void CLRBindingTestMissing03()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            binding.missingField = 123;
+        }
+
+        [ILRuntimeTest.ILRuntimeTest(ExpectException = typeof(ILRuntimeException))]
+        public static void CLRBindingTestMissing04()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            binding.Emit<MissingType>(null);
+        }
+
+        [ILRuntimeTest.ILRuntimeTest(ExpectException = typeof(ILRuntimeException))]
+        public static void CLRBindingTestMissing05()
+        {
+            ILRuntimeTest.TestFramework.TestCLRBinding binding = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            binding.MissingMethodGeneric<MissingType>(null);
+        }
+
+        [ILRuntimeTest.ILRuntimeTest(ExpectException = typeof(ILRuntimeException))]
+        public static void CLRBindingTestMissing08()
+        {
+            MissingType mt = new MissingType();
+            
         }
     }
 }

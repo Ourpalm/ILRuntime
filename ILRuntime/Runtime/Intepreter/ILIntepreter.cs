@@ -1971,6 +1971,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     IMethod m = domain.GetMethod(ip->TokenInteger);
                                     if (m == null)
                                     {
+                                        int exToken = (int)(((ulong)ip->TokenLong & 0xFFFFFFFF00000000) >> 32);
+                                        if (exToken > 0)
+                                        {
+                                            var ex = domain.GetException(exToken);
+                                            if (ex != null)
+                                            {
+                                                throw new ILRuntimeException(ex.Message, this, method, ex);
+                                            }
+                                        }
                                         //Irrelevant method
                                         int cnt = (int)ip->TokenLong;
                                         //Balance the stack

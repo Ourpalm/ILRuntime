@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define TEST_MISSING_METHOD
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -103,6 +104,29 @@ namespace ILRuntimeTest.TestFramework
         {
             LoadAsset("123", obj);
         }
+
+#if TEST_MISSING_METHOD
+        public int missingField;
+        public void MissingMethodGeneric<T>(T obj)
+        {
+
+        }
+
+        public void MissingMethod()
+        {
+
+        }
+
+        public static void MissingStaticMethod()
+        {
+
+        }
+#endif
     }
 
+#if TEST_MISSING_METHOD
+    public class MissingType
+    {
+    }
+#endif
 }
