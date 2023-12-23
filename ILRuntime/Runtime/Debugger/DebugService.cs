@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 #endif
 using System.Reflection;
-
+using ILRuntime.Runtime.Enviorment;
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
 #else
@@ -203,7 +203,19 @@ namespace ILRuntime.Runtime.Debugger
                 var addr = *(long*)&arg->Value;
                 arg = (StackObject*)addr;
             }
-            ILTypeInstance instance = arg->ObjectType != ObjectTypes.Null ? intepreter.Stack.ManagedStack[arg->Value] as ILTypeInstance : null;
+            ILTypeInstance instance = null;
+            if (arg->ObjectType != ObjectTypes.Null)
+            {
+                var box = intepreter.Stack.ManagedStack[arg->Value];
+                if (box is ILTypeInstance ilInstance)
+                {
+                    instance = ilInstance;
+                }
+                else if (box is CrossBindingAdaptorType adaptor)
+                {
+                    instance = adaptor.ILInstance;
+                }
+            }
             if (instance == null)
                 return "null";
             var fields = instance.Type.TypeDefinition.Fields;
