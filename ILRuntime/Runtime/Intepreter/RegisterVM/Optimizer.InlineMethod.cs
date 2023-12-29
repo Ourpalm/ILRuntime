@@ -18,7 +18,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public static void InlineMethod(CodeBasicBlock block, ILMethod method, RegisterVMSymbolLink symbolLink, ref Dictionary<int, int[]> jumpTables, short baseRegIdx, bool hasReturn)
         {
             var ins = block.FinalInstructions;
-            var body = method.BodyRegister;
+            var body = method.BodyRegister.ToArray();
             OpCodeR start = new OpCodeR();
             start.Code = OpCodeREnum.InlineStart;
             ins.Add(start);
@@ -69,15 +69,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         {
                             if (needMove)
                             {
-                                for (int j = branchStart; j < ins.Count; j++)
+                                for (int j = branchStart; j < body.Length + branchStart; j++)
                                 {
-                                    var op2 = ins[j];
+                                    bool isPendingIns = j >= ins.Count;
+                                    var op2 = isPendingIns ? body[j - branchStart] : ins[j];
                                     if (IsBranching(op2.Code))
                                     {
                                         if (op2.Operand > i)
                                         {
                                             op2.Operand++;
-                                            ins[j] = op2;
+                                            if (!isPendingIns)
+                                                ins[j] = op2;
+                                            else
+                                                body[j - branchStart] = op2;
                                         }
                                     }
                                     else if (IsIntermediateBranching(op2.Code))
@@ -85,7 +89,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         if (op2.Operand4 > i)
                                         {
                                             op2.Operand4++;
-                                            ins[j] = op2;
+                                            if (!isPendingIns)
+                                                ins[j] = op2;
+                                            else
+                                                body[j - branchStart] = op2;
                                         }
                                     }
                                     else if(op2.Code == OpCodeREnum.Switch)
