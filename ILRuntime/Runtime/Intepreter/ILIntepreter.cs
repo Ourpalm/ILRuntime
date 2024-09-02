@@ -3628,7 +3628,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                     }
                                                     else
                                                     {
-                                                        throw new InvalidCastException(string.Format("Cannot Cast {0} to {1}", ((ILTypeInstance)obj).Type.FullName, type.FullName));
+                                                        string curType;
+                                                        if (type.IsDelegate)
+                                                        {
+                                                            curType = $"{((DelegateAdapter)obj).Method.DeclearingType.FullName}.{((DelegateAdapter)obj).Method.Name}";
+                                                        }
+                                                        else
+                                                            curType = ((ILTypeInstance)obj).Type.FullName;
+                                                        throw new InvalidCastException(string.Format("Cannot Cast {0} to {1}", curType, type.FullName));
                                                     }
                                                 }
                                                 else

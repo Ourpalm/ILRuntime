@@ -1110,7 +1110,7 @@ namespace ILRuntime.Runtime.Intepreter
                 }
                 if (im.IsDelegateInvoke)
                 {
-                    if (im.ParameterCount == method_count && ret_type == method.ReturnType)
+                    if (im.ParameterCount == method_count && method.ReturnType.CanAssignTo(ret_type))
                     {
 
                         for (int i = 0; i < im.ParameterCount; i++)
