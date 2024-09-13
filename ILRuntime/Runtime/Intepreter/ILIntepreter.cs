@@ -5486,6 +5486,10 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 ((ILTypeInstance)obj).PushToStack(idx, dst, this, mStack);
             }
+            else if (obj is CrossBindingAdaptorType)
+            {
+                ((CrossBindingAdaptorType)obj).ILInstance.PushToStack(idx, dst, this, mStack);
+            }
             else
             {
                 CLRType t = AppDomain.GetType(obj.GetType()) as CLRType;
