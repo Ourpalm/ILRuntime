@@ -5094,7 +5094,7 @@ namespace ILRuntime.Runtime.Intepreter
                             StackObject so;
                             var sop = &so;
                             if (!((CLRType)t).CopyFieldToStack(idx, obj, this, ref sop, mStack))
-                                res = (int)((CLRType)t).GetFieldValue(idx, obj);
+                                res = Convert.ToInt32(((CLRType)t).GetFieldValue(idx, obj));
                             else
                             {
                                 res = so.Value;
