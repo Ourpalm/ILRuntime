@@ -136,10 +136,21 @@ namespace ILRuntime.Reflection
             List<Attribute> res = new List<Attribute>();
             for (int i = 0; i < customAttributes.Length; i++)
             {
-                if (attributeTypes[i].Equals(attributeType))
+                if (attributeTypes[i].Equals(attributeType)||(inherit&&(attributeType.IsAssignableFrom(attributeTypes[i])||attributeTypes[i].BaseType!=null&&attributeType.IsAssignableFrom(attributeTypes[i].BaseType))))
                     res.Add(customAttributes[i]);
             }
             return res.ToArray();
+        }
+        public Object GetCustomAttribute ( Type oType, Boolean inherit ) => this.GetCustomAttributes ( oType, inherit ).FirstOrDefault ();
+        public T GetCustomAttribute<T> ( Boolean inherit ) where T : System.Attribute => this.GetCustomAttributes<T> ( inherit ).FirstOrDefault ();
+        public T [] GetCustomAttributes<T> ( Boolean inherit ) where T : System.Attribute
+        {
+            IList<T> aDataList = new List<T> ();
+            foreach ( T attribute in this.GetCustomAttributes ( inherit ) )
+            {
+                aDataList.Add ( attribute );
+            }
+            return aDataList.ToArray ();
         }
 
         public override MethodImplAttributes GetMethodImplementationFlags()
