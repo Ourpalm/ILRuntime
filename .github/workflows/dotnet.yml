@@ -18,7 +18,6 @@ jobs:
       with:
         dotnet-version: |
           5.0.x
-          2.0.x
     - name: Build Test Cases
       run: dotnet build TestCases/
     - name: Build Test Cases(Release)
