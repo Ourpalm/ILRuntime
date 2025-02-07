@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HotfixAOT\HotfixAOT.csproj" />
     <ProjectReference Include="..\ILRuntime\ILRuntime.csproj" />
     <ProjectReference Include="..\LitJson\LitJson.csproj" />
   </ItemGroup>
