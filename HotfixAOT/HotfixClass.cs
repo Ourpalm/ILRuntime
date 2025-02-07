@@ -39,13 +39,18 @@ namespace HotfixAOT
             result = $"{b}{a++}";
 #endif
         }
-        
+
+        static Func<HotfixClass, int, int> ttt;
         public int Function(int a)
         {
 #if PATCHED
             HotfixClass2 cls = new HotfixClass2(a);
             return cls.IntValue;
 #else
+            if(ttt !=null)
+            {
+                return ttt(this, a);
+            }
             return a + 111;
 #endif
         }

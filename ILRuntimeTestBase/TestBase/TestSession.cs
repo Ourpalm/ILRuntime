@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using HotfixAOT;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntimeTest.Test;
 using ILRuntimeTest.TestFramework;
@@ -25,6 +26,9 @@ namespace ILRuntimeTest.TestBase
 
         public void Load(string assemblyPath, bool useRegister)
         {
+            Action<int, int> f;
+            HotfixClass cls = new HotfixClass(33);
+            cls.Function(123);
             fs = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read);
             {
                 var path = Path.GetDirectoryName(assemblyPath);
