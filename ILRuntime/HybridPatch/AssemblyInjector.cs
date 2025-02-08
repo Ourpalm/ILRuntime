@@ -1,6 +1,8 @@
-﻿using ILRuntime.Mono.Cecil;
+﻿using ILRuntime.CLR.Method;
+using ILRuntime.Mono.Cecil;
 using ILRuntime.Mono.Cecil.Cil;
 using ILRuntime.Runtime;
+using ILRuntime.Runtime.Enviorment;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +17,9 @@ namespace ILRuntime.Hybrid
     {
         Stream srcAsm;
         ModuleDefinition module;
+        FieldDefinition appdomainField;
         AssemblyDefinition asm;
+        ReflectionReferences reflection;
         AssemblyInjector(Stream srcAsm)
         {
             this.srcAsm = srcAsm;
@@ -28,11 +32,12 @@ namespace ILRuntime.Hybrid
             string attributeName = typeof(ILRuntimePatchAttribute).FullName;
             if (module.HasTypes)
             {
-                var patchedType = module.GetType("ILRuntime.Hybrid.Patched");
-                if (patchedType != null)
+                var patchType = module.GetType("ILRuntime.Hybrid.Patched");
+                if (patchType != null)
                     throw new NotSupportedException("Cannot patch a assembly twice");
 
-                module.Types.Add(new TypeDefinition("ILRuntime.Hybrid", "Patched", TypeAttributes.Sealed | TypeAttributes.NotPublic));
+                reflection = new ReflectionReferences(module);
+                InjectPatchType();
                 foreach (var type in module.GetTypes())
                 {
                     if (type.HasCustomAttributes)
@@ -47,6 +52,15 @@ namespace ILRuntime.Hybrid
                     }
                 }                
             }
+        }
+
+        void InjectPatchType()
+        {
+            var patchType = new TypeDefinition("ILRuntime.Hybrid", "Patched", TypeAttributes.Sealed | TypeAttributes.Public);
+            appdomainField = new FieldDefinition("domain", FieldAttributes.Static | FieldAttributes.Assembly, reflection.AppDomainType);
+            patchType.Fields.Add(appdomainField);
+            module.Types.Add(patchType);
+
         }
 
         public void WriteToFile(Stream stream)
@@ -82,168 +96,101 @@ namespace ILRuntime.Hybrid
         void InjectMethod(TypeDefinition declaringType, MethodDefinition method, int mIdx)
         {
             FieldDefinition redirectDef;
-            TypeReference deleType = null;
-            MethodReference invokeMethod;
-            if (method.ReturnType != module.TypeSystem.Void)
-            {
-                (deleType, invokeMethod) = CreateFunctionRedirectDelegate(method);
-            }
-            else
-            {
-                (deleType, invokeMethod) = CreateMethodRedirectDelegate(method);
-            }
-            redirectDef = new FieldDefinition($"___@redirect_{method.Name}_{mIdx}", FieldAttributes.Private | FieldAttributes.Static, deleType);
+            redirectDef = new FieldDefinition($"___@redirect_{method.Name}_{mIdx}", FieldAttributes.Private | FieldAttributes.Static, reflection.ILMethodType);
             declaringType.Fields.Add(redirectDef);
 
+            VariableDefinition invokeCtx = new VariableDefinition(reflection.InvocationCtxType);
+            method.Body.Variables.Add(invokeCtx);
+            bool hasReturn = method.ReturnType != module.TypeSystem.Void;
+
+            VariableDefinition returnValue = null;
+            if (hasReturn)
+            {
+                //returnValue = new VariableDefinition(method.ReturnType);
+                //method.Body.Variables.Add(returnValue);
+            }
             var processor = method.Body.GetILProcessor();
             Instruction first = null;
             if (method.Body.Instructions.Count > 0)
                 first = method.Body.Instructions[0];
 
-            AppendInstruction(processor, first, processor.Create(OpCodes.Ldsfld, redirectDef));
-            AppendInstruction(processor, first, processor.Create(OpCodes.Ldnull));
-            AppendInstruction(processor, first, processor.Create(OpCodes.Ceq));
-            Instruction elseMarker = processor.Create(OpCodes.Nop);
-            AppendInstruction(processor, first, processor.Create(OpCodes.Brtrue_S, elseMarker));
-            AppendInstruction(processor, first, processor.Create(OpCodes.Ldsfld, redirectDef));
+            int[] refOutIdx = new int[method.Parameters.Count];
+            int refIdxCur = 0;
+            for (int i = 0; i < method.Parameters.Count; i++)
+            {
+                var p = method.Parameters[i];
+                if (p.ParameterType.IsByReference)
+                {
+                    refOutIdx[i] = refIdxCur++;
+                }
+                else
+                    refOutIdx[i] = -1;
+            }
 
+            processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, redirectDef));
+            Instruction elseMarker = processor.Create(OpCodes.Nop);
+            processor.AppendInstruction(first, processor.Create(OpCodes.Brfalse_S, elseMarker));
+
+            processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, appdomainField));
+            processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, redirectDef));
+            processor.AppendInstruction(first, processor.Create(OpCodes.Callvirt, reflection.BeginInvokeMethod));
+            processor.AppendInstruction(first, processor.Create(OpCodes.Stloc, invokeCtx));
+            if (refIdxCur > 0)
+            {
+                for (int i = 0; i < method.Parameters.Count; i++)
+                {
+                    var p = method.Parameters[i];
+                    if (p.ParameterType.IsByReference)
+                    {
+                        int paramIdx = method.IsStatic ? i : i + 1;
+                        processor.AppendPushArgument(module, reflection, invokeCtx, p, paramIdx, first);
+                    }
+                }
+            }
             if (!method.IsStatic)
             {
-                AppendInstruction(processor, first, processor.Create(OpCodes.Ldarg_0));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Ldc_I4_1));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.PushObjectMethod));
             }
             for (int i = 0; i < method.Parameters.Count; i++)
             {
+                var p = method.Parameters[i];
+                if (p.ParameterType.IsByReference)
+                {
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
+                    processor.AppendLdc(first, refOutIdx[i]);
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.PushReferenceMethod));
+                    continue;
+                }
                 int paramIdx = method.IsStatic ? i : i + 1;
-                switch (paramIdx)
-                {
-                    case 0:
-                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldarg_0));
-                        break;
-                    case 1:
-                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldarg_1));
-                        break;
-                    case 2:
-                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldarg_2));
-                        break;
-                    case 3:
-                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldarg_3));
-                        break;
-                    default:
-                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldarg, i));
-                        break;
-                }
+                processor.AppendPushArgument(module, reflection, invokeCtx, p, paramIdx, first);
             }
-            AppendInstruction(processor, first, processor.Create(OpCodes.Callvirt, invokeMethod));
-            AppendInstruction(processor, first, processor.Create(OpCodes.Ret));
-            AppendInstruction(processor, first, elseMarker);
-        }
 
-        void AppendInstruction(ILProcessor processor, Instruction before, Instruction instruction)
-        {
-            if(before != null)
-                processor.InsertBefore(before, instruction);
-            else
-                processor.Append(instruction);
-        }
-
-        (TypeReference, MethodReference) CreateFunctionRedirectDelegate(MethodDefinition method)
-        {
-            int paramCnt = method.Parameters.Count;
-            if (!method.IsStatic)
-                paramCnt++;
-
-            if (paramCnt < 5)
+            processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
+            processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.InvocationCtxInvokeMethod));
+            if (refIdxCur > 0)
             {
-                Type gType = null;
-                switch (paramCnt)
+                for (int i = 0; i < method.Parameters.Count; i++)
                 {
-                    case 0:
-                        gType = typeof(Func<>);
-                        break;
-                    case 1:
-                        gType = typeof(Func<,>);
-                        break;
-                    case 2:
-                        gType = typeof(Func<,,>);
-                        break;
-                    case 3:
-                        gType = typeof(Func<,,,>);
-                        break;
-                    case 4:
-                        gType = typeof(Func<,,,,>);
-                        break;
+                    var p = method.Parameters[i];
+                    if (p.ParameterType.IsByReference)
+                    {
+                        int paramIdx = method.IsStatic ? i : i + 1;
+                        processor.AppendStoreArgument(module, reflection, invokeCtx, p, refOutIdx[i], paramIdx, first);
+                    }
                 }
-                TypeReference gTypeRef = module.ImportReference(gType);
-                List<TypeReference> paramTypes = new List<TypeReference>();
-                if (!method.IsStatic)
-                {
-                    paramTypes.Add(method.DeclaringType);
-                }
-                foreach (var param in method.Parameters)
-                {
-                    var pType = param.ParameterType.IsByReference ? param.ParameterType.GetElementType() : param.ParameterType;
-                    paramTypes.Add(pType);
-                }
-                paramTypes.Add(method.ReturnType);
-                GenericInstanceType resType = gTypeRef.MakeGenericInstanceType(paramTypes.ToArray());
-                var invoke = resType.Resolve().Methods.First((m) => m.Name == "Invoke");
-                return (resType, module.ImportReference(resType.GetMethod(invoke)));
             }
-            else
+            if (hasReturn)
             {
-                return (null, null);
+                processor.AppendReadReturnValue(module, method.ReturnType, reflection, invokeCtx, first);
+                processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Constrained, reflection.InvocationCtxType));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.DisposeMethod));
             }
-        }
-
-        (TypeReference, MethodReference) CreateMethodRedirectDelegate(MethodDefinition method)
-        {
-            int paramCnt = method.Parameters.Count;
-            if (!method.IsStatic)
-                paramCnt++;
-
-            if (paramCnt < 5)
-            {
-                Type gType = null;
-                switch (paramCnt)
-                {
-                    case 0:
-                        gType = typeof(Action);
-                        break;
-                    case 1:
-                        gType = typeof(Action<>);
-                        break;
-                    case 2:
-                        gType = typeof(Action<,>);
-                        break;
-                    case 3:
-                        gType = typeof(Action<,,>);
-                        break;
-                    case 4:
-                        gType = typeof(Action<,,,>);
-                        break;
-
-                }
-                TypeReference gTypeRef = module.ImportReference(gType);
-                List<TypeReference> paramTypes = new List<TypeReference>();
-                if (!method.IsStatic)
-                {
-                    paramTypes.Add(method.DeclaringType);                    
-                }
-                foreach(var param in method.Parameters)
-                {
-                    var pType = param.ParameterType.IsByReference ? param.ParameterType.GetElementType() : param.ParameterType;
-                    paramTypes.Add(pType);
-                }
-                GenericInstanceType resType = gTypeRef.MakeGenericInstanceType(paramTypes.ToArray());
-
-                var invoke = resType.Resolve().Methods.First((m) => m.Name == "Invoke");
-                
-                return (resType, module.ImportReference(resType.GetMethod(invoke)));
-            }
-            else
-            {
-                return (null, null);
-            }
+            processor.AppendInstruction(first, processor.Create(OpCodes.Ret));
+            processor.AppendInstruction(first, elseMarker);
         }
         public static AssemblyInjector CreateInjector(Stream srcAsm)
         {
