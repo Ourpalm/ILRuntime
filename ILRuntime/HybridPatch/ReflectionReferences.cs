@@ -64,7 +64,7 @@ namespace ILRuntime.Hybrid
                 }
             }
 
-            mi = typeof(IDisposable).GetMethod("Dispose");
+            mi = typeof(InvocationContext).GetMethod("Dispose");
             DisposeMethod = module.ImportReference(mi);
             
         }

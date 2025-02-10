@@ -185,10 +185,9 @@ namespace ILRuntime.Hybrid
             if (hasReturn)
             {
                 processor.AppendReadReturnValue(module, method.ReturnType, reflection, invokeCtx, first);
-                processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
-                processor.AppendInstruction(first, processor.Create(OpCodes.Constrained, reflection.InvocationCtxType));
-                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.DisposeMethod));
             }
+            processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
+            processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.DisposeMethod));
             processor.AppendInstruction(first, processor.Create(OpCodes.Ret));
             processor.AppendInstruction(first, elseMarker);
         }
