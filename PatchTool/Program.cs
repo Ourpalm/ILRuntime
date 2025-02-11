@@ -10,6 +10,9 @@ namespace PatchTool
             [Value(0, Required = true, HelpText = "Input file")]
             public string File { get; set; }
 
+            [Value(1, Required = true, HelpText = "Patched assembly")]
+            public string PatchedFile { get; set; }
+
             [Option('o', "output", Required = true, HelpText = "Output file")]
             public string OutputFile { get; set; }
 
@@ -50,6 +53,31 @@ namespace PatchTool
             }
             else if (options.ShouldGeneratePatch)
             {
+                if (string.IsNullOrEmpty(options.PatchedFile))
+                {
+                    Console.WriteLine("Please specify the patched version of the original assembly");
+                    return 1;
+                }
+                if (File.Exists(options.File) && File.Exists(options.PatchedFile))
+                {
+                    using (Stream fs = File.Open(options.File, FileMode.Open, FileAccess.Read))
+                    {
+                        using (Stream fs2 = File.Open(options.PatchedFile, FileMode.Open, FileAccess.Read))
+                        {
+                            PatchGenerator generator = new PatchGenerator(fs, fs2);
+                            generator.Analyze();
+
+                            using (Stream output = File.Create(options.OutputFile))
+                            {
+                                generator.SavePatch(output);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("The specified files do not exist!");
+                }
                 return 0;
             }
             else
