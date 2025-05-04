@@ -49,9 +49,14 @@ namespace ILRuntime.CLR.Utils
                                 t = appdomain.GetType(ga, contextType, contextMethod);
                                 if (t == null && genericArguments != null)
                                     t = genericArguments[j];
-                                if (name == gp.Name + "[]")
+                                int nameLength = gp.Name.Length;
+                                if (name.Length == nameLength + 2 &&  name.StartsWith(gp.Name) &&  name.EndsWith("[]"))
                                 {
                                     name = t.FullName + "[]";
+                                }
+                                else if (name.Length == nameLength + 11 && name.StartsWith(gp.Name) &&  name.EndsWith("[0...,0...]"))
+                                {
+                                    name = t.FullName + "[,]";
                                 }
                                 else
                                 {
