@@ -35,6 +35,8 @@ namespace ILRuntimeDebugEngine
                 SyntaxNode node = location.SourceTree.GetRoot().FindNode(location.SourceSpan, true, true);
 
                 bool isLambda = GetParentMethod<LambdaExpressionSyntax>(node.Parent) != null;
+                bool isLocalFunc = GetParentMethod<LocalFunctionStatementSyntax>(node.Parent) != null;
+
                 BaseMethodDeclarationSyntax method = GetParentMethod<MethodDeclarationSyntax>(node.Parent);
                 string methodName = null;
                 if (method != null)
@@ -69,7 +71,7 @@ namespace ILRuntimeDebugEngine
 
                 var bindRequest = new CSBindBreakpoint();
                 bindRequest.BreakpointHashCode = this.GetHashCode();
-                bindRequest.IsLambda = isLambda;
+                bindRequest.IsLambda = isLambda || isLocalFunc;
                 bindRequest.NamespaceName = string.Join(".", nameSpaceStack);
                 bindRequest.TypeName = className;
                 bindRequest.MethodName = methodName;
