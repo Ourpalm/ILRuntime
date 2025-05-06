@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -418,8 +418,6 @@ namespace ILRuntime.CLR.TypeSystem
         {
             if (fieldMapping == null)
                 InitializeFields();
-            if (fieldBindingCache == null)
-                return false;
             var binding = GetFieldBinding(hash);
             if (binding.Key != null)
             {
@@ -434,8 +432,6 @@ namespace ILRuntime.CLR.TypeSystem
         {
             if (fieldMapping == null)
                 InitializeFields();
-            if (fieldBindingCache == null)
-                return false;
             var binding = GetFieldBinding(hash);
             if (binding.Value != null)
             {

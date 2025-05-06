@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -143,8 +143,16 @@ namespace ILRuntime.Runtime.CLRBinding
                         // Check for a generic method with the same name and params
                         needMethods = true;
                         sb.AppendLine(string.Format("            method = methods.Where(t => t.Name.Equals(\"{0}\") && t.CheckMethodParams(args)).Single();", i.Name));
-                    } else
-                        sb.AppendLine(string.Format("            method = type.GetMethod(\"{0}\", flag, null, args, null);", i.Name));
+                    }
+                    else
+                    {
+                        if (i.DeclaringType != type)
+                        {
+                            sb.AppendLine(string.Format("            method = typeof({1}).GetMethod(\"{0}\", flag, null, args, null);", i.Name, i.DeclaringType.FullName));
+                        }
+                        else
+                            sb.AppendLine(string.Format("            method = type.GetMethod(\"{0}\", flag, null, args, null);", i.Name));
+                    }
 
                     sb.AppendLine(string.Format("            app.RegisterCLRMethodRedirection(method, {0}_{1});", i.Name, idx));
                 }
@@ -153,8 +161,8 @@ namespace ILRuntime.Runtime.CLRBinding
             }
             return sb.ToString();
         }
-    
-        internal static string GenerateMethodWraperCode(this Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes, List<Type> valueTypeBinders, Enviorment.AppDomain domain)
+
+        internal static string GenerateMethodWraperCode(this Type type, MethodInfo[] methods, string typeClsName, HashSet<MethodBase> excludes, List<Type> valueTypeBinders, Enviorment.AppDomain domain, string forceInstanceTypeName = null)
         {
             StringBuilder sb = new StringBuilder();
             bool isMultiArr = type.IsArray && type.GetArrayRank() > 1;
@@ -224,7 +232,10 @@ namespace ILRuntime.Runtime.CLRBinding
                         if (noUnbox)
                             sb.AppendLine(string.Format("            object instance_of_this_method = {0};", type.GetRetrieveValueCode(typeClsName)));
                         else
-                            sb.AppendLine(string.Format("            {0} instance_of_this_method = {1};", typeClsName, type.GetRetrieveValueCode(typeClsName)));
+                        {
+                            string useTypeName = forceInstanceTypeName != null ? forceInstanceTypeName : typeClsName;
+                            sb.AppendLine(string.Format("            {0} instance_of_this_method = {1};", useTypeName, type.GetRetrieveValueCode(useTypeName)));
+                        }
                         if (!type.IsValueType && !hasByRef)
                             sb.AppendLine("            __intp.Free(ptr_of_this_method);");
                     }

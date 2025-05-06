@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +7,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter;
 using System.Reflection;
 using System.Threading;
+using ILRuntime.Runtime.CLRBinding;
 
 namespace ILRuntime.Runtime.Enviorment
 {
@@ -22,18 +23,24 @@ namespace ILRuntime.Runtime.Enviorment
             public string OverrideString;
         }
 
-        public static string GenerateCrossBindingAdapterCode(Type baseType, string nameSpace)
+        public static string GenerateCrossBindingAdapterCode(Type baseType, string nameSpace, List<Type> valueTypeBinders = null)
         {
             StringBuilder sb = new StringBuilder();
             List<MethodInfo> virtMethods = new List<MethodInfo>();
-            GetMethods(baseType, virtMethods);
+            List<MethodInfo> protectedMethods = new List<MethodInfo>();
+            GetMethods(baseType, virtMethods, protectedMethods);
             string clsName, realClsName;
             bool isByRef;
             baseType.GetClassName(out clsName, out realClsName, out isByRef, true);
             sb.Append(@"using System;
+using System.Reflection;
 using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
+using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Utils;
+using ILRuntime.Runtime.Stack;
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
 #else
@@ -43,7 +50,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 namespace ");
             sb.AppendLine(nameSpace);
             sb.Append(@"{   
-    public class ");
+    public unsafe partial class ");
             sb.Append(clsName);
             sb.AppendLine(@"Adapter : CrossBindingAdaptor
     {");
@@ -72,7 +79,7 @@ namespace ");
         }
 ");
 
-            sb.AppendLine(string.Format("        public class Adapter : {0}, CrossBindingAdaptorType", realClsName));
+            sb.AppendLine(string.Format("        public partial class Adapter : {0}, CrossBindingAdaptorType", realClsName));
             sb.AppendLine("        {");
             GenerateCrossBindingMethodInfo(sb, virtMethods);
             sb.AppendLine(@"
@@ -93,7 +100,7 @@ namespace ");
 
             public ILTypeInstance ILInstance { get { return instance; } }
 ");
-            GenerateCrossBindingMethodBody(sb, virtMethods);
+            GenerateCrossBindingMethodBody(baseType, sb, virtMethods, protectedMethods, valueTypeBinders);
             sb.Append(@"            public override string ToString()
             {
                 IMethod m = appdomain.ObjectType.GetMethod("); sb.AppendLine("\"ToString\", 0);");
@@ -119,7 +126,7 @@ namespace ");
             return sb.ToString();
         }
 
-        static void GenerateCrossBindingMethodBody(StringBuilder sb, List<MethodInfo> virtMethods)
+        static void GenerateCrossBindingMethodBody(Type baseType, StringBuilder sb, List<MethodInfo> virtMethods, List<MethodInfo> protectedMethods, List<Type> valueTypeBinders)
         {
             int index = 0;
             Dictionary<string, PropertyGenerateInfo> pendingProperties = new Dictionary<string, PropertyGenerateInfo>();
@@ -263,6 +270,51 @@ namespace ");
                 }
                 sb.AppendLine("            }");
                 sb.AppendLine();
+            }
+
+            if (protectedMethods.Count > 0)
+            {
+                baseType.GetClassName(out var clsName, out var realClsName, out var isByRef);
+                sb.Append(@"
+        public static void RegisterCLRBindings(ILRuntime.Runtime.Enviorment.AppDomain app)
+        {
+");
+                string flagDef = "            BindingFlags flag = BindingFlags.Instance | BindingFlags.NonPublic;";
+                string methodDef = "            MethodBase method;";
+                string methodsDef = "            MethodInfo[] methods = type.GetMethods(flag).Where(t => !t.IsGenericMethod).ToArray();";
+                string fieldDef = "            FieldInfo field;";
+                string argsDef = "            Type[] args;";
+                string typeDef = string.Format("            Type type = typeof({0});", realClsName);
+                var methods = protectedMethods.ToArray();
+                FieldInfo[] fields = (from fi in baseType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                                     where fi.IsFamily
+                                     select fi).ToArray();
+                string registerMethodCode = baseType.GenerateMethodRegisterCode(methods, null, out bool needMethods);
+                string registerFieldCode = baseType.GenerateFieldRegisterCode(fields, null, true);
+                string methodWraperCode = baseType.GenerateMethodWraperCode(methods, realClsName, null, valueTypeBinders, null, "Adapter");
+                string fieldWraperCode = baseType.GenerateFieldWraperCode(fields, "Adapter", null, valueTypeBinders, null, true);
+                bool hasMethodCode = !string.IsNullOrEmpty(registerMethodCode);
+                bool hasFieldCode = !string.IsNullOrEmpty(registerFieldCode);
+                bool hasNormalMethod = methods.Where(x => !x.IsGenericMethod).Count() != 0;
+                if ((hasMethodCode || hasFieldCode) && hasNormalMethod)
+                    sb.AppendLine(flagDef);
+                if (hasMethodCode || hasFieldCode)
+                {
+                    sb.AppendLine(methodDef);
+                    sb.AppendLine(argsDef);
+                    sb.AppendLine(typeDef);
+                }
+                if (hasFieldCode)
+                    sb.AppendLine(fieldDef);
+                if (needMethods)
+                    sb.AppendLine(methodsDef);
+
+                sb.AppendLine(registerMethodCode);
+                sb.AppendLine(registerFieldCode);
+                sb.AppendLine("        }");
+                sb.AppendLine();
+                sb.AppendLine(methodWraperCode);
+                sb.AppendLine(fieldWraperCode);
             }
         }
 
@@ -541,7 +593,7 @@ namespace ");
             }");
         }
 
-        static void GetMethods(Type type, List<MethodInfo> list)
+        static void GetMethods(Type type, List<MethodInfo> list, List<MethodInfo> protectedMethods)
         {
             if (type == null)
                 return;
@@ -556,6 +608,12 @@ namespace ");
 
                     list.Add(i);
                 }
+                else if(i.IsFamily && protectedMethods != null)
+                {
+                    if (i.Name == "MemberwiseClone")
+                        continue;
+                    protectedMethods.Add(i);
+                }
             }
 
             var interfaceArray = type.GetInterfaces();
@@ -563,7 +621,7 @@ namespace ");
             {
                 for (int i = 0; i < interfaceArray.Length; ++i)
                 {
-                    GetMethods(interfaceArray[i], list);
+                    GetMethods(interfaceArray[i], list, null);
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,10 +12,12 @@ namespace ILRuntime.Runtime.Intepreter
         string message;
         string stackTrace;
         string thisInfo, localInfo;
+        Exception innerException;
         internal ILRuntimeException(string message, ILIntepreter intepreter, CLR.Method.ILMethod method, Exception innerException = null)
-            : base(message, innerException)
+            : base(message)
         
         {
+            this.innerException = innerException;
             this.message = message;
             var ds = intepreter.AppDomain.DebugService;
             if (innerException is ILRuntimeException)
@@ -40,6 +42,10 @@ namespace ILRuntime.Runtime.Intepreter
                 {
 
                 }
+                if (innerException != null)
+                {
+                    stackTrace += "\n\nRethrown as Exception:" + innerException.ToString();
+                }
             }
 
             if (ds.OnILRuntimeException != null) {
@@ -51,7 +57,7 @@ namespace ILRuntime.Runtime.Intepreter
         {
             get
             {
-                return message + "\n" + stackTrace;
+                return message;
             }
         }
 
@@ -74,6 +80,11 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 return localInfo;
             }
+        }
+
+        public Exception GetInnerException()
+        {
+            return innerException;
         }
 
         public override string ToString()

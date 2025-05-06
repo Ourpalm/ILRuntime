@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -442,11 +442,14 @@ namespace ILRuntime.Runtime.Intepreter
                 if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
                     CLRType clrType = intp.AppDomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
-                    var obj = clrType.GetFieldValue(fieldIdx, clrInstance);
-                    if (obj is CrossBindingAdaptorType)
-                        obj = ((CrossBindingAdaptorType)obj).ILInstance;
-                    //if(!clrType.CopyFieldToStack(fieldIdx, clrInstance,))
-                    ILIntepreter.PushObject(esp, managedStack, obj);
+                    if (!clrType.CopyFieldToStack(fieldIdx, clrInstance, intp, ref esp, managedStack))
+                    {
+                        var obj = clrType.GetFieldValue(fieldIdx, clrInstance);
+                        if (obj is CrossBindingAdaptorType)
+                            obj = ((CrossBindingAdaptorType)obj).ILInstance;
+                        //if(!clrType.CopyFieldToStack(fieldIdx, clrInstance,))
+                        ILIntepreter.PushObject(esp, managedStack, obj);
+                    }
                 }
                 else
                     throw new TypeLoadException();
@@ -583,31 +586,35 @@ namespace ILRuntime.Runtime.Intepreter
             throw new NotImplementedException();
         }
 
-        internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, Enviorment.AppDomain appdomain, AutoList managedStack)
+        internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, ILIntepreter intp, AutoList managedStack)
         {
             if (fieldIdx < fields.Length && fieldIdx >= 0)
                 AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
             else
             {
+                var appdomain = intp != null ? intp.AppDomain : type.AppDomain;
                 if (Type.FirstCLRBaseType != null && Type.FirstCLRBaseType is Enviorment.CrossBindingAdaptor)
                 {
                     CLRType clrType = appdomain.GetType(((Enviorment.CrossBindingAdaptor)Type.FirstCLRBaseType).BaseCLRType) as CLRType;
-                    var field = clrType.GetField(fieldIdx);
-                    clrType.SetFieldValue(fieldIdx, ref clrInstance, field.FieldType.CheckCLRTypes(ILIntepreter.CheckAndCloneValueType(StackObject.ToObject(esp, appdomain, managedStack), appdomain)));
+                    if (intp != null && !clrType.AssignFieldFromStack(fieldIdx, ref clrInstance, intp, esp, managedStack))
+                    {
+                        var field = clrType.GetField(fieldIdx);
+                        clrType.SetFieldValue(fieldIdx, ref clrInstance, field.FieldType.CheckCLRTypes(ILIntepreter.CheckAndCloneValueType(StackObject.ToObject(esp, appdomain, managedStack), appdomain)));
+                    }
                 }
                 else
                     throw new TypeLoadException();
             }
         }
 
-        internal unsafe void AssignFromStack(StackObject* esp, Enviorment.AppDomain appdomain, AutoList managedStack)
+        internal unsafe void AssignFromStack(StackObject* esp, ILIntepreter intp, AutoList managedStack)
         {
             StackObject* val = ILIntepreter.ResolveReference(esp);
             int cnt = val->ValueLow;
             for (int i = 0; i < cnt; i++)
             {
                 var addr = ILIntepreter.Minus(val, i + 1);
-                AssignFromStack(i, addr, type.AppDomain, managedStack);
+                AssignFromStack(i, addr, intp, managedStack);
             }
         }
 
@@ -640,7 +647,9 @@ namespace ILRuntime.Runtime.Intepreter
                             if (ins == null)
                                 throw new NullReferenceException();
                             ILTypeInstance child = (ILTypeInstance)ins;
-                            child.AssignFromStack(esp, domain, managedStack);
+                            //ILIntepreter instance is only needed in clrbinding, in this case, it's pure value type declared inside ILRuntime, so it won't need it
+                            //Adding a parameter in this widely used method would introduce unnecessary overhead
+                            child.AssignFromStack(esp, null, managedStack);
                         }
                         else
                         {

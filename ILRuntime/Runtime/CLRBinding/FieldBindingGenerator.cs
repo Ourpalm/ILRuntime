@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace ILRuntime.Runtime.CLRBinding
 {
     static class FieldBindingGenerator
     {
-        internal static string GenerateFieldRegisterCode(this Type type, FieldInfo[] fields, HashSet<FieldInfo> excludes)
+        internal static string GenerateFieldRegisterCode(this Type type, FieldInfo[] fields, HashSet<FieldInfo> excludes, bool noGetterSetter = false)
         {
             StringBuilder sb = new StringBuilder();
             int idx = 0;
@@ -21,12 +21,18 @@ namespace ILRuntime.Runtime.CLRBinding
                     continue;
                 if (i.IsSpecialName)
                     continue;
-
-                sb.AppendLine(string.Format("            field = type.GetField(\"{0}\", flag);", i.Name));
-                sb.AppendLine(string.Format("            app.RegisterCLRFieldGetter(field, get_{0}_{1});", i.Name, idx));
+                if (i.DeclaringType != type)
+                {
+                    sb.AppendLine(string.Format("            field = typeof({1}).GetField(\"{0}\", flag);", i.Name, i.DeclaringType.FullName));
+                }
+                else
+                    sb.AppendLine(string.Format("            field = type.GetField(\"{0}\", flag);", i.Name));
+                if (!noGetterSetter)
+                    sb.AppendLine(string.Format("            app.RegisterCLRFieldGetter(field, get_{0}_{1});", i.Name, idx));
                 if (!i.IsInitOnly && !i.IsLiteral)
                 {
-                    sb.AppendLine(string.Format("            app.RegisterCLRFieldSetter(field, set_{0}_{1});", i.Name, idx));
+                    if (!noGetterSetter)
+                        sb.AppendLine(string.Format("            app.RegisterCLRFieldSetter(field, set_{0}_{1});", i.Name, idx));
                     sb.AppendLine(string.Format("            app.RegisterCLRFieldBinding(field, CopyToStack_{0}_{1}, AssignFromStack_{0}_{1});", i.Name, idx));
                 }
                 else
@@ -39,7 +45,7 @@ namespace ILRuntime.Runtime.CLRBinding
             return sb.ToString();
         }
 
-        internal static string GenerateFieldWraperCode(this Type type, FieldInfo[] fields, string typeClsName, HashSet<FieldInfo> excludes, List<Type> valueTypeBinders, Enviorment.AppDomain domain)
+        internal static string GenerateFieldWraperCode(this Type type, FieldInfo[] fields, string typeClsName, HashSet<FieldInfo> excludes, List<Type> valueTypeBinders, Enviorment.AppDomain domain, bool noGetterSetter = false)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -50,18 +56,21 @@ namespace ILRuntime.Runtime.CLRBinding
                     continue;
                 if (type.ShouldSkipField(i))
                     continue;
-                sb.AppendLine(string.Format("        static object get_{0}_{1}(ref object o)", i.Name, idx));
-                sb.AppendLine("        {");
-                if (i.IsStatic)
+                if (!noGetterSetter)
                 {
-                    sb.AppendLine(string.Format("            return {0}.{1};", typeClsName, i.Name));
+                    sb.AppendLine(string.Format("        static object get_{0}_{1}(ref object o)", i.Name, idx));
+                    sb.AppendLine("        {");
+                    if (i.IsStatic)
+                    {
+                        sb.AppendLine(string.Format("            return {0}.{1};", typeClsName, i.Name));
+                    }
+                    else
+                    {
+                        sb.AppendLine(string.Format("            return (({0})o).{1};", typeClsName, i.Name));
+                    }
+                    sb.AppendLine("        }");
+                    sb.AppendLine();
                 }
-                else
-                {
-                    sb.AppendLine(string.Format("            return (({0})o).{1};", typeClsName, i.Name));
-                }
-                sb.AppendLine("        }");
-                sb.AppendLine();
                 sb.AppendLine(string.Format("        static StackObject* CopyToStack_{0}_{1}(ref object o, ILIntepreter __intp, StackObject* __ret, AutoList __mStack)", i.Name, idx));
                 sb.AppendLine("        {");
                 if (i.IsStatic)
@@ -99,25 +108,28 @@ namespace ILRuntime.Runtime.CLRBinding
 
                 if (!i.IsInitOnly && !i.IsLiteral)
                 {
-                    sb.AppendLine(string.Format("        static void set_{0}_{1}(ref object o, object v)", i.Name, idx));
-                    sb.AppendLine("        {");
-                    if (i.IsStatic)
+                    if (!noGetterSetter)
                     {
-                        sb.AppendLine(string.Format("            {0}.{1} = ({2})v;", typeClsName, i.Name, realClsName));
-                    }
-                    else
-                    {
-                        if (type.IsValueType)
+                        sb.AppendLine(string.Format("        static void set_{0}_{1}(ref object o, object v)", i.Name, idx));
+                        sb.AppendLine("        {");
+                        if (i.IsStatic)
                         {
-                            sb.AppendLine(string.Format("            {0} ins =({0})o;", typeClsName));
-                            sb.AppendLine(string.Format("            ins.{0} = ({1})v;", i.Name, realClsName));
-                            sb.AppendLine("            o = ins;");
+                            sb.AppendLine(string.Format("            {0}.{1} = ({2})v;", typeClsName, i.Name, realClsName));
                         }
                         else
-                            sb.AppendLine(string.Format("            (({0})o).{1} = ({2})v;", typeClsName, i.Name, realClsName));
+                        {
+                            if (type.IsValueType)
+                            {
+                                sb.AppendLine(string.Format("            {0} ins =({0})o;", typeClsName));
+                                sb.AppendLine(string.Format("            ins.{0} = ({1})v;", i.Name, realClsName));
+                                sb.AppendLine("            o = ins;");
+                            }
+                            else
+                                sb.AppendLine(string.Format("            (({0})o).{1} = ({2})v;", typeClsName, i.Name, realClsName));
+                        }
+                        sb.AppendLine("        }");
+                        sb.AppendLine();
                     }
-                    sb.AppendLine("        }");
-                    sb.AppendLine();
                     sb.AppendLine(string.Format("        static StackObject* AssignFromStack_{0}_{1}(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)", i.Name, idx));
                     sb.AppendLine("        {");
                     sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -114,7 +114,9 @@ namespace ILRuntime.Runtime.Stack
                             for (int i = 0; i < dst->ValueLow; i++)
                             {
                                 var addr = ILIntepreter.Minus(dst, i + 1);
-                                ins.AssignFromStack(i, addr, appdomain, mStack);
+                                //ILIntepreter instance is only needed in clrbinding, in this case, it's pure value type declared inside ILRuntime, so it won't need it
+                                //Adding a parameter in this widely used method would introduce unnecessary overhead
+                                ins.AssignFromStack(i, addr, null, mStack);
                             }
                             return ins;
                         }
