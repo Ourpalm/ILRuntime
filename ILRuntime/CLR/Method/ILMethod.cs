@@ -178,6 +178,8 @@ namespace ILRuntime.CLR.Method
                 }
                 else
                 {
+                    if (def.HasBody && def.Body.Instructions.Count == 0)
+                        return false;
                     if (jitImmediately)
                     {
                         InitCodeBody(true);
@@ -608,14 +610,15 @@ namespace ILRuntime.CLR.Method
                 Dictionary<Mono.Cecil.Cil.Instruction, int> addr = new Dictionary<Mono.Cecil.Cil.Instruction, int>();
 
                 bool noRelease = false;
-                if (register)
+                bool hasInstruction = def.Body.Instructions.Count > 0;
+                if (register && hasInstruction)
                 {
                     JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
                     bodyRegister = jit.Compile(out stackRegisterCnt, out jumptablesR, addr, out registerSymbols);
                 }
                 else
                 {
-                    if (def.Body.Instructions.Count > 0)
+                    if (hasInstruction)
                         InitStackCodeBody(addr);
                     else if(declaringType.IsGenericInstance)
                     {
