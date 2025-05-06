@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -217,7 +217,7 @@ namespace ILRuntime.Runtime.Enviorment
             invocated = true;
         }
 
-        internal StackObject* ESP
+        public StackObject* ESP
         {
             get
             {
@@ -229,7 +229,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
-        internal ILIntepreter Intepreter
+        public ILIntepreter Intepreter
         {
             get
             {
@@ -237,7 +237,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
-        internal AutoList ManagedStack
+        public AutoList ManagedStack
         {
             get
             {
