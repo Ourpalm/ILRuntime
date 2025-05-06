@@ -19,7 +19,7 @@ namespace ILRuntime.Hybrid
         List<KeyValuePair<ILMethod, int>> patchedMethods = new List<KeyValuePair<ILMethod, int>>();
         Dictionary<string, TypeDefinition> internalTypes;
         Dictionary<string, TypeReference> genericParameters = new Dictionary<string, TypeReference>();
-
+        ModuleDefinition module;
         public string Name { get { return patchInfo.Name; } }
 
         public bool IsPatched { get;private set; }
@@ -60,7 +60,6 @@ namespace ILRuntime.Hybrid
 
         TypeReference ResolveType(TypeReferencePatchInfo info, Runtime.Enviorment.AppDomain domain, TypeReference ctxType, bool preferInternal = false)
         {
-            var module = domain.LoadedModules[0];
             if (info.IsByReference)
             {
                 var et = ResolveType(info.ElementType, domain, ctxType, preferInternal);
@@ -508,6 +507,7 @@ namespace ILRuntime.Hybrid
             {
                 domain.GetType(i);
             }
+            ((DefaultAssemblyResolver)module.AssemblyResolver).AddSearchDirectory(Path.GetDirectoryName(assembly.Location));
             InitializeTypes(domain);
 
             MethodInfo applyMI = type.GetMethod(AssemblyInjector.PatchApplyPatchMethodName);
@@ -518,6 +518,7 @@ namespace ILRuntime.Hybrid
         {
             AssemblyPatch patch = new AssemblyPatch();
             patch.patchInfo = AssemblyPatchInfo.FromStream(new BinaryReader(stream));
+            patch.module = ModuleDefinition.CreateModule("HotfixModule", ModuleKind.Dll);
             return patch;
         }
     }
