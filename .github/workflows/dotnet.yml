@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
       with:
         lfs: true
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
         dotnet-version: |
           8.0.x
     - name: Build Test Cases
