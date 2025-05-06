@@ -19,23 +19,31 @@ jobs:
       uses: actions/setup-dotnet@v1
         dotnet-version: |
           8.0.x
+    - name: Build Hotfix Project
+      run: dotnet build --framework net8.0 -c Release HotfixAOT/
+    - name: Build Hotfix Project(Patched)
+      run: dotnet build --framework net8.0 -c Release_Patched HotfixAOT/
+    - name: Inject hotfix library
+      run: dotnet run --framework net8.0 -c Release PatchTool/ -i -h HotfixAOT/Patched/HotfixAOT.hash -o HotfixAOT/Patched/HotfixAOT.dll HotfixAOT/bin/Release/net8.0/HotfixAOT.dll
+    - name: Generate hotfix Patch
+      run: dotnet run --framework net8.0 -c Release PatchTool/ -p -o HotfixAOT/Patched/HotfixAOT.patch HotfixAOT/Patched/HotfixAOT.hash HotfixAOT/bin/Release_Patched/net8.0/HotfixAOT.dll
     - name: Build Test Cases
       run: dotnet build TestCases/
     - name: Build Test Cases(Release)
       run: dotnet build -c Release TestCases/
     - name: Test (I:Debug T:Debug R:false)
-      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
+      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
     - name: Test (I:Debug T:Debug R:true)
-      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll true
+      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true
     - name: Test (I:Debug T:Release R:false)
-      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll false
+      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
     - name: Test (I:Debug T:Release R:true)
-      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll true
+      run: dotnet run --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true
     - name: Test (I:Release T:Debug R:false)
-      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll false
+      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
     - name: Test (I:Release T:Debug R:true)
-      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll true
+      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true
     - name: Test (I:Release T:Release R:false)
-      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll false
+      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
     - name: Test (I:Release T:Release R:true)
-      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll true    
+      run: dotnet run -c Release --verbosity normal --framework net8.0 --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/netstandard2.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true    
