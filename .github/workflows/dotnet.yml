@@ -25,9 +25,9 @@ jobs:
     - name: Build Hotfix Project(Patched)
       run: dotnet build --framework net8.0 -c Release_Patched HotfixAOT/
     - name: Inject hotfix library
-      run: dotnet run --framework net8.0 -c Release --project PatchTool/PatchTool/PatchTool.csproj "-i -h HotfixAOT/Patched/HotfixAOT.hash -o HotfixAOT/Patched/HotfixAOT.dll HotfixAOT/bin/Release/net8.0/HotfixAOT.dll"
+      run: dotnet run --framework net8.0 -c Release --project PatchTool/PatchTool.csproj -- -i -h HotfixAOT/Patched/HotfixAOT.hash -o HotfixAOT/Patched/HotfixAOT.dll HotfixAOT/bin/Release/net8.0/HotfixAOT.dll
     - name: Generate hotfix Patch
-      run: dotnet run --framework net8.0 -c Release --project PatchTool/PatchTool/PatchTool.csproj "-p -o HotfixAOT/Patched/HotfixAOT.patch HotfixAOT/Patched/HotfixAOT.hash HotfixAOT/bin/Release_Patched/net8.0/HotfixAOT.dll"
+      run: dotnet run --framework net8.0 -c Release --project PatchTool/PatchTool.csproj -- -p -o HotfixAOT/Patched/HotfixAOT.patch HotfixAOT/Patched/HotfixAOT.hash HotfixAOT/bin/Release_Patched/net8.0/HotfixAOT.dll
     - name: Build Test Cases
       run: dotnet build TestCases/
     - name: Build Test Cases(Release)
