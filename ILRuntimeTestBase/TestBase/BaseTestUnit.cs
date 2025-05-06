@@ -143,7 +143,7 @@ namespace ILRuntimeTest.Test
             }
             catch (ILRuntime.Runtime.Intepreter.ILRuntimeException e)
             {
-                if (e.InnerException.GetType() != expectingEx)
+                if (e.GetInnerException() == null || e.GetInnerException().GetType() != expectingEx)
                 {
                     Message.AppendLine(e.ToString());
                     if (e.InnerException != null)
