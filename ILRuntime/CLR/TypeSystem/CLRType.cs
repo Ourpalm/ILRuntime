@@ -10,6 +10,8 @@ using ILRuntime.CLR.Method;
 using ILRuntime.Reflection;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Stack;
+using ILRuntime.Hybrid;
+
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
@@ -94,6 +96,9 @@ namespace ILRuntime.CLR.TypeSystem
                     throw new NotSupportedException("Cannot find ValueTypeBinder for type:" + clrType.FullName);
             }
         }
+
+        internal PatchGetFieldDelegate GetStaticFieldCallback { get; set; }
+        internal PatchSetFieldDelegate SetStaticFieldCallback { get; set; }
 
         public ILRuntime.Runtime.Enviorment.AppDomain AppDomain
         {
@@ -641,6 +646,15 @@ namespace ILRuntime.CLR.TypeSystem
                 Array.Resize(ref orderedFieldTypes, idx);
             }
         }
+
+        public int GetFieldIndex(string name)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldMapping.TryGetValue(name, out var index)) 
+                return index;
+            return 0;
+        }
         public int GetFieldIndex(object token)
         {
             if (fieldMapping == null)
@@ -838,10 +852,10 @@ namespace ILRuntime.CLR.TypeSystem
                                 continue;
                             for (int j = 0; j < paramCount; j++)
                             {
-                                var typeA = /*param[j].TypeForCLR.IsByRef ? param[j].TypeForCLR.GetElementType() : */param[j].TypeForCLR;
+                                var typeA = /*param[j].TypeForCLR.IsByRef ? param[j].TypeForCLR.GetElementType() : */param[j]?.TypeForCLR;
                                 var typeB = /*i.Parameters[j].TypeForCLR.IsByRef ? i.Parameters[j].TypeForCLR.GetElementType() : */i.Parameters[j].TypeForCLR;
 
-                                if (typeA != typeB)
+                                if (typeA != null && typeA != typeB)
                                 {
                                     match = false;
                                     break;

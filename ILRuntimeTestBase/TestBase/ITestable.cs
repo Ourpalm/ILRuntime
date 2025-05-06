@@ -19,11 +19,8 @@ namespace ILRuntimeTest
     /// </summary>
     public interface ITestable
     {
-        bool Init(string fileName);
-        bool Init(ILRuntime.Runtime.Enviorment.AppDomain app);
-        bool Init(ILRuntime.Runtime.Enviorment.AppDomain app, string type, string method);
+        string TestName { get; }
         void Run(bool skipPerformance = false);
-        bool Check();
         TestResultInfo CheckResult();
     }
 }

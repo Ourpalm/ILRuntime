@@ -23,9 +23,11 @@ namespace ILRuntime.CLR.TypeSystem
         ILMethod staticConstructor;
         List<ILMethod> constructors;
         IType [] fieldTypes;
-        FieldDefinition [] fieldDefinitions;
-        IType [] staticFieldTypes;
-        FieldDefinition [] staticFieldDefinitions;
+        FieldReference[] fieldReferences;
+        FieldDefinition[] fieldDefinitions;
+        IType[] staticFieldTypes;
+        FieldReference[] staticFieldReferences;
+        FieldDefinition[] staticFieldDefinitions;
         Dictionary<string, int> fieldMapping;
         Dictionary<string, int> staticFieldMapping;
         ILTypeStaticInstance staticInstance;
@@ -177,6 +179,16 @@ namespace ILRuntime.CLR.TypeSystem
                 if ( fieldMapping == null )
                     InitializeFields ();
                 return staticFieldDefinitions;
+            }
+        }
+
+        public FieldReference[] StaticFieldReferences
+        {
+            get
+            {
+                if (fieldMapping == null)
+                    InitializeFields();
+                return staticFieldReferences;
             }
         }
 
@@ -679,6 +691,51 @@ namespace ILRuntime.CLR.TypeSystem
             baseTypeInitialized = true;
         }
 
+        internal IMethod GetMethod(MethodDefinition def)
+        {
+            if (methods == null)
+                InitializeMethods();
+            if (def.IsConstructor)
+            {
+                foreach(var i in constructors)
+                {
+                    if (i.Definition == def)
+                        return i;
+                }
+            }
+            else
+            {
+                foreach(var i in  methods)
+                {
+                    foreach(var j in i.Value)
+                    {
+                        if(j.Definition == def)
+                        {
+                            return j;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public ILMethod GetMethodByGenericDefinition(ILMethod definitionMethod)
+        {
+            if (definitionMethod == null)
+                return null;
+            if (methods == null)
+                InitializeMethods();
+            foreach(var i in methods)
+            {
+                foreach(var j in i.Value)
+                {
+                    if (j.Definition == definitionMethod.Definition)
+                        return j;
+                }
+            }
+            return null;
+        }
+
         public IMethod GetMethod ( string name )
         {
             if ( methods == null )
@@ -739,9 +796,9 @@ namespace ILRuntime.CLR.TypeSystem
                 if (i.IsConstructor)
                 {
                     if (i.IsStatic)
-                        staticConstructor = new ILMethod(i, this, appdomain, jitFlags);
+                        staticConstructor = new ILMethod(i, i, this, appdomain, jitFlags);
                     else
-                        constructors.Add(new ILMethod(i, this, appdomain, jitFlags));
+                        constructors.Add(new ILMethod(i, i, this, appdomain, jitFlags));
                 }
                 else
                 {
@@ -751,7 +808,7 @@ namespace ILRuntime.CLR.TypeSystem
                         lst = new List<ILMethod>();
                         methods[i.Name] = lst;
                     }
-                    var m = new ILMethod(i, this, appdomain, jitFlags);
+                    var m = new ILMethod(i, i, this, appdomain, jitFlags);
                     lst.Add(m);
                 }
             }
@@ -1072,87 +1129,119 @@ namespace ILRuntime.CLR.TypeSystem
             return -1;
         }
 
-        public IType GetField ( string name, out int fieldIdx )
+        public IType GetField(string name, out int fieldIdx)
         {
-            if ( fieldMapping == null )
-                InitializeFields ();
-            if ( fieldMapping.TryGetValue ( name, out fieldIdx ) )
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldMapping.TryGetValue(name, out fieldIdx))
             {
-                return fieldTypes [ fieldIdx - FieldStartIndex ];
+                return fieldTypes[fieldIdx - FieldStartIndex];
             }
-            else if ( BaseType != null && BaseType is ILType )
+            else if (BaseType != null && BaseType is ILType)
             {
-                return ( ( ILType ) BaseType ).GetField ( name, out fieldIdx );
+                return ((ILType)BaseType).GetField(name, out fieldIdx);
             }
-            else
+            else if (staticFieldMapping != null && staticFieldMapping.TryGetValue(name, out fieldIdx))
+            {
+                return staticFieldTypes[fieldIdx];
+            }
+            else 
                 return null;
         }
 
-        public IType GetField ( int fieldIdx, out FieldDefinition fd )
+        public IType GetField(int fieldIdx, out FieldReference fr)
         {
-            if ( fieldMapping == null )
-                InitializeFields ();
-            if ( fieldIdx < FieldStartIndex )
-                return ( ( ILType ) BaseType ).GetField ( fieldIdx, out fd );
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldIdx < FieldStartIndex)
+                return ((ILType)BaseType).GetField(fieldIdx, out fr);
             else
             {
-                fd = fieldDefinitions [ fieldIdx - FieldStartIndex ];
-                return fieldTypes [ fieldIdx - FieldStartIndex ];
+                fr = fieldReferences[fieldIdx - FieldStartIndex];
+                return fieldTypes[fieldIdx - FieldStartIndex];
+            }
+        }
+
+        public IType GetField(int fieldIdx, out FieldDefinition fd)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldIdx < FieldStartIndex)
+                return ((ILType)BaseType).GetField(fieldIdx, out fd);
+            else
+            {
+                fd = fieldDefinitions[fieldIdx - FieldStartIndex];
+                return fieldTypes[fieldIdx - FieldStartIndex];
             }
         }
 
         void InitializeFields ()
         {
             fieldMapping = new Dictionary<string, int> ();
-            if ( definition == null )
+            if (definition == null)
             {
-                fieldTypes = new IType [ 0 ];
-                fieldDefinitions = new FieldDefinition [ 0 ];
+                fieldTypes = new IType[0];
+                fieldReferences = new FieldReference[0];
+                fieldDefinitions = new FieldDefinition[0];
                 return;
             }
             fieldTypes = new IType [ definition.Fields.Count ];
-            fieldDefinitions = new FieldDefinition [ definition.Fields.Count ];
+            fieldReferences = new FieldReference[definition.Fields.Count];
+            fieldDefinitions = new FieldDefinition[definition.Fields.Count];
             var fields = definition.Fields;
             int idx = FieldStartIndex;
             int idxStatic = 0;
-            for ( int i = 0; i < fields.Count; i++ )
+            for (int i = 0; i < fields.Count; i++)
             {
-                var field = fields [ i ];
-                if ( field.IsStatic )
+                var field = fields[i];
+                if (field.IsStatic)
                 {
                     //It makes no sence to initialize
-                    if ( !TypeReference.HasGenericParameters || IsGenericInstance )
+                    if (!TypeReference.HasGenericParameters || IsGenericInstance)
                     {
-                        if ( staticFieldTypes == null )
+                        if (staticFieldTypes == null)
                         {
-                            staticFieldTypes = new IType [ definition.Fields.Count ];
-                            staticFieldDefinitions = new FieldDefinition [ definition.Fields.Count ];
-                            staticFieldMapping = new Dictionary<string, int> ();
+                            staticFieldTypes = new IType[definition.Fields.Count];
+                            staticFieldReferences = new FieldReference[definition.Fields.Count];
+                            staticFieldDefinitions = new FieldDefinition[definition.Fields.Count];
+                            staticFieldMapping = new Dictionary<string, int>();
                         }
-                        staticFieldMapping [ field.Name ] = idxStatic;
-                        staticFieldDefinitions [ idxStatic ] = field;
-                        if ( field.FieldType.IsGenericParameter )
+                        staticFieldMapping[field.Name] = idxStatic;
+                        if (field.FieldType.IsGenericParameter)
                         {
-                            staticFieldTypes [ idxStatic ] = FindGenericArgument ( field.FieldType.Name );
+                            staticFieldTypes[idxStatic] = FindGenericArgument(field.FieldType.Name);
                         }
                         else
-                            staticFieldTypes [ idxStatic ] = appdomain.GetType ( field.FieldType, this, null );
+                            staticFieldTypes[idxStatic] = appdomain.GetType(field.FieldType, this, null);
+                        FieldReference fr = field;
+                        if (typeRef.IsGenericInstance)
+                        {
+                            fr = new FieldReference(field.Name, staticFieldTypes[idxStatic].ToTypeReference(appdomain.LoadedModules[0]), typeRef);                            
+                        }
+                        staticFieldReferences[idxStatic] = fr;
+                        staticFieldDefinitions[idxStatic] = field;
                         idxStatic++;
                     }
                 }
                 else
                 {
-                    fieldMapping [ field.Name ] = idx;
-                    fieldDefinitions [ idx - FieldStartIndex ] = field;
-                    if ( field.FieldType.IsGenericParameter )
+                    fieldMapping[field.Name] = idx;
+                    if (field.FieldType.IsGenericParameter)
                     {
-                        fieldTypes [ idx - FieldStartIndex ] = FindGenericArgument ( field.FieldType.Name );
+                        fieldTypes[idx - FieldStartIndex] = FindGenericArgument(field.FieldType.Name);
                     }
                     else
-                        fieldTypes [ idx - FieldStartIndex ] = appdomain.GetType ( field.FieldType, this, null );
-                    if ( IsEnum )
+                        fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType, this, null);
+                    FieldReference fr = field;
+                    if (typeRef.IsGenericInstance)
                     {
-                        enumType = fieldTypes [ idx - FieldStartIndex ];
+                        fr = new FieldReference(field.Name, fieldTypes[idx - FieldStartIndex].ToTypeReference(appdomain.LoadedModules[0]), typeRef);
+                    }
+                    fieldReferences[idx - FieldStartIndex] = fr;
+                    fieldDefinitions[idx - FieldStartIndex] = field;
+                    if (IsEnum)
+                    {
+                        enumType = fieldTypes[idx - FieldStartIndex];
                     }
                     idx++;
                 }
@@ -1190,7 +1279,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 for ( int i = 0; i < this.genericArguments.Length; i++ )
                 {
-                    if ( this.genericArguments [ i ].Key == key )
+                    if ( this.genericArguments [ i ].Key == key)
                     {
                         return this.genericArguments [ i ].Value;
                     }
@@ -1280,7 +1369,15 @@ namespace ILRuntime.CLR.TypeSystem
                 bool match = true;
                 for ( int j = 0; j < genericArguments.Length; j++ )
                 {
-                    if ( i.genericArguments [ j ].Value != genericArguments [ j ].Value )
+                    if (i.genericArguments[j].Value is ILGenericParameterType ptA && genericArguments[j].Value is ILGenericParameterType ptB)
+                    {
+                        if(ptA.TypeReference != ptB.TypeReference)
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
+                    else if ( i.genericArguments [ j ].Value != genericArguments [ j ].Value )
                     {
                         match = false;
                         break;
@@ -1289,7 +1386,26 @@ namespace ILRuntime.CLR.TypeSystem
                 if ( match )
                     return i;
             }
-            var res = new ILType ( definition, appdomain );
+            GenericInstanceType def = new GenericInstanceType(typeRef);
+            foreach (var i in genericArguments)
+            {
+                TypeReference tRef = null;
+                if (i.Value is ILType ilType)
+                {
+                    tRef = ilType.typeRef;
+                }
+                else if (i.Value is ILGenericParameterType gpt)
+                {
+                    tRef = gpt.TypeReference;
+                }
+                else
+                {
+                    CLRType clrType = (CLRType)i.Value;
+                    tRef = appdomain.LoadedModules[0].ImportReference(clrType.TypeForCLR);
+                }
+                def.GenericArguments.Add(tRef);
+            }
+            var res = new ILType ( def, appdomain );
             res.genericDefinition = this;
             res.genericArguments = genericArguments;
 

@@ -141,7 +141,7 @@ namespace ILRuntime.Runtime.Debugger
                     ins = vmSymbol.Instruction;
                     sb.AppendLine(string.Format("{0}(JIT_{1:0000}:{2})", ins, frames[0].Address.Value, frames[0].Method.BodyRegister[frames[0].Address.Value]));
                 }
-                else
+                else if (frames[0].Method.Definition.Body.Instructions.Count > 0)
                 {
                     ins = frames[0].Method.Definition.Body.Instructions[frames[0].Address.Value];
                     sb.AppendLine(ins.ToString());
@@ -179,7 +179,7 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 else
                 {
-                    if (f.Address != null)
+                    if (f.Address != null && m.Definition.Body.Instructions.Count > 0)
                     {
                         ins = m.Definition.Body.Instructions[f.Address.Value];
                         var md = m.Definition;

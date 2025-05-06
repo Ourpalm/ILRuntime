@@ -1,4 +1,5 @@
-﻿using ILRuntime.Runtime.Stack;
+﻿using ILRuntime.Mono.Cecil;
+using ILRuntime.Runtime.Stack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +12,29 @@ namespace ILRuntime.CLR.TypeSystem
         string name;
         bool isArray, isByRef;
         ILGenericParameterType arrayType, byrefType, elementType;
+        TypeReference reference;
         public ILGenericParameterType(string name)
         {
             this.name = name;
         }
+
+        public ILGenericParameterType(TypeReference tr)
+        {
+            name = tr.Name;
+            reference = tr;
+        }
+
         public bool IsGenericInstance
         {
             get { return false; }
+        }
+
+        public TypeReference TypeReference
+        {
+            get
+            {
+                return reference;
+            }
         }
 
         public KeyValuePair<string, IType>[] GenericArguments

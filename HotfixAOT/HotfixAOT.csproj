@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <Configurations>Debug;Release;Release_Patched</Configurations>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release_Patched|netstandard2.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);PATCHED</DefineConstants>
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release_Patched|net8.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);PATCHED</DefineConstants>
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ILRuntime\ILRuntime.csproj" />
+  </ItemGroup>
+
+</Project>

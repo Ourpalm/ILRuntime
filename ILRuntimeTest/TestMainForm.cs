@@ -132,7 +132,7 @@ namespace ILRuntimeTest
                 Properties.Settings.Default["assembly_path"] = txtPath.Text;
                 Properties.Settings.Default.Save();
                 session = new TestSession();
-                session.Load(txtPath.Text, cbEnableRegVM.Checked);
+                session.Load(txtPath.Text, "../../../../HotfixAOT/Patched/HotfixAOT.patch", cbEnableRegVM.Checked);
                 _isLoadAssembly = true;
                 LoadTest();
                 UpdateBtnState();

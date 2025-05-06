@@ -314,7 +314,7 @@ namespace ILRuntime.Runtime.Enviorment
             paramCnt++;
         }
 
-        public void PushValueType<T>(ref T obj)
+        internal static StackObject* PushValueTypeSub<T>(ref T obj, StackObject* esp, Runtime.Enviorment.AppDomain domain, ILIntepreter intp, AutoList mStack, bool useRegister)
         {
             Type t = typeof(T);
             bool needPush = false;
@@ -339,7 +339,12 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 res = ILIntepreter.PushObject(esp, mStack, obj, true);
             }
-            esp = res;
+            return res;
+        }
+
+        public void PushValueType<T>(ref T obj)
+        {
+            esp = PushValueTypeSub(ref obj, esp, domain, intp, mStack, useRegister);
             paramCnt++;
         }
 
@@ -362,6 +367,11 @@ namespace ILRuntime.Runtime.Enviorment
             if (useRegister)
                 mStack.Add(null);
             esp++;
+        }
+
+        public void PushParameter<T>(T val)
+        {
+            PushParameter(GetInvocationType<T>(), val);
         }
 
         internal void PushParameter<T>(InvocationTypes type, T val)
@@ -389,6 +399,31 @@ namespace ILRuntime.Runtime.Enviorment
                 default:
                     PushObject(val);
                     break;
+            }
+        }
+
+        public T ReadResult<T>()
+        {
+            return ReadResult<T>(GetInvocationType<T>());
+        }
+
+        public T ReadResult<T>(int index)
+        {
+            var type = GetInvocationType<T>();
+            switch (type)
+            {
+                case InvocationTypes.Integer:
+                    return PrimitiveConverter<T>.CheckAndInvokeFromInteger(ReadInteger(index));
+                case InvocationTypes.Long:
+                    return PrimitiveConverter<T>.CheckAndInvokeFromLong(ReadLong(index));
+                case InvocationTypes.Float:
+                    return PrimitiveConverter<T>.CheckAndInvokeFromFloat(ReadFloat(index));
+                case InvocationTypes.Double:
+                    return PrimitiveConverter<T>.CheckAndInvokeFromDouble(ReadDouble(index));
+                case InvocationTypes.ValueType:
+                    return ReadValueType<T>(index);
+                default:
+                    return ReadObject<T>(index);
             }
         }
 
@@ -486,7 +521,7 @@ namespace ILRuntime.Runtime.Enviorment
             CheckReturnValue();
             return *(double*)&esp->Value;
         }
-        public double ReaDouble(int index)
+        public double ReadDouble(int index)
         {
             var esp = ILIntepreter.Add(ebp, index);
             return *(double*)&esp->Value;
@@ -507,9 +542,14 @@ namespace ILRuntime.Runtime.Enviorment
             return esp->Value == 1;
         }
 
-        public T ReadValueType<T>()
+        public T ReadValueType<T>(int index)
         {
-            CheckReturnValue();
+            var esp = ILIntepreter.Add(ebp, index);
+            return ReadValueTypeSub<T>(esp, domain, intp, mStack);
+        }
+
+        internal static T ReadValueTypeSub<T>(StackObject* val, Runtime.Enviorment.AppDomain domain, ILIntepreter intp, AutoList mStack)
+        {
             Type t = typeof(T);
             T res = default(T);
             ValueTypeBinder binder;
@@ -518,14 +558,20 @@ namespace ILRuntime.Runtime.Enviorment
                 var binderT = binder as ValueTypeBinder<T>;
                 if (binderT != null)
                 {
-                    binderT.ParseValue(ref res, intp, esp, mStack);
+                    binderT.ParseValue(ref res, intp, val, mStack);
                 }
                 else
-                    res = (T)t.CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
+                    res = (T)t.CheckCLRTypes(StackObject.ToObject(val, domain, mStack));
             }
             else
-                res = (T)t.CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
+                res = (T)t.CheckCLRTypes(StackObject.ToObject(val, domain, mStack));
             return res;
+        }
+
+        public T ReadValueType<T>()
+        {
+            CheckReturnValue();
+            return ReadValueTypeSub<T>(esp, domain, intp, mStack);
         }
 
         public T ReadObject<T>()

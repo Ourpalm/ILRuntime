@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PatchTool": {
+      "commandName": "Project",
+      "commandLineArgs": "-i -p -o HotfixAOT.dll ../../../../HotfixAOT/bin/Release/net8.0/HotfixAOT.dll"
+    }
+  }
+}

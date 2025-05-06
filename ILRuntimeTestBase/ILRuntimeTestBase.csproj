@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="HotfixAOT">
+      <HintPath>..\HotfixAOT\Patched\HotfixAOT.dll</HintPath>
+    </Reference>
     <Reference Include="ILRuntime.Mono.Cecil">
       <HintPath>..\Dependencies\ILRuntime.Mono.Cecil.dll</HintPath>
     </Reference>

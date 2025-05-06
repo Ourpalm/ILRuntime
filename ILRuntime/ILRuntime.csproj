@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NET_4_6</DefineConstants>
   </PropertyGroup>
@@ -14,6 +14,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;NET_4_6;NO_PROFILER;OUTPUT_JIT_RESULT</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Patched|AnyCPU'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET_4_6</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using HotfixAOT;
 using ILRuntime.CLR.TypeSystem;
+using ILRuntime.Hybrid;
 using ILRuntimeTest.Test;
 using ILRuntimeTest.TestFramework;
 
@@ -12,10 +14,10 @@ namespace ILRuntimeTest.TestBase
     public class TestSession 
     {
         ILRuntime.Runtime.Enviorment.AppDomain _app;
-        private List<BaseTestUnit> _testUnitList = new List<BaseTestUnit>();
+        private List<ITestable> _testUnitList = new List<ITestable>();
         FileStream fs, fs2;
 
-        public List<BaseTestUnit> TestList => _testUnitList;
+        public List<ITestable> TestList => _testUnitList;
 
         static TestSession lastSession;
 
@@ -23,7 +25,7 @@ namespace ILRuntimeTest.TestBase
 
         public ILRuntime.Runtime.Enviorment.AppDomain Appdomain => _app;
 
-        public void Load(string assemblyPath, bool useRegister)
+        public void Load(string assemblyPath, string patchPath, bool useRegister)
         {
             fs = new FileStream(assemblyPath, FileMode.Open, FileAccess.Read);
             {
@@ -61,6 +63,16 @@ namespace ILRuntimeTest.TestBase
                 _app.InitializeBindings(true);
                 LoadTest();
             }
+            using (fs = new FileStream(patchPath, FileMode.Open))
+            {
+                var patch = AssemblyPatch.LoadFromStream(fs);
+                patch.PatchAssembly(typeof(HotfixClass).Assembly, _app);
+                foreach (var i in HotfixAOT.AllTestCases.GetAllTestCases())
+                {
+                    _testUnitList.Add(new HotfixTestUnit(i, true));
+                }
+            }
+
             lastSession = this;
         }
 

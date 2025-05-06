@@ -2,13 +2,42 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using ILRuntime.CLR.TypeSystem;
+using ILRuntime.Hybrid;
+using ILRuntime.Mono.Cecil;
 using ILRuntime.Runtime.Stack;
 
 namespace ILRuntime.Runtime
 {
     public static class Extensions
     {
+        public static TypeReference ToTypeReference(this IType type, ModuleDefinition mr)
+        {
+            if (type is ILType ilType)
+            {
+                return ilType.TypeReference;
+            }
+            else if (type is CLRType clrType)
+            {
+                if (type.IsGenericInstance)
+                {
+                    var gd = mr.ImportReference(clrType.TypeForCLR.GetGenericTypeDefinition());
+
+                    TypeReference[] ga = new TypeReference[type.GenericArguments.Length];
+                    for (int i = 0; i < type.GenericArguments.Length; i++)
+                    {
+                        ga[i] = type.GenericArguments[i].Value.ToTypeReference(mr);
+                    }
+                    return gd.MakeGenericInstanceType(ga);
+                }
+                return mr.ImportReference(clrType.TypeForCLR);
+            }
+            else
+            {
+                ILGenericParameterType gpt = (ILGenericParameterType)type;
+                return gpt.TypeReference;
+            }
+        }
         public static bool GetJITFlags(this Mono.Cecil.CustomAttribute attribute, Enviorment.AppDomain appdomain, out int flags)
         {
             var at = appdomain.GetType(attribute.AttributeType, null, null);

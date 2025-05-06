@@ -42,7 +42,7 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
-                return def.Name;
+                return def != null ? def.Name : cDef.Name;
             }
         }
         public bool HasThis
@@ -156,7 +156,7 @@ namespace ILRuntime.CLR.Method
             this.def = def;
             declaringType = type;
             this.appdomain = domain;
-            if (!def.ContainsGenericParameters)
+            if (!def.ReturnType.ContainsGenericParameters)
             {
                 ReturnType = domain.GetType(def.ReturnType.FullName);
                 if (ReturnType == null)
