@@ -16,6 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
+        lfs: true
         dotnet-version: |
           8.0.x
     - name: Build Test Cases
