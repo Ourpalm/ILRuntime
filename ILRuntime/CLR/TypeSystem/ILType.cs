@@ -34,6 +34,7 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, int> fieldTokenMapping = new Dictionary<int, int> ();
         int fieldStartIdx = -1;
         int totalFieldCnt = -1;
+        bool hasGenericArguments;
         KeyValuePair<string, IType> [] genericArguments;
         IType baseType, byRefType, enumType, elementType;
         Dictionary<int, IType> arrayTypes;
@@ -224,6 +225,8 @@ namespace ILRuntime.CLR.TypeSystem
         {
             get
             {
+                if (genericArguments != null)
+                    return hasGenericArguments;
                 return typeRef.HasGenericParameters && genericArguments == null;
             }
         }
@@ -1408,7 +1411,14 @@ namespace ILRuntime.CLR.TypeSystem
             var res = new ILType ( def, appdomain );
             res.genericDefinition = this;
             res.genericArguments = genericArguments;
-
+            foreach (var i in genericArguments)
+            {
+                if (i.Value.HasGenericParameter)
+                {
+                    res.hasGenericArguments = true;
+                    break;
+                }
+            }
             genericInstances.Add ( res );
             return res;
         }

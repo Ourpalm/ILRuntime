@@ -309,9 +309,26 @@ namespace ILRuntime.CLR.Method
                         return i.Value;
                 }
             }
-            else
-                return res;
-            return null;
+            if (res == null && def.HasGenericParameters)
+            {
+                bool found = false;
+                TypeReference pt = null;
+                foreach (var j in def.GenericParameters)
+                {
+                    if (j.Name == name)
+                    {
+                        found = true;
+                        pt = j;
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    res = new ILGenericParameterType(pt);
+                }
+            }
+            return res;
+            
         }
 
         internal OpCode[] Body
@@ -994,23 +1011,9 @@ namespace ILRuntime.CLR.Method
                 if (pt.IsGenericParameter)
                 {
                     type = FindGenericArgument(pt.Name);
-                    if (type == null && def.HasGenericParameters)
+                    if (type == null)
                     {
-                        bool found = false;
-                        foreach (var j in def.GenericParameters)
-                        {
-                            if (j.Name == pt.Name)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found)
-                        {
-                            type = new ILGenericParameterType(pt);
-                        }
-                        else
-                            throw new NotSupportedException("Cannot find Generic Parameter " + pt.Name + " in " + def.FullName);
+                        throw new NotSupportedException("Cannot find Generic Parameter " + pt.Name + " in " + def.FullName);
                     }
                 }
                 else

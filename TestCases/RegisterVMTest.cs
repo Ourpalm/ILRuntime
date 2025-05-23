@@ -32,6 +32,86 @@ namespace TestCases
             }
         }
 
+        public static void RegisterVMTest03()
+        {
+            Bug779.instance.Init();
+        }
+
+        public class SqlData3 { }
+        public class ILObject3 { }
+        public class ScrollItem3 { }
+        public abstract class ILScrollRect3
+        {
+
+            public abstract void Clear(bool isClear = true);
+
+        }
+        public class ILScrollRect3<T> : ILScrollRect3 where T : ScrollItem3, new()
+        {
+
+            public List<T> list;
+            public ILScrollRect3(Object transform, bool enableTab = false, bool isClear = true)
+            {
+
+                list = new List<T>();
+
+                //重置
+                Clear(isClear);
+
+
+            }
+
+            public override void Clear(bool isClear = true)
+            {
+
+                Console.WriteLine("list 在构造方法中 有创建，不可能 为 null, 但是确实为null 下方打印 如果为 true 为null");
+                Console.WriteLine(list == null);
+                for (int i = list.Count - 1; i >= 0; i--) Del(list[i]);
+
+            }
+
+            public void Del(T item) { }
+            public virtual void ToLowerAddSqlDataItem<K, V>(Func<V, string> whereSql, string orderSql, int addCount, int maxCount) where K : SqlData3, new() where V : ILObject3
+            {
+            }
+            public virtual void ToUpperAddSqlDataItem<K, V>(Func<V, string> whereSql, string orderSql, int addCount, int maxCount) where K : SqlData3, new() where V : ILObject3
+            {
+            }
+            public virtual V ToLowerFindListData<V>() where V : ILObject3
+            {
+                return null;
+            }
+            public virtual V ToUpperFindListData<V>() where V : ILObject3
+            {
+                return null;
+            }
+
+        }
+        public class ILScrollTop3 : ILScrollRect3<ScrollItem3>
+        {
+            public Action callback;
+            public ILScrollTop3(Object transform, Action callback = null) : base(transform, false, true)
+            {
+                this.callback = callback;
+            }
+
+        }
+
+        public class Bug779
+        {
+
+            public static Bug779 instance = new Bug779();
+            public void Init()
+            {
+
+                //获取
+                ILScrollTop3 scrollTop = new ILScrollTop3(null);
+                scrollTop.Clear();
+                return;
+
+            }
+
+        }
         class InlineTest
         {
             int a;
