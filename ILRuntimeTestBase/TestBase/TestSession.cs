@@ -38,7 +38,7 @@ namespace ILRuntimeTest.TestBase
                     pdbPath = Path.Combine(path, name) + ".mdb";
                 }
 
-                _app = new ILRuntime.Runtime.Enviorment.AppDomain(useRegister ? ILRuntime.Runtime.ILRuntimeJITFlags.JITImmediately : ILRuntime.Runtime.ILRuntimeJITFlags.None);
+                _app = new ILRuntime.Runtime.Enviorment.AppDomain(useRegister ? ILRuntime.Runtime.ILRuntimeJITFlags.JITImmediately : ILRuntime.Runtime.ILRuntimeJITFlags.JITOnDemand);
                 try
                 {
                     ILRuntime.Runtime.Debugger.DebuggerServer.GetProjectNameFunction = () => "ILRuntimeTest";

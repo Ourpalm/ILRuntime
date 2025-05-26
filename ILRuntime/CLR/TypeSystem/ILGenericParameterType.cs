@@ -129,7 +129,8 @@ namespace ILRuntime.CLR.TypeSystem
         {
             if (byrefType == null)
             {
-                byrefType = new ILGenericParameterType(name + "&");
+                TypeReference tr = new ByReferenceType(reference);
+                byrefType = new ILGenericParameterType(tr);
                 byrefType.isByRef = true;
                 byrefType.elementType = this;
             }
@@ -146,7 +147,8 @@ namespace ILRuntime.CLR.TypeSystem
         {
             if (arrayType == null)
             {
-                arrayType = new ILGenericParameterType(name + "[]");
+                TypeReference tr = new ArrayType(reference, rank);
+                arrayType = new ILGenericParameterType(tr);
                 arrayType.isArray = true;
                 arrayType.elementType = this;
             }

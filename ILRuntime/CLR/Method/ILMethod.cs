@@ -205,7 +205,7 @@ namespace ILRuntime.CLR.Method
         {
             this.reference = reference;
             def = md;
-            if (type.HasGenericParameter)
+            if (type.HasGenericParameter && !type.IsGenericInstance)
             {
                 KeyValuePair<string, IType>[] gas = new KeyValuePair<string, IType>[type.TypeDefinition.GenericParameters.Count];
                 for(int i = 0; i < gas.Length; i++)

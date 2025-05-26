@@ -884,6 +884,14 @@ namespace ILRuntime.CLR.TypeSystem
 
         }
 
+        bool CheckTypeEqual(IType typeA, IType typeB)
+        {
+            if (typeA is ILGenericParameterType pt1 && typeB is ILGenericParameterType pt2)
+                return pt1 == pt2 || pt1.TypeReference == pt2.TypeReference || pt1.Name == pt2.Name;
+            else
+                return typeA == typeB;
+        }
+
         public IMethod GetMethod ( string name, List<IType> param, IType [] genericArguments, IType returnType = null, bool declaredOnly = false )
         {
             if ( methods == null )
@@ -910,7 +918,7 @@ namespace ILRuntime.CLR.TypeSystem
                                 continue;
                             for ( int j = 0; j < pCnt; j++ )
                             {
-                                if ( param [ j ] != i.Parameters [ j ] )
+                                if (!CheckTypeEqual(param[j], i.Parameters[j]))
                                 {
                                     match = false;
                                     break;
@@ -918,7 +926,7 @@ namespace ILRuntime.CLR.TypeSystem
                             }
                             if ( match )
                             {
-                                match = returnType == null || i.ReturnType == returnType;
+                                match = returnType == null || CheckTypeEqual(i.ReturnType, returnType);
                             }
                             if ( match )
                                 return i;
