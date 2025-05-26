@@ -39,49 +39,42 @@ namespace TestCases
             Bug779.instance.Init();
         }
 
+        [ILRuntimeJIT(ILRuntimeJITFlags.JITImmediately)]
         public static void RegisterVMTest04()
         {
-            byte[] data = new byte[800];
-            ByteArray sd_data = new ByteArray(data);
-            sd_data.Uncompress();
-
             Bug778.instance.Init();
         }
         public class Bug778
         {
 
-            public int version = 15;
-            public ILScrollRect2<TopPetItem2> attrView;
             public ILScrollRect2<ScrollItem2> skillView;
-            public ILButton2 attrButton;
             public ILButton2 skillButton;
-
+            Action viewRectEvent;
             public static Bug778 instance = new Bug778();
 
             /// <summary>
             /// INIT
             /// </summary>
+            [ILRuntimeJIT(ILRuntimeJITFlags.JITImmediately)]
             public void Init()
             {
-
-                Console.WriteLine(version);
-
-                attrView = new ILScrollRect2<TopPetItem2>();
                 skillView = new ILScrollRect2<ScrollItem2>();
-                attrButton = new ILButton2();
-                attrButton.onClick = SetAttrFrame;
                 skillButton = new ILButton2();
                 skillButton.onClick = SetSkillFrame;
-                for (int i = 0; i < 100; i++) attrButton.SetStateEvent(1);
-                for (int i = 0; i < 40; i++) skillButton.SetStateEvent(1);
-
-
+                //for (int i = 0; i < 20; i++)
+                skillButton.SetStateEvent(1);
             }
 
-            public void SetAttrFrame(int state, ILButton2 item)
+            [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
+            public void SetViewRect(ChangeType2 type = ChangeType2.TopUp,
+                                             bool isAnim = false,
+                                             bool isJudgeEmpty = true,
+                                             Action action = null)
             {
-                attrView.SetViewRect(ChangeType2.TopUp);
+                viewRectEvent = action;
             }
+
+            [ILRuntimeJIT(ILRuntimeJITFlags.JITImmediately)]
             public void SetSkillFrame(int state, ILButton2 item)
             {
                 skillView.SetViewRect(ChangeType2.TopUp);
@@ -98,11 +91,14 @@ namespace TestCases
             public Action viewRectEvent;
             public abstract void SetViewRect(ChangeType2 type = ChangeType2.TopUp, bool isAnim = false, bool isJudgeEmpty = true, Action action = null);
         }
+        [ILRuntimeJIT(ILRuntimeJITFlags.JITImmediately)]
+
         public class ILScrollRect2<T> : ILScrollRect2 where T : ScrollItem2, new()
         {
             public ILScrollRect2() { }
 
             //把 Action = null 删除掉  报错停止
+            [ILRuntimeJIT(ILRuntimeJITFlags.NoJIT)]
             public override void SetViewRect(ChangeType2 type = ChangeType2.TopUp,
                                              bool isAnim = false,
                                              bool isJudgeEmpty = true,
@@ -133,11 +129,13 @@ namespace TestCases
             }
 
         }
+        [ILRuntimeJIT(ILRuntimeJITFlags.JITImmediately)]
         public class ILButton2
         {
 
             public Action<int, ILButton2> onClick;
             public ILButton2() { }
+
             public virtual void SetStateEvent(int state)
             {
                 onClick?.Invoke(state, this);
@@ -311,107 +309,6 @@ namespace TestCases
                 return null;
 
             }
-        }
-
-        public class DynamicArray<T>
-        {
-            protected int m_capcity;
-            protected T[] m_data;
-            protected int m_size;
-
-            public DynamicArray()
-            {
-                this.m_data = null;
-                this.m_size = 0;
-                this.m_capcity = 0;
-                this.capcity = 0x20;
-            }
-            public DynamicArray(int cap)
-            {
-                this.m_data = null;
-                this.m_size = 0;
-                this.m_capcity = 0;
-                this.capcity = cap;
-            }
-
-            public void PushBack(T[] v, int count)
-            {
-                int capcity = this.m_capcity;
-                while (capcity < (this.m_size + count))
-                {
-                    capcity *= 2;
-                }
-                this.capcity = capcity;
-                for (int i = 0; i < count; i++)
-                {
-                    int size = this.m_size;
-                    this.m_size = size + 1;
-                    this.m_data[size] = v[i];
-                }
-            }
-            public int capcity
-            {
-                get
-                {
-                    return this.m_capcity;
-                }
-                set
-                {
-                    if (this.m_capcity < value)
-                    {
-                        T[] array = new T[value];
-                        if (this.m_data != null)
-                        {
-                            this.m_data.CopyTo(array, 0);
-                        }
-                        this.m_data = array;
-                        this.m_capcity = value;
-                    }
-                }
-            }
-        }
-        public class ByteArray : DynamicArray<byte>
-        {
-
-            public ByteArray(byte[] d)
-            {
-                base.m_data = d.Clone() as byte[];
-                base.m_size = d.Length;
-                base.m_capcity = d.Length;
-            }
-
-            public bool Uncompress()
-            {
-
-                MemoryStream stream = new MemoryStream(m_data);
-                DynamicArray<byte> array = new DynamicArray<byte>();
-                int count = 0;
-                byte[] buffer = new byte[0x800];
-
-
-                goto Label_0050;
-            Label_0028:
-                count = stream.Read(buffer, 0, buffer.Length);
-                if (count > 0)
-                {
-                    array.PushBack(buffer, count);
-                }
-                else
-                {
-                    goto Label_0055;
-                }
-            Label_0050:
-                goto Label_0028;
-
-            Label_0055:
-                stream.Close();
-
-
-
-
-                return true;
-            }
-
         }
     }
 }

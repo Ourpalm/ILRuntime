@@ -2918,23 +2918,22 @@ namespace ILRuntime.Runtime.Intepreter
                                                         useRegister = ilm.ShouldUseRegisterVM;
                                                     }
                                                 }
-                                                if (shouldFix)
+                                                if (useRegister)
                                                 {
-                                                    if (useRegister)
+                                                    if (shouldFix)
                                                     {
                                                         for (intVal = 0; intVal < objCnt; intVal++)
                                                         {
                                                             mStack.Add(null);
                                                         }
                                                     }
-                                                    else
-                                                        mStack.RemoveRange(mStack.Count - objCnt, objCnt);
-                                                }
-                                                if (useRegister)
                                                     esp = ExecuteR(ilm, esp, out unhandledException);
+                                                }
                                                 else
                                                 {
                                                     esp = Execute(ilm, esp, out unhandledException);
+                                                    if (shouldFix)
+                                                        mStack.RemoveRange(mStack.Count - objCnt, objCnt);
                                                 }
                                                 ValueTypeBasePointer = bp;
                                                 if (unhandledException)
