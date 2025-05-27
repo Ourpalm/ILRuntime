@@ -11,8 +11,6 @@ using ILRuntime.Runtime.Stack;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Utils;
-using System.Collections;
-
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
@@ -189,7 +187,9 @@ namespace ILRuntime.Runtime.Intepreter
             float floatVal = 0;
             double doubleVal = 0;
             IType type;
+            CLRMethod cm;
             Type clrType;
+            IMethod m;
 
             fixed (OpCodeR* ptr = body)
             {
@@ -2796,10 +2796,50 @@ namespace ILRuntime.Runtime.Intepreter
                                         continue;
                                     }
                                 }
+                            case OpCodeREnum.Call_Redirect:
+                                {
+                                    cm = domain.GetMethod(ip->Operand2) as CLRMethod;
+                                    if (cm != null)
+                                    {
+                                        var hasConstrained = (ip->Operand4 & 0x1) == 0x1;
+                                        var isNewObj = (ip->Operand4 & 0x2) == 0x2;
+                                        var needPop = (ip->Operand4 & 0x4) == 0x4;
+                                        if (!hasConstrained)
+                                        {
+                                            if (ip->Register2 >= 0)
+                                            {
+                                                reg1 = (r + ip->Register2);
+                                                CopyToStack(esp, reg1, mStack);
+                                                esp++;
+                                            }
+                                            if (ip->Register3 >= 0)
+                                            {
+                                                reg1 = (r + ip->Register3);
+                                                CopyToStack(esp, reg1, mStack);
+                                                esp++;
+                                            }
+                                            if (ip->Register4 >= 0)
+                                            {
+                                                reg1 = (r + ip->Register4);
+                                                CopyToStack(esp, reg1, mStack);
+                                                esp++;
+                                            }
+                                        }
+                                        var redirect = cm.Redirection;
+                                        esp = redirect(this, esp, mStack, cm, isNewObj);
+                                        if (isNewObj || needPop)
+                                        {
+                                            esp = PopToRegister(ref info, ip->Register1, esp);
+                                        }
+                                    }
+                                    else
+                                        throw new NotSupportedException();
+                                }
+                                break;
                             case OpCodeREnum.Call:
                             case OpCodeREnum.Callvirt:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand2);
+                                    m = domain.GetMethod(ip->Operand2);
                                     if (m == null)
                                     {
                                         //Irrelevant method
@@ -2942,7 +2982,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                         else
                                         {
-                                            CLRMethod cm = (CLRMethod)m;
+                                            cm = (CLRMethod)m;
                                             bool processed = false;
                                             if (cm.IsDelegateInvoke)
                                             {
@@ -3300,7 +3340,7 @@ namespace ILRuntime.Runtime.Intepreter
                             #region Initialization & Instantiation
                             case OpCodeREnum.Newobj:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand2);
+                                    m = domain.GetMethod(ip->Operand2);
                                     if (m is ILMethod)
                                     {
                                         type = m.DeclearingType as ILType;
@@ -3470,7 +3510,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        CLRMethod cm = (CLRMethod)m;
+                                        cm = (CLRMethod)m;
                                         //Means new object();
                                         if (cm == null)
                                         {
@@ -3840,7 +3880,7 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Constrained:
                                 {
                                     type = domain.GetType(ip->Operand);
-                                    var m = domain.GetMethod((int)ip->Operand2);
+                                    m = domain.GetMethod((int)ip->Operand2);
                                     var pCnt = m.ParameterCount;
                                     objRef = esp - (pCnt + 1);
                                     var insIdx = mStack.Count;
@@ -4465,13 +4505,13 @@ namespace ILRuntime.Runtime.Intepreter
 
                             case OpCodeREnum.Ldftn:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand2);
+                                    m = domain.GetMethod(ip->Operand2);
                                     AssignToRegister(ref info, ip->Register1, m);
                                 }
                                 break;
                             case OpCodeREnum.Ldvirtftn:
                                 {
-                                    IMethod m = domain.GetMethod(ip->Operand2);
+                                    m = domain.GetMethod(ip->Operand2);
                                     objRef = (r + ip->Register2);
                                     if (m is ILMethod)
                                     {

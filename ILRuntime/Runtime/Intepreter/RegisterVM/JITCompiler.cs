@@ -541,6 +541,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         baseRegIdx -= (short)pCnt;
                         op.Register1 = baseRegIdx++;
+                        if (m is CLRMethod cm && cm.Redirection != null)
+                        {
+                            if (!cm.DeclearingType.IsDelegate)
+                            {
+                                op.Code = OpCodeREnum.Call_Redirect;
+                                op.Operand4 = 0x2;
+                                var rCnt = cm.ParameterCount;
+                                rCnt = rCnt - Math.Max((rCnt - CallRegisterParamCount), 0);
+
+                                op.Operand4 |= (short)rCnt << 16;
+                            }
+                        }
                     }
                     break;
                 case Code.Call:
@@ -615,6 +627,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Register1 = baseRegIdx++;
                             else
                                 op.Register1 = -1;
+                            if (m is CLRMethod cm && cm.Redirection != null)
+                            {
+                                if (!cm.IsDelegateInvoke && !cm.IsDelegateDynamicInvoke)
+                                {
+                                    op.Code = OpCodeREnum.Call_Redirect;
+                                    op.Operand4 = 0;
+                                    if (hasConstrained)
+                                        op.Operand4 |= 0x1;
+                                    if (cm.ReturnType != appdomain.VoidType && !cm.IsConstructor)
+                                        op.Operand4 |= 0x4;
+
+                                    var rCnt = cm.HasThis ? cm.ParameterCount + 1 : cm.ParameterCount;
+                                    rCnt = rCnt - Math.Max((rCnt - CallRegisterParamCount), 0);
+
+                                    op.Operand4 |= (short)rCnt << 16;
+                                }
+                            }
                         }
                         else
                         {

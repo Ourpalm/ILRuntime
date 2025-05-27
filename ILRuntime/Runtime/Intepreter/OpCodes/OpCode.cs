@@ -335,6 +335,40 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                         }
                     }
                     break;
+
+                case OpCodeREnum.Call_Redirect:
+                    {
+                        string retR = Register1 >= 0 ? "r" + Register1 : "-";
+                        if (Register2 >= 0)
+                            retR += ", r" + Register2;
+                        if (Register3 >= 0)
+                            retR += ", r" + Register3;
+                        if (Register4 >= 0)
+                            retR += ", r" + Register4;
+
+                        string flags = "";
+                        if ((Operand4 & 0x2) == 0x2)
+                            flags = "c";
+                        else
+                            flags = "m";
+                        if ((Operand4 & 0x1) == 0x1)
+                            flags += "t";
+                        if ((Operand4 & 0x4) == 0x4)
+                            flags += "r";
+                        if (domain == null)
+                        {
+                            param = string.Format("{0}, {1}({2})", retR, Operand2, flags);
+                        }
+                        else
+                        {
+                            IMethod m = domain.GetMethod(Operand2);
+                            if (m is CLR.Method.CLRMethod)
+                                param = m != null ? string.Format("{0}, {1}::{2}({3})", retR, m.DeclearingType.FullName, m, flags) : string.Format("{0}, {1}({2})", retR, Operand2, flags);
+                            else
+                                param = m != null ? string.Format("{0}, {1}({2})", retR, m, flags) : string.Format("{0}, {1}({2})", retR, Operand2, flags);
+                        }
+                    }
+                    break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Newobj:

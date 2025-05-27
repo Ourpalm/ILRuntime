@@ -38,6 +38,12 @@ namespace ILRuntimeTest
 
             listView1.Columns.AddRange(row1);
             listView1.View = View.Details;
+            this.Disposed += TestMainForm_Disposed;
+        }
+
+        private void TestMainForm_Disposed(object sender, EventArgs e)
+        {
+            session?.Dispose();
         }
 
         private void OnBtnRun(object sender, EventArgs e)

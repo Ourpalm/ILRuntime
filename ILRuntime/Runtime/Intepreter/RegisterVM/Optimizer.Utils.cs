@@ -496,6 +496,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Constrained:
                     return false;
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Newobj:
                     r1 = op.Register2;
@@ -704,6 +705,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldc_R4:
                 case OpCodeREnum.Ldc_R8:
                 case OpCodeREnum.Ldstr:
+                case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Callvirt:
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Newobj:
@@ -1065,6 +1067,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Newobj:
 
                     switch (idx)
@@ -1228,6 +1231,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Unbox_Any:
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Newobj:
                 case OpCodeREnum.Ldind_I:
                 case OpCodeREnum.Ldind_I1:

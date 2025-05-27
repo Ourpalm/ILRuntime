@@ -924,5 +924,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         Shli,
         Shri,
         Shri_Un,
+        /// <summary>
+        /// 直接调用CLRRedirection
+        /// </summary>
+        Call_Redirect,
     }
 }
