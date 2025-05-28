@@ -29,6 +29,9 @@ namespace ILRuntime.Runtime.Intepreter
         public StackObject* RegisterStart;
         public StackObject* StackRegisterStart;
         public StackObject* RegisterEnd;
+#if UNITY_2021_1_OR_NEWER
+        [System.NonSerialized]
+#endif
         public AutoList ManagedStack;
     }
     public unsafe partial class ILIntepreter
