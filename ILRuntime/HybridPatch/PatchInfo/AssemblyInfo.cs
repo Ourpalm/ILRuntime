@@ -697,7 +697,7 @@ namespace ILRuntime.Hybrid
 
         public AssemblyDefinition Assembly { get; private set; }
 
-        public static AssemblyHashInfo BuildHashInfo(AssemblyDefinition asm)
+        public static AssemblyHashInfo BuildHashInfo(AssemblyDefinition asm, IPatchSettings settings)
         {
             AssemblyHashInfo info = new AssemblyHashInfo();
             info.Name = asm.FullName;
@@ -711,7 +711,7 @@ namespace ILRuntime.Hybrid
                 List<TypeHashInfo> types = new List<TypeHashInfo>();
                 foreach (var i in mainModule.Types)
                 {
-                    AddTypeInfo(i, types, ref typeIdx, ref fieldIdx, ref methodIdx, false);
+                    AddTypeInfo(i, types, ref typeIdx, ref fieldIdx, ref methodIdx, false, settings);
                 }
                 info.Types = types.ToArray();
             }
@@ -736,15 +736,15 @@ namespace ILRuntime.Hybrid
             return info;
         }
 
-        static void AddTypeInfo(TypeDefinition type, List<TypeHashInfo> types, ref int typeIdx, ref int fieldIdx, ref int methodIdx, bool forceInclude)
+        static void AddTypeInfo(TypeDefinition type, List<TypeHashInfo> types, ref int typeIdx, ref int fieldIdx, ref int methodIdx, bool forceInclude, IPatchSettings settings)
         {
-            
-            bool shoudInclude = forceInclude || type.ShouldIncludeInPatch();
+            bool shouldIncludeBySetting = settings !=null? settings.ShouldTypeIncludeInPatch(type) : false;
+            bool shoudInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
             if (shoudInclude)
-                types.Add(TypeHashInfo.BuildHashInfo(type, ref typeIdx, ref fieldIdx, ref methodIdx));
+                types.Add(TypeHashInfo.BuildHashInfo(type, ref typeIdx, ref fieldIdx, ref methodIdx, settings));
             foreach (var t in type.NestedTypes)
             {
-                AddTypeInfo(t, types, ref typeIdx, ref fieldIdx, ref methodIdx, shoudInclude);
+                AddTypeInfo(t, types, ref typeIdx, ref fieldIdx, ref methodIdx, shoudInclude, settings);
             }
         }
 
@@ -803,14 +803,15 @@ namespace ILRuntime.Hybrid
 
         public MethodHashInfo[] Methods { get; set; }
 
-        static void GetBaseTypeFields(TypeDefinition type, ref List<FieldDefinition> fields)
+        static void GetBaseTypeFields(TypeDefinition type, ref List<FieldDefinition> fields, IPatchSettings settings)
         {
             if (type.BaseType == null)
                 return;
             var baseType = type.BaseType.Resolve();
             if (baseType == null || baseType.ShouldIncludeInPatch())
                 return;
-
+            if (settings != null && settings.ShouldTypeIncludeInPatch(baseType))
+                return;
             if (baseType.Fields.Count > 0)
             {
                 if(fields == null)
@@ -821,11 +822,11 @@ namespace ILRuntime.Hybrid
                         fields.Add(i);
                 }
             }
-            GetBaseTypeFields(baseType, ref fields);
+            GetBaseTypeFields(baseType, ref fields, settings);
         }
         
 
-        public static TypeHashInfo BuildHashInfo(TypeDefinition type, ref int typeIdx, ref int fieldIdx, ref int methodIdx)
+        public static TypeHashInfo BuildHashInfo(TypeDefinition type, ref int typeIdx, ref int fieldIdx, ref int methodIdx, IPatchSettings settings)
         {
             MD5 md5 = MD5.Create();
             MemoryStream ms = new MemoryStream();
@@ -838,7 +839,7 @@ namespace ILRuntime.Hybrid
             info.Namespace = namesp;
             info.Index = typeIdx++;
             List<FieldDefinition> baseFields = null;
-            GetBaseTypeFields(type, ref baseFields);
+            GetBaseTypeFields(type, ref baseFields, settings);
             int baseFieldCnt = baseFields != null ? baseFields.Count : 0;
             info.Fields = new FieldHashInfo[type.Fields.Count + baseFieldCnt];
             for (int i = 0; i < type.Fields.Count; i++)

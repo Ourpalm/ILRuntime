@@ -539,18 +539,8 @@ namespace ILRuntime.Hybrid
         unsafe void ILRuntimeSetFieldValue(int fieldIdx, ILIntepreter intp, StackObject* esp, IList<object> mStack);
     }
 
-    public class TestPatch : IPatchableType
+    public interface IPatchSettings
     {
-        public ILTypeInstance ILRuntimeExtraFieldObject => throw new NotImplementedException();
-
-        public unsafe StackObject* ILRuntimeGetFieldValue(int fieldIdx, ILIntepreter intp, StackObject* esp, IList<object> mStack)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe void ILRuntimeSetFieldValue(int fieldIdx, ILIntepreter intp, StackObject* esp, IList<object> mStack)
-        {
-            throw new NotImplementedException();
-        }
+        bool ShouldTypeIncludeInPatch(TypeDefinition type);
     }
 }

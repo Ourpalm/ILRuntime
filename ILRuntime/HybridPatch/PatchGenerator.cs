@@ -20,21 +20,16 @@ namespace ILRuntime.Hybrid
         TypeReference byteArrayType;
 
         public bool HasPatch { get; private set; }
-        public PatchGenerator(Stream srcHash, Stream patchedAsm)
+        public PatchGenerator(Stream srcHash, Stream patchedAsm, IPatchSettings settings = null)
         {
-            LoadAssemblyHashInfo(srcHash, patchedAsm);
+            LoadAssemblyHashInfo(srcHash, patchedAsm, settings);
         }
 
-        public PatchGenerator(AssemblyHashInfo info, Stream patchAsm)
-        {
-            this.asmInfo = info;
-        }
-
-        void LoadAssemblyHashInfo(Stream srcAsm, Stream patchAsm)
+        void LoadAssemblyHashInfo(Stream srcAsm, Stream patchAsm, IPatchSettings settings)
         {          
             asmInfo = AssemblyHashInfo.FromStream(srcAsm);
             var def = AssemblyDefinition.ReadAssembly(patchAsm);
-            patchAsmInfo = AssemblyHashInfo.BuildHashInfo(def);
+            patchAsmInfo = AssemblyHashInfo.BuildHashInfo(def, settings);
 
             privateImplementationType = new TypePatchInfo()
             {

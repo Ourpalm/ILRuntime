@@ -35,7 +35,7 @@ namespace ILRuntime.Hybrid
 
         internal const string PatchTypeGetPatchableTypesMethodName = "GetPatchableTypes";
         internal const string PatchApplyPatchMethodName = "ApplyPatch";
-        AssemblyInjector(Stream srcAsm, Stream pdbStream, IAssemblyResolver resolver)
+        AssemblyInjector(Stream srcAsm, Stream pdbStream, IAssemblyResolver resolver, IPatchSettings settings)
         {
             if(resolver == null)
                 resolver = new DefaultAssemblyResolver();
@@ -52,7 +52,7 @@ namespace ILRuntime.Hybrid
             this.srcAsm = srcAsm;
             asm = AssemblyDefinition.ReadAssembly(srcAsm, readerParameters);
             module = asm.MainModule;
-            asmInfo = AssemblyHashInfo.BuildHashInfo(asm);
+            asmInfo = AssemblyHashInfo.BuildHashInfo(asm, settings);
         }
 
         public void Inject()
@@ -1218,9 +1218,9 @@ namespace ILRuntime.Hybrid
 
             return methodCtx;
         }
-        public static AssemblyInjector CreateInjector(Stream srcAsm, Stream pdbStream = null, IAssemblyResolver resolver = null)
+        public static AssemblyInjector CreateInjector(Stream srcAsm, Stream pdbStream = null, IPatchSettings settings = null, IAssemblyResolver resolver = null)
         {
-            return new AssemblyInjector(srcAsm, pdbStream, resolver);
+            return new AssemblyInjector(srcAsm, pdbStream, resolver, settings);
         }
     }
 }
