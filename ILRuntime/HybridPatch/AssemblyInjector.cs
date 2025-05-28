@@ -2,6 +2,7 @@
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Mono.Cecil.Cil;
+using ILRuntime.Mono.Cecil.Pdb;
 using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using System;
@@ -34,10 +35,22 @@ namespace ILRuntime.Hybrid
 
         internal const string PatchTypeGetPatchableTypesMethodName = "GetPatchableTypes";
         internal const string PatchApplyPatchMethodName = "ApplyPatch";
-        AssemblyInjector(Stream srcAsm)
+        AssemblyInjector(Stream srcAsm, Stream pdbStream, IAssemblyResolver resolver)
         {
+            if(resolver == null)
+                resolver = new DefaultAssemblyResolver();
+            bool hasSymbol = pdbStream != null;
+            ReaderParameters readerParameters = new ReaderParameters
+            {
+                InMemory = true,
+                ReadSymbols = hasSymbol,
+                SymbolReaderProvider = hasSymbol ? new PdbReaderProvider() : null,
+                AssemblyResolver = resolver,
+                SymbolStream = pdbStream,
+                ReadWrite = true
+            };
             this.srcAsm = srcAsm;
-            asm = AssemblyDefinition.ReadAssembly(srcAsm);
+            asm = AssemblyDefinition.ReadAssembly(srcAsm, readerParameters);
             module = asm.MainModule;
             asmInfo = AssemblyHashInfo.BuildHashInfo(asm);
         }
@@ -166,9 +179,16 @@ namespace ILRuntime.Hybrid
             processor.Append(processor.Create(OpCodes.Ret));
         }
 
-        public void WriteAssemblyToFile(Stream stream)
+        public void WriteAssemblyToFile(Stream stream, Stream pdbStream = null)
         {
-            asm.Write(stream);
+            bool hasSymbol = pdbStream != null;
+            WriterParameters writerParameters = new WriterParameters
+            {
+                SymbolStream = pdbStream,
+                WriteSymbols = hasSymbol,
+                SymbolWriterProvider = hasSymbol ? new PdbWriterProvider() : null
+            };
+            asm.Write(stream, writerParameters);
         }
 
         public void WritePatchInfoToFile(Stream stream)
@@ -1198,9 +1218,9 @@ namespace ILRuntime.Hybrid
 
             return methodCtx;
         }
-        public static AssemblyInjector CreateInjector(Stream srcAsm)
+        public static AssemblyInjector CreateInjector(Stream srcAsm, Stream pdbStream = null, IAssemblyResolver resolver = null)
         {
-            return new AssemblyInjector(srcAsm);
+            return new AssemblyInjector(srcAsm, pdbStream, resolver);
         }
     }
 }

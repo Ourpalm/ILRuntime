@@ -29,6 +29,9 @@
     <Reference Include="ILRuntime.Mono.Cecil">
       <HintPath>..\Dependencies\netstandard2.0\ILRuntime.Mono.Cecil.dll</HintPath>
     </Reference>
+    <Reference Include="ILRuntime.Mono.Cecil.Pdb">
+      <HintPath>..\Dependencies\netstandard2.0\ILRuntime.Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeAnalysis">
       <HintPath>..\Dependencies\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>

@@ -40,12 +40,25 @@ namespace PatchTool
                 {
                     using (Stream fs = File.Open(options.File, FileMode.Open, FileAccess.Read))
                     {
-                        var injector = AssemblyInjector.CreateInjector(fs);
+                        string fn = Path.GetFileNameWithoutExtension(options.File);
+                        string folder = Path.GetDirectoryName(options.File);
+                        string pdbFile = $"{folder}/{fn}.pdb";
+                        Stream pdbStream = null;
+                        if (File.Exists(pdbFile))
+                            pdbStream = File.Open(pdbFile, FileMode.Open, FileAccess.Read);
+                        var injector = AssemblyInjector.CreateInjector(fs, pdbStream);
                         injector.Inject();
-
+                        pdbStream?.Close();
                         using(Stream output = File.Create(options.OutputFile))
                         {
-                            injector.WriteAssemblyToFile(output);
+                            fn = Path.GetFileNameWithoutExtension(options.OutputFile);
+                            folder = Path.GetDirectoryName(options.OutputFile);
+                            pdbFile = $"{folder}/{fn}.pdb";
+                            if (pdbStream != null)
+                            {
+                                pdbStream = File.Create(pdbFile);
+                            }
+                            injector.WriteAssemblyToFile(output, pdbStream);
                         }
                         if (!string.IsNullOrEmpty(options.HashFile))
                         {
