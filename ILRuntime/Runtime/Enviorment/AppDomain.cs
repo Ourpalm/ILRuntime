@@ -649,7 +649,7 @@ namespace ILRuntime.Runtime.Enviorment
             references[name] = content;
         }
 
-        internal void AddReferenceAssembly(Assembly asm)
+        public void AddReferenceAssembly(Assembly asm)
         {
             referenceAssemblies.Add(asm);
         }
