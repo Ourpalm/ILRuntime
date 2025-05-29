@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using ILRuntime.Hybrid;
+using ILRuntime.Mono.Cecil;
 using System;
 using System.IO;
 
@@ -46,7 +47,9 @@ namespace PatchTool
                         Stream pdbStream = null;
                         if (File.Exists(pdbFile))
                             pdbStream = File.Open(pdbFile, FileMode.Open, FileAccess.Read);
-                        var injector = AssemblyInjector.CreateInjector(fs, pdbStream);
+                        DefaultAssemblyResolver resolver = new DefaultAssemblyResolver();
+                        resolver.AddSearchDirectory(folder);
+                        var injector = AssemblyInjector.CreateInjector(fs, pdbStream, null, resolver);
                         injector.Inject();
                         pdbStream?.Close();
                         using(Stream output = File.Create(options.OutputFile))

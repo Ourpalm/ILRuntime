@@ -11,6 +11,56 @@ namespace ILRuntime.Hybrid
 {
     internal static class CecilExtensions
     {
+        public static bool CheckTypeReferenceEqual(this TypeReference a, TypeReference b)
+        {
+            if(a == b) return true;
+            if (a is TypeSpecification specA)
+            {
+                if (b is TypeSpecification specB)
+                {
+                    if (a is ByReferenceType)
+                    {
+                        return b is ByReferenceType && CheckTypeReferenceEqual(a.GetElementType(), b.GetElementType());
+                    }
+                    else if (a is ArrayType)
+                    {
+                        return b is ArrayType && CheckTypeReferenceEqual(a.GetElementType(), b.GetElementType());
+                    }
+                    else if (a is GenericInstanceType gitA)
+                    {
+                        if (b is GenericInstanceType gitB)
+                        {
+                            if (!CheckTypeReferenceEqual(gitA.ElementType, gitB.ElementType))
+                                return false;
+                            if ((gitA.GenericArguments.Count != gitB.GenericArguments.Count))
+                                return false;
+                            bool isMatch = true;
+                            for (int i = 0; i < gitA.GenericArguments.Count; i++)
+                            {
+                                if (!CheckTypeReferenceEqual(gitA.GenericArguments[i], gitB.GenericArguments[i]))
+                                {
+                                    isMatch = false;
+                                    break;
+                                }
+                            }
+                            return isMatch;
+                        }
+                        else
+                            return false;
+                    }
+                    else
+                        throw new NotImplementedException();
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                if (b is TypeSpecification)
+                    return false;
+                return a.FullName == b.FullName;
+            }
+        }
         public static void FixClosureNameConsistency(this ModuleDefinition module)
         {
             MD5 md5 = MD5.Create();

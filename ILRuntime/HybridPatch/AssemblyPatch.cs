@@ -273,7 +273,7 @@ namespace ILRuntime.Hybrid
                             {
                                 var pt = ResolveType(method.DeclaringType, domain, dtr);
                                 var pt2 = ResolveType(TypeReferencePatchInfo.Create(i.Parameters[0].ParameterType, null), domain, dtr);
-                                if (!CheckTypeReferenceEqual(pt, pt2))
+                                if (!pt.CheckTypeReferenceEqual(pt2))
                                 {
                                     isMatch = false;
                                     break;
@@ -284,7 +284,7 @@ namespace ILRuntime.Hybrid
                                 int offset = isExtendedMethod ? -1 : 0;
                                 var pt = ResolveType(method.Parameters[j + offset], domain, dtr);
                                 var pt2 = ResolveType(TypeReferencePatchInfo.Create(i.Parameters[j].ParameterType, null), domain, dtr);
-                                if (!CheckTypeReferenceEqual(pt, pt2))
+                                if (!pt.CheckTypeReferenceEqual(pt2))
                                 {
                                     isMatch = false;
                                     break;
@@ -313,55 +313,7 @@ namespace ILRuntime.Hybrid
             return null;
         }
 
-        bool CheckTypeReferenceEqual(TypeReference a, TypeReference b)
-        {
-            if (a is TypeSpecification specA)
-            {
-                if (b is TypeSpecification specB)
-                {
-                    if (a is ByReferenceType)
-                    {
-                        return b is ByReferenceType && CheckTypeReferenceEqual(a.GetElementType(), b.GetElementType());
-                    }
-                    else if (a is ArrayType)
-                    {
-                        return b is ArrayType && CheckTypeReferenceEqual(a.GetElementType(), b.GetElementType());
-                    }
-                    else if (a is GenericInstanceType gitA)
-                    {
-                        if (b is GenericInstanceType gitB)
-                        {
-                            if (!CheckTypeReferenceEqual(gitA.ElementType, gitB.ElementType))
-                                return false;
-                            if ((gitA.GenericArguments.Count != gitB.GenericArguments.Count))
-                                return false;
-                            bool isMatch = true;
-                            for (int i = 0; i < gitA.GenericArguments.Count; i++)
-                            {
-                                if (!CheckTypeReferenceEqual(gitA.GenericArguments[i], gitB.GenericArguments[i]))
-                                {
-                                    isMatch = false;
-                                    break;
-                                }
-                            }
-                            return isMatch;
-                        }
-                        else
-                            return false;
-                    }
-                    else
-                        throw new NotImplementedException();
-                }
-                else
-                    return false;
-            }
-            else
-            {
-                if (b is TypeSpecification)
-                    return false;
-                return a.FullName == b.FullName;
-            }
-        }
+        
         internal void InitializeMethodBody(TypeReference declaringType, MethodPatchInfo info, ILMethod method, Runtime.Enviorment.AppDomain domain)
         {
             var body = info.CodeBody;

@@ -37,12 +37,15 @@ namespace ILRuntime.Hybrid
         internal const string PatchApplyPatchMethodName = "ApplyPatch";
         AssemblyInjector(Stream srcAsm, Stream pdbStream, IAssemblyResolver resolver, IPatchSettings settings)
         {
-            if(resolver == null)
+            var a = new DefaultAssemblyResolver();
+            if (resolver == null)
                 resolver = new DefaultAssemblyResolver();
             bool hasSymbol = pdbStream != null;
+            srcAsm = CheckAndCopyStream(srcAsm);
+            if (hasSymbol)
+                pdbStream = CheckAndCopyStream(pdbStream);
             ReaderParameters readerParameters = new ReaderParameters
             {
-                InMemory = true,
                 ReadSymbols = hasSymbol,
                 SymbolReaderProvider = hasSymbol ? new PdbReaderProvider() : null,
                 AssemblyResolver = resolver,
@@ -53,6 +56,19 @@ namespace ILRuntime.Hybrid
             asm = AssemblyDefinition.ReadAssembly(srcAsm, readerParameters);
             module = asm.MainModule;
             asmInfo = AssemblyHashInfo.BuildHashInfo(asm, settings);
+        }
+
+        Stream CheckAndCopyStream(Stream ori)
+        {
+            if (ori is FileStream)
+            {
+                MemoryStream ms = new MemoryStream((int)(ori.Length - ori.Position));
+                ori.CopyTo(ms);
+                ms.Position = 0;
+                return ms;
+            }
+            else
+                return ori;
         }
 
         public void Inject()
@@ -238,18 +254,20 @@ namespace ILRuntime.Hybrid
                         TypeReference btr = type;
                         do
                         {
-                            var bt = type.Resolve();
+                            var bt = btr.Resolve();
                             btr = bt != null ? bt.BaseType : null;
                         }
-                        while (btr != field.DeclaringType || btr == null);
+                        while (!btr.CheckTypeReferenceEqual(field.DeclaringType) && btr != null);
                         if (btr != null)
                             fieldDeclaringType = btr;
                     }
-                    FieldReference fr = new FieldReference(field.Name, field.FieldType, fieldDeclaringType);
+                    var fieldType = module.ImportReference(field.FieldType);
+                    fieldDeclaringType = module.ImportReference(fieldDeclaringType);
+                    FieldReference fr = new FieldReference(field.Name, fieldType, fieldDeclaringType);
                     Instruction begin = null;
                     if (field.FieldType.IsPrimitive)
                     {
-                        if (field.FieldType == module.TypeSystem.Int32)
+                        if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int32))
                         {
                             if (isStatic)
                             {
@@ -272,8 +290,8 @@ namespace ILRuntime.Hybrid
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.UInt32 || field.FieldType == module.TypeSystem.Int16 || field.FieldType == module.TypeSystem.UInt16 ||
-                            field.FieldType == module.TypeSystem.Byte || field.FieldType == module.TypeSystem.SByte || field.FieldType == module.TypeSystem.Char)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16) ||
+                            field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Char))
                         {
                             if (isStatic)
                             {
@@ -292,23 +310,23 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ldarg_S, (byte)4));
                                 processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterRetrieveInt32Method));
                             }
-                            if (field.FieldType == module.TypeSystem.UInt32)
+                            if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_U4));
                             }
-                            else if (field.FieldType == module.TypeSystem.Int16)
+                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_I2));
                             }
-                            else if (field.FieldType == module.TypeSystem.UInt16)
+                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_U2));
                             }
-                            else if (field.FieldType == module.TypeSystem.Byte)
+                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_U1));
                             }
-                            else if (field.FieldType == module.TypeSystem.SByte)
+                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_I1));
                             }
@@ -318,7 +336,7 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Stfld, fr));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.Int64)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int64))
                         {
                             if (isStatic)
                             {
@@ -342,7 +360,7 @@ namespace ILRuntime.Hybrid
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.UInt64)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64))
                         {
                             if (isStatic)
                             {
@@ -367,7 +385,7 @@ namespace ILRuntime.Hybrid
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.Single)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Single))
                         {
                             if (isStatic)
                             {
@@ -391,7 +409,7 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ret));
                             }
                         }
-                        else if (field.FieldType == module.TypeSystem.Double)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Double))
                         {
                             if (isStatic)
                             {
@@ -415,7 +433,7 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ret));
                             }
                         }
-                        else if (field.FieldType == module.TypeSystem.Boolean)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Boolean))
                         {
                             if (isStatic)
                             {
@@ -478,7 +496,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(begin);
                             processor.Append(processor.Create(OpCodes.Ldarg_2));
                             processor.Append(processor.Create(OpCodes.Ldarg_3));
-                            processor.Append(processor.Create(OpCodes.Call, reflection.GetRetrieveObjectMethod(field.FieldType)));
+                            processor.Append(processor.Create(OpCodes.Call, reflection.GetRetrieveObjectMethod(fieldType)));
                             processor.Append(processor.Create(OpCodes.Stsfld, fr));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
@@ -489,7 +507,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Ldarg_2));
                             processor.Append(processor.Create(OpCodes.Ldarg_3));
                             processor.Append(processor.Create(OpCodes.Ldarg_S, (byte)4));
-                            processor.Append(processor.Create(OpCodes.Call, reflection.GetRetrieveObjectMethod(field.FieldType)));
+                            processor.Append(processor.Create(OpCodes.Call, reflection.GetRetrieveObjectMethod(fieldType)));
                             processor.Append(processor.Create(OpCodes.Stfld, fr));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
@@ -556,17 +574,19 @@ namespace ILRuntime.Hybrid
                         TypeReference btr = type;
                         do
                         {
-                            var bt = type.Resolve();
+                            var bt = btr.Resolve();
                             btr = bt != null ? bt.BaseType : null;
                         }
-                        while (btr != field.DeclaringType || btr == null);
+                        while (!btr.CheckTypeReferenceEqual(field.DeclaringType) && btr != null);
                         if (btr != null)
                             fieldDeclaringType = btr;
                     }
-                    FieldReference fr = new FieldReference(field.Name, field.FieldType, fieldDeclaringType);
+                    var fieldType = module.ImportReference(field.FieldType);
+                    fieldDeclaringType = module.ImportReference(fieldDeclaringType);
+                    FieldReference fr = new FieldReference(field.Name, fieldType, fieldDeclaringType);
                     if (field.FieldType.IsPrimitive)
                     {
-                        if (field.FieldType == module.TypeSystem.Int32)
+                        if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int32))
                         {
                             if (isStatic)
                             {
@@ -584,8 +604,8 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt32Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.UInt32 || field.FieldType == module.TypeSystem.Int16 || field.FieldType == module.TypeSystem.UInt16 ||
-                            field.FieldType == module.TypeSystem.Byte || field.FieldType == module.TypeSystem.SByte || field.FieldType == module.TypeSystem.Char)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16) ||
+                            field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Char))
                         {
                             if (isStatic)
                             {
@@ -604,7 +624,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt32Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.Int64)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int64))
                         {
                             if (isStatic)
                             {
@@ -622,7 +642,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt64Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.UInt64)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64))
                         {
                             if (isStatic)
                             {
@@ -641,7 +661,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt64Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.Single)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Single))
                         {
                             if (isStatic)
                             {
@@ -659,7 +679,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushFloatMethod));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.Double)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Double))
                         {
                             if (isStatic)
                             {
@@ -677,7 +697,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushDoubleMethod));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType == module.TypeSystem.Boolean)
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Boolean))
                         {
                             if (isStatic)
                             {
@@ -740,7 +760,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Ldarg_0));
                             processor.Append(processor.Create(OpCodes.Ldfld, fr));
                         }
-                        processor.Append(processor.Create(OpCodes.Call, reflection.GetPushObjectMethod(field.FieldType)));
+                        processor.Append(processor.Create(OpCodes.Call, reflection.GetPushObjectMethod(fieldType)));
                         processor.Append(processor.Create(OpCodes.Ret));
                     }
                     targets[i] = begin;
