@@ -10,16 +10,21 @@ namespace HotfixAOT
     {
         public int IntField;
         static int IntFieldS;
+        public bool BoolField;
+        static bool BoolFieldS;
 #if PATCHED
         public int IntFieldAdded;
         static float FloatFieldAdded;
+        static bool BoolFieldAdded;
 #endif
 
         public HotfixClass(int val)
-        {
+        {   
 #if PATCHED
             IntField = val + 100;
             IntFieldAdded = val + 200;
+            BoolField = true;
+            BoolFieldS = true;
 #else
             IntField = val;
 #endif
@@ -53,6 +58,16 @@ namespace HotfixAOT
 #endif
         }
 
+        public void MethodRef3(ref bool a, string b, out string result)
+        {
+#if PATCHED
+            a = !a;
+            result = string.Format("result:{1} ref:{0}", b, a);
+#else            
+            result = string.Format("result:{1} ref:{0}", b, a);
+#endif
+        }
+
         static Func<HotfixClass, int, int> ttt;
         public int Function(int a)
         {
@@ -74,6 +89,7 @@ namespace HotfixAOT
 #if PATCHED
             IntFieldS = (val + 100) / 2;
             FloatFieldAdded = (float)val /3f;
+            BoolFieldAdded = true;
 #else
             IntFieldS = val / 2;
 #endif
@@ -90,6 +106,17 @@ namespace HotfixAOT
             return FloatFieldAdded;
 #else
             return 0;
+#endif
+
+        }
+
+        public static bool GetBoolField()
+        {
+
+#if PATCHED
+            return BoolFieldAdded;
+#else
+            return false;
 #endif
 
         }
@@ -217,17 +244,20 @@ namespace HotfixAOT
         {
             HotfixClass cls = new HotfixClass(100);
 
-            return patched ? cls.IntField == 200 : cls.IntField == 100;
+            return patched ? cls.IntField == 200 && cls.BoolField : cls.IntField == 100;
         }
 
         static bool Test02(bool patched)
         {
             HotfixClass cls = new HotfixClass(100);
             cls.MethodRef(ref cls.IntField, "aaa", out var result);
+            bool oldVal = cls.BoolField;
+            cls.MethodRef3(ref cls.BoolField, "aaa", out var result2);
 
             if (patched)
             {
-                return cls.IntField == 301 && result == $"result:{300} ref:aaa";
+                Console.WriteLine(string.Format("result:{0},{1}", cls.IntField, cls.BoolField));
+                return cls.IntField == 301 && !cls.BoolField && oldVal && result == $"result:300 ref:aaa";
             }
             else
             {
@@ -244,7 +274,7 @@ namespace HotfixAOT
         static bool Test04(bool patched)
         {
             HotfixClass.InitStaticFields(100);
-            return patched ? HotfixClass.GetIntField() == 100 && Math.Abs(HotfixClass.GetFloatField() - (100f / 3f)) < 0.0001f :
+            return patched ? HotfixClass.GetBoolField() && (HotfixClass.GetIntField() == 100) && Math.Abs(HotfixClass.GetFloatField() - (100f / 3f)) < 0.0001f:
                 HotfixClass.GetIntField() == 50 && HotfixClass.GetFloatField() == 0;
         }
 

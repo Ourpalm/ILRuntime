@@ -255,7 +255,14 @@ namespace ILRuntime.Hybrid
                 AppendInstruction(processor, first, processor.Create(OpCodes.Ldloca, invokeCtx));
                 processor.AppendLdc(first, refIdx);
                 AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt32ByIndexMethod));
-                AppendInstruction(processor, first, processor.Create(OpCodes.Stind_I4));
+                if (pt == module.TypeSystem.Boolean)
+                {
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Ldc_I4_1));
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Ceq));
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Stind_I1));
+                }
+                else
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Stind_I4));
             }
             else if (pt == module.TypeSystem.UInt32)
             {
@@ -358,6 +365,11 @@ namespace ILRuntime.Hybrid
                 if (returnType == module.TypeSystem.Int32 || returnType == module.TypeSystem.Char || returnType == module.TypeSystem.Boolean)
                 {
                     AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt32Method));
+                    if (returnType == module.TypeSystem.Boolean)
+                    {
+                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldc_I4_1));
+                        AppendInstruction(processor, first, processor.Create(OpCodes.Ceq));
+                    }
                 }
                 else if (returnType == module.TypeSystem.UInt32)
                 {
@@ -420,7 +432,7 @@ namespace ILRuntime.Hybrid
             AppendInstruction(processor, first, processor.Create(OpCodes.Ldloca, invokeCtx));
             bool isByref = param.ParameterType.IsByReference;
             var pt = isByref ? ((TypeSpecification)param.ParameterType).ElementType : param.ParameterType;
-            if (pt == module.TypeSystem.Int32 || pt == module.TypeSystem.Char || pt == module.TypeSystem.Boolean)
+            if (pt == module.TypeSystem.Int32 || pt == module.TypeSystem.Char)
             {
                 AppendLoadArgument(processor, paramIdx, first);
                 if (isByref)
@@ -434,6 +446,13 @@ namespace ILRuntime.Hybrid
                     AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_U4));
                 AppendInstruction(processor, first, processor.Create(OpCodes.Conv_I4));
                 AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushInt32Method));
+            }
+            else if (pt == module.TypeSystem.Boolean)
+            {
+                AppendLoadArgument(processor, paramIdx, first);
+                if (isByref)
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_U1));
+                AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushBoolMethod));
             }
             else if (pt == module.TypeSystem.Int16)
             {

@@ -415,6 +415,34 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ret));
                             }
                         }
+                        else if (field.FieldType == module.TypeSystem.Boolean)
+                        {
+                            if (isStatic)
+                            {
+                                begin = processor.Create(OpCodes.Ldarg_1);
+                                processor.Append(begin);
+                                processor.Append(processor.Create(OpCodes.Ldarg_2));
+                                processor.Append(processor.Create(OpCodes.Ldarg_3));
+                                processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterRetrieveInt32Method));
+                                processor.Append(processor.Create(OpCodes.Ldc_I4_1));
+                                processor.Append(processor.Create(OpCodes.Ceq));
+                                processor.Append(processor.Create(OpCodes.Stsfld, fr));
+                                processor.Append(processor.Create(OpCodes.Ret));
+                            }
+                            else
+                            {
+                                begin = processor.Create(OpCodes.Ldarg_0);
+                                processor.Append(begin);
+                                processor.Append(processor.Create(OpCodes.Ldarg_2));
+                                processor.Append(processor.Create(OpCodes.Ldarg_3));
+                                processor.Append(processor.Create(OpCodes.Ldarg_S, (byte)4));
+                                processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterRetrieveInt32Method));
+                                processor.Append(processor.Create(OpCodes.Ldc_I4_1));
+                                processor.Append(processor.Create(OpCodes.Ceq));
+                                processor.Append(processor.Create(OpCodes.Stfld, fr));
+                                processor.Append(processor.Create(OpCodes.Ret));
+                            }
+                        }
                         else
                             throw new NotImplementedException();
                     }
@@ -647,6 +675,28 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ldfld, fr));
                             }
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushDoubleMethod));
+                            processor.Append(processor.Create(OpCodes.Ret));
+                        }
+                        else if (field.FieldType == module.TypeSystem.Boolean)
+                        {
+                            if (isStatic)
+                            {
+                                begin = processor.Create(OpCodes.Ldarg_2);
+                                processor.Append(begin);
+                                processor.Append(processor.Create(OpCodes.Ldsfld, fr));
+                            }
+                            else
+                            {
+                                begin = processor.Create(OpCodes.Ldarg_3);
+                                processor.Append(begin);
+                                processor.Append(processor.Create(OpCodes.Ldarg_0));
+                                processor.Append(processor.Create(OpCodes.Ldfld, fr));
+                            }
+                            var marker = processor.Create(OpCodes.Ldc_I4_1);
+                            var callIns = processor.Create(OpCodes.Call, reflection.InterpreterPushInt32Method);
+                            processor.Append(processor.Create(OpCodes.Ldc_I4_0));
+                            processor.Append(processor.Create(OpCodes.Cgt_Un));
+                            processor.Append(callIns);
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
                         else
