@@ -4,6 +4,7 @@ using ILRuntime.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -195,8 +196,8 @@ namespace ILRuntime.Hybrid
                 {
                     if (i.IsClosureType())
                         return true;
-                    else
-                        return i.CheckHasClosureType();
+                    else if (i.CheckHasClosureType())
+                        return true;
                 }
                 return false;
             }
@@ -204,23 +205,37 @@ namespace ILRuntime.Hybrid
                 return false;
         }
 
-        static Dictionary<MemberReference, string> BuildClosureNameMapping(this TypeDefinition type, BinaryWriter bw, MD5 md5)
+        static Dictionary<MemberReference, string> BuildClosureNameMapping(this TypeDefinition type, BinaryWriter bw, MD5 md5, string hash = null, Dictionary<MemberReference, string> res = null)
         {
-            Dictionary<MemberReference, string> res = new Dictionary<MemberReference, string>();
+            if (res == null)
+                res = new Dictionary<MemberReference, string>();
             foreach (var i in type.Methods)
             {
-                BuildClosureNameMapping(res, i, bw, md5);
+                BuildClosureNameMapping(res, i, bw, md5, hash);
             }
             return res;
         }
 
-        static void BuildClosureNameMapping(Dictionary<MemberReference, string> res, MethodDefinition method, BinaryWriter bw, MD5 md5)
+        static void BuildClosureNameMapping(Dictionary<MemberReference, string> res, MethodDefinition method, BinaryWriter bw, MD5 md5, string hash = null)
         {
             if (method.HasBody)
             {
+                if (string.IsNullOrEmpty(hash))
+                    hash = method.ComputeHash(bw, md5, false).Substring(0, 6);
+
+                CustomAttribute attr;
+                if (method.IsAsyncMethod(out attr) || method.IsIteratorMethod(out attr))
+                {
+                    TypeReference tr = (TypeReference)attr.ConstructorArguments[0].Value;
+                    var td = tr.Resolve();
+                    if (td.IsClosureType())
+                    {
+                        res[td] = hash;
+                        BuildClosureNameMapping(td, bw, md5, hash, res);
+                    }
+                }
                 foreach (var ins in method.Body.Instructions)
                 {
-                    string hash = method.ComputeHash(bw, md5, false).Substring(0, 6);
                     if ((ins.OpCode.Code == Code.Newobj || ins.OpCode.Code == Code.Ldftn) && ins.Operand is MethodReference mr)
                     {
                         var dt = mr.DeclaringType.Resolve();
@@ -241,9 +256,12 @@ namespace ILRuntime.Hybrid
                     }
                 }
             }
+            
         }
 
         static string attributeName = typeof(ILRuntimePatchAttribute).FullName;
+        static string asyncAttributeName = typeof(AsyncStateMachineAttribute).Name;
+        static string enumerableAttributeName = typeof(IteratorStateMachineAttribute).Name;
 
         public static bool ShouldIncludeInPatch(this TypeDefinition type)
         {
@@ -306,6 +324,38 @@ namespace ILRuntime.Hybrid
                 return false;
         }
 
+        public static bool IsAsyncMethod(this MethodDefinition method, out CustomAttribute attr)
+        {
+            if (method.HasCustomAttributes)
+            {
+                foreach (var i in method.CustomAttributes)
+                {
+                    if (i.AttributeType.Name == asyncAttributeName)
+                    {
+                        attr = i;
+                        return true;
+                    }
+                }
+            }
+            attr = null;
+            return false;
+        }
+        public static bool IsIteratorMethod(this MethodDefinition method, out CustomAttribute attr)
+        {
+            if (method.HasCustomAttributes)
+            {
+                foreach (var i in method.CustomAttributes)
+                {
+                    if (i.AttributeType.Name == enumerableAttributeName)
+                    {
+                        attr = i;
+                        return true;
+                    }
+                }
+            }
+            attr = null;
+            return false;
+        }
         public static void GetTypeNames(this TypeDefinition type, out string namesp, out string name)
         {
             if (type.IsNested)
