@@ -705,7 +705,7 @@ namespace ILRuntime.Hybrid
             int typeIdx = 0, methodIdx = 0, fieldIdx = 1;//Field Starts with 1 to distinguish fields without index
 
             var mainModule = asm.MainModule;
-            mainModule.FixClosureNameConsistency();
+            mainModule.FixClosureNameConsistency(settings);
             if (mainModule.HasTypes)
             {
                 List<TypeHashInfo> types = new List<TypeHashInfo>();
@@ -740,6 +740,7 @@ namespace ILRuntime.Hybrid
         {
             bool shouldIncludeBySetting = settings !=null? settings.ShouldTypeIncludeInPatch(type) : false;
             bool shoudInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
+            shoudInclude &= !type.IsDelegate();
             if (shoudInclude)
                 types.Add(TypeHashInfo.BuildHashInfo(type, ref typeIdx, ref fieldIdx, ref methodIdx, settings));
             foreach (var t in type.NestedTypes)
@@ -811,6 +812,8 @@ namespace ILRuntime.Hybrid
             if (baseType == null || baseType.ShouldIncludeInPatch())
                 return;
             if (settings != null && settings.ShouldTypeIncludeInPatch(baseType))
+                return;
+            if (type.IsDelegate())
                 return;
             if (baseType.Fields.Count > 0)
             {

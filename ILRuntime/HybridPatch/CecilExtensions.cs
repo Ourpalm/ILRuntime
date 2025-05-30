@@ -61,7 +61,51 @@ namespace ILRuntime.Hybrid
                 return a.FullName == b.FullName;
             }
         }
-        public static void FixClosureNameConsistency(this ModuleDefinition module)
+
+        public static bool IsDelegate(this TypeReference typeRef)
+        {
+            if (typeRef == null)
+            {
+                return false;
+            }
+
+            // 1. 尝试解析 TypeReference 获取 TypeDefinition
+            // TypeDefinition 包含了类型的完整信息，包括基类等。
+            TypeDefinition typeDef = typeRef.Resolve();
+
+            if (typeDef != null)
+            {
+                if (!typeDef.IsClass) // 委托首先是类
+                {
+                    return false;
+                }
+                TypeReference baseType = typeDef.BaseType;
+                while (baseType != null)
+                {
+                    if (baseType.FullName == "System.MulticastDelegate")
+                    {
+                        return true;
+                    }
+                    if (baseType.FullName == "System.Delegate")
+                    {
+                        return true;
+                    }
+                    TypeDefinition resolvedBase = baseType.Resolve();
+                    if (resolvedBase == null) break; // 无法继续解析基类链
+                    baseType = resolvedBase.BaseType;
+                }
+                return false;
+            }
+            else
+            {
+                if (typeRef.FullName == "System.Delegate" || typeRef.FullName == "System.MulticastDelegate")
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+        public static void FixClosureNameConsistency(this ModuleDefinition module, IPatchSettings settings)
         {
             MD5 md5 = MD5.Create();
             MemoryStream ms = new MemoryStream();
@@ -71,50 +115,129 @@ namespace ILRuntime.Hybrid
             {
                 foreach (var i in module.Types)
                 {
-                    i.FixClosureNameConsistency(false, bw, md5);
+                    FixClosureNameConsistency(i, false, settings, bw, md5);
                 }
             }
         }
 
-        public static void FixClosureNameConsistency(this TypeDefinition type, bool forceInclude, BinaryWriter bw, MD5 md5)
+        static void FixClosureNameConsistency(TypeDefinition type, bool forceInclude, IPatchSettings settings, BinaryWriter bw, MD5 md5)
         {
-            bool shouldInclude = forceInclude || type.ShouldIncludeInPatch();
-            if (shouldInclude)
+            bool shouldIncludeBySetting = settings != null ? settings.ShouldTypeIncludeInPatch(type) : false;
+            bool shouldInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
+            if (shouldInclude && !type.IsDelegate())
             {
-                bool isClosure = type.IsClosureType();
-                bool needMemberAlias = false;
-                if (isClosure)
+                if (type.CheckHasClosureType())
                 {
-                    if (type.Name.Contains("<>c__DisplayClass"))
+                    var nameMapping = type.BuildClosureNameMapping(bw, md5);
+                    foreach (var i in type.NestedTypes)
                     {
-                        type.Name = type.GetClosureAliasName(type.Name, "<>c__DisplayClass", bw, md5);
-                    }
-                    else
-                        needMemberAlias = true;
-
-                    if (needMemberAlias)
-                    {
-                        foreach (var f in type.Fields)
+                        if (i.IsClosureType())
                         {
-                            if (f.Name.Contains("__"))
+                            if (nameMapping.TryGetValue(i, out var hash))
                             {
-                                f.Name = type.GetClosureAliasName(f.Name, "__", bw, md5);
+                                if (i.Name.Contains("<>c__DisplayClass"))
+                                {
+                                    i.Name = GetClosureAliasName(i.Name, "<>c__DisplayClass", hash);
+                                }
+                                else if(i.Name == "<>c")
+                                {
+                                    FixClosureAliasNameNoCapture(i, nameMapping);
+                                }
+                                else
+                                {
+                                    i.Name = GetClosureAliasName(i.Name, "__", hash);
+                                }
                             }
-                        }
-                        foreach (var m in type.Methods)
-                        {
-                            if (m.Name.Contains("__"))
+                            else if (i.Name == "<>c")
                             {
-                                m.Name = type.GetClosureAliasName(m.Name, "__", bw, md5);
+                                FixClosureAliasNameNoCapture(i, nameMapping);
                             }
+                            else
+                                throw new NotImplementedException();
                         }
                     }
                 }
-                if (type.HasNestedTypes)
-                {   
-                    foreach (var i in type.NestedTypes)
+            }
+            if (type.HasNestedTypes)
+            {
+                foreach (var i in type.NestedTypes)
+                {
+                    if (!i.IsClosureType())
+                        FixClosureNameConsistency(i, shouldInclude, settings, bw, md5);
+                }
+            }
+        }
+
+        static void FixClosureAliasNameNoCapture(TypeDefinition type, Dictionary<MemberReference, string> nameMapping)
+        {
+            string hash;
+            foreach (var f in type.Fields)
+            {
+                if (nameMapping.TryGetValue(f, out hash) && f.Name.Contains("__"))
+                {
+                    f.Name = GetClosureAliasName(f.Name, "__", hash);
+                }
+            }
+            foreach (var m in type.Methods)
+            {
+                if (nameMapping.TryGetValue(m, out hash) && m.Name.Contains("__"))
+                {
+                    m.Name = GetClosureAliasName(m.Name, "__", hash);
+                }
+            }
+        }
+
+        static bool CheckHasClosureType(this TypeDefinition type)
+        {
+            if (!type.IsClosureType() && type.HasNestedTypes)
+            {
+                foreach (var i in type.NestedTypes)
+                {
+                    if (i.IsClosureType())
+                        return true;
+                    else
+                        return i.CheckHasClosureType();
+                }
+                return false;
+            }
+            else
+                return false;
+        }
+
+        static Dictionary<MemberReference, string> BuildClosureNameMapping(this TypeDefinition type, BinaryWriter bw, MD5 md5)
+        {
+            Dictionary<MemberReference, string> res = new Dictionary<MemberReference, string>();
+            foreach (var i in type.Methods)
+            {
+                BuildClosureNameMapping(res, i, bw, md5);
+            }
+            return res;
+        }
+
+        static void BuildClosureNameMapping(Dictionary<MemberReference, string> res, MethodDefinition method, BinaryWriter bw, MD5 md5)
+        {
+            if (method.HasBody)
+            {
+                foreach (var ins in method.Body.Instructions)
+                {
+                    string hash = method.ComputeHash(bw, md5, false).Substring(0, 6);
+                    if ((ins.OpCode.Code == Code.Newobj || ins.OpCode.Code == Code.Ldftn) && ins.Operand is MethodReference mr)
                     {
-                        i.FixClosureNameConsistency(shouldInclude, bw, md5);
+                        var dt = mr.DeclaringType.Resolve();
+                        if (dt.IsClosureType())
+                        {
+                            res[dt] = hash;
+                            res[mr.Resolve()] = hash;
+                        }
+                    }
+                    else if (ins.OpCode.Code == Code.Ldsfld && ins.Operand is FieldReference fr)
+                    {
+                        var dt = fr.DeclaringType.Resolve();
+                        if (dt.IsClosureType())
+                        {
+                            res[dt] = hash;
+                            res[fr.Resolve()] = hash;
+                        }
                     }
                 }
             }
@@ -139,23 +262,32 @@ namespace ILRuntime.Hybrid
             return shouldInclude;
         }
 
-        public static string GetClosureAliasName(this TypeDefinition type, string name, string identifier, BinaryWriter bw, MD5 md5)
+        public static string GetClosureAliasName(string name, string identifier, string hash)
         {
             int startIdx = name.IndexOf(identifier);
             string heading = name.Substring(0, startIdx);
             name = name.Substring(startIdx);
-            var dt = type.DeclaringType;
             string trailing = name.Replace(identifier, "");
             string[] token = trailing.Split('_');
-            int mIdx = int.Parse(token[0]);
-            var mi = dt.Methods[mIdx - dt.Fields.Count];
-            return $"{heading}{identifier}{mi.ComputeHash(bw, md5, false).Substring(0, 6)}_{token[1]}";
+            if (token.Length > 1)
+            {
+                int mIdx = int.Parse(token[0]);
+                //mi.ComputeHash(bw, md5, false).Substring(0, 6)
+                return $"{heading}{identifier}{hash}_{token[1]}";
+            }
+            else
+            {
+                if (token[0].Contains("`"))
+                    return $"{heading}{identifier}{hash}{token[0].Substring(token[0].IndexOf("`"))}";
+                else
+                    return $"{heading}{identifier}{hash}";
+            }
         }
         public static bool IsClosureType(this TypeDefinition type)
         {
             if (type.IsNested)
             {
-                if (type.Name.StartsWith("<>c"))
+                if (type.Name.StartsWith("<"))
                 {
                     if (type.HasCustomAttributes)
                     {
