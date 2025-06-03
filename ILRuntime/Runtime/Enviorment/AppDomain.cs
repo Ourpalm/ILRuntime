@@ -616,6 +616,8 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 foreach (var t in module.GetTypes()) //获取所有此模块定义的类型
                 {
+                    if (t.IsPrimitive)
+                        continue;
                     ILType type = new ILType(t, this);
 
                     AddType(type);
@@ -1110,6 +1112,8 @@ namespace ILRuntime.Runtime.Enviorment
 
         internal IType GetType(object token, IType contextType, IMethod contextMethod)
         {
+            if (token is RequiredModifierType rmt)
+                token = rmt.ElementType;
             int hash = token.GetHashCode();
             IType res;
             if (mapTypeToken.TryGetValue(hash, out res))
@@ -1175,6 +1179,12 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     ArrayType at = (ArrayType)_ref;
                     var t = GetType(at.ElementType, contextType, contextMethod);
+                    bool isInvalidToken = false;
+                    if (t == null && at.ElementType.IsGenericParameter)
+                    {
+                        t = new ILGenericParameterType(at.ElementType);
+                        isInvalidToken = true;
+                    }
                     if (t != null)
                     {
                         res = t.MakeArrayType(at.Rank);
@@ -1187,10 +1197,13 @@ namespace ILRuntime.Runtime.Enviorment
                             }
                             mapTypeToken[hash] = res;
                         }
-                        mapTypeToken[res.GetHashCode()] = res;
+                        if (!isInvalidToken)
+                        {
+                            mapTypeToken[res.GetHashCode()] = res;
 
-                        if (!string.IsNullOrEmpty(res.FullName))
-                            mapType[res.FullName] = res;
+                            if (!string.IsNullOrEmpty(res.FullName))
+                                mapType[res.FullName] = res;
+                        }
                         return res;
                     }
                     return t;

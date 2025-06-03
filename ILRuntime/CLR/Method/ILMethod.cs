@@ -208,10 +208,10 @@ namespace ILRuntime.CLR.Method
             if (type.HasGenericParameter && !type.IsGenericInstance)
             {
                 KeyValuePair<string, IType>[] gas = new KeyValuePair<string, IType>[type.TypeDefinition.GenericParameters.Count];
-                for(int i = 0; i < gas.Length; i++)
+                for (int i = 0; i < gas.Length; i++)
                 {
                     var gp = type.TypeDefinition.GenericParameters[i];
-                    gas[i] = new KeyValuePair<string, IType>(gp.Name,  new ILGenericParameterType(gp));
+                    gas[i] = new KeyValuePair<string, IType>(gp.Name, new ILGenericParameterType(gp));
                 }
                 declaringType = (ILType)type.MakeGenericInstance(gas);
             }
@@ -240,12 +240,12 @@ namespace ILRuntime.CLR.Method
                     }
                 }
             }
-            if(def.HasCustomAttributes)
+            if (def.HasCustomAttributes)
             {
-                for(int i = 0; i < def.CustomAttributes.Count; i++)
+                for (int i = 0; i < def.CustomAttributes.Count; i++)
                 {
                     int f;
-                    if(def.CustomAttributes[i].GetJITFlags(domain, out f))
+                    if (def.CustomAttributes[i].GetJITFlags(domain, out f))
                     {
                         this.jitFlags = f;
                         break;

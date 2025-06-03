@@ -129,7 +129,6 @@ namespace ILRuntime.Hybrid
 
         void InitializeTypes(Runtime.Enviorment.AppDomain domain)
         {
-            var module = domain.LoadedModules[0];
             internalTypes = new Dictionary<string, TypeDefinition>();
             List<TypeDefinition> defs = new List<TypeDefinition>();
             List<ILType> types = new List<ILType>();
@@ -438,6 +437,21 @@ namespace ILRuntime.Hybrid
                 res[i] = opcode;
             }
             method.SetBodyAndJumptables(res, jumptables);
+        }
+
+        public bool CanApplyPatch(Assembly assembly)
+        {
+            if (IsPatched)
+                return false;
+            var type = assembly.GetType(PatchedTypeName);
+            if (type == null)
+                return false;
+            var attr = type.GetCustomAttribute<PatchableAssemblyAttribute>(false);
+            if (attr == null)
+                return false;
+            if (attr.Name != patchInfo.Name || attr.AssemblyHash != patchInfo.BaseHash)
+                return false;
+            return true;
         }
 
         public void PatchAssembly(Assembly assembly, Runtime.Enviorment.AppDomain domain)

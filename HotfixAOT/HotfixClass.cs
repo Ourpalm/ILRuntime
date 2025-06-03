@@ -147,6 +147,24 @@ namespace HotfixAOT
 #endif
         }
 
+        public string TestSwitchCase(int val)
+        {
+            switch (val)
+            {
+                case 1:
+                    return "122";
+                case 2:
+                    return "222";
+#if PATCHED
+                case 3:
+                    return "333";
+
+#endif
+                default:
+                    return "999";
+            }
+        }
+
         public int FunctionNoChange(int a, string b)
         {
             return a + int.Parse(b);
@@ -302,6 +320,13 @@ namespace HotfixAOT
             cls.TestArray2();
             return true;
         }
+
+        static bool Test09(bool patched)
+        {
+            HotfixClass cls = new HotfixClass(0);
+            var res = cls.TestSwitchCase(3);
+            return patched ? res == "333" : res == "999" ;
+        }
         public static IEnumerable<ITestCase> GetTestCases()
         {
             yield return new DelegateTestCase($"{nameof(HotfixBasicTestCases)}.{nameof(Test01)}", Test01);
@@ -312,6 +337,7 @@ namespace HotfixAOT
             yield return new DelegateTestCase($"{nameof(HotfixBasicTestCases)}.{nameof(Test06)}", Test06);
             yield return new DelegateTestCase($"{nameof(HotfixBasicTestCases)}.{nameof(Test07)}", Test07);
             yield return new DelegateTestCase($"{nameof(HotfixBasicTestCases)}.{nameof(Test08)}", Test08);
+            yield return new DelegateTestCase($"{nameof(HotfixBasicTestCases)}.{nameof(Test09)}", Test09);
         }
     }
 

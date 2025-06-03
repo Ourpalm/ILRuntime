@@ -40,20 +40,28 @@ namespace ILRuntime.Runtime
         }
         public static bool GetJITFlags(this Mono.Cecil.CustomAttribute attribute, Enviorment.AppDomain appdomain, out int flags)
         {
-            var at = appdomain.GetType(attribute.AttributeType, null, null);
             flags = ILRuntimeJITFlags.None;
-            if (at == appdomain.JITAttributeType)
+
+            if (attribute.AttributeType.Name == appdomain.JITAttributeType.Name)
             {
-                if (attribute.HasConstructorArguments)
+                var at = appdomain.GetType(attribute.AttributeType, null, null);
+                if (at == appdomain.JITAttributeType)
                 {
-                    flags = (int)attribute.ConstructorArguments[0].Value;
+                    if (attribute.HasConstructorArguments)
+                    {
+                        flags = (int)attribute.ConstructorArguments[0].Value;
+                    }
+                    else
+                        flags = ILRuntimeJITFlags.JITOnDemand;
+                    return true;
                 }
                 else
-                    flags = ILRuntimeJITFlags.JITOnDemand;
-                return true;
+                    return false;
             }
             else
+            {
                 return false;
+            }
         }
         public static void GetClassName(this Type type, out string clsName, out string realClsName, out bool isByRef, bool simpleClassName = false)
         {

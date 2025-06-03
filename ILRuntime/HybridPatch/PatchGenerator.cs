@@ -18,17 +18,34 @@ namespace ILRuntime.Hybrid
         TypePatchInfo privateImplementationType;
         Dictionary<string, FieldPatchInfo> privateImplementationFields;
         TypeReference byteArrayType;
+        IAssemblyResolver resolver;
 
         public bool HasPatch { get; private set; }
-        public PatchGenerator(Stream srcHash, Stream patchedAsm, IPatchSettings settings = null)
+
+        public AssemblyPatchInfo PatchInfo { get { return patchInfo; } }
+        public PatchGenerator(Stream srcHash, Stream patchedAsm, IAssemblyResolver resolver = null, IPatchSettings settings = null)
         {
-            LoadAssemblyHashInfo(srcHash, patchedAsm, settings);
+            asmInfo = AssemblyHashInfo.FromStream(srcHash);
+            this.resolver = resolver;
+            LoadAssemblyHashInfo(patchedAsm, resolver, settings);
         }
 
-        void LoadAssemblyHashInfo(Stream srcAsm, Stream patchAsm, IPatchSettings settings)
-        {          
-            asmInfo = AssemblyHashInfo.FromStream(srcAsm);
-            var def = AssemblyDefinition.ReadAssembly(patchAsm);
+        public PatchGenerator(AssemblyHashInfo hashInfo, Stream patchedAsm, IAssemblyResolver resolver = null, IPatchSettings settings = null)
+        {
+            asmInfo = hashInfo;
+            this.resolver = resolver;
+            LoadAssemblyHashInfo(patchedAsm, resolver, settings);
+        }
+
+        void LoadAssemblyHashInfo(Stream patchAsm, IAssemblyResolver resolver, IPatchSettings settings)
+        {
+            if (resolver == null)
+                resolver = new DefaultAssemblyResolver();
+            ReaderParameters readerParameters = new ReaderParameters
+            {
+                AssemblyResolver = resolver,
+            };
+            var def = AssemblyDefinition.ReadAssembly(patchAsm, readerParameters);
             patchAsmInfo = AssemblyHashInfo.BuildHashInfo(def, settings);
 
             privateImplementationType = new TypePatchInfo()
@@ -291,8 +308,16 @@ namespace ILRuntime.Hybrid
             List<FieldReferencePatchInfo> fields = new List<FieldReferencePatchInfo>();
             Dictionary<long, int> fieldIdxMapping = new Dictionary<long, int>();
             Dictionary<long, int> staticFieldIdxMapping = new Dictionary<long, int>();
+            Dictionary<int, int> jumptableIdxMapping = new Dictionary<int, int>();
             List<int[]> jumptables = new List<int[]>();
             Runtime.Enviorment.AppDomain app = new Runtime.Enviorment.AppDomain();
+            app.SuppressStaticConstructor = true;
+            foreach (var i in patchAsmInfo.Assembly.MainModule.AssemblyReferences)
+            {
+                var asm = resolver.Resolve(i);
+                if (asm != null)
+                    app.InitializeFromModule(asm.MainModule);
+            }
             app.InitializeFromModule(patchAsmInfo.Assembly.MainModule);
 
             foreach (var i in typeInfos)
@@ -467,6 +492,15 @@ namespace ILRuntime.Hybrid
                                 }
                                 break;
                             case OpCodeEnum.Switch:
+                                {
+                                    if (!jumptableIdxMapping.TryGetValue(opcode.TokenInteger, out var sIdx))
+                                    {
+                                        sIdx = jumptables.Count;
+                                        jumptableIdxMapping[opcode.TokenInteger] = sIdx;
+                                        jumptables.Add(method.JumpTables[opcode.TokenInteger]);
+                                    }
+                                    opcode.TokenInteger = sIdx;
+                                }
                                 break;
                             default:
                                 break;
