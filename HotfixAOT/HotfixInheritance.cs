@@ -11,6 +11,11 @@ namespace HotfixAOT
         int privField;
         public int pubField;
 #if PATCHED
+        public int privField2 = 3;
+#else
+        public int privField2 = 2;
+#endif
+#if PATCHED
         int privFieldAdded;
 #endif
         public HotfixInheritance(int val)
@@ -31,7 +36,8 @@ namespace HotfixAOT
             get
             {
                 Console.WriteLine("Val=" + privField);
-                return privField;
+                Console.WriteLine("Val2=" + privField2);
+                return privField + privField2;
             }
         }
 
@@ -135,7 +141,7 @@ namespace HotfixAOT
             HotfixInheritance cls = new HotfixInheritance(100);
             Console.WriteLine("pubField=" + cls.pubField);
 
-            return patched ? cls.Value == 700 && cls.pubField == 900: cls.Value == 600;
+            return patched ? cls.Value == 703 && cls.pubField == 900: cls.Value == 602;
         }
         static bool Test02(bool patched)
         {

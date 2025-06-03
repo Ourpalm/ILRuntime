@@ -598,7 +598,10 @@ namespace ILRuntime.Hybrid
                     AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.GetReadResultByIndexMethod(pt)));
                 else
                     AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.GetReadObjectByIndexMethod(pt)));
-                AppendInstruction(processor, first, processor.Create(OpCodes.Stind_Ref));
+                if (pt.IsValueType)
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Stobj, pt));
+                else
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Stind_Ref));
             }
         }
 
@@ -753,14 +756,14 @@ namespace ILRuntime.Hybrid
                 AppendLoadArgument(processor, paramIdx, first);
                 if (isByref)
                     AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_R4));
-                AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushInt64Method));
+                AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushFloatMethod));
             }
             else if (pt == module.TypeSystem.Double)
             {
                 AppendLoadArgument(processor, paramIdx, first);
                 if (isByref)
                     AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_R8));
-                AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushInt64Method));
+                AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushDoubleMethod));
             }
             else if(!pt.ContainsGenericParameter && pt.Resolve().IsEnum)
             {
@@ -773,8 +776,13 @@ namespace ILRuntime.Hybrid
             {
                 AppendLoadArgument(processor, paramIdx, first);
                 if (isByref)
-                    AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_Ref));
-                if (pt.ContainsGenericParameter)
+                {
+                    if (pt.IsValueType)
+                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldobj, pt));
+                    else
+                        AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_Ref));
+                }
+                if (pt.ContainsGenericParameter || pt.IsValueType)
                 {
                     AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.GetPushParameterMethod(pt)));
                 }

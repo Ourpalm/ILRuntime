@@ -1163,8 +1163,14 @@ namespace ILRuntime.Hybrid
                 {
                     if (!begin && i.OpCode == OpCodes.Call)
                     {
-                        begin = true;
-                        first = null;
+                        if (i.Operand is MethodReference mr)
+                        {
+                            if (mr.Resolve().IsConstructor)
+                            {
+                                begin = true;
+                                first = null;
+                            }
+                        }
                     }
                     else if (begin)
                     {
@@ -1232,6 +1238,11 @@ namespace ILRuntime.Hybrid
                     if (p.ParameterType.IsByReference)
                     {
                         int paramIdx = method.IsStatic ? i : i + 1;
+                        if (p.ParameterType.GetElementType().IsValueType && !p.ParameterType.GetElementType().IsPrimitive)
+                        {
+                            processor.AppendLoadArgument(paramIdx, first);
+                            processor.AppendInstruction(first, processor.Create(OpCodes.Initobj, p.ParameterType.GetElementType()));
+                        }
                         processor.AppendPushArgument(module, reflection, invokeCtx, p, paramIdx, first);
                     }
                 }
@@ -1240,8 +1251,16 @@ namespace ILRuntime.Hybrid
             {
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
-                processor.AppendInstruction(first, processor.Create(OpCodes.Ldc_I4_1));
-                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.PushObjectMethod));
+                if (method.DeclaringType.IsValueType)
+                {
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldobj, method.DeclaringType));
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.GetPushParameterMethod(method.DeclaringType)));
+                }
+                else
+                {
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldc_I4_1));
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.PushObjectMethod));
+                }
             }
             for (int i = 0; i < method.Parameters.Count; i++)
             {
@@ -1264,6 +1283,18 @@ namespace ILRuntime.Hybrid
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldc_I4_0));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Stfld, invokingField));
+            }
+
+            if (method.DeclaringType.IsValueType)
+            {
+                processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
+                if (refIdxCur > 0)
+                    processor.AppendLdc(first, 0 + refIdxCur);
+                else
+                    processor.AppendLdc(first, 0);
+                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.GetReadResultByIndexMethod(method.DeclaringType)));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Stobj, method.DeclaringType));
             }
             if (refIdxCur > 0)
             {
