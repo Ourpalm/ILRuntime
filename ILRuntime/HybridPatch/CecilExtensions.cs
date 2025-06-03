@@ -213,6 +213,19 @@ namespace ILRuntime.Hybrid
             {
                 BuildClosureNameMapping(res, i, bw, md5, hash);
             }
+            foreach(var i in type.NestedTypes)
+            {
+                if (i.IsClosureType())
+                {
+                    foreach (var j in i.Methods)
+                    {
+                        if(res.TryGetValue(i, out hash))
+                        {
+                            BuildClosureNameMapping(res, j, bw, md5, hash);
+                        }
+                    }
+                }
+            }
             return res;
         }
 
