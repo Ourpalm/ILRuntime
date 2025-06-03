@@ -840,7 +840,8 @@ namespace ILRuntime.Runtime.Intepreter
         {
             get
             {
-                throw new NotSupportedException();
+                ThrowAdapterNotFound(method);
+                return null;
             }
         }
         public override Delegate Delegate

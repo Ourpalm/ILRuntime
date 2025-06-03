@@ -965,6 +965,15 @@ namespace ILRuntime.Runtime.Enviorment
                             break;
                     }
                 }
+                if (t == null)
+                {
+                    foreach(var i in System.AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        t = i.GetType(fullname);
+                        if (t != null)
+                            break;
+                    }
+                }
                 if (t != null)
                 {
                     if (!clrTypeMapping.TryGetValue(t, out res))

@@ -243,7 +243,7 @@ namespace ILRuntime.Hybrid
                 for (int i = 0; i < targets.Length; i++)
                 {
                     var field = info.Fields[i].Definition;
-                    if (((FieldDefinition)field).IsStatic != isStatic)
+                    if (((FieldDefinition)field).IsStatic != isStatic || ((FieldDefinition)field).HasConstant)
                     {
                         targets[i] = switchEnd;
                         continue;
@@ -562,7 +562,7 @@ namespace ILRuntime.Hybrid
                 for (int i = 0; i < targets.Length; i++)
                 {
                     var field = info.Fields[i].Definition;
-                    if(((FieldDefinition)field).IsStatic != isStatic)
+                    if(((FieldDefinition)field).IsStatic != isStatic || ((FieldDefinition)field).HasConstant)
                     {
                         targets[i] = switchEnd;
                         continue;
