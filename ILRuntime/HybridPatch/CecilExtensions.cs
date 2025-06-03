@@ -125,7 +125,7 @@ namespace ILRuntime.Hybrid
         {
             bool shouldIncludeBySetting = settings != null ? settings.ShouldTypeIncludeInPatch(type) : false;
             bool shouldInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
-            if (shouldInclude && !type.IsDelegate())
+            if (shouldInclude && !type.IsDelegate() && !type.IsInterface)
             {
                 if (type.CheckHasClosureType())
                 {

@@ -740,7 +740,7 @@ namespace ILRuntime.Hybrid
         {
             bool shouldIncludeBySetting = settings !=null? settings.ShouldTypeIncludeInPatch(type) : false;
             bool shoudInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
-            shoudInclude &= !type.IsDelegate();
+            shoudInclude &= !type.IsDelegate() && !type.IsInterface;
             if (shoudInclude)
                 types.Add(TypeHashInfo.BuildHashInfo(type, ref typeIdx, ref fieldIdx, ref methodIdx, settings));
             foreach (var t in type.NestedTypes)
@@ -813,7 +813,7 @@ namespace ILRuntime.Hybrid
                 return;
             if (settings != null && settings.ShouldTypeIncludeInPatch(baseType))
                 return;
-            if (type.IsDelegate())
+            if (type.IsDelegate() && type.IsInterface)
                 return;
             if (baseType.Fields.Count > 0)
             {
