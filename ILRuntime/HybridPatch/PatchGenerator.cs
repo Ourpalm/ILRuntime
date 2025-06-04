@@ -314,7 +314,7 @@ namespace ILRuntime.Hybrid
             app.SuppressStaticConstructor = true;
             foreach (var i in patchAsmInfo.Assembly.MainModule.AssemblyReferences)
             {
-                var asm = resolver.Resolve(i);
+                var asm = resolver?.Resolve(i);
                 if (asm != null)
                     app.InitializeFromModule(asm.MainModule);
             }
