@@ -806,13 +806,43 @@ namespace ILRuntime.CLR.TypeSystem
                 else
                 {
                     List<ILMethod> lst;
+                    var m = new ILMethod(i, i, this, appdomain, jitFlags);
                     if (!methods.TryGetValue(i.Name, out lst))
                     {
                         lst = new List<ILMethod>();
                         methods[i.Name] = lst;
                     }
-                    var m = new ILMethod(i, i, this, appdomain, jitFlags);
                     lst.Add(m);
+                    if (i.HasOverrides)
+                    {
+                        //Deal with interface implementation with explicit naming and implicit naming
+                        foreach(var o in i.Overrides)
+                        {
+                            if (o.Name != i.Name)
+                            {
+                                if (!methods.TryGetValue(o.Name, out lst))
+                                {
+                                    lst = new List<ILMethod>();
+                                    methods[o.Name] = lst;
+                                }
+                                lst.Add(m);
+                            }
+                            else
+                            {
+                                string cn = $"{o.DeclaringType.FullName}.{o.Name}";
+                                if (cn != i.Name)
+                                {
+                                    if (!methods.TryGetValue(cn, out lst))
+                                    {
+                                        lst = new List<ILMethod>();
+                                        methods[cn] = lst;
+                                    }
+                                    lst.Add(m);
+                                }
+                            }
+                        }
+                    }
+                    
                 }
             }
 
@@ -868,13 +898,16 @@ namespace ILRuntime.CLR.TypeSystem
             }
             if ( m == null && method.DeclearingType.IsInterface )
             {
-                if ( method.DeclearingType is ILType )
+                if (method.DeclearingType is ILType)
                 {
-                    ILType iltype = ( ILType ) method.DeclearingType;
-                    m = GetMethod ( string.Format ( "{0}.{1}", iltype.FullNameForNested, method.Name ), method.Parameters, genericArguments, method.ReturnType, true );
+                    ILType iltype = (ILType)method.DeclearingType;
+                    m = GetMethod(string.Format("{0}.{1}", iltype.FullNameForNested, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
                 }
                 else
-                    m = GetMethod ( string.Format ( "{0}.{1}", method.DeclearingType.FullName, method.Name ), method.Parameters, genericArguments, method.ReturnType, true );
+                {
+                    ((CLRType)method.DeclearingType).TypeForCLR.GetClassName(out var clsName, out var realName, out var isByRef);
+                    m = GetMethod(string.Format("{0}.{1}", realName, method.Name), method.Parameters, genericArguments, method.ReturnType, true);
+                }
             }
 
             if ( m == null || m.IsGenericInstance == method.IsGenericInstance )
