@@ -869,20 +869,24 @@ namespace ILRuntime.Hybrid
                 };
             }
             info.Hash = type.ComputeFieldsHash(bw, md5);
-            info.Methods = new MethodHashInfo[type.Methods.Count];
+            List<MethodHashInfo> methods = new List<MethodHashInfo>();
             for (int i = 0; i < type.Methods.Count; i++)
             {
                 var m = type.Methods[i];
-                info.Methods[i] = new MethodHashInfo()
+                if (m.ShouldIncludeInPatch())
                 {
-                    Definition = m,
-                    DeclaringType = m.DeclaringType.FullName,
-                    Name = m.Name,
-                    Hash = m.ComputeHash(bw, md5, false),
-                    FullHash = m.ComputeHash(bw, md5, true),
-                    Index = methodIdx++,
-                };
+                    methods.Add(new MethodHashInfo()
+                    {
+                        Definition = m,
+                        DeclaringType = m.DeclaringType.FullName,
+                        Name = m.Name,
+                        Hash = m.ComputeHash(bw, md5, false),
+                        FullHash = m.ComputeHash(bw, md5, true),
+                        Index = methodIdx++,
+                    });
+                }
             }
+            info.Methods = methods.ToArray();
             md5.Dispose();
             return info;
         }

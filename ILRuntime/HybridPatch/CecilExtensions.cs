@@ -273,6 +273,7 @@ namespace ILRuntime.Hybrid
         }
 
         static string attributeName = typeof(ILRuntimePatchAttribute).FullName;
+        static string ignoreAttributeName = typeof(ILRuntimePatchIgnore).FullName;
         static string asyncAttributeName = typeof(AsyncStateMachineAttribute).Name;
         static string enumerableAttributeName = typeof(IteratorStateMachineAttribute).Name;
 
@@ -283,6 +284,8 @@ namespace ILRuntime.Hybrid
             {
                 foreach (var attr in type.CustomAttributes)
                 {
+                    if (attr.AttributeType.FullName == ignoreAttributeName)
+                        return false;
                     if (attr.AttributeType.FullName == attributeName)
                     {
                         shouldInclude = true;
@@ -291,6 +294,19 @@ namespace ILRuntime.Hybrid
                 }
             }
             return shouldInclude;
+        }
+
+        public static bool ShouldIncludeInPatch(this MethodDefinition method)
+        {
+            if (method.HasCustomAttributes)
+            {
+                foreach (var attr in method.CustomAttributes)
+                {
+                    if (attr.AttributeType.FullName == ignoreAttributeName)
+                        return false;
+                }
+            }
+            return true;
         }
 
         public static string GetClosureAliasName(string name, string identifier, string hash)

@@ -35,6 +35,7 @@ namespace ILRuntime.Runtime.Enviorment
             sb.Append(@"using System;
 using System.Reflection;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.CLR.TypeSystem;
@@ -50,6 +51,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 namespace ");
             sb.AppendLine(nameSpace);
             sb.Append(@"{   
+    [ILRuntimePatchIgnore]
     public unsafe partial class ");
             sb.Append(clsName);
             sb.AppendLine(@"Adapter : CrossBindingAdaptor

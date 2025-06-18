@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ILRuntime.CLR.TypeSystem
 {
-    class ILGenericParameterType : IType
+    public class ILGenericParameterType : IType
     {
         string name;
         bool isArray, isByRef;
