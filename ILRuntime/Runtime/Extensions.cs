@@ -412,7 +412,7 @@ namespace ILRuntime.Runtime
                     if (q.IsGenericType)
                     {
                         var t1 = type.GetGenericTypeDefinition();
-                        var t2 = type.GetGenericTypeDefinition();
+                        var t2 = q.GetGenericTypeDefinition();
                         if (t1 == t2)
                         {
                             var argA = type.GetGenericArguments();
