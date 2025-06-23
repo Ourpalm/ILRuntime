@@ -4901,10 +4901,12 @@ namespace ILRuntime.Runtime.Intepreter
                 throw new InvalidCastException();
 #endif
             int cnt = descriptor->ValueLow;
+            StackObject* dstVal = dstDescriptor;
+            StackObject* srcVal = descriptor;
             for (int i = 0; i < cnt; i++)
             {
-                StackObject* srcVal = Minus(descriptor, i + 1);
-                StackObject* dstVal = Minus(dstDescriptor, i + 1);
+                srcVal--;
+                dstVal--;
 #if DEBUG
                 if (!noCheck && srcVal->ObjectType != dstVal->ObjectType)
                     throw new NotSupportedException();
