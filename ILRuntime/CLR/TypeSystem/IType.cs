@@ -53,6 +53,8 @@ namespace ILRuntime.CLR.TypeSystem
 
         int TypeIndex { get; }
 
+        ValueTypeInitInfo ValueTypeInitializationInfo { get; }
+
         ILRuntime.Runtime.Enviorment.AppDomain AppDomain { get; }
 
         /// <summary>

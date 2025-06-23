@@ -311,6 +311,14 @@ namespace ILRuntime.Runtime.Enviorment
                 return -1;
             }
         }
+
+        public ValueTypeInitInfo ValueTypeInitializationInfo
+        {
+            get
+            {
+                return null;
+            }
+        }
         #endregion
     }
 }

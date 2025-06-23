@@ -54,6 +54,7 @@ namespace ILRuntime.CLR.TypeSystem
 
         int valuetypeFieldCount, valuetypeManagedCount;
         bool valuetypeSizeCalculated;
+        ValueTypeInitInfo vtInitInfo;
         int hashCode = -1;
         int tIdx = -1;
         static int instance_id = 0x20000000;
@@ -1063,6 +1064,18 @@ namespace ILRuntime.CLR.TypeSystem
         public IType ResolveGenericType(IType contextType)
         {
             throw new NotImplementedException();
+        }
+        public ValueTypeInitInfo ValueTypeInitializationInfo
+        {
+            get
+            {
+                if (vtInitInfo == null)
+                {
+                    if (IsValueType)
+                        vtInitInfo = new ValueTypeInitInfo(this);
+                }
+                return vtInitInfo;
+            }
         }
         public void GetValueTypeSize(out int fieldCout, out int managedCount)
         {

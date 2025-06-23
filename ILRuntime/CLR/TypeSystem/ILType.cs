@@ -56,6 +56,7 @@ namespace ILRuntime.CLR.TypeSystem
         IMethod mToString, mEquals, mGetHashCode;
         int valuetypeFieldCount, valuetypeManagedCount;
         bool valuetypeSizeCalculated;
+        ValueTypeInitInfo vtInitInfo;
 
         public IMethod ToStringMethod
         {
@@ -1553,6 +1554,19 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
             return size;
+        }
+
+        public ValueTypeInitInfo ValueTypeInitializationInfo
+        {
+            get
+            {
+                if(vtInitInfo == null)
+                {
+                    if (IsValueType)
+                        vtInitInfo = new ValueTypeInitInfo(this);
+                }
+                return vtInitInfo;
+            }
         }
 
         public void GetValueTypeSize ( out int fieldCout, out int managedCount )

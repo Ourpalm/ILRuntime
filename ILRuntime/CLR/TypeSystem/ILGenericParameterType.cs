@@ -267,5 +267,13 @@ namespace ILRuntime.CLR.TypeSystem
                 return -1;
             }
         }
+
+        public ValueTypeInitInfo ValueTypeInitializationInfo
+        {
+            get
+            {
+                return null;
+            }
+        }
     }
 }
