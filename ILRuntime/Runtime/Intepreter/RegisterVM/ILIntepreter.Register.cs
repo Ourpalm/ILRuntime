@@ -5304,6 +5304,7 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
+                        var oriESP = esp;
                         if (ehs != null)
                         {
                             int addr = (int)(ip - ptr);
@@ -5367,7 +5368,7 @@ namespace ILRuntime.Runtime.Intepreter
                             {
                                 unhandledException = false;
                                 finallyEndAddress = -1;
-                                lastCaughtEx = ex is ILRuntimeException ? ex : new ILRuntimeException(ex.Message, this, method, ex);
+                                lastCaughtEx = ex is ILRuntimeException ? ex : new ILRuntimeException(ex.Message, this, method, oriESP, ex);
                                 ip = ptr + eh.HandlerStart;
                                 continue;
                             }
@@ -5383,7 +5384,7 @@ namespace ILRuntime.Runtime.Intepreter
                         if (!AppDomain.DebugService.Break(this, ex))
 #endif
                         {
-                            var newEx = new ILRuntimeException(ex.Message, this, method, ex);
+                            var newEx = new ILRuntimeException(ex.Message, this, method, oriESP, ex);
                             throw newEx;
                         }
                     }

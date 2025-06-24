@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace ILRuntime.Runtime.Intepreter
         string stackTrace;
         string thisInfo, localInfo;
         Exception innerException;
-        internal ILRuntimeException(string message, ILIntepreter intepreter, CLR.Method.ILMethod method, Exception innerException = null)
+        internal unsafe ILRuntimeException(string message, ILIntepreter intepreter, CLR.Method.ILMethod method, StackObject* esp, Exception innerException = null)
             : base(message)
         
         {
@@ -42,6 +43,9 @@ namespace ILRuntime.Runtime.Intepreter
                 {
 
                 }
+#if DEBUG
+                stackTrace += "\n\n" + ds.DumpStack(esp, intepreter.Stack).ToString();
+#endif
                 if (innerException != null)
                 {
                     stackTrace += "\n\nRethrown as Exception:" + innerException.ToString();

@@ -1626,7 +1626,7 @@ namespace ILRuntime.Runtime.Debugger
             }
         }
 
-        internal unsafe void DumpStack(StackObject* esp, RuntimeStack stack)
+        internal unsafe StringBuilder DumpStack(StackObject* esp, RuntimeStack stack)
         {
             var start = stack.StackBase;
             var end = esp + 10;
@@ -1741,6 +1741,7 @@ namespace ILRuntime.Runtime.Debugger
 #else
             UnityEngine.Debug.LogWarning(final.ToString());
 #endif
+            return final;
         }
 
         unsafe void GetStackObjectText(StringBuilder sb, StackObject* esp, AutoList mStack, StackObject* valueTypeEnd)
