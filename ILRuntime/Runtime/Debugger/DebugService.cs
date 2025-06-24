@@ -1670,7 +1670,7 @@ namespace ILRuntime.Runtime.Debugger
                 }
                 catch
                 {
-                    sb.Append(" Cannot Fetch Object Info");
+                    sb.Append(string.Format(" Cannot Fetch Object Info(Value:0x{0:X8}, ValueLow:0x{1:X8}", i->Value, i->ValueLow));
                 }
                 if (i < esp)
                 {
@@ -1713,6 +1713,8 @@ namespace ILRuntime.Runtime.Debugger
                         GetStackObjectText(sb, ptr, mStack, valuePointerEnd);
                         final.AppendLine(sb.ToString());
                     }
+
+                    i = Minus(i, i->ValueLow + 1);
                 }
                 catch
                 {
@@ -1728,8 +1730,9 @@ namespace ILRuntime.Runtime.Debugger
                         sb.Append(" Cannot Fetch Object Info");
                     }
                     final.AppendLine(sb.ToString());
+
+                    i = Minus(i, 1);
                 }
-                i = Minus(i, i->ValueLow + 1);
             }
             final.AppendLine("Managed Objects:");
             for (int i = 0; i < mStack.Count; i++)
