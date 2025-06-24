@@ -43,7 +43,7 @@ namespace ILRuntime.Runtime.Intepreter
                 {
 
                 }
-#if DEBUG
+#if DEBUG && DETAILED_STACK_INFO
                 stackTrace += "\n\n" + ds.DumpStack(esp, intepreter.Stack).ToString();
 #endif
                 if (innerException != null)

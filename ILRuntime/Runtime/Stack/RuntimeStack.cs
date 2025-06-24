@@ -405,7 +405,14 @@ namespace ILRuntime.Runtime.Stack
                 ptr->ObjectType = ObjectTypes.ValueTypeObjectReference;
                 *(long*)&ptr->Value = (long)dst;
                 //InitializeValueTypeObject(type, dst, ref managedIdx, noInitialize, managedStack);
-                initInfo.InitializeStackValueType(dst, managedIdx, managedStack);
+                if (noInitialize)
+                {
+                    dst->ObjectType = ObjectTypes.ValueTypeDescriptor;
+                    dst->Value = type.TypeIndex;
+                    dst->ValueLow = type.TotalFieldCount;
+                }
+                else
+                    initInfo.InitializeStackValueType(dst, managedIdx, managedStack);
             }
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
             else
@@ -419,9 +426,9 @@ namespace ILRuntime.Runtime.Stack
             ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
             ptr->Value = type.TypeIndex;
             ptr->ValueLow = tFCnt;
-            StackObject* endPtr = ptr - (tFCnt + 1);
             if (noInitialize)
                 return;
+            StackObject* endPtr = ptr - (tFCnt + 1);
             if (type is ILType)
             {
                 ILType t = (ILType)type;
