@@ -1,4 +1,4 @@
-﻿using ILRuntime.Mono.Cecil;
+using ILRuntime.Mono.Cecil;
 using ILRuntime.Mono.Cecil.Cil;
 using ILRuntime.Runtime;
 using System;
@@ -581,6 +581,14 @@ namespace ILRuntime.Hybrid
                 AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt64ByIndexMethod));
                 AppendInstruction(processor, first, processor.Create(OpCodes.Stind_I8));
             }
+            else if (pt == module.TypeSystem.IntPtr)
+            {
+                processor.AppendLoadArgument(paramIdx, first);
+                AppendInstruction(processor, first, processor.Create(OpCodes.Ldloca, invokeCtx));
+                processor.AppendLdc(first, refIdx);
+                AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt64ByIndexMethod));
+                AppendInstruction(processor, first, processor.Create(OpCodes.Stind_I));
+            }
             else if (pt == module.TypeSystem.Single)
             {
                 processor.AppendLoadArgument(paramIdx, first);
@@ -668,6 +676,11 @@ namespace ILRuntime.Hybrid
                 {
                     AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt64Method));
                     AppendInstruction(processor, first, processor.Create(OpCodes.Conv_U8));
+                }
+                else if (returnType == module.TypeSystem.IntPtr)
+                {
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt64Method));
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Conv_I));
                 }
                 else if (returnType == module.TypeSystem.Single)
                 {
@@ -763,8 +776,19 @@ namespace ILRuntime.Hybrid
                 if (isByref)
                 {
                     AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_I8));
-                    AppendInstruction(processor, first, processor.Create(OpCodes.Conv_U8));
                 }
+                else
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Conv_I8));
+                AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushInt64Method));
+            }
+            else if (pt == module.TypeSystem.IntPtr)
+            {
+                AppendLoadArgument(processor, paramIdx, first);
+                if (isByref)
+                {
+                    AppendInstruction(processor, first, processor.Create(OpCodes.Ldind_I));
+                }
+                AppendInstruction(processor, first, processor.Create(OpCodes.Conv_I8));
                 AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.PushInt64Method));
             }
             else if (pt == module.TypeSystem.Single)

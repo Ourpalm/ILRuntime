@@ -5583,6 +5583,8 @@ namespace ILRuntime.Runtime.Intepreter
                     int start = int.MaxValue, end = 0;
                     stack.CountValueTypeManaged(v, ref start, ref end, &endAddr);
                     noCheck = val <= ResolveReference(v) && val > endAddr;
+                    //if noCheck == true, it means the value to be copied is a member of the value in target register,
+                    //it's safe to just initialize the header and then copy the value backwards, since the member are always after the target address, no data is overlapping
                     stack.AllocValueType(v, ct, true, noCheck);
                 }
 #if DEBUG

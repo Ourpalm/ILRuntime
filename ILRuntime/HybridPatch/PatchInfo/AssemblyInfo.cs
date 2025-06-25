@@ -1,4 +1,4 @@
-﻿using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Runtime;
@@ -740,7 +740,7 @@ namespace ILRuntime.Hybrid
         {
             bool shouldIncludeBySetting = settings !=null? settings.ShouldTypeIncludeInPatch(type) : false;
             bool shoudInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
-            shoudInclude &= !type.IsDelegate() && !type.IsInterface;
+            shoudInclude &= !type.IsDelegate() && !type.IsInterface && !type.IsEnum;
             if (shoudInclude)
                 types.Add(TypeHashInfo.BuildHashInfo(type, ref typeIdx, ref fieldIdx, ref methodIdx, settings));
             foreach (var t in type.NestedTypes)
@@ -813,7 +813,7 @@ namespace ILRuntime.Hybrid
                 return;
             if (settings != null && settings.ShouldTypeIncludeInPatch(baseType))
                 return;
-            if (type.IsDelegate() && type.IsInterface)
+            if (type.IsDelegate() && type.IsInterface && !type.IsEnum)
                 return;
             if (baseType.Fields.Count > 0)
             {

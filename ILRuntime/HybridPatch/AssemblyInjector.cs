@@ -1,4 +1,4 @@
-﻿using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Mono.Cecil.Cil;
@@ -257,11 +257,11 @@ namespace ILRuntime.Hybrid
                             var bt = btr.Resolve();
                             btr = bt != null ? bt.BaseType : null;
                         }
-                        while (!btr.CheckTypeReferenceEqual(field.DeclaringType) && btr != null);
+                        while (btr != null && !btr.CheckTypeReferenceEqual(field.DeclaringType));
                         if (btr != null)
                             fieldDeclaringType = btr;
                     }
-                    var fieldType = module.ImportReference(field.FieldType);
+                    var fieldType = field.FieldType.IsGenericParameter ? field.FieldType : module.ImportReference(field.FieldType);
                     fieldDeclaringType = module.ImportReference(fieldDeclaringType);
                     FieldReference fr = new FieldReference(field.Name, fieldType, fieldDeclaringType);
                     Instruction begin = null;
@@ -381,6 +381,31 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ldarg_S, (byte)4));
                                 processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterRetrieveInt64Method));
                                 processor.Append(processor.Create(OpCodes.Conv_U8));
+                                processor.Append(processor.Create(OpCodes.Stfld, fr));
+                            }
+                            processor.Append(processor.Create(OpCodes.Ret));
+                        }
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.IntPtr))
+                        {
+                            if (isStatic)
+                            {
+                                begin = processor.Create(OpCodes.Ldarg_1);
+                                processor.Append(begin);
+                                processor.Append(processor.Create(OpCodes.Ldarg_2));
+                                processor.Append(processor.Create(OpCodes.Ldarg_3));
+                                processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterRetrieveInt64Method));
+                                processor.Append(processor.Create(OpCodes.Conv_I));
+                                processor.Append(processor.Create(OpCodes.Stsfld, fr));
+                            }
+                            else
+                            {
+                                begin = processor.Create(OpCodes.Ldarg_0);
+                                processor.Append(begin);
+                                processor.Append(processor.Create(OpCodes.Ldarg_2));
+                                processor.Append(processor.Create(OpCodes.Ldarg_3));
+                                processor.Append(processor.Create(OpCodes.Ldarg_S, (byte)4));
+                                processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterRetrieveInt64Method));
+                                processor.Append(processor.Create(OpCodes.Conv_I));
                                 processor.Append(processor.Create(OpCodes.Stfld, fr));
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
@@ -577,11 +602,11 @@ namespace ILRuntime.Hybrid
                             var bt = btr.Resolve();
                             btr = bt != null ? bt.BaseType : null;
                         }
-                        while (!btr.CheckTypeReferenceEqual(field.DeclaringType) && btr != null);
+                        while (btr != null && !btr.CheckTypeReferenceEqual(field.DeclaringType));
                         if (btr != null)
                             fieldDeclaringType = btr;
                     }
-                    var fieldType = module.ImportReference(field.FieldType);
+                    TypeReference fieldType = field.FieldType.IsGenericParameter ? field.FieldType : module.ImportReference(field.FieldType);
                     fieldDeclaringType = module.ImportReference(fieldDeclaringType);
                     FieldReference fr = new FieldReference(field.Name, fieldType, fieldDeclaringType);
                     if (field.FieldType.IsPrimitive)
@@ -642,7 +667,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt64Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64))
+                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.IntPtr))
                         {
                             if (isStatic)
                             {
