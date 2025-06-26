@@ -20,15 +20,15 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 namespace ILRuntime.Runtime.Generated
 {
     [ILRuntimePatchIgnore]
-    unsafe class System_Action_1_String_Binding
+    unsafe class System_Action_2_Int32_ILTypeInstance_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
             Type[] args;
-            Type type = typeof(System.Action<System.String>);
-            args = new Type[]{typeof(System.String)};
+            Type type = typeof(System.Action<System.Int32, ILRuntime.Runtime.Intepreter.ILTypeInstance>);
+            args = new Type[]{typeof(System.Int32), typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance)};
             method = type.GetMethod("Invoke", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Invoke_0);
 
@@ -40,17 +40,20 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = __esp - 2;
+            StackObject* __ret = __esp - 3;
 
             ptr_of_this_method = __esp - 1;
-            System.String @obj = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
+            ILRuntime.Runtime.Intepreter.ILTypeInstance @arg2 = (ILRuntime.Runtime.Intepreter.ILTypeInstance)typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             ptr_of_this_method = __esp - 2;
-            System.Action<System.String> instance_of_this_method = (System.Action<System.String>)typeof(System.Action<System.String>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
+            System.Int32 @arg1 = ptr_of_this_method->Value;
+
+            ptr_of_this_method = __esp - 3;
+            System.Action<System.Int32, ILRuntime.Runtime.Intepreter.ILTypeInstance> instance_of_this_method = (System.Action<System.Int32, ILRuntime.Runtime.Intepreter.ILTypeInstance>)typeof(System.Action<System.Int32, ILRuntime.Runtime.Intepreter.ILTypeInstance>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            instance_of_this_method.Invoke(@obj);
+            instance_of_this_method.Invoke(@arg1, @arg2);
 
             return __ret;
         }

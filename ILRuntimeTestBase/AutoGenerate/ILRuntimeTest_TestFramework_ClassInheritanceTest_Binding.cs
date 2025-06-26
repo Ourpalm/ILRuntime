@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
@@ -18,6 +19,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.Runtime.Generated
 {
+    [ILRuntimePatchIgnore]
     unsafe class ILRuntimeTest_TestFramework_ClassInheritanceTest_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
@@ -60,10 +62,10 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.TestAbstract();
@@ -75,10 +77,10 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.TestVirtual();
@@ -90,10 +92,10 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.ClassInheritanceTest instance_of_this_method = (ILRuntimeTest.TestFramework.ClassInheritanceTest)typeof(ILRuntimeTest.TestFramework.ClassInheritanceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.TestField();
@@ -105,10 +107,10 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.InterfaceTest @ins = (ILRuntimeTest.TestFramework.InterfaceTest)typeof(ILRuntimeTest.TestFramework.InterfaceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.InterfaceTest @ins = (ILRuntimeTest.TestFramework.InterfaceTest)typeof(ILRuntimeTest.TestFramework.InterfaceTest).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -121,15 +123,15 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = __esp - 1;
             System.Int64 @i = __intp.RetriveInt64(ptr_of_this_method, __mStack);
 
 
             ILRuntimeTest.TestFramework.ClassInheritanceTest.TestLongRef(ref @i);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = __esp - 1;
             switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.StackObjectReference:
@@ -229,7 +231,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* AssignFromStack_staticField_1(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            System.IDisposable @staticField = (System.IDisposable)typeof(System.IDisposable).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            System.IDisposable @staticField = (System.IDisposable)typeof(System.IDisposable).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             ILRuntimeTest.TestFramework.ClassInheritanceTest.staticField = @staticField;
             return ptr_of_this_method;
         }

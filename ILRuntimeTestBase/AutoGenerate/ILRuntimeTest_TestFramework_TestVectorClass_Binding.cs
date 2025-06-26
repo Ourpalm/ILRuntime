@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
@@ -18,6 +19,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.Runtime.Generated
 {
+    [ILRuntimePatchIgnore]
     unsafe class ILRuntimeTest_TestFramework_TestVectorClass_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
@@ -59,10 +61,10 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Vector2;
@@ -79,26 +81,26 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            StackObject* __ret = __esp - 4;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestVectorClass @d = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.TestVectorClass @d = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = __esp - 2;
             ILRuntimeTest.TestFramework.TestVector3 @c = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
                 ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @c, __intp, ptr_of_this_method, __mStack, true);
             } else {
-                @c = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+                @c = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)16);
                 __intp.Free(ptr_of_this_method);
             }
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.String @b = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 3;
+            System.String @b = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = __esp - 4;
             System.Int32 @a = ptr_of_this_method->Value;
 
 
@@ -111,19 +113,19 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = __esp - 1;
             ILRuntimeTest.TestFramework.TestVector3 @value = new ILRuntimeTest.TestFramework.TestVector3();
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
                 ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @value, __intp, ptr_of_this_method, __mStack, true);
             } else {
-                @value = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+                @value = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)16);
                 __intp.Free(ptr_of_this_method);
             }
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.Vector2 = value;
@@ -135,10 +137,10 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.Obj;
@@ -150,21 +152,21 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 4);
+            StackObject* __ret = __esp - 4;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestVectorClass @d = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.TestVectorClass @d = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVectorClass @c = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestFramework.TestVectorClass @c = (ILRuntimeTest.TestFramework.TestVectorClass)typeof(ILRuntimeTest.TestFramework.TestVectorClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
-            System.String @b = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 3;
+            System.String @b = (System.String)typeof(System.String).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 4);
+            ptr_of_this_method = __esp - 4;
             System.Int32 @a = ptr_of_this_method->Value;
 
 
@@ -202,7 +204,7 @@ namespace ILRuntime.Runtime.Generated
             if (ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder != null) {
                 ILRuntime.Runtime.Generated.CLRBindings.s_ILRuntimeTest_TestFramework_TestVector3_Binding_Binder.ParseValue(ref @vector, __intp, ptr_of_this_method, __mStack, true);
             } else {
-                @vector = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+                @vector = (ILRuntimeTest.TestFramework.TestVector3)typeof(ILRuntimeTest.TestFramework.TestVector3).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)16);
             }
             ((ILRuntimeTest.TestFramework.TestVectorClass)o).vector = @vector;
             return ptr_of_this_method;
@@ -212,7 +214,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+            StackObject* __ret = __esp - 0;
 
             var result_of_this_method = new ILRuntimeTest.TestFramework.TestVectorClass();
 

@@ -22,7 +22,7 @@ namespace ILRuntime.Runtime.Enviorment
     {
         public static StackObject* GetCurrentStackTrace(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            StackObject* ret = esp - 1 - 1;
+            StackObject* ret = esp - 2;
             intp.Free(esp - 1);
 
             return ILIntepreter.PushObject(ret, mStack, intp.AppDomain.DebugService.GetStackTrace(intp));
@@ -109,7 +109,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public static StackObject* CreateInstance3(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            var p = esp - 1 - 1;
+            var p = esp - 2;
             var t = mStack[p->Value] as Type;
             var p2 = esp - 1;
             var t2 = mStack[p2->Value] as Object[];
@@ -231,12 +231,12 @@ namespace ILRuntime.Runtime.Enviorment
 
         public unsafe static StackObject* InitializeArray(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
             var param = esp - 1;
             byte[] data = StackObject.ToObject(param, domain, mStack) as byte[];
             intp.Free(param);
-            param = esp - 1 - 1;
+            param = esp - 2;
             object array = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
@@ -506,13 +506,13 @@ namespace ILRuntime.Runtime.Enviorment
         public unsafe static StackObject* DelegateCombine(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
             var param = esp - 1;
             object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
-            param = esp - 1 - 1;
+            param = esp - 2;
             object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
@@ -569,7 +569,7 @@ namespace ILRuntime.Runtime.Enviorment
             var domain = ctx.AppDomain;
 
             //Don't ask me why not esp -2, unity won't return the right result
-            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 2), domain, mStack);
             var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
@@ -613,13 +613,13 @@ namespace ILRuntime.Runtime.Enviorment
         public unsafe static StackObject* DelegateRemove(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
             var param = esp - 1;
             object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
-            param = esp - 1 - 1;
+            param = esp - 2;
             object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
@@ -661,7 +661,7 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 2), domain, mStack);
             var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
@@ -720,13 +720,13 @@ namespace ILRuntime.Runtime.Enviorment
         public unsafe static StackObject* DelegateEqulity(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
             var param = esp - 1;
             object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
-            param = esp - 1 - 1;
+            param = esp - 2;
             object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
@@ -771,7 +771,7 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 2), domain, mStack);
             var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
@@ -805,13 +805,13 @@ namespace ILRuntime.Runtime.Enviorment
         public unsafe static StackObject* DelegateInequlity(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             //Don't ask me why not esp -2, unity won't return the right result
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
             var param = esp - 1;
             object dele2 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
-            param = esp - 1 - 1;
+            param = esp - 2;
             object dele1 = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
@@ -853,7 +853,7 @@ namespace ILRuntime.Runtime.Enviorment
             var mStack = ctx.ManagedStack;
             var domain = ctx.AppDomain;
 
-            var dele1 = StackObject.ToObject((esp - 1 - 1), domain, mStack);
+            var dele1 = StackObject.ToObject((esp - 2), domain, mStack);
             var dele2 = StackObject.ToObject((esp - 1), domain, mStack);
 
             if (dele1 != null)
@@ -902,7 +902,7 @@ namespace ILRuntime.Runtime.Enviorment
             var p = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
-            param = esp - 1 - 1;
+            param = esp - 2;
             var obj = StackObject.ToObject(param, domain, mStack);
             intp.Free(param);
 
@@ -1028,14 +1028,14 @@ namespace ILRuntime.Runtime.Enviorment
         }*/
         public static StackObject* EnumParse(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
 
             var p = esp - 1;
             string name = (string)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            p = esp - 1 - 1;
+            p = esp - 2;
             Type t = (Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
             if (t is ILRuntimeType)
@@ -1182,14 +1182,14 @@ namespace ILRuntime.Runtime.Enviorment
 
         public static StackObject* EnumGetName(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
 
             var p = esp - 1;
             object val = StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            p = esp - 1 - 1;
+            p = esp - 2;
             Type t = (Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
@@ -1227,14 +1227,14 @@ namespace ILRuntime.Runtime.Enviorment
 
         public static StackObject* EnumToObject(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
 
             var p = esp - 1;
             int val = p->Value;
             intp.Free(p);
 
-            p = esp - 1 - 1;
+            p = esp - 2;
             Type t = (Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
@@ -1262,14 +1262,14 @@ namespace ILRuntime.Runtime.Enviorment
 #if NET_4_6 || NET_STANDARD_2_0
         public static StackObject* EnumHasFlag(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
 
             var p = esp - 1;
             object val = StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            p = esp - 1 - 1;
+            p = esp - 2;
             object ins = StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
@@ -1293,14 +1293,14 @@ namespace ILRuntime.Runtime.Enviorment
 
         public static StackObject* EnumCompareTo(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-            var ret = esp - 1 - 1;
+            var ret = esp - 2;
             AppDomain domain = intp.AppDomain;
 
             var p = esp - 1;
             object val = StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            p = esp - 1 - 1;
+            p = esp - 2;
             object ins = StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
@@ -1332,7 +1332,7 @@ namespace ILRuntime.Runtime.Enviorment
             MethodInfo mi = (MethodInfo)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 
-            p = esp - 1 - 1;
+            p = esp - 2;
             Type t = (Type)StackObject.ToObject(p, domain, mStack);
             intp.Free(p);
 

@@ -183,14 +183,14 @@ namespace ILRuntime.Runtime.CLRBinding
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 if (param.Length != 0 || !i.IsStatic)
                     sb.AppendLine("            StackObject* ptr_of_this_method;");
-                sb.AppendLine(string.Format("            StackObject* __ret = ILIntepreter.Minus(__esp, {0});", paramCnt));
+                sb.AppendLine(string.Format("            StackObject* __ret = __esp - {0};", paramCnt));
                 sb.AppendLine();
                 bool hasByRef = param.HasByRefParam();
                 string shouldFreeParam = hasByRef ? "false" : "true";
                 for (int j = param.Length; j > 0; j--)
                 {
                     var p = param[j - 1];
-                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
+                    sb.AppendLine(string.Format("            ptr_of_this_method = __esp - {0};", param.Length - j + 1));
                     p.ParameterType.AppendArgumentCode(sb, j, p.Name, valueTypeBinders, isMultiArr, hasByRef, true);
                     sb.AppendLine();
                 }
@@ -198,7 +198,7 @@ namespace ILRuntime.Runtime.CLRBinding
 
                 if (!i.IsStatic)
                 {
-                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
+                    sb.AppendLine(string.Format("            ptr_of_this_method = __esp - {0};", paramCnt));
                     if (type.IsPrimitive)
                         sb.AppendLine(string.Format("            {0} instance_of_this_method = GetInstance(__domain, ptr_of_this_method, __mStack);", typeClsName));
                     else if (type.IsValueType && !type.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(type))
@@ -510,7 +510,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     bool isByRef;
                     var pt = p.ParameterType.IsByRef ? p.ParameterType.GetElementType() : p.ParameterType;
                     pt.GetClassName(out clsName, out realClsName, out isByRef);
-                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
+                    sb.AppendLine(string.Format("            ptr_of_this_method = __esp - {0};", param.Length - j + 1));
                     if (p.ParameterType.IsByRef)
                     {
                         sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)
@@ -596,7 +596,7 @@ namespace ILRuntime.Runtime.CLRBinding
 
                 if (!i.IsStatic && ((type.IsValueType && !type.IsPrimitive) || hasByRef))//need to write back value type instance
                 {
-                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", paramCnt));
+                    sb.AppendLine(string.Format("            ptr_of_this_method = __esp - {0};", paramCnt));
                     bool noWriteback = noUnbox; 
                     if (type.IsValueType && !type.IsPrimitive && !noWriteback)
                     {

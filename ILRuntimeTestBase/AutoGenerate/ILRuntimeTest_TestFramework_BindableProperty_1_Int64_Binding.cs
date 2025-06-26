@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
@@ -18,6 +19,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.Runtime.Generated
 {
+    [ILRuntimePatchIgnore]
     unsafe class ILRuntimeTest_TestFramework_BindableProperty_1_Int64_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
@@ -47,13 +49,13 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = __esp - 1;
             System.Int64 @value = *(long*)&ptr_of_this_method->Value;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.BindableProperty<System.Int64> instance_of_this_method = (ILRuntimeTest.TestFramework.BindableProperty<System.Int64>)typeof(ILRuntimeTest.TestFramework.BindableProperty<System.Int64>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestFramework.BindableProperty<System.Int64> instance_of_this_method = (ILRuntimeTest.TestFramework.BindableProperty<System.Int64>)typeof(ILRuntimeTest.TestFramework.BindableProperty<System.Int64>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             instance_of_this_method.Value = value;
@@ -81,7 +83,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* AssignFromStack_OnChangeWithOldVal_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal @OnChangeWithOldVal = (ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal)typeof(ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal @OnChangeWithOldVal = (ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal)typeof(ILRuntimeTest.TestFramework.BindableProperty<System.Int64>.onChangeWithOldVal).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             ((ILRuntimeTest.TestFramework.BindableProperty<System.Int64>)o).OnChangeWithOldVal = @OnChangeWithOldVal;
             return ptr_of_this_method;
         }
@@ -91,8 +93,8 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 1);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 1;
+            ptr_of_this_method = __esp - 1;
             System.Int64 @val = *(long*)&ptr_of_this_method->Value;
 
 

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
@@ -18,6 +19,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.Runtime.Generated
 {
+    [ILRuntimePatchIgnore]
     unsafe class ILRuntimeTest_TestBase_GenericExtensions_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
@@ -265,14 +267,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<System.Object> @a = (System.Action<System.Object>)typeof(System.Action<System.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<System.Object> @a = (System.Action<System.Object>)typeof(System.Action<System.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -285,14 +287,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -305,14 +307,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<System.Exception> @a = (System.Action<System.Exception>)typeof(System.Action<System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<System.Exception> @a = (System.Action<System.Exception>)typeof(System.Action<System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -325,14 +327,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -345,14 +347,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<System.ArgumentException> @a = (System.Action<System.ArgumentException>)typeof(System.Action<System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<System.ArgumentException> @a = (System.Action<System.ArgumentException>)typeof(System.Action<System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -365,14 +367,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -385,14 +387,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<System.Exception> @a = (System.Action<System.Exception>)typeof(System.Action<System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<System.Exception> @a = (System.Action<System.Exception>)typeof(System.Action<System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -405,14 +407,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -425,14 +427,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<System.ArgumentException> @a = (System.Action<System.ArgumentException>)typeof(System.Action<System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<System.ArgumentException> @a = (System.Action<System.ArgumentException>)typeof(System.Action<System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -445,14 +447,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)8);
+            ptr_of_this_method = __esp - 1;
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>)typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)8);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -465,14 +467,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -485,14 +487,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -505,14 +507,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.SubExtensionClass @i = (ILRuntimeTest.TestBase.SubExtensionClass)typeof(ILRuntimeTest.TestBase.SubExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.SubExtensionClass @i = (ILRuntimeTest.TestBase.SubExtensionClass)typeof(ILRuntimeTest.TestBase.SubExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -525,14 +527,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            System.Exception @ex = (System.Exception)typeof(System.Exception).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.SubExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.SubExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -545,14 +547,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.ArgumentException @ex = (System.ArgumentException)typeof(System.ArgumentException).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            System.ArgumentException @ex = (System.ArgumentException)typeof(System.ArgumentException).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)typeof(ILRuntimeTest.TestBase.ExtensionClass).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -565,14 +567,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.ArgumentException @ex = (System.ArgumentException)typeof(System.ArgumentException).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            System.ArgumentException @ex = (System.ArgumentException)typeof(System.ArgumentException).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 
@@ -585,14 +587,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            System.ArgumentException @ex = (System.ArgumentException)typeof(System.ArgumentException).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 1;
+            System.ArgumentException @ex = (System.ArgumentException)typeof(System.ArgumentException).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestBase.SubExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestBase.SubExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>)typeof(ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
 

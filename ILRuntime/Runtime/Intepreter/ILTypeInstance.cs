@@ -531,7 +531,7 @@ namespace ILRuntime.Runtime.Intepreter
             ptr->ValueLow = type.TotalFieldCount;
             for(int i = 0; i < fields.Length; i++)
             {
-                var val = ILIntepreter.Minus(ptr, i + 1);
+                var val = ptr - (i + 1);
                 switch (val->ObjectType)
                 {
                     case ObjectTypes.Object:
@@ -613,7 +613,7 @@ namespace ILRuntime.Runtime.Intepreter
             int cnt = val->ValueLow;
             for (int i = 0; i < cnt; i++)
             {
-                var addr = ILIntepreter.Minus(val, i + 1);
+                var addr = val - (i + 1);
                 AssignFromStack(i, addr, intp, managedStack);
             }
         }

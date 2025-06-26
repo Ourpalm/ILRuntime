@@ -67,13 +67,13 @@ namespace ILRuntime.Runtime.CLRBinding
                 sb.AppendLine("            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;");
                 if (param.Length != 0)
                     sb.AppendLine("            StackObject* ptr_of_this_method;");
-                sb.AppendLine(string.Format("            StackObject* __ret = ILIntepreter.Minus(__esp, {0});", paramCnt));
+                sb.AppendLine(string.Format("            StackObject* __ret = __esp - {0};", paramCnt));
                 bool hasByRef = param.HasByRefParam();
                 string shouldFreeParam = hasByRef ? "false" : "true";
                 for (int j = param.Length; j > 0; j--)
                 {
                     var p = param[j - 1];
-                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
+                    sb.AppendLine(string.Format("            ptr_of_this_method = __esp - {0};", param.Length - j + 1));
                     string clsName, realClsName;
                     bool isByRef;
                     p.ParameterType.GetClassName(out clsName, out realClsName, out isByRef);
@@ -194,7 +194,7 @@ namespace ILRuntime.Runtime.CLRBinding
                     bool isByRef;
                     var pt = p.ParameterType.IsByRef ? p.ParameterType.GetElementType() : p.ParameterType;
                     pt.GetClassName(out clsName, out realClsName, out isByRef);
-                    sb.AppendLine(string.Format("            ptr_of_this_method = ILIntepreter.Minus(__esp, {0});", param.Length - j + 1));
+                    sb.AppendLine(string.Format("            ptr_of_this_method = __esp - {0};", param.Length - j + 1));
                     if (p.ParameterType.IsByRef)
                     {
                         sb.AppendLine(@"            switch(ptr_of_this_method->ObjectType)

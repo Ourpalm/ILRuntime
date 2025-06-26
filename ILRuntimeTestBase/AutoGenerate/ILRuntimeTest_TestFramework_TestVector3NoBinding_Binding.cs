@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
@@ -18,6 +19,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.Runtime.Generated
 {
+    [ILRuntimePatchIgnore]
     unsafe class ILRuntimeTest_TestFramework_TestVector3NoBinding_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
@@ -112,7 +114,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* get_one_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+            StackObject* __ret = __esp - 0;
 
 
             var result_of_this_method = ILRuntimeTest.TestFramework.TestVector3NoBinding.one;
@@ -124,13 +126,13 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = __esp - 1;
             System.Single @b = *(float*)&ptr_of_this_method->Value;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVector3NoBinding @a = (ILRuntimeTest.TestFramework.TestVector3NoBinding)typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestFramework.TestVector3NoBinding @a = (ILRuntimeTest.TestFramework.TestVector3NoBinding)typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)16);
             __intp.Free(ptr_of_this_method);
 
 
@@ -143,14 +145,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            ILRuntimeTest.TestFramework.TestVector3NoBinding @b = (ILRuntimeTest.TestFramework.TestVector3NoBinding)typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+            ptr_of_this_method = __esp - 1;
+            ILRuntimeTest.TestFramework.TestVector3NoBinding @b = (ILRuntimeTest.TestFramework.TestVector3NoBinding)typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)16);
             __intp.Free(ptr_of_this_method);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
-            ILRuntimeTest.TestFramework.TestVector3NoBinding @a = (ILRuntimeTest.TestFramework.TestVector3NoBinding)typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)16);
+            ptr_of_this_method = __esp - 2;
+            ILRuntimeTest.TestFramework.TestVector3NoBinding @a = (ILRuntimeTest.TestFramework.TestVector3NoBinding)typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)16);
             __intp.Free(ptr_of_this_method);
 
 
@@ -162,7 +164,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* get_zero_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+            StackObject* __ret = __esp - 0;
 
 
             var result_of_this_method = ILRuntimeTest.TestFramework.TestVector3NoBinding.zero;
@@ -273,14 +275,14 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 3);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            StackObject* __ret = __esp - 3;
+            ptr_of_this_method = __esp - 1;
             System.Single @z = *(float*)&ptr_of_this_method->Value;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = __esp - 2;
             System.Single @y = *(float*)&ptr_of_this_method->Value;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 3);
+            ptr_of_this_method = __esp - 3;
             System.Single @x = *(float*)&ptr_of_this_method->Value;
 
 

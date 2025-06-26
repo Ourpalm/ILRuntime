@@ -121,7 +121,7 @@ namespace ILRuntime.Runtime.Stack
 #endif
             StackObject* returnVal = esp - 1;
             var method = frame.Method;
-            StackObject* ret = ILIntepreter.Minus(frame.LocalVarPointer, method.ParameterCount);
+            StackObject* ret = frame.LocalVarPointer - method.ParameterCount;
             int mStackBase = frame.ManagedStackBase;
             if (method.HasThis)
                 ret--;
@@ -317,7 +317,7 @@ namespace ILRuntime.Runtime.Stack
         void AllocBlock(int size, out StackObject* dst, out int managedIdx)
         {
             dst = valueTypePtr;
-            valueTypePtr = ILIntepreter.Minus(valueTypePtr, size);
+            valueTypePtr = valueTypePtr - size;
             if (valueTypePtr <= StackBase)
                 throw new StackOverflowException();
             managedIdx = managedStack.Count;            
@@ -397,7 +397,7 @@ namespace ILRuntime.Runtime.Stack
                     dst = valueTypePtr;
                     managedIdx = managedStack.Count;
 
-                    valueTypePtr = ILIntepreter.Minus(valueTypePtr, size);
+                    valueTypePtr = valueTypePtr - size;
                     if (valueTypePtr <= StackBase)
                         throw new StackOverflowException();
                 }
@@ -435,7 +435,7 @@ namespace ILRuntime.Runtime.Stack
                 for (int i = 0; i < t.FieldTypes.Length; i++)
                 {
                     var ft = t.FieldTypes[i];
-                    StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i + 1);
+                    StackObject* val = ptr - (t.FieldStartIndex + i + 1);
                     if (ft.IsPrimitive)
                         *val = ft.DefaultObject;
                     else if (ft.IsEnum)
@@ -487,7 +487,7 @@ namespace ILRuntime.Runtime.Stack
                 for (int i = 0; i < cnt; i++)
                 {
                     var it = arr[i] as CLRType;
-                    StackObject* val = ILIntepreter.Minus(ptr, i + 1);
+                    StackObject* val = ptr - (i + 1);
                     if (it.IsPrimitive)
                         *val = it.DefaultObject;
                     else if (it.IsEnum)
@@ -539,7 +539,7 @@ namespace ILRuntime.Runtime.Stack
                 for (int i = 0; i < t.FieldTypes.Length; i++)
                 {
                     var ft = t.FieldTypes[i];
-                    StackObject* val = ILIntepreter.Minus(ptr, t.FieldStartIndex + i + 1);
+                    StackObject* val = ptr - (t.FieldStartIndex + i + 1);
                     if (ft.IsPrimitive || ft.IsEnum)
                         StackObject.Initialized(val, ft);
                     else
@@ -577,7 +577,7 @@ namespace ILRuntime.Runtime.Stack
                 for (int i = 0; i < cnt; i++)
                 {
                     var vt = t.OrderedFieldTypes[i] as CLRType;
-                    StackObject* val = ILIntepreter.Minus(ptr, i + 1);
+                    StackObject* val = ptr - (i + 1);
                     if (vt.IsPrimitive)
                         StackObject.Initialized(val, vt);
                     else

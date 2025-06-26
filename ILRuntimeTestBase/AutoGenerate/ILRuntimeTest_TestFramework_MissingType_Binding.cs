@@ -20,14 +20,14 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 namespace ILRuntime.Runtime.Generated
 {
     [ILRuntimePatchIgnore]
-    unsafe class System_ArgumentException_Binding
+    unsafe class ILRuntimeTest_TestFramework_MissingType_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
             Type[] args;
-            Type type = typeof(System.ArgumentException);
+            Type type = typeof(ILRuntimeTest.TestFramework.MissingType);
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
@@ -42,7 +42,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = __esp - 0;
 
-            var result_of_this_method = new System.ArgumentException();
+            var result_of_this_method = new ILRuntimeTest.TestFramework.MissingType();
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }

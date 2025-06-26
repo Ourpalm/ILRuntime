@@ -77,6 +77,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestBase_TestSession_Binding.Register(app);
             ILRuntime_Runtime_Enviorment_AppDomain_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestCLRBinding_Binding.Register(app);
+            ILRuntimeTest_TestFramework_MissingType_Binding.Register(app);
             System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_List_1_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_List_1_ILTypeInstance_Binding.Register(app);
@@ -140,6 +141,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntimeTest_TestFramework_ClassInheritanceTest2_1_ILRuntimeTest_TestFramework_ClassInheritanceTest2Adaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestClass2_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_TestClass3Adaptor_Binding_Adaptor_Binding.Register(app);
+            System_Collections_Generic_List_1_ILTypeInstance_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILRuntimeTest_TestFramework_ClassInheritanceTestAdaptor_Binding_Adaptor_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestHashMap_2_Int32_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_IEnumerator_1_KeyValuePair_2_Int32_ILTypeInstance_Binding.Register(app);
@@ -161,6 +163,7 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_List_1_String_Binding.Register(app);
             System_Collections_Generic_List_1_FieldInfo_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestCLREnumClass_Binding.Register(app);
+            System_Action_2_Int32_ILTypeInstance_Binding.Register(app);
             System_Nullable_1_Int32_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_List_1_String_Binding.Register(app);
             System_Collections_Generic_List_1_String_Binding_Enumerator_Binding.Register(app);
@@ -182,7 +185,6 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollection_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_ILTypeInstance_Binding_ValueCollection_Binding_Enumerator_Binding.Register(app);
             System_NotSupportedException_Binding.Register(app);
-            System_Collections_Generic_List_1_ILTypeInstance_Binding_Enumerator_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Type_Int32_Binding.Register(app);
             System_NotImplementedException_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Object_Object_Binding.Register(app);

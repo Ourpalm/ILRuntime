@@ -113,7 +113,7 @@ namespace ILRuntime.Runtime.Stack
                             var ins = iltype.Instantiate(false);
                             for (int i = 0; i < dst->ValueLow; i++)
                             {
-                                var addr = ILIntepreter.Minus(dst, i + 1);
+                                var addr = dst - (i + 1);
                                 //ILIntepreter instance is only needed in clrbinding, in this case, it's pure value type declared inside ILRuntime, so it won't need it
                                 //Adding a parameter in this widely used method would introduce unnecessary overhead
                                 ins.AssignFromStack(i, addr, null, mStack);
@@ -212,8 +212,8 @@ namespace ILRuntime.Runtime.Stack
         Double,
         StackObjectReference,//Value = pointer, 
         StaticFieldReference,
-        ValueTypeObjectReference,
         ValueTypeDescriptor,
+        ValueTypeObjectReference,
         Object,
         FieldReference,//Value = objIdx, ValueLow = fieldIdx
         ArrayReference,//Value = objIdx, ValueLow = elemIdx

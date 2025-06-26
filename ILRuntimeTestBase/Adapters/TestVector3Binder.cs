@@ -13,13 +13,13 @@ namespace ILRuntimeTest.TestFramework
     {
         public override unsafe void AssignFromStack(ref Fixed64 ins, StackObject* ptr, IList<object> mStack)
         {
-            var v = ILIntepreter.Minus(ptr, 1);
+            var v = ptr - 1;
             ins = new Fixed64(*(long*)&v->Value);
         }
 
         public override unsafe void CopyValueTypeToStack(ref Fixed64 ins, StackObject* ptr, IList<object> mStack)
         {
-            var v = ILIntepreter.Minus(ptr, 1);
+            var v = ptr - 1;
             *(long*)&v->Value = ins.RawValue;
         }
         public override void RegisterCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
@@ -40,14 +40,14 @@ namespace ILRuntimeTest.TestFramework
             {
                 ret = esp;
                 Fixed64 vec;
-                var ptr = ILIntepreter.Minus(esp, 1);
+                var ptr = esp -1;
                 var val = *(long*)&ptr->Value;
                 vec = new Fixed64(val);
                 PushFixed64(ref vec, intp, ptr, mStack);
             }
             else
             {
-                ret = ILIntepreter.Minus(esp, 2);
+                ret = esp - 2;
                 var instance = ILIntepreter.GetObjectAndResolveReference(ret);
                 var dst = *(StackObject**)&instance->Value;
                 var f = ILIntepreter.Minus(dst, 1);

@@ -361,7 +361,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public void PushReference(int index)
         {
-            var dst = ILIntepreter.Add(ebp, index);
+            var dst = ebp + index;
             esp->ObjectType = ObjectTypes.StackObjectReference;
             *(long*)&esp->Value = (long)dst;
             if (useRegister)
@@ -476,7 +476,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public int ReadInteger(int index)
         {
-            var esp = ILIntepreter.Add(ebp, index);
+            var esp = ebp + index;
             return esp->Value;
         }
         public T ReadInteger<T>()
@@ -491,7 +491,7 @@ namespace ILRuntime.Runtime.Enviorment
         }
         public long ReadLong(int index)
         {
-            var esp = ILIntepreter.Add(ebp, index);
+            var esp = ebp + index;
             return *(long*)&esp->Value;
         }
         public T ReadLong<T>()
@@ -507,7 +507,7 @@ namespace ILRuntime.Runtime.Enviorment
 
         public float ReadFloat(int index)
         {
-            var esp = ILIntepreter.Add(ebp, index);
+            var esp = ebp + index;
             return *(float*)&esp->Value;
         }
 
@@ -523,7 +523,7 @@ namespace ILRuntime.Runtime.Enviorment
         }
         public double ReadDouble(int index)
         {
-            var esp = ILIntepreter.Add(ebp, index);
+            var esp = ebp + index;
             return *(double*)&esp->Value;
         }
         public T ReadDouble<T>()
@@ -538,13 +538,13 @@ namespace ILRuntime.Runtime.Enviorment
         }
         public bool ReadBool(int index)
         {
-            var esp = ILIntepreter.Add(ebp, index);
+            var esp = ebp + index;
             return esp->Value == 1;
         }
 
         public T ReadValueType<T>(int index)
         {
-            var esp = ILIntepreter.Add(ebp, index);
+            var esp = ebp + index;
             return ReadValueTypeSub<T>(esp, domain, intp, mStack);
         }
 
@@ -587,7 +587,7 @@ namespace ILRuntime.Runtime.Enviorment
         }
         public T ReadObject<T>(int index)
         {
-            var esp = ILIntepreter.Add(ebp, index);
+            var esp = ebp + index;
             return (T)typeof(T).CheckCLRTypes(StackObject.ToObject(esp, domain, mStack));
         }
 

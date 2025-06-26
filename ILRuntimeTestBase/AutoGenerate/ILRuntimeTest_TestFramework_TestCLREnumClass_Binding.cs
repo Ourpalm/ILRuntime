@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
+using ILRuntime.Runtime;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
@@ -18,6 +19,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 #endif
 namespace ILRuntime.Runtime.Generated
 {
+    [ILRuntimePatchIgnore]
     unsafe class ILRuntimeTest_TestFramework_TestCLREnumClass_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
@@ -47,18 +49,18 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 2);
+            StackObject* __ret = __esp - 2;
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = __esp - 1;
             ILRuntimeTest.TestFramework.TestCLREnum @tag = (ILRuntimeTest.TestFramework.TestCLREnum)__intp.RetriveInt32(ptr_of_this_method, __mStack);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = __esp - 2;
             System.UInt32 @key = (System.UInt32)__intp.RetriveInt32(ptr_of_this_method, __mStack);
 
 
             ILRuntimeTest.TestFramework.TestCLREnumClass.TestCLREnumRef(out @key, out @tag);
 
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
+            ptr_of_this_method = __esp - 1;
             switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.StackObjectReference:
@@ -104,7 +106,7 @@ namespace ILRuntime.Runtime.Generated
             }
 
             __intp.Free(ptr_of_this_method);
-            ptr_of_this_method = ILIntepreter.Minus(__esp, 2);
+            ptr_of_this_method = __esp - 2;
             switch(ptr_of_this_method->ObjectType)
             {
                 case ObjectTypes.StackObjectReference:
@@ -156,7 +158,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* get_Test2_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* __ret = ILIntepreter.Minus(__esp, 0);
+            StackObject* __ret = __esp - 0;
 
 
             var result_of_this_method = ILRuntimeTest.TestFramework.TestCLREnumClass.Test2;
@@ -184,7 +186,7 @@ namespace ILRuntime.Runtime.Generated
         static StackObject* AssignFromStack_Test_0(ref object o, ILIntepreter __intp, StackObject* ptr_of_this_method, AutoList __mStack)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            ILRuntimeTest.TestFramework.TestCLREnum @Test = (ILRuntimeTest.TestFramework.TestCLREnum)typeof(ILRuntimeTest.TestFramework.TestCLREnum).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)20);
+            ILRuntimeTest.TestFramework.TestCLREnum @Test = (ILRuntimeTest.TestFramework.TestCLREnum)typeof(ILRuntimeTest.TestFramework.TestCLREnum).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (ILRuntime.CLR.Utils.Extensions.TypeFlags)20);
             ILRuntimeTest.TestFramework.TestCLREnumClass.Test = @Test;
             return ptr_of_this_method;
         }
