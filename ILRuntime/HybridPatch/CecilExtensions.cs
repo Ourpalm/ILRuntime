@@ -587,6 +587,7 @@ namespace ILRuntime.Hybrid
                 AppendInstruction(processor, first, processor.Create(OpCodes.Ldloca, invokeCtx));
                 processor.AppendLdc(first, refIdx);
                 AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt64ByIndexMethod));
+                AppendInstruction(processor, first, processor.Create(OpCodes.Conv_I));
                 AppendInstruction(processor, first, processor.Create(OpCodes.Stind_I));
             }
             else if (pt == module.TypeSystem.Single)
