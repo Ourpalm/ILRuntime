@@ -92,6 +92,15 @@ namespace ILRuntime.Hybrid
             mi = typeof(InvocationContext).GetMethod("ReadInteger", new Type[] { typeof(int) });
             ReadInt32ByIndexMethod = module.ImportReference(mi);
 
+            mi = typeof(InvocationContext).GetMethod(nameof(InvocationContext.ReadLong), new Type[] { typeof(int) });
+            ReadInt64ByIndexMethod = module.ImportReference(mi);
+
+            mi = typeof(InvocationContext).GetMethod(nameof(InvocationContext.ReadFloat), new Type[] { typeof(int) });
+            ReadFloatByIndexMethod = module.ImportReference(mi);
+
+            mi = typeof(InvocationContext).GetMethod(nameof(InvocationContext.ReadDouble), new Type[] { typeof(int) });
+            ReadDoubleByIndexMethod = module.ImportReference(mi);
+
             mi = typeof(InvocationContext).GetMethod("PushReference", new Type[] { typeof(int) });
             PushReferenceMethod = module.ImportReference(mi);
 
