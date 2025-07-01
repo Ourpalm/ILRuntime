@@ -153,36 +153,43 @@ namespace ILRuntime.Runtime.Debugger
             info.Name = "";
             if (obj != null)
             {
-                info.Value = obj.ToString();
-                if(obj is int)
+                try
                 {
-                    info.ValueType = ValueTypes.Integer;
-                }
-                else if(obj is bool)
-                {
-                    info.ValueType = ValueTypes.Boolean;
-                    info.Value = info.Value.ToLower(); // 小写的true或false
-                }
-                else if(obj is string)
-                {
-                    info.ValueType = ValueTypes.String;
-                }
-                if (retriveType)
-                {
-                    if (obj is Runtime.Intepreter.ILTypeInstance)
+                    info.Value = obj.ToString();
+                    if (obj is int)
                     {
-                        info.TypeName = ((Intepreter.ILTypeInstance)obj).Type.FullName;                        
+                        info.ValueType = ValueTypes.Integer;
                     }
-                    else if (obj is Enviorment.CrossBindingAdaptorType)
+                    else if (obj is bool)
                     {
-                        info.TypeName = ((Enviorment.CrossBindingAdaptorType)obj).ILInstance.Type.FullName;
+                        info.ValueType = ValueTypes.Boolean;
+                        info.Value = info.Value.ToLower(); // 小写的true或false
                     }
-                    else
+                    else if (obj is string)
                     {
-                        info.TypeName = obj.GetType().FullName;
+                        info.ValueType = ValueTypes.String;
                     }
+                    if (retriveType)
+                    {
+                        if (obj is Runtime.Intepreter.ILTypeInstance)
+                        {
+                            info.TypeName = ((Intepreter.ILTypeInstance)obj).Type.FullName;
+                        }
+                        else if (obj is Enviorment.CrossBindingAdaptorType)
+                        {
+                            info.TypeName = ((Enviorment.CrossBindingAdaptorType)obj).ILInstance.Type.FullName;
+                        }
+                        else
+                        {
+                            info.TypeName = obj.GetType().FullName;
+                        }
+                    }
+                    info.Expandable = !obj.GetType().IsPrimitive && !(obj is string);
                 }
-                info.Expandable = !obj.GetType().IsPrimitive && !(obj is string);
+                catch (Exception ex)
+                {
+                    info = GetException(ex);
+                }
             }
             else
             {
