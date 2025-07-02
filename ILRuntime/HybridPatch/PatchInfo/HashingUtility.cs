@@ -1,4 +1,4 @@
-﻿using ILRuntime.Mono.Cecil;
+using ILRuntime.Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +31,18 @@ namespace ILRuntime.Hybrid
             bw.Write(field.Name);
         }
 
-        public static string ComputeFieldHash(this FieldDefinition field, BinaryWriter bw, HashAlgorithm hasher)
+        static void WriteFieldInfo(FieldReference field, BinaryWriter bw, HashAlgorithm hasher)
+        {
+            var fd = field.Resolve();
+            if (fd != null)
+                bw.Write(fd.IsStatic);
+            else
+                bw.Write(false);
+            bw.Write(field.FieldType.FullName);
+            bw.Write(field.Name);
+        }
+
+        public static string ComputeFieldHash(this FieldReference field, BinaryWriter bw, HashAlgorithm hasher)
         {
             MemoryStream ms = bw.BaseStream as MemoryStream;
             ms.Position = 0;

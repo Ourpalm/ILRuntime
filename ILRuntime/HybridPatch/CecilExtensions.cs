@@ -124,8 +124,9 @@ namespace ILRuntime.Hybrid
         static void FixClosureNameConsistency(TypeDefinition type, bool forceInclude, IPatchSettings settings, BinaryWriter bw, MD5 md5)
         {
             bool shouldIncludeBySetting = settings != null ? settings.ShouldTypeIncludeInPatch(type) : false;
-            bool shouldInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
-            if (shouldInclude && !type.IsDelegate() && !type.IsInterface)
+            bool isIgnore = false;
+            bool shouldInclude = type.ShouldIncludeInPatch(out isIgnore) || forceInclude || shouldIncludeBySetting;
+            if (shouldInclude && !type.IsDelegate() && !type.IsInterface && !isIgnore)
             {
                 if (type.CheckHasClosureType())
                 {
@@ -277,19 +278,19 @@ namespace ILRuntime.Hybrid
         static string asyncAttributeName = typeof(AsyncStateMachineAttribute).Name;
         static string enumerableAttributeName = typeof(IteratorStateMachineAttribute).Name;
 
-        public static bool ShouldIncludeInPatch(this TypeDefinition type)
+        public static bool ShouldIncludeInPatch(this TypeDefinition type, out bool isIgnore)
         {
             bool shouldInclude = false;
+            isIgnore = false;
             if(type.HasCustomAttributes)
             {
                 foreach (var attr in type.CustomAttributes)
                 {
                     if (attr.AttributeType.FullName == ignoreAttributeName)
-                        return false;
+                        isIgnore = true;
                     if (attr.AttributeType.FullName == attributeName)
                     {
                         shouldInclude = true;
-                        break;
                     }
                 }
             }
@@ -587,7 +588,6 @@ namespace ILRuntime.Hybrid
                 AppendInstruction(processor, first, processor.Create(OpCodes.Ldloca, invokeCtx));
                 processor.AppendLdc(first, refIdx);
                 AppendInstruction(processor, first, processor.Create(OpCodes.Call, reflection.ReadInt64ByIndexMethod));
-                AppendInstruction(processor, first, processor.Create(OpCodes.Conv_I));
                 AppendInstruction(processor, first, processor.Create(OpCodes.Stind_I));
             }
             else if (pt == module.TypeSystem.Single)

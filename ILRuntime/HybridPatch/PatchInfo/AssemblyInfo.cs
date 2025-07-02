@@ -739,13 +739,17 @@ namespace ILRuntime.Hybrid
         static void AddTypeInfo(TypeDefinition type, List<TypeHashInfo> types, ref int typeIdx, ref int fieldIdx, ref int methodIdx, bool forceInclude, IPatchSettings settings)
         {
             bool shouldIncludeBySetting = settings !=null? settings.ShouldTypeIncludeInPatch(type) : false;
-            bool shoudInclude = forceInclude || shouldIncludeBySetting || type.ShouldIncludeInPatch();
-            shoudInclude &= !type.IsDelegate() && !type.IsInterface && !type.IsEnum;
+            bool isIgnore = false;
+            bool shoudInclude = type.ShouldIncludeInPatch(out isIgnore) || forceInclude || shouldIncludeBySetting;
+            shoudInclude &= !type.IsDelegate() && !type.IsInterface && !type.IsEnum && !isIgnore;
             if (shoudInclude)
                 types.Add(TypeHashInfo.BuildHashInfo(type, ref typeIdx, ref fieldIdx, ref methodIdx, settings));
-            foreach (var t in type.NestedTypes)
+            if (!isIgnore)
             {
-                AddTypeInfo(t, types, ref typeIdx, ref fieldIdx, ref methodIdx, shoudInclude, settings);
+                foreach (var t in type.NestedTypes)
+                {
+                    AddTypeInfo(t, types, ref typeIdx, ref fieldIdx, ref methodIdx, shoudInclude, settings);
+                }
             }
         }
 
@@ -804,12 +808,28 @@ namespace ILRuntime.Hybrid
 
         public MethodHashInfo[] Methods { get; set; }
 
-        static void GetBaseTypeFields(TypeDefinition type, ref List<FieldDefinition> fields, IPatchSettings settings)
+        static void GetBaseTypeFields(TypeDefinition type, ref List<FieldReference> fields, IPatchSettings settings, Dictionary<TypeReference, TypeReference> genericArguments = null)
         {
             if (type.BaseType == null)
                 return;
             var baseType = type.BaseType.Resolve();
-            if (baseType == null || baseType.ShouldIncludeInPatch())
+            bool isGenericInstance = false;
+            if (type.BaseType.IsGenericInstance)
+            {
+                isGenericInstance = true;
+                if (genericArguments == null)
+                {
+                    genericArguments = new Dictionary<TypeReference, TypeReference>();
+                }
+                var gi = type.BaseType as GenericInstanceType;
+                var gp = gi.Resolve().GenericParameters;
+                var ga = gi.GenericArguments;
+                for (int i = 0; i < gp.Count; i++)
+                {
+                    genericArguments[gp[i]] = ga[i];
+                }
+            }
+            if (baseType == null || (baseType.ShouldIncludeInPatch(out var isIgnore) && !isIgnore))
                 return;
             if (settings != null && settings.ShouldTypeIncludeInPatch(baseType))
                 return;
@@ -818,14 +838,21 @@ namespace ILRuntime.Hybrid
             if (baseType.Fields.Count > 0)
             {
                 if(fields == null)
-                    fields = new List<FieldDefinition>();
+                    fields = new List<FieldReference>();
                 foreach (var i in baseType.Fields)
                 {
                     if (i.IsPublic || i.IsFamily || i.IsAssembly || i.IsFamilyOrAssembly || i.IsFamilyAndAssembly)
-                        fields.Add(i);
+                    {
+                        if (isGenericInstance)
+                        {
+                            fields.Add(new FieldReference(i.Name, i.FieldType, type.BaseType));
+                        }
+                        else
+                            fields.Add(i);
+                    }
                 }
             }
-            GetBaseTypeFields(baseType, ref fields, settings);
+            GetBaseTypeFields(baseType, ref fields, settings, genericArguments);
         }
         
 
@@ -841,7 +868,7 @@ namespace ILRuntime.Hybrid
             info.Name = name;
             info.Namespace = namesp;
             info.Index = typeIdx++;
-            List<FieldDefinition> baseFields = null;
+            List<FieldReference> baseFields = null;
             GetBaseTypeFields(type, ref baseFields, settings);
             int baseFieldCnt = baseFields != null ? baseFields.Count : 0;
             info.Fields = new FieldHashInfo[type.Fields.Count + baseFieldCnt];

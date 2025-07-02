@@ -243,10 +243,14 @@ namespace ILRuntime.Hybrid
                 for (int i = 0; i < targets.Length; i++)
                 {
                     var field = info.Fields[i].Definition;
-                    if (((FieldDefinition)field).IsStatic != isStatic || ((FieldDefinition)field).HasConstant)
+                    var fd = field.Resolve();
+                    if (fd != null)
                     {
-                        targets[i] = switchEnd;
-                        continue;
+                        if (fd.IsStatic != isStatic || fd.HasConstant)
+                        {
+                            targets[i] = switchEnd;
+                            continue;
+                        }
                     }
                     TypeReference fieldDeclaringType = declaringType;
                     if (info.Fields[i].IsForeign)
@@ -515,6 +519,19 @@ namespace ILRuntime.Hybrid
                     }
                     else
                     {
+                        if (fieldType.IsGenericParameter && fieldDeclaringType is GenericInstanceType git)
+                        {
+                            var gp = git.Resolve().GenericParameters;
+                            var ga = git.GenericArguments;
+                            for (int idx = 0; idx < gp.Count; idx++)
+                            {
+                                if (gp[idx] == fieldType)
+                                {
+                                    fieldType = ga[idx];
+                                    break;
+                                }
+                            }
+                        }
                         if (isStatic)
                         {
                             begin = processor.Create(OpCodes.Ldarg_1);
@@ -587,10 +604,14 @@ namespace ILRuntime.Hybrid
                 for (int i = 0; i < targets.Length; i++)
                 {
                     var field = info.Fields[i].Definition;
-                    if(((FieldDefinition)field).IsStatic != isStatic || ((FieldDefinition)field).HasConstant)
+                    var fd = field.Resolve();
+                    if (fd != null)
                     {
-                        targets[i] = switchEnd;
-                        continue;
+                        if (fd.IsStatic != isStatic || fd.HasConstant)
+                        {
+                            targets[i] = switchEnd;
+                            continue;
+                        }
                     }
                     Instruction begin = null;
                     TypeReference fieldDeclaringType = declaringType;
@@ -785,6 +806,19 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Ldarg_0));
                             processor.Append(processor.Create(OpCodes.Ldfld, fr));
                         }
+                        if (fieldType.IsGenericParameter && fieldDeclaringType is GenericInstanceType git)
+                        {
+                            var gp = git.Resolve().GenericParameters;
+                            var ga = git.GenericArguments;
+                            for (int idx = 0; idx < gp.Count; idx++)
+                            {
+                                if (gp[idx] == fieldType)
+                                {
+                                    fieldType = ga[idx];
+                                    break;
+                                }
+                            }
+                        }
                         processor.Append(processor.Create(OpCodes.Call, reflection.GetPushObjectMethod(fieldType)));
                         processor.Append(processor.Create(OpCodes.Ret));
                     }
@@ -819,7 +853,8 @@ namespace ILRuntime.Hybrid
         {
             foreach (var i in info.Fields)
             {
-                if (((FieldDefinition)i.Definition).IsStatic)
+                var fd = i.Definition.Resolve();
+                if (fd !=null && fd.IsStatic)
                     return true;
             }
             return false;
@@ -1139,16 +1174,39 @@ namespace ILRuntime.Hybrid
 
             bool isOverride = method.IsVirtual && !method.IsNewSlot;
             FieldReference invokingField = null;
+            TypeReference methodDeclaringType = ctx.DeclaringType;
             if (isOverride)
             {
-                var fd = new FieldDefinition($"___@invoking_{method.Name}_{methodInfo.Index}", FieldAttributes.Private, module.TypeSystem.Boolean);
-                ctx.DeclaringType.Fields.Add(fd);
-                if (ctx.IsGenericType)
+                MethodReference overrideMethod = null;
+                do
                 {
-                    invokingField = new FieldReference(fd.Name, module.TypeSystem.Boolean, ctx.DeclaringTypeGenericInstance);
+                    var dt = methodDeclaringType.Resolve();
+                    if (dt != null)
+                    {
+                        methodDeclaringType = dt.BaseType;
+                        overrideMethod = methodDeclaringType.GetMethod(method.Name);
+                    }
+                    else
+                        break;
+                }
+                while (overrideMethod == null);
+                methodDeclaringType = module.ImportReference(methodDeclaringType);
+                var omd = overrideMethod?.Resolve();
+                if (omd != null && omd.IsAbstract)
+                {
+                    isOverride = false;
                 }
                 else
-                    invokingField = fd;
+                {
+                    var fd = new FieldDefinition($"___@invoking_{method.Name}_{methodInfo.Index}", FieldAttributes.Private, module.TypeSystem.Boolean);
+                    ctx.DeclaringType.Fields.Add(fd);
+                    if (ctx.IsGenericType)
+                    {
+                        invokingField = new FieldReference(fd.Name, module.TypeSystem.Boolean, ctx.DeclaringTypeGenericInstance);
+                    }
+                    else
+                        invokingField = fd;
+                }
             }
             
             VariableDefinition invokeCtx = new VariableDefinition(reflection.InvocationCtxType);
@@ -1178,7 +1236,6 @@ namespace ILRuntime.Hybrid
                 else
                     refOutIdx[i] = -1;
             }
-
             Instruction elseMarker;
             if (method.IsConstructor && !method.IsStatic)
             {
@@ -1235,7 +1292,7 @@ namespace ILRuntime.Hybrid
                 {
                     processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg, i + 1));
                 }
-                MethodReference baseMethod = new MethodReference(method.Name, method.ReturnType, ctx.DeclaringType.BaseType);
+                MethodReference baseMethod = new MethodReference(method.Name, method.ReturnType, methodDeclaringType);
                 baseMethod.HasThis = true;
                 foreach (var i in method.Parameters)
                 {
