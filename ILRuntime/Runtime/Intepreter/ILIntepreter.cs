@@ -2168,10 +2168,8 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         if (obj != null)
                                         {
-                                            instance = null;
-                                            if (obj is ILTypeInstance)
-                                                instance = obj as ILTypeInstance;
-                                            else if (obj is CrossBindingAdaptorType)
+                                            instance = obj as ILTypeInstance;
+                                            if (instance == null && obj is CrossBindingAdaptorType)
                                                 instance = (obj as CrossBindingAdaptorType).ILInstance;
                                             if (instance != null)
                                             {
@@ -2317,11 +2315,9 @@ namespace ILRuntime.Runtime.Intepreter
                                         Free(ret);
                                         if (obj != null)
                                         {
-                                            instance = null;
-                                            if (obj is ILTypeInstance)
-                                                instance = obj as ILTypeInstance;
-                                            else if (obj is CrossBindingAdaptorType)
-                                                instance = (obj as CrossBindingAdaptorType).ILInstance;
+                                            instance = obj as ILTypeInstance;
+                                            if (instance == null && obj is CrossBindingAdaptorType)
+                                                instance = ((CrossBindingAdaptorType)obj).ILInstance;
                                             if (instance != null)
                                                 instance.PushToStack((int)ip->TokenLong, ret, this, mStack);
                                             else
@@ -5049,18 +5045,12 @@ namespace ILRuntime.Runtime.Intepreter
             var type = InvocationContext.GetInvocationType<T>();
             switch (type)
             {
-                case InvocationTypes.Integer:
-                    return PrimitiveConverter<T>.CheckAndInvokeFromInteger(esp->Value);
-                case InvocationTypes.Long:
-                    return PrimitiveConverter<T>.CheckAndInvokeFromLong(*(long*)&esp->Value);
-                case InvocationTypes.Float:
-                    return PrimitiveConverter<T>.CheckAndInvokeFromFloat(*(float*)&esp->Value);
-                case InvocationTypes.Double:
-                    return PrimitiveConverter<T>.CheckAndInvokeFromDouble(*(double*)&esp->Value);
                 case InvocationTypes.ValueType:
                     return InvocationContext.ReadValueTypeSub<T>(esp, domain, this, (AutoList)mStack);
+                case InvocationTypes.Object:
+                    return (T)typeof(T).CheckCLRTypes(RetriveObject(esp, (AutoList)mStack), CLR.Utils.Extensions.TypeFlags.Default);
                 default:
-                    return (T)RetriveObject(esp, (AutoList)mStack);
+                    throw new NotSupportedException("This API doesn't support reading " + typeof(T).FullName);
             }
         }
         public object RetriveObject(StackObject* esp, AutoList mStack)
@@ -6027,30 +6017,13 @@ namespace ILRuntime.Runtime.Intepreter
         {
             var type = InvocationContext.GetInvocationType<T>();
             switch(type)
-            {
-                case InvocationTypes.Integer:
-                    esp->ObjectType = ObjectTypes.Integer;
-                    esp->Value = PrimitiveConverter<T>.CheckAndInvokeToInteger(obj); 
-                    return esp + 1;
-                case InvocationTypes.Long:
-                    esp->ObjectType = ObjectTypes.Long;
-                    *(long*)&esp->Value = PrimitiveConverter<T>.CheckAndInvokeToLong(obj);
-                    return esp + 1;
-                case InvocationTypes.Float:
-                    esp->ObjectType = ObjectTypes.Float;
-                    *(float*)&esp->Value = PrimitiveConverter<T>.CheckAndInvokeToFloat(obj);
-                    return esp + 1;
-                case InvocationTypes.Double:
-                    esp->ObjectType = ObjectTypes.Double;
-                    *(double*)&esp->Value = PrimitiveConverter<T>.CheckAndInvokeToDouble(obj);
-                    return esp + 1; 
-                case InvocationTypes.Enum:
-                    return PushObject(esp, (AutoList)mStack, obj, false);
+            {   
                 case InvocationTypes.ValueType:
                     return InvocationContext.PushValueTypeSub(ref obj, esp, domain, this, (AutoList)mStack, false);
-                default:
+                case InvocationTypes.Object:
                     return PushObject(esp, (AutoList)mStack, obj, true);
-
+                default:
+                    throw new NotSupportedException();
             }
         }
 
