@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
@@ -776,7 +776,11 @@ namespace ILRuntime.Runtime.Debugger
                     }
                 }
                 else
+                {
+                    if (info != null)
+                        return new VariableInfo[] { info };
                     return new VariableInfo[] { VariableInfo.NullReferenceExeption };
+                }
             }
             else
                 return new VariableInfo[] { VariableInfo.NullReferenceExeption };
@@ -853,6 +857,7 @@ namespace ILRuntime.Runtime.Debugger
                     info.Type = VariableTypes.IndexAccess;
                     info.Offset = i;
                     info.Value = string.Format("{0},{1}", SafeToString(keys[i]), SafeToString(values[i]));
+                    info.ValueObjType = values[i].GetType();
                     info.Expandable = true;
                     res[i] = info;
                 }
@@ -990,53 +995,9 @@ namespace ILRuntime.Runtime.Debugger
                         return info;
                     }
                     else
-                    {
-                        //if(obj is ILTypeInstance)
-                        //{
-                        //    var m = ((ILTypeInstance)obj).Type.GetMethod("get_Item");
-                        //    if (m != null)
-                        //    {
-                        //        res = intepreter.AppDomain.Invoke(m, obj, idxObj);
-                        //        info = VariableInfo.FromObject(res);
-                        //        info.Type = VariableTypes.IndexAccess;
-                        //        info.TypeName = m.ReturnType.FullName;
-                        //        info.Expandable = res != null && !m.ReturnType.IsPrimitive;
-
-                        //        return info;
-                        //    }
-                        //    else
-                        //        return VariableInfo.NullReferenceExeption;
-                        //}
-                        //else
-                        //{
-                        //if(obj is ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)
-                        //{
-                        //    throw new NotImplementedException();
-                        //}
-                        //else
-                        //{
-                        //if (obj is IDictionary && idxObj is int)
-                        //{
-                        //    IDictionary dic = (IDictionary)obj;
-                        //    var keys = GetArray(dic.Keys);
-                        //    if (keys[0].GetType() != typeof(int))
-                        //    {
-                        //        int index = (int)idxObj;
-                        //        var values = GetArray(dic.Values);
-                        //        var t = typeof(KeyValuePair<,>).MakeGenericType(keys[index].GetType(), values[index].GetType());
-                        //        var ctor = t.GetConstructor(new Type[] { keys[index].GetType(), values[index].GetType() });
-                        //        res = ctor.Invoke(new object[] { keys[index], values[index] });
-                        //        info = VariableInfo.FromObject(res);
-                        //        info.Type = VariableTypes.IndexAccess;
-                        //        info.Offset = index;
-                        //        info.TypeName = t.FullName;
-                        //        info.Expandable = true;
-                        //        info.ValueObjType = t;
-
-                        //        return info;
-                        //    }
-                        //}
-
+                    {   
+                        if (objType == null)
+                            objType = obj.GetType();
                         var pi = GetOverrideIndexer(objType, info.ValueObjType);
                         //var pi = obj.GetType().GetProperty("Item");
                         if (pi != null)
@@ -1050,9 +1011,56 @@ namespace ILRuntime.Runtime.Debugger
                             return info;
                         }
                         else
-                            return VariableInfo.GetError(string.Format("无法将带[] 的索引应用于“{0}”类型的表达式", objType.FullName));
-                        //}
-                        //}
+                        {
+                            if (obj is ILTypeInstance)
+                            {
+                                var m = ((ILTypeInstance)obj).Type.GetMethod("get_Item");
+                                if (m != null)
+                                {
+                                    res = intepreter.AppDomain.Invoke(m, obj, idxObj);
+                                    info = VariableInfo.FromObject(res);
+                                    info.Type = VariableTypes.IndexAccess;
+                                    info.TypeName = m.ReturnType.FullName;
+                                    info.Expandable = res != null && !m.ReturnType.IsPrimitive;
+
+                                    return info;
+                                }
+                                else
+                                    return VariableInfo.NullReferenceExeption;
+                            }
+                            else
+                            {
+                                if (obj is ILRuntime.Runtime.Enviorment.CrossBindingAdaptorType)
+                                {
+                                    throw new NotImplementedException();
+                                }
+                                else
+                                {
+                                    if (obj is IDictionary && idxObj is int)
+                                    {
+                                        IDictionary dic = (IDictionary)obj;
+                                        var keys = GetArray(dic.Keys);
+                                        if (keys[0].GetType() != typeof(int))
+                                        {
+                                            int index = (int)idxObj;
+                                            var values = GetArray(dic.Values);
+                                            var t = typeof(KeyValuePair<,>).MakeGenericType(keys[index].GetType(), values[index].GetType());
+                                            var ctor = t.GetConstructor(new Type[] { keys[index].GetType(), values[index].GetType() });
+                                            res = ctor.Invoke(new object[] { keys[index], values[index] });
+                                            info = VariableInfo.FromObject(res);
+                                            info.Type = VariableTypes.IndexAccess;
+                                            info.Offset = index;
+                                            info.TypeName = t.FullName;
+                                            info.Expandable = true;
+                                            info.ValueObjType = t;
+
+                                            return info;
+                                        }
+                                    }
+                                    return VariableInfo.GetError(string.Format("无法将带[] 的索引应用于“{0}”类型的表达式", objType.FullName));
+                                }
+                            }
+                        }
                     }
                 }
                 else
