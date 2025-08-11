@@ -686,7 +686,14 @@ namespace ILRuntime.Runtime.Debugger
                     vType = m.DeclearingType;
                 }
 
-                v = vType.TypeForCLR.CheckCLRTypes(v);
+                try
+                {
+                    v = vType.TypeForCLR.CheckCLRTypes(v);
+                }
+                catch(Exception ex)
+                {
+                    v = ex.ToString();
+                }
                 VariableInfo vinfo = VariableInfo.FromObject(v);
                 vinfo.Address = (long)val;
                 vinfo.Name = name;
@@ -706,7 +713,14 @@ namespace ILRuntime.Runtime.Debugger
                 string vName = null;
                 m.Definition.DebugInformation.TryGetName(lv, out vName);
                 string name = string.IsNullOrEmpty(vName) ? "v" + lv.Index : vName;
-                v = type.TypeForCLR.CheckCLRTypes(v);
+                try
+                {
+                    v = type.TypeForCLR.CheckCLRTypes(v);
+                }
+                catch(Exception ex)
+                {
+                    v = ex.ToString();
+                }
                 VariableInfo vinfo = VariableInfo.FromObject(v);
                 vinfo.Address = (long)val;
                 vinfo.Name = name;

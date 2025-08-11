@@ -478,17 +478,37 @@ namespace ILRuntime.Runtime.CLRBinding
             }
         }
 
-        static bool CheckAssignableToCrossBindingAdapters(Enviorment.AppDomain domain, Type type)
+        static bool CheckAssignableToCrossBindingAdapters(Enviorment.AppDomain domain, Type type, HashSet<Type> crossbindingTypes=null)
         {
             if (type == typeof(object))
                 return true;
-            bool res = domain.CrossBindingAdaptors.ContainsKey(type);
+            if(crossbindingTypes == null)
+            {
+                crossbindingTypes = new HashSet<Type>();
+                foreach (var i in domain.CrossBindingAdaptors)
+                {
+                    crossbindingTypes.Add(i.Key);
+                    List<Type> bases = new List<Type>();
+                    bases.Add(i.Key.BaseType);
+                    bases.AddRange(i.Key.GetInterfaces());
+                    foreach (var t in bases)
+                    {
+                        var curT = t;
+                        while (curT != null && curT != typeof(object))
+                        {
+                            crossbindingTypes.Add(curT);
+                            curT = curT.BaseType;
+                        }
+                    }
+                }
+            }
+            bool res = crossbindingTypes.Contains(type);
             if (!res)
             {
                 var baseType = type.BaseType;
                 if (baseType != null && baseType != typeof(object))
                 {
-                    res = CheckAssignableToCrossBindingAdapters(domain, baseType);
+                    res = CheckAssignableToCrossBindingAdapters(domain, baseType, crossbindingTypes);
                 }
             }
             if (!res)
@@ -496,10 +516,14 @@ namespace ILRuntime.Runtime.CLRBinding
                 var interfaces = type.GetInterfaces();
                 foreach(var i in interfaces)
                 {
-                    res = CheckAssignableToCrossBindingAdapters(domain, i);
+                    res = CheckAssignableToCrossBindingAdapters(domain, i, crossbindingTypes);
                     if (res)
                         break;
                 }
+            }
+            if (res)
+            {
+
             }
             return res;
         }
