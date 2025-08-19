@@ -1288,6 +1288,19 @@ namespace ILRuntime.Hybrid
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldfld, invokingField));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Brfalse, callBaseMarker));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
+                if (ctx.DeclaringType.IsValueType)
+                {
+                    if (ctx.IsGenericType)
+                    {
+                        processor.AppendInstruction(first, processor.Create(OpCodes.Ldobj, ctx.DeclaringTypeGenericInstance));
+                        processor.AppendInstruction(first, processor.Create(OpCodes.Box, ctx.DeclaringTypeGenericInstance));
+                    }
+                    else
+                    {
+                        processor.AppendInstruction(first, processor.Create(OpCodes.Ldobj, ctx.DeclaringType));
+                        processor.AppendInstruction(first, processor.Create(OpCodes.Box, ctx.DeclaringType));
+                    }
+                }
                 for (int i = 0; i < method.Parameters.Count; i++)
                 {
                     processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg, i + 1));
@@ -1367,7 +1380,7 @@ namespace ILRuntime.Hybrid
                 processor.AppendInstruction(first, processor.Create(OpCodes.Stfld, invokingField));
             }
 
-            if (method.DeclaringType.IsValueType)
+            if (method.DeclaringType.IsValueType && !method.IsStatic)
             {
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
