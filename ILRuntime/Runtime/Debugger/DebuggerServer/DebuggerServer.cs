@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -414,6 +414,7 @@ namespace ILRuntime.Runtime.Debugger
                     {
                         if (vt.FullName.Contains(msg.TypeName))
                         {
+                            int maxStartLine = 0;
                             foreach (var j in vt.GetMethods())
                             {
                                 if (j.Name.Contains(string.Format("<{0}>", msg.MethodName)))
@@ -421,12 +422,19 @@ namespace ILRuntime.Runtime.Debugger
                                     ILMethod ilm = (ILMethod)j;
                                     if (ilm.StartLine <= (msg.StartLine + 1) && ilm.EndLine >= (msg.StartLine + 1))
                                     {
-                                        found = ilm;
-                                        break;
+                                        if (ilm.StartLine > maxStartLine)
+                                        {
+                                            found = ilm;
+                                            maxStartLine = ilm.StartLine;
+                                        }
                                     }
-                                    else if (CheckCompilerGeneratedStateMachine(ilm, domain, msg.StartLine, out found))
+                                    else if (CheckCompilerGeneratedStateMachine(ilm, domain, msg.StartLine, out var newFound))
                                     {
-                                        break;
+                                        if (newFound.StartLine > maxStartLine)
+                                        {
+                                            found = newFound;
+                                            maxStartLine = newFound.StartLine;
+                                        }
                                     }
                                 }
                             }
