@@ -42,6 +42,7 @@ namespace ILRuntime.Runtime.CLRBinding
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Method;
