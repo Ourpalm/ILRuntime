@@ -1,4 +1,4 @@
-﻿using ILRuntime.Runtime.Stack;
+using ILRuntime.Runtime.Stack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -20,6 +20,7 @@ namespace ILRuntime.CLR.TypeSystem
         public int SizeInBytes {  get; private set; }
 
         int[] managedIndices;
+        CLRType[] clrValueTypes;
         int[] valueTypeIndices;
 
         public ValueTypeInitInfo(IType type)
@@ -36,7 +37,8 @@ namespace ILRuntime.CLR.TypeSystem
             fixed (StackObject* ptr = stackObjects)
             {
                 var dst = ptr + fieldCnt - 1;
-                RuntimeStack.InitializeValueTypeObject(type, dst, ref managedIdx, false, new AutoList());
+                AutoList mStack = new AutoList();
+                RuntimeStack.InitializeValueTypeObject(type, dst, ref managedIdx, false, mStack);
                 
                 managedIdx = 0;
                 for (int i = 0; i < FieldCount; i++)
@@ -46,7 +48,14 @@ namespace ILRuntime.CLR.TypeSystem
                     if (so->ObjectType == ObjectTypes.Object)
                     {
                         if (managedIndices == null)
+                        {
                             managedIndices = new int[mCnt];
+                            clrValueTypes = new CLRType[mCnt];
+                        }
+                        if (mStack[so->Value] != null)
+                        {
+                            clrValueTypes[managedIdx] = type.AppDomain.GetType(mStack[so->Value].GetType()) as CLRType;
+                        }
                         managedIndices[managedIdx++] = offset;
                     }
                     else if (so->ObjectType == ObjectTypes.ValueTypeObjectReference)
@@ -74,14 +83,17 @@ namespace ILRuntime.CLR.TypeSystem
                     for (int i = 0; i < managedIndices.Length; i++)
                     {
                         int idx = managedIndices[i];
+                        object defaultValue = clrValueTypes[i] != null ? clrValueTypes[i].CreateDefaultInstance() : null;
                         int finalMIdx = managedIdx + dst[idx].Value;
                         dst[idx].Value = finalMIdx;
                         if (finalMIdx < mStack.Count)
-                            mStack[finalMIdx] = null;
+                        {
+                            mStack[finalMIdx] = defaultValue;
+                        }
                         else
                         {
                             if (mStack.Count == finalMIdx)
-                                mStack.Add(null);
+                                mStack.Add(defaultValue);
                             else
                                 throw new NotSupportedException();
                         }
