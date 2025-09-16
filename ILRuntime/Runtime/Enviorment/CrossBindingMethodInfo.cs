@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -694,6 +694,8 @@ namespace ILRuntime.Runtime.Enviorment
 
         protected virtual Type[] Parameters { get { return null; } }
         protected virtual Type ReturnType { get { return null; } }
+
+        public IMethod CurrentMethod { get { return method; } }
 
         public bool CheckShouldInvokeBase(ILTypeInstance ins)
         {

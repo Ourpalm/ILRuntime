@@ -2051,6 +2051,14 @@ namespace ILRuntime.Runtime.Intepreter
                                                         ilm = ((ILTypeInstance)obj).Type.GetVirtualMethod(ilm) as ILMethod;
                                                     }
                                                 }
+
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                                                var oldStepType = CurrentStepType;
+                                                if (ilm.IsDebuggerStepThrough)
+                                                {
+                                                    CurrentStepType = StepTypes.Over;
+                                                }
+#endif
                                                 if (ilm.ShouldUseRegisterVM)
                                                 {
                                                     PrepareRegisterCallStack(esp, mStack, ilm);
@@ -2059,6 +2067,10 @@ namespace ILRuntime.Runtime.Intepreter
                                                 else
                                                     esp = Execute(ilm, esp, out unhandledException);
                                                 ValueTypeBasePointer = bp;
+
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                                                CurrentStepType = oldStepType;
+#endif
                                                 if (unhandledException)
                                                     returned = true;
                                             }

@@ -407,13 +407,17 @@ namespace ILRuntime.Runtime.Debugger
             lock (AppDomain.FreeIntepreters)
             {
                 ILIntepreter intp;
-                if (AppDomain.Intepreters.TryGetValue(threadHash, out intp))
+                foreach (var i in AppDomain.Intepreters)
                 {
+                    intp = i.Value;
+                    //We should resume all threads on execute
                     intp.ClearDebugState();
-                    intp.CurrentStepType = type;
-                    intp.LastStepInstructionIndex = intp.Stack.Frames.Count > 0 ? intp.Stack.Frames.Peek().Address.Value : 0;
-                    intp.LastStepFrameBase = intp.Stack.Frames.Count > 0 ? ResolveCurrentFrameBasePointer(intp) : (StackObject*)0;
-
+                    if(intp.GetHashCode() == threadHash)
+                    {
+                        intp.CurrentStepType = type;
+                        intp.LastStepInstructionIndex = intp.Stack.Frames.Count > 0 ? intp.Stack.Frames.Peek().Address.Value : 0;
+                        intp.LastStepFrameBase = intp.Stack.Frames.Count > 0 ? ResolveCurrentFrameBasePointer(intp) : (StackObject*)0;
+                    }
                     intp.Resume();
                 }
             }

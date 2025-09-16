@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,7 @@ using ILRuntime.Runtime.Debugger;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Reflection;
 using ILRuntime.Hybrid;
+using System.Diagnostics;
 namespace ILRuntime.CLR.Method
 {
     public sealed class ILMethod : IMethod
@@ -44,6 +45,9 @@ namespace ILRuntime.CLR.Method
         int warmupCounter = 0;
         Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> variables;
         int hashCode = -1;
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+        bool isDebuggerStepThrough;
+#endif
         static int instance_id = 0x10000000;
         MethodPatchContext patchCtx;
 
@@ -165,7 +169,11 @@ namespace ILRuntime.CLR.Method
 
         public IType[] GenericArugmentsArray { get { return genericArguments; } }
 
-        public ILMethod GenericDefinition { get { return genericDefinition; } } 
+        public ILMethod GenericDefinition { get { return genericDefinition; } }
+
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+        public bool IsDebuggerStepThrough { get { return isDebuggerStepThrough; } }
+#endif
         public bool ShouldUseRegisterVM
         {
             get
@@ -250,6 +258,13 @@ namespace ILRuntime.CLR.Method
                         this.jitFlags = f;
                         break;
                     }
+
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                    else if (def.CustomAttributes[i].AttributeType.Name == nameof(DebuggerStepThroughAttribute))
+                    {
+                        isDebuggerStepThrough = true;
+                    }
+#endif
                 }
             }
             jitImmediately = (jitFlags & ILRuntimeJITFlags.JITImmediately) == ILRuntimeJITFlags.JITImmediately;

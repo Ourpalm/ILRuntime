@@ -2961,6 +2961,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                         useRegister = ilm.ShouldUseRegisterVM;
                                                     }
                                                 }
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                                                var oldStepType = CurrentStepType;
+                                                if (ilm.IsDebuggerStepThrough)
+                                                {
+                                                    CurrentStepType = Debugger.StepTypes.Over;
+                                                }
+#endif
                                                 if (useRegister)
                                                 {
                                                     if (shouldFix)
@@ -2979,6 +2986,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                         mStack.RemoveRange(mStack.Count - objCnt, objCnt);
                                                 }
                                                 ValueTypeBasePointer = bp;
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+                                                CurrentStepType = oldStepType;
+#endif
                                                 if (unhandledException)
                                                     returned = true;
                                             }
