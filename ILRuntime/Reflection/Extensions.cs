@@ -11,6 +11,33 @@ namespace ILRuntime.Reflection
 {
     static class Extensions
     {
+        static object GetCustomAttributeValue(Runtime.Enviorment.AppDomain appdomain, CustomAttributeArgument ca)
+        {
+            if (ca.Type.IsArray)
+            {
+                var valArr = ca.Value as CustomAttributeArgument[];
+                if (valArr != null)
+                {
+                    IType at = appdomain.GetType(ca.Type.GetElementType(), null, null);
+                    var type = at.ReflectionType;
+                    if (type is ILRuntimeType ilruntimeType)
+                        type = ilruntimeType.ILType.TypeForCLR;
+                    else if (type is ILRuntimeWrapperType iwt)
+                        type = iwt.RealType;
+                    var arr = Array.CreateInstance(type, valArr.Length);
+                    for(int i = 0;i < valArr.Length; i++)
+                    {
+                        arr.SetValue(valArr[i].Value, i);
+                    }
+                    return arr;
+                }
+                else
+                    return null;
+                
+            }
+            else
+                return ca.Value;
+        }
         public static object CreateInstance(this CustomAttribute attribute, IType at, Runtime.Enviorment.AppDomain appdomain)
         {
             object ins;
@@ -31,7 +58,7 @@ namespace ILRuntime.Reflection
                     {
                         var ca = attribute.ConstructorArguments[j];
                         param.Add(appdomain.GetType(ca.Type, null, null));
-                        p[j] = ca.Value;
+                        p[j] = GetCustomAttributeValue(appdomain, ca);
                     }
                     var ctor = it.GetConstructor(param);
                     appdomain.Invoke(ctor, ins, p);
@@ -70,7 +97,8 @@ namespace ILRuntime.Reflection
                     {
                         var ca = attribute.ConstructorArguments[j];
                         param.Add(appdomain.GetType(ca.Type, null, null));
-                        p[j] = ca.Value;
+
+                        p[j] = GetCustomAttributeValue(appdomain, ca);
                     }
                 }
                 ins = ((CLRMethod)at.GetConstructor(param)).ConstructorInfo.Invoke(p);

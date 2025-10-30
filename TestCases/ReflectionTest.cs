@@ -653,5 +653,54 @@ namespace TestCases
                 throw new Exception($"CurType = {yy.CurType}, Value = {yy.Value}");
             }
         }
+
+        class Test25Cls
+        {
+            [TestCLRAttribute2("ttt","Test func")]
+            public static void FuncCall()
+            {
+
+            }
+
+            [TestCLRAttribute2("ttt", "Test func", "ggg")]
+            public static void FuncCall2()
+            {
+
+            }
+        }
+        public static void ReflectionTest25()
+        {
+            MethodInfo mi = typeof(Test25Cls).GetMethod(nameof(Test25Cls.FuncCall2), BindingFlags.Public | BindingFlags.Static);
+            if (TestCLRAttribute2.TestIsDefineAttribute(mi))
+            {
+                var attr = TestCLRAttribute2.GetTestCLRAttribute2(mi);
+                if (attr != null)
+                {
+                    if (attr.Parameters == null || attr.Parameters.Length != 1)
+                        throw new Exception();
+                    if (attr.Parameters[0] != "ggg")
+                        throw new Exception();
+                }
+                else
+                    throw new Exception();
+            }
+            else
+                throw new Exception();
+
+            mi = typeof(Test25Cls).GetMethod(nameof(Test25Cls.FuncCall), BindingFlags.Public | BindingFlags.Static);
+            if (TestCLRAttribute2.TestIsDefineAttribute(mi))
+            {
+                var attr = TestCLRAttribute2.GetTestCLRAttribute2(mi);
+                if (attr != null)
+                {
+                    if (attr.Parameters == null || attr.Parameters.Length != 0)
+                        throw new Exception();
+                }
+                else
+                    throw new Exception();
+            }
+            else
+                throw new Exception();
+        }
     }
 }

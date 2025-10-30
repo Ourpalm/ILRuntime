@@ -197,6 +197,8 @@ namespace ILRuntime.Reflection
             {
                 if (attributeTypes[i] == attributeType)
                     return true;
+                else if (attributeTypes[i] is ILRuntimeWrapperType iwt)
+                    return iwt.RealType == attributeType;
             }
             return false;
         }
