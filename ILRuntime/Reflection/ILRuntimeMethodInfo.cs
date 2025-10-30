@@ -136,7 +136,7 @@ namespace ILRuntime.Reflection
             List<Attribute> res = new List<Attribute>();
             for (int i = 0; i < customAttributes.Length; i++)
             {
-                if (attributeTypes[i].Equals(attributeType))
+                if (attributeTypes[i].Equals(attributeType) || attributeTypes[i].IsSubclassOf(attributeType))
                     res.Add(customAttributes[i]);
             }
             return res.ToArray();
@@ -195,10 +195,8 @@ namespace ILRuntime.Reflection
                 InitializeCustomAttribute();
             for (int i = 0; i < customAttributes.Length; i++)
             {
-                if (attributeTypes[i] == attributeType)
+                if (attributeTypes[i].Equals(attributeType) || attributeTypes[i].IsSubclassOf(attributeType))
                     return true;
-                else if (attributeTypes[i] is ILRuntimeWrapperType iwt)
-                    return iwt.RealType == attributeType;
             }
             return false;
         }

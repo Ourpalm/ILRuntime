@@ -290,5 +290,16 @@ namespace ILRuntime.Reflection
         {
             return et.IsDefined(attributeType, inherit);
         }
+
+#if NET_4_6 || NET_STANDARD_2_0
+        public override bool Equals(Type o)
+        {
+            return o is ILRuntimeWrapperType ? ((ILRuntimeWrapperType)o).et == et : et == o;
+        }
+#endif
+        public override bool Equals(object o)
+        {
+            return o is ILRuntimeWrapperType ? ((ILRuntimeWrapperType)o).et == et : et == (Type)o;
+        }
     }
 }
