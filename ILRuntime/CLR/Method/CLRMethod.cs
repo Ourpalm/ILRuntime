@@ -333,8 +333,8 @@ namespace ILRuntime.CLR.Method
                     instance = StackObject.ToObject((Minus(esp, paramCount + 1)), appdomain, mStack);
                     if (!(instance is Reflection.ILRuntimeWrapperType))
                         instance = declaringType.TypeForCLR.CheckCLRTypes(instance);
-                    if (declaringType.IsValueType)
-                        instance = ILIntepreter.CheckAndCloneValueType(instance, appdomain);
+                    //if (declaringType.IsValueType)
+                    //    instance = ILIntepreter.CheckAndCloneValueType(instance, appdomain);
                     if (instance == null)
                         throw new NullReferenceException();
                 }
