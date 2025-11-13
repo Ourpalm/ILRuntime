@@ -59,9 +59,6 @@ namespace ILRuntime.Runtime.Generated
 
             app.RegisterCLRCreateDefaultInstance(type, () => new ILRuntimeTest.TestFramework.TestVector3NoBinding());
 
-            args = new Type[]{typeof(System.Single), typeof(System.Single), typeof(System.Single)};
-            method = type.GetConstructor(flag, null, args, null);
-            app.RegisterCLRMethodRedirection(method, Ctor_0);
 
         }
 
@@ -269,33 +266,6 @@ namespace ILRuntime.Runtime.Generated
             var ins = new ILRuntimeTest.TestFramework.TestVector3NoBinding();
             ins = (ILRuntimeTest.TestFramework.TestVector3NoBinding)o;
             return ins;
-        }
-
-        static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = __esp - 3;
-            ptr_of_this_method = __esp - 1;
-            System.Single @z = *(float*)&ptr_of_this_method->Value;
-
-            ptr_of_this_method = __esp - 2;
-            System.Single @y = *(float*)&ptr_of_this_method->Value;
-
-            ptr_of_this_method = __esp - 3;
-            System.Single @x = *(float*)&ptr_of_this_method->Value;
-
-
-            var result_of_this_method = new ILRuntimeTest.TestFramework.TestVector3NoBinding(@x, @y, @z);
-
-            if(!isNewObj)
-            {
-                __ret--;
-                WriteBackInstance(__domain, __ret, __mStack, ref result_of_this_method);
-                return __ret;
-            }
-
-            return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
 
 

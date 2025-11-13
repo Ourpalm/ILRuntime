@@ -161,6 +161,20 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb.AppendLine();
                 }
                 sb.AppendLine();
+                if (!type.IsValueType)
+                {
+                    sb.AppendLine("            if(!isNewObj) ");
+                    sb.AppendLine("            {");
+                    if (paramCnt > 0)
+                        sb.AppendLine($"                ptr_of_this_method = __esp - {paramCnt + 1};");
+                    else
+                        sb.AppendLine($"                StackObject* ptr_of_this_method = __esp - {paramCnt + 1};");
+                    sb.AppendLine($"                {typeClsName} __this = ({typeClsName})typeof({typeClsName}).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));");
+                    sb.AppendLine($"                __intp.Free(ptr_of_this_method);");
+                    sb.AppendLine($"                if(__this is CrossBindingAdaptorType)");
+                    sb.AppendLine($"                    return __esp - {paramCnt + 1};");
+                    sb.AppendLine("            }");
+                }
                 sb.Append("            var result_of_this_method = ");
                 {
                     string clsName, realClsName;

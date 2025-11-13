@@ -228,7 +228,7 @@ namespace ILRuntimeTest
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(TestClass2), "ILRuntimeTest");
+            var msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(ClassInheritanceTest), "ILRuntimeTest");
             MessageBox.Show(msg);
             msg = ILRuntime.Runtime.Enviorment.CrossBindingCodeGenerator.GenerateCrossBindingAdapterCode(typeof(IAsyncStateMachine), "ILRuntimeTest");
             MessageBox.Show(msg);
@@ -256,7 +256,7 @@ namespace ILRuntimeTest
 
                 //Crossbind Adapter is needed to generate the correct binding code
                 ILRuntimeHelper.Init(domain);
-                string outputPath = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "ILRuntimeTestBase/AutoGenerate"; // "..\\..\\AutoGenerate"
+                string outputPath = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "ILRuntimeTestBase/AutoGenerate"; // "..\\..\\AutoGenerate"
                 ILRuntime.Runtime.CLRBinding.BindingCodeGenerator.GenerateBindingCode(domain, outputPath);
             }
         }

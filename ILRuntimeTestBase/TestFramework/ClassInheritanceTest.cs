@@ -124,7 +124,7 @@ namespace ILRuntimeTest.TestFramework
         }
     }
     [NeedAdaptor]
-    public abstract class ClassInheritanceTest : InterfaceTest
+    public class ClassInheritanceTest : InterfaceTest
     {
         protected int testVal = 100;
         public int TestVal2 = 200;
@@ -141,7 +141,7 @@ namespace ILRuntimeTest.TestFramework
             TestVal2 = 555;
         }
 
-        public abstract void TestAbstract();
+        public virtual void TestAbstract() { }
 
         public virtual void TestVirtual()
         {

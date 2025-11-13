@@ -76,6 +76,14 @@ namespace ILRuntime.Runtime.Generated
             System.Int32 a1 = ptr_of_this_method->Value;
 
 
+            if(!isNewObj) 
+            {
+                ptr_of_this_method = __esp - 3;
+                System.Int32[,] __this = (System.Int32[,])typeof(System.Int32[,]).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));
+                __intp.Free(ptr_of_this_method);
+                if(__this is CrossBindingAdaptorType)
+                    return __esp - 3;
+            }
             var result_of_this_method = new System.Int32[a1, a2];
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);

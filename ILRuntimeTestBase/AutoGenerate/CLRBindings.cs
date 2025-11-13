@@ -162,6 +162,7 @@ namespace ILRuntime.Runtime.Generated
             System_Reflection_PropertyInfo_Binding.Register(app);
             System_Collections_Generic_List_1_String_Binding.Register(app);
             System_Collections_Generic_List_1_FieldInfo_Binding.Register(app);
+            ILRuntimeTest_TestFramework_TestCLRAttribute2_Binding.Register(app);
             ILRuntimeTest_TestFramework_TestCLREnumClass_Binding.Register(app);
             System_Action_2_Int32_ILTypeInstance_Binding.Register(app);
             System_Nullable_1_Int32_Binding.Register(app);

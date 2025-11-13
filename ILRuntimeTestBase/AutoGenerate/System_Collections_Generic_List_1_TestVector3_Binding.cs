@@ -69,6 +69,14 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             StackObject* __ret = __esp - 0;
 
+            if(!isNewObj) 
+            {
+                StackObject* ptr_of_this_method = __esp - 1;
+                System.Collections.Generic.List<ILRuntimeTest.TestFramework.TestVector3> __this = (System.Collections.Generic.List<ILRuntimeTest.TestFramework.TestVector3>)typeof(System.Collections.Generic.List<ILRuntimeTest.TestFramework.TestVector3>).CheckCLRTypes(__intp.RetriveObject(ptr_of_this_method, __mStack));
+                __intp.Free(ptr_of_this_method);
+                if(__this is CrossBindingAdaptorType)
+                    return __esp - 1;
+            }
             var result_of_this_method = new System.Collections.Generic.List<ILRuntimeTest.TestFramework.TestVector3>();
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
