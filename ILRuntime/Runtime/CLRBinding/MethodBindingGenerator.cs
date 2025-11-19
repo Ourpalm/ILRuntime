@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Utils;
+using System.Runtime.CompilerServices;
 
 namespace ILRuntime.Runtime.CLRBinding
 {
@@ -194,8 +195,15 @@ namespace ILRuntime.Runtime.CLRBinding
                     p.ParameterType.AppendArgumentCode(sb, j, p.Name, valueTypeBinders, isMultiArr, hasByRef, true);
                     sb.AppendLine();
                 }
-                bool noUnbox = (type.Name.Contains("AsyncTaskMethodBuilder") || type.FullName.StartsWith("System.Runtime.CompilerServices.AsyncVoidMethodBuilder")) && i.Name == "Start";
-
+                bool noUnbox = false;
+                if(i.Name == "Start" && i.IsGenericMethod)
+                {
+                    var ga = i.GetGenericArguments();
+                    if (typeof(IAsyncStateMachine).IsAssignableFrom(ga[0]))
+                    {
+                        noUnbox = true;
+                    }
+                }
                 if (!i.IsStatic)
                 {
                     sb.AppendLine(string.Format("            ptr_of_this_method = __esp - {0};", paramCnt));
