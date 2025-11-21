@@ -490,6 +490,9 @@ namespace ILRuntime.Reflection
                 else if (attributeTypes[i] is ILRuntimeWrapperType iwt)
                     return iwt.RealType == attributeType;
             }
+            if(inherit)
+                return ILType.BaseType.ReflectionType.IsDefined(attributeType, inherit);
+
             return false;
         }
 
