@@ -1137,7 +1137,7 @@ namespace ILRuntime.CLR.TypeSystem
 
                     for (int j = 0; j < param.Count; j++)
                     {
-                        if ((exactMatch && param[j] != i.Parameters[j]) || !i.Parameters[j].CanAssignTo(param[j]))
+                        if ((exactMatch && param[j] != i.Parameters[j]) || !param[j].CanAssignTo(i.Parameters[j]))
                         {
                             match = false;
                             break;
