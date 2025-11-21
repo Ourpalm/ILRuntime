@@ -76,6 +76,7 @@ namespace ILRuntime.Runtime.Enviorment
         int defaultJITFlags;
         List<ModuleDefinition> loadedModules = new List<ModuleDefinition>();
         List<Assembly> referenceAssemblies = new List<Assembly>();
+        public static string Version { get { return "3.0.0"; } }
 
         /// <summary>
         /// Determine if invoking unbinded CLR method(using reflection) is allowed
