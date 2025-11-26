@@ -1,4 +1,5 @@
 ﻿using ILRuntimeTest;
+using ILRuntimeTest.TestFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -477,6 +478,16 @@ namespace TestCases
             float percent = (float)exp / maxExp;
             Console.WriteLine("maxExp:" + maxExp + ",exp:" + exp + ", exp / maxExp:" + percent);
             return percent;
+        }
+
+        public static void UnitTest_1021()
+        {
+            TestClass2 localData = null;
+            TestClass2.Register(null);
+            TestClass2 testData = TestClass2.Alloc();
+            if(localData != testData)
+                throw new Exception();
+
         }
     }
 }

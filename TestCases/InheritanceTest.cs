@@ -77,7 +77,13 @@ namespace TestCases
             Console.WriteLine(cls3.ToString());
             cls3.TestAbstract();
             ((InterfaceTest2)cls3).TestVirtual();
+            Test_Interface_sub(cls3);
             cls3.TestField();
+        }
+
+        static void Test_Interface_sub(InterfaceTest2 ins)
+        {
+            ins.TestVirtual();
         }
 
         public static void InheritanceTest_Interface2()
@@ -493,7 +499,7 @@ namespace TestCases
         {
         }
 
-        class TestCls5 : TestClass2
+        internal class TestCls5 : TestClass2
         {
             public int bbbb;
             public override void VMethod3(ref int arg)
@@ -682,8 +688,12 @@ namespace TestCases
             Console.WriteLine("This is TestCls2.TestVirtual");
         }
     }
+    class TestCls3Base
+    {
 
-    class TestCls3 : InterfaceTest2
+    }
+
+    class TestCls3 : TestCls3Base, InterfaceTest2
     {
         int testVal;
 
