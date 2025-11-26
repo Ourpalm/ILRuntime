@@ -1590,6 +1590,13 @@ namespace ILRuntime.Runtime.Intepreter
                                                 throw new NotImplementedException();
                                         }
                                     }
+                                    else 
+                                    {
+                                        if (a->ObjectType == ObjectTypes.Null && b->ObjectType == ObjectTypes.Object)
+                                            transfer = mStack[b->Value] == null;
+                                        else if (b->ObjectType == ObjectTypes.Null && a->ObjectType == ObjectTypes.Object)
+                                            transfer = mStack[a->Value] == null;
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 2);
                                     esp = esp - 2;
@@ -1634,7 +1641,14 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                     }
                                     else
-                                        transfer = true;
+                                    {
+                                        if (a->ObjectType == ObjectTypes.Null && b->ObjectType == ObjectTypes.Object)
+                                            transfer = mStack[b->Value] != null;
+                                        else if (b->ObjectType == ObjectTypes.Null && a->ObjectType == ObjectTypes.Object)
+                                            transfer = mStack[a->Value] != null;
+                                        else
+                                            transfer = true;
+                                    }
                                     Free(esp - 1);
                                     Free(esp - 2);
                                     esp = esp - 2;
@@ -5841,7 +5855,12 @@ namespace ILRuntime.Runtime.Intepreter
                 {
                     dst->Value = dstmStack.Count;
                     var obj = mStack[src->Value];
-                    dstmStack.Add(obj);
+                    if (obj != null)
+                        dstmStack.Add(obj);
+                    else
+                    {
+                        PushNull(dst);
+                    }
                 }
             }
         }
