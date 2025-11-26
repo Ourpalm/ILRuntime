@@ -18,7 +18,7 @@ namespace ILRuntimeTest.TestFramework
 
         public static TestClass2 Alloc()
         {
-            return objs[0];
+            return objs[objs.Count - 1];
         }
         public static int Add(int a, int b)
         {
