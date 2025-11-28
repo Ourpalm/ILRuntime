@@ -19,7 +19,8 @@ namespace ILRuntime.Runtime.Enviorment
             public Type ReturnType;
             public string GetterBody;
             public string SettingBody;
-            public string Modifier;
+            public string GetterModifier;
+            public string SettingModifier;
             public string OverrideString;
         }
 
@@ -197,7 +198,6 @@ namespace ");
                 }
                 else
                 {
-                    pInfo.Modifier = modifier;
                     pInfo.OverrideString = overrideStr;
                 }
                 if (!i.IsAbstract)
@@ -230,10 +230,12 @@ namespace ");
                 {
                     if (isGetter)
                     {
+                        pInfo.GetterModifier = modifier;
                         pInfo.GetterBody = sb.ToString();
                     }
                     else
                     {
+                        pInfo.SettingModifier = modifier;
                         pInfo.SettingBody = sb.ToString();
                     }
                     sb = oriBuilder;
@@ -252,11 +254,13 @@ namespace ");
                 string clsName, realClsName;
                 bool isByRef;
                 pInfo.ReturnType.GetClassName(out clsName, out realClsName, out isByRef, true);
-                sb.AppendLine(string.Format("            {0} {3}{1} {2}", pInfo.Modifier, realClsName, pInfo.Name, pInfo.OverrideString));
+                var modifier = pInfo.GetterModifier == "public" || string.IsNullOrEmpty(pInfo.SettingModifier) ? pInfo.GetterModifier : pInfo.SettingModifier;
+                sb.AppendLine(string.Format("            {0} {3}{1} {2}", modifier, realClsName, pInfo.Name, pInfo.OverrideString));
                 sb.AppendLine("            {");
                 if (!string.IsNullOrEmpty(pInfo.GetterBody))
                 {
-                    sb.AppendLine("            get");
+                    if (pInfo.GetterModifier == modifier) sb.AppendLine("            get");
+                    else sb.AppendLine($"            {pInfo.GetterModifier} get");
                     sb.AppendLine("            {");
                     sb.AppendLine(pInfo.GetterBody);
                     sb.AppendLine("            }");
@@ -264,7 +268,8 @@ namespace ");
                 }
                 if (!string.IsNullOrEmpty(pInfo.SettingBody))
                 {
-                    sb.AppendLine("            set");
+                    if (pInfo.SettingModifier == modifier) sb.AppendLine("            set");
+                    else sb.AppendLine($"            {pInfo.SettingModifier} set");
                     sb.AppendLine("            {");
                     sb.AppendLine(pInfo.SettingBody);
                     sb.AppendLine("            }");
@@ -376,7 +381,7 @@ namespace ");
             var returnType = info.ReturnType;
             if (returnType.IsByRef)
                 returnType = returnType.GetElementType();
-            if (returnType.IsNotPublic || returnType.IsNested && !returnType.IsNestedPublic)
+            if (returnType.IsNotPublic || returnType.IsNested && !returnType.IsNestedPublic && !returnType.IsNestedFamily && !returnType.IsNestedFamORAssem)
                 return true;
 
             return false;
@@ -426,15 +431,6 @@ namespace ");
                 sb.Append(")");
                 if (isByRef)
                     sb.Append(".MakeByRefType()");
-            }
-            if (returnType != typeof(void))
-            {
-                if (!first)
-                    sb.Append(", ");
-                string clsName, realClsName;
-                bool isByRef;
-                returnType.GetClassName(out clsName, out realClsName, out isByRef, true);
-                sb.Append(realClsName);
             }
             return sb.ToString();
         }
@@ -585,7 +581,7 @@ namespace ");
             sb.AppendLine("                    }");
             if (hasReturn)
                 sb.AppendLine(@"                    else
-                        return default(TResult);");
+                        return default;");
             sb.AppendLine(@"                }
 
                 public override void Invoke(ILTypeInstance instance)
@@ -662,7 +658,8 @@ namespace ");
             {
                 if (p.IsOut)
                 {
-                    sb.AppendLine(string.Format("                    {0} = default({1});", p.Name, p.ParameterType.GetElementType().FullName));
+                    p.ParameterType.GetClassName(out var clsName, out var realClsName, out var isByRef, true);
+                    sb.AppendLine(string.Format("                    {0} = default({1});", p.Name, realClsName));
                 }
             }
         }
