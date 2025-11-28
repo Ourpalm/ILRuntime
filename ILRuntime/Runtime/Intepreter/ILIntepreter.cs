@@ -4641,7 +4641,8 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeEnum.Throw:
                                 {
                                     objRef = GetObjectAndResolveReference(esp - 1);
-                                    var ex = mStack[objRef->Value] as Exception;
+                                    var exObj = mStack[objRef->Value];
+                                    var ex = exObj as Exception ?? (exObj as ILTypeInstance)?.CLRInstance as Exception;
                                     Free(objRef);
                                     esp--;
                                     throw ex;
