@@ -469,6 +469,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_Ref:
                 case OpCodeREnum.Stobj:
                 case OpCodeREnum.Stfld:
+                case OpCodeREnum.Stfld_I1:
+                case OpCodeREnum.Stfld_I2:
+                case OpCodeREnum.Stfld_I4:
+                case OpCodeREnum.Stfld_I8:
+                case OpCodeREnum.Stfld_U1:
+                case OpCodeREnum.Stfld_U2:
+                case OpCodeREnum.Stfld_U4:
+                case OpCodeREnum.Stfld_U8:
+                case OpCodeREnum.Stfld_R4:
+                case OpCodeREnum.Stfld_R8:
+                case OpCodeREnum.Stfld_Ref:
+                case OpCodeREnum.Stfld_Value:
                     r1 = op.Register1;
                     r2 = op.Register2;
                     return true;
@@ -804,6 +816,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stelem_Ref:
                 case OpCodeREnum.Stelem_Any:
                 case OpCodeREnum.Stfld:
+                case OpCodeREnum.Stfld_I1:
+                case OpCodeREnum.Stfld_I2:
+                case OpCodeREnum.Stfld_I4:
+                case OpCodeREnum.Stfld_I8:
+                case OpCodeREnum.Stfld_U1:
+                case OpCodeREnum.Stfld_U2:
+                case OpCodeREnum.Stfld_U4:
+                case OpCodeREnum.Stfld_U8:
+                case OpCodeREnum.Stfld_R4:
+                case OpCodeREnum.Stfld_R8:
+                case OpCodeREnum.Stfld_Ref:
+                case OpCodeREnum.Stfld_Value:
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Throw:
                 case OpCodeREnum.Readonly:
@@ -981,6 +1005,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Stind_Ref:
                 case OpCodeREnum.Stobj:
                 case OpCodeREnum.Stfld:
+                case OpCodeREnum.Stfld_I1:
+                case OpCodeREnum.Stfld_I2:
+                case OpCodeREnum.Stfld_I4:
+                case OpCodeREnum.Stfld_I8:
+                case OpCodeREnum.Stfld_U1:
+                case OpCodeREnum.Stfld_U2:
+                case OpCodeREnum.Stfld_U4:
+                case OpCodeREnum.Stfld_U8:
+                case OpCodeREnum.Stfld_R4:
+                case OpCodeREnum.Stfld_R8:
+                case OpCodeREnum.Stfld_Ref:
+                case OpCodeREnum.Stfld_Value:
                     switch (idx)
                     {
                         case 0:

@@ -954,7 +954,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Stfld:
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
-                    op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+                    {
+                        var offset = appdomain.GetFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
+                        if(type is ILType)
+                        {
+                            op.Code = GetStfldCodeForType(fieldType);
+                            op.Operand = type.GetHashCode();
+                            op.Operand2 = offset.PrimitiveOffset;
+                            op.Operand3 = offset.ReferenceOffset;
+                        }
+                        else
+                            op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
+                    }
                     baseRegIdx -= 2;
                     break;
                 case Code.Box:
@@ -1022,6 +1033,77 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 block.NeedLoadConstantElimination = Optimizer.IsLoadConstant(op.Code);
         }
 
+        OpCodeREnum GetStfldCodeForType(IType fieldType)
+        {
+            OpCodeREnum res = OpCodeREnum.Stfld_Ref;
+            if (fieldType.IsPrimitive)
+            {
+                if (fieldType == appdomain.IntType)
+                {
+                    res = OpCodeREnum.Stfld_I4;
+                }
+                else if (fieldType == appdomain.LongType)
+                {
+                    res = OpCodeREnum.Stfld_I8;
+                }
+                else if (fieldType == appdomain.ShortType)
+                {
+                    res = OpCodeREnum.Stfld_I2;
+                }
+                else if (fieldType == appdomain.ByteType)
+                {
+                    res = OpCodeREnum.Stfld_U1;
+                }
+                else if (fieldType == appdomain.BoolType)
+                {
+                    res = OpCodeREnum.Stfld_I1;
+                }
+                else if (fieldType == appdomain.FloatType)
+                {
+                    res = OpCodeREnum.Stfld_R4;
+                }
+                else if (fieldType == appdomain.DoubleType)
+                {
+                    res = OpCodeREnum.Stfld_R8;
+                }
+                else if (fieldType == appdomain.SByteType)
+                {
+                    res = OpCodeREnum.Stfld_I1;
+                }
+                else if (fieldType == appdomain.UShortType)
+                {
+                    res = OpCodeREnum.Stfld_U2;
+                }
+                else if (fieldType == appdomain.UIntType)
+                {
+                    res = OpCodeREnum.Stfld_U4;
+                }
+                else if (fieldType == appdomain.ULongType)
+                {
+                    res = OpCodeREnum.Stfld_U8;
+                }
+                else if (fieldType == appdomain.CharType)
+                {
+                    res = OpCodeREnum.Stfld_U4;
+                }
+                else if (fieldType == appdomain.IntPtrType)
+                {
+                    res = OpCodeREnum.Stfld_U8;
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else
+            {
+                if (fieldType is ILType && fieldType.IsValueType)
+                {
+                    res = OpCodeREnum.Stfld_Value;
+                }
+                else
+                    res = OpCodeREnum.Stfld_Ref;
+            }
+            return res;
+        }
 
         int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline, out IMethod m, out ILMethod toInline, out bool isILMethod)
         {

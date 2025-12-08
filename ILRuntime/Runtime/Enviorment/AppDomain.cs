@@ -17,6 +17,8 @@ using ILRuntime.Other;
 using ILRuntime.Runtime.Intepreter.RegisterVM;
 using System.Threading;
 using ILRuntime.Hybrid;
+using ILRuntime.Runtime.Intepreter.OpCodes;
+
 
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
@@ -67,7 +69,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<Type, CLRMemberwiseCloneDelegate> memberwiseCloneMap = new Dictionary<Type, CLRMemberwiseCloneDelegate>(new ByReferenceKeyComparer<Type>());
         Dictionary<Type, CLRCreateDefaultInstanceDelegate> createDefaultInstanceMap = new Dictionary<Type, CLRCreateDefaultInstanceDelegate>(new ByReferenceKeyComparer<Type>());
         Dictionary<Type, CLRCreateArrayInstanceDelegate> createArrayInstanceMap = new Dictionary<Type, CLRCreateArrayInstanceDelegate>(new ByReferenceKeyComparer<Type>());
-        IType voidType, intType, longType, boolType, floatType, doubleType, objectType, jitAttributeType;
+        IType voidType, sbyteType, shortType, intType, longType, byteType, ushortType, uintType, ulongType,intptrType, boolType, floatType, doubleType, charType, objectType, jitAttributeType;
         DelegateManager dMgr;
         Assembly[] loadedAssemblies;
         Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
@@ -76,6 +78,7 @@ namespace ILRuntime.Runtime.Enviorment
         int defaultJITFlags;
         List<ModuleDefinition> loadedModules = new List<ModuleDefinition>();
         List<Assembly> referenceAssemblies = new List<Assembly>();
+        
         public static string Version { get { return "3.0.0"; } }
 
         /// <summary>
@@ -228,8 +231,16 @@ namespace ILRuntime.Runtime.Enviorment
         }
 
         public IType VoidType { get { return voidType; } }
+        public IType SByteType { get { return sbyteType; } }
+        public IType ShortType { get { return shortType; } }
         public IType IntType { get { return intType; } }
         public IType LongType { get { return longType; } }
+        public IType ByteType { get { return byteType; } }
+        public IType UShortType { get { return ushortType; } }
+        public IType UIntType { get { return uintType; } }
+        public IType ULongType { get { return ulongType; } }
+        public IType IntPtrType { get { return intptrType; } }
+        public IType CharType { get { return charType; } }
         public IType BoolType { get { return boolType; } }
         public IType FloatType { get { return floatType; } }
         public IType DoubleType { get { return doubleType; } }
@@ -629,8 +640,16 @@ namespace ILRuntime.Runtime.Enviorment
             if (voidType == null)
             {
                 voidType = GetType("System.Void");
+                sbyteType = GetType("System.SByte");
+                shortType = GetType("System.Int16");
                 intType = GetType("System.Int32");
                 longType = GetType("System.Int64");
+                byteType = GetType("System.Byte");
+                ushortType = GetType("System.UInt16");
+                uintType = GetType("System.UInt32");
+                ulongType = GetType("System.UInt64");
+                intptrType = GetType("System.IntPtr");
+                charType = GetType("System.Char");
                 boolType = GetType("System.Boolean");
                 floatType = GetType("System.Single");
                 doubleType = GetType("System.Double");
@@ -1780,6 +1799,83 @@ namespace ILRuntime.Runtime.Enviorment
 
                 return res;
             }
+        }
+
+        internal ILTypeFieldOffset GetFieldOffset(object token, IType contextType, IMethod contextMethod, out IType type, out IType fieldType)
+        {
+            FieldReference f = token as FieldReference;
+            type = GetType(f.DeclaringType, contextType, contextMethod);
+            fieldType = GetType(f.FieldType, type, contextMethod);
+            if (type is ILType it)
+            {
+                if (it.TypeReference.HasGenericParameters)
+                {
+                    mapTypeToken[type.GetHashCode()] = it;
+                }
+                return it.GetFieldOffset(token);
+            }
+            else
+            {
+                return new ILTypeFieldOffset() { PrimitiveOffset = type.GetFieldIndex(token) }; 
+            }
+        }
+
+        internal int GetPrimitiveSize(IType fieldType)
+        {
+            if (fieldType == IntType)
+            {
+                return 4;
+            }
+            else if (fieldType == LongType)
+            {
+                return 8;
+            }
+            else if (fieldType == ShortType)
+            {
+                return 2;
+            }
+            else if (fieldType == ByteType)
+            {
+                return 1;
+            }
+            else if (fieldType == BoolType)
+            {
+                return 1;
+            }
+            else if (fieldType == FloatType)
+            {
+                return 4;
+            }
+            else if (fieldType == DoubleType)
+            {
+                return 8;
+            }
+            else if (fieldType == SByteType)
+            {
+                return 1;
+            }
+            else if (fieldType == UShortType)
+            {
+                return 2;
+            }
+            else if (fieldType == UIntType)
+            {
+                return 4;
+            }
+            else if (fieldType == ULongType)
+            {
+                return 8;
+            }
+            else if (fieldType == CharType)
+            {
+                return 4;
+            }
+            else if (fieldType == IntPtrType)
+            {
+                return 8;
+            }
+            else
+                throw new NotImplementedException();
         }
 
         internal long CacheString(object token)

@@ -11,6 +11,10 @@ using ILRuntime.Runtime.Stack;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Utils;
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+
+
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
@@ -184,6 +188,8 @@ namespace ILRuntime.Runtime.Intepreter
             var ehs = method.ExceptionHandlerRegister;
 
             StackObject* reg1, reg2, reg3, objRef, objRef2, val, dst, ret;
+            byte[] primBuffer;
+            ILTypeInstance ilInstance;
             bool transfer;
             int intVal = 0;
             long longVal = 0;
@@ -3085,6 +3091,114 @@ namespace ILRuntime.Runtime.Intepreter
                             #endregion
 
                             #region FieldOperation
+                            case OpCodeREnum.Stfld_Value:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        obj = RetriveObject(objRef, mStack);
+
+                                    }
+                                }
+                                break;
+
+                            case OpCodeREnum.Stfld_I4:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+
+#if NETSTANDARD2_0
+
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, reg2->Value);
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_I8:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        obj = RetriveObject(objRef, mStack);
+
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_R4:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        obj = RetriveObject(objRef, mStack);
+
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_R8:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        obj = RetriveObject(objRef, mStack);
+
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Stfld:
                                 {
                                     reg2 = (r + ip->Register2);
@@ -3348,7 +3462,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     reg1->ValueLow = (int)(ip->OperandLong);
                                 }
                                 break;
-                            #endregion
+#endregion
 
                             #region Initialization & Instantiation
                             case OpCodeREnum.Newobj:

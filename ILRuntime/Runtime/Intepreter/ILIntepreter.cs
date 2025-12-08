@@ -5004,8 +5004,8 @@ namespace ILRuntime.Runtime.Intepreter
                         {
                             CopyStackValueType(val, dst, mStack);
                         }
-                        else
-                            throw new NotImplementedException();
+                        //else
+                        //    throw new NotImplementedException();
                     }
                     break;
                 default:
@@ -5924,28 +5924,36 @@ namespace ILRuntime.Runtime.Intepreter
             esp->ValueLow = 0;
             return esp + 1;
         }
-
+#if NET_4_6 || NET_STANDARD_2_0
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static StackObject* PushInt32(StackObject* esp, int val)
         {
             esp->ObjectType = ObjectTypes.Integer;
             esp->Value = val;
             return esp + 1;
         }
-
+#if NET_4_6 || NET_STANDARD_2_0
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static StackObject* PushInt64(StackObject* esp, long val)
         {
             esp->ObjectType = ObjectTypes.Long;
             *(long*)(&esp->Value) = val;
             return esp + 1;
         }
-
+#if NET_4_6 || NET_STANDARD_2_0
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static StackObject* PushFloat(StackObject* esp, float val)
         {
             esp->ObjectType = ObjectTypes.Float;
             *(float*)(&esp->Value) = val;
             return esp + 1;
         }
-
+#if NET_4_6 || NET_STANDARD_2_0
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static StackObject* PushDouble(StackObject* esp, double val)
         {
             esp->ObjectType = ObjectTypes.Double;

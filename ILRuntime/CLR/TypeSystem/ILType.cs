@@ -10,9 +10,15 @@ using ILRuntime.CLR.Method;
 using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Reflection;
 using ILRuntime.Runtime.Stack;
+using System.Runtime.CompilerServices;
 
 namespace ILRuntime.CLR.TypeSystem
 {
+    internal struct ILTypeFieldOffset
+    {
+        public int PrimitiveOffset;
+        public int ReferenceOffset;
+    }
     public sealed class ILType : IType
     {
         Dictionary<string, List<ILMethod>> methods;
@@ -23,6 +29,7 @@ namespace ILRuntime.CLR.TypeSystem
         ILMethod staticConstructor;
         List<ILMethod> constructors;
         IType [] fieldTypes;
+        ILTypeFieldOffset[] fieldOffsets;
         FieldReference[] fieldReferences;
         FieldDefinition[] fieldDefinitions;
         IType[] staticFieldTypes;
@@ -57,6 +64,8 @@ namespace ILRuntime.CLR.TypeSystem
         int valuetypeFieldCount, valuetypeManagedCount;
         bool valuetypeSizeCalculated;
         ValueTypeInitInfo vtInitInfo;
+        int totalPrimitiveSize = -1;
+        int totalReferenceCnt = -1;
 
         public IMethod ToStringMethod
         {
@@ -292,6 +301,32 @@ namespace ILRuntime.CLR.TypeSystem
                         totalFieldCnt = fieldTypes.Length;
                 }
                 return totalFieldCnt;
+            }
+        }
+
+        public int TotalPrimitiveSize
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (totalPrimitiveSize < 0)
+                {
+                    InitializeFields();
+                }
+                return totalPrimitiveSize;
+            }
+        }
+
+        public int TotalReferenceCount
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (totalReferenceCnt < 0)
+                {
+                    InitializeFields();
+                }
+                return totalReferenceCnt;
             }
         }
 
@@ -1174,6 +1209,22 @@ namespace ILRuntime.CLR.TypeSystem
             return -1;
         }
 
+        internal ILTypeFieldOffset GetFieldOffset(object token)
+        {
+            var idx = GetFieldIndex(token);
+            return GetFieldOffset(idx);
+        }
+
+        internal ILTypeFieldOffset GetFieldOffset(int idx)
+        {
+            if (idx < FieldStartIndex)
+                return ((ILType)BaseType).GetFieldOffset(idx);
+            else
+            {
+                return fieldOffsets[idx - FieldStartIndex];
+            }
+        }
+
         public IType GetField(string name, out int fieldIdx)
         {
             if (fieldMapping == null)
@@ -1231,11 +1282,14 @@ namespace ILRuntime.CLR.TypeSystem
                 return;
             }
             fieldTypes = new IType [ definition.Fields.Count ];
+            fieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
             fieldReferences = new FieldReference[definition.Fields.Count];
             fieldDefinitions = new FieldDefinition[definition.Fields.Count];
             var fields = definition.Fields;
             int idx = FieldStartIndex;
             int idxStatic = 0;
+            int primitiveOffset = 0;
+            int referenceOffset = 0;
             for (int i = 0; i < fields.Count; i++)
             {
                 var field = fields[i];
@@ -1271,28 +1325,66 @@ namespace ILRuntime.CLR.TypeSystem
                 else
                 {
                     fieldMapping[field.Name] = idx;
+                    IType fieldType;
                     if (field.FieldType.IsGenericParameter)
                     {
-                        fieldTypes[idx - FieldStartIndex] = FindGenericArgument(field.FieldType.Name);
+                        fieldType = FindGenericArgument(field.FieldType.Name);
                     }
                     else
-                        fieldTypes[idx - FieldStartIndex] = appdomain.GetType(field.FieldType, this, null);
+                        fieldType = appdomain.GetType(field.FieldType, this, null);
+                    fieldTypes[idx - FieldStartIndex] = fieldType;
                     FieldReference fr = field;
                     if (typeRef.IsGenericInstance)
                     {
-                        fr = new FieldReference(field.Name, fieldTypes[idx - FieldStartIndex].ToTypeReference(appdomain.LoadedModules[0]), typeRef);
+                        fr = new FieldReference(field.Name, fieldType.ToTypeReference(appdomain.LoadedModules[0]), typeRef);
                     }
                     fieldReferences[idx - FieldStartIndex] = fr;
                     fieldDefinitions[idx - FieldStartIndex] = field;
                     if (IsEnum)
                     {
-                        enumType = fieldTypes[idx - FieldStartIndex];
+                        enumType = fieldType;
+                    }
+
+                    if (fieldType.IsPrimitive)
+                    {
+                        fieldOffsets[idx - FieldStartIndex] = new ILTypeFieldOffset()
+                        {
+                            PrimitiveOffset = primitiveOffset,
+                            ReferenceOffset = referenceOffset
+                        };
+                        primitiveOffset += AppDomain.GetPrimitiveSize(fieldType);
+                    }
+                    else
+                    {
+                        if(fieldType.IsValueType && fieldType is ILType it)
+                        {
+                            fieldOffsets[idx - FieldStartIndex] = new ILTypeFieldOffset()
+                            {
+                                PrimitiveOffset = primitiveOffset,
+                                ReferenceOffset = referenceOffset
+                            };
+                            primitiveOffset += it.TotalPrimitiveSize;
+                            referenceOffset += it.TotalReferenceCount;
+                        }
+                        else
+                        {
+                            fieldOffsets[idx - fieldStartIdx] = new ILTypeFieldOffset()
+                            {
+                                PrimitiveOffset = primitiveOffset,
+                                ReferenceOffset = referenceOffset
+                            };
+                            referenceOffset++;
+                        }
                     }
                     idx++;
                 }
             }
             Array.Resize ( ref fieldTypes, idx - FieldStartIndex );
             Array.Resize ( ref fieldDefinitions, idx - FieldStartIndex );
+            Array.Resize(ref fieldOffsets, idx - FieldStartIndex );
+
+            totalPrimitiveSize = primitiveOffset;
+            totalReferenceCnt = referenceOffset;
 
             if ( staticFieldTypes != null )
             {
