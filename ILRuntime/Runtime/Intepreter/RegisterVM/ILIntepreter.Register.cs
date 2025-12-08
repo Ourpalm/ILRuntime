@@ -3111,7 +3111,58 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Stfld_I1:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
 
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, (sbyte)reg2->Value);
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_I2:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
+
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, (short)reg2->Value);
+#endif
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Stfld_I4:
                                 {
                                     reg2 = (r + ip->Register2);
@@ -3128,7 +3179,6 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
-
 #if NETSTANDARD2_0
 
 #else
@@ -3154,8 +3204,118 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        obj = RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
 
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, *(long*)&reg2->Value);
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_U1:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
+
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, (byte)reg2->Value);
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_U2:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
+
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, (ushort)reg2->Value);
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_U4:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
+
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, (uint)reg2->Value);
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_U8:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
+
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, *(ulong*)&reg2->Value);
+#endif
                                     }
                                 }
                                 break;
@@ -3174,8 +3334,14 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        obj = RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
 
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, *(float*)&reg2->Value);
+#endif
                                     }
                                 }
                                 break;
@@ -3194,8 +3360,39 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        obj = RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
 
+#else
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        Unsafe.WriteUnaligned(ref tarAddr, *(double*)&reg2->Value);
+#endif
+
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Stfld_Ref:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference((r + ip->Register1));
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = ILIntepreter.ResolveReference(objRef);
+                                        var ft = domain.GetTypeByIndex(dst->Value);
+                                        if (ft is ILType)
+                                            CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
+                                        else
+                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+#if NETSTANDARD2_0
+
+#else
+                                        ilInstance.ManagedObjects[ip->Operand3] = mStack[reg2->Value];
+#endif
                                     }
                                 }
                                 break;
@@ -3218,13 +3415,13 @@ namespace ILRuntime.Runtime.Intepreter
 
                                         if (obj != null)
                                         {
-                                            ILTypeInstance instance = null;
+                                            ilInstance = null;
                                             if (obj is ILTypeInstance)
-                                                instance = obj as ILTypeInstance;
+                                                ilInstance = obj as ILTypeInstance;
                                             else if (obj is CrossBindingAdaptorType)
-                                                instance = (obj as CrossBindingAdaptorType).ILInstance;
-                                            if (instance != null)
-                                                instance.AssignFromStack((int)ip->OperandLong, reg2, this, mStack);
+                                                ilInstance = (obj as CrossBindingAdaptorType).ILInstance;
+                                            if (ilInstance != null)
+                                                ilInstance.AssignFromStack((int)ip->OperandLong, reg2, this, mStack);
                                             else
                                             {
                                                 var t = obj.GetType();

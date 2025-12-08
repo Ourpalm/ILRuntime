@@ -8,6 +8,8 @@ using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Runtime.Enviorment;
+using System.Runtime.CompilerServices;
+
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
@@ -165,7 +167,14 @@ namespace ILRuntime.Runtime.Intepreter
             get { return null; }
         }
 
-        public byte[] Primitives { get => fields; }
+        public byte[] Primitives
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                return fields;
+            }
+        }
 
         public virtual bool IsValueType
         {
