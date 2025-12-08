@@ -153,6 +153,35 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ldflda:
                     param = string.Format("r{0}, r{1}, 0x{2:X8}", Register1, Register2, OperandLong);
                     break;
+                case OpCodeREnum.Ldfld_I1:
+                case OpCodeREnum.Ldfld_I2:
+                case OpCodeREnum.Ldfld_I4:
+                case OpCodeREnum.Ldfld_I8:
+                case OpCodeREnum.Ldfld_U1:
+                case OpCodeREnum.Ldfld_U2:
+                case OpCodeREnum.Ldfld_U4:
+                case OpCodeREnum.Ldfld_U8:
+                case OpCodeREnum.Ldfld_R4:
+                case OpCodeREnum.Ldfld_R8:
+                case OpCodeREnum.Ldfld_Ref:
+                case OpCodeREnum.Ldfld_Value:
+                case OpCodeREnum.Stfld_I1:
+                case OpCodeREnum.Stfld_I2:
+                case OpCodeREnum.Stfld_I4:
+                case OpCodeREnum.Stfld_I8:
+                case OpCodeREnum.Stfld_U1:
+                case OpCodeREnum.Stfld_U2:
+                case OpCodeREnum.Stfld_U4:
+                case OpCodeREnum.Stfld_U8:
+                case OpCodeREnum.Stfld_R4:
+                case OpCodeREnum.Stfld_R8:
+                case OpCodeREnum.Stfld_Ref:
+                case OpCodeREnum.Stfld_Value:
+                    if (domain != null)
+                        param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, domain.GetType(Operand), Operand2, Operand3);
+                    else
+                        param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, Operand, Operand2, Operand3);
+                    break;
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Ldsfld:
                 case OpCodeREnum.Ldsflda:

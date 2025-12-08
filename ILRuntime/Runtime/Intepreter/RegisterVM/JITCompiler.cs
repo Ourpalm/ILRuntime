@@ -946,6 +946,21 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Ldfld:
+                    op.Register1 = (short)(baseRegIdx - 1);
+                    op.Register2 = (short)(baseRegIdx - 1);
+                    {
+                        var offset = appdomain.GetFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
+                        if (type is ILType)
+                        {
+                            op.Code = GetLdfldCodeForType(fieldType);
+                            op.Operand = type.GetHashCode();
+                            op.Operand2 = offset.PrimitiveOffset;
+                            op.Operand3 = offset.ReferenceOffset;
+                        }
+                        else
+                            op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
+                    }
+                    break;
                 case Code.Ldflda:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
@@ -1032,7 +1047,77 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             if (!block.NeedLoadConstantElimination)
                 block.NeedLoadConstantElimination = Optimizer.IsLoadConstant(op.Code);
         }
-
+        OpCodeREnum GetLdfldCodeForType(IType fieldType)
+        {
+            OpCodeREnum res = OpCodeREnum.Ldfld_Ref;
+            if (fieldType.IsPrimitive)
+            {
+                if (fieldType == appdomain.IntType)
+                {
+                    res = OpCodeREnum.Ldfld_I4;
+                }
+                else if (fieldType == appdomain.LongType)
+                {
+                    res = OpCodeREnum.Ldfld_I8;
+                }
+                else if (fieldType == appdomain.ShortType)
+                {
+                    res = OpCodeREnum.Ldfld_I2;
+                }
+                else if (fieldType == appdomain.ByteType)
+                {
+                    res = OpCodeREnum.Ldfld_U1;
+                }
+                else if (fieldType == appdomain.BoolType)
+                {
+                    res = OpCodeREnum.Ldfld_I1;
+                }
+                else if (fieldType == appdomain.FloatType)
+                {
+                    res = OpCodeREnum.Ldfld_R4;
+                }
+                else if (fieldType == appdomain.DoubleType)
+                {
+                    res = OpCodeREnum.Ldfld_R8;
+                }
+                else if (fieldType == appdomain.SByteType)
+                {
+                    res = OpCodeREnum.Ldfld_I1;
+                }
+                else if (fieldType == appdomain.UShortType)
+                {
+                    res = OpCodeREnum.Ldfld_U2;
+                }
+                else if (fieldType == appdomain.UIntType)
+                {
+                    res = OpCodeREnum.Ldfld_U4;
+                }
+                else if (fieldType == appdomain.ULongType)
+                {
+                    res = OpCodeREnum.Ldfld_U8;
+                }
+                else if (fieldType == appdomain.CharType)
+                {
+                    res = OpCodeREnum.Ldfld_U4;
+                }
+                else if (fieldType == appdomain.IntPtrType)
+                {
+                    res = OpCodeREnum.Ldfld_U8;
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else
+            {
+                if (fieldType is ILType && fieldType.IsValueType)
+                {
+                    res = OpCodeREnum.Ldfld_Value;
+                }
+                else
+                    res = OpCodeREnum.Ldfld_Ref;
+            }
+            return res;
+        }
         OpCodeREnum GetStfldCodeForType(IType fieldType)
         {
             OpCodeREnum res = OpCodeREnum.Stfld_Ref;

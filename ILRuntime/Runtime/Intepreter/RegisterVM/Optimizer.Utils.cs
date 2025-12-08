@@ -454,6 +454,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
                 case OpCodeREnum.Ldflda:
+                case OpCodeREnum.Ldfld_I1:
+                case OpCodeREnum.Ldfld_I2:
+                case OpCodeREnum.Ldfld_I4:
+                case OpCodeREnum.Ldfld_I8:
+                case OpCodeREnum.Ldfld_U1:
+                case OpCodeREnum.Ldfld_U2:
+                case OpCodeREnum.Ldfld_U4:
+                case OpCodeREnum.Ldfld_U8:
+                case OpCodeREnum.Ldfld_R4:
+                case OpCodeREnum.Ldfld_R8:
+                case OpCodeREnum.Ldfld_Ref:
+                case OpCodeREnum.Ldfld_Value:
                 case OpCodeREnum.Ldvirtftn:
                 case OpCodeREnum.Isinst:
                 case OpCodeREnum.Castclass:
@@ -741,6 +753,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
+                case OpCodeREnum.Ldfld_I1:
+                case OpCodeREnum.Ldfld_I2:
+                case OpCodeREnum.Ldfld_I4:
+                case OpCodeREnum.Ldfld_I8:
+                case OpCodeREnum.Ldfld_U1:
+                case OpCodeREnum.Ldfld_U2:
+                case OpCodeREnum.Ldfld_U4:
+                case OpCodeREnum.Ldfld_U8:
+                case OpCodeREnum.Ldfld_R4:
+                case OpCodeREnum.Ldfld_R8:
+                case OpCodeREnum.Ldfld_Ref:
+                case OpCodeREnum.Ldfld_Value:
                 case OpCodeREnum.Ldflda:
                 case OpCodeREnum.Ldtoken:
                 case OpCodeREnum.Isinst:
@@ -971,6 +995,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldlen:
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
+                case OpCodeREnum.Ldfld_I1:
+                case OpCodeREnum.Ldfld_I2:
+                case OpCodeREnum.Ldfld_I4:
+                case OpCodeREnum.Ldfld_I8:
+                case OpCodeREnum.Ldfld_U1:
+                case OpCodeREnum.Ldfld_U2:
+                case OpCodeREnum.Ldfld_U4:
+                case OpCodeREnum.Ldfld_U8:
+                case OpCodeREnum.Ldfld_R4:
+                case OpCodeREnum.Ldfld_R8:
+                case OpCodeREnum.Ldfld_Ref:
+                case OpCodeREnum.Ldfld_Value:
                 case OpCodeREnum.Ldflda:
                 case OpCodeREnum.Ldvirtftn:
                 case OpCodeREnum.Isinst:
@@ -1290,6 +1326,18 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Newarr:
                 case OpCodeREnum.Ldfld:
                 case OpCodeREnum.Ldflda:
+                case OpCodeREnum.Ldfld_I1:
+                case OpCodeREnum.Ldfld_I2:
+                case OpCodeREnum.Ldfld_I4:
+                case OpCodeREnum.Ldfld_I8:
+                case OpCodeREnum.Ldfld_U1:
+                case OpCodeREnum.Ldfld_U2:
+                case OpCodeREnum.Ldfld_U4:
+                case OpCodeREnum.Ldfld_U8:
+                case OpCodeREnum.Ldfld_R4:
+                case OpCodeREnum.Ldfld_R8:
+                case OpCodeREnum.Ldfld_Ref:
+                case OpCodeREnum.Ldfld_Value:
                 case OpCodeREnum.Ldsfld:
                 case OpCodeREnum.Ldsflda:
                 case OpCodeREnum.Ldtoken:
