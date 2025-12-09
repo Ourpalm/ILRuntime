@@ -5087,9 +5087,9 @@ namespace ILRuntime.Runtime.Intepreter
                     throw new NotSupportedException("This API doesn't support reading " + typeof(T).FullName);
             }
         }
-        public object RetriveObject(StackObject* esp, AutoList mStack)
+        public object RetriveObject(StackObject* esp, AutoList mStack, bool dereference = true)
         {
-            StackObject* objRef = GetObjectAndResolveReference(esp);
+            StackObject* objRef = dereference ? GetObjectAndResolveReference(esp) : esp;
             if (objRef->ObjectType == ObjectTypes.Null)
                 return null;
             object obj = null;

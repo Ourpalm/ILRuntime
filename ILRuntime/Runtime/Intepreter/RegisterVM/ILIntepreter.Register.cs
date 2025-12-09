@@ -187,8 +187,7 @@ namespace ILRuntime.Runtime.Intepreter
             ValueTypeBasePointer = bp;
             var ehs = method.ExceptionHandlerRegister;
 
-            StackObject* reg1, reg2, reg3, objRef, objRef2, val, dst, ret;
-            byte[] primBuffer;
+            StackObject* reg1, reg2, reg3, objRef, objRef2, val, dst, ret;            
             ILTypeInstance ilInstance;
             bool transfer;
             int intVal = 0;
@@ -3098,15 +3097,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        obj = RetriveObject(objRef, mStack);
+                                        obj = RetriveObject(objRef, mStack, false);
 
                                     }
                                 }
@@ -3118,15 +3117,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3144,15 +3143,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3170,15 +3169,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3196,15 +3195,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3222,15 +3221,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3248,15 +3247,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3274,15 +3273,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3300,15 +3299,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3326,15 +3325,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3352,15 +3351,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3379,15 +3378,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3403,15 +3402,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = ILIntepreter.ResolveReference(objRef);
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             CopyToValueTypeField(dst, (int)ip->OperandLong, reg2, mStack);
                                         else
-                                            CopyToValueTypeField(dst, ((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
+                                            CopyToValueTypeField(dst, ((CLRType)type).FieldIndexMapping[(int)ip->OperandLong], reg2, mStack);
                                     }
                                     else
                                     {
-                                        obj = RetriveObject(objRef, mStack);
+                                        obj = RetriveObject(objRef, mStack, false);
 
                                         if (obj != null)
                                         {
@@ -3500,6 +3499,64 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Ldfld_I1:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushInt32(reg1, Unsafe.ReadUnaligned<sbyte>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldfld_I2:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushInt32(reg1, Unsafe.ReadUnaligned<short>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Ldfld_I4:
                                 {
                                     reg2 = (r + ip->Register2);
@@ -3507,17 +3564,17 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = *(StackObject**)&objRef->Value;
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             val = dst - ((int)ip->OperandLong + 1);
                                         else
-                                            val = dst - (((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
                                         //TODO: Check master modification
                                         CopyToRegister(ref info, ip->Register1, val);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3529,6 +3586,151 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Ldfld_I8:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushInt64(reg1, Unsafe.ReadUnaligned<long>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldfld_U1:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushInt32(reg1, Unsafe.ReadUnaligned<byte>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldfld_U2:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushInt32(reg1, Unsafe.ReadUnaligned<ushort>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldfld_U4:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushInt64(reg1, Unsafe.ReadUnaligned<uint>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
+                            case OpCodeREnum.Ldfld_U8:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushInt64(reg1, Unsafe.ReadUnaligned<long>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Ldfld_R4:
                                 {
                                     reg2 = (r + ip->Register2);
@@ -3536,17 +3738,17 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = *(StackObject**)&objRef->Value;
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             val = dst - ((int)ip->OperandLong + 1);
                                         else
-                                            val = dst - (((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
                                         //TODO: Check master modification
                                         CopyToRegister(ref info, ip->Register1, val);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
 #if NETSTANDARD2_0
 
 #else
@@ -3558,6 +3760,35 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                 }
                                 break;
+                            case OpCodeREnum.Ldfld_R8:
+                                {
+                                    reg2 = (r + ip->Register2);
+                                    objRef = GetObjectAndResolveReference(reg2);
+                                    if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
+                                    {
+                                        dst = *(StackObject**)&objRef->Value;
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
+                                            val = dst - ((int)ip->OperandLong + 1);
+                                        else
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                        //TODO: Check master modification
+                                        CopyToRegister(ref info, ip->Register1, val);
+                                    }
+                                    else
+                                    {
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
+#if NETSTANDARD2_0
+
+#else
+                                        reg1 = (r + ip->Register1);
+                                        ref byte baseAddr = ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives);
+                                        ref byte tarAddr = ref Unsafe.Add(ref baseAddr, ip->Operand2);
+                                        PushDouble(reg1, Unsafe.ReadUnaligned<double>(ref tarAddr));
+#endif
+                                    }
+                                }
+                                break;
                             case OpCodeREnum.Ldfld_Ref:
                                 {
                                     reg2 = (r + ip->Register2);
@@ -3565,17 +3796,17 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = *(StackObject**)&objRef->Value;
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             val = dst - ((int)ip->OperandLong + 1);
                                         else
-                                            val = dst - (((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
                                         //TODO: Check master modification
                                         CopyToRegister(ref info, ip->Register1, val);
                                     }
                                     else
                                     {
-                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack);
+                                        ilInstance = (ILTypeInstance)RetriveObject(objRef, mStack, false);
                                         AssignToRegister(ref info, ip->Register1, ilInstance.ManagedObjects[ip->Operand3], true);
                                     }
                                 }
@@ -3587,17 +3818,17 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference)
                                     {
                                         dst = *(StackObject**)&objRef->Value;
-                                        var ft = domain.GetTypeByIndex(dst->Value);
-                                        if (ft is ILType)
+                                        type = domain.GetTypeByIndex(dst->Value);
+                                        if (type is ILType)
                                             val = dst - ((int)ip->OperandLong + 1);
                                         else
-                                            val = dst - (((CLRType)ft).FieldIndexMapping[(int)ip->OperandLong] + 1);
+                                            val = dst - (((CLRType)type).FieldIndexMapping[(int)ip->OperandLong] + 1);
                                         //TODO: Check master modification
                                         CopyToRegister(ref info, ip->Register1, val);
                                     }
                                     else
                                     {
-                                        obj = RetriveObject(objRef, mStack);
+                                        obj = RetriveObject(objRef, mStack, false);
                                         if (obj != null)
                                         {
                                             ILTypeInstance instance = null;
@@ -3659,7 +3890,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        obj = RetriveObject(objRef, mStack);
+                                        obj = RetriveObject(objRef, mStack, false);
                                         if (obj != null)
                                         {
                                             AssignToRegister(ref info, ip->Register1, obj);
