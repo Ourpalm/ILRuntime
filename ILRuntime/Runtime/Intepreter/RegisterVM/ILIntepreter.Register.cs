@@ -5937,73 +5937,16 @@ namespace ILRuntime.Runtime.Intepreter
                     catch (Exception ex)
                     {
                         var oriESP = esp;
-                        if (ehs != null)
+                        bool isJmp = HandleException(ex, ref esp, ehs, method, (int)(ip - ptr), ref frame, ref lastCaughtEx, ref unhandledException, ref finallyEndAddress, out int jmpTarget, out bool isCatch);
+                        if (isCatch)
                         {
-                            int addr = (int)(ip - ptr);
-                            var eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, true);
-
-                            if (eh == null)
-                            {
-                                eh = GetCorrespondingExceptionHandler(ehs, ex, addr, ExceptionHandlerType.Catch, false);
-                            }
-                            if (eh != null)
-                            {
-                                if (ex is ILRuntimeException)
-                                {
-                                    ILRuntimeException ire = (ILRuntimeException)ex;
-                                    var inner = ire.GetInnerException();
-                                    inner.Data["ThisInfo"] = ire.ThisInfo;
-                                    inner.Data["StackTrace"] = inner.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", ire.StackTrace, inner.Data["StackTrace"]) : ire.StackTrace;
-                                    inner.Data["LocalInfo"] = ire.LocalInfo;
-                                    ex = inner;
-                                }
-                                else
-                                {
-                                    var debugger = AppDomain.DebugService;
-                                    if (method.HasThis)
-                                        ex.Data["ThisInfo"] = debugger.GetThisInfo(this);
-                                    else
-                                        ex.Data["ThisInfo"] = "";
-                                    ex.Data["StackTrace"] = ex.Data.Contains("StackTrace") ? string.Format("{0}\n--- End of stack trace from previous location ---\n{1}", debugger.GetStackTrace(this), ex.Data["StackTrace"]) : debugger.GetStackTrace(this);
-                                    ex.Data["LocalInfo"] = debugger.GetLocalVariableInfo(this);
-                                }
-                                //Clear call stack
-                                while (stack.Frames.Peek().BasePointer != frame.BasePointer)
-                                {
-                                    var f = stack.Frames.Peek();
-                                    esp = stack.PopFrame(ref f, esp);
-                                    if (f.Method.ReturnType != AppDomain.VoidType)
-                                    {
-                                        Free(esp - 1);
-                                        esp--;
-                                    }
-                                }
-                                lastCaughtEx = ex;
-                                short exReg = (short)(paramCnt + locCnt);
-                                AssignToRegister(ref info, exReg, ex);
-                                unhandledException = false;
-                                var eh2 = FindExceptionHandlerByBranchTarget(addr, eh.HandlerStart, ehs);
-                                if (eh2 != null)
-                                {
-                                    finallyEndAddress = eh.HandlerStart;
-                                    ip = ptr + eh2.HandlerStart;
-                                    continue;
-                                }
-                                ip = ptr + eh.HandlerStart;
-                                continue;
-                            }
-
-                            eh = GetCorrespondingExceptionHandler(ehs, null, addr, ExceptionHandlerType.Fault, false);
-                            if (eh == null)
-                                eh = GetCorrespondingExceptionHandler(ehs, null, addr, ExceptionHandlerType.Finally, false);
-                            if (eh != null)
-                            {
-                                unhandledException = false;
-                                finallyEndAddress = -1;
-                                lastCaughtEx = ex is ILRuntimeException ? ex : new ILRuntimeException(ex.Message, this, method, oriESP, ex);
-                                ip = ptr + eh.HandlerStart;
-                                continue;
-                            }
+                            short exReg = (short)(paramCnt + locCnt);
+                            AssignToRegister(ref info, exReg, ex);
+                        }
+                        if (isJmp)
+                        {
+                            ip = ptr + jmpTarget;
+                            continue;
                         }
                         if (unhandledException)
                         {
