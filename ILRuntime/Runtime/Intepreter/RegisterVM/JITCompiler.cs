@@ -12,6 +12,22 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 
 namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
+    struct StackSlotInfo
+    {
+        public int Offset;
+        public int RefOffset;
+        public int Size;        
+    }
+    struct CompiledFrame
+    {
+        public OpCodeR[] CodeBody;
+        public int StackRegisterCount;
+        public Dictionary<int, int[]> SwitchTargets;
+        public Dictionary<int, RegisterVMSymbol> Symbols;
+        public StackSlotInfo[] LocalInfos;
+        public int TotalStructSize;
+        public int TotalRefSize;
+    }
     struct JITCompiler
     {
         public const int CallRegisterParamCount = 3;
@@ -96,7 +112,49 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 return false;
         }
 
-        public OpCodeR[] Compile(out int stackRegisterCnt, out Dictionary<int, int[]> switchTargets, Dictionary<Instruction, int> addr, out Dictionary<int, RegisterVMSymbol> symbols)
+        List<IType> GatherValueTypes(ref CompiledFrame frame)
+        {
+            List<IType> valueTypes = new List<IType>();
+            var body = frame.CodeBody;
+            var domain = method.AppDomain;
+            for (int i = 0; i < body.Length; i++)
+            {
+                var code = body[i];
+                IType type = null;
+                switch (code.Code)
+                {
+                    case OpCodeREnum.Ldobj:
+                    case OpCodeREnum.Stobj:
+                    case OpCodeREnum.Box:
+                    case OpCodeREnum.Unbox:
+                    case OpCodeREnum.Unbox_Any:
+                    case OpCodeREnum.Isinst:
+                    case OpCodeREnum.Castclass:
+                    case OpCodeREnum.Constrained:
+                    case OpCodeREnum.Sizeof:
+                    case OpCodeREnum.Newarr:
+                    case OpCodeREnum.Ldfld_Ref:
+                    case OpCodeREnum.Ldfld_Value:
+                    case OpCodeREnum.Stfld_Ref:
+                    case OpCodeREnum.Stfld_Value:
+                        type = domain.GetType(code.Operand);
+                        break;
+                    case OpCodeREnum.Ldfld:
+                    case OpCodeREnum.Stfld:
+                    case OpCodeREnum.Ldsfld:
+                    case OpCodeREnum.Stsfld:
+                        type = domain.GetType((int)(code.OperandLong >> 32));
+                        break;
+                }
+                if (type != null && type.IsValueType && !type.IsPrimitive)
+                {
+                    valueTypes.Add(type);
+                }
+            }
+            return valueTypes;
+        }
+
+        public CompiledFrame Compile(Dictionary<Instruction, int> addr)
         {
 #if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
@@ -109,7 +167,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
 #endif
             method.Compiling = true;
-            symbols = new Dictionary<int, RegisterVMSymbol>();
+            Dictionary<int, RegisterVMSymbol> symbols = new Dictionary<int, RegisterVMSymbol>();
 
             var body = def.Body;
             short locVarRegStart = (short)def.Parameters.Count;
@@ -340,9 +398,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #else
             symbols = null;
 #endif
-            switchTargets = jumptables;
+            CompiledFrame frame = new CompiledFrame();
+            frame.SwitchTargets = jumptables;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
-            stackRegisterCnt = Math.Max(totalRegCnt - baseRegStart, 0);
+            frame.StackRegisterCount = Math.Max(totalRegCnt - baseRegStart, 0);
 #if OUTPUT_JIT_RESULT
             Console.WriteLine($"Final Results for {method}:");
 
@@ -353,7 +412,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
 #endif
             method.Compiling = false;
-            var arr = res.ToArray();
+            frame.CodeBody = res.ToArray();
+            AllocateLocalStackSpaces(ref frame);
+
 #if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
 #if UNITY_5_5_OR_NEWER
@@ -362,7 +423,77 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 UnityEngine.Profiler.EndSample();
 #endif
 #endif
-            return arr;
+            return frame;
+        }
+
+        void AllocateLocalStackSpaces(ref CompiledFrame frame)
+        {
+            var body = def.Body;
+            int varCnt = body.Variables.Count;
+            StackSlotInfo[] localInfo = new StackSlotInfo[varCnt + frame.StackRegisterCount];
+            int offset = 0;
+            int refOffset = 0;
+            for (int i = 0; i < varCnt; i++)
+            {
+                var vt = body.Variables[i].VariableType;
+                StackSlotInfo slot = default;
+                if (vt.IsValueType && !vt.IsPrimitive)
+                {
+                    var ivt = appdomain.GetType(vt, declaringType, method);
+                    if (ivt is ILType il)
+                    {
+                        int size = il.TotalPrimitiveSize;
+                        int refSize = il.TotalReferenceCount;
+                        slot.Offset = offset;
+                        slot.Size = size;
+                        slot.RefOffset = refOffset;
+                        offset += size;
+                        refOffset += refSize;
+                    }
+                    else
+                    {
+                        slot.Offset = offset;
+                        slot.RefOffset = refOffset;
+                        slot.Size = 0;
+                        refOffset++;
+                    }
+                }
+                else if (!vt.IsValueType)
+                {
+                    slot.Offset = offset;
+                    slot.RefOffset = refOffset;
+                    slot.Size = 0;
+                    refOffset++;
+                }
+                localInfo[i] = slot;
+            }
+            var valueTypes = GatherValueTypes(ref frame);
+            int maxSize = 0, maxRefCount = 1;
+            foreach (var i in valueTypes)
+            {
+                if (i is ILType il)
+                {
+                    int size = il.TotalPrimitiveSize;
+                    int refSize = il.TotalReferenceCount;
+                    if (size > maxSize)
+                        maxSize = size;
+                    if (refSize > maxRefCount)
+                        maxRefCount = refSize;
+                }
+            }
+            for (int i = 0; i < frame.StackRegisterCount; i++)
+            {
+                StackSlotInfo slot = default;
+                slot.Offset = offset;
+                slot.RefOffset = refOffset;
+                slot.Size = maxSize;
+                offset += maxSize;
+                refOffset += maxRefCount;
+                localInfo[varCnt + i] = slot;
+            }
+            frame.LocalInfos = localInfo;
+            frame.TotalStructSize = offset;
+            frame.TotalRefSize = refOffset;
         }
         void PrepareJumpTable(object token)
         {

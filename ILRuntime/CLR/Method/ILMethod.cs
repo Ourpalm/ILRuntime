@@ -646,7 +646,10 @@ namespace ILRuntime.CLR.Method
                 if (register && hasInstruction)
                 {
                     JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
-                    bodyRegister = jit.Compile(out stackRegisterCnt, out jumptablesR, addr, out registerSymbols);
+                    var compiledFrame = jit.Compile(addr);
+                    bodyRegister = compiledFrame.CodeBody;
+                    stackRegisterCnt = compiledFrame.StackRegisterCount;
+                    registerSymbols = compiledFrame.Symbols;
                 }
                 else
                 {
