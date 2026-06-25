@@ -1,4 +1,4 @@
-﻿//#define PATCHED
+//#define PATCHED
 using ILRuntime.Runtime;
 using System;
 using System.Collections.Generic;
@@ -64,6 +64,45 @@ namespace HotfixAOT
 #endif
     }
 
+    [ILRuntimePatch]
+    public struct GenericStruct<T>
+    {
+        public T Value;
+        public T GetValue()
+        {
+#if PATCHED
+            Console.WriteLine("GenericStruct GetValue PATCHED");
+            return Value;
+#else
+            return Value;
+#endif
+        }
+        
+        public void SetValue(T val)
+        {
+#if PATCHED
+            Console.WriteLine("GenericStruct SetValue PATCHED");
+            Value = val;
+#else
+            Value = val;
+#endif
+        }
+    }
+
+    [ILRuntimePatch]
+    public class HotfixTestGenericMethods
+    {
+        public T GenericMethod<T>(T val)
+        {
+#if PATCHED
+            Console.WriteLine("GenericMethod PATCHED");
+            return val;
+#else
+            return val;
+#endif
+        }
+    }
+
     public class HotfixTestGenericTestCases
     {
         static bool Test01(bool patched)
@@ -80,10 +119,25 @@ namespace HotfixAOT
             cls.SetTransformer(new Func<int, int>((a) => a + 200));
             return patched ? cls.GetValue() == 300 : cls.GetValue() == 100;
         }
+        static bool Test03(bool patched)
+        {
+            var st = new GenericStruct<int>();
+            st.SetValue(42);
+            return st.GetValue() == 42;
+        }
+
+        static bool Test04(bool patched)
+        {
+            var obj = new HotfixTestGenericMethods();
+            return obj.GenericMethod<int>(99) == 99 && obj.GenericMethod<string>("test") == "test";
+        }
+
         public static IEnumerable<ITestCase> GetTestCases()
         {
             yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test01)}", Test01);
             yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test02)}", Test02);
+            yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test03)}", Test03);
+            yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test04)}", Test04);
         }
     }
 }

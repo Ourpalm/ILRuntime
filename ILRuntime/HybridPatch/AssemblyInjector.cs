@@ -267,11 +267,25 @@ namespace ILRuntime.Hybrid
                     }
                     var fieldType = field.FieldType.IsGenericParameter ? field.FieldType : module.ImportReference(field.FieldType);
                     fieldDeclaringType = module.ImportReference(fieldDeclaringType);
+                    if (fieldType.IsGenericParameter && fieldDeclaringType is GenericInstanceType)
+                    {
+                        var gitInstance = (GenericInstanceType)fieldDeclaringType;
+                        var gp = gitInstance.Resolve().GenericParameters;
+                        var ga = gitInstance.GenericArguments;
+                        for (int idx = 0; idx < gp.Count; idx++)
+                        {
+                            if (gp[idx] == fieldType)
+                            {
+                                fieldType = ga[idx];
+                                break;
+                            }
+                        }
+                    }
                     FieldReference fr = new FieldReference(field.Name, fieldType, fieldDeclaringType);
                     Instruction begin = null;
-                    if (field.FieldType.IsPrimitive)
+                    if (fieldType.IsPrimitive)
                     {
-                        if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int32))
+                        if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Int32))
                         {
                             if (isStatic)
                             {
@@ -294,8 +308,8 @@ namespace ILRuntime.Hybrid
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16) ||
-                            field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Char))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16) ||
+                            fieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.Char))
                         {
                             if (isStatic)
                             {
@@ -314,23 +328,23 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ldarg_S, (byte)4));
                                 processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterRetrieveInt32Method));
                             }
-                            if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32))
+                            if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_U4));
                             }
-                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16))
+                            else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_I2));
                             }
-                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16))
+                            else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_U2));
                             }
-                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte))
+                            else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_U1));
                             }
-                            else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte))
+                            else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte))
                             {
                                 processor.Append(processor.Create(OpCodes.Conv_I1));
                             }
@@ -340,7 +354,7 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Stfld, fr));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int64))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Int64))
                         {
                             if (isStatic)
                             {
@@ -364,7 +378,7 @@ namespace ILRuntime.Hybrid
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64))
                         {
                             if (isStatic)
                             {
@@ -389,7 +403,7 @@ namespace ILRuntime.Hybrid
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.IntPtr))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.IntPtr))
                         {
                             if (isStatic)
                             {
@@ -414,7 +428,7 @@ namespace ILRuntime.Hybrid
                             }
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Single))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Single))
                         {
                             if (isStatic)
                             {
@@ -438,7 +452,7 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ret));
                             }
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Double))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Double))
                         {
                             if (isStatic)
                             {
@@ -462,7 +476,7 @@ namespace ILRuntime.Hybrid
                                 processor.Append(processor.Create(OpCodes.Ret));
                             }
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Boolean))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Boolean))
                         {
                             if (isStatic)
                             {
@@ -493,7 +507,7 @@ namespace ILRuntime.Hybrid
                         else
                             throw new NotImplementedException();
                     }
-                    else if (!field.FieldType.IsGenericParameter && field.FieldType.Resolve().IsEnum)
+                    else if (!fieldType.IsGenericParameter && fieldType.Resolve().IsEnum)
                     {
                         if (isStatic)
                         {
@@ -519,19 +533,6 @@ namespace ILRuntime.Hybrid
                     }
                     else
                     {
-                        if (fieldType.IsGenericParameter && fieldDeclaringType is GenericInstanceType git)
-                        {
-                            var gp = git.Resolve().GenericParameters;
-                            var ga = git.GenericArguments;
-                            for (int idx = 0; idx < gp.Count; idx++)
-                            {
-                                if (gp[idx] == fieldType)
-                                {
-                                    fieldType = ga[idx];
-                                    break;
-                                }
-                            }
-                        }
                         if (isStatic)
                         {
                             begin = processor.Create(OpCodes.Ldarg_1);
@@ -629,10 +630,24 @@ namespace ILRuntime.Hybrid
                     }
                     TypeReference fieldType = field.FieldType.IsGenericParameter ? field.FieldType : module.ImportReference(field.FieldType);
                     fieldDeclaringType = module.ImportReference(fieldDeclaringType);
-                    FieldReference fr = new FieldReference(field.Name, fieldType, fieldDeclaringType);
-                    if (field.FieldType.IsPrimitive)
+                    if (fieldType.IsGenericParameter && fieldDeclaringType is GenericInstanceType)
                     {
-                        if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int32))
+                        var gitInstance = (GenericInstanceType)fieldDeclaringType;
+                        var gp = gitInstance.Resolve().GenericParameters;
+                        var ga = gitInstance.GenericArguments;
+                        for (int idx = 0; idx < gp.Count; idx++)
+                        {
+                            if (gp[idx] == fieldType)
+                            {
+                                fieldType = ga[idx];
+                                break;
+                            }
+                        }
+                    }
+                    FieldReference fr = new FieldReference(field.Name, fieldType, fieldDeclaringType);
+                    if (fieldType.IsPrimitive)
+                    {
+                        if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Int32))
                         {
                             if (isStatic)
                             {
@@ -650,8 +665,8 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt32Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16) ||
-                            field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Char))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt32) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.Int16) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt16) ||
+                            fieldType.CheckTypeReferenceEqual(module.TypeSystem.Byte) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.SByte) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.Char))
                         {
                             if (isStatic)
                             {
@@ -670,7 +685,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt32Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Int64))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Int64))
                         {
                             if (isStatic)
                             {
@@ -688,7 +703,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt64Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64) || field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.IntPtr))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.UInt64) || fieldType.CheckTypeReferenceEqual(module.TypeSystem.IntPtr))
                         {
                             if (isStatic)
                             {
@@ -707,7 +722,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushInt64Method));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Single))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Single))
                         {
                             if (isStatic)
                             {
@@ -725,7 +740,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushFloatMethod));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Double))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Double))
                         {
                             if (isStatic)
                             {
@@ -743,7 +758,7 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Call, reflection.InterpreterPushDoubleMethod));
                             processor.Append(processor.Create(OpCodes.Ret));
                         }
-                        else if (field.FieldType.CheckTypeReferenceEqual(module.TypeSystem.Boolean))
+                        else if (fieldType.CheckTypeReferenceEqual(module.TypeSystem.Boolean))
                         {
                             if (isStatic)
                             {
@@ -768,7 +783,7 @@ namespace ILRuntime.Hybrid
                         else
                             throw new NotImplementedException();
                     }
-                    else if (!field.FieldType.IsGenericParameter && field.FieldType.Resolve().IsEnum)
+                    else if (!fieldType.IsGenericParameter && fieldType.Resolve().IsEnum)
                     {
                         if (isStatic)
                         {
@@ -805,19 +820,6 @@ namespace ILRuntime.Hybrid
                             processor.Append(processor.Create(OpCodes.Ldarg_S, (byte)4));
                             processor.Append(processor.Create(OpCodes.Ldarg_0));
                             processor.Append(processor.Create(OpCodes.Ldfld, fr));
-                        }
-                        if (fieldType.IsGenericParameter && fieldDeclaringType is GenericInstanceType git)
-                        {
-                            var gp = git.Resolve().GenericParameters;
-                            var ga = git.GenericArguments;
-                            for (int idx = 0; idx < gp.Count; idx++)
-                            {
-                                if (gp[idx] == fieldType)
-                                {
-                                    fieldType = ga[idx];
-                                    break;
-                                }
-                            }
                         }
                         processor.Append(processor.Create(OpCodes.Call, reflection.GetPushObjectMethod(fieldType)));
                         processor.Append(processor.Create(OpCodes.Ret));
@@ -1172,6 +1174,22 @@ namespace ILRuntime.Hybrid
             }
             ctx.DeclaringType.Fields.Add(methodCtx.ILMethod);
 
+            if (method.HasGenericParameters)
+            {
+                var cacheType = new TypeDefinition("", $"___@cache_{method.Name}_{methodInfo.Index}",
+                    TypeAttributes.NestedAssembly | TypeAttributes.Sealed | TypeAttributes.Abstract,
+                    module.TypeSystem.Object);
+                foreach (var gp in method.GenericParameters)
+                {
+                    cacheType.GenericParameters.Add(new GenericParameter(gp.Name, cacheType));
+                }
+                var cacheField = new FieldDefinition("method", FieldAttributes.Public | FieldAttributes.Static, reflection.IMethodType);
+                cacheType.Fields.Add(cacheField);
+                ctx.DeclaringType.NestedTypes.Add(cacheType);
+                methodCtx.GenericMethodCacheType = cacheType;
+                methodCtx.GenericMethodCacheField = cacheField;
+            }
+
             bool isOverride = method.IsVirtual && !method.IsNewSlot;
             FieldReference invokingField = null;
             TypeReference methodDeclaringType = ctx.DeclaringType;
@@ -1226,6 +1244,11 @@ namespace ILRuntime.Hybrid
 
             int[] refOutIdx = new int[method.Parameters.Count];
             int refIdxCur = 0;
+            int thisRefIdx = -1;
+            if (method.DeclaringType.IsValueType && !method.IsStatic)
+            {
+                thisRefIdx = refIdxCur++;
+            }
             for (int i = 0; i < method.Parameters.Count; i++)
             {
                 var p = method.Parameters[i];
@@ -1319,14 +1342,56 @@ namespace ILRuntime.Hybrid
                 processor.AppendInstruction(first, processor.Create(OpCodes.Stfld, invokingField));
             }
             processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, appdomainField));
-            if (ctx.IsGenericType)
-                processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, methodCtx.ILMethodGenericInstance));
+            if (method.HasGenericParameters)
+            {
+                var cacheTypeInstance = methodCtx.GenericMethodCacheType.MakeGenericInstanceType(
+                    method.GenericParameters.ToArray());
+                var cacheFieldRef = new FieldReference("method", reflection.IMethodType, cacheTypeInstance);
+                var useCache = processor.Create(OpCodes.Nop);
+
+                processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, cacheFieldRef));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Dup));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Brtrue, useCache));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Pop));
+                if (ctx.IsGenericType)
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, methodCtx.ILMethodGenericInstance));
+                else
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, methodCtx.ILMethod));
+                var genericParams = method.GenericParameters;
+                processor.AppendLdc(first, genericParams.Count);
+                processor.AppendInstruction(first, processor.Create(OpCodes.Newarr, reflection.TypeType));
+                for (int i = 0; i < genericParams.Count; i++)
+                {
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Dup));
+                    processor.AppendLdc(first, i);
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldtoken, genericParams[i]));
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.GetTypeFromHandle));
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Stelem_Ref));
+                }
+                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.ILMethodMakeGenericInstanceMethod));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Dup));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Stsfld, cacheFieldRef));
+                processor.AppendInstruction(first, useCache);
+            }
             else
-                processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, methodCtx.ILMethod));
+            {
+                if (ctx.IsGenericType)
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, methodCtx.ILMethodGenericInstance));
+                else
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldsfld, methodCtx.ILMethod));
+            }
             processor.AppendInstruction(first, processor.Create(OpCodes.Callvirt, reflection.BeginInvokeMethod));
             processor.AppendInstruction(first, processor.Create(OpCodes.Stloc, invokeCtx));
             if (refIdxCur > 0)
             {
+                if (thisRefIdx >= 0)
+                {
+                    var vtType = ctx.IsGenericType ? ctx.DeclaringTypeGenericInstance : ctx.DeclaringType;
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldobj, vtType));
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.GetPushParameterMethod(vtType)));
+                }
                 for (int i = 0; i < method.Parameters.Count; i++)
                 {
                     var p = method.Parameters[i];
@@ -1345,14 +1410,14 @@ namespace ILRuntime.Hybrid
             if (!method.IsStatic)
             {
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
-                processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
                 if (method.DeclaringType.IsValueType)
                 {
-                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldobj, method.DeclaringType));
-                    processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.GetPushParameterMethod(method.DeclaringType)));
+                    processor.AppendLdc(first, thisRefIdx);
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.PushReferenceMethod));
                 }
                 else
                 {
+                    processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
                     processor.AppendInstruction(first, processor.Create(OpCodes.Ldc_I4_1));
                     processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.PushObjectMethod));
                 }
@@ -1384,12 +1449,10 @@ namespace ILRuntime.Hybrid
             {
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg_0));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ldloca, invokeCtx));
-                if (refIdxCur > 0)
-                    processor.AppendLdc(first, 0 + refIdxCur);
-                else
-                    processor.AppendLdc(first, 0);
-                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.GetReadResultByIndexMethod(method.DeclaringType)));
-                processor.AppendInstruction(first, processor.Create(OpCodes.Stobj, method.DeclaringType));
+                processor.AppendLdc(first, thisRefIdx);
+                var vtType = ctx.IsGenericType ? ctx.DeclaringTypeGenericInstance : ctx.DeclaringType;
+                processor.AppendInstruction(first, processor.Create(OpCodes.Call, reflection.GetReadResultByIndexMethod(vtType)));
+                processor.AppendInstruction(first, processor.Create(OpCodes.Stobj, vtType));
             }
             if (refIdxCur > 0)
             {

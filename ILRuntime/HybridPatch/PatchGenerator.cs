@@ -1,4 +1,4 @@
-﻿using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Runtime.Intepreter.OpCodes;
@@ -205,12 +205,12 @@ namespace ILRuntime.Hybrid
                             TypeReferencePatchInfo param = TypeReferencePatchInfo.Create(p.ParameterType, internalRefs);
                             parameters.Add(param);
                         }
-                        if (t.Definition.HasGenericParameters)
+                        if (m.Definition.HasGenericParameters)
                         {
-                            m.GenericParameters = new TypeReferencePatchInfo[t.Definition.GenericParameters.Count];
+                            m.GenericParameters = new TypeReferencePatchInfo[m.Definition.GenericParameters.Count];
                             for (int j = 0; j < m.GenericParameters.Length; j++)
                             {
-                                m.GenericParameters[j] = TypeReferencePatchInfo.Create(t.Definition.GenericParameters[j], internalRefs);
+                                m.GenericParameters[j] = TypeReferencePatchInfo.Create(m.Definition.GenericParameters[j], internalRefs);
                             }
                         }
                         else

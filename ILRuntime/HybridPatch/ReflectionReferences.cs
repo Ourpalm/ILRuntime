@@ -40,6 +40,7 @@ namespace ILRuntime.Hybrid
             mi = typeof(Runtime.Enviorment.AppDomain).GetMethod(nameof(Runtime.Enviorment.AppDomain.GetType), new Type[] { typeof(Type) });
             AppDomainGetTypeMethod = module.ImportReference(mi);
             ILMethodType = module.ImportReference(typeof(ILMethod));
+            IMethodType = module.ImportReference(typeof(IMethod));
             ILTypeType = module.ImportReference(typeof(ILType));
             ITypeType = module.ImportReference(typeof(IType));
             ITypeArrayType = module.ImportReference(typeof(IType[]));
@@ -55,7 +56,7 @@ namespace ILRuntime.Hybrid
             ILTypeMakeGenericInstanceMethod = module.ImportReference(mi);
             mi = typeof(ILType).GetMethod(nameof(ILType.GetMethodByGenericDefinition));
             ILTypeGetMethodByGenericDefinition = module.ImportReference(mi);
-            mi = typeof(ILMethod).GetMethod(nameof(ILMethod.MakeGenericMethod));
+            mi = typeof(AssemblyPatch).GetMethod(nameof(AssemblyPatch.MakeGenericMethod), BindingFlags.Public | BindingFlags.Static);
             ILMethodMakeGenericInstanceMethod = module.ImportReference(mi);
             ILTypeInstanceType = module.ImportReference(typeof(ILTypeInstance));
             ILMethodArrayType = module.ImportReference(typeof(ILMethod).MakeArrayType());
@@ -65,6 +66,11 @@ namespace ILRuntime.Hybrid
             TypeType = module.ImportReference(typeof(Type));
 
             GetTypeFromHandle = module.ImportReference(typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle)));
+
+            mi = typeof(MethodBase).GetMethod(nameof(MethodBase.GetCurrentMethod));
+            GetCurrentMethodMethod = module.ImportReference(mi);
+            mi = typeof(MethodBase).GetMethod(nameof(MethodBase.GetGenericArguments));
+            GetGenericArgumentsMethod = module.ImportReference(mi);
 
             var methods = typeof(InvocationContext).GetMethods();
 
@@ -190,6 +196,7 @@ namespace ILRuntime.Hybrid
 
         public TypeReference AppDomainType { get; private set; }
         public TypeReference ILMethodType { get; private set; }
+        public TypeReference IMethodType { get; private set; }
         public TypeReference ILTypeType { get; private set; }
         public MethodReference ILTypeInstantiateMethod { get; private set; }
         public TypeReference ILTypeInstanceType { get; private set; }
@@ -253,6 +260,9 @@ namespace ILRuntime.Hybrid
         public MethodReference InterpreterRetrieveDoubleMethod { get; private set; }
 
         public MethodReference GetTypeFromHandle { get; private set; }
+
+        public MethodReference GetCurrentMethodMethod { get; private set; }
+        public MethodReference GetGenericArgumentsMethod { get; private set; }
 
         public MethodReference GetReadObjectMethod(TypeReference type)
         {

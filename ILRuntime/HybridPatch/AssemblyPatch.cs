@@ -1,4 +1,4 @@
-﻿using ILRuntime.CLR.Method;
+using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Mono.Cecil;
 using ILRuntime.Runtime.Intepreter;
@@ -21,6 +21,18 @@ namespace ILRuntime.Hybrid
         Dictionary<string, TypeReference> genericParameters = new Dictionary<string, TypeReference>();
         ModuleDefinition module;
         public string Name { get { return patchInfo.Name; } }
+        
+        public static IMethod MakeGenericMethod(ILMethod method, Type[] genericArguments)
+        {
+            if (genericArguments == null) throw new ArgumentNullException(nameof(genericArguments));
+            IType[] args = new IType[genericArguments.Length];
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (genericArguments[i] == null) throw new Exception("genericArguments[" + i + "] is null!");
+                args[i] = method.AppDomain.GetType(genericArguments[i]);
+            }
+            return method.MakeGenericMethod(args);
+        }
 
         public bool IsPatched { get;private set; }
 
@@ -210,7 +222,7 @@ namespace ILRuntime.Hybrid
                     if (!mi.IsNew)
                         patchedMethods.Add(new KeyValuePair<ILMethod, int>((ILMethod)m, mi.Index));
 
-                    if (td.HasGenericParameters)
+                    if (td.HasGenericParameters || (mi.GenericParameters != null && mi.GenericParameters.Length > 0))
                     {
                         ((ILMethod)m).SetMethodPatchContext(new MethodPatchContext(this, mi));
                     }

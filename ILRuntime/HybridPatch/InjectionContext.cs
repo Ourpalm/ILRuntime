@@ -28,5 +28,7 @@ namespace ILRuntime.Hybrid
         public FieldDefinition ILMethod;
         public FieldReference ILMethodGenericInstance;
         public FieldDefinition ILMethodGenericDefinition;
+        public TypeDefinition GenericMethodCacheType;
+        public FieldDefinition GenericMethodCacheField;
     }
 }

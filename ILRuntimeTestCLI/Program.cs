@@ -10,20 +10,23 @@ namespace ILRuntimeTestCLI
         {
             if(args.Length <3)
             {
-                Console.WriteLine("Usage: ILRuntimeTestCLI path patchPath useRegister[true|false]");
+                Console.WriteLine("Usage: ILRuntimeTestCLI path patchPath useRegister[true|false] [filterName]");
                 return -1;
             }
 
             string path = args[0];
             string patchPath = args[1];
             bool useRegister = args[2].ToLower() == "true";
+            string filter = args.Length > 3 ? args[3] : null;
             TestSession session = new TestSession();
             session.Load(path, patchPath, useRegister);
             int ignoreCnt = 0;
             int todoCnt = 0;
             List<TestResultInfo> failedTests = new List<TestResultInfo>();
             foreach(var i in session.TestList)
-            {                
+            {
+                if (filter != null && !i.TestName.Contains(filter))
+                    continue;
                 i.Run(true);
                 var res = i.CheckResult();
                 if (res.Result == ILRuntimeTest.Test.TestResults.Failed)
