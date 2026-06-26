@@ -125,7 +125,7 @@ Callee:
   2. esp += method.FrameSize （推进到自己帧尾部）
   3. 为自己的引用类型 locals 分配 mStack 槽:
      localRefBase = mStack.Count
-     mStack.Count += method.LocalRefCount
+     mStack.Count += method.TotalRefSize
      将新槽 index 写入对应 local 的帧位置
   4. Unsafe.InitBlock(frameBase + ParamPrimitiveSize, 0, LocalsPrimitiveSize)
      （仅清零 locals 区，params 保留 caller 写入的值）
@@ -263,7 +263,7 @@ RuntimeStack.nativePointer 内的布局:
 - `int local0` → 在帧 byte 区域偏移 0 处占 4 字节
 - `long local1` → 偏移 4 处占 8 字节
 - `MyStruct local2`（含 int x, int y）→ 偏移 12 处占 8 字节，字段 x 在偏移 12，字段 y 在偏移 16
-- `object local3` → 在 byte 区域不占空间（或占一个 index），在 mStack[refOffset] 中
+- `object local3` → 在 byte 区域占 4 字节（存 mStack index），实际对象在 mStack[refOffset] 中
 
 值类型不需要描述符、不需要 `AllocValueType`、不需要 `ValueTypeObjectReference`——它们就是帧中连续的一段 bytes。
 
@@ -434,10 +434,8 @@ NeoAssembly 文件结构:
 │   ├── StackSlotInfo[]// 局部变量栈布局
 │   ├── ExceptionHandlers[]
 │   ├── ParameterCount
-│   ├── LocalVariableCount
-│   ├── StackRegisterCount
-│   ├── TotalStructSize
-│   └── TotalRefSize
+│   ├── TotalStructSize   // 帧 byte 区域总大小
+│   └── TotalRefSize      // 引用类型 slot 总数
 └── InitializerTable   // 静态构造器列表
 ```
 
@@ -499,7 +497,7 @@ ILRuntimeNeoCompiler (ilrt_neoc)
 ### Phase 4：预编译工具链
 
 - [ ] 定义 NeoAssembly 二进制格式
-- [ ] 扩展 PatchTool 支持全程序集预编译
+- [ ] 实现 ilrt_neoc 预编译工具（独立于 PatchTool）
 - [ ] 实现运行时加载器
 - [ ] 泛型实例化处理
 
@@ -511,13 +509,25 @@ ILRuntimeNeoCompiler (ilrt_neoc)
 
 ---
 
-## 10. 待讨论问题
+## 10. 讨论主题索引
 
-1. ~~**泛型方法的预编译策略？**~~ → **已确定，见下方第 11 节**
-
-2. ~~**ValueType 的 Copy 语义**~~ → **已确定，见下方第 12 节**
-
-3. ~~**虚方法表/接口方法表**~~ → **已确定，见下方第 13 节**
+| 节 | 主题 | 状态 |
+|----|------|------|
+| 11 | 泛型方法预编译策略 | 已确定 |
+| 12 | ValueType Copy 语义与 Move_Vt 指令 | 已确定 |
+| 13 | 虚方法表 (VTable) 设计 | 已确定 |
+| 14 | 编译模式与兼容性策略 | 已确定 |
+| 15 | Ref/Out 参数与 ldloca/ldflda | 已确定 |
+| 16 | CLR 类型对象的通盘考虑 | 已确定 |
+| 17 | 异常处理（try/catch/finally） | 已确定 |
+| 18 | Boxing/Unboxing | 已确定 |
+| 19 | newobj 的返回值处理 | 已确定 |
+| 20 | 栈溢出保护 | 已确定 |
+| 21 | 委托（Delegate） | 已确定 |
+| 22 | 数组元素访问 | 已确定 |
+| 23 | 静态字段 | 已确定 |
+| 24 | isinst/castclass 适配 | 已确定 |
+| 25 | ldelema 与 CLR 值类型嵌套字段引用 | 已确定 |
 
 ---
 
@@ -841,9 +851,7 @@ Codebase 需要同时支持两种运行模式：
 
 ### 14.3 互斥保护
 
-`USE_OLD_OBJ_MODEL` 宏不再保留。新 Object Model（byte[] Primitives）是唯一的堆对象模型，无条件启用。
-
-模式切换只有一个维度：`ENABLE_NEO_MODE` 控制解释器是 Legacy（ExecuteR）还是 Neo（ExecuteNeo）。
+`USE_OLD_OBJ_MODEL` 宏不再保留。`ENABLE_NEO_MODE` 同时控制 Object Model 和解释器：Neo 模式使用新 Object Model（byte[] Primitives）+ ExecuteNeo，Legacy 模式使用旧 StackObject[] 模型 + ExecuteR（见 14.5 节）。
 
 运行时保护：
 - Neo 模式下调用 `ExecuteR`/`Execute`（Legacy 入口）→ 抛异常
@@ -902,15 +910,16 @@ ILTypeInstance.cs            // #if ENABLE_NEO_MODE 切换新旧 Object Model
 每个 ref slot 占 **8 bytes**，存储 `(objectIndex, offset)` 对：
 
 ```
-objectIndex == -1 (FRAME_MARKER):
+objectIndex == -1 (FRAME_REF):
   → offset = 相对 nativePointer 起始的绝对偏移
   → 目标在非托管帧内存中，直接指针读写
 
 objectIndex >= 0:
   → objectIndex = mStack index
-  → offset 的含义取决于目标对象类型：
-    - ILTypeInstance → 字段在 Primitives 中的偏移（重新获取 managed ref 后读写）
-    - CLR 对象 → 字段 hash（通过 CLRType.GetFieldValue/SetFieldValue 读写）
+  → stind/ldind 运行时按 mStack[objectIndex] 的类型分派：
+    - ILTypeInstance → offset = 字段在 Primitives 中的偏移
+    - CLR 对象 → offset = fieldIndex（通过 CLRType.GetFieldValue/SetFieldValue 读写）
+    - Array → offset = elementIndex（数组元素读写）
 ```
 
 ### 15.3 各指令的实现思路
@@ -974,56 +983,212 @@ ILRuntime 执行时栈上出现 CLR 类型对象（`string`、`List<T>`、Unity 
 
 ---
 
-## 17. 待讨论事项（后续）
+## 17. 异常处理（try/catch/finally）（已确定）
 
-以下事项已识别但暂未详细讨论，实现时需逐一确认设计：
+### 17.1 整体思路
 
-### 17.1 异常处理（try/catch/finally）
+Neo 的异常处理控制流与 Legacy Register VM 完全一致：C# `try-catch` 包裹执行循环，IL 的 `throw` 实际抛出 C# 异常，由执行循环的 `catch` 块调用 `HandleException` 查找匹配的 handler。`Leave`/`Endfinally` 的逻辑不变。
 
-- 异常对象传递：引用类型，存 mStack index，catch 块如何接收？
-- 栈展开：esp 回退需要记录每帧的 frameBase（或从 FrameSize 反推）
-- finally 块的 mStack 状态恢复
-- leave 指令的语义：正确回退 esp 和 mStack.Count
-- nested try/catch 的帧状态保存/恢复
+### 17.2 esp 恢复
 
-### 17.2 Boxing/Unboxing
+esp 以参数方式传递（与 Legacy 一致），C# 异常展开自动恢复 esp，无需额外处理。
 
-- Box IL 值类型：从帧 byte 区域 CopyBlock → new ILTypeInstance 的 Primitives
-- Box CLR 值类型：直接 CLR boxing（`object obj = value`）
-- Unbox：从 ILTypeInstance.Primitives → 帧 byte 区域
-- constrained callvirt（值类型上调接口方法）：是否需要临时 box？
+### 17.3 mStack 恢复
 
-### 17.3 newobj 的返回值处理
+当 catch handler 捕获异常时，一行恢复：`mStack.Count = frameRefBase + method.TotalRefSize`。这会截断所有未正常退出的 callee 帧残留的 mStack 槽位，同时保留当前帧自己的引用槽。
 
-- 分配 ILTypeInstance → mStack.Add(instance) → 返回 mStack index
-- 构造函数是 IL 方法时：this = 新对象的 mStack index，写到 callee 帧 param0
-- 构造函数是 CLR 方法时：走 CLR Redirection
-- newobj 指令内部流程：分配 + 写 this + Call constructor + 返回 index
+### 17.4 Frames 栈维护
 
-### 17.4 栈溢出保护
+DebugService 通过 `RuntimeStack.Frames` 获取调用栈，Neo 需要继续维护。Push/Pop 时机与 Legacy 一致：方法入口 PushFrame，正常退出 PopFrame，异常未处理时不 Pop——由上层 HandleException 找到匹配 handler 后批量 Pop 中间帧。
 
-- nativePointer 有固定大小（`MAXIMAL_STACK_OBJECTS * sizeof(StackObject)`）
-- Neo 帧推进 esp 前需要检查 `esp + frameSize <= nativePointer + totalSize`
-- 否则深递归会 silent memory corruption（比爆线程栈更危险）
-- 建议：每次 Call 前做边界检查，溢出时抛出 StackOverflowException
+### 17.5 异常对象存储
 
-### 17.5 委托（Delegate）
+编译器为每个 catch 块的异常变量分配一个普通 temp ref slot（与其他引用类型 local/temp 统一）。ExceptionHandler 元数据中记录该 slot 的 ref offset，catch handler 进入时将异常对象写入 `mStack[frameRefBase + refOffset]`。catch 块内访问异常对象走普通引用 slot 读取，无需特殊指令。
 
-- `ldftn`/`ldvirtftn`：方法引用的存储方式
-- Delegate.Invoke：需要适配 Neo calling convention
-- 目标可能是 IL 方法或 CLR 方法
-- 多播委托的 invocation list 遍历
+### 17.6 HandleException 复用
 
-### 17.6 数组元素访问
+核心查找逻辑（`GetCorrespondingExceptionHandler`、`FindExceptionHandlerByBranchTarget`）完全复用。栈清理部分 Neo 更简单：只需弹 Frames 栈条目 + 重置 mStack.Count，不需要 Legacy 中的 StackObject 清理和值类型释放。用条件编译或方法重载区分。
 
-- IL 类型数组：元素是 ILTypeInstance → `ldelem` 返回 mStack index
-- CLR 类型数组：元素是 CLR 对象 → 同样 mStack index
-- 值类型数组：元素存储格式？紧凑 byte 数组还是每个元素独立 ILTypeInstance？
-- stelem 对值类型 = 深拷贝
+---
 
-### 17.7 静态字段
+## 18. Boxing/Unboxing（已确定）
 
-- `ILTypeStaticInstance` 需要与 Neo Object Model 对齐
-- `ldsfld`/`stsfld` 的访问路径
-- 静态构造器的触发时机
-- CLR 类型的静态字段访问
+### 18.1 IL 值类型
+
+- **Box**：`new ILTypeInstance(type)`，从帧 byte 区域 CopyBlock → Primitives，含引用字段时同步拷贝 ManagedObjects。结果存入 mStack，返回 index。
+- **Unbox**：从 ILTypeInstance.Primitives CopyBlock → 帧 byte 区域，引用字段同步拷贝。
+
+### 18.2 CLR 值类型：根据 ValueTypeBinder 编译期区分
+
+| 条件 | 存储位置 | Box | Unbox | 方法调用 |
+|------|---------|-----|-------|---------|
+| **有 ValueTypeBinder** | Neo 栈上（flat bytes） | 从栈 bytes 重建 CLR 对象 | 拷贝到栈 | Binder 通过 CLR Redirection 直接操作栈上 byte 数据 |
+| **无 ValueTypeBinder** | 保持 boxed 在 mStack | 已是 CLR 对象，无需转换 | 保持引用（不拷贝到栈） | 直接调用 CLR 方法，无 re-box 开销 |
+
+编译器（ilrt_neoc）在预编译时已知 Binder 注册信息，据此生成不同的指令变体。
+
+**无 Binder 时不 unbox 到栈的原因**：没有 Binder 提供方法重定向，调用 CLR 方法时需要重新 box 回 CLR 对象，产生无意义的 unbox → re-box 循环。保持 boxed 避免此开销。
+
+### 18.3 栈上 CLR 值类型的 memcpy 策略
+
+有 ValueTypeBinder 时，CLR struct 在 Neo 栈上的数据拷贝：
+- **Blittable**（无引用字段，可直接 memcpy）：直接 CopyBlock
+- **Non-blittable**：运行时计算内存布局并缓存，按布局逐字段拷贝
+
+### 18.4 constrained callvirt
+
+编译期特化，不保留运行时判断：
+- 静态类型已知时，编译器直接生成 Call（值类型实现了该方法）或 Box + Callvirt（未实现）
+- 泛型 T 在实例化（patch）时确定具体路径
+- 值类型直接调用时，`this` 以 Ref Slot（第 15 节）传递
+
+### 18.5 ValueTypeBinder 在 Neo 中的角色
+
+与 Legacy 模式不同，Neo 中 ValueTypeBinder 的主要职责是：
+- 通过 CLR Redirection 将值类型方法重定向为直接操作栈上 byte 数据
+- 提供字段直接操作能力，避免 CLR 对象与栈数据之间的来回转换
+
+---
+
+## 19. newobj 的返回值处理（已确定）
+
+行为由已确定的设计直接推导：
+
+- **引用类型 newobj**：分配 ILTypeInstance → 写入预分配的 mStack ref slot → `this` 作为 mStack index 写到 callee 帧 param0 → 按第 3 节 calling convention 调构造函数 → 结果为该 ref slot 的 index
+- **IL 值类型 newobj**：目标 slot 已在帧上（编译期分配），zero-init 后 `this` 以 Ref Slot（第 15 节）传递给构造函数，构造函数直接操作帧内数据
+- **CLR 类型 newobj**：有 ValueTypeBinder 走 Binder，无 Binder 走 CLR Redirection/反射，存储方式遵循第 18 节规则
+
+---
+
+## 20. 栈溢出保护（已确定）
+
+在帧初始化时（InitializeFrame/PushFrame 的 Neo 版本）检查 `esp + frameSize <= stackEnd`，不足则抛出 StackOverflowException。与现有机制统一，仅在 DEBUG 模式下启用。
+
+---
+
+## 21. 委托（Delegate）（已确定）
+
+行为由现有架构直接推导，无额外设计决策：
+
+- **ldftn/ldvirtftn**：IMethod 引用存入 mStack（引用类型），帧中存 mStack index
+- **Delegate 创建**：Newobj 检测到 delegate 类型时，通过 DelegateManager 创建 DelegateAdapter，绑定 instance + method
+- **Delegate.Invoke**：DelegateAdapter 的 InvokeILMethod 适配 Neo calling convention——将参数写入 byte* 帧 → ExecuteNeo → 读返回值。与 CLR Redirection 互为镜像（Redirection 是 IL→CLR，Delegate 是 CLR→IL）
+- **多播委托**：沿用 IDelegateAdapter.next 链表，逻辑不变
+
+---
+
+## 22. 数组元素访问（已确定）
+
+### 22.1 各类型数组的存储
+
+| 数组类型 | 存储方式 |
+|---------|---------|
+| CLR 类型数组（int[], string[], Vector3[] 等） | CLR 原生数组 |
+| IL 引用类型数组（MyILClass[]） | `object[]`，元素为 ILTypeInstance |
+| IL 值类型数组（MyILStruct[]） | `ILTypeInstance[]`，元素为独立 ILTypeInstance 对象 |
+
+### 22.2 IL 值类型数组选择 ILTypeInstance[] 的原因
+
+紧凑 byte[] 布局虽然缓存友好，但 ILArray 不是 CLR Array，无法直接传给期望 `Array`/`T[]` 参数的 CLR API。保持 `ILTypeInstance[]` 则天然兼容所有 CLR 数组操作。新 Object Model 下每个 ILTypeInstance 已使用紧凑 byte[] Primitives，单元素字段访问的性能提升已有保障。数组级紧凑优化可作为后续优化点。
+
+### 22.3 元素访问语义
+
+- `ldelem` 基本类型数组（int[] 等）：直接读值写到帧 byte 区域
+- `ldelem` 引用类型数组：返回元素的 mStack index
+- `ldelem` IL 值类型数组：从元素 ILTypeInstance.Primitives CopyBlock 到帧 byte 区域（+ 引用字段拷贝）
+- `stelem` 值类型：深拷贝（CopyBlock Primitives + 拷贝 ManagedObjects）
+- `stelem` 引用类型：拷贝引用
+
+---
+
+## 23. 静态字段（已确定）
+
+行为由新 Object Model 直接推导：
+
+- **ILTypeStaticInstance**：使用新 Object Model（byte[] Primitives + AutoList ManagedObjects），与普通 ILTypeInstance 同构
+- **ldsfld/stsfld**：通过 type → StaticInstance → 字段偏移访问 Primitives/ManagedObjects，与实例字段访问路径一致
+- **静态构造器触发**：时机不变（首次访问类型时触发）
+- **CLR 类型静态字段**：通过 CLRType binding 或反射访问，与 Legacy 一致
+
+---
+
+## 24. isinst/castclass 适配（已确定）
+
+### 24.1 背景
+
+C# 编译器对值类型做 isinst/castclass 前会先 emit `box` 指令。Legacy Register VM 的 box 对基本类型（int/float/long/double）不真的 box，保留 ObjectType 标记，因此 isinst 需要处理 `ObjectType <= Double` 的路径。Neo 帧中没有 ObjectType 标记，需要不同的策略。
+
+### 24.2 方案：编译期 peephole 合并
+
+在指令翻译阶段（BCP/FCP 之前），检测 `box T` + `isinst U` / `castclass U` 的固定 pattern，编译期消解：
+
+| IL 序列 | 编译期判断 | 优化结果 |
+|---------|-----------|---------|
+| `box T; isinst U` | T 兼容 U | 消除两条指令，直接保留原值 |
+| `box T; isinst U` | T 不兼容 U | 消除两条指令，写 null |
+| `box T; isinst U; unbox.any` | T 兼容 U | 消除三条指令，直接 Move |
+| `box T; castclass U` | T 兼容 U | 消除 |
+| `box T; castclass U` | T 不兼容 U | 编译期报错或保留 |
+| 涉及泛型参数 T | 实例化时确定 | 加入 patch 表（PatchKind.IsinstResult） |
+
+### 24.3 运行时残留路径
+
+编译期无法消解的情况（操作数静态类型为 object/接口等），操作数**已在 mStack 中**（是引用类型或 boxed 值类型），isinst/castclass 直接对 mStack 中的对象做类型检查：
+- `ILTypeInstance` → `CanAssignTo`
+- CLR 对象 → `IsAssignableFrom`
+
+不涉及帧内 flat bytes，不需要额外 box。
+
+---
+
+## 25. ldelema 与 CLR 值类型嵌套字段引用（已确定）
+
+### 25.1 问题
+
+`ref arr[i].field.innerField` 需要跨越数组元素 + 多层值类型字段。CLR 值类型没有 byte offset 直接访问能力（无 ValueTypeBinder 时），需要逐层处理。
+
+### 25.2 Legacy 方案
+
+Legacy 使用 `FieldReference(mStackIndex, fieldIndex)` 和 `ArrayReference(mStackIndex, elementIndex)` 表示。嵌套 ldflda 时，`RetriveObject` 按 fieldIndex 调用 `CLRType.GetFieldValue` 取出中间值（boxed），放入 mStack，产生新的 FieldReference。每层独立，不打包多层信息。
+
+### 25.3 Neo 方案
+
+**Ref Slot 保持 8 字节 `(objectIndex, offset)`**，与 Legacy 的 FieldReference/ArrayReference 完全对应：
+
+- ldflda 遇到非帧内 Ref Slot 输入时，先通过 offset 取出中间值（`CLRType.GetFieldValue` 或数组元素访问）放入 mStack，再产生新的 Ref Slot
+- stind/ldind 按 `mStack[objectIndex]` 的运行时类型分派（ILTypeInstance / CLR 对象 / Array）
+- ILTypeInstance 路径不做中间解引用，field offset 直接累加
+
+```
+Outer[] arr;  // CLR 值类型数组
+ref int r = ref arr[2].inner.x;
+
+ldelema arr, 2     → RefSlot = (arrIdx, 2)        // Array 引用
+ldflda inner       → RetriveObject 取 arr[2]，box 入 mStack 得 tmpIdx
+                     → RefSlot = (tmpIdx, innerFieldIdx)
+ldflda x           → RetriveObject 取 inner，box 入 mStack 得 tmpIdx2
+                     → RefSlot = (tmpIdx2, xFieldIdx)
+stind_i4           → CLRType.SetFieldValue(xFieldIdx, ...) + 回写 mStack
+```
+
+### 25.4 stind 回写
+
+与 Legacy 的 `StoreValueToFieldReference` 一致：CLR 值类型通过 `ref obj` 模式，修改后写回 `mStack[objectIndex] = obj`。
+
+### 25.5 不需要额外字段的原因
+
+Legacy 用 `ObjectType` 枚举区分 FieldReference/ArrayReference，Neo 不需要——stind/ldind 通过 `mStack[objectIndex]` 的 CLR 类型即可区分数组和对象。Ref Slot 保持 `(objectIndex, offset)` 两个 int32，共 8 字节。
+
+---
+
+## 附录：从现有设计可直接推导的指令/功能
+
+以下主题无需额外设计决策，行为由已确定的章节直接推导：
+
+| 主题 | 推导依据 |
+|------|---------|
+| **Cross-binding adapters** | 适配器模式不变（CLR 包装器持有 ILTypeInstance），IL 方法调用入口从 ExecuteR → ExecuteNeo，新 Object Model 对适配器层透明 |
+| **Enum 类型** | 按 underlying type（int/byte 等）存储在 byte 区域，box/unbox 遵循第 18 节规则 |
+| **ldobj/stobj** | 通过 Ref Slot（第 15 节）读写值类型：IL 值类型 CopyBlock + 引用字段拷贝，基本类型直接读写 |
+| **DebugService 变量检查** | Neo 帧无 ObjectType 标记。CompiledFrame 的 StackSlotInfo[]、TotalStructSize、TotalRefSize 仅在 `#if DEBUG` 下持久化到 ILMethod（当前编译后丢弃了），DebugService 通过 ILMethod.LocalInfos（类型 + 偏移）解读帧数据。解释器执行时不需要这些字段——帧布局已编码在指令 operand 中 |
+| **算术/比较/分支指令** | add/sub/ceq/beq 等直接操作帧 byte 区域，寄存器语义从 StackObject 索引统一改为 byte 偏移，所有特化变体（Add_I4 等）的 operand 编码需调整，无设计决策 |
