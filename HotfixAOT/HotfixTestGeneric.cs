@@ -71,8 +71,7 @@ namespace HotfixAOT
         public T GetValue()
         {
 #if PATCHED
-            Console.WriteLine("GenericStruct GetValue PATCHED");
-            return Value;
+            return default(T);
 #else
             return Value;
 #endif
@@ -81,7 +80,6 @@ namespace HotfixAOT
         public void SetValue(T val)
         {
 #if PATCHED
-            Console.WriteLine("GenericStruct SetValue PATCHED");
             Value = val;
 #else
             Value = val;
@@ -95,8 +93,7 @@ namespace HotfixAOT
         public T GenericMethod<T>(T val)
         {
 #if PATCHED
-            Console.WriteLine("GenericMethod PATCHED");
-            return val;
+            return default(T);
 #else
             return val;
 #endif
@@ -123,13 +120,16 @@ namespace HotfixAOT
         {
             var st = new GenericStruct<int>();
             st.SetValue(42);
-            return st.GetValue() == 42;
+            return patched ? st.GetValue() == 0 : st.GetValue() == 42;
         }
 
         static bool Test04(bool patched)
         {
             var obj = new HotfixTestGenericMethods();
-            return obj.GenericMethod<int>(99) == 99 && obj.GenericMethod<string>("test") == "test";
+            if (patched)
+                return obj.GenericMethod<int>(99) == 0 && obj.GenericMethod<string>("test") == null;
+            else
+                return obj.GenericMethod<int>(99) == 99 && obj.GenericMethod<string>("test") == "test";
         }
 
         public static IEnumerable<ITestCase> GetTestCases()

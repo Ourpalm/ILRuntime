@@ -1,4 +1,4 @@
-﻿//#define PATCHED
+//#define PATCHED
 using ILRuntime.Runtime;
 using System;
 using System.Collections.Generic;
@@ -38,6 +38,8 @@ namespace HotfixAOT
             foreach (var i in HotfixTestGenericTestCases.GetTestCases())
                 yield return i;
             foreach (var i in HotfixTestInheritanceTestCases.GetTestCases())
+                yield return i;
+            foreach (var i in HotfixAdvancedTestCases.GetTestCases())
                 yield return i;
         }
     }
