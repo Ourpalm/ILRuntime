@@ -230,9 +230,9 @@ namespace HotfixAOT
         public int? GetNullableInt(bool returnNull)
         {
 #if PATCHED
-            return returnNull ? 42 : null;
+            return returnNull ? (int?)42 : null;
 #else
-            return returnNull ? null : 42;
+            return returnNull ? (int?)null : 42;
 #endif
         }
     }

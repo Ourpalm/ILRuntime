@@ -235,7 +235,7 @@ namespace ILRuntime.Hybrid
             if (method.HasBody)
             {
                 if (string.IsNullOrEmpty(hash))
-                    hash = method.ComputeHash(bw, md5, false).Substring(0, 6);
+                    hash = method.ComputeHash(bw, md5, false).Substring(0, 6).Replace('+', '-').Replace('/', '_');
 
                 CustomAttribute attr;
                 if (method.IsAsyncMethod(out attr) || method.IsIteratorMethod(out attr))

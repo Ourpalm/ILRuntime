@@ -32,19 +32,17 @@ namespace HotfixAOT
 #endif
         }
 
-        public IEnumerable<int> GetWithBreak(int max)
+        public IEnumerable<int> GetWithBreak(int count)
         {
 #if PATCHED
-            for (int i = 0; i < max; i++)
+            for (int i = 0; i < count; i++)
             {
                 if (i >= 2) yield break;
                 yield return i * 100;
             }
 #else
-            for (int i = 0; i < max; i++)
-            {
+            for (int i = 0; i < count; i++)
                 yield return i;
-            }
 #endif
         }
     }
@@ -73,9 +71,9 @@ namespace HotfixAOT
         public Func<string, string> GetFormatter()
         {
 #if PATCHED
-            return (s) => $"[{prefix}]{s}";
+            return (s) => string.Concat("[", prefix, "]", s);
 #else
-            return (s) => $"{prefix}:{s}";
+            return (s) => string.Concat(prefix, ":", s);
 #endif
         }
 
@@ -146,35 +144,31 @@ namespace HotfixAOT
         {
             var obj = new HotfixClosureThis(2, "");
             int result = obj.ProcessWithLocalAndThis(5);
-            // non-patched: 5 * 2 + 10 = 20
-            // patched: 5 * 2 + 10 + 5 = 25
             return patched ? result == 25 : result == 20;
         }
 
         static bool TestLambdaNoCapture(bool patched)
         {
-            // TestLambdaExp3: no capture lambda
             int result = HotfixClass.TestLambdaExp3(50);
             return patched ? result == 150 : result == 50;
         }
 
         static bool TestLambdaCaptureSingle(bool patched)
         {
-            // TestLambdaExp5: captures only 'a' parameter
             int result = HotfixClass.TestLambdaExp5(50);
             return patched ? result == 150 : result == 50;
         }
 
         public static IEnumerable<ITestCase> GetTestCases()
         {
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestIteratorNumbers)}", TestIteratorNumbers);
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestIteratorStrings)}", TestIteratorStrings);
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestIteratorBreak)}", TestIteratorBreak);
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestClosureThis)}", TestClosureThis);
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestClosureFormatter)}", TestClosureFormatter);
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestClosureLocalAndThis)}", TestClosureLocalAndThis);
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestLambdaNoCapture)}", TestLambdaNoCapture);
-            yield return new DelegateTestCase($"{nameof(HotfixIteratorAndClosureTestCases)}.{nameof(TestLambdaCaptureSingle)}", TestLambdaCaptureSingle);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestIteratorNumbers)), TestIteratorNumbers);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestIteratorStrings)), TestIteratorStrings);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestIteratorBreak)), TestIteratorBreak);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureThis)), TestClosureThis);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureFormatter)), TestClosureFormatter);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureLocalAndThis)), TestClosureLocalAndThis);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestLambdaNoCapture)), TestLambdaNoCapture);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestLambdaCaptureSingle)), TestLambdaCaptureSingle);
         }
     }
 }

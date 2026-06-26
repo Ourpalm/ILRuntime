@@ -20,8 +20,4 @@
     <ProjectReference Include="..\ILRuntime\ILRuntime.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="HotfixIteratorAndClosure.cs" />
-  </ItemGroup>
-
 </Project>

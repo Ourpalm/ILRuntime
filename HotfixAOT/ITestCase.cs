@@ -41,8 +41,8 @@ namespace HotfixAOT
                 yield return i;
             foreach (var i in HotfixAdvancedTestCases.GetTestCases())
                 yield return i;
-            //foreach (var i in HotfixIteratorAndClosureTestCases.GetTestCases())
-            //    yield return i;
+            foreach (var i in HotfixIteratorAndClosureTestCases.GetTestCases())
+                yield return i;
             foreach (var i in HotfixMiscTestCases.GetTestCases())
                 yield return i;
             foreach (var i in HotfixControlFlowTestCases.GetTestCases())

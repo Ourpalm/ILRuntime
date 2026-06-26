@@ -144,6 +144,32 @@ namespace ILRuntime.Hybrid
                         }
                     }
                 }
+                else if (i.Definition.IsClosureType())
+                {
+                    fieldPatch = new List<FieldPatchInfo>();
+                    foreach (var f in i.Fields)
+                    {
+                        fieldPatch.Add(new FieldPatchInfo()
+                        {
+                            Name = f.Name,
+                            Definition = f.Definition.Resolve(),
+                        });
+                        internalRefs.Add(f.Definition);
+                        internalRefs.Add(f.Definition.Resolve());
+                    }
+                    methodPatch = new List<MethodPatchInfo>();
+                    foreach (var m in i.Methods)
+                    {
+                        methodPatch.Add(new MethodPatchInfo()
+                        {
+                            Index = -1,
+                            IsNew = true,
+                            Name = m.Name,
+                            Definition = m.Definition
+                        });
+                        internalRefs.Add(m.Definition);
+                    }
+                }
 
                 if (fieldPatch != null || methodPatch != null)
                 {
@@ -152,7 +178,7 @@ namespace ILRuntime.Hybrid
                     info.Namespace = i.Namespace;
                     info.Index = i.Index;
                     info.Definition = i.Definition;
-                    info.IsNew = string.IsNullOrEmpty(oriType.Hash);
+                    info.IsNew = !originalMapping.ContainsKey(i.Name) || string.IsNullOrEmpty(oriType.Hash);
                     info.Fields = fieldPatch != null ? fieldPatch.ToArray() : new FieldPatchInfo[0];
                     info.Methods = methodPatch != null ? methodPatch.ToArray() : new MethodPatchInfo[0];
                     if(i.Definition.HasGenericParameters)
