@@ -449,6 +449,27 @@ namespace ILRuntime.Hybrid
                 res[i] = opcode;
             }
             method.SetBodyAndJumptables(res, jumptables);
+
+            if (info.ExceptionHandlers != null && info.ExceptionHandlers.Length > 0)
+            {
+                var ehs = new CLR.Method.ExceptionHandler[info.ExceptionHandlers.Length];
+                for (int i = 0; i < info.ExceptionHandlers.Length; i++)
+                {
+                    var ehInfo = info.ExceptionHandlers[i];
+                    var eh = new CLR.Method.ExceptionHandler();
+                    eh.HandlerType = (CLR.Method.ExceptionHandlerType)ehInfo.HandlerType;
+                    eh.TryStart = ehInfo.TryStart;
+                    eh.TryEnd = ehInfo.TryEnd;
+                    eh.HandlerStart = ehInfo.HandlerStart;
+                    eh.HandlerEnd = ehInfo.HandlerEnd;
+                    if (eh.HandlerType == CLR.Method.ExceptionHandlerType.Catch && ehInfo.CatchTypeIndex >= 0)
+                    {
+                        eh.CatchType = domain.GetType(ResolveType(patchInfo.TypeReferences[ehInfo.CatchTypeIndex], domain, null), method.DeclearingType, method);
+                    }
+                    ehs[i] = eh;
+                }
+                method.SetExceptionHandler(ehs);
+            }
         }
 
         public bool CanApplyPatch(Assembly assembly)

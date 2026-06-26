@@ -375,6 +375,11 @@ namespace ILRuntime.CLR.Method
             this.jumptables = jumptables;
         }
 
+        internal void SetExceptionHandler(ExceptionHandler[] handlers)
+        {
+            this.exceptionHandler = handlers;
+        }
+
         internal OpCodeR[] BodyRegister
         {
             get

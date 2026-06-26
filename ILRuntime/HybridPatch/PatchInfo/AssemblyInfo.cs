@@ -429,6 +429,39 @@ namespace ILRuntime.Hybrid
         }
     }
 
+    public struct ExceptionHandlerPatchInfo
+    {
+        public byte HandlerType { get; internal set; }
+        public int TryStart { get; internal set; }
+        public int TryEnd { get; internal set; }
+        public int HandlerStart { get; internal set; }
+        public int HandlerEnd { get; internal set; }
+        public int CatchTypeIndex { get; internal set; }
+
+        public void WriteToStream(BinaryWriter bw)
+        {
+            bw.Write(HandlerType);
+            bw.Write(TryStart);
+            bw.Write(TryEnd);
+            bw.Write(HandlerStart);
+            bw.Write(HandlerEnd);
+            bw.Write(CatchTypeIndex);
+        }
+
+        public static ExceptionHandlerPatchInfo FromStream(BinaryReader br)
+        {
+            return new ExceptionHandlerPatchInfo
+            {
+                HandlerType = br.ReadByte(),
+                TryStart = br.ReadInt32(),
+                TryEnd = br.ReadInt32(),
+                HandlerStart = br.ReadInt32(),
+                HandlerEnd = br.ReadInt32(),
+                CatchTypeIndex = br.ReadInt32(),
+            };
+        }
+    }
+
     public struct MethodPatchInfo
     {
         internal MethodDefinition Definition { get; set; }
@@ -445,6 +478,7 @@ namespace ILRuntime.Hybrid
         public bool IsRegisterVM { get; internal set; }
 
         public TypeReferencePatchInfo[] LocalVariables { get; internal set; }
+        public ExceptionHandlerPatchInfo[] ExceptionHandlers { get; internal set; }
         internal OpCode[] CodeBody { get; set; }
 
         internal OpCodeR[] CodeBodyRegister { get; set; }
@@ -478,6 +512,14 @@ namespace ILRuntime.Hybrid
                 bw.Write((short)opcode.Code);
                 bw.Write(opcode.TokenInteger);
                 bw.Write(opcode.TokenLong);
+            }
+            bw.Write(ExceptionHandlers != null ? ExceptionHandlers.Length : 0);
+            if (ExceptionHandlers != null)
+            {
+                for (int i = 0; i < ExceptionHandlers.Length; i++)
+                {
+                    ExceptionHandlers[i].WriteToStream(bw);
+                }
             }
         }
 
@@ -519,6 +561,12 @@ namespace ILRuntime.Hybrid
                     TokenLong = br.ReadInt64(),
                 };
                 info.CodeBody[i] = opcode;
+            }
+            cnt = br.ReadInt32();
+            info.ExceptionHandlers = new ExceptionHandlerPatchInfo[cnt];
+            for (int i = 0; i < cnt; i++)
+            {
+                info.ExceptionHandlers[i] = ExceptionHandlerPatchInfo.FromStream(br);
             }
             return info;
         }

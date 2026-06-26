@@ -508,6 +508,41 @@ namespace ILRuntime.Hybrid
 
                         mi.CodeBody[idx] = opcode;
                     }
+
+                    var ehs = method.ExceptionHandler;
+                    if (ehs != null && ehs.Length > 0)
+                    {
+                        mi.ExceptionHandlers = new ExceptionHandlerPatchInfo[ehs.Length];
+                        for (int idx = 0; idx < ehs.Length; idx++)
+                        {
+                            var eh = ehs[idx];
+                            var ehInfo = new ExceptionHandlerPatchInfo();
+                            ehInfo.HandlerType = (byte)eh.HandlerType;
+                            ehInfo.TryStart = eh.TryStart;
+                            ehInfo.TryEnd = eh.TryEnd;
+                            ehInfo.HandlerStart = eh.HandlerStart;
+                            ehInfo.HandlerEnd = eh.HandlerEnd;
+                            if (eh.HandlerType == CLR.Method.ExceptionHandlerType.Catch && eh.CatchType != null)
+                            {
+                                if (!typeIdxMapping.TryGetValue(eh.CatchType, out var tIdx))
+                                {
+                                    tIdx = types.Count;
+                                    types.Add(TypeReferencePatchInfo.Create(eh.CatchType, patchAsmInfo.Assembly.MainModule, internalRefs));
+                                    typeIdxMapping[eh.CatchType] = tIdx;
+                                }
+                                ehInfo.CatchTypeIndex = tIdx;
+                            }
+                            else
+                            {
+                                ehInfo.CatchTypeIndex = -1;
+                            }
+                            mi.ExceptionHandlers[idx] = ehInfo;
+                        }
+                    }
+                    else
+                    {
+                        mi.ExceptionHandlers = new ExceptionHandlerPatchInfo[0];
+                    }
                 }
             }
 
