@@ -27,6 +27,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public StackSlotInfo[] LocalInfos;
         public int TotalStructSize;
         public int TotalRefSize;
+#if ENABLE_NEO_MODE
+        public StackSlotInfo[] ParamInfos;
+        public int ParamPrimitiveSize;
+        public int ParamReferenceCount;
+        public int LocalsPrimitiveSize;
+        public int LocalsReferenceCount;
+        public int ReturnPrimitiveSize;
+        public int ReturnRefCount;
+        public bool[] LocalIsReference;
+#endif
     }
     struct JITCompiler
     {
@@ -436,9 +446,52 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         {
             var body = def.Body;
             int varCnt = body.Variables.Count;
-            StackSlotInfo[] localInfo = new StackSlotInfo[varCnt + frame.StackRegisterCount];
+
+            // 1) Parameter slots
+            int paramCnt = method.ParameterCount + (method.HasThis ? 1 : 0);
+            StackSlotInfo[] paramInfo = new StackSlotInfo[paramCnt];
             int offset = 0;
             int refOffset = 0;
+            int paramIdx = 0;
+            if (method.HasThis)
+            {
+                StackSlotInfo slot = default;
+                if (declaringType.IsValueType)
+                {
+                    int size = declaringType.TotalPrimitiveSize;
+                    int refSize = declaringType.TotalReferenceCount;
+                    slot.Offset = offset;
+                    slot.RefOffset = refOffset;
+                    slot.Size = size;
+                    offset += size;
+                    refOffset += refSize;
+                }
+                else
+                {
+                    slot.Offset = offset;
+                    slot.RefOffset = refOffset;
+                    slot.Size = 0;
+                    refOffset++;
+                }
+                paramInfo[paramIdx++] = slot;
+            }
+            for (int i = 0; i < method.ParameterCount; i++)
+            {
+                var pDef = def.Parameters[i];
+                var pt = appdomain.GetType(pDef.ParameterType, declaringType, method);
+                StackSlotInfo slot = AllocateSlotForType(pt, ref offset, ref refOffset);
+                paramInfo[paramIdx++] = slot;
+            }
+            frame.ParamInfos = paramInfo;
+            frame.ParamPrimitiveSize = offset;
+            frame.ParamReferenceCount = refOffset;
+
+            int localsPrimStart = offset;
+            int localsRefStart = refOffset;
+
+            // 2) Local slots
+            StackSlotInfo[] localInfo = new StackSlotInfo[varCnt + frame.StackRegisterCount];
+            bool[] localIsRef = new bool[localInfo.Length];
             for (int i = 0; i < varCnt; i++)
             {
                 var vt = body.Variables[i].VariableType;
@@ -462,6 +515,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         slot.RefOffset = refOffset;
                         slot.Size = 0;
                         refOffset++;
+                        localIsRef[i] = true;
                     }
                 }
                 else if (!vt.IsValueType)
@@ -470,6 +524,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     slot.RefOffset = refOffset;
                     slot.Size = 0;
                     refOffset++;
+                    localIsRef[i] = true;
+                }
+                else
+                {
+                    // primitive
+                    var ivt = appdomain.GetType(vt, declaringType, method);
+                    int size = appdomain.GetPrimitiveSize(ivt);
+                    slot.Offset = offset;
+                    slot.RefOffset = refOffset;
+                    slot.Size = size;
+                    offset += size;
                 }
                 localInfo[i] = slot;
             }
@@ -498,8 +563,56 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 localInfo[varCnt + i] = slot;
             }
             frame.LocalInfos = localInfo;
+            frame.LocalIsReference = localIsRef;
             frame.TotalStructSize = offset;
             frame.TotalRefSize = refOffset;
+            frame.LocalsPrimitiveSize = offset - localsPrimStart;
+            frame.LocalsReferenceCount = refOffset - localsRefStart;
+
+            // 3) Return value
+            int retPrim = 0, retRef = 0;
+            var retType = method.ReturnType;
+            if (retType != null && retType != appdomain.VoidType)
+            {
+                int dummyOffset = 0, dummyRef = 0;
+                AllocateSlotForType(retType, ref dummyOffset, ref dummyRef);
+                retPrim = dummyOffset;
+                retRef = dummyRef;
+            }
+            frame.ReturnPrimitiveSize = retPrim;
+            frame.ReturnRefCount = retRef;
+        }
+
+        StackSlotInfo AllocateSlotForType(IType t, ref int offset, ref int refOffset)
+        {
+            StackSlotInfo slot = default;
+            if (t.IsPrimitive)
+            {
+                int size = appdomain.GetPrimitiveSize(t);
+                slot.Offset = offset;
+                slot.RefOffset = refOffset;
+                slot.Size = size;
+                offset += size;
+            }
+            else if (t.IsValueType && t is ILType il)
+            {
+                int size = il.TotalPrimitiveSize;
+                int refSize = il.TotalReferenceCount;
+                slot.Offset = offset;
+                slot.RefOffset = refOffset;
+                slot.Size = size;
+                offset += size;
+                refOffset += refSize;
+            }
+            else
+            {
+                // CLR value type / reference type -> stored as reference (mStack index)
+                slot.Offset = offset;
+                slot.RefOffset = refOffset;
+                slot.Size = 0;
+                refOffset++;
+            }
+            return slot;
         }
 #endif
         void PrepareJumpTable(object token)

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
+    <Configurations>Debug;Release;Release_Patched;Debug_Neo;Release_Neo</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -15,7 +16,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;NET_4_6;NO_PROFILER;OUTPUT_JIT_RESULT</DefineConstants>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Patched|AnyCPU'">
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,6 +34,10 @@
     <OutputPath>bin\Release_Neo\</OutputPath>
     <DefineConstants>TRACE;NET_4_6;ENABLE_NEO_MODE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="DynamicExpresso.Core">

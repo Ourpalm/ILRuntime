@@ -33,6 +33,7 @@ namespace ILRuntime.CLR.TypeSystem
         IType [] fieldTypes;
 #if ENABLE_NEO_MODE
         ILTypeFieldOffset[] fieldOffsets;
+        ILTypeFieldOffset[] staticFieldOffsets;
 #endif
         FieldReference[] fieldReferences;
         FieldDefinition[] fieldDefinitions;
@@ -71,6 +72,8 @@ namespace ILRuntime.CLR.TypeSystem
 #if ENABLE_NEO_MODE
         int totalPrimitiveSize = -1;
         int totalReferenceCnt = -1;
+        int totalStaticPrimitiveSize = -1;
+        int totalStaticReferenceCnt = -1;
 #endif
 
         public IMethod ToStringMethod
@@ -334,6 +337,32 @@ namespace ILRuntime.CLR.TypeSystem
                     InitializeFields();
                 }
                 return totalReferenceCnt;
+            }
+        }
+
+        public int StaticTotalPrimitiveSize
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (totalStaticPrimitiveSize < 0)
+                {
+                    InitializeFields();
+                }
+                return totalStaticPrimitiveSize;
+            }
+        }
+
+        public int StaticTotalReferenceCount
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (totalStaticReferenceCnt < 0)
+                {
+                    InitializeFields();
+                }
+                return totalStaticReferenceCnt;
             }
         }
 #endif
@@ -1233,6 +1262,11 @@ namespace ILRuntime.CLR.TypeSystem
                 return fieldOffsets[idx - FieldStartIndex];
             }
         }
+
+        internal ILTypeFieldOffset GetStaticFieldOffset(int idx)
+        {
+            return staticFieldOffsets[idx];
+        }
 #endif
 
         public IType GetField(string name, out int fieldIdx)
@@ -1289,11 +1323,19 @@ namespace ILRuntime.CLR.TypeSystem
                 fieldTypes = new IType[0];
                 fieldReferences = new FieldReference[0];
                 fieldDefinitions = new FieldDefinition[0];
+#if ENABLE_NEO_MODE
+                fieldOffsets = new ILTypeFieldOffset[0];
+                totalPrimitiveSize = 0;
+                totalReferenceCnt = 0;
+                totalStaticPrimitiveSize = 0;
+                totalStaticReferenceCnt = 0;
+#endif
                 return;
             }
             fieldTypes = new IType [ definition.Fields.Count ];
 #if ENABLE_NEO_MODE
             fieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
+            staticFieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
 #endif
             fieldReferences = new FieldReference[definition.Fields.Count];
             fieldDefinitions = new FieldDefinition[definition.Fields.Count];
@@ -1303,6 +1345,8 @@ namespace ILRuntime.CLR.TypeSystem
 #if ENABLE_NEO_MODE
             int primitiveOffset = 0;
             int referenceOffset = 0;
+            int staticPrimitiveOffset = 0;
+            int staticReferenceOffset = 0;
 #endif
             for (int i = 0; i < fields.Count; i++)
             {
@@ -1333,6 +1377,40 @@ namespace ILRuntime.CLR.TypeSystem
                         }
                         staticFieldReferences[idxStatic] = fr;
                         staticFieldDefinitions[idxStatic] = field;
+#if ENABLE_NEO_MODE
+                        var staticFieldType = staticFieldTypes[idxStatic];
+                        if (staticFieldType.IsPrimitive)
+                        {
+                            staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
+                            {
+                                PrimitiveOffset = staticPrimitiveOffset,
+                                ReferenceOffset = staticReferenceOffset
+                            };
+                            staticPrimitiveOffset += AppDomain.GetPrimitiveSize(staticFieldType);
+                        }
+                        else
+                        {
+                            if (staticFieldType.IsValueType && staticFieldType is ILType sit)
+                            {
+                                staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
+                                {
+                                    PrimitiveOffset = staticPrimitiveOffset,
+                                    ReferenceOffset = staticReferenceOffset
+                                };
+                                staticPrimitiveOffset += sit.TotalPrimitiveSize;
+                                staticReferenceOffset += sit.TotalReferenceCount;
+                            }
+                            else
+                            {
+                                staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
+                                {
+                                    PrimitiveOffset = staticPrimitiveOffset,
+                                    ReferenceOffset = staticReferenceOffset
+                                };
+                                staticReferenceOffset++;
+                            }
+                        }
+#endif
                         idxStatic++;
                     }
                 }
@@ -1408,8 +1486,21 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 Array.Resize ( ref staticFieldTypes, idxStatic );
                 Array.Resize ( ref staticFieldDefinitions, idxStatic );
+#if ENABLE_NEO_MODE
+                Array.Resize(ref staticFieldOffsets, idxStatic);
+                totalStaticPrimitiveSize = staticPrimitiveOffset;
+                totalStaticReferenceCnt = staticReferenceOffset;
+#endif
                 //staticInstance = new ILTypeStaticInstance(this);
             }
+#if ENABLE_NEO_MODE
+            else
+            {
+                staticFieldOffsets = null;
+                totalStaticPrimitiveSize = 0;
+                totalStaticReferenceCnt = 0;
+            }
+#endif
         }
 
         public IType FindGenericArgument ( string key )

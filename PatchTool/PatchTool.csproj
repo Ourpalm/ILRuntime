@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net8.0;netcoreapp3.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Configurations>Debug;Release;Debug_Neo;Release_Neo</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

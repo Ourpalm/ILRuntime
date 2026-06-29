@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
-    <Configurations>Debug;Release;Release_Patched</Configurations>
+    <Configurations>Debug;Release;Release_Patched;Debug_Neo;Release_Neo</Configurations>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 

@@ -9,6 +9,7 @@ using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Runtime.Enviorment;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
@@ -46,6 +47,31 @@ namespace ILRuntime.Runtime.Intepreter
                     idx++;
                 }
             }
+#else
+            int pSize = type.StaticTotalPrimitiveSize;
+            int mCnt = type.StaticTotalReferenceCount;
+            if (pSize > 0)
+                fields = new byte[pSize];
+            if (mCnt > 0)
+            {
+                managedObjs = new AutoList(mCnt);
+                for (int i = 0; i < mCnt; i++)
+                    managedObjs.Add(null);
+            }
+            int idxStatic = 0;
+            foreach (var f in type.TypeDefinition.Fields)
+            {
+                if (f.IsStatic)
+                {
+                    if (f.InitialValue != null && f.InitialValue.Length > 0)
+                    {
+                        var offset = type.GetStaticFieldOffset(idxStatic);
+                        if (managedObjs != null)
+                            managedObjs[offset.ReferenceOffset] = f.InitialValue;
+                    }
+                    idxStatic++;
+                }
+            }
 #endif
         }
     }
@@ -59,6 +85,10 @@ namespace ILRuntime.Runtime.Intepreter
             this.type = type;
 #if !ENABLE_NEO_MODE
             fields = new StackObject[1];
+#else
+            var ut = type.FieldTypes[0];
+            int size = type.AppDomain.GetPrimitiveSize(ut);
+            fields = new byte[size];
 #endif
         }
 #if !ENABLE_NEO_MODE
@@ -119,6 +149,95 @@ namespace ILRuntime.Runtime.Intepreter
                         else if (f.Constant is uint)
                         {
                             int val = (int) (uint) f.Constant;
+                            if (val == intVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is ushort)
+                        {
+                            if ((ushort)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is sbyte)
+                        {
+                            if ((sbyte)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else
+                            throw new NotImplementedException();
+                    }
+                }
+            }
+            return isLong ? longVal.ToString() : intVal.ToString();
+        }
+#else
+        public override ILTypeInstance Clone()
+        {
+            var ins = new ILEnumTypeInstance(type);
+            Buffer.BlockCopy(fields, 0, ins.fields, 0, fields.Length);
+            return ins;
+        }
+
+        public override string ToString()
+        {
+            int size = fields.Length;
+            long longVal = 0;
+            int intVal = 0;
+            bool isLong = size == 8;
+            var span = new ReadOnlySpan<byte>(fields);
+            switch (size)
+            {
+                case 1:
+                    intVal = fields[0];
+                    break;
+                case 2:
+                    intVal = MemoryMarshal.Read<short>(span);
+                    break;
+                case 4:
+                    intVal = MemoryMarshal.Read<int>(span);
+                    break;
+                case 8:
+                    longVal = MemoryMarshal.Read<long>(span);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            var defFields = type.TypeDefinition.Fields;
+            for (int i = 0; i < defFields.Count; i++)
+            {
+                var f = defFields[i];
+                if (f.IsStatic)
+                {
+                    if (isLong)
+                    {
+                        long val = f.Constant is long ? (long)f.Constant : (long)(ulong)f.Constant;
+                        if (val == longVal)
+                            return f.Name;
+                    }
+                    else
+                    {
+                        if (f.Constant is int)
+                        {
+                            if ((int)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is short)
+                        {
+                            if ((short)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is long)
+                        {
+                            if ((long)f.Constant == longVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is byte)
+                        {
+                            if ((byte)f.Constant == intVal)
+                                return f.Name;
+                        }
+                        else if (f.Constant is uint)
+                        {
+                            int val = (int)(uint)f.Constant;
                             if (val == intVal)
                                 return f.Name;
                         }

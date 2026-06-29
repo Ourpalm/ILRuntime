@@ -45,6 +45,9 @@ namespace ILRuntime.CLR.Method
         int warmupCounter = 0;
         Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> variables;
         int hashCode = -1;
+#if ENABLE_NEO_MODE
+        Runtime.Intepreter.RegisterVM.CompiledFrame neoFrame;
+#endif
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
         bool isDebuggerStepThrough;
 #endif
@@ -409,6 +412,10 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+#if ENABLE_NEO_MODE
+        internal ref readonly Runtime.Intepreter.RegisterVM.CompiledFrame NeoFrame { get { return ref neoFrame; } }
+#endif
+
         public bool IsConstructor
         {
             get
@@ -651,6 +658,9 @@ namespace ILRuntime.CLR.Method
                     stackRegisterCnt = compiledFrame.StackRegisterCount;
                     jumptablesR = compiledFrame.SwitchTargets;
                     registerSymbols = compiledFrame.Symbols;
+#if ENABLE_NEO_MODE
+                    neoFrame = compiledFrame;
+#endif
                 }
                 else
                 {

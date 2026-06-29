@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,6 +23,15 @@ namespace ILRuntime.Other
         private int _version;
         [NonSerialized]
         private Object _syncRoot;
+
+        /// <summary>
+        /// Raw backing array. Length may exceed <see cref="Count"/>; only indices in [0, Count)
+        /// are populated. Exposed for high-performance batch operations (Array.Copy etc.).
+        /// </summary>
+        internal T[] InnerArray
+        {
+            get { return _items; }
+        }
 
         private static readonly T[] _emptyArray = new T[0];
 

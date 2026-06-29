@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>ILRuntime.VSCode</RootNamespace>
     <StartupObject>ILRuntime.VSCode.Program</StartupObject>
+    <Configurations>Debug;Release;Debug_Neo;Release_Neo</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
