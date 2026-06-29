@@ -23,7 +23,7 @@ namespace ILRuntime.Runtime.Intepreter
         public unsafe ILTypeStaticInstance(ILType type)
         {
             this.type = type;
-#if USE_OLD_OBJ_MODEL
+#if !ENABLE_NEO_MODE
             fields = new StackObject[type.StaticFieldTypes.Length];
             managedObjs = new AutoList(fields.Length);
             for (int i = 0; i < fields.Length; i++)
@@ -57,9 +57,11 @@ namespace ILRuntime.Runtime.Intepreter
             if (!type.IsEnum)
                 throw new NotSupportedException();
             this.type = type;
-            //fields = new StackObject[1];
+#if !ENABLE_NEO_MODE
+            fields = new StackObject[1];
+#endif
         }
-#if USE_OLD_OBJ_MODEL
+#if !ENABLE_NEO_MODE
 
         public override ILTypeInstance Clone()
         {
@@ -143,10 +145,10 @@ namespace ILRuntime.Runtime.Intepreter
     public class ILTypeInstance
     {
         protected ILType type;
-#if USE_OLD_OBJ_MODEL
-        protected StackObject[] fields;
-#else
+#if ENABLE_NEO_MODE
         protected byte[] fields;
+#else
+        protected StackObject[] fields;
 #endif
         protected AutoList managedObjs;
         object clrInstance;
@@ -161,9 +163,9 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+#if ENABLE_NEO_MODE
         public StackObject[] Fields
         {
-            //            get { return fields; }
             get { return null; }
         }
 
@@ -175,6 +177,12 @@ namespace ILRuntime.Runtime.Intepreter
                 return fields;
             }
         }
+#else
+        public StackObject[] Fields
+        {
+            get { return fields; }
+        }
+#endif
 
         public virtual bool IsValueType
         {
@@ -200,16 +208,7 @@ namespace ILRuntime.Runtime.Intepreter
         public ILTypeInstance(ILType type, bool initializeCLRInstance = true)
         {
             this.type = type;
-#if USE_OLD_OBJ_MODEL
-            fields = new StackObject[type.TotalFieldCount];
-            var cnt = fields.Length;
-            managedObjs = new AutoList(cnt);
-            for (int i = 0; i < cnt; i++)
-            {
-                managedObjs.Add(null);
-            }
-            InitializeFields(type);
-#else
+#if ENABLE_NEO_MODE
             int pSize = type.TotalPrimitiveSize;
             int mCnt = type.TotalReferenceCount;
             if (pSize > 0)
@@ -220,6 +219,15 @@ namespace ILRuntime.Runtime.Intepreter
                 for (int i = 0; i < mCnt; i++)
                     managedObjs.Add(null);
             }
+#else
+            fields = new StackObject[type.TotalFieldCount];
+            var cnt = fields.Length;
+            managedObjs = new AutoList(cnt);
+            for (int i = 0; i < cnt; i++)
+            {
+                managedObjs.Add(null);
+            }
+            InitializeFields(type);
 #endif
 
             if (initializeCLRInstance)
@@ -249,7 +257,8 @@ namespace ILRuntime.Runtime.Intepreter
         {
             get
             {
-                /*if (index < fields.Length && index >= 0)
+#if !ENABLE_NEO_MODE
+                if (index < fields.Length && index >= 0)
                 {
                     fixed (StackObject* ptr = fields)
                     {
@@ -266,12 +275,15 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                         throw new TypeLoadException();
-                }*/
+                }
+#else
                 return null;
+#endif
             }
             set
             {
-                /*value = ILIntepreter.CheckAndCloneValueType(value, type.AppDomain);
+#if !ENABLE_NEO_MODE
+                value = ILIntepreter.CheckAndCloneValueType(value, type.AppDomain);
                 if (index < fields.Length && index >= 0)
                 {
                     fixed (StackObject* ptr = fields)
@@ -311,10 +323,11 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     else
                         throw new TypeLoadException();
-                }*/
+                }
+#endif
             }
         }
-#if USE_OLD_OBJ_MODEL
+#if !ENABLE_NEO_MODE
         public unsafe void AssignFieldNoClone(int index, object value)
         {
             if (index < fields.Length && index >= 0)
@@ -368,7 +381,11 @@ namespace ILRuntime.Runtime.Intepreter
             traversedObj.Add(this);
             if (type == null)
                 return SizeOfILTypeInstance;
+#if ENABLE_NEO_MODE
+            var size = SizeOfILTypeInstance + (fields != null ? fields.Length : 0);
+#else
             var size = SizeOfILTypeInstance + sizeof(StackObject) * fields.Length;
+#endif
             if (managedObjs != null)
             {
                 size += managedObjs.Count * 4;
@@ -443,9 +460,10 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
+#if !ENABLE_NEO_MODE
         void InitializeFields(ILType type)
         {
-            /*for (int i = 0; i < type.FieldTypes.Length; i++)
+            for (int i = 0; i < type.FieldTypes.Length; i++)
             {
                 var idx = type.FieldStartIndex + i;
                 var ft = type.FieldTypes[i];
@@ -456,8 +474,9 @@ namespace ILRuntime.Runtime.Intepreter
                 StackObject.Initialized(ref fields[idx], idx, ft, managedObjs);
             }
             if (type.BaseType != null && type.BaseType is ILType)
-                InitializeFields((ILType)type.BaseType);*/
+                InitializeFields((ILType)type.BaseType);
         }
+#endif
 
         internal unsafe void PushFieldAddress(int fieldIdx, StackObject* esp, AutoList managedStack)
         {
@@ -467,9 +486,10 @@ namespace ILRuntime.Runtime.Intepreter
             esp->ValueLow = fieldIdx;
         }
 
+#if !ENABLE_NEO_MODE
         internal unsafe void PushToStack(int fieldIdx, StackObject* esp, ILIntepreter intp, AutoList managedStack)
         {
-            /*if (fieldIdx < fields.Length && fieldIdx >= 0)
+            if (fieldIdx < fields.Length && fieldIdx >= 0)
             {
                 PushToStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack, intp);
             }
@@ -483,18 +503,17 @@ namespace ILRuntime.Runtime.Intepreter
                         var obj = clrType.GetFieldValue(fieldIdx, clrInstance);
                         if (obj is CrossBindingAdaptorType)
                             obj = ((CrossBindingAdaptorType)obj).ILInstance;
-                        //if(!clrType.CopyFieldToStack(fieldIdx, clrInstance,))
                         ILIntepreter.PushObject(esp, managedStack, obj);
                     }
                 }
                 else
                     throw new TypeLoadException();
-            }*/
+            }
         }
 
         internal unsafe void CopyToRegister(int fieldIdx,ref RegisterFrameInfo info, short reg)
         {
-            /*if (fieldIdx < fields.Length && fieldIdx >= 0)
+            if (fieldIdx < fields.Length && fieldIdx >= 0)
             {
                 fixed(StackObject* ptr = fields)
                 {
@@ -513,14 +532,24 @@ namespace ILRuntime.Runtime.Intepreter
                 }
                 else
                     throw new TypeLoadException();
-            }*/
+            }
         }
+#else
+        internal unsafe void PushToStack(int fieldIdx, StackObject* esp, ILIntepreter intp, AutoList managedStack)
+        {
+        }
+
+        internal unsafe void CopyToRegister(int fieldIdx,ref RegisterFrameInfo info, short reg)
+        {
+        }
+#endif
 
         bool NeedCheckFieldValueType(int fieldIdx)
         {
             return fieldIdx >= 64 || ((valueTypeMask & ((ulong)1 << fieldIdx)) != 0);
         }
 
+#if !ENABLE_NEO_MODE
         unsafe void PushToStackSub(ref StackObject field, int fieldIdx, StackObject* esp, AutoList managedStack, ILIntepreter intp)
         {
             if (field.ObjectType >= ObjectTypes.Object)
@@ -562,7 +591,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal unsafe void CopyValueTypeToStack(StackObject* ptr, AutoList mStack)
         {
-            /*ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
+            ptr->ObjectType = ObjectTypes.ValueTypeDescriptor;
             ptr->Value = type.TypeIndex;
             ptr->ValueLow = type.TotalFieldCount;
             for(int i = 0; i < fields.Length; i++)
@@ -595,9 +624,15 @@ namespace ILRuntime.Runtime.Intepreter
                         *val = fields[i];
                         break;
                 }                
-            }*/
+            }
         }
+#else
+        internal unsafe void CopyValueTypeToStack(StackObject* ptr, AutoList mStack)
+        {
+        }
+#endif
 
+#if !ENABLE_NEO_MODE
         internal void Clear()
         {   
             InitializeFields(type);
@@ -605,7 +640,7 @@ namespace ILRuntime.Runtime.Intepreter
 
         internal void InitializeField(int fieldIdx)
         {
-            /*int curStart = type.FieldStartIndex;
+            int curStart = type.FieldStartIndex;
             ILType curType = type;
             while(curType != null)
             {
@@ -619,12 +654,12 @@ namespace ILRuntime.Runtime.Intepreter
                 else
                     curType = curType.BaseType as ILType;
             }
-            throw new NotImplementedException();*/
+            throw new NotImplementedException();
         }
 
         internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, ILIntepreter intp, AutoList managedStack)
         {
-            /*if (fieldIdx < fields.Length && fieldIdx >= 0)
+            if (fieldIdx < fields.Length && fieldIdx >= 0)
                 AssignFromStackSub(ref fields[fieldIdx], fieldIdx, esp, managedStack);
             else
             {
@@ -640,7 +675,7 @@ namespace ILRuntime.Runtime.Intepreter
                 }
                 else
                     throw new TypeLoadException();
-            }*/
+            }
         }
 
         internal unsafe void AssignFromStack(StackObject* esp, ILIntepreter intp, AutoList managedStack)
@@ -683,8 +718,6 @@ namespace ILRuntime.Runtime.Intepreter
                             if (ins == null)
                                 throw new NullReferenceException();
                             ILTypeInstance child = (ILTypeInstance)ins;
-                            //ILIntepreter instance is only needed in clrbinding, in this case, it's pure value type declared inside ILRuntime, so it won't need it
-                            //Adding a parameter in this widely used method would introduce unnecessary overhead
                             child.AssignFromStack(esp, null, managedStack);
                         }
                         else
@@ -700,6 +733,23 @@ namespace ILRuntime.Runtime.Intepreter
                     break;
             }
         }
+#else
+        internal void Clear()
+        {
+        }
+
+        internal void InitializeField(int fieldIdx)
+        {
+        }
+
+        internal unsafe void AssignFromStack(int fieldIdx, StackObject* esp, ILIntepreter intp, AutoList managedStack)
+        {
+        }
+
+        internal unsafe void AssignFromStack(StackObject* esp, ILIntepreter intp, AutoList managedStack)
+        {
+        }
+#endif
 
        
         public override string ToString()
@@ -721,7 +771,8 @@ namespace ILRuntime.Runtime.Intepreter
 
         public override bool Equals(object obj)
         {
-            /*if (type != null)
+#if !ENABLE_NEO_MODE
+            if (type != null)
             {
                 var m = type.EqualsMethod;
                 if (m != null && m is ILMethod)
@@ -761,12 +812,14 @@ namespace ILRuntime.Runtime.Intepreter
                         return base.Equals(obj);
                 }
             }
-            else*/
+            else
+#endif
                 return base.Equals(obj);
         }
         public override int GetHashCode()
         {
-            /*if (type != null)
+#if !ENABLE_NEO_MODE
+            if (type != null)
             {
                 var m = type.GetHashCodeMethod;
                 if (m != null && m is ILMethod)
@@ -788,7 +841,8 @@ namespace ILRuntime.Runtime.Intepreter
                         return base.GetHashCode();
                 }
             }
-            else*/
+            else
+#endif
                 return base.GetHashCode();
         }
 
@@ -800,11 +854,21 @@ namespace ILRuntime.Runtime.Intepreter
         public virtual ILTypeInstance Clone()
         {
             ILTypeInstance ins = new ILTypeInstance(type);
+#if !ENABLE_NEO_MODE
             for (int i = 0; i < fields.Length; i++)
             {
                 ins.fields[i] = fields[i];
                 ins.managedObjs[i] = ILIntepreter.CheckAndCloneValueType(managedObjs[i], Type.AppDomain);
             }
+#else
+            if (fields != null)
+                Array.Copy(fields, ins.fields, fields.Length);
+            if (managedObjs != null)
+            {
+                for (int i = 0; i < managedObjs.Count; i++)
+                    ins.managedObjs[i] = ILIntepreter.CheckAndCloneValueType(managedObjs[i], Type.AppDomain);
+            }
+#endif
             return ins;
         }
 

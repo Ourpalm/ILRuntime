@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -112,6 +112,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 return false;
         }
 
+#if ENABLE_NEO_MODE
         List<IType> GatherValueTypes(ref CompiledFrame frame)
         {
             List<IType> valueTypes = new List<IType>();
@@ -153,6 +154,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             return valueTypes;
         }
+#endif
 
         public CompiledFrame Compile(Dictionary<Instruction, int> addr)
         {
@@ -400,6 +402,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
             CompiledFrame frame = new CompiledFrame();
             frame.SwitchTargets = jumptables;
+            frame.Symbols = symbols;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             frame.StackRegisterCount = Math.Max(totalRegCnt - baseRegStart, 0);
 #if OUTPUT_JIT_RESULT
@@ -413,7 +416,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
             method.Compiling = false;
             frame.CodeBody = res.ToArray();
+#if ENABLE_NEO_MODE
             AllocateLocalStackSpaces(ref frame);
+#endif
 
 #if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
@@ -426,6 +431,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             return frame;
         }
 
+#if ENABLE_NEO_MODE
         void AllocateLocalStackSpaces(ref CompiledFrame frame)
         {
             var body = def.Body;
@@ -495,6 +501,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             frame.TotalStructSize = offset;
             frame.TotalRefSize = refOffset;
         }
+#endif
         void PrepareJumpTable(object token)
         {
             int hashCode = token.GetHashCode();
@@ -1077,6 +1084,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Operand = method.GetTypeTokenHashCode(token);
                     break;
                 case Code.Ldfld:
+#if ENABLE_NEO_MODE
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
                     {
@@ -1092,6 +1100,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
                     }
                     break;
+#endif
                 case Code.Ldflda:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
@@ -1100,6 +1109,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Stfld:
                     op.Register1 = (short)(baseRegIdx - 2);
                     op.Register2 = (short)(baseRegIdx - 1);
+#if ENABLE_NEO_MODE
                     {
                         var offset = appdomain.GetFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
                         if(type is ILType)
@@ -1112,6 +1122,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         else
                             op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
                     }
+#else
+                    op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+#endif
                     baseRegIdx -= 2;
                     break;
                 case Code.Box:
@@ -1178,6 +1191,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             if (!block.NeedLoadConstantElimination)
                 block.NeedLoadConstantElimination = Optimizer.IsLoadConstant(op.Code);
         }
+#if ENABLE_NEO_MODE
         OpCodeREnum GetLdfldCodeForType(IType fieldType)
         {
             OpCodeREnum res = OpCodeREnum.Ldfld_Ref;
@@ -1320,6 +1334,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             return res;
         }
+#endif
 
         int InitializeFunctionParam(ref OpCodes.OpCodeR op, object token, out bool hasReturn, out bool canInline, out IMethod m, out ILMethod toInline, out bool isILMethod)
         {

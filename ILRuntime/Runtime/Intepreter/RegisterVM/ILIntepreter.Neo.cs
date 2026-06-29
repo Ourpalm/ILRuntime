@@ -1,4 +1,5 @@
-﻿using System;
+#if ENABLE_NEO_MODE
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -50,8 +51,6 @@ namespace ILRuntime.Runtime.Intepreter
 			{
 				r--;
 				paramCnt++;
-				/// 为确保性能，暂时先确保开发的时候，安全检查完备。
-				/// 当然手机端运行时可能会出现为空的类对象可正常调用成员函数，导致成员函数里面访问成员变量报错时可能使得根据Log跟踪BUG时方向错误。
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 				if (!method.DeclearingType.IsValueType)
 				{
@@ -70,20 +69,13 @@ namespace ILRuntime.Runtime.Intepreter
 				var a = (r + i);
 				switch (a->ObjectType)
 				{
-					/*case ObjectTypes.Null:
-                        //Need to reserve place for null, in case of starg
-                        a->ObjectType = ObjectTypes.Object;
-                        a->Value = mStack.Count;
-                        mStack.Add(null);
-                        break;*/
 					case ObjectTypes.ValueTypeObjectReference:
-						//CloneStackValueType(a, a, mStack);
 						break;
 					case ObjectTypes.Object:
 					case ObjectTypes.FieldReference:
 					case ObjectTypes.ArrayReference:
 						{
-							if (i > 0 || !method.HasThis)//this instance should not be cloned
+							if (i > 0 || !method.HasThis)
 								mStack[a->Value] = CheckAndCloneValueType(mStack[a->Value], AppDomain);
 						}
 						break;
@@ -106,10 +98,6 @@ namespace ILRuntime.Runtime.Intepreter
 
 			object obj;
 
-			/*for (int i = 0; i < locCnt; i++)
-            {
-                InitializeRegisterLocal(method, i, v1, locBase, mStack);
-            }*/
 			esp = stackRegStart + stackRegCnt + locCnt;
 
 			info.RegisterEnd = esp;
@@ -168,7 +156,7 @@ namespace ILRuntime.Runtime.Intepreter
 						}
 						ip++;
 					}
-					catch(Exception ex)
+					catch (Exception ex)
 					{
 						var oriESP = esp;
 						bool isJmp = HandleException(ex, ref esp, ehs, method, (int)(ip - ptr), ref frame, ref lastCaughtEx, ref unhandledException, ref finallyEndAddress, out int jmpTarget, out bool isCatch);
@@ -199,6 +187,8 @@ namespace ILRuntime.Runtime.Intepreter
 					}
 				}
 			}
+			return esp;
 		}
 	}
 }
+#endif

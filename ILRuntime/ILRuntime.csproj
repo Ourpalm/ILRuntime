@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
@@ -20,6 +20,18 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NET_4_6</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Neo|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>bin\Debug_Neo\</OutputPath>
+    <DefineConstants>TRACE;NET_4_6;NO_PROFILER;OUTPUT_JIT_RESULT;ENABLE_NEO_MODE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Neo|AnyCPU'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <OutputPath>bin\Release_Neo\</OutputPath>
+    <DefineConstants>TRACE;NET_4_6;ENABLE_NEO_MODE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

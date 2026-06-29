@@ -649,6 +649,7 @@ namespace ILRuntime.CLR.Method
                     var compiledFrame = jit.Compile(addr);
                     bodyRegister = compiledFrame.CodeBody;
                     stackRegisterCnt = compiledFrame.StackRegisterCount;
+                    jumptablesR = compiledFrame.SwitchTargets;
                     registerSymbols = compiledFrame.Symbols;
                 }
                 else
