@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -952,5 +952,46 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         Ldfld_R8,
         Ldfld_Ref,
         Ldfld_Value,
+
+        // === Neo only - Step 6: 三槽算术 _I8/_R4/_R8 ===
+        Add_I8, Sub_I8, Mul_I8, Div_I8, Div_Un_I8, Rem_I8, Rem_Un_I8,
+        And_I8, Or_I8, Xor_I8, Shl_I8, Shr_I8, Shr_Un_I8,
+        Add_R4, Sub_R4, Mul_R4, Div_R4, Rem_R4,
+        Add_R8, Sub_R8, Mul_R8, Div_R8, Rem_R8,
+
+        // === Neo only - Step 6: 单目 _I8/_R4/_R8 ===
+        Neg_I8, Not_I8, Neg_R4, Neg_R8,
+
+        // === Neo only - Step 6: 比较 _I8/_R4/_R8 ===
+        Ceq_I8, Cgt_I8, Cgt_Un_I8, Clt_I8, Clt_Un_I8,
+        Ceq_R4, Cgt_R4, Cgt_Un_R4, Clt_R4, Clt_Un_R4,
+        Ceq_R8, Cgt_R8, Cgt_Un_R8, Clt_R8, Clt_Un_R8,
+
+        // === Neo only - Step 6: 类型化分支 _I8/_R4/_R8（含 _Un 整数变体） ===
+        Beq_I8, Bne_Un_I8, Blt_I8, Bgt_I8, Ble_I8, Bge_I8,
+        Blt_Un_I8, Bgt_Un_I8, Ble_Un_I8, Bge_Un_I8,
+        Beq_R4, Bne_Un_R4, Blt_R4, Bgt_R4, Ble_R4, Bge_R4,
+        Blt_Un_R4, Bgt_Un_R4, Ble_Un_R4, Bge_Un_R4,
+        Beq_R8, Bne_Un_R8, Blt_R8, Bgt_R8, Ble_R8, Bge_R8,
+        Blt_Un_R8, Bgt_Un_R8, Ble_Un_R8, Bge_Un_R8,
+
+        // === Neo only - Step 6: 立即数算术 _I8 完整 + _R4/_R8（仅 Add/Sub/Mul/Div/Rem）===
+        Addi_I8, Subi_I8, Muli_I8, Divi_I8, Divi_Un_I8, Remi_I8, Remi_Un_I8,
+        Andi_I8, Ori_I8, Xori_I8, Shli_I8, Shri_I8, Shri_Un_I8,
+        Addi_R4, Subi_R4, Muli_R4, Divi_R4, Remi_R4,
+        Addi_R8, Subi_R8, Muli_R8, Divi_R8, Remi_R8,
+
+        // === Neo only - Step 6: 立即数比较 _I8/_R4/_R8 ===
+        Ceqi_I8, Cgti_I8, Cgti_Un_I8, Clti_I8, Clti_Un_I8,
+        Ceqi_R4, Cgti_R4, Cgti_Un_R4, Clti_R4, Clti_Un_R4,
+        Ceqi_R8, Cgti_R8, Cgti_Un_R8, Clti_R8, Clti_Un_R8,
+
+        // === Neo only - Step 6: 立即数分支 _I8/_R4/_R8（含 _Un 整数变体）===
+        Beqi_I8, Bnei_Un_I8, Blti_I8, Bgti_I8, Blei_I8, Bgei_I8,
+        Blti_Un_I8, Bgti_Un_I8, Blei_Un_I8, Bgei_Un_I8,
+        Beqi_R4, Bnei_Un_R4, Blti_R4, Bgti_R4, Blei_R4, Bgei_R4,
+        Blti_Un_R4, Bgti_Un_R4, Blei_Un_R4, Bgei_Un_R4,
+        Beqi_R8, Bnei_Un_R8, Blti_R8, Bgti_R8, Blei_R8, Bgei_R8,
+        Blti_Un_R8, Bgti_Un_R8, Blei_Un_R8, Bgei_Un_R8,
     }
 }

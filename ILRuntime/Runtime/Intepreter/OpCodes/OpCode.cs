@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,6 +59,17 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public double OperandDouble;
         [FieldOffset(20)]
         public int Operand4;
+
+#if ENABLE_NEO_MODE
+        // Neo mode: byte offsets in frame. Register1/2/3 reinterpreted as
+        // ushort byte offsets (0..65535) post-LowerNeoOffsets pass.
+        // DstOffset shares Register1, SrcOffset shares Register2.
+        // Register3 used directly as byte offset via (ushort)op.Register3.
+        [FieldOffset(4)]
+        public ushort DstOffset;
+        [FieldOffset(6)]
+        public ushort SrcOffset;
+#endif
 
         public override string ToString()
         {

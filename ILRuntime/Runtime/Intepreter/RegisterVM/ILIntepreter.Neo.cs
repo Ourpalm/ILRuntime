@@ -11,6 +11,7 @@ using ILRuntime.Runtime.Stack;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.CLR.Utils;
+using ILRuntime.Runtime.Intepreter.RegisterVM;
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
@@ -94,9 +95,8 @@ namespace ILRuntime.Runtime.Intepreter
                 IType t;
                 ILType ilType;
                 ILTypeInstance ins;
-                StackSlotInfo srcSlot, dstSlot;
                 object obj;
-                int sz, refCnt, srcIdx, dstIdx;
+                int sz, refCnt, srcIdx, dstIdx, srcRefOffset, dstRefOffset;
                 while (!returned)
                 {
                     try
@@ -111,33 +111,659 @@ namespace ILRuntime.Runtime.Intepreter
                         OpCodeREnum code = ip->Code;
                         switch (code)
                         {
+                            case OpCodeREnum.Ldc_I4_M1:
+                                *(int*)(frameBase + ip->DstOffset) = -1;
+                                break;
+                            case OpCodeREnum.Ldc_I4_0:
+                                *(int*)(frameBase + ip->DstOffset) = 0;
+                                break;
+                            case OpCodeREnum.Ldc_I4_1:
+                                *(int*)(frameBase + ip->DstOffset) = 1;
+                                break;
+                            case OpCodeREnum.Ldc_I4_2:
+                                *(int*)(frameBase + ip->DstOffset) = 2;
+                                break;
+                            case OpCodeREnum.Ldc_I4_3:
+                                *(int*)(frameBase + ip->DstOffset) = 3;
+                                break;
+                            case OpCodeREnum.Ldc_I4_4:
+                                *(int*)(frameBase + ip->DstOffset) = 4;
+                                break;
+                            case OpCodeREnum.Ldc_I4_5:
+                                *(int*)(frameBase + ip->DstOffset) = 5;
+                                break;
+                            case OpCodeREnum.Ldc_I4_6:
+                                *(int*)(frameBase + ip->DstOffset) = 6;
+                                break;
+                            case OpCodeREnum.Ldc_I4_7:
+                                *(int*)(frameBase + ip->DstOffset) = 7;
+                                break;
+                            case OpCodeREnum.Ldc_I4_8:
+                                *(int*)(frameBase + ip->DstOffset) = 8;
+                                break;
+                            case OpCodeREnum.Ldc_I4:
+                            case OpCodeREnum.Ldc_I4_S:
+                                *(int*)(frameBase + ip->DstOffset) = ip->Operand;
+                                break;
+                            case OpCodeREnum.Ldc_I8:
+                                *(long*)(frameBase + ip->DstOffset) = ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Ldc_R4:
+                                *(float*)(frameBase + ip->DstOffset) = ip->OperandFloat;
+                                break;
+                            case OpCodeREnum.Ldc_R8:
+                                *(double*)(frameBase + ip->DstOffset) = ip->OperandDouble;
+                                break;
+                            case OpCodeREnum.Move:
+                                Unsafe.CopyBlock(frameBase + ip->DstOffset, frameBase + ip->SrcOffset, (uint)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Add:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) + *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Sub:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) - *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Mul:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) * *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Div:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) / *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Div_Un:
+                                *(int*)(frameBase + ip->DstOffset) = (int)(*(uint*)(frameBase + ip->SrcOffset) / *(uint*)(frameBase + (ushort)ip->Register3));
+                                break;
+                            case OpCodeREnum.Rem:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) % *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Rem_Un:
+                                *(int*)(frameBase + ip->DstOffset) = (int)(*(uint*)(frameBase + ip->SrcOffset) % *(uint*)(frameBase + (ushort)ip->Register3));
+                                break;
+                            case OpCodeREnum.And:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) & *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Or:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) | *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Xor:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) ^ *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Shl:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) << *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Shr:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) >> *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Shr_Un:
+                                *(int*)(frameBase + ip->DstOffset) = (int)(*(uint*)(frameBase + ip->SrcOffset) >> *(int*)(frameBase + (ushort)ip->Register3));
+                                break;
+                            case OpCodeREnum.Neg:
+                                *(int*)(frameBase + ip->DstOffset) = -*(int*)(frameBase + ip->SrcOffset);
+                                break;
+                            case OpCodeREnum.Not:
+                                *(int*)(frameBase + ip->DstOffset) = ~*(int*)(frameBase + ip->SrcOffset);
+                                break;
+                            case OpCodeREnum.Add_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) + *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Sub_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) - *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Mul_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) * *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Div_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) / *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Div_Un_I8:
+                                *(long*)(frameBase + ip->DstOffset) = (long)(*(ulong*)(frameBase + ip->SrcOffset) / *(ulong*)(frameBase + (ushort)ip->Register3));
+                                break;
+                            case OpCodeREnum.Rem_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) % *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Rem_Un_I8:
+                                *(long*)(frameBase + ip->DstOffset) = (long)(*(ulong*)(frameBase + ip->SrcOffset) % *(ulong*)(frameBase + (ushort)ip->Register3));
+                                break;
+                            case OpCodeREnum.And_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) & *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Or_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) | *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Xor_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) ^ *(long*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Shl_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) << *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Shr_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) >> *(int*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Shr_Un_I8:
+                                *(long*)(frameBase + ip->DstOffset) = (long)(*(ulong*)(frameBase + ip->SrcOffset) >> *(int*)(frameBase + (ushort)ip->Register3));
+                                break;
+                            case OpCodeREnum.Neg_I8:
+                                *(long*)(frameBase + ip->DstOffset) = -*(long*)(frameBase + ip->SrcOffset);
+                                break;
+                            case OpCodeREnum.Not_I8:
+                                *(long*)(frameBase + ip->DstOffset) = ~*(long*)(frameBase + ip->SrcOffset);
+                                break;
+                            case OpCodeREnum.Add_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) + *(float*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Sub_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) - *(float*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Mul_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) * *(float*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Div_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) / *(float*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Rem_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) % *(float*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Neg_R4:
+                                *(float*)(frameBase + ip->DstOffset) = -*(float*)(frameBase + ip->SrcOffset);
+                                break;
+                            case OpCodeREnum.Add_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) + *(double*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Sub_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) - *(double*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Mul_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) * *(double*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Div_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) / *(double*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Rem_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) % *(double*)(frameBase + (ushort)ip->Register3);
+                                break;
+                            case OpCodeREnum.Neg_R8:
+                                *(double*)(frameBase + ip->DstOffset) = -*(double*)(frameBase + ip->SrcOffset);
+                                break;
+                            case OpCodeREnum.Ceq:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) == *(int*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgt:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) > *(int*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgt_Un:
+                                *(int*)(frameBase + ip->DstOffset) = *(uint*)(frameBase + ip->SrcOffset) > *(uint*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clt:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) < *(int*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clt_Un:
+                                *(int*)(frameBase + ip->DstOffset) = *(uint*)(frameBase + ip->SrcOffset) < *(uint*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Ceq_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) == *(long*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgt_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) > *(long*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgt_Un_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(ulong*)(frameBase + ip->SrcOffset) > *(ulong*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clt_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) < *(long*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clt_Un_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(ulong*)(frameBase + ip->SrcOffset) < *(ulong*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Ceq_R4:
+                                *(int*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) == *(float*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Ceq_R8:
+                                *(int*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) == *(double*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgt_R4:
+                            case OpCodeREnum.Cgt_Un_R4:
+                                *(int*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) > *(float*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgt_R8:
+                            case OpCodeREnum.Cgt_Un_R8:
+                                *(int*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) > *(double*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clt_R4:
+                            case OpCodeREnum.Clt_Un_R4:
+                                *(int*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) < *(float*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clt_R8:
+                            case OpCodeREnum.Clt_Un_R8:
+                                *(int*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) < *(double*)(frameBase + (ushort)ip->Register3) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Br:
+                            case OpCodeREnum.Br_S:
+                                ip = ptr + ip->Operand;
+                                continue;
+                            case OpCodeREnum.Brtrue:
+                            case OpCodeREnum.Brtrue_S:
+                                if (ip->Operand2 == 8 ? *(long*)(frameBase + ip->DstOffset) != 0 : *(int*)(frameBase + ip->DstOffset) != 0)
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
+                                break;
+                            case OpCodeREnum.Brfalse:
+                            case OpCodeREnum.Brfalse_S:
+                                if (ip->Operand2 == 8 ? *(long*)(frameBase + ip->DstOffset) == 0 : *(int*)(frameBase + ip->DstOffset) == 0)
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
+                                break;
+                            case OpCodeREnum.Beq:
+                                if (*(int*)(frameBase + ip->DstOffset) == *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bne_Un:
+                                if (*(int*)(frameBase + ip->DstOffset) != *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Blt:
+                                if (*(int*)(frameBase + ip->DstOffset) < *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bgt:
+                                if (*(int*)(frameBase + ip->DstOffset) > *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Ble:
+                                if (*(int*)(frameBase + ip->DstOffset) <= *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bge:
+                                if (*(int*)(frameBase + ip->DstOffset) >= *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Blt_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) < *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bgt_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) > *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Ble_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) <= *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bge_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) >= *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Beq_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) == *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bne_Un_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) != *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Blt_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) < *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bgt_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) > *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Ble_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) <= *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bge_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) >= *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Blt_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) < *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bgt_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) > *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Ble_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) <= *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bge_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) >= *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Beq_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) == *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bne_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) != *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Blt_R4:
+                            case OpCodeREnum.Blt_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) < *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bgt_R4:
+                            case OpCodeREnum.Bgt_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) > *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Ble_R4:
+                            case OpCodeREnum.Ble_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) <= *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bge_R4:
+                            case OpCodeREnum.Bge_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) >= *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Beq_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) == *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bne_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) != *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Blt_R8:
+                            case OpCodeREnum.Blt_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) < *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bgt_R8:
+                            case OpCodeREnum.Bgt_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) > *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Ble_R8:
+                            case OpCodeREnum.Ble_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) <= *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Bge_R8:
+                            case OpCodeREnum.Bge_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) >= *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                break;
+                            case OpCodeREnum.Addi:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) + ip->Operand;
+                                break;
+                            case OpCodeREnum.Subi:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) - ip->Operand;
+                                break;
+                            case OpCodeREnum.Muli:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) * ip->Operand;
+                                break;
+                            case OpCodeREnum.Divi:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) / ip->Operand;
+                                break;
+                            case OpCodeREnum.Divi_Un:
+                                *(int*)(frameBase + ip->DstOffset) = (int)(*(uint*)(frameBase + ip->SrcOffset) / (uint)ip->Operand);
+                                break;
+                            case OpCodeREnum.Remi:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) % ip->Operand;
+                                break;
+                            case OpCodeREnum.Remi_Un:
+                                *(int*)(frameBase + ip->DstOffset) = (int)(*(uint*)(frameBase + ip->SrcOffset) % (uint)ip->Operand);
+                                break;
+                            case OpCodeREnum.Andi:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) & ip->Operand;
+                                break;
+                            case OpCodeREnum.Ori:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) | ip->Operand;
+                                break;
+                            case OpCodeREnum.Xori:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) ^ ip->Operand;
+                                break;
+                            case OpCodeREnum.Shli:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) << ip->Operand;
+                                break;
+                            case OpCodeREnum.Shri:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) >> ip->Operand;
+                                break;
+                            case OpCodeREnum.Shri_Un:
+                                *(int*)(frameBase + ip->DstOffset) = (int)(*(uint*)(frameBase + ip->SrcOffset) >> ip->Operand);
+                                break;
+                            case OpCodeREnum.Addi_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) + ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Subi_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) - ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Muli_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) * ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Divi_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) / ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Divi_Un_I8:
+                                *(long*)(frameBase + ip->DstOffset) = (long)(*(ulong*)(frameBase + ip->SrcOffset) / (ulong)ip->OperandLong);
+                                break;
+                            case OpCodeREnum.Remi_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) % ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Remi_Un_I8:
+                                *(long*)(frameBase + ip->DstOffset) = (long)(*(ulong*)(frameBase + ip->SrcOffset) % (ulong)ip->OperandLong);
+                                break;
+                            case OpCodeREnum.Andi_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) & ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Ori_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) | ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Xori_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) ^ ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Shli_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) << (int)ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Shri_I8:
+                                *(long*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) >> (int)ip->OperandLong;
+                                break;
+                            case OpCodeREnum.Shri_Un_I8:
+                                *(long*)(frameBase + ip->DstOffset) = (long)(*(ulong*)(frameBase + ip->SrcOffset) >> (int)ip->OperandLong);
+                                break;
+                            case OpCodeREnum.Addi_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) + ip->OperandFloat;
+                                break;
+                            case OpCodeREnum.Subi_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) - ip->OperandFloat;
+                                break;
+                            case OpCodeREnum.Muli_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) * ip->OperandFloat;
+                                break;
+                            case OpCodeREnum.Divi_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) / ip->OperandFloat;
+                                break;
+                            case OpCodeREnum.Remi_R4:
+                                *(float*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) % ip->OperandFloat;
+                                break;
+                            case OpCodeREnum.Addi_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) + ip->OperandDouble;
+                                break;
+                            case OpCodeREnum.Subi_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) - ip->OperandDouble;
+                                break;
+                            case OpCodeREnum.Muli_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) * ip->OperandDouble;
+                                break;
+                            case OpCodeREnum.Divi_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) / ip->OperandDouble;
+                                break;
+                            case OpCodeREnum.Remi_R8:
+                                *(double*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) % ip->OperandDouble;
+                                break;
+                            case OpCodeREnum.Ceqi:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) == ip->Operand ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgti:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) > ip->Operand ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgti_Un:
+                                *(int*)(frameBase + ip->DstOffset) = *(uint*)(frameBase + ip->SrcOffset) > (uint)ip->Operand ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clti:
+                                *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) < ip->Operand ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clti_Un:
+                                *(int*)(frameBase + ip->DstOffset) = *(uint*)(frameBase + ip->SrcOffset) < (uint)ip->Operand ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Ceqi_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) == ip->OperandLong ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgti_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) > ip->OperandLong ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgti_Un_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(ulong*)(frameBase + ip->SrcOffset) > (ulong)ip->OperandLong ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clti_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(long*)(frameBase + ip->SrcOffset) < ip->OperandLong ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clti_Un_I8:
+                                *(int*)(frameBase + ip->DstOffset) = *(ulong*)(frameBase + ip->SrcOffset) < (ulong)ip->OperandLong ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Ceqi_R4:
+                                *(int*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) == ip->OperandFloat ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgti_R4:
+                            case OpCodeREnum.Cgti_Un_R4:
+                                *(int*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) > ip->OperandFloat ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clti_R4:
+                            case OpCodeREnum.Clti_Un_R4:
+                                *(int*)(frameBase + ip->DstOffset) = *(float*)(frameBase + ip->SrcOffset) < ip->OperandFloat ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Ceqi_R8:
+                                *(int*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) == ip->OperandDouble ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgti_R8:
+                            case OpCodeREnum.Cgti_Un_R8:
+                                *(int*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) > ip->OperandDouble ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Clti_R8:
+                            case OpCodeREnum.Clti_Un_R8:
+                                *(int*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) < ip->OperandDouble ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Beqi:
+                                if (*(int*)(frameBase + ip->DstOffset) == ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bnei_Un:
+                                if (*(int*)(frameBase + ip->DstOffset) != ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blti:
+                                if (*(int*)(frameBase + ip->DstOffset) < ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgti:
+                                if (*(int*)(frameBase + ip->DstOffset) > ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blei:
+                                if (*(int*)(frameBase + ip->DstOffset) <= ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgei:
+                                if (*(int*)(frameBase + ip->DstOffset) >= ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blti_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) < (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgti_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) > (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blei_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) <= (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgei_Un:
+                                if (*(uint*)(frameBase + ip->DstOffset) >= (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Beqi_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) == ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bnei_Un_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) != ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blti_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) < ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgti_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) > ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blei_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) <= ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgei_I8:
+                                if (*(long*)(frameBase + ip->DstOffset) >= ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blti_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) < (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgti_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) > (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blei_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) <= (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgei_Un_I8:
+                                if (*(ulong*)(frameBase + ip->DstOffset) >= (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Beqi_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) == ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bnei_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) != ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blti_R4:
+                            case OpCodeREnum.Blti_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) < ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgti_R4:
+                            case OpCodeREnum.Bgti_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) > ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blei_R4:
+                            case OpCodeREnum.Blei_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) <= ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgei_R4:
+                            case OpCodeREnum.Bgei_Un_R4:
+                                if (*(float*)(frameBase + ip->DstOffset) >= ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Beqi_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) == ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bnei_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) != ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blti_R8:
+                            case OpCodeREnum.Blti_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) < ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgti_R8:
+                            case OpCodeREnum.Bgti_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) > ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Blei_R8:
+                            case OpCodeREnum.Blei_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) <= ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Bgei_R8:
+                            case OpCodeREnum.Bgei_Un_R8:
+                                if (*(double*)(frameBase + ip->DstOffset) >= ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                break;
+                            case OpCodeREnum.Conv_I1:
+                                *(int*)(frameBase + ip->DstOffset) = (sbyte)ReadConvI8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_U1:
+                                *(int*)(frameBase + ip->DstOffset) = (byte)ReadConvI8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_I2:
+                                *(int*)(frameBase + ip->DstOffset) = (short)ReadConvI8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_U2:
+                                *(int*)(frameBase + ip->DstOffset) = (ushort)ReadConvI8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_I4:
+                                *(int*)(frameBase + ip->DstOffset) = ReadConvI4(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_U4:
+                                *(uint*)(frameBase + ip->DstOffset) = ReadConvU4(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_I8:
+                                *(long*)(frameBase + ip->DstOffset) = ReadConvI8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_U8:
+                                *(ulong*)(frameBase + ip->DstOffset) = ReadConvU8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_R4:
+                                *(float*)(frameBase + ip->DstOffset) = ReadConvR4(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
+                            case OpCodeREnum.Conv_R8:
+                                *(double*)(frameBase + ip->DstOffset) = ReadConvR8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
+                                break;
                             case OpCodeREnum.Ret:
                                 if (retDst != null && (returnPrimitiveSize > 0 || returnRefCount > 0))
                                 {
-                                    srcSlot = localInfos[ip->Register1];
                                     if (returnPrimitiveSize > 0)
-                                        Unsafe.CopyBlock(retDst, frameBase + srcSlot.Offset, (uint)returnPrimitiveSize);
-                                    // Reference part: copy via the backing array when we own it
-                                    // (Release path uses UncheckedList<object>). In Debug we run on
-                                    // List<object> whose internal array isn't accessible on
-                                    // netstandard2.1, so fall back to a tight loop — Debug builds
-                                    // aren't perf-critical.
+                                        Unsafe.CopyBlock(retDst, frameBase + ip->DstOffset, (uint)returnPrimitiveSize);
                                     if (returnRefCount > 0)
-                                    {
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                                        srcIdx = frameRefBase + srcSlot.RefOffset;
-                                        for (int i = 0; i < returnRefCount; i++)
-                                            mStack[retRefBase + i] = mStack[srcIdx + i];
-#else
-                                        var arr = mStack.InnerArray;
-                                        Array.Copy(arr, frameRefBase + srcSlot.RefOffset, arr, retRefBase, returnRefCount);
-#endif
-                                    }
+                                        throw new NotImplementedException("Neo Ret reference return requires Step 7 RefOffset lowering");
                                 }
                                 returned = true;
                                 break;
                             case OpCodeREnum.Initobj:
-                                srcSlot = localInfos[ip->Register1];
                                 t = AppDomain.GetType(ip->Operand);
                                 ilType = t as ILType;
                                 if (ilType != null)
@@ -155,13 +781,15 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         // Reference type initobj → write null index (-1) into the byte slot.
-                                        *(int*)(frameBase + srcSlot.Offset) = -1;
+                                        *(int*)(frameBase + ip->DstOffset) = -1;
                                         break;
                                     }
                                     if (sz > 0)
-                                        Unsafe.InitBlock(frameBase + srcSlot.Offset, 0, (uint)sz);
+                                        Unsafe.InitBlock(frameBase + ip->DstOffset, 0, (uint)sz);
+                                    if (refCnt > 0)
+                                        throw new NotImplementedException("Neo Initobj reference fields require Step 7 RefOffset lowering");
                                     for (int i = 0; i < refCnt; i++)
-                                        mStack[frameRefBase + srcSlot.RefOffset + i] = null;
+                                        mStack[frameRefBase + i] = null;
                                 }
                                 else
                                 {
@@ -170,8 +798,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeREnum.Box:
-                                srcSlot = localInfos[ip->Register2];
-                                dstSlot = localInfos[ip->Register1];
+                                dstRefOffset = ip->Operand3 >> 16;
+                                srcRefOffset = (short)(ip->Operand3 & 0xffff);
                                 t = AppDomain.GetType(ip->Operand);
                                 ilType = t as ILType;
                                 if (ilType != null)
@@ -183,7 +811,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (sz > 0)
                                         {
                                             ref byte dstP = ref MemoryMarshal.GetReference(ins.Primitives.AsSpan());
-                                            Unsafe.CopyBlock(ref dstP, ref *(frameBase + srcSlot.Offset), (uint)sz);
+                                            Unsafe.CopyBlock(ref dstP, ref *(frameBase + ip->SrcOffset), (uint)sz);
                                         }
                                     }
                                     else if (ilType.IsPrimitive)
@@ -195,30 +823,30 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (sz > 0 && ins.Primitives != null)
                                         {
                                             ref byte dstP = ref MemoryMarshal.GetReference(ins.Primitives.AsSpan());
-                                            Unsafe.CopyBlock(ref dstP, ref *(frameBase + srcSlot.Offset), (uint)sz);
+                                            Unsafe.CopyBlock(ref dstP, ref *(frameBase + ip->SrcOffset), (uint)sz);
                                         }
                                     }
                                     else if (ilType.IsValueType)
                                     {
                                         ins = ilType.Instantiate(false);
-                                        CopyFrameToIL(frameBase, srcSlot.Offset, srcSlot.RefOffset,
+                                        CopyFrameToIL(frameBase, ip->SrcOffset, srcRefOffset,
                                                       ilType.TotalPrimitiveSize, ilType.TotalReferenceCount,
                                                       mStack, frameRefBase, ins);
                                     }
                                     else
                                     {
                                         // Boxing a reference type is a no-op: the same instance flows through.
-                                        srcIdx = *(int*)(frameBase + srcSlot.Offset);
+                                        srcIdx = *(int*)(frameBase + ip->SrcOffset);
                                         obj = srcIdx >= 0 ? mStack[srcIdx] : null;
-                                        dstIdx = frameRefBase + dstSlot.RefOffset;
+                                        dstIdx = frameRefBase + dstRefOffset;
                                         mStack[dstIdx] = obj;
-                                        *(int*)(frameBase + dstSlot.Offset) = obj != null ? dstIdx : -1;
+                                        *(int*)(frameBase + ip->DstOffset) = obj != null ? dstIdx : -1;
                                         break;
                                     }
                                     ins.Boxed = true;
-                                    dstIdx = frameRefBase + dstSlot.RefOffset;
+                                    dstIdx = frameRefBase + dstRefOffset;
                                     mStack[dstIdx] = ins;
-                                    *(int*)(frameBase + dstSlot.Offset) = dstIdx;
+                                    *(int*)(frameBase + ip->DstOffset) = dstIdx;
                                 }
                                 else
                                 {
@@ -228,10 +856,9 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Unbox:
                             case OpCodeREnum.Unbox_Any:
-                                srcSlot = localInfos[ip->Register2];
-                                dstSlot = localInfos[ip->Register1];
+                                dstRefOffset = ip->Operand3 >> 16;
                                 t = AppDomain.GetType(ip->Operand);
-                                srcIdx = *(int*)(frameBase + srcSlot.Offset);
+                                srcIdx = *(int*)(frameBase + ip->SrcOffset);
                                 if (srcIdx < 0)
                                     throw new NullReferenceException();
                                 obj = mStack[srcIdx];
@@ -249,7 +876,7 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (sz > 0)
                                         {
                                             ref byte srcP = ref MemoryMarshal.GetReference(ins.Primitives.AsSpan());
-                                            Unsafe.CopyBlock(ref *(frameBase + dstSlot.Offset), ref srcP, (uint)sz);
+                                            Unsafe.CopyBlock(ref *(frameBase + ip->DstOffset), ref srcP, (uint)sz);
                                         }
                                     }
                                     else if (ilType.IsPrimitive)
@@ -258,13 +885,13 @@ namespace ILRuntime.Runtime.Intepreter
                                         if (sz > 0 && ins.Primitives != null)
                                         {
                                             ref byte srcP = ref MemoryMarshal.GetReference(ins.Primitives.AsSpan());
-                                            Unsafe.CopyBlock(ref *(frameBase + dstSlot.Offset), ref srcP, (uint)sz);
+                                            Unsafe.CopyBlock(ref *(frameBase + ip->DstOffset), ref srcP, (uint)sz);
                                         }
                                     }
                                     else if (ilType.IsValueType)
                                     {
                                         CopyILToFrame(ins,
-                                                      frameBase, dstSlot.Offset, dstSlot.RefOffset,
+                                                      frameBase, ip->DstOffset, dstRefOffset,
                                                       ilType.TotalPrimitiveSize, ilType.TotalReferenceCount,
                                                       mStack, frameRefBase);
                                     }
@@ -279,6 +906,8 @@ namespace ILRuntime.Runtime.Intepreter
                                     throw new NotImplementedException("CLR value type Unbox: Step 13");
                                 }
                                 break;
+                            default:
+                                throw new NotImplementedException(string.Format("Neo: opcode {0} not yet implemented (Step 6)", code));
                         }
                         ip++;
                     }
@@ -339,6 +968,144 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
 #endif
             return frameBase;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static unsafe int ReadConvI4(byte* frameBase, ushort offset, NeoPrimitiveTypeTag tag)
+        {
+            unchecked
+            {
+                switch (tag)
+                {
+                    case NeoPrimitiveTypeTag.U4:
+                        return (int)*(uint*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I8:
+                        return (int)*(long*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.U8:
+                        return (int)*(ulong*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R4:
+                        return (int)*(float*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R8:
+                        return (int)*(double*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I4:
+                    default:
+                        return *(int*)(frameBase + offset);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static unsafe uint ReadConvU4(byte* frameBase, ushort offset, NeoPrimitiveTypeTag tag)
+        {
+            unchecked
+            {
+                switch (tag)
+                {
+                    case NeoPrimitiveTypeTag.U4:
+                        return *(uint*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I8:
+                        return (uint)*(long*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.U8:
+                        return (uint)*(ulong*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R4:
+                        return (uint)*(float*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R8:
+                        return (uint)*(double*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I4:
+                    default:
+                        return (uint)*(int*)(frameBase + offset);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static unsafe long ReadConvI8(byte* frameBase, ushort offset, NeoPrimitiveTypeTag tag)
+        {
+            unchecked
+            {
+                switch (tag)
+                {
+                    case NeoPrimitiveTypeTag.U4:
+                        return *(uint*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I8:
+                        return *(long*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.U8:
+                        return (long)*(ulong*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R4:
+                        return (long)*(float*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R8:
+                        return (long)*(double*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I4:
+                    default:
+                        return *(int*)(frameBase + offset);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static unsafe ulong ReadConvU8(byte* frameBase, ushort offset, NeoPrimitiveTypeTag tag)
+        {
+            unchecked
+            {
+                switch (tag)
+                {
+                    case NeoPrimitiveTypeTag.U4:
+                        return *(uint*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I8:
+                        return (ulong)*(long*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.U8:
+                        return *(ulong*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R4:
+                        return (ulong)*(float*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.R8:
+                        return (ulong)*(double*)(frameBase + offset);
+                    case NeoPrimitiveTypeTag.I4:
+                    default:
+                        return (ulong)*(int*)(frameBase + offset);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static unsafe float ReadConvR4(byte* frameBase, ushort offset, NeoPrimitiveTypeTag tag)
+        {
+            switch (tag)
+            {
+                case NeoPrimitiveTypeTag.U4:
+                    return *(uint*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.I8:
+                    return *(long*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.U8:
+                    return *(ulong*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.R4:
+                    return *(float*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.R8:
+                    return (float)*(double*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.I4:
+                default:
+                    return *(int*)(frameBase + offset);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static unsafe double ReadConvR8(byte* frameBase, ushort offset, NeoPrimitiveTypeTag tag)
+        {
+            switch (tag)
+            {
+                case NeoPrimitiveTypeTag.U4:
+                    return *(uint*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.I8:
+                    return *(long*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.U8:
+                    return *(ulong*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.R4:
+                    return *(float*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.R8:
+                    return *(double*)(frameBase + offset);
+                case NeoPrimitiveTypeTag.I4:
+                default:
+                    return *(int*)(frameBase + offset);
+            }
         }
 
         // Copies frame byte region + frame mStack refs into an ILTypeInstance.

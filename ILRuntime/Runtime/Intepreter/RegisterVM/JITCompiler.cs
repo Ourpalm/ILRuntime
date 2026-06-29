@@ -12,6 +12,17 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 
 namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
+#if ENABLE_NEO_MODE
+    internal enum NeoPrimitiveTypeTag : int
+    {
+        I4 = 0,
+        U4 = 1,
+        I8 = 2,
+        U8 = 3,
+        R4 = 4,
+        R8 = 5,
+    }
+#endif
     struct StackSlotInfo
     {
         public int Offset;
@@ -415,6 +426,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             frame.Symbols = symbols;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             frame.StackRegisterCount = Math.Max(totalRegCnt - baseRegStart, 0);
+#if ENABLE_NEO_MODE
+            TypeSpecializeNeoOpcodes(res, locVarRegStart, totalRegCnt);
+#endif
 #if OUTPUT_JIT_RESULT
             Console.WriteLine($"Final Results for {method}:");
 
@@ -428,6 +442,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             frame.CodeBody = res.ToArray();
 #if ENABLE_NEO_MODE
             AllocateLocalStackSpaces(ref frame);
+            LowerNeoOffsets(ref frame);
 #endif
 
 #if DEBUG && !NO_PROFILER
@@ -442,6 +457,919 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
 
 #if ENABLE_NEO_MODE
+        void TypeSpecializeNeoOpcodes(List<OpCodeR> body, short locVarRegStart, int totalRegCnt)
+        {
+            IType[] registerTypes = BuildInitialRegisterTypes(locVarRegStart, totalRegCnt);
+            for (int i = 0; i < body.Count; i++)
+            {
+                OpCodeR op = body[i];
+                switch (op.Code)
+                {
+                    case OpCodeREnum.Ldc_I4_M1:
+                    case OpCodeREnum.Ldc_I4_0:
+                    case OpCodeREnum.Ldc_I4_1:
+                    case OpCodeREnum.Ldc_I4_2:
+                    case OpCodeREnum.Ldc_I4_3:
+                    case OpCodeREnum.Ldc_I4_4:
+                    case OpCodeREnum.Ldc_I4_5:
+                    case OpCodeREnum.Ldc_I4_6:
+                    case OpCodeREnum.Ldc_I4_7:
+                    case OpCodeREnum.Ldc_I4_8:
+                    case OpCodeREnum.Ldc_I4:
+                    case OpCodeREnum.Ldc_I4_S:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.IntType);
+                        break;
+                    case OpCodeREnum.Ldc_I8:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.LongType);
+                        break;
+                    case OpCodeREnum.Ldc_R4:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.FloatType);
+                        break;
+                    case OpCodeREnum.Ldc_R8:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.DoubleType);
+                        break;
+                    case OpCodeREnum.Ldnull:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.ObjectType);
+                        break;
+                    case OpCodeREnum.Move:
+                        SetRegisterType(registerTypes, op.Register1, GetRegisterType(registerTypes, op.Register2));
+                        break;
+                    case OpCodeREnum.Neg:
+                    case OpCodeREnum.Not:
+                        op.Code = GetTypedUnaryOpcode(op.Code, InferPrimTag(GetRegisterType(registerTypes, op.Register2), appdomain));
+                        SetRegisterType(registerTypes, op.Register1, GetRegisterType(registerTypes, op.Register2));
+                        break;
+                    case OpCodeREnum.Add:
+                    case OpCodeREnum.Sub:
+                    case OpCodeREnum.Mul:
+                    case OpCodeREnum.Div:
+                    case OpCodeREnum.Div_Un:
+                    case OpCodeREnum.Rem:
+                    case OpCodeREnum.Rem_Un:
+                    case OpCodeREnum.And:
+                    case OpCodeREnum.Or:
+                    case OpCodeREnum.Xor:
+                    case OpCodeREnum.Shl:
+                    case OpCodeREnum.Shr:
+                    case OpCodeREnum.Shr_Un:
+                        op.Code = GetTypedBinaryOpcode(op.Code, InferPrimTag(GetRegisterType(registerTypes, op.Register2), appdomain));
+                        SetRegisterType(registerTypes, op.Register1, GetRegisterType(registerTypes, op.Register2));
+                        break;
+                    case OpCodeREnum.Ceq:
+                    case OpCodeREnum.Cgt:
+                    case OpCodeREnum.Cgt_Un:
+                    case OpCodeREnum.Clt:
+                    case OpCodeREnum.Clt_Un:
+                        op.Code = GetTypedCompareOpcode(op.Code, InferPrimTag(GetRegisterType(registerTypes, op.Register2), appdomain));
+                        SetRegisterType(registerTypes, op.Register1, appdomain.IntType);
+                        break;
+                    case OpCodeREnum.Beq:
+                    case OpCodeREnum.Beq_S:
+                    case OpCodeREnum.Bne_Un:
+                    case OpCodeREnum.Bne_Un_S:
+                    case OpCodeREnum.Blt:
+                    case OpCodeREnum.Blt_S:
+                    case OpCodeREnum.Blt_Un:
+                    case OpCodeREnum.Blt_Un_S:
+                    case OpCodeREnum.Bgt:
+                    case OpCodeREnum.Bgt_S:
+                    case OpCodeREnum.Bgt_Un:
+                    case OpCodeREnum.Bgt_Un_S:
+                    case OpCodeREnum.Ble:
+                    case OpCodeREnum.Ble_S:
+                    case OpCodeREnum.Ble_Un:
+                    case OpCodeREnum.Ble_Un_S:
+                    case OpCodeREnum.Bge:
+                    case OpCodeREnum.Bge_S:
+                    case OpCodeREnum.Bge_Un:
+                    case OpCodeREnum.Bge_Un_S:
+                        op.Code = GetTypedBranchOpcode(NormalizeBranchOpcode(op.Code), InferPrimTag(GetRegisterType(registerTypes, op.Register1), appdomain));
+                        break;
+                    case OpCodeREnum.Addi:
+                    case OpCodeREnum.Subi:
+                    case OpCodeREnum.Muli:
+                    case OpCodeREnum.Divi:
+                    case OpCodeREnum.Divi_Un:
+                    case OpCodeREnum.Remi:
+                    case OpCodeREnum.Remi_Un:
+                    case OpCodeREnum.Andi:
+                    case OpCodeREnum.Ori:
+                    case OpCodeREnum.Xori:
+                    case OpCodeREnum.Shli:
+                    case OpCodeREnum.Shri:
+                    case OpCodeREnum.Shri_Un:
+                        op.Code = GetTypedImmediateBinaryOpcode(op.Code, InferPrimTag(GetRegisterType(registerTypes, op.Register2), appdomain));
+                        SetRegisterType(registerTypes, op.Register1, GetRegisterType(registerTypes, op.Register2));
+                        break;
+                    case OpCodeREnum.Ceqi:
+                    case OpCodeREnum.Cgti:
+                    case OpCodeREnum.Cgti_Un:
+                    case OpCodeREnum.Clti:
+                    case OpCodeREnum.Clti_Un:
+                        op.Code = GetTypedImmediateCompareOpcode(op.Code, InferPrimTag(GetRegisterType(registerTypes, op.Register2), appdomain));
+                        SetRegisterType(registerTypes, op.Register1, appdomain.IntType);
+                        break;
+                    case OpCodeREnum.Beqi:
+                    case OpCodeREnum.Bnei_Un:
+                    case OpCodeREnum.Blti:
+                    case OpCodeREnum.Blti_Un:
+                    case OpCodeREnum.Bgti:
+                    case OpCodeREnum.Bgti_Un:
+                    case OpCodeREnum.Blei:
+                    case OpCodeREnum.Blei_Un:
+                    case OpCodeREnum.Bgei:
+                    case OpCodeREnum.Bgei_Un:
+                        op.Code = GetTypedImmediateBranchOpcode(op.Code, InferPrimTag(GetRegisterType(registerTypes, op.Register1), appdomain));
+                        break;
+                    case OpCodeREnum.Conv_I:
+                    case OpCodeREnum.Conv_I1:
+                    case OpCodeREnum.Conv_I2:
+                    case OpCodeREnum.Conv_I4:
+                    case OpCodeREnum.Conv_I8:
+                    case OpCodeREnum.Conv_R4:
+                    case OpCodeREnum.Conv_R8:
+                    case OpCodeREnum.Conv_R_Un:
+                    case OpCodeREnum.Conv_U:
+                    case OpCodeREnum.Conv_U1:
+                    case OpCodeREnum.Conv_U2:
+                    case OpCodeREnum.Conv_U4:
+                    case OpCodeREnum.Conv_U8:
+                        op.Operand2 = (int)InferPrimTag(GetRegisterType(registerTypes, op.Register2), appdomain);
+                        SetRegisterType(registerTypes, op.Register1, GetConvResultType(op.Code));
+                        break;
+                    case OpCodeREnum.Ldfld_I1:
+                    case OpCodeREnum.Ldfld_I2:
+                    case OpCodeREnum.Ldfld_I4:
+                    case OpCodeREnum.Ldfld_U1:
+                    case OpCodeREnum.Ldfld_U2:
+                    case OpCodeREnum.Ldfld_U4:
+                    case OpCodeREnum.Ldlen:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.IntType);
+                        break;
+                    case OpCodeREnum.Ldfld_I8:
+                    case OpCodeREnum.Ldfld_U8:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.LongType);
+                        break;
+                    case OpCodeREnum.Ldfld_R4:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.FloatType);
+                        break;
+                    case OpCodeREnum.Ldfld_R8:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.DoubleType);
+                        break;
+                }
+                body[i] = op;
+            }
+        }
+
+        IType[] BuildInitialRegisterTypes(short locVarRegStart, int totalRegCnt)
+        {
+            IType[] registerTypes = new IType[totalRegCnt];
+            int idx = 0;
+            if (method.HasThis)
+                registerTypes[idx++] = declaringType;
+            for (int i = 0; i < method.ParameterCount && idx < registerTypes.Length; i++, idx++)
+            {
+                registerTypes[idx] = appdomain.GetType(def.Parameters[i].ParameterType, declaringType, method);
+            }
+            for (int i = 0; i < def.Body.Variables.Count; i++)
+            {
+                int reg = locVarRegStart + i;
+                if (reg < registerTypes.Length)
+                    registerTypes[reg] = appdomain.GetType(def.Body.Variables[i].VariableType, declaringType, method);
+            }
+            return registerTypes;
+        }
+
+        static IType GetRegisterType(IType[] registerTypes, short reg)
+        {
+            if (reg >= 0 && reg < registerTypes.Length)
+                return registerTypes[reg];
+            return null;
+        }
+
+        static void SetRegisterType(IType[] registerTypes, short reg, IType type)
+        {
+            if (reg >= 0 && reg < registerTypes.Length)
+                registerTypes[reg] = type;
+        }
+
+        IType GetConvResultType(OpCodeREnum code)
+        {
+            switch (code)
+            {
+                case OpCodeREnum.Conv_I8:
+                    return appdomain.LongType;
+                case OpCodeREnum.Conv_U8:
+                    return appdomain.ULongType;
+                case OpCodeREnum.Conv_R4:
+                    return appdomain.FloatType;
+                case OpCodeREnum.Conv_R8:
+                case OpCodeREnum.Conv_R_Un:
+                    return appdomain.DoubleType;
+                case OpCodeREnum.Conv_U4:
+                case OpCodeREnum.Conv_U:
+                    return appdomain.UIntType;
+                default:
+                    return appdomain.IntType;
+            }
+        }
+
+        internal static NeoPrimitiveTypeTag InferPrimTag(IType t, Enviorment.AppDomain appdomain)
+        {
+            if (t == null)
+                return NeoPrimitiveTypeTag.I4;
+
+            // 解 enum 到 underlying type
+            if (t is ILType ilt && ilt.IsEnum)
+            {
+                var fts = ilt.FieldTypes;
+                if (fts != null && fts.Length > 0)
+                    t = fts[0];
+            }
+
+            // 通过 TypeForCLR 比对 CLR 基本类型
+            var clr = t.TypeForCLR;
+            if (clr == typeof(bool) || clr == typeof(byte) || clr == typeof(sbyte)
+                || clr == typeof(short) || clr == typeof(ushort) || clr == typeof(char)
+                || clr == typeof(int))
+                return NeoPrimitiveTypeTag.I4;
+            if (clr == typeof(uint))
+                return NeoPrimitiveTypeTag.U4;
+            if (clr == typeof(long))
+                return NeoPrimitiveTypeTag.I8;
+            if (clr == typeof(ulong))
+                return NeoPrimitiveTypeTag.U8;
+            if (clr == typeof(float))
+                return NeoPrimitiveTypeTag.R4;
+            if (clr == typeof(double))
+                return NeoPrimitiveTypeTag.R8;
+            if (clr == typeof(IntPtr) || clr == typeof(UIntPtr))
+                return IntPtr.Size == 8 ? NeoPrimitiveTypeTag.I8 : NeoPrimitiveTypeTag.I4;
+
+            // fallback
+            return NeoPrimitiveTypeTag.I4;
+        }
+
+        static OpCodeREnum NormalizeBranchOpcode(OpCodeREnum code)
+        {
+            switch (code)
+            {
+                case OpCodeREnum.Beq_S:
+                    return OpCodeREnum.Beq;
+                case OpCodeREnum.Bne_Un_S:
+                    return OpCodeREnum.Bne_Un;
+                case OpCodeREnum.Blt_S:
+                    return OpCodeREnum.Blt;
+                case OpCodeREnum.Blt_Un_S:
+                    return OpCodeREnum.Blt_Un;
+                case OpCodeREnum.Bgt_S:
+                    return OpCodeREnum.Bgt;
+                case OpCodeREnum.Bgt_Un_S:
+                    return OpCodeREnum.Bgt_Un;
+                case OpCodeREnum.Ble_S:
+                    return OpCodeREnum.Ble;
+                case OpCodeREnum.Ble_Un_S:
+                    return OpCodeREnum.Ble_Un;
+                case OpCodeREnum.Bge_S:
+                    return OpCodeREnum.Bge;
+                case OpCodeREnum.Bge_Un_S:
+                    return OpCodeREnum.Bge_Un;
+                default:
+                    return code;
+            }
+        }
+
+        static OpCodeREnum GetTypedBinaryOpcode(OpCodeREnum code, NeoPrimitiveTypeTag tag)
+        {
+            switch (tag)
+            {
+                case NeoPrimitiveTypeTag.I8:
+                case NeoPrimitiveTypeTag.U8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Add: return OpCodeREnum.Add_I8;
+                        case OpCodeREnum.Sub: return OpCodeREnum.Sub_I8;
+                        case OpCodeREnum.Mul: return OpCodeREnum.Mul_I8;
+                        case OpCodeREnum.Div: return OpCodeREnum.Div_I8;
+                        case OpCodeREnum.Div_Un: return OpCodeREnum.Div_Un_I8;
+                        case OpCodeREnum.Rem: return OpCodeREnum.Rem_I8;
+                        case OpCodeREnum.Rem_Un: return OpCodeREnum.Rem_Un_I8;
+                        case OpCodeREnum.And: return OpCodeREnum.And_I8;
+                        case OpCodeREnum.Or: return OpCodeREnum.Or_I8;
+                        case OpCodeREnum.Xor: return OpCodeREnum.Xor_I8;
+                        case OpCodeREnum.Shl: return OpCodeREnum.Shl_I8;
+                        case OpCodeREnum.Shr: return OpCodeREnum.Shr_I8;
+                        case OpCodeREnum.Shr_Un: return OpCodeREnum.Shr_Un_I8;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R4:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Add: return OpCodeREnum.Add_R4;
+                        case OpCodeREnum.Sub: return OpCodeREnum.Sub_R4;
+                        case OpCodeREnum.Mul: return OpCodeREnum.Mul_R4;
+                        case OpCodeREnum.Div: return OpCodeREnum.Div_R4;
+                        case OpCodeREnum.Rem: return OpCodeREnum.Rem_R4;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Add: return OpCodeREnum.Add_R8;
+                        case OpCodeREnum.Sub: return OpCodeREnum.Sub_R8;
+                        case OpCodeREnum.Mul: return OpCodeREnum.Mul_R8;
+                        case OpCodeREnum.Div: return OpCodeREnum.Div_R8;
+                        case OpCodeREnum.Rem: return OpCodeREnum.Rem_R8;
+                    }
+                    break;
+            }
+            return code;
+        }
+
+        static OpCodeREnum GetTypedUnaryOpcode(OpCodeREnum code, NeoPrimitiveTypeTag tag)
+        {
+            if (code == OpCodeREnum.Neg)
+            {
+                if (tag == NeoPrimitiveTypeTag.I8 || tag == NeoPrimitiveTypeTag.U8)
+                    return OpCodeREnum.Neg_I8;
+                if (tag == NeoPrimitiveTypeTag.R4)
+                    return OpCodeREnum.Neg_R4;
+                if (tag == NeoPrimitiveTypeTag.R8)
+                    return OpCodeREnum.Neg_R8;
+            }
+            else if (code == OpCodeREnum.Not && (tag == NeoPrimitiveTypeTag.I8 || tag == NeoPrimitiveTypeTag.U8))
+            {
+                return OpCodeREnum.Not_I8;
+            }
+            return code;
+        }
+
+        static OpCodeREnum GetTypedCompareOpcode(OpCodeREnum code, NeoPrimitiveTypeTag tag)
+        {
+            switch (tag)
+            {
+                case NeoPrimitiveTypeTag.I8:
+                case NeoPrimitiveTypeTag.U8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Ceq: return OpCodeREnum.Ceq_I8;
+                        case OpCodeREnum.Cgt: return OpCodeREnum.Cgt_I8;
+                        case OpCodeREnum.Cgt_Un: return OpCodeREnum.Cgt_Un_I8;
+                        case OpCodeREnum.Clt: return OpCodeREnum.Clt_I8;
+                        case OpCodeREnum.Clt_Un: return OpCodeREnum.Clt_Un_I8;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R4:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Ceq: return OpCodeREnum.Ceq_R4;
+                        case OpCodeREnum.Cgt: return OpCodeREnum.Cgt_R4;
+                        case OpCodeREnum.Cgt_Un: return OpCodeREnum.Cgt_Un_R4;
+                        case OpCodeREnum.Clt: return OpCodeREnum.Clt_R4;
+                        case OpCodeREnum.Clt_Un: return OpCodeREnum.Clt_Un_R4;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Ceq: return OpCodeREnum.Ceq_R8;
+                        case OpCodeREnum.Cgt: return OpCodeREnum.Cgt_R8;
+                        case OpCodeREnum.Cgt_Un: return OpCodeREnum.Cgt_Un_R8;
+                        case OpCodeREnum.Clt: return OpCodeREnum.Clt_R8;
+                        case OpCodeREnum.Clt_Un: return OpCodeREnum.Clt_Un_R8;
+                    }
+                    break;
+            }
+            return code;
+        }
+
+        static OpCodeREnum GetTypedBranchOpcode(OpCodeREnum code, NeoPrimitiveTypeTag tag)
+        {
+            if (tag == NeoPrimitiveTypeTag.I8 || tag == NeoPrimitiveTypeTag.U8)
+            {
+                switch (code)
+                {
+                    case OpCodeREnum.Beq: return OpCodeREnum.Beq_I8;
+                    case OpCodeREnum.Bne_Un: return OpCodeREnum.Bne_Un_I8;
+                    case OpCodeREnum.Blt: return OpCodeREnum.Blt_I8;
+                    case OpCodeREnum.Blt_Un: return OpCodeREnum.Blt_Un_I8;
+                    case OpCodeREnum.Bgt: return OpCodeREnum.Bgt_I8;
+                    case OpCodeREnum.Bgt_Un: return OpCodeREnum.Bgt_Un_I8;
+                    case OpCodeREnum.Ble: return OpCodeREnum.Ble_I8;
+                    case OpCodeREnum.Ble_Un: return OpCodeREnum.Ble_Un_I8;
+                    case OpCodeREnum.Bge: return OpCodeREnum.Bge_I8;
+                    case OpCodeREnum.Bge_Un: return OpCodeREnum.Bge_Un_I8;
+                }
+            }
+            if (tag == NeoPrimitiveTypeTag.R4)
+            {
+                switch (code)
+                {
+                    case OpCodeREnum.Beq: return OpCodeREnum.Beq_R4;
+                    case OpCodeREnum.Bne_Un: return OpCodeREnum.Bne_Un_R4;
+                    case OpCodeREnum.Blt: return OpCodeREnum.Blt_R4;
+                    case OpCodeREnum.Blt_Un: return OpCodeREnum.Blt_Un_R4;
+                    case OpCodeREnum.Bgt: return OpCodeREnum.Bgt_R4;
+                    case OpCodeREnum.Bgt_Un: return OpCodeREnum.Bgt_Un_R4;
+                    case OpCodeREnum.Ble: return OpCodeREnum.Ble_R4;
+                    case OpCodeREnum.Ble_Un: return OpCodeREnum.Ble_Un_R4;
+                    case OpCodeREnum.Bge: return OpCodeREnum.Bge_R4;
+                    case OpCodeREnum.Bge_Un: return OpCodeREnum.Bge_Un_R4;
+                }
+            }
+            if (tag == NeoPrimitiveTypeTag.R8)
+            {
+                switch (code)
+                {
+                    case OpCodeREnum.Beq: return OpCodeREnum.Beq_R8;
+                    case OpCodeREnum.Bne_Un: return OpCodeREnum.Bne_Un_R8;
+                    case OpCodeREnum.Blt: return OpCodeREnum.Blt_R8;
+                    case OpCodeREnum.Blt_Un: return OpCodeREnum.Blt_Un_R8;
+                    case OpCodeREnum.Bgt: return OpCodeREnum.Bgt_R8;
+                    case OpCodeREnum.Bgt_Un: return OpCodeREnum.Bgt_Un_R8;
+                    case OpCodeREnum.Ble: return OpCodeREnum.Ble_R8;
+                    case OpCodeREnum.Ble_Un: return OpCodeREnum.Ble_Un_R8;
+                    case OpCodeREnum.Bge: return OpCodeREnum.Bge_R8;
+                    case OpCodeREnum.Bge_Un: return OpCodeREnum.Bge_Un_R8;
+                }
+            }
+            return code;
+        }
+
+        static OpCodeREnum GetTypedImmediateBinaryOpcode(OpCodeREnum code, NeoPrimitiveTypeTag tag)
+        {
+            switch (tag)
+            {
+                case NeoPrimitiveTypeTag.I8:
+                case NeoPrimitiveTypeTag.U8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Addi: return OpCodeREnum.Addi_I8;
+                        case OpCodeREnum.Subi: return OpCodeREnum.Subi_I8;
+                        case OpCodeREnum.Muli: return OpCodeREnum.Muli_I8;
+                        case OpCodeREnum.Divi: return OpCodeREnum.Divi_I8;
+                        case OpCodeREnum.Divi_Un: return OpCodeREnum.Divi_Un_I8;
+                        case OpCodeREnum.Remi: return OpCodeREnum.Remi_I8;
+                        case OpCodeREnum.Remi_Un: return OpCodeREnum.Remi_Un_I8;
+                        case OpCodeREnum.Andi: return OpCodeREnum.Andi_I8;
+                        case OpCodeREnum.Ori: return OpCodeREnum.Ori_I8;
+                        case OpCodeREnum.Xori: return OpCodeREnum.Xori_I8;
+                        case OpCodeREnum.Shli: return OpCodeREnum.Shli_I8;
+                        case OpCodeREnum.Shri: return OpCodeREnum.Shri_I8;
+                        case OpCodeREnum.Shri_Un: return OpCodeREnum.Shri_Un_I8;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R4:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Addi: return OpCodeREnum.Addi_R4;
+                        case OpCodeREnum.Subi: return OpCodeREnum.Subi_R4;
+                        case OpCodeREnum.Muli: return OpCodeREnum.Muli_R4;
+                        case OpCodeREnum.Divi: return OpCodeREnum.Divi_R4;
+                        case OpCodeREnum.Remi: return OpCodeREnum.Remi_R4;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Addi: return OpCodeREnum.Addi_R8;
+                        case OpCodeREnum.Subi: return OpCodeREnum.Subi_R8;
+                        case OpCodeREnum.Muli: return OpCodeREnum.Muli_R8;
+                        case OpCodeREnum.Divi: return OpCodeREnum.Divi_R8;
+                        case OpCodeREnum.Remi: return OpCodeREnum.Remi_R8;
+                    }
+                    break;
+            }
+            return code;
+        }
+
+        static OpCodeREnum GetTypedImmediateCompareOpcode(OpCodeREnum code, NeoPrimitiveTypeTag tag)
+        {
+            switch (tag)
+            {
+                case NeoPrimitiveTypeTag.I8:
+                case NeoPrimitiveTypeTag.U8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Ceqi: return OpCodeREnum.Ceqi_I8;
+                        case OpCodeREnum.Cgti: return OpCodeREnum.Cgti_I8;
+                        case OpCodeREnum.Cgti_Un: return OpCodeREnum.Cgti_Un_I8;
+                        case OpCodeREnum.Clti: return OpCodeREnum.Clti_I8;
+                        case OpCodeREnum.Clti_Un: return OpCodeREnum.Clti_Un_I8;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R4:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Ceqi: return OpCodeREnum.Ceqi_R4;
+                        case OpCodeREnum.Cgti: return OpCodeREnum.Cgti_R4;
+                        case OpCodeREnum.Cgti_Un: return OpCodeREnum.Cgti_Un_R4;
+                        case OpCodeREnum.Clti: return OpCodeREnum.Clti_R4;
+                        case OpCodeREnum.Clti_Un: return OpCodeREnum.Clti_Un_R4;
+                    }
+                    break;
+                case NeoPrimitiveTypeTag.R8:
+                    switch (code)
+                    {
+                        case OpCodeREnum.Ceqi: return OpCodeREnum.Ceqi_R8;
+                        case OpCodeREnum.Cgti: return OpCodeREnum.Cgti_R8;
+                        case OpCodeREnum.Cgti_Un: return OpCodeREnum.Cgti_Un_R8;
+                        case OpCodeREnum.Clti: return OpCodeREnum.Clti_R8;
+                        case OpCodeREnum.Clti_Un: return OpCodeREnum.Clti_Un_R8;
+                    }
+                    break;
+            }
+            return code;
+        }
+
+        static OpCodeREnum GetTypedImmediateBranchOpcode(OpCodeREnum code, NeoPrimitiveTypeTag tag)
+        {
+            if (tag == NeoPrimitiveTypeTag.I8 || tag == NeoPrimitiveTypeTag.U8)
+            {
+                switch (code)
+                {
+                    case OpCodeREnum.Beqi: return OpCodeREnum.Beqi_I8;
+                    case OpCodeREnum.Bnei_Un: return OpCodeREnum.Bnei_Un_I8;
+                    case OpCodeREnum.Blti: return OpCodeREnum.Blti_I8;
+                    case OpCodeREnum.Blti_Un: return OpCodeREnum.Blti_Un_I8;
+                    case OpCodeREnum.Bgti: return OpCodeREnum.Bgti_I8;
+                    case OpCodeREnum.Bgti_Un: return OpCodeREnum.Bgti_Un_I8;
+                    case OpCodeREnum.Blei: return OpCodeREnum.Blei_I8;
+                    case OpCodeREnum.Blei_Un: return OpCodeREnum.Blei_Un_I8;
+                    case OpCodeREnum.Bgei: return OpCodeREnum.Bgei_I8;
+                    case OpCodeREnum.Bgei_Un: return OpCodeREnum.Bgei_Un_I8;
+                }
+            }
+            if (tag == NeoPrimitiveTypeTag.R4)
+            {
+                switch (code)
+                {
+                    case OpCodeREnum.Beqi: return OpCodeREnum.Beqi_R4;
+                    case OpCodeREnum.Bnei_Un: return OpCodeREnum.Bnei_Un_R4;
+                    case OpCodeREnum.Blti: return OpCodeREnum.Blti_R4;
+                    case OpCodeREnum.Blti_Un: return OpCodeREnum.Blti_Un_R4;
+                    case OpCodeREnum.Bgti: return OpCodeREnum.Bgti_R4;
+                    case OpCodeREnum.Bgti_Un: return OpCodeREnum.Bgti_Un_R4;
+                    case OpCodeREnum.Blei: return OpCodeREnum.Blei_R4;
+                    case OpCodeREnum.Blei_Un: return OpCodeREnum.Blei_Un_R4;
+                    case OpCodeREnum.Bgei: return OpCodeREnum.Bgei_R4;
+                    case OpCodeREnum.Bgei_Un: return OpCodeREnum.Bgei_Un_R4;
+                }
+            }
+            if (tag == NeoPrimitiveTypeTag.R8)
+            {
+                switch (code)
+                {
+                    case OpCodeREnum.Beqi: return OpCodeREnum.Beqi_R8;
+                    case OpCodeREnum.Bnei_Un: return OpCodeREnum.Bnei_Un_R8;
+                    case OpCodeREnum.Blti: return OpCodeREnum.Blti_R8;
+                    case OpCodeREnum.Blti_Un: return OpCodeREnum.Blti_Un_R8;
+                    case OpCodeREnum.Bgti: return OpCodeREnum.Bgti_R8;
+                    case OpCodeREnum.Bgti_Un: return OpCodeREnum.Bgti_Un_R8;
+                    case OpCodeREnum.Blei: return OpCodeREnum.Blei_R8;
+                    case OpCodeREnum.Blei_Un: return OpCodeREnum.Blei_Un_R8;
+                    case OpCodeREnum.Bgei: return OpCodeREnum.Bgei_R8;
+                    case OpCodeREnum.Bgei_Un: return OpCodeREnum.Bgei_Un_R8;
+                }
+            }
+            return code;
+        }
+
+        void LowerNeoOffsets(ref CompiledFrame frame)
+        {
+            if (frame.TotalStructSize > ushort.MaxValue)
+            {
+                throw new NotSupportedException(string.Format("Neo frame primitive size {0} exceeds maximum byte offset {1}.", frame.TotalStructSize, ushort.MaxValue));
+            }
+
+            var localInfos = frame.LocalInfos;
+            var body = frame.CodeBody;
+            for (int i = 0; i < body.Length; i++)
+            {
+                OpCodeR op = body[i];
+                bool handled = true;
+                switch (op.Code)
+                {
+                    case OpCodeREnum.Add:
+                    case OpCodeREnum.Sub:
+                    case OpCodeREnum.Mul:
+                    case OpCodeREnum.Div:
+                    case OpCodeREnum.Div_Un:
+                    case OpCodeREnum.Rem:
+                    case OpCodeREnum.Rem_Un:
+                    case OpCodeREnum.And:
+                    case OpCodeREnum.Or:
+                    case OpCodeREnum.Xor:
+                    case OpCodeREnum.Shl:
+                    case OpCodeREnum.Shr:
+                    case OpCodeREnum.Shr_Un:
+                    case OpCodeREnum.Ceq:
+                    case OpCodeREnum.Cgt:
+                    case OpCodeREnum.Cgt_Un:
+                    case OpCodeREnum.Clt:
+                    case OpCodeREnum.Clt_Un:
+                    case OpCodeREnum.Add_I8:
+                    case OpCodeREnum.Sub_I8:
+                    case OpCodeREnum.Mul_I8:
+                    case OpCodeREnum.Div_I8:
+                    case OpCodeREnum.Div_Un_I8:
+                    case OpCodeREnum.Rem_I8:
+                    case OpCodeREnum.Rem_Un_I8:
+                    case OpCodeREnum.And_I8:
+                    case OpCodeREnum.Or_I8:
+                    case OpCodeREnum.Xor_I8:
+                    case OpCodeREnum.Shl_I8:
+                    case OpCodeREnum.Shr_I8:
+                    case OpCodeREnum.Shr_Un_I8:
+                    case OpCodeREnum.Add_R4:
+                    case OpCodeREnum.Sub_R4:
+                    case OpCodeREnum.Mul_R4:
+                    case OpCodeREnum.Div_R4:
+                    case OpCodeREnum.Rem_R4:
+                    case OpCodeREnum.Add_R8:
+                    case OpCodeREnum.Sub_R8:
+                    case OpCodeREnum.Mul_R8:
+                    case OpCodeREnum.Div_R8:
+                    case OpCodeREnum.Rem_R8:
+                    case OpCodeREnum.Ceq_I8:
+                    case OpCodeREnum.Cgt_I8:
+                    case OpCodeREnum.Cgt_Un_I8:
+                    case OpCodeREnum.Clt_I8:
+                    case OpCodeREnum.Clt_Un_I8:
+                    case OpCodeREnum.Ceq_R4:
+                    case OpCodeREnum.Cgt_R4:
+                    case OpCodeREnum.Cgt_Un_R4:
+                    case OpCodeREnum.Clt_R4:
+                    case OpCodeREnum.Clt_Un_R4:
+                    case OpCodeREnum.Ceq_R8:
+                    case OpCodeREnum.Cgt_R8:
+                    case OpCodeREnum.Cgt_Un_R8:
+                    case OpCodeREnum.Clt_R8:
+                    case OpCodeREnum.Clt_Un_R8:
+                        LowerR1R2R3(ref op, localInfos);
+                        break;
+
+                    case OpCodeREnum.Neg:
+                    case OpCodeREnum.Not:
+                    case OpCodeREnum.Neg_I8:
+                    case OpCodeREnum.Not_I8:
+                    case OpCodeREnum.Neg_R4:
+                    case OpCodeREnum.Neg_R8:
+                    case OpCodeREnum.Move:
+                    case OpCodeREnum.Conv_I:
+                    case OpCodeREnum.Conv_I1:
+                    case OpCodeREnum.Conv_I2:
+                    case OpCodeREnum.Conv_I4:
+                    case OpCodeREnum.Conv_I8:
+                    case OpCodeREnum.Conv_R4:
+                    case OpCodeREnum.Conv_R8:
+                    case OpCodeREnum.Conv_R_Un:
+                    case OpCodeREnum.Conv_U:
+                    case OpCodeREnum.Conv_U1:
+                    case OpCodeREnum.Conv_U2:
+                    case OpCodeREnum.Conv_U4:
+                    case OpCodeREnum.Conv_U8:
+                    case OpCodeREnum.Addi:
+                    case OpCodeREnum.Subi:
+                    case OpCodeREnum.Muli:
+                    case OpCodeREnum.Divi:
+                    case OpCodeREnum.Divi_Un:
+                    case OpCodeREnum.Remi:
+                    case OpCodeREnum.Remi_Un:
+                    case OpCodeREnum.Andi:
+                    case OpCodeREnum.Ori:
+                    case OpCodeREnum.Xori:
+                    case OpCodeREnum.Shli:
+                    case OpCodeREnum.Shri:
+                    case OpCodeREnum.Shri_Un:
+                    case OpCodeREnum.Ceqi:
+                    case OpCodeREnum.Cgti:
+                    case OpCodeREnum.Cgti_Un:
+                    case OpCodeREnum.Clti:
+                    case OpCodeREnum.Clti_Un:
+                    case OpCodeREnum.Addi_I8:
+                    case OpCodeREnum.Subi_I8:
+                    case OpCodeREnum.Muli_I8:
+                    case OpCodeREnum.Divi_I8:
+                    case OpCodeREnum.Divi_Un_I8:
+                    case OpCodeREnum.Remi_I8:
+                    case OpCodeREnum.Remi_Un_I8:
+                    case OpCodeREnum.Andi_I8:
+                    case OpCodeREnum.Ori_I8:
+                    case OpCodeREnum.Xori_I8:
+                    case OpCodeREnum.Shli_I8:
+                    case OpCodeREnum.Shri_I8:
+                    case OpCodeREnum.Shri_Un_I8:
+                    case OpCodeREnum.Addi_R4:
+                    case OpCodeREnum.Subi_R4:
+                    case OpCodeREnum.Muli_R4:
+                    case OpCodeREnum.Divi_R4:
+                    case OpCodeREnum.Remi_R4:
+                    case OpCodeREnum.Addi_R8:
+                    case OpCodeREnum.Subi_R8:
+                    case OpCodeREnum.Muli_R8:
+                    case OpCodeREnum.Divi_R8:
+                    case OpCodeREnum.Remi_R8:
+                    case OpCodeREnum.Ceqi_I8:
+                    case OpCodeREnum.Cgti_I8:
+                    case OpCodeREnum.Cgti_Un_I8:
+                    case OpCodeREnum.Clti_I8:
+                    case OpCodeREnum.Clti_Un_I8:
+                    case OpCodeREnum.Ceqi_R4:
+                    case OpCodeREnum.Cgti_R4:
+                    case OpCodeREnum.Cgti_Un_R4:
+                    case OpCodeREnum.Clti_R4:
+                    case OpCodeREnum.Clti_Un_R4:
+                    case OpCodeREnum.Ceqi_R8:
+                    case OpCodeREnum.Cgti_R8:
+                    case OpCodeREnum.Cgti_Un_R8:
+                    case OpCodeREnum.Clti_R8:
+                    case OpCodeREnum.Clti_Un_R8:
+                        LowerR1R2(ref op, localInfos);
+                        break;
+
+                    case OpCodeREnum.Beq:
+                    case OpCodeREnum.Bne_Un:
+                    case OpCodeREnum.Blt:
+                    case OpCodeREnum.Blt_Un:
+                    case OpCodeREnum.Bgt:
+                    case OpCodeREnum.Bgt_Un:
+                    case OpCodeREnum.Ble:
+                    case OpCodeREnum.Ble_Un:
+                    case OpCodeREnum.Bge:
+                    case OpCodeREnum.Bge_Un:
+                    case OpCodeREnum.Beq_I8:
+                    case OpCodeREnum.Bne_Un_I8:
+                    case OpCodeREnum.Blt_I8:
+                    case OpCodeREnum.Blt_Un_I8:
+                    case OpCodeREnum.Bgt_I8:
+                    case OpCodeREnum.Bgt_Un_I8:
+                    case OpCodeREnum.Ble_I8:
+                    case OpCodeREnum.Ble_Un_I8:
+                    case OpCodeREnum.Bge_I8:
+                    case OpCodeREnum.Bge_Un_I8:
+                    case OpCodeREnum.Beq_R4:
+                    case OpCodeREnum.Bne_Un_R4:
+                    case OpCodeREnum.Blt_R4:
+                    case OpCodeREnum.Blt_Un_R4:
+                    case OpCodeREnum.Bgt_R4:
+                    case OpCodeREnum.Bgt_Un_R4:
+                    case OpCodeREnum.Ble_R4:
+                    case OpCodeREnum.Ble_Un_R4:
+                    case OpCodeREnum.Bge_R4:
+                    case OpCodeREnum.Bge_Un_R4:
+                    case OpCodeREnum.Beq_R8:
+                    case OpCodeREnum.Bne_Un_R8:
+                    case OpCodeREnum.Blt_R8:
+                    case OpCodeREnum.Blt_Un_R8:
+                    case OpCodeREnum.Bgt_R8:
+                    case OpCodeREnum.Bgt_Un_R8:
+                    case OpCodeREnum.Ble_R8:
+                    case OpCodeREnum.Ble_Un_R8:
+                    case OpCodeREnum.Bge_R8:
+                    case OpCodeREnum.Bge_Un_R8:
+                        LowerR1R2(ref op, localInfos);
+                        break;
+
+                    case OpCodeREnum.Brtrue:
+                    case OpCodeREnum.Brtrue_S:
+                    case OpCodeREnum.Brfalse:
+                    case OpCodeREnum.Brfalse_S:
+                        {
+                            short r1 = op.Register1;
+                            int size = localInfos[r1].Size;
+                            int off1 = localInfos[r1].Offset;
+                            op.Operand2 = size;
+                            op.DstOffset = (ushort)off1;
+                        }
+                        break;
+                    case OpCodeREnum.Beqi:
+                    case OpCodeREnum.Bnei_Un:
+                    case OpCodeREnum.Blti:
+                    case OpCodeREnum.Blti_Un:
+                    case OpCodeREnum.Bgti:
+                    case OpCodeREnum.Bgti_Un:
+                    case OpCodeREnum.Blei:
+                    case OpCodeREnum.Blei_Un:
+                    case OpCodeREnum.Bgei:
+                    case OpCodeREnum.Bgei_Un:
+                    case OpCodeREnum.Beqi_I8:
+                    case OpCodeREnum.Bnei_Un_I8:
+                    case OpCodeREnum.Blti_I8:
+                    case OpCodeREnum.Blti_Un_I8:
+                    case OpCodeREnum.Bgti_I8:
+                    case OpCodeREnum.Bgti_Un_I8:
+                    case OpCodeREnum.Blei_I8:
+                    case OpCodeREnum.Blei_Un_I8:
+                    case OpCodeREnum.Bgei_I8:
+                    case OpCodeREnum.Bgei_Un_I8:
+                    case OpCodeREnum.Beqi_R4:
+                    case OpCodeREnum.Bnei_Un_R4:
+                    case OpCodeREnum.Blti_R4:
+                    case OpCodeREnum.Blti_Un_R4:
+                    case OpCodeREnum.Bgti_R4:
+                    case OpCodeREnum.Bgti_Un_R4:
+                    case OpCodeREnum.Blei_R4:
+                    case OpCodeREnum.Blei_Un_R4:
+                    case OpCodeREnum.Bgei_R4:
+                    case OpCodeREnum.Bgei_Un_R4:
+                    case OpCodeREnum.Beqi_R8:
+                    case OpCodeREnum.Bnei_Un_R8:
+                    case OpCodeREnum.Blti_R8:
+                    case OpCodeREnum.Blti_Un_R8:
+                    case OpCodeREnum.Bgti_R8:
+                    case OpCodeREnum.Bgti_Un_R8:
+                    case OpCodeREnum.Blei_R8:
+                    case OpCodeREnum.Blei_Un_R8:
+                    case OpCodeREnum.Bgei_R8:
+                    case OpCodeREnum.Bgei_Un_R8:
+                    case OpCodeREnum.Initobj:
+                    case OpCodeREnum.Ldc_I4_M1:
+                    case OpCodeREnum.Ldc_I4_0:
+                    case OpCodeREnum.Ldc_I4_1:
+                    case OpCodeREnum.Ldc_I4_2:
+                    case OpCodeREnum.Ldc_I4_3:
+                    case OpCodeREnum.Ldc_I4_4:
+                    case OpCodeREnum.Ldc_I4_5:
+                    case OpCodeREnum.Ldc_I4_6:
+                    case OpCodeREnum.Ldc_I4_7:
+                    case OpCodeREnum.Ldc_I4_8:
+                    case OpCodeREnum.Ldc_I4:
+                    case OpCodeREnum.Ldc_I4_S:
+                    case OpCodeREnum.Ldc_I8:
+                    case OpCodeREnum.Ldc_R4:
+                    case OpCodeREnum.Ldc_R8:
+                        LowerR1(ref op, localInfos);
+                        break;
+                    case OpCodeREnum.Ret:
+                        if (op.Register1 >= 0)
+                            LowerR1(ref op, localInfos);
+                        break;
+                    case OpCodeREnum.Box:
+                    case OpCodeREnum.Unbox:
+                    case OpCodeREnum.Unbox_Any:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            int off1 = localInfos[r1].Offset;
+                            int off2 = localInfos[r2].Offset;
+                            int ref1 = localInfos[r1].RefOffset;
+                            int ref2 = localInfos[r2].RefOffset;
+                            op.DstOffset = (ushort)off1;
+                            op.SrcOffset = (ushort)off2;
+                            op.Operand3 = (ref1 << 16) | (ref2 & 0xffff);
+                        }
+                        break;
+                    case OpCodeREnum.Br:
+                    case OpCodeREnum.Br_S:
+                    case OpCodeREnum.Nop:
+                        break;
+                    default:
+                        handled = false;
+                        break;
+                }
+                WarnUnhandledNeoLoweringOpcode(op.Code, handled);
+                body[i] = op;
+            }
+        }
+
+        static void LowerR1(ref OpCodeR op, StackSlotInfo[] localInfos)
+        {
+            short r1 = op.Register1;
+            int off1 = localInfos[r1].Offset;
+            op.DstOffset = (ushort)off1;
+        }
+
+        static void LowerR1R2(ref OpCodeR op, StackSlotInfo[] localInfos)
+        {
+            short r1 = op.Register1;
+            short r2 = op.Register2;
+            int off1 = localInfos[r1].Offset;
+            int off2 = localInfos[r2].Offset;
+            op.DstOffset = (ushort)off1;
+            op.SrcOffset = (ushort)off2;
+        }
+
+        static void LowerR1R2R3(ref OpCodeR op, StackSlotInfo[] localInfos)
+        {
+            short r1 = op.Register1;
+            short r2 = op.Register2;
+            short r3 = op.Register3;
+            int off1 = localInfos[r1].Offset;
+            int off2 = localInfos[r2].Offset;
+            int off3 = localInfos[r3].Offset;
+            op.DstOffset = (ushort)off1;
+            op.SrcOffset = (ushort)off2;
+            op.Register3 = unchecked((short)off3);
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        static void WarnUnhandledNeoLoweringOpcode(OpCodeREnum code, bool handled)
+        {
+            if (!handled)
+                System.Diagnostics.Debug.WriteLine(string.Format("Neo lowering skipped opcode {0}.", code));
+        }
+
         void AllocateLocalStackSpaces(ref CompiledFrame frame)
         {
             var body = def.Body;
@@ -490,8 +1418,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             int localsRefStart = refOffset;
 
             // 2) Local slots
-            StackSlotInfo[] localInfo = new StackSlotInfo[varCnt + frame.StackRegisterCount];
+            int baseRegStart = paramCnt + varCnt;
+            int locVarRegStart = paramCnt;
+            StackSlotInfo[] localInfo = new StackSlotInfo[paramCnt + varCnt + frame.StackRegisterCount];
             bool[] localIsRef = new bool[localInfo.Length];
+            for (int i = 0; i < paramCnt; i++)
+            {
+                localInfo[i] = paramInfo[i];
+            }
             for (int i = 0; i < varCnt; i++)
             {
                 var vt = body.Variables[i].VariableType;
@@ -536,10 +1470,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     slot.Size = size;
                     offset += size;
                 }
-                localInfo[i] = slot;
+                localInfo[locVarRegStart + i] = slot;
             }
             var valueTypes = GatherValueTypes(ref frame);
-            int maxSize = 0, maxRefCount = 1;
+            int maxSize = 8, maxRefCount = 1;
             foreach (var i in valueTypes)
             {
                 if (i is ILType il)
@@ -560,7 +1494,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 slot.Size = maxSize;
                 offset += maxSize;
                 refOffset += maxRefCount;
-                localInfo[varCnt + i] = slot;
+                localInfo[baseRegStart + i] = slot;
             }
             frame.LocalInfos = localInfo;
             frame.LocalIsReference = localIsRef;

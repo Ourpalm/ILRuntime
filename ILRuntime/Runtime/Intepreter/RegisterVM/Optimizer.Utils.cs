@@ -22,6 +22,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Sub:
                 case OpCodeREnum.Mul:
                 case OpCodeREnum.Div:
+                case OpCodeREnum.Div_Un:
                 case OpCodeREnum.Rem:
                 case OpCodeREnum.Rem_Un:
                 case OpCodeREnum.And:
@@ -69,6 +70,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Subi:
                 case OpCodeREnum.Muli:
                 case OpCodeREnum.Divi:
+                case OpCodeREnum.Divi_Un:
                 case OpCodeREnum.Remi:
                 case OpCodeREnum.Remi_Un:
                 case OpCodeREnum.Andi:
@@ -160,6 +162,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     return OpCodeREnum.Muli;
                 case OpCodeREnum.Div:
                     return OpCodeREnum.Divi;
+                case OpCodeREnum.Div_Un:
+                    return OpCodeREnum.Divi_Un;
                 case OpCodeREnum.Rem:
                     return OpCodeREnum.Remi;
                 case OpCodeREnum.Rem_Un:
@@ -627,6 +631,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Subi:
                 case OpCodeREnum.Muli:
                 case OpCodeREnum.Divi:
+                case OpCodeREnum.Divi_Un:
                 case OpCodeREnum.Remi:
                 case OpCodeREnum.Remi_Un:
                 case OpCodeREnum.Andi:
@@ -899,6 +904,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Subi:
                 case OpCodeREnum.Muli:
                 case OpCodeREnum.Divi:
+                case OpCodeREnum.Divi_Un:
                 case OpCodeREnum.Remi:
                 case OpCodeREnum.Remi_Un:
                 case OpCodeREnum.Andi:
@@ -1015,6 +1021,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Subi:
                 case OpCodeREnum.Muli:
                 case OpCodeREnum.Divi:
+                case OpCodeREnum.Divi_Un:
                 case OpCodeREnum.Remi:
                 case OpCodeREnum.Remi_Un:
                 case OpCodeREnum.Andi:
@@ -1361,6 +1368,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Subi:
                 case OpCodeREnum.Muli:
                 case OpCodeREnum.Divi:
+                case OpCodeREnum.Divi_Un:
                 case OpCodeREnum.Remi:
                 case OpCodeREnum.Remi_Un:
                 case OpCodeREnum.Andi:
