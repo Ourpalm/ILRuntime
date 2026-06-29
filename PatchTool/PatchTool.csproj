@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net8.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net8.0;netcoreapp3.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 

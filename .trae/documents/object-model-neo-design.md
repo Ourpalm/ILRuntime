@@ -7,6 +7,31 @@
 
 ---
 
+## 0. .NET 兼容性约束
+
+| 模式 | 目标框架 | 说明 |
+|------|---------|------|
+| **Legacy** | .NET Standard 2.0 | 所有 Legacy 路径代码必须严格使用 .NET Standard 2.0 兼容 API |
+| **Neo** | .NET Standard 2.1 | Neo 模式专用代码可使用 .NET Standard 2.1 API（如 `Span<T>`、`MemoryMarshal`、`Unsafe` 内建支持等） |
+
+Neo 模式下常用的关键 API 及其兼容性：
+
+| API | .NET Standard 2.1 | 说明 |
+|-----|-------------------|------|
+| `MemoryMarshal.GetReference(Span<T>)` | 原生可用 | 用于获取 `byte[]` 首元素 ref |
+| `Unsafe.InitBlock / CopyBlock` | 原生可用 | 帧初始化、值类型拷贝 |
+| `Unsafe.Add<T>(ref T, int)` | 原生可用 | ref 指针运算 |
+| `Unsafe.Unbox<T>(object)` | 原生可用 | CLR struct in-place 方法调用 |
+| `Unsafe.ReadUnaligned<T>` | 原生可用 | 安全读取非对齐数据 |
+| `ManualResetValueTaskSourceCore<T>` | 原生可用 | Async 桥接 |
+| `IValueTaskSource<T>` | 原生可用 | ValueTask 自定义实现 |
+
+**注意**：`MemoryMarshal.GetArrayDataReference<T>(T[])` 仅在 .NET 5+ 可用，**不可使用**。替代方案为 `MemoryMarshal.GetReference(arr.AsSpan())`。
+
+Unity 2022 使用 .NET Standard 2.1 profile（基于 CoreCLR），上述 API 均可用。
+
+---
+
 ## 1. 当前架构的性能瓶颈分析
 
 ### 1.1 Call 指令的模式转换开销
@@ -292,7 +317,7 @@ RuntimeStack.nativePointer 内的布局:
 
 ```
 堆对象 (ILTypeInstance):
-  byte[] Primitives     → MemoryMarshal.GetArrayDataReference() 得到 baseAddr
+  byte[] Primitives     → MemoryMarshal.GetReference(Primitives.AsSpan()) 得到 baseAddr
   AutoList ManagedObjects → refs[index]
 
 栈局部变量 (Neo 帧):
@@ -336,8 +361,8 @@ case Ldfld_I4:
     // ip->Register2 = 对象变量在帧中的 byte 偏移（该位置存储 mStack 绝对 index）
     int objIndex = *(int*)(frameBase + ip->Register2);
     ilInstance = (ILTypeInstance)mStack[objIndex];
-    byte* baseAddr = Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(ilInstance.Primitives));
-    *(int*)(frameBase + ip->Register1) = *(int*)(baseAddr + ip->Operand2);
+    ref byte baseAddr = ref MemoryMarshal.GetReference(ilInstance.Primitives.AsSpan());
+    *(int*)(frameBase + ip->Register1) = Unsafe.ReadUnaligned<int>(ref Unsafe.Add(ref baseAddr, ip->Operand2));
     break;
 ```
 
