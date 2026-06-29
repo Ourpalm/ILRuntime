@@ -47,6 +47,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public int ReturnPrimitiveSize;
         public int ReturnRefCount;
         public bool[] LocalIsReference;
+        // Body executed by ExecuteNeo. Same opcode shape as CodeBody but with
+        // Register1/2/3 lowered to byte offsets via LowerNeoOffsets. CodeBody
+        // itself stays in register-index form so inliner / debugger / future
+        // AOT serialization can keep operating on a stable representation.
+        public OpCodeR[] NeoExecuteBody;
 #endif
     }
     struct JITCompiler
@@ -442,6 +447,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             frame.CodeBody = res.ToArray();
 #if ENABLE_NEO_MODE
             AllocateLocalStackSpaces(ref frame);
+            // Keep frame.CodeBody in register-index form (used by inliner,
+            // debugger, optimization passes when this method is later inlined).
+            // ExecuteNeo runs against a lowered copy where Register1/2/3 hold
+            // byte offsets after LowerNeoOffsets.
+            frame.NeoExecuteBody = (OpCodeR[])frame.CodeBody.Clone();
             LowerNeoOffsets(ref frame);
 #endif
 
@@ -1043,7 +1053,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
             var localInfos = frame.LocalInfos;
-            var body = frame.CodeBody;
+            var body = frame.NeoExecuteBody;
             for (int i = 0; i < body.Length; i++)
             {
                 OpCodeR op = body[i];

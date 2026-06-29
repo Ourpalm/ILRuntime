@@ -40,7 +40,7 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             unhandledException = false;
 
-            OpCodeR[] body = method.BodyRegister;
+            OpCodeR[] body = method.NeoFrame.NeoExecuteBody;
             AutoList mStack = stack.ManagedStack;
             ref readonly var nf = ref method.NeoFrame;
             int frameSize = nf.TotalStructSize;
