@@ -848,16 +848,55 @@ case Call_Neo:
 
 ## 14. 编译模式与兼容性策略（已确定）
 
-### 14.1 双模式共存
+### 14.1 三层模式架构
 
-Codebase 需要同时支持两种运行模式：
+Codebase 同时支持 Legacy 和 Neo 两种运行模式，Neo 模式内部支持 JIT 和 AOT 两种编译路径：
 
-| 模式 | 编译宏 | Object Model | 解释器 | 适用场景 |
-|------|--------|-------------|--------|---------|
-| Legacy | 未定义 `ENABLE_NEO_MODE` | 旧 StackObject 模型 | ExecuteR / Execute | 默认行为，向后兼容 |
-| Neo | 定义 `ENABLE_NEO_MODE` | 新 byte* 紧凑模型 | ExecuteNeo | 显式启用，追求极致性能 |
+| 模式 | 编译宏 | Object Model | 解释器 | 编译方式 | 适用场景 |
+|------|--------|-------------|--------|---------|---------|
+| Legacy | 未定义 `ENABLE_NEO_MODE` | 旧 StackObject 模型 | ExecuteR / Execute | 现有 JIT | 默认行为，向后兼容 |
+| Neo JIT | 定义 `ENABLE_NEO_MODE` | 新 byte* 紧凑模型 | ExecuteNeo | 改造后的 JIT（运行时） | 开发调试、热更新 |
+| Neo AOT | 定义 `ENABLE_NEO_MODE` | 新 byte* 紧凑模型 | ExecuteNeo | ilrt_neoc 预编译 | 极致启动速度、无 Cecil 依赖 |
 
-### 14.2 编译宏规则
+### 14.2 Neo JIT 与 Neo AOT 的关系
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     ENABLE_NEO_MODE                      │
+│                                                         │
+│  ┌─── Neo JIT ───┐     ┌─── Neo AOT ───────────┐      │
+│  │ DLL (Cecil)   │     │ .neo 文件 (预编译产出) │      │
+│  │     │         │     │     │                  │      │
+│  │     ▼         │     │     ▼                  │      │
+│  │ JITCompiler   │     │ Runtime Loader         │      │
+│  │ (运行时编译)  │     │ (反序列化 + 绑定)      │      │
+│  │     │         │     │     │                  │      │
+│  └─────┼─────────┘     └─────┼──────────────────┘      │
+│        │                      │                         │
+│        ▼                      ▼                         │
+│     OpCodeR[] + CompiledFrame + VTable                  │
+│        │                                                │
+│        ▼                                                │
+│     ExecuteNeo (统一解释器)                              │
+└─────────────────────────────────────────────────────────┘
+```
+
+**设计原则**：
+- Neo JIT 功能完整——不依赖 .neo 文件即可运行所有 IL 代码
+- Neo AOT 是纯优化层，把 JIT 编译工作提前到构建期
+- 两种路径产出的 OpCodeR[] 语义完全一致，ExecuteNeo 无需区分来源
+- VTable、接口偏移表等元数据在 JIT 模式下运行时构建（从 Cecil），在 AOT 模式下从 .neo 文件加载
+
+**Neo AOT 相对 JIT 的优势**：
+- 消除首次方法调用的 JIT 编译延迟
+- 运行时无需加载 Cecil DLL 和解析程序集元数据，减少内存占用
+- 泛型方法使用模板+Patch 机制，减少预编译体积（多个引用类型实例化共享同一份模板）
+
+**Cecil 依赖**：
+- Neo JIT 模式下 Cecil 仍然加载，`ILType.TypeDefinition` 等引用正常存在，运行时元数据访问路径不变
+- Neo AOT 模式下无 Cecil，`ILType`/`ILMethod` 通过 .neo 元数据表初始化（双路径构造）
+
+### 14.3 编译宏规则
 
 **宏名**：`ENABLE_NEO_MODE`
 
@@ -866,15 +905,17 @@ Codebase 需要同时支持两种运行模式：
 ```csharp
 // 典型用法
 #if ENABLE_NEO_MODE
-    // Neo 模式代码路径
+    // Neo 模式代码路径（JIT 和 AOT 共用）
 #else
     // Legacy 模式代码路径
 #endif
 ```
 
-### 14.3 互斥保护
+Neo JIT 和 Neo AOT 不通过编译宏区分——它们是运行时行为差异（加载 DLL 走 JIT，加载 .neo 走 AOT），代码路径在 `AppDomain.LoadAssembly` / `AppDomain.LoadNeoAssembly` 层面分叉。
 
-`USE_OLD_OBJ_MODEL` 宏不再保留。`ENABLE_NEO_MODE` 同时控制 Object Model 和解释器：Neo 模式使用新 Object Model（byte[] Primitives）+ ExecuteNeo，Legacy 模式使用旧 StackObject[] 模型 + ExecuteR（见 14.5 节）。
+### 14.4 互斥保护
+
+`USE_OLD_OBJ_MODEL` 宏不再保留。`ENABLE_NEO_MODE` 同时控制 Object Model 和解释器：Neo 模式使用新 Object Model（byte[] Primitives）+ ExecuteNeo，Legacy 模式使用旧 StackObject[] 模型 + ExecuteR（见 14.6 节）。
 
 运行时保护：
 - Neo 模式下调用 `ExecuteR`/`Execute`（Legacy 入口）→ 抛异常
@@ -882,7 +923,7 @@ Codebase 需要同时支持两种运行模式：
 - Neo 模式下注册旧版 `CLRRedirectionDelegate` → 抛异常
 - Legacy 模式下注册 `CLRRedirectionDelegateNeo` → 抛异常
 
-### 14.4 代码组织建议
+### 14.5 代码组织建议
 
 ```
 ILIntepreter.cs              // 共享代码（帧管理、异常处理基础设施）
@@ -891,7 +932,7 @@ ILIntepreter.Neo.cs          // Neo 模式 ExecuteNeo 实现（#if ENABLE_NEO_MO
 ILTypeInstance.cs            // #if ENABLE_NEO_MODE 切换新旧 Object Model
 ```
 
-### 14.5 Object Model 与解释器模式的关系
+### 14.6 Object Model 与解释器模式的关系
 
 新 Object Model（byte[] Primitives + AutoList ManagedObjects）**仅在 Neo 模式下启用**。Legacy 模式保持原有的 StackObject[] 字段存储，避免性能退化。
 
@@ -907,7 +948,7 @@ ILTypeInstance.cs            // #if ENABLE_NEO_MODE 切换新旧 Object Model
 
 原因：新 Object Model 的值类型字段用紧凑 byte[] 存储，但 Legacy 栈上值类型格式为 StackObject[] 展开。如果混用，每次 Ldfld/Stfld 值类型字段都需要格式转换（紧凑 ↔ 展开），带来性能退化。因此两种模式各自使用匹配的 Object Model，保持内部格式一致性。
 
-### 14.6 待清理：ILIntepreter.Register.cs 中的新 Object Model 代码
+### 14.7 待清理：ILIntepreter.Register.cs 中的新 Object Model 代码
 
 当前 `ILIntepreter.Register.cs` 中存在 `#if !USE_OLD_OBJ_MODEL` 条件下的新 Object Model 代码路径（Ldfld/Stfld 等指令的 byte[] Primitives 访问逻辑）。既然 Legacy 模式确定不使用新 Object Model，这些代码应在后续开发中清理：
 
