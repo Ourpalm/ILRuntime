@@ -14,11 +14,13 @@ using System.Runtime.CompilerServices;
 
 namespace ILRuntime.CLR.TypeSystem
 {
+#if ENABLE_NEO_MODE
     internal struct ILTypeFieldOffset
     {
         public int PrimitiveOffset;
         public int ReferenceOffset;
     }
+#endif
     public sealed class ILType : IType
     {
         Dictionary<string, List<ILMethod>> methods;
@@ -29,7 +31,9 @@ namespace ILRuntime.CLR.TypeSystem
         ILMethod staticConstructor;
         List<ILMethod> constructors;
         IType [] fieldTypes;
+#if ENABLE_NEO_MODE
         ILTypeFieldOffset[] fieldOffsets;
+#endif
         FieldReference[] fieldReferences;
         FieldDefinition[] fieldDefinitions;
         IType[] staticFieldTypes;
@@ -64,8 +68,10 @@ namespace ILRuntime.CLR.TypeSystem
         int valuetypeFieldCount, valuetypeManagedCount;
         bool valuetypeSizeCalculated;
         ValueTypeInitInfo vtInitInfo;
+#if ENABLE_NEO_MODE
         int totalPrimitiveSize = -1;
         int totalReferenceCnt = -1;
+#endif
 
         public IMethod ToStringMethod
         {
@@ -304,6 +310,7 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
+#if ENABLE_NEO_MODE
         public int TotalPrimitiveSize
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -329,6 +336,7 @@ namespace ILRuntime.CLR.TypeSystem
                 return totalReferenceCnt;
             }
         }
+#endif
 
         internal List<ILType> GenericInstances
         {
@@ -1209,6 +1217,7 @@ namespace ILRuntime.CLR.TypeSystem
             return -1;
         }
 
+#if ENABLE_NEO_MODE
         internal ILTypeFieldOffset GetFieldOffset(object token)
         {
             var idx = GetFieldIndex(token);
@@ -1224,6 +1233,7 @@ namespace ILRuntime.CLR.TypeSystem
                 return fieldOffsets[idx - FieldStartIndex];
             }
         }
+#endif
 
         public IType GetField(string name, out int fieldIdx)
         {
@@ -1282,14 +1292,18 @@ namespace ILRuntime.CLR.TypeSystem
                 return;
             }
             fieldTypes = new IType [ definition.Fields.Count ];
+#if ENABLE_NEO_MODE
             fieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
+#endif
             fieldReferences = new FieldReference[definition.Fields.Count];
             fieldDefinitions = new FieldDefinition[definition.Fields.Count];
             var fields = definition.Fields;
             int idx = FieldStartIndex;
             int idxStatic = 0;
+#if ENABLE_NEO_MODE
             int primitiveOffset = 0;
             int referenceOffset = 0;
+#endif
             for (int i = 0; i < fields.Count; i++)
             {
                 var field = fields[i];
@@ -1345,6 +1359,7 @@ namespace ILRuntime.CLR.TypeSystem
                         enumType = fieldType;
                     }
 
+#if ENABLE_NEO_MODE
                     if (fieldType.IsPrimitive)
                     {
                         fieldOffsets[idx - FieldStartIndex] = new ILTypeFieldOffset()
@@ -1376,15 +1391,18 @@ namespace ILRuntime.CLR.TypeSystem
                             referenceOffset++;
                         }
                     }
+#endif
                     idx++;
                 }
             }
             Array.Resize ( ref fieldTypes, idx - FieldStartIndex );
             Array.Resize ( ref fieldDefinitions, idx - FieldStartIndex );
+#if ENABLE_NEO_MODE
             Array.Resize(ref fieldOffsets, idx - FieldStartIndex );
 
             totalPrimitiveSize = primitiveOffset;
             totalReferenceCnt = referenceOffset;
+#endif
 
             if ( staticFieldTypes != null )
             {

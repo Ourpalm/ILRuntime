@@ -1801,6 +1801,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
         }
 
+#if ENABLE_NEO_MODE
         internal ILTypeFieldOffset GetFieldOffset(object token, IType contextType, IMethod contextMethod, out IType type, out IType fieldType)
         {
             FieldReference f = token as FieldReference;
@@ -1877,6 +1878,7 @@ namespace ILRuntime.Runtime.Enviorment
             else
                 throw new NotImplementedException();
         }
+#endif
 
         internal long CacheString(object token)
         {
