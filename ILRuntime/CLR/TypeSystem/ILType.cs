@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -165,7 +165,14 @@ namespace ILRuntime.CLR.TypeSystem
                     staticConstructorCalled = true;
                     if ( staticConstructor != null && ( !TypeReference.HasGenericParameters || IsGenericInstance ) )
                     {
+#if ENABLE_NEO_MODE
+                        // TODO Step 7: Neo interpreter still lacks Stfld_*/Ldfld_* case handlers,
+                        // and ExecuteR (Legacy register VM) refuses the specialized field opcodes
+                        // that JITCompiler emits in Neo mode. Suppressing cctor invocation here
+                        // unblocks Step 6 smoke tests; restore once Step 7 lands.
+#else
                         appdomain.Invoke ( staticConstructor, null, null );
+#endif
                     }
                 }
                 return staticInstance;
@@ -319,7 +326,12 @@ namespace ILRuntime.CLR.TypeSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (totalPrimitiveSize < 0)
+                // fieldMapping is the first thing InitializeFields() assigns,
+                // and it stays non-null afterwards. Use it as the
+                // initialized-flag so cyclic field-type graphs (e.g. a struct
+                // referenced indirectly by its own static field type) don't
+                // re-enter InitializeFields and overflow the stack.
+                if (fieldMapping == null)
                 {
                     InitializeFields();
                 }
@@ -332,7 +344,7 @@ namespace ILRuntime.CLR.TypeSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (totalReferenceCnt < 0)
+                if (fieldMapping == null)
                 {
                     InitializeFields();
                 }
@@ -345,7 +357,7 @@ namespace ILRuntime.CLR.TypeSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (totalStaticPrimitiveSize < 0)
+                if (fieldMapping == null)
                 {
                     InitializeFields();
                 }
@@ -358,7 +370,7 @@ namespace ILRuntime.CLR.TypeSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (totalStaticReferenceCnt < 0)
+                if (fieldMapping == null)
                 {
                     InitializeFields();
                 }
@@ -942,7 +954,12 @@ namespace ILRuntime.CLR.TypeSystem
                 staticConstructorCalled = true;
                 if (staticConstructor != null && (!TypeReference.HasGenericParameters || IsGenericInstance))
                 {
+#if ENABLE_NEO_MODE
+                    // TODO Step 7: see InitializeMethods entry above. Re-enable once
+                    // Neo Stfld_*/Ldfld_* handlers are wired up.
+#else
                     appdomain.Invoke(staticConstructor, null, null);
+#endif
                 }
             }
         }

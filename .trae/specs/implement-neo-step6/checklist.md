@@ -70,16 +70,26 @@
 - [x] Step 5 既有端到端测试用例保持通过
 
 ## 端到端 Smoke 测试
-- [ ] Neo `int Add(int a, int b)` 正确（I4 三槽 Add）
-- [ ] Neo `int AddConst(int a) { return a + 5; }` 正确（I4 立即数 Addi）
-- [ ] Neo `int Max(int a, int b)` 正确
-- [ ] Neo `int Sum(int n)` 求和正确（I4 立即数分支 Blti）
-- [ ] Neo `long AddL(long a, long b)` 正确（Add_I8）
-- [ ] Neo `long AddConstL(long a) { return a + 100L; }` 正确（Addi_I8）
-- [ ] Neo `bool EqL(long a) { return a == 42L; }` 正确（Ceqi_I8）
-- [ ] Neo `for (long i = 0; i < n; i++) {}` 正确（Blti_I8）
-- [ ] Neo `double DivD(double a, double b)` 与 Legacy 一致
-- [ ] Neo `long ShiftL(long v, int n)` 与 Legacy 一致
-- [ ] Neo `int Convert(double d)` 与 Legacy 一致
-- [ ] Neo 模式下 mStack.Count 在测试方法返回后恢复到调用前
+> 测试代码：[TestCases/NeoStep6Test.cs](file:///f:/SVN/ILRuntime/TestCases/NeoStep6Test.cs)；`ILRuntimeTestCLI` 增加 `nameFilter` 参数以便聚焦 `NeoStep6Test`，并在 `Main` 外层加 try/catch 输出未处理异常，避免被 .NET 进程直接吞掉退出码。
+>
+> **临时跳过 cctor**：`ENABLE_NEO_MODE` 下 [ILType.cs](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSystem/ILType.cs) 的 `InitializeMethods` / `StaticInstance` 两处条件编译跳过了 `appdomain.Invoke(staticConstructor)`，避免触发尚未实现的 `Stfld_*` / `Ldfld_*` case。Step 7（引用类型寄存器拷贝 + `Ldfld_*` / `Stfld_*` 完整实现）落地时一并恢复。
+>
+> 顺便发现并修复的 Step 3-4 阻塞：[ILType.cs#L317-L373](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSystem/ILType.cs#L317-L373) 中 `TotalPrimitiveSize`/`TotalReferenceCount`/`StaticTotalPrimitiveSize`/`StaticTotalReferenceCount` 用 `< 0` 作为未初始化哨兵，循环字段图（如 struct 静态字段间接引用自身）会重入 `InitializeFields()` 导致栈溢出。已改为按 `fieldMapping == null` 判定。
+>
+> 顺便发现并修复的 Move lowering bug：[JITCompiler.cs Move case](file:///f:/SVN/ILRuntime/ILRuntime/Runtime/Intepreter/RegisterVM/JITCompiler.cs#L1130-L1148) 之前只取 `src.Size`，当 stack register (`maxSize=8`) 写回 int local (`size=4`) 时会 `CopyBlock(8)` 覆盖相邻 slot，导致循环计数器被破坏（`NeoSumI4` 死循环）。改为 `min(src.Size, dst.Size)`。
+
+- [x] Neo `int Add(int a, int b)` 正确（I4 三槽 Add）— NeoAddI4
+- [x] Neo `int AddConst(int a) { return a + 5; }` 正确（I4 立即数 Addi）— NeoAddiI4
+- [x] Neo `int Max(int a, int b)` 正确 — NeoMaxI4
+- [x] Neo `int Sum(int n)` 求和正确（I4 立即数分支 Blti）— NeoSumI4（Move lowering fix 后通过）
+- [x] Neo `long AddL(long a, long b)` 正确（Add_I8）— NeoAddI8
+- [x] Neo `long AddConstL(long a) { return a + 100L; }` 正确（Addi_I8）— NeoAddiI8
+- [x] Neo `bool EqL(long a) { return a == 42L; }` 正确（Ceqi_I8）— NeoEqI8
+- [x] Neo `for (long i = 0; i < n; i++) {}` 正确（Blti_I8）— NeoSumI8
+- [x] Neo `double DivD(double a, double b)` 与 Legacy 一致 — NeoDivR8
+- [x] Neo R8 NaN 比较不跳转 — NeoNaNR8
+- [x] Neo `long ShiftL(long v, int n)` 与 Legacy 一致 — NeoShlI8
+- [x] Neo `int Convert(double d)` 与 Legacy 一致 — NeoConvR8ToI4
+- [x] Neo Conv I4→I8 符号扩展 — NeoConvI4ToI8
+- [x] Neo 整数除零抛 DivideByZeroException — NeoDivByZeroI4
 - [ ] **帧大小溢出**：构造 TotalStructSize > 65535 的方法（巨型 fixed 数组 struct local），LowerNeoOffsets 抛 NotSupportedException

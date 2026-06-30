@@ -296,6 +296,15 @@ Neo AOT 工具链（纯优化层，不影响功能正确性）:
 6. 堆对象字段访问（`Ldfld_*` / `Stfld_*` 非 Inline 变体）：
    - 从帧读 mStack index → 取出 ILTypeInstance → 通过 Primitives/ManagedObjects 读写字段
 
+### 7z. Step 6 cctor 回归恢复
+
+Step 6 smoke 临时在 [ILType.cs](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSystem/ILType.cs) 的 `InitializeMethods` / `StaticInstance` 两处条件编译跳过了 `appdomain.Invoke(staticConstructor)`，原因是 JITCompiler 在 Neo 模式下会为静态构造函数生成 `Stfld_I8` / `Ldfld_*` 等 Step 5 引入的特化字段访问指令，但 Step 5 当时只重构了对象模型，没把这些 case 接到解释器。
+
+本步骤实现完整的 `Stfld_*` / `Ldfld_*` case handler 之后：
+1. 删除 [ILType.cs](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSystem/ILType.cs) 中两处 `#if ENABLE_NEO_MODE` 跳过 cctor 的分支，恢复无条件调用
+2. 重跑 Step 6 整组 smoke（`NeoStep6Test` 14 个用例）确认 cctor 触发不破坏任何已通过的算术/分支/常量加载场景
+3. 加跑一个新的最小 cctor 用例：定义 `class C { static int X = 42; }`，验证 `C.X` 读到 42（端到端验证 ldsfld + cctor 触发链）
+
 **依赖**: Step 6
 
 **验证方式**:
@@ -303,6 +312,7 @@ Neo AOT 工具链（纯优化层，不影响功能正确性）:
 - 验证方法退出后 mStack.Count 恢复
 - 多次调用同一方法，mStack 不无限增长
 - 堆对象字段读写（对象由测试框架从外部传入作为参数）
+- **Step 6 smoke 回归**：14 个 `NeoStep6Test.*` 用例 + 至少一个静态字段读取用例全部通过
 
 ---
 
@@ -376,12 +386,27 @@ Neo AOT 工具链（纯优化层，不影响功能正确性）:
    - 无 Redirection → 通过反射 Invoke（临时 fallback）
 5. 实现若干核心 CLR 方法的 Neo Redirection（如 `Console.WriteLine`、基本数学函数）
 
+### 9z. Step 6 smoke 断言升级
+
+Step 6 smoke 用例（[TestCases/NeoStep6Test.cs](file:///f:/SVN/ILRuntime/TestCases/NeoStep6Test.cs)）当前受限于 Step 6 时还没有 `Call` / `Throw` / `Ldstr` / `Newobj` 能力，用了一个 hack：检查失败时执行 `int z = 1; int d = 0; int _ = z / d;` 触发 `DivideByZeroException`，借助 harness 把任何未预期异常视为 Failed 这一点来反馈失败。这样的代价是断言粒度极粗，**只能告诉你"某个分支跑到了"，不能告诉你两个比较值具体差多少**，调试 lowering bug 时基本只能靠肉眼读 JIT dump。
+
+Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` 等）可以直接被 IL 调用。本步骤完成时回填 Step 6 smoke：
+1. 把 `NeoStep6Test.cs` 中所有 `if (cond) { int z = 1; int d = 0; int _ = z / d; }` 替换为：
+   - 调用 `Console.WriteLine($"NeoXxx FAIL: expected={...}, actual={...}")` 输出对比值
+   - 然后 `throw new Exception("NeoXxx assertion failed")` 或调用测试框架的 `Assert.Fail`
+2. 移除文件头部约束注释 "no Call/Ldstr/Newobj/Console/string.Format/Ldsfld"
+3. 整组 smoke 重跑，验证升级后断言仍然全绿（同时也是 Step 9 的端到端验证 — `Console.WriteLine` 的 Neo Redirection 工作正常）
+4. 在 Step 6 checklist 中把这条工作勾掉
+
+注：Step 6 期间为绕开 cctor 已经禁用 `Ldsfld`，所以测试用例不会触发任何 cctor。但 `Console.WriteLine(string)` 不需要 cctor（CLR 方法），所以即使在 Step 7 cctor 恢复之前也可以做这次回填，只要 Step 9 的 Redirection 已经覆盖 `Console.WriteLine` 即可。
+
 **依赖**: Step 8（需要 Call 约定已建立）
 
 **验证方式**:
 - IL 方法调用 CLR 方法：`Console.WriteLine("hello")`
 - 带返回值的 CLR 调用：`Math.Max(a, b)`
 - 带引用类型参数的 CLR 调用
+- **Step 6 smoke 断言升级回归**：`NeoStep6Test` 14 个用例改用 `Console.WriteLine` + throw 后仍全绿
 
 ---
 

@@ -1151,6 +1151,42 @@ namespace ILRuntime.Runtime.Intepreter
                     mStack[dstBase + i] = srcRefs[i];
             }
         }
+
+        // Step 6 entry shim: convert raw bytes the Neo interpreter wrote into
+        // retDst back into a CLR object the outer Run() pipeline can consume.
+        // Step 8 will replace this whole code path with the proper Neo call
+        // convention; for now it's only invoked from the top-level Invoke entry
+        // for primitive return types.
+        static unsafe object NeoBoxReturnValue(IType returnType, byte* retDst, int retSize)
+        {
+            var clr = returnType.TypeForCLR;
+            if (clr == typeof(int))
+                return *(int*)retDst;
+            if (clr == typeof(uint))
+                return *(uint*)retDst;
+            if (clr == typeof(long))
+                return *(long*)retDst;
+            if (clr == typeof(ulong))
+                return *(ulong*)retDst;
+            if (clr == typeof(short))
+                return *(short*)retDst;
+            if (clr == typeof(ushort))
+                return *(ushort*)retDst;
+            if (clr == typeof(byte))
+                return *retDst;
+            if (clr == typeof(sbyte))
+                return *(sbyte*)retDst;
+            if (clr == typeof(bool))
+                return *retDst != 0;
+            if (clr == typeof(char))
+                return *(char*)retDst;
+            if (clr == typeof(float))
+                return *(float*)retDst;
+            if (clr == typeof(double))
+                return *(double*)retDst;
+            // Fallback: raw bytes as int
+            return retSize >= 4 ? (object)*(int*)retDst : (object)(int)*retDst;
+        }
     }
 }
 #endif

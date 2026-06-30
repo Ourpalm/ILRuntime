@@ -396,7 +396,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             r1 = -1;
             r2 = -1;
             r3 = -1;
+#if ENABLE_NEO_MODE
+            switch (NeoNormalizeOpCode(op.Code))
+#else
             switch (op.Code)
+#endif
             {
                 case OpCodeREnum.Move:
                 case OpCodeREnum.Conv_I:
@@ -676,7 +680,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public static bool GetOpcodeDestRegister(ref OpCodes.OpCodeR op, out short r1)
         {
             r1 = -1;
+#if ENABLE_NEO_MODE
+            switch (NeoNormalizeOpCode(op.Code))
+#else
             switch (op.Code)
+#endif
             {
                 case OpCodes.OpCodeREnum.Move:
                 case OpCodeREnum.Conv_I:
@@ -940,7 +948,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         static void ReplaceOpcodeSource(ref OpCodes.OpCodeR op, int idx, short src)
         {
+#if ENABLE_NEO_MODE
+            switch (NeoNormalizeOpCode(op.Code))
+#else
             switch (op.Code)
+#endif
             {
                 case OpCodes.OpCodeREnum.Move:
                 case OpCodeREnum.Conv_I:
@@ -1226,7 +1238,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
         static void ReplaceOpcodeDest(ref OpCodes.OpCodeR op, short dst)
         {
+#if ENABLE_NEO_MODE
+            switch (NeoNormalizeOpCode(op.Code))
+#else
             switch (op.Code)
+#endif
             {
                 case OpCodes.OpCodeREnum.Move:
                 case OpCodeREnum.Ldc_I4_0:
@@ -1420,5 +1436,94 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     throw new NotImplementedException();
             }
         }
+
+#if ENABLE_NEO_MODE
+        // The Neo JIT emits typed opcode variants (Add_I8, Beqi_R8, etc.) but
+        // the Register/Operand layout for each variant is identical to its
+        // untyped sibling (Add, Beqi). Optimizer passes only need the layout,
+        // so we collapse every Neo-only suffix back to the base opcode for
+        // switch dispatch. Keep this in sync whenever a new typed variant is
+        // added in OpCodeREnum.cs.
+        static OpCodeREnum NeoNormalizeOpCode(OpCodeREnum code)
+        {
+            switch (code)
+            {
+                // Three-slot arithmetic _I8 / _R4 / _R8
+                case OpCodeREnum.Add_I8: case OpCodeREnum.Add_R4: case OpCodeREnum.Add_R8: return OpCodeREnum.Add;
+                case OpCodeREnum.Sub_I8: case OpCodeREnum.Sub_R4: case OpCodeREnum.Sub_R8: return OpCodeREnum.Sub;
+                case OpCodeREnum.Mul_I8: case OpCodeREnum.Mul_R4: case OpCodeREnum.Mul_R8: return OpCodeREnum.Mul;
+                case OpCodeREnum.Div_I8: case OpCodeREnum.Div_R4: case OpCodeREnum.Div_R8: return OpCodeREnum.Div;
+                case OpCodeREnum.Div_Un_I8: return OpCodeREnum.Div_Un;
+                case OpCodeREnum.Rem_I8: case OpCodeREnum.Rem_R4: case OpCodeREnum.Rem_R8: return OpCodeREnum.Rem;
+                case OpCodeREnum.Rem_Un_I8: return OpCodeREnum.Rem_Un;
+                case OpCodeREnum.And_I8: return OpCodeREnum.And;
+                case OpCodeREnum.Or_I8:  return OpCodeREnum.Or;
+                case OpCodeREnum.Xor_I8: return OpCodeREnum.Xor;
+                case OpCodeREnum.Shl_I8: return OpCodeREnum.Shl;
+                case OpCodeREnum.Shr_I8: return OpCodeREnum.Shr;
+                case OpCodeREnum.Shr_Un_I8: return OpCodeREnum.Shr_Un;
+
+                // Unary
+                case OpCodeREnum.Neg_I8: case OpCodeREnum.Neg_R4: case OpCodeREnum.Neg_R8: return OpCodeREnum.Neg;
+                case OpCodeREnum.Not_I8: return OpCodeREnum.Not;
+
+                // Compare
+                case OpCodeREnum.Ceq_I8: case OpCodeREnum.Ceq_R4: case OpCodeREnum.Ceq_R8: return OpCodeREnum.Ceq;
+                case OpCodeREnum.Cgt_I8: case OpCodeREnum.Cgt_R4: case OpCodeREnum.Cgt_R8: return OpCodeREnum.Cgt;
+                case OpCodeREnum.Cgt_Un_I8: case OpCodeREnum.Cgt_Un_R4: case OpCodeREnum.Cgt_Un_R8: return OpCodeREnum.Cgt_Un;
+                case OpCodeREnum.Clt_I8: case OpCodeREnum.Clt_R4: case OpCodeREnum.Clt_R8: return OpCodeREnum.Clt;
+                case OpCodeREnum.Clt_Un_I8: case OpCodeREnum.Clt_Un_R4: case OpCodeREnum.Clt_Un_R8: return OpCodeREnum.Clt_Un;
+
+                // Two-source typed branches
+                case OpCodeREnum.Beq_I8: case OpCodeREnum.Beq_R4: case OpCodeREnum.Beq_R8: return OpCodeREnum.Beq;
+                case OpCodeREnum.Bne_Un_I8: case OpCodeREnum.Bne_Un_R4: case OpCodeREnum.Bne_Un_R8: return OpCodeREnum.Bne_Un;
+                case OpCodeREnum.Blt_I8: case OpCodeREnum.Blt_R4: case OpCodeREnum.Blt_R8: return OpCodeREnum.Blt;
+                case OpCodeREnum.Blt_Un_I8: case OpCodeREnum.Blt_Un_R4: case OpCodeREnum.Blt_Un_R8: return OpCodeREnum.Blt_Un;
+                case OpCodeREnum.Bgt_I8: case OpCodeREnum.Bgt_R4: case OpCodeREnum.Bgt_R8: return OpCodeREnum.Bgt;
+                case OpCodeREnum.Bgt_Un_I8: case OpCodeREnum.Bgt_Un_R4: case OpCodeREnum.Bgt_Un_R8: return OpCodeREnum.Bgt_Un;
+                case OpCodeREnum.Ble_I8: case OpCodeREnum.Ble_R4: case OpCodeREnum.Ble_R8: return OpCodeREnum.Ble;
+                case OpCodeREnum.Ble_Un_I8: case OpCodeREnum.Ble_Un_R4: case OpCodeREnum.Ble_Un_R8: return OpCodeREnum.Ble_Un;
+                case OpCodeREnum.Bge_I8: case OpCodeREnum.Bge_R4: case OpCodeREnum.Bge_R8: return OpCodeREnum.Bge;
+                case OpCodeREnum.Bge_Un_I8: case OpCodeREnum.Bge_Un_R4: case OpCodeREnum.Bge_Un_R8: return OpCodeREnum.Bge_Un;
+
+                // Immediate arithmetic
+                case OpCodeREnum.Addi_I8: case OpCodeREnum.Addi_R4: case OpCodeREnum.Addi_R8: return OpCodeREnum.Addi;
+                case OpCodeREnum.Subi_I8: case OpCodeREnum.Subi_R4: case OpCodeREnum.Subi_R8: return OpCodeREnum.Subi;
+                case OpCodeREnum.Muli_I8: case OpCodeREnum.Muli_R4: case OpCodeREnum.Muli_R8: return OpCodeREnum.Muli;
+                case OpCodeREnum.Divi_I8: case OpCodeREnum.Divi_R4: case OpCodeREnum.Divi_R8: return OpCodeREnum.Divi;
+                case OpCodeREnum.Divi_Un_I8: return OpCodeREnum.Divi_Un;
+                case OpCodeREnum.Remi_I8: case OpCodeREnum.Remi_R4: case OpCodeREnum.Remi_R8: return OpCodeREnum.Remi;
+                case OpCodeREnum.Remi_Un_I8: return OpCodeREnum.Remi_Un;
+                case OpCodeREnum.Andi_I8: return OpCodeREnum.Andi;
+                case OpCodeREnum.Ori_I8: return OpCodeREnum.Ori;
+                case OpCodeREnum.Xori_I8: return OpCodeREnum.Xori;
+                case OpCodeREnum.Shli_I8: return OpCodeREnum.Shli;
+                case OpCodeREnum.Shri_I8: return OpCodeREnum.Shri;
+                case OpCodeREnum.Shri_Un_I8: return OpCodeREnum.Shri_Un;
+
+                // Immediate compare
+                case OpCodeREnum.Ceqi_I8: case OpCodeREnum.Ceqi_R4: case OpCodeREnum.Ceqi_R8: return OpCodeREnum.Ceqi;
+                case OpCodeREnum.Cgti_I8: case OpCodeREnum.Cgti_R4: case OpCodeREnum.Cgti_R8: return OpCodeREnum.Cgti;
+                case OpCodeREnum.Cgti_Un_I8: case OpCodeREnum.Cgti_Un_R4: case OpCodeREnum.Cgti_Un_R8: return OpCodeREnum.Cgti_Un;
+                case OpCodeREnum.Clti_I8: case OpCodeREnum.Clti_R4: case OpCodeREnum.Clti_R8: return OpCodeREnum.Clti;
+                case OpCodeREnum.Clti_Un_I8: case OpCodeREnum.Clti_Un_R4: case OpCodeREnum.Clti_Un_R8: return OpCodeREnum.Clti_Un;
+
+                // Immediate branch
+                case OpCodeREnum.Beqi_I8: case OpCodeREnum.Beqi_R4: case OpCodeREnum.Beqi_R8: return OpCodeREnum.Beqi;
+                case OpCodeREnum.Bnei_Un_I8: case OpCodeREnum.Bnei_Un_R4: case OpCodeREnum.Bnei_Un_R8: return OpCodeREnum.Bnei_Un;
+                case OpCodeREnum.Blti_I8: case OpCodeREnum.Blti_R4: case OpCodeREnum.Blti_R8: return OpCodeREnum.Blti;
+                case OpCodeREnum.Blti_Un_I8: case OpCodeREnum.Blti_Un_R4: case OpCodeREnum.Blti_Un_R8: return OpCodeREnum.Blti_Un;
+                case OpCodeREnum.Bgti_I8: case OpCodeREnum.Bgti_R4: case OpCodeREnum.Bgti_R8: return OpCodeREnum.Bgti;
+                case OpCodeREnum.Bgti_Un_I8: case OpCodeREnum.Bgti_Un_R4: case OpCodeREnum.Bgti_Un_R8: return OpCodeREnum.Bgti_Un;
+                case OpCodeREnum.Blei_I8: case OpCodeREnum.Blei_R4: case OpCodeREnum.Blei_R8: return OpCodeREnum.Blei;
+                case OpCodeREnum.Blei_Un_I8: case OpCodeREnum.Blei_Un_R4: case OpCodeREnum.Blei_Un_R8: return OpCodeREnum.Blei_Un;
+                case OpCodeREnum.Bgei_I8: case OpCodeREnum.Bgei_R4: case OpCodeREnum.Bgei_R8: return OpCodeREnum.Bgei;
+                case OpCodeREnum.Bgei_Un_I8: case OpCodeREnum.Bgei_Un_R4: case OpCodeREnum.Bgei_Un_R8: return OpCodeREnum.Bgei_Un;
+
+                default:
+                    return code;
+            }
+        }
+#endif
     }
 }

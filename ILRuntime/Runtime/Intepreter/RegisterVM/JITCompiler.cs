@@ -1125,7 +1125,27 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Not_I8:
                     case OpCodeREnum.Neg_R4:
                     case OpCodeREnum.Neg_R8:
+                        LowerR1R2(ref op, localInfos);
+                        break;
                     case OpCodeREnum.Move:
+                        // Move emits Unsafe.CopyBlock at runtime, so it needs the
+                        // copy size (in bytes) in Operand2. Use min(src,dst) so a
+                        // wide stack register (8 bytes) copied into a narrow local
+                        // (e.g. int = 4 bytes) doesn't clobber neighbouring slots.
+                        {
+                            int srcReg = op.Register2;
+                            int dstReg = op.Register1;
+                            int srcSz = (srcReg >= 0 && srcReg < localInfos.Length) ? localInfos[srcReg].Size : 0;
+                            int dstSz = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].Size : 0;
+                            int sz;
+                            if (srcSz > 0 && dstSz > 0)
+                                sz = srcSz < dstSz ? srcSz : dstSz;
+                            else
+                                sz = srcSz > 0 ? srcSz : dstSz;
+                            LowerR1R2(ref op, localInfos);
+                            op.Operand2 = sz;
+                        }
+                        break;
                     case OpCodeREnum.Conv_I:
                     case OpCodeREnum.Conv_I1:
                     case OpCodeREnum.Conv_I2:
