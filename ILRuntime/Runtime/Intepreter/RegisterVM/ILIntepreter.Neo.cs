@@ -1035,6 +1035,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Call:
                             case OpCodeREnum.Callvirt:
+                            case OpCodeREnum.Newobj:
                                 {
                                     var targetMethod = AppDomain.GetMethod(ip->Operand2);
                                     if (targetMethod == null)
@@ -1042,34 +1043,76 @@ namespace ILRuntime.Runtime.Intepreter
                                         ip++;
                                         continue;
                                     }
-                                    
+
+                                    int newobjDstIdx = -1;
+                                    if (ip->Code == OpCodeREnum.Newobj)
+                                    {
+                                        var newobjType = targetMethod.DeclearingType as ILType;
+                                        if (newobjType == null)
+                                            throw new NotImplementedException("Neo Newobj CLR type is not implemented (Step 9)");
+                                        if (newobjType.IsDelegate)
+                                            throw new NotImplementedException("Neo Newobj delegate is not implemented");
+
+                                        dstRefOffset = ip->Operand3;
+                                        newobjDstIdx = frameRefBase + dstRefOffset;
+
+                                        ins = newobjType.Instantiate(false);
+                                        mStack[newobjDstIdx] = ins;
+                                        *(int*)(frameBase + ip->DstOffset) = newobjDstIdx;
+                                    }
+
                                     if (targetMethod is ILMethod ilm)
                                     {
                                         int callParamIdx = ip->Operand;
                                         ref var map = ref nf.NeoCallParams[callParamIdx];
                                         byte* targetBase = newEsp;
-                                        
-                                        if (map.PrimitiveSize != null)
+
+                                        if (ip->Code == OpCodeREnum.Newobj)
                                         {
-                                            for (int i = 0; i < map.PrimitiveSize.Length; i++)
+                                            // Write 'this' index to param0
+                                            *(int*)(targetBase + map.PrimitiveDst[0]) = newobjDstIdx;
+                                            
+                                            if (map.PrimitiveSize != null)
                                             {
-                                                Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
+                                                for (int i = 1; i < map.PrimitiveSize.Length; i++)
+                                                {
+                                                    Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
+                                                }
                                             }
                                         }
-                                        
+                                        else
+                                        {
+                                            if (map.PrimitiveSize != null)
+                                            {
+                                                for (int i = 0; i < map.PrimitiveSize.Length; i++)
+                                                {
+                                                    Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
+                                                }
+                                            }
+                                        }
+
                                         if (map.RefSrc != null && map.RefSrc.Length > 0)
                                         {
                                             throw new NotImplementedException("Neo Call reference parameters require Step 7 RefOffset lowering");
                                         }
-                                        
+
                                         int retSize = ilm.NeoFrame.ReturnPrimitiveSize;
                                         int targetRetRefBase = mStack.Count;
-                                        byte* retDstPtr = ip->Register1 >= 0 ? frameBase + ip->DstOffset : null;
-                                        
+                                        byte* retDstPtr = null;
+
+                                        if (ip->Code == OpCodeREnum.Newobj)
+                                        {
+                                            mStack.Add(mStack[newobjDstIdx]); // push 'this'
+                                        }
+                                        else if (ip->Register1 >= 0)
+                                        {
+                                            retDstPtr = frameBase + ip->DstOffset;
+                                        }
+
                                         ExecuteNeo(ilm, targetBase, retDstPtr, targetRetRefBase, out unhandledException);
                                         if (unhandledException)
                                             return null;
-                                        
+
                                         ip++;
                                         continue;
                                     }
@@ -1085,8 +1128,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (returnPrimitiveSize > 0)
                                         Unsafe.CopyBlock(retDst, frameBase + ip->DstOffset, (uint)returnPrimitiveSize);
                                     if (returnRefCount > 0)
-                                        throw new NotImplementedException("Neo Ret reference return requires Step 7 RefOffset lowering");
+                                    {
+                                        int srcRefBase = ip->Operand3; // RefOffset set by LowerR1
+                                        for (int i = 0; i < returnRefCount; i++)
+                                        {
+                                            int retSrcIdx = *(int*)(frameBase + ip->DstOffset + returnPrimitiveSize + i * 4);
+                                            mStack[retRefBase + i] = retSrcIdx >= 0 ? mStack[retSrcIdx] : null;
+                                        }
+                                    }
                                 }
+                                mStack.RemoveRange(frameRefBase, mStack.Count - frameRefBase);
                                 returned = true;
                                 break;
                             case OpCodeREnum.Initobj:
@@ -1124,8 +1175,8 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeREnum.Box:
-                                dstRefOffset = ip->Operand3 >> 16;
-                                srcRefOffset = (short)(ip->Operand3 & 0xffff);
+                                dstRefOffset = ip->Operand3;
+                                srcRefOffset = (short)ip->Operand4;
                                 t = AppDomain.GetType(ip->Operand);
                                 ilType = t as ILType;
                                 if (ilType != null)
@@ -1271,7 +1322,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Unbox:
                             case OpCodeREnum.Unbox_Any:
-                                dstRefOffset = ip->Operand3 >> 16;
+                                dstRefOffset = ip->Operand3;
                                 t = AppDomain.GetType(ip->Operand);
                                 srcIdx = *(int*)(frameBase + ip->SrcOffset);
                                 if (srcIdx < 0)

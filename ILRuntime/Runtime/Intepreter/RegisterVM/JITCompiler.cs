@@ -1097,8 +1097,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 {
                     slot.Offset = offset;
                     slot.RefOffset = refOffset;
-                    slot.Size = 0;
+                    slot.Size = 4;
                     slot.RefCount = 1;
+                    offset += 4;
                     refOffset++;
                 }
                 paramInfo[paramIdx++] = slot;
@@ -1148,8 +1149,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     {
                         slot.Offset = offset;
                         slot.RefOffset = refOffset;
-                        slot.Size = 0;
+                        slot.Size = 4;
                         slot.RefCount = 1;
+                        offset += 4;
                         refOffset++;
                         localIsRef[locVarRegStart + i] = true;
                     }
@@ -1158,8 +1160,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 {
                     slot.Offset = offset;
                     slot.RefOffset = refOffset;
-                    slot.Size = 0;
+                    slot.Size = 4;
                     slot.RefCount = 1;
+                    offset += 4;
                     refOffset++;
                     localIsRef[locVarRegStart + i] = true;
                 }
@@ -1250,8 +1253,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 // CLR value type / reference type -> stored as reference (mStack index)
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
-                slot.Size = 0;
+                slot.Size = 4; // Need 4 bytes to store the mStack index in the primitive frame
                 slot.RefCount = 1;
+                offset += 4;
                 refOffset++;
             }
             return slot;

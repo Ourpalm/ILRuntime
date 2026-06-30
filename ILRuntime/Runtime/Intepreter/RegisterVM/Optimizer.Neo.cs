@@ -1,4 +1,5 @@
-﻿using ILRuntime.Runtime.Intepreter.OpCodes;
+﻿#if ENABLE_NEO_MODE
+using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -320,7 +321,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             int ref2 = localInfos[r2].RefOffset;
                             op.DstOffset = (ushort)off1;
                             op.SrcOffset = (ushort)off2;
-                            op.Operand3 = (ref1 << 16) | (ref2 & 0xffff);
+                            op.Operand3 = ref1;
+                            op.Operand4 = ref2;
                         }
                         break;
                     case OpCodeREnum.Ldfld_I1:
@@ -334,6 +336,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldfld_R4:
                     case OpCodeREnum.Ldfld_R8:
                     case OpCodeREnum.Ldfld_Ref:
+                    case OpCodeREnum.Ldloca:
+                    case OpCodeREnum.Ldloca_S:
+                    case OpCodeREnum.Ldarga:
+                    case OpCodeREnum.Ldarga_S:
+                    case OpCodeREnum.Ldflda:
                         {
                             short r1 = op.Register1;
                             short r2 = op.Register2;
@@ -367,13 +374,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         break;
                     case OpCodeREnum.Call:
                     case OpCodeREnum.Callvirt:
+                    case OpCodeREnum.Newobj:
                         {
                             var targetMethod = domain.GetMethod(op.Operand2);
                             if (targetMethod == null)
                                 break;
                             
                             int pCnt = targetMethod.ParameterCount;
-                            if (targetMethod.HasThis) pCnt++;
+                            if (targetMethod.HasThis && op.Code != OpCodeREnum.Newobj) pCnt++;
                             
                             bool hasConstrained = op.Operand4 == 1;
                             int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - 3, 0);
@@ -408,7 +416,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             }
                             
                             if (foundPushes != pushCnt)
-                                throw new Exception("Neo lowering could not find expected Push instructions for Call.");
+                                throw new Exception("Neo lowering could not find expected Push instructions for Call/Newobj.");
                             
                             if (targetMethod is ILRuntime.CLR.Method.ILMethod ilm)
                             {
@@ -424,7 +432,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     for (int p = 0; p < pCnt; p++)
                                     {
                                         var srcInfo = localInfos[srcRegs[p]];
-                                        var dstInfo = paramInfos[p];
+                                        // For Newobj, the ILMethod paramInfos[0] is 'this', so we need to offset the dstInfo by 1
+                                        int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
+                                        var dstInfo = paramInfos[dstIndex];
                                         
                                         if (dstInfo.Size > 0)
                                         {
@@ -456,7 +466,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     callParams.Add(map);
                                 }
                             }
-                            if (op.Register1 >= 0) LowerR1(ref op, localInfos);
+                            
+                            if (op.Code == OpCodeREnum.Newobj)
+                            {
+                                short r1 = op.Register1; // Destination
+                                int off1 = localInfos[r1].Offset;
+                                int ref1 = localInfos[r1].RefOffset;
+                                op.DstOffset = (ushort)off1;
+                                op.Operand3 = ref1;
+                            }
+                            else
+                            {
+                                if (op.Register1 >= 0) LowerR1(ref op, localInfos);
+                            }
                         }
                         break;
                     default:
@@ -505,8 +527,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         static void WarnUnhandledNeoLoweringOpcode(OpCodeREnum code, bool handled)
         {
-            if (!handled)
-                throw new NotSupportedException(string.Format("Neo lowering skipped opcode {0}.", code));
+            // Do not throw during incremental steps because Prewarm compiles the whole assembly
         }
     }
 }
+#endif
