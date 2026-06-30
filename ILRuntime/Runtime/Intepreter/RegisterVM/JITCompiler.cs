@@ -22,12 +22,22 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         R4 = 4,
         R8 = 5,
     }
+
+    struct NeoCallParamMap
+    {
+        public ushort[] PrimitiveSrc;
+        public ushort[] PrimitiveDst;
+        public ushort[] PrimitiveSize;
+        public ushort[] RefSrc;
+        public ushort[] RefDst;
+    }
 #endif
     struct StackSlotInfo
     {
         public int Offset;
         public int RefOffset;
-        public int Size;        
+        public int Size;
+        public int RefCount;
     }
     struct CompiledFrame
     {
@@ -39,6 +49,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public int TotalStructSize;
         public int TotalRefSize;
 #if ENABLE_NEO_MODE
+        public NeoCallParamMap[] NeoCallParams;
         public StackSlotInfo[] ParamInfos;
         public int ParamPrimitiveSize;
         public int ParamReferenceCount;
@@ -452,7 +463,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             // ExecuteNeo runs against a lowered copy where Register1/2/3 hold
             // byte offsets after LowerNeoOffsets.
             frame.NeoExecuteBody = (OpCodeR[])frame.CodeBody.Clone();
-            Optimizer.LowerNeoOffsets(ref frame);
+            Optimizer.LowerNeoOffsets(ref frame, appdomain);
 #endif
 
 #if DEBUG && !NO_PROFILER
@@ -501,8 +512,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldnull:
                         SetRegisterType(registerTypes, op.Register1, appdomain.ObjectType);
                         break;
+                    case OpCodeREnum.Ldstr:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.ObjectType);
+                        break;
                     case OpCodeREnum.Move:
-                        SetRegisterType(registerTypes, op.Register1, GetRegisterType(registerTypes, op.Register2));
+                        {
+                            IType srcType = GetRegisterType(registerTypes, op.Register2);
+                            op.Operand = IsNeoReferenceSlot(srcType) ? 1 : 0;
+                            SetRegisterType(registerTypes, op.Register1, srcType);
+                        }
                         break;
                     case OpCodeREnum.Neg:
                     case OpCodeREnum.Not:
@@ -661,6 +679,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         {
             if (reg >= 0 && reg < registerTypes.Length)
                 registerTypes[reg] = type;
+        }
+
+        static bool IsNeoReferenceSlot(IType type)
+        {
+            return type != null && !type.IsPrimitive && !type.IsValueType;
         }
 
         IType GetConvResultType(OpCodeREnum code)
@@ -1066,6 +1089,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     slot.Offset = offset;
                     slot.RefOffset = refOffset;
                     slot.Size = size;
+                    slot.RefCount = refSize;
                     offset += size;
                     refOffset += refSize;
                 }
@@ -1074,6 +1098,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     slot.Offset = offset;
                     slot.RefOffset = refOffset;
                     slot.Size = 0;
+                    slot.RefCount = 1;
                     refOffset++;
                 }
                 paramInfo[paramIdx++] = slot;
@@ -1115,6 +1140,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         slot.Offset = offset;
                         slot.Size = size;
                         slot.RefOffset = refOffset;
+                        slot.RefCount = refSize;
                         offset += size;
                         refOffset += refSize;
                     }
@@ -1123,8 +1149,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         slot.Offset = offset;
                         slot.RefOffset = refOffset;
                         slot.Size = 0;
+                        slot.RefCount = 1;
                         refOffset++;
-                        localIsRef[i] = true;
+                        localIsRef[locVarRegStart + i] = true;
                     }
                 }
                 else if (!vt.IsValueType)
@@ -1132,8 +1159,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     slot.Offset = offset;
                     slot.RefOffset = refOffset;
                     slot.Size = 0;
+                    slot.RefCount = 1;
                     refOffset++;
-                    localIsRef[i] = true;
+                    localIsRef[locVarRegStart + i] = true;
                 }
                 else
                 {
@@ -1143,6 +1171,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     slot.Offset = offset;
                     slot.RefOffset = refOffset;
                     slot.Size = size;
+                    slot.RefCount = 0;
                     offset += size;
                 }
                 localInfo[locVarRegStart + i] = slot;
@@ -1167,6 +1196,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
                 slot.Size = maxSize;
+                slot.RefCount = maxRefCount;
                 offset += maxSize;
                 refOffset += maxRefCount;
                 localInfo[baseRegStart + i] = slot;
@@ -1201,6 +1231,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
                 slot.Size = size;
+                slot.RefCount = 0;
                 offset += size;
             }
             else if (t.IsValueType && t is ILType il)
@@ -1210,6 +1241,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
                 slot.Size = size;
+                slot.RefCount = refSize;
                 offset += size;
                 refOffset += refSize;
             }
@@ -1219,6 +1251,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
                 slot.Size = 0;
+                slot.RefCount = 1;
                 refOffset++;
             }
             return slot;

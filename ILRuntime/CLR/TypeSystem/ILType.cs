@@ -165,14 +165,7 @@ namespace ILRuntime.CLR.TypeSystem
                     staticConstructorCalled = true;
                     if ( staticConstructor != null && ( !TypeReference.HasGenericParameters || IsGenericInstance ) )
                     {
-#if ENABLE_NEO_MODE
-                        // TODO Step 7: Neo interpreter still lacks Stfld_*/Ldfld_* case handlers,
-                        // and ExecuteR (Legacy register VM) refuses the specialized field opcodes
-                        // that JITCompiler emits in Neo mode. Suppressing cctor invocation here
-                        // unblocks Step 6 smoke tests; restore once Step 7 lands.
-#else
                         appdomain.Invoke ( staticConstructor, null, null );
-#endif
                     }
                 }
                 return staticInstance;
@@ -954,12 +947,7 @@ namespace ILRuntime.CLR.TypeSystem
                 staticConstructorCalled = true;
                 if (staticConstructor != null && (!TypeReference.HasGenericParameters || IsGenericInstance))
                 {
-#if ENABLE_NEO_MODE
-                    // TODO Step 7: see InitializeMethods entry above. Re-enable once
-                    // Neo Stfld_*/Ldfld_* handlers are wired up.
-#else
                     appdomain.Invoke(staticConstructor, null, null);
-#endif
                 }
             }
         }

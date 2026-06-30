@@ -7,7 +7,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     partial class Optimizer
     {
-        public static void LowerNeoOffsets(ref CompiledFrame frame)
+        public static void LowerNeoOffsets(ref CompiledFrame frame, Enviorment.AppDomain domain)
         {
             if (frame.TotalStructSize > ushort.MaxValue)
             {
@@ -16,6 +16,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
             var localInfos = frame.LocalInfos;
             var body = frame.NeoExecuteBody;
+            List<NeoCallParamMap> callParams = new List<NeoCallParamMap>();
             for (int i = 0; i < body.Length; i++)
             {
                 OpCodeR op = body[i];
@@ -97,15 +98,21 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         {
                             int srcReg = op.Register2;
                             int dstReg = op.Register1;
+                            bool isRefMove = op.Operand == 1;
                             int srcSz = (srcReg >= 0 && srcReg < localInfos.Length) ? localInfos[srcReg].Size : 0;
                             int dstSz = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].Size : 0;
+                            int dstRef = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].RefOffset : 0;
                             int sz;
-                            if (srcSz > 0 && dstSz > 0)
+                            if (isRefMove)
+                                sz = 4;
+                            else if (srcSz > 0 && dstSz > 0)
                                 sz = srcSz < dstSz ? srcSz : dstSz;
                             else
                                 sz = srcSz > 0 ? srcSz : dstSz;
                             LowerR1R2(ref op, localInfos);
+                            op.Operand = isRefMove ? 1 : 0;
                             op.Operand2 = sz;
+                            op.Operand3 = dstRef;
                         }
                         break;
                     case OpCodeREnum.Conv_I:
@@ -276,6 +283,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Bgei_R8:
                     case OpCodeREnum.Bgei_Un_R8:
                     case OpCodeREnum.Initobj:
+                    case OpCodeREnum.Ldnull:
+                    case OpCodeREnum.Ldstr:
                     case OpCodeREnum.Ldc_I4_M1:
                     case OpCodeREnum.Ldc_I4_0:
                     case OpCodeREnum.Ldc_I4_1:
@@ -291,6 +300,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldc_I8:
                     case OpCodeREnum.Ldc_R4:
                     case OpCodeREnum.Ldc_R8:
+                        if (op.Code == OpCodeREnum.Ldstr)
+                            op.Operand = localInfos[op.Register1].RefOffset;
                         LowerR1(ref op, localInfos);
                         break;
                     case OpCodeREnum.Ret:
@@ -312,9 +323,141 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.Operand3 = (ref1 << 16) | (ref2 & 0xffff);
                         }
                         break;
+                    case OpCodeREnum.Ldfld_I1:
+                    case OpCodeREnum.Ldfld_I2:
+                    case OpCodeREnum.Ldfld_I4:
+                    case OpCodeREnum.Ldfld_I8:
+                    case OpCodeREnum.Ldfld_U1:
+                    case OpCodeREnum.Ldfld_U2:
+                    case OpCodeREnum.Ldfld_U4:
+                    case OpCodeREnum.Ldfld_U8:
+                    case OpCodeREnum.Ldfld_R4:
+                    case OpCodeREnum.Ldfld_R8:
+                    case OpCodeREnum.Ldfld_Ref:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            if (op.Code == OpCodeREnum.Ldfld_Ref)
+                                op.Operand = localInfos[r1].RefOffset;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                        }
+                        break;
+                    case OpCodeREnum.Stfld_I1:
+                    case OpCodeREnum.Stfld_I2:
+                    case OpCodeREnum.Stfld_I4:
+                    case OpCodeREnum.Stfld_I8:
+                    case OpCodeREnum.Stfld_U1:
+                    case OpCodeREnum.Stfld_U2:
+                    case OpCodeREnum.Stfld_U4:
+                    case OpCodeREnum.Stfld_U8:
+                    case OpCodeREnum.Stfld_R4:
+                    case OpCodeREnum.Stfld_R8:
+                    case OpCodeREnum.Stfld_Ref:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                        }
+                        break;
                     case OpCodeREnum.Br:
                     case OpCodeREnum.Br_S:
                     case OpCodeREnum.Nop:
+                        break;
+                    case OpCodeREnum.Call:
+                    case OpCodeREnum.Callvirt:
+                        {
+                            var targetMethod = domain.GetMethod(op.Operand2);
+                            if (targetMethod == null)
+                                break;
+                            
+                            int pCnt = targetMethod.ParameterCount;
+                            if (targetMethod.HasThis) pCnt++;
+                            
+                            bool hasConstrained = op.Operand4 == 1;
+                            int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - 3, 0);
+                            int regCnt = pCnt - pushCnt;
+                            
+                            short[] srcRegs = new short[pCnt];
+                            if (regCnt > 0) srcRegs[pCnt - regCnt] = op.Register2;
+                            if (regCnt > 1) srcRegs[pCnt - regCnt + 1] = op.Register3;
+                            if (regCnt > 2) srcRegs[pCnt - regCnt + 2] = op.Register4;
+                            
+                            int foundPushes = 0;
+                            int scanIdx = i - 1;
+                            while (scanIdx >= 0 && foundPushes < pushCnt)
+                            {
+                                if (body[scanIdx].Code == OpCodeREnum.Push)
+                                {
+                                    srcRegs[pushCnt - 1 - foundPushes] = body[scanIdx].Register1;
+                                    // 彻底删除该指令，避免解释器 Nop 带来的 Dispatch 开销
+                                    for (int j = scanIdx; j < body.Length - 1; j++)
+                                    {
+                                        body[j] = body[j + 1];
+                                    }
+                                    Array.Resize(ref body, body.Length - 1);
+                                    // 因为当前指令(Call)的位置前移了，我们需要更新外层循环的 i 和当前 op
+                                    i--;
+                                    op = body[i];
+                                    foundPushes++;
+                                    // 不减少 scanIdx，因为后面的指令已经补上来了，当前 scanIdx 就是前一条指令
+                                    continue;
+                                }
+                                scanIdx--;
+                            }
+                            
+                            if (foundPushes != pushCnt)
+                                throw new Exception("Neo lowering could not find expected Push instructions for Call.");
+                            
+                            if (targetMethod is ILRuntime.CLR.Method.ILMethod ilm)
+                            {
+                                var paramInfos = ilm.NeoFrame.ParamInfos;
+                                if (paramInfos != null)
+                                {
+                                    List<ushort> primSrc = new List<ushort>();
+                                    List<ushort> primDst = new List<ushort>();
+                                    List<ushort> primSize = new List<ushort>();
+                                    List<ushort> refSrc = new List<ushort>();
+                                    List<ushort> refDst = new List<ushort>();
+                                    
+                                    for (int p = 0; p < pCnt; p++)
+                                    {
+                                        var srcInfo = localInfos[srcRegs[p]];
+                                        var dstInfo = paramInfos[p];
+                                        
+                                        if (dstInfo.Size > 0)
+                                        {
+                                            primSrc.Add((ushort)srcInfo.Offset);
+                                            primDst.Add((ushort)dstInfo.Offset);
+                                            primSize.Add((ushort)dstInfo.Size);
+                                        }
+                                        for (int r = 0; r < dstInfo.RefCount; r++)
+                                        {
+                                            refSrc.Add((ushort)(srcInfo.RefOffset + r));
+                                            refDst.Add((ushort)(dstInfo.RefOffset + r));
+                                        }
+                                    }
+                                    
+                                    NeoCallParamMap map = new NeoCallParamMap();
+                                    if (primSrc.Count > 0)
+                                    {
+                                        map.PrimitiveSrc = primSrc.ToArray();
+                                        map.PrimitiveDst = primDst.ToArray();
+                                        map.PrimitiveSize = primSize.ToArray();
+                                    }
+                                    if (refSrc.Count > 0)
+                                    {
+                                        map.RefSrc = refSrc.ToArray();
+                                        map.RefDst = refDst.ToArray();
+                                    }
+                                    
+                                    op.Operand = callParams.Count;
+                                    callParams.Add(map);
+                                }
+                            }
+                            if (op.Register1 >= 0) LowerR1(ref op, localInfos);
+                        }
                         break;
                     default:
                         handled = false;
@@ -322,6 +465,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 WarnUnhandledNeoLoweringOpcode(op.Code, handled);
                 body[i] = op;
+            }
+            frame.NeoExecuteBody = body;
+            if (callParams.Count > 0)
+            {
+                frame.NeoCallParams = callParams.ToArray();
             }
         }
 
