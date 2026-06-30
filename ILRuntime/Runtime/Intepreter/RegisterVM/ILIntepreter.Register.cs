@@ -4560,8 +4560,16 @@ namespace ILRuntime.Runtime.Intepreter
                                         switch (reg1->ObjectType)
                                         {
                                             case ObjectTypes.Integer:
-                                            case ObjectTypes.Float:
                                                 res = reg1->Value == reg2->Value;
+                                                break;
+                                            case ObjectTypes.Float:
+                                                res = *(float*)&reg1->Value == *(float*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Double:
+                                                res = *(double*)&reg1->Value == *(double*)&reg2->Value;
+                                                break;
+                                            case ObjectTypes.Long:
+                                                res = *(long*)&reg1->Value == *(long*)&reg2->Value;
                                                 break;
                                             case ObjectTypes.Object:
                                                 res = mStack[reg1->Value] == mStack[reg2->Value];
@@ -4700,10 +4708,10 @@ namespace ILRuntime.Runtime.Intepreter
                                             res = (ulong)*(long*)&reg1->Value < (ulong)*(long*)&reg2->Value && reg2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&reg1->Value < *(float*)&reg2->Value && reg2->ObjectType != ObjectTypes.Null;
+                                            res = !(*(float*)&reg1->Value >= *(float*)&reg2->Value) && reg2->ObjectType != ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&reg1->Value < *(double*)&reg2->Value && reg2->ObjectType != ObjectTypes.Null;
+                                            res = !(*(double*)&reg1->Value >= *(double*)&reg2->Value) && reg2->ObjectType != ObjectTypes.Null;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -4757,10 +4765,10 @@ namespace ILRuntime.Runtime.Intepreter
                                             res = *(long*)&reg1->Value > *(long*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&reg1->Value > *(float*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            res = !(*(float*)&reg1->Value <= *(float*)&reg2->Value) || reg2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&reg1->Value > *(double*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            res = !(*(double*)&reg1->Value <= *(double*)&reg2->Value) || reg2->ObjectType == ObjectTypes.Null;
                                             break;
                                         default:
                                             throw new NotImplementedException();
@@ -4814,10 +4822,10 @@ namespace ILRuntime.Runtime.Intepreter
                                             res = (ulong)*(long*)&reg1->Value > (ulong)*(long*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Float:
-                                            res = *(float*)&reg1->Value > *(float*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            res = !(*(float*)&reg1->Value <= *(float*)&reg2->Value) || reg2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Double:
-                                            res = *(double*)&reg1->Value > *(double*)&reg2->Value || reg2->ObjectType == ObjectTypes.Null;
+                                            res = !(*(double*)&reg1->Value <= *(double*)&reg2->Value) || reg2->ObjectType == ObjectTypes.Null;
                                             break;
                                         case ObjectTypes.Object:
                                             res = mStack[reg1->Value] != null && (reg2->ObjectType == ObjectTypes.Null || mStack[reg2->Value] == null);
