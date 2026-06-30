@@ -356,108 +356,236 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeREnum.Beq:
-                                if (*(int*)(frameBase + ip->DstOffset) == *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) == *(int*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bne_Un:
-                                if (*(int*)(frameBase + ip->DstOffset) != *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) != *(int*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blt:
-                                if (*(int*)(frameBase + ip->DstOffset) < *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) < *(int*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgt:
-                                if (*(int*)(frameBase + ip->DstOffset) > *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) > *(int*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Ble:
-                                if (*(int*)(frameBase + ip->DstOffset) <= *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) <= *(int*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bge:
-                                if (*(int*)(frameBase + ip->DstOffset) >= *(int*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) >= *(int*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blt_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) < *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) < *(uint*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgt_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) > *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) > *(uint*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Ble_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) <= *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) <= *(uint*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bge_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) >= *(uint*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) >= *(uint*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Beq_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) == *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) == *(long*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bne_Un_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) != *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) != *(long*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blt_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) < *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) < *(long*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgt_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) > *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) > *(long*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Ble_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) <= *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) <= *(long*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bge_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) >= *(long*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) >= *(long*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blt_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) < *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) < *(ulong*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgt_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) > *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) > *(ulong*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Ble_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) <= *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) <= *(ulong*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bge_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) >= *(ulong*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) >= *(ulong*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Beq_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) == *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) == *(float*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bne_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) != *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) != *(float*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blt_R4:
                             case OpCodeREnum.Blt_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) < *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) < *(float*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgt_R4:
                             case OpCodeREnum.Bgt_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) > *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) > *(float*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Ble_R4:
                             case OpCodeREnum.Ble_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) <= *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) <= *(float*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bge_R4:
                             case OpCodeREnum.Bge_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) >= *(float*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) >= *(float*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Beq_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) == *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) == *(double*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bne_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) != *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) != *(double*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blt_R8:
                             case OpCodeREnum.Blt_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) < *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) < *(double*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgt_R8:
                             case OpCodeREnum.Bgt_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) > *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) > *(double*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Ble_R8:
                             case OpCodeREnum.Ble_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) <= *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) <= *(double*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bge_R8:
                             case OpCodeREnum.Bge_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) >= *(double*)(frameBase + ip->SrcOffset)) { ip = ptr + ip->Operand; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) >= *(double*)(frameBase + ip->SrcOffset))
+                                {
+                                    ip = ptr + ip->Operand;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Addi:
                                 *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) + ip->Operand;
@@ -620,108 +748,236 @@ namespace ILRuntime.Runtime.Intepreter
                                 *(int*)(frameBase + ip->DstOffset) = *(double*)(frameBase + ip->SrcOffset) < ip->OperandDouble ? 1 : 0;
                                 break;
                             case OpCodeREnum.Beqi:
-                                if (*(int*)(frameBase + ip->DstOffset) == ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) == ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bnei_Un:
-                                if (*(int*)(frameBase + ip->DstOffset) != ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) != ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blti:
-                                if (*(int*)(frameBase + ip->DstOffset) < ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) < ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgti:
-                                if (*(int*)(frameBase + ip->DstOffset) > ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) > ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blei:
-                                if (*(int*)(frameBase + ip->DstOffset) <= ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) <= ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgei:
-                                if (*(int*)(frameBase + ip->DstOffset) >= ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(int*)(frameBase + ip->DstOffset) >= ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blti_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) < (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) < (uint)ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgti_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) > (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) > (uint)ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blei_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) <= (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) <= (uint)ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgei_Un:
-                                if (*(uint*)(frameBase + ip->DstOffset) >= (uint)ip->Operand) { ip = ptr + ip->Operand4; continue; }
+                                if (*(uint*)(frameBase + ip->DstOffset) >= (uint)ip->Operand)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Beqi_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) == ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) == ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bnei_Un_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) != ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) != ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blti_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) < ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) < ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgti_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) > ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) > ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blei_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) <= ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) <= ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgei_I8:
-                                if (*(long*)(frameBase + ip->DstOffset) >= ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(long*)(frameBase + ip->DstOffset) >= ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blti_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) < (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) < (ulong)ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgti_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) > (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) > (ulong)ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blei_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) <= (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) <= (ulong)ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgei_Un_I8:
-                                if (*(ulong*)(frameBase + ip->DstOffset) >= (ulong)ip->OperandLong) { ip = ptr + ip->Operand4; continue; }
+                                if (*(ulong*)(frameBase + ip->DstOffset) >= (ulong)ip->OperandLong)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Beqi_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) == ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) == ip->OperandFloat)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bnei_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) != ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) != ip->OperandFloat)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blti_R4:
                             case OpCodeREnum.Blti_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) < ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) < ip->OperandFloat)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgti_R4:
                             case OpCodeREnum.Bgti_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) > ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) > ip->OperandFloat)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blei_R4:
                             case OpCodeREnum.Blei_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) <= ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) <= ip->OperandFloat)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgei_R4:
                             case OpCodeREnum.Bgei_Un_R4:
-                                if (*(float*)(frameBase + ip->DstOffset) >= ip->OperandFloat) { ip = ptr + ip->Operand4; continue; }
+                                if (*(float*)(frameBase + ip->DstOffset) >= ip->OperandFloat)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Beqi_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) == ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) == ip->OperandDouble)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bnei_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) != ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) != ip->OperandDouble)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blti_R8:
                             case OpCodeREnum.Blti_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) < ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) < ip->OperandDouble)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgti_R8:
                             case OpCodeREnum.Bgti_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) > ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) > ip->OperandDouble)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Blei_R8:
                             case OpCodeREnum.Blei_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) <= ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) <= ip->OperandDouble)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Bgei_R8:
                             case OpCodeREnum.Bgei_Un_R8:
-                                if (*(double*)(frameBase + ip->DstOffset) >= ip->OperandDouble) { ip = ptr + ip->Operand4; continue; }
+                                if (*(double*)(frameBase + ip->DstOffset) >= ip->OperandDouble)
+                                {
+                                    ip = ptr + ip->Operand4;
+                                    continue;
+                                }
                                 break;
                             case OpCodeREnum.Conv_I1:
                                 *(int*)(frameBase + ip->DstOffset) = (sbyte)ReadConvI8(frameBase, ip->SrcOffset, (NeoPrimitiveTypeTag)ip->Operand2);
