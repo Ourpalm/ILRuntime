@@ -39,10 +39,20 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public OpCodeREnum Code;
         [FieldOffset(4)]
         public short Register1;
+        // Neo mode: byte offsets in frame. Register1/2/3 reinterpreted as
+        // ushort byte offsets (0..65535) post-LowerNeoOffsets pass.
+        // DstOffset shares Register1, SrcOffset shares Register2.
+        // Register3 used directly as byte offset via (ushort)op.Register3.
+        [FieldOffset(4)]
+        public ushort DstOffset;
         [FieldOffset(6)]
         public short Register2;
+        [FieldOffset(6)]
+        public ushort SrcOffset;
         [FieldOffset(8)]
         public short Register3;
+        [FieldOffset(8)]
+        public ushort OperandOffset;
         [FieldOffset(10)]
         public short Register4;
         [FieldOffset(8)]
@@ -59,17 +69,6 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public double OperandDouble;
         [FieldOffset(20)]
         public int Operand4;
-
-#if ENABLE_NEO_MODE
-        // Neo mode: byte offsets in frame. Register1/2/3 reinterpreted as
-        // ushort byte offsets (0..65535) post-LowerNeoOffsets pass.
-        // DstOffset shares Register1, SrcOffset shares Register2.
-        // Register3 used directly as byte offset via (ushort)op.Register3.
-        [FieldOffset(4)]
-        public ushort DstOffset;
-        [FieldOffset(6)]
-        public ushort SrcOffset;
-#endif
 
         public override string ToString()
         {

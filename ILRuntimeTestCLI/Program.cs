@@ -8,9 +8,10 @@ namespace ILRuntimeTestCLI
     {
         static int Main(string[] args)
         {
+            TestSession session = new TestSession();
             try
             {
-                return Run(args);
+                return Run(args, session);
             }
             catch (Exception ex)
             {
@@ -25,9 +26,13 @@ namespace ILRuntimeTestCLI
                 }
                 return -2;
             }
+            finally
+            {
+                session.Dispose();
+            }
         }
 
-        static int Run(string[] args)
+        static int Run(string[] args, TestSession session)
         {
             if(args.Length <3)
             {
@@ -39,7 +44,6 @@ namespace ILRuntimeTestCLI
             string patchPath = args[1];
             bool useRegister = args[2].ToLower() == "true";
             string nameFilter = args.Length >= 4 ? args[3] : null;
-            TestSession session = new TestSession();
             session.Load(path, patchPath, useRegister);
             int ignoreCnt = 0;
             int todoCnt = 0;
