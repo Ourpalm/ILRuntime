@@ -7,15 +7,6 @@ namespace TestCases
     /// Step 6 smoke tests for the Neo register VM. These exercise the typed
     /// arithmetic / compare / branch / Conv / immediate variants emitted under
     /// ENABLE_NEO_MODE.
-    ///
-    /// Constraints (Step 6 only): no Call, no Ldstr, no Newobj, no Console,
-    /// no string.Format, no static-field references (Ldsfld). Each method's
-    /// body must compile to nothing more than the opcodes Step 6 implements.
-    ///
-    /// Failure signaling: every check that fails performs an inline
-    /// `int x = 1 / 0;` to raise a DivideByZeroException. The harness
-    /// (BaseTestUnit.Invoke) treats any unexpected exception as Failed, so a
-    /// non-zero bail-out is reported even though we never call into anything.
     /// </summary>
     public class NeoStep6Test
     {
@@ -27,7 +18,8 @@ namespace TestCases
             int r = a + b;
             if (r != 42)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoAddI4 failed: r != 42");
+                throw new Exception("NeoAddI4 failed: r != 42");
             }
         }
 
@@ -38,7 +30,8 @@ namespace TestCases
             int r = a + 5;
             if (r != 42)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoAddiI4 failed: r != 42");
+                throw new Exception("NeoAddiI4 failed: r != 42");
             }
         }
 
@@ -50,14 +43,16 @@ namespace TestCases
             int r1 = a > b ? a : b;
             if (r1 != 13)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoMaxI4 failed: r1 != 13");
+                throw new Exception("NeoMaxI4 failed: r1 != 13");
             }
             int c = 99;
             int d2 = 1;
             int r2 = c > d2 ? c : d2;
             if (r2 != 99)
             {
-                int z = 1; int dd = 0; int _ = z / dd;
+                Console.WriteLine("NeoMaxI4 failed: r2 != 99");
+                throw new Exception("NeoMaxI4 failed: r2 != 99");
             }
         }
 
@@ -69,7 +64,8 @@ namespace TestCases
                 s += i;
             if (s != 45)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoSumI4 failed: s != 45");
+                throw new Exception("NeoSumI4 failed: s != 45");
             }
         }
 
@@ -81,7 +77,8 @@ namespace TestCases
             long r = a + b;
             if (r != 40000000002L)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoAddI8 failed: r != 40000000002L");
+                throw new Exception("NeoAddI8 failed: r != 40000000002L");
             }
         }
 
@@ -92,7 +89,8 @@ namespace TestCases
             long r = a + 100L;
             if (r != 300L)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoAddiI8 failed: r != 300L");
+                throw new Exception("NeoAddiI8 failed: r != 300L");
             }
         }
 
@@ -102,12 +100,14 @@ namespace TestCases
             long x = 42L;
             if (!(x == 42L))
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoEqI8 failed: !(x == 42L)");
+                throw new Exception("NeoEqI8 failed: !(x == 42L)");
             }
             long y = 43L;
             if (y == 42L)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoEqI8 failed: y == 42L");
+                throw new Exception("NeoEqI8 failed: y == 42L");
             }
         }
 
@@ -119,7 +119,8 @@ namespace TestCases
                 s += i;
             if (s != 10L)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoSumI8 failed: s != 10L");
+                throw new Exception("NeoSumI8 failed: s != 10L");
             }
         }
 
@@ -131,17 +132,20 @@ namespace TestCases
             double r = a / b;
             if (r != 2.5)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoDivR8 failed: r != 2.5");
+                throw new Exception("NeoDivR8 failed: r != 2.5");
             }
             double inf = 1.0 / 0.0;
             if (!(inf > 1e300))
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoDivR8 failed: !(inf > 1e300)");
+                throw new Exception("NeoDivR8 failed: !(inf > 1e300)");
             }
             double ninf = -1.0 / 0.0;
             if (!(ninf < -1e300))
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoDivR8 failed: !(ninf < -1e300)");
+                throw new Exception("NeoDivR8 failed: !(ninf < -1e300)");
             }
         }
 
@@ -151,11 +155,13 @@ namespace TestCases
             double nan = 0.0 / 0.0;
             if (nan == nan)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoNaNR8 failed: nan == nan");
+                throw new Exception("NeoNaNR8 failed: nan == nan");
             }
             if (!(nan != nan))
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoNaNR8 failed: !(nan != nan)");
+                throw new Exception("NeoNaNR8 failed: !(nan != nan)");
             }
         }
 
@@ -167,7 +173,8 @@ namespace TestCases
             long r = v << n;
             if (r != (3L << 32))
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoShlI8 failed: r != (3L << 32)");
+                throw new Exception("NeoShlI8 failed: r != (3L << 32)");
             }
         }
 
@@ -178,13 +185,15 @@ namespace TestCases
             int r = (int)d;
             if (r != 3)
             {
-                int z = 1; int dd = 0; int _ = z / dd;
+                Console.WriteLine("NeoConvR8ToI4 failed: r != 3");
+                throw new Exception("NeoConvR8ToI4 failed: r != 3");
             }
             double e = -3.9;
             int r2 = (int)e;
             if (r2 != -3)
             {
-                int z = 1; int dd = 0; int _ = z / dd;
+                Console.WriteLine("NeoConvR8ToI4 failed: r2 != -3");
+                throw new Exception("NeoConvR8ToI4 failed: r2 != -3");
             }
         }
 
@@ -195,7 +204,8 @@ namespace TestCases
             long r = (long)i;
             if (r != -1L)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoConvI4ToI8 failed: r != -1L");
+                throw new Exception("NeoConvI4ToI8 failed: r != -1L");
             }
         }
 
@@ -209,7 +219,8 @@ namespace TestCases
             // sink so the compiler keeps the divide:
             if (r == 0)
             {
-                int z = 1; int d = 0; int _ = z / d;
+                Console.WriteLine("NeoDivByZeroI4 failed: unreachable");
+                throw new Exception("NeoDivByZeroI4 failed: unreachable");
             }
         }
     }

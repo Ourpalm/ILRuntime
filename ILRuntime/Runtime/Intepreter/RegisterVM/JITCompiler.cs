@@ -193,7 +193,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
 #endif
 
-        public CompiledFrame Compile(Dictionary<Instruction, int> addr)
+        public void Compile(Dictionary<Instruction, int> addr, ref CompiledFrame frame)
         {
 #if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
@@ -437,7 +437,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #else
             symbols = null;
 #endif
-            CompiledFrame frame = new CompiledFrame();
+            frame = new CompiledFrame();
             frame.SwitchTargets = jumptables;
             frame.Symbols = symbols;
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
@@ -474,7 +474,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 UnityEngine.Profiler.EndSample();
 #endif
 #endif
-            return frame;
         }
 
 #if ENABLE_NEO_MODE

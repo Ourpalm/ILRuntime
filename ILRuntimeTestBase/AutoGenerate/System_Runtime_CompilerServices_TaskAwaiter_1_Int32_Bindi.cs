@@ -30,10 +30,18 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>);
             args = new Type[]{};
             method = type.GetMethod("get_IsCompleted", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_IsCompleted_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_IsCompleted_0);
+#endif
             args = new Type[]{};
             method = type.GetMethod("GetResult", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, GetResult_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, GetResult_1);
+#endif
 
             app.RegisterCLRCreateDefaultInstance(type, () => new System.Runtime.CompilerServices.TaskAwaiter<System.Int32>());
 
@@ -86,6 +94,17 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+#if ENABLE_NEO_MODE
+        static void get_IsCompleted_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> instance_of_this_method = default(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>);
+            // TODO: ValueType instance in Neo
+            var result_of_this_method = instance_of_this_method.IsCompleted;
+            if (__retDst != null) *(int*)__retDst = result_of_this_method ? 1 : 0;
+        }
+#else
         static StackObject* get_IsCompleted_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -106,7 +125,19 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method ? 1 : 0;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void GetResult_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> instance_of_this_method = default(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>);
+            // TODO: ValueType instance in Neo
+            var result_of_this_method = instance_of_this_method.GetResult();
+            if (__retDst != null) *(int*)__retDst = (int)result_of_this_method;
+        }
+#else
         static StackObject* GetResult_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -127,6 +158,7 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
 
 

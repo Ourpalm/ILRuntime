@@ -30,12 +30,28 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Action<System.Single, System.Double, System.Int32>);
             args = new Type[]{typeof(System.Single), typeof(System.Double), typeof(System.Int32)};
             method = type.GetMethod("Invoke", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Invoke_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Invoke_0);
+#endif
 
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Invoke_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Action<System.Single, System.Double, System.Int32> instance_of_this_method = (System.Action<System.Single, System.Double, System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Single @arg1 = ILIntepreter.ReadNeoFloat(__frameBase, ref __curPrim);
+            System.Double @arg2 = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);
+            System.Int32 @arg3 = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            instance_of_this_method.Invoke(@arg1, @arg2, @arg3);
+        }
+#else
         static StackObject* Invoke_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -59,6 +75,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
 

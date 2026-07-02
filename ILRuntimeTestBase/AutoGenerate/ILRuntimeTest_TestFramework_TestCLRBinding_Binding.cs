@@ -51,7 +51,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestFramework.TestCLRBinding)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Emit_0_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Emit_0);
+#endif
 
                         break;
                     }
@@ -65,7 +69,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.String), typeof(ILRuntimeTest.TestFramework.TestCLRBinding)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, LoadAsset_1_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, LoadAsset_1);
+#endif
 
                         break;
                     }
@@ -79,7 +87,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.String), typeof(System.String)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, LoadAsset_2_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, LoadAsset_2);
+#endif
 
                         break;
                     }
@@ -93,7 +105,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.String), typeof(System.Int32)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, LoadAsset_3_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, LoadAsset_3);
+#endif
 
                         break;
                     }
@@ -101,7 +117,11 @@ namespace ILRuntime.Runtime.Generated
             }
             args = new Type[]{};
             method = type.GetMethod("MissingMethod", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, MissingMethod_4_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, MissingMethod_4);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor)};
             if (genericMethods.TryGetValue("MissingMethodGeneric", out lst))
             {
@@ -110,7 +130,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, MissingMethodGeneric_5_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, MissingMethodGeneric_5);
+#endif
 
                         break;
                     }
@@ -124,7 +148,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestFramework.MissingType)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Emit_6_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Emit_6);
+#endif
 
                         break;
                     }
@@ -138,7 +166,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestFramework.MissingType)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, MissingMethodGeneric_7_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, MissingMethodGeneric_7);
+#endif
 
                         break;
                     }
@@ -152,11 +184,25 @@ namespace ILRuntime.Runtime.Generated
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Emit_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestCLRBinding @obj = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.Emit<ILRuntimeTest.TestFramework.TestCLRBinding>(@obj);
+        }
+#else
         static StackObject* Emit_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -175,7 +221,19 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void LoadAsset_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.String @name = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestCLRBinding @obj = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.LoadAsset<ILRuntimeTest.TestFramework.TestCLRBinding>(@name, @obj);
+        }
+#else
         static StackObject* LoadAsset_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -198,7 +256,19 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void LoadAsset_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.String @name = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.String @obj = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.LoadAsset<System.String>(@name, @obj);
+        }
+#else
         static StackObject* LoadAsset_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -221,7 +291,19 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void LoadAsset_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.String @name = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Int32 @obj = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            instance_of_this_method.LoadAsset<System.Int32>(@name, @obj);
+        }
+#else
         static StackObject* LoadAsset_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -243,7 +325,17 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void MissingMethod_4_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.MissingMethod();
+        }
+#else
         static StackObject* MissingMethod_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -258,7 +350,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void MissingMethodGeneric_5_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor @obj = (ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.MissingMethodGeneric<ILRuntimeTest.TestFramework.ClassInheritanceTestAdaptor.Adaptor>(@obj);
+        }
+#else
         static StackObject* MissingMethodGeneric_5(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -277,7 +380,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Emit_6_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.MissingType @obj = (ILRuntimeTest.TestFramework.MissingType)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.Emit<ILRuntimeTest.TestFramework.MissingType>(@obj);
+        }
+#else
         static StackObject* Emit_6(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -296,7 +410,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void MissingMethodGeneric_7_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestCLRBinding instance_of_this_method = (ILRuntimeTest.TestFramework.TestCLRBinding)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.MissingType @obj = (ILRuntimeTest.TestFramework.MissingType)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.MissingMethodGeneric<ILRuntimeTest.TestFramework.MissingType>(@obj);
+        }
+#else
         static StackObject* MissingMethodGeneric_7(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -315,6 +440,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
         static object get_missingField_0(ref object o)
@@ -344,6 +470,30 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            ILRuntimeTest.TestFramework.TestCLRBinding result_of_this_method = new ILRuntimeTest.TestFramework.TestCLRBinding();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -361,6 +511,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
     }

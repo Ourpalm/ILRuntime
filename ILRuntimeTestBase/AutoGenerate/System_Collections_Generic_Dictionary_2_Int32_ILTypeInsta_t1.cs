@@ -30,12 +30,26 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Collections.Generic.Dictionary<System.Int32, ILRuntime.Runtime.Intepreter.ILTypeInstance>.ValueCollection);
             args = new Type[]{};
             method = type.GetMethod("GetEnumerator", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, GetEnumerator_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, GetEnumerator_0);
+#endif
 
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void GetEnumerator_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.Dictionary<System.Int32, ILRuntime.Runtime.Intepreter.ILTypeInstance>.ValueCollection instance_of_this_method = (System.Collections.Generic.Dictionary<System.Int32, ILRuntime.Runtime.Intepreter.ILTypeInstance>.ValueCollection)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = instance_of_this_method.GetEnumerator();
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* GetEnumerator_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -50,6 +64,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
 

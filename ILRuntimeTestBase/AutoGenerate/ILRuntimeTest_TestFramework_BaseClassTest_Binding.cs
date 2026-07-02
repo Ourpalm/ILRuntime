@@ -31,7 +31,11 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.BaseClassTest);
             args = new Type[]{};
             method = type.GetMethod("DoTest", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, DoTest_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, DoTest_0);
+#endif
 
             field = type.GetField("testField", flag);
             app.RegisterCLRFieldGetter(field, get_testField_0);
@@ -42,6 +46,14 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void DoTest_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.BaseClassTest.DoTest();
+        }
+#else
         static StackObject* DoTest_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -52,6 +64,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
         static object get_testField_0(ref object o)

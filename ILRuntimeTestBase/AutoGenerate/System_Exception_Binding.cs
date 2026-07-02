@@ -30,24 +30,61 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Exception);
             args = new Type[]{};
             method = type.GetMethod("get_Message", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_Message_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_Message_0);
+#endif
             args = new Type[]{};
             method = type.GetMethod("get_Data", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_Data_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_Data_1);
+#endif
             args = new Type[]{};
             method = type.GetMethod("get_StackTrace", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_StackTrace_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_StackTrace_2);
+#endif
 
             args = new Type[]{typeof(System.String)};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_1);
+#endif
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void get_Message_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Exception instance_of_this_method = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = instance_of_this_method.Message;
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* get_Message_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -62,7 +99,25 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void get_Data_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Exception instance_of_this_method = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = instance_of_this_method.Data;
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* get_Data_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -77,7 +132,25 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void get_StackTrace_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Exception instance_of_this_method = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = instance_of_this_method.StackTrace;
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* get_StackTrace_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -92,8 +165,34 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            System.String @message = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Exception result_of_this_method = new System.Exception(@message);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -116,7 +215,32 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Ctor_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            System.Exception result_of_this_method = new System.Exception();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Ctor_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -134,6 +258,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
     }

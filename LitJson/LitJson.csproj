@@ -35,6 +35,22 @@
     <OutputPath>bin\Release_Neo\</OutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug_Neo|netstandard2.1|AnyCPU'">
+    <DefineConstants>$(DefineConstants);DEBUG;ENABLE_NEO_MODE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug_Neo|net8.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);DEBUG;ENABLE_NEO_MODE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release_Neo|netstandard2.1|AnyCPU'">
+    <DefineConstants>$(DefineConstants);ENABLE_NEO_MODE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release_Neo|net8.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);ENABLE_NEO_MODE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ILRuntime\ILRuntime.csproj" />
   </ItemGroup>

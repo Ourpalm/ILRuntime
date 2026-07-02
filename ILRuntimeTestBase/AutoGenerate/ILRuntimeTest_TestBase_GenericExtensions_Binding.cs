@@ -50,7 +50,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.Action<System.Object>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method1_0_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method1_0);
+#endif
 
                         break;
                     }
@@ -64,7 +68,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method1_1_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method1_1);
+#endif
 
                         break;
                     }
@@ -72,10 +80,18 @@ namespace ILRuntime.Runtime.Generated
             }
             args = new Type[]{typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.Action<System.Exception>)};
             method = type.GetMethod("Method2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Method2_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Method2_2);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>)};
             method = type.GetMethod("Method2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Method2_3_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Method2_3);
+#endif
             args = new Type[]{typeof(System.ArgumentException)};
             if (genericMethods.TryGetValue("Method2", out lst))
             {
@@ -84,7 +100,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.Action<System.ArgumentException>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method2_4_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method2_4);
+#endif
 
                         break;
                     }
@@ -98,7 +118,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method2_5_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method2_5);
+#endif
 
                         break;
                     }
@@ -112,7 +136,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>), typeof(System.Action<System.Exception>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method2_6_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method2_6);
+#endif
 
                         break;
                     }
@@ -126,7 +154,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>), typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method2_7_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method2_7);
+#endif
 
                         break;
                     }
@@ -140,7 +172,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>), typeof(System.Action<System.ArgumentException>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method2_8_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method2_8);
+#endif
 
                         break;
                     }
@@ -154,7 +190,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>), typeof(System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method2_9_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method2_9);
+#endif
 
                         break;
                     }
@@ -168,7 +208,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.Exception)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method3_10_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method3_10);
+#endif
 
                         break;
                     }
@@ -182,7 +226,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>), typeof(System.Exception)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method3_11_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method3_11);
+#endif
 
                         break;
                     }
@@ -196,7 +244,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.SubExtensionClass), typeof(System.Exception)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method3_12_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method3_12);
+#endif
 
                         break;
                     }
@@ -210,7 +262,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>), typeof(System.Exception)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method3_13_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method3_13);
+#endif
 
                         break;
                     }
@@ -224,7 +280,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass), typeof(System.ArgumentException)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method3_14_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method3_14);
+#endif
 
                         break;
                     }
@@ -238,7 +298,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.ExtensionClass<System.Int32>), typeof(System.ArgumentException)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method3_15_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method3_15);
+#endif
 
                         break;
                     }
@@ -252,7 +316,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>), typeof(System.ArgumentException)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Method3_16_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Method3_16);
+#endif
 
                         break;
                     }
@@ -263,6 +331,16 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Method1_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<System.Object> @a = (System.Action<System.Object>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method1<ILRuntimeTest.TestBase.ExtensionClass>(@i, @a);
+        }
+#else
         static StackObject* Method1_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -282,7 +360,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method1_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Object>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method1<ILRuntimeTest.TestBase.ExtensionClass>(@i, @a);
+        }
+#else
         static StackObject* Method1_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -302,7 +391,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<System.Exception> @a = (System.Action<System.Exception>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2(@i, @a);
+        }
+#else
         static StackObject* Method2_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -322,7 +422,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.Exception>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2(@i, @a);
+        }
+#else
         static StackObject* Method2_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -342,7 +453,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_4_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<System.ArgumentException> @a = (System.Action<System.ArgumentException>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2<System.ArgumentException>(@i, @a);
+        }
+#else
         static StackObject* Method2_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -362,7 +484,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_5_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass, System.ArgumentException>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2<System.ArgumentException>(@i, @a);
+        }
+#else
         static StackObject* Method2_5(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -382,7 +515,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_6_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<System.Exception> @a = (System.Action<System.Exception>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2<System.Int32>(@i, @a);
+        }
+#else
         static StackObject* Method2_6(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -402,7 +546,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_7_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.Exception>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2<System.Int32>(@i, @a);
+        }
+#else
         static StackObject* Method2_7(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -422,7 +577,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_8_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<System.ArgumentException> @a = (System.Action<System.ArgumentException>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2<System.Int32, System.ArgumentException>(@i, @a);
+        }
+#else
         static StackObject* Method2_8(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -442,7 +608,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method2_9_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException> @a = (System.Action<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method2<System.Int32, System.ArgumentException>(@i, @a);
+        }
+#else
         static StackObject* Method2_9(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -462,7 +639,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method3_10_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Exception @ex = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method3<ILRuntimeTest.TestBase.ExtensionClass>(@i, @ex);
+        }
+#else
         static StackObject* Method3_10(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -482,7 +670,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method3_11_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Exception @ex = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method3<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>>(@i, @ex);
+        }
+#else
         static StackObject* Method3_11(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -502,7 +701,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method3_12_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.SubExtensionClass @i = (ILRuntimeTest.TestBase.SubExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Exception @ex = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method3<ILRuntimeTest.TestBase.SubExtensionClass>(@i, @ex);
+        }
+#else
         static StackObject* Method3_12(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -522,7 +732,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method3_13_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.SubExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Exception @ex = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method3<ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>>(@i, @ex);
+        }
+#else
         static StackObject* Method3_13(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -542,7 +763,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method3_14_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass @i = (ILRuntimeTest.TestBase.ExtensionClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.ArgumentException @ex = (System.ArgumentException)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method3<System.ArgumentException>(@i, @ex);
+        }
+#else
         static StackObject* Method3_14(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -562,7 +794,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method3_15_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.ExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.ExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.ArgumentException @ex = (System.ArgumentException)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method3<ILRuntimeTest.TestBase.ExtensionClass<System.Int32>, System.ArgumentException>(@i, @ex);
+        }
+#else
         static StackObject* Method3_15(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -582,7 +825,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Method3_16_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestBase.SubExtensionClass<System.Int32> @i = (ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.ArgumentException @ex = (System.ArgumentException)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestBase.GenericExtensions.Method3<ILRuntimeTest.TestBase.SubExtensionClass<System.Int32>, System.ArgumentException>(@i, @ex);
+        }
+#else
         static StackObject* Method3_16(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -602,6 +856,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
 

@@ -104,6 +104,64 @@ namespace ILRuntime.Runtime.CLRBinding
             }
         }
 
+        internal static void AppendArgumentCodeNeo(this Type p, StringBuilder sb, int idx, string name, List<Type> valueTypeBinders, bool isMultiArr)
+        {
+            string clsName, realClsName;
+            bool isByRef;
+            p.GetClassName(out clsName, out realClsName, out isByRef);
+            var pt = p.IsByRef ? p.GetElementType() : p;
+            string varName;
+            if (isMultiArr)
+            {
+                varName = "a" + idx;
+            }
+            else
+            {
+                varName = (name != null ? "@" + name : "a" + idx);
+            }
+
+            if (pt.IsValueType && !pt.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(pt))
+            {
+                sb.AppendLine($"            {realClsName} {varName} = default({realClsName});");
+                sb.AppendLine("            // TODO: CLR value type reflection fallback: Step 13");
+            }
+            else
+            {
+                if (pt.IsByRef || pt == typeof(System.TypedReference) || (pt.IsValueType && !pt.IsPrimitive && !pt.IsEnum && (valueTypeBinders == null || !valueTypeBinders.Contains(pt))))
+                {
+                    sb.AppendLine($"            {realClsName} {varName} = default({realClsName});");
+                    sb.AppendLine("            // TODO: ByRef or unsupported ValueType parameters in Neo");
+                }
+                else
+                {
+                    if (pt.IsPrimitive || pt.IsEnum)
+                    {
+                        if (pt == typeof(int) || pt.IsEnum) { sb.AppendLine($"            {realClsName} {varName} = ({realClsName})ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(long)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoInt64(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(float)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoFloat(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(double)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(bool)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;"); }
+                        else if (pt == typeof(byte)) { sb.AppendLine($"            {realClsName} {varName} = (byte)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(sbyte)) { sb.AppendLine($"            {realClsName} {varName} = (sbyte)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(short)) { sb.AppendLine($"            {realClsName} {varName} = (short)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(ushort)) { sb.AppendLine($"            {realClsName} {varName} = (ushort)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(uint)) { sb.AppendLine($"            {realClsName} {varName} = (uint)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(ulong)) { sb.AppendLine($"            {realClsName} {varName} = (ulong)ILIntepreter.ReadNeoInt64(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(char)) { sb.AppendLine($"            {realClsName} {varName} = (char)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else 
+                        { 
+                            sb.AppendLine($"            {realClsName} {varName} = default({realClsName});");
+                            sb.AppendLine($"            // TODO: Primitive {pt.Name}"); 
+                        }
+                    }
+                    else
+                    {
+                        sb.AppendLine($"            {realClsName} {varName} = ({realClsName})ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);");
+                    }
+                }
+            }
+        }
+
         internal static void AppendArgumentCode(this Type p, StringBuilder sb, int idx, string name, List<Type> valueTypeBinders, bool isMultiArr, bool hasByRef, bool needFree)
         {
             string clsName, realClsName;
@@ -376,6 +434,41 @@ namespace ILRuntime.Runtime.CLRBinding
                     sb.Append(paramName);
                     sb.AppendLine(";");
                 }*/
+            }
+        }
+
+        internal static void GetReturnValueCodeNeo(this Type type, StringBuilder sb)
+        {
+            if (type.IsPrimitive || type.IsEnum)
+            {
+                if (type == typeof(int) || type.IsEnum) sb.AppendLine("            if (__retDst != null) *(int*)__retDst = (int)result_of_this_method;");
+                else if (type == typeof(long)) sb.AppendLine("            if (__retDst != null) *(long*)__retDst = (long)result_of_this_method;");
+                else if (type == typeof(float)) sb.AppendLine("            if (__retDst != null) *(float*)__retDst = (float)result_of_this_method;");
+                else if (type == typeof(double)) sb.AppendLine("            if (__retDst != null) *(double*)__retDst = (double)result_of_this_method;");
+                else if (type == typeof(bool)) sb.AppendLine("            if (__retDst != null) *(int*)__retDst = result_of_this_method ? 1 : 0;");
+                else if (type == typeof(byte)) sb.AppendLine("            if (__retDst != null) *(int*)__retDst = (byte)result_of_this_method;");
+                else if (type == typeof(sbyte)) sb.AppendLine("            if (__retDst != null) *(int*)__retDst = (sbyte)result_of_this_method;");
+                else if (type == typeof(short)) sb.AppendLine("            if (__retDst != null) *(int*)__retDst = (short)result_of_this_method;");
+                else if (type == typeof(ushort)) sb.AppendLine("            if (__retDst != null) *(int*)__retDst = (ushort)result_of_this_method;");
+                else if (type == typeof(uint)) sb.AppendLine("            if (__retDst != null) *(uint*)__retDst = (uint)result_of_this_method;");
+                else if (type == typeof(ulong)) sb.AppendLine("            if (__retDst != null) *(ulong*)__retDst = (ulong)result_of_this_method;");
+                else if (type == typeof(char)) sb.AppendLine("            if (__retDst != null) *(int*)__retDst = (char)result_of_this_method;");
+                else sb.AppendLine($"            throw new NotImplementedException(\"Primitive return {type.Name}\");");
+            }
+            else if (type.IsValueType)
+            {
+                sb.AppendLine("            // TODO: CLR value type return in reflection fallback: Step 13");
+            }
+            else
+            {
+                sb.AppendLine(@"            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }");
             }
         }
 

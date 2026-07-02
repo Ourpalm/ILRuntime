@@ -30,15 +30,34 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Convert);
             args = new Type[]{typeof(System.String), typeof(System.Int32)};
             method = type.GetMethod("ToInt64", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, ToInt64_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, ToInt64_0);
+#endif
             args = new Type[]{typeof(System.Object), typeof(System.Type)};
             method = type.GetMethod("ChangeType", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, ChangeType_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, ChangeType_1);
+#endif
 
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void ToInt64_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.String @value = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Int32 @fromBase = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            var result_of_this_method = System.Convert.ToInt64(@value, @fromBase);
+            if (__retDst != null) *(long*)__retDst = (long)result_of_this_method;
+        }
+#else
         static StackObject* ToInt64_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -59,7 +78,26 @@ namespace ILRuntime.Runtime.Generated
             *(long*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void ChangeType_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Object @value = (System.Object)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Type @conversionType = (System.Type)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Convert.ChangeType(@value, @conversionType);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* ChangeType_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -84,6 +122,7 @@ namespace ILRuntime.Runtime.Generated
             }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method, true);
         }
+#endif
 
 
 

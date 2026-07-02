@@ -30,7 +30,11 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Runtime.CompilerServices.AsyncVoidMethodBuilder);
             args = new Type[]{};
             method = type.GetMethod("Create", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Create_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Create_0);
+#endif
             Dictionary<string, List<MethodInfo>> genericMethods = new Dictionary<string, List<MethodInfo>>();
             List<MethodInfo> lst = null;                    
             foreach(var m in type.GetMethods())
@@ -53,7 +57,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).MakeByRefType()))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Start_1_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Start_1);
+#endif
 
                         break;
                     }
@@ -67,7 +75,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.Runtime.CompilerServices.TaskAwaiter).MakeByRefType(), typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).MakeByRefType()))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, AwaitUnsafeOnCompleted_2_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, AwaitUnsafeOnCompleted_2);
+#endif
 
                         break;
                     }
@@ -75,10 +87,18 @@ namespace ILRuntime.Runtime.Generated
             }
             args = new Type[]{typeof(System.Exception)};
             method = type.GetMethod("SetException", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, SetException_3_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, SetException_3);
+#endif
             args = new Type[]{};
             method = type.GetMethod("SetResult", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, SetResult_4_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, SetResult_4);
+#endif
             args = new Type[]{typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>), typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)};
             if (genericMethods.TryGetValue("AwaitUnsafeOnCompleted", out lst))
             {
@@ -87,7 +107,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>).MakeByRefType(), typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).MakeByRefType()))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, AwaitUnsafeOnCompleted_5_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, AwaitUnsafeOnCompleted_5);
+#endif
 
                         break;
                     }
@@ -101,7 +125,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(void), typeof(System.Runtime.CompilerServices.TaskAwaiter<ILRuntime.Runtime.Intepreter.ILTypeInstance>).MakeByRefType(), typeof(ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor).MakeByRefType()))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, AwaitUnsafeOnCompleted_6_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, AwaitUnsafeOnCompleted_6);
+#endif
 
                         break;
                     }
@@ -159,6 +187,15 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+#if ENABLE_NEO_MODE
+        static void Create_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            var result_of_this_method = System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Create();
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* Create_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -169,7 +206,19 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Start_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.AsyncVoidMethodBuilder instance_of_this_method = default(System.Runtime.CompilerServices.AsyncVoidMethodBuilder);
+            // TODO: ValueType instance in Neo
+            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.Start<ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @stateMachine);
+        }
+#else
         static StackObject* Start_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -244,7 +293,21 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void AwaitUnsafeOnCompleted_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.AsyncVoidMethodBuilder instance_of_this_method = default(System.Runtime.CompilerServices.AsyncVoidMethodBuilder);
+            // TODO: ValueType instance in Neo
+            System.Runtime.CompilerServices.TaskAwaiter @awaiter = default(System.Runtime.CompilerServices.TaskAwaiter);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @awaiter, ref @stateMachine);
+        }
+#else
         static StackObject* AwaitUnsafeOnCompleted_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -379,7 +442,19 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void SetException_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.AsyncVoidMethodBuilder instance_of_this_method = default(System.Runtime.CompilerServices.AsyncVoidMethodBuilder);
+            // TODO: ValueType instance in Neo
+            System.Exception @exception = (System.Exception)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.SetException(@exception);
+        }
+#else
         static StackObject* SetException_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -402,7 +477,18 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void SetResult_4_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.AsyncVoidMethodBuilder instance_of_this_method = default(System.Runtime.CompilerServices.AsyncVoidMethodBuilder);
+            // TODO: ValueType instance in Neo
+            instance_of_this_method.SetResult();
+        }
+#else
         static StackObject* SetResult_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -421,7 +507,21 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void AwaitUnsafeOnCompleted_5_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.AsyncVoidMethodBuilder instance_of_this_method = default(System.Runtime.CompilerServices.AsyncVoidMethodBuilder);
+            // TODO: ValueType instance in Neo
+            System.Runtime.CompilerServices.TaskAwaiter<System.Int32> @awaiter = default(System.Runtime.CompilerServices.TaskAwaiter<System.Int32>);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<System.Int32>, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @awaiter, ref @stateMachine);
+        }
+#else
         static StackObject* AwaitUnsafeOnCompleted_5(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -556,7 +656,21 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void AwaitUnsafeOnCompleted_6_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Runtime.CompilerServices.AsyncVoidMethodBuilder instance_of_this_method = default(System.Runtime.CompilerServices.AsyncVoidMethodBuilder);
+            // TODO: ValueType instance in Neo
+            System.Runtime.CompilerServices.TaskAwaiter<ILRuntime.Runtime.Intepreter.ILTypeInstance> @awaiter = default(System.Runtime.CompilerServices.TaskAwaiter<ILRuntime.Runtime.Intepreter.ILTypeInstance>);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor @stateMachine = (ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<ILRuntime.Runtime.Intepreter.ILTypeInstance>, ILRuntimeTest.TestFramework.IAsyncStateMachineClassInheritanceAdaptor.IAsyncStateMachineAdaptor>(ref @awaiter, ref @stateMachine);
+        }
+#else
         static StackObject* AwaitUnsafeOnCompleted_6(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -691,6 +805,7 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
 
 

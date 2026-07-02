@@ -418,53 +418,76 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             if (foundPushes != pushCnt)
                                 throw new Exception("Neo lowering could not find expected Push instructions for Call/Newobj.");
                             
+                             StackSlotInfo[] paramInfos = null;
                             if (targetMethod is ILRuntime.CLR.Method.ILMethod ilm)
                             {
-                                var paramInfos = ilm.NeoFrame.ParamInfos;
-                                if (paramInfos != null)
+                                paramInfos = ilm.NeoFrame.ParamInfos;
+                            }
+                            else if (targetMethod is ILRuntime.CLR.Method.CLRMethod clrMethod)
+                            {
+                                // Generate contiguous paramInfos for CLRMethod
+                                int totalParams = pCnt + (op.Code == OpCodeREnum.Newobj ? 1 : 0);
+                                paramInfos = new StackSlotInfo[totalParams];
+                                int curPrim = 0, curRef = 0;
+                                if (op.Code == OpCodeREnum.Newobj)
                                 {
-                                    List<ushort> primSrc = new List<ushort>();
-                                    List<ushort> primDst = new List<ushort>();
-                                    List<ushort> primSize = new List<ushort>();
-                                    List<ushort> refSrc = new List<ushort>();
-                                    List<ushort> refDst = new List<ushort>();
-                                    
-                                    for (int p = 0; p < pCnt; p++)
-                                    {
-                                        var srcInfo = localInfos[srcRegs[p]];
-                                        // For Newobj, the ILMethod paramInfos[0] is 'this', so we need to offset the dstInfo by 1
-                                        int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
-                                        var dstInfo = paramInfos[dstIndex];
-                                        
-                                        if (dstInfo.Size > 0)
-                                        {
-                                            primSrc.Add((ushort)srcInfo.Offset);
-                                            primDst.Add((ushort)dstInfo.Offset);
-                                            primSize.Add((ushort)dstInfo.Size);
-                                        }
-                                        for (int r = 0; r < dstInfo.RefCount; r++)
-                                        {
-                                            refSrc.Add((ushort)(srcInfo.RefOffset + r));
-                                            refDst.Add((ushort)(dstInfo.RefOffset + r));
-                                        }
-                                    }
-                                    
-                                    NeoCallParamMap map = new NeoCallParamMap();
-                                    if (primSrc.Count > 0)
-                                    {
-                                        map.PrimitiveSrc = primSrc.ToArray();
-                                        map.PrimitiveDst = primDst.ToArray();
-                                        map.PrimitiveSize = primSize.ToArray();
-                                    }
-                                    if (refSrc.Count > 0)
-                                    {
-                                        map.RefSrc = refSrc.ToArray();
-                                        map.RefDst = refDst.ToArray();
-                                    }
-                                    
-                                    op.Operand = callParams.Count;
-                                    callParams.Add(map);
+                                    paramInfos[0] = new StackSlotInfo { Offset = curPrim, Size = 4, RefOffset = curRef, RefCount = 1 };
+                                    curPrim += 4;
+                                    curRef += 1;
                                 }
+                                for (int p = 0; p < pCnt; p++)
+                                {
+                                    int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
+                                    var srcInfo = localInfos[srcRegs[p]];
+                                    paramInfos[dstIndex] = new StackSlotInfo { Offset = curPrim, Size = srcInfo.Size, RefOffset = curRef, RefCount = srcInfo.RefCount };
+                                    curPrim += srcInfo.Size;
+                                    curRef += srcInfo.RefCount;
+                                }
+                            }
+
+                            if (paramInfos != null)
+                            {
+                                List<ushort> primSrc = new List<ushort>();
+                                List<ushort> primDst = new List<ushort>();
+                                List<ushort> primSize = new List<ushort>();
+                                List<ushort> refSrc = new List<ushort>();
+                                List<ushort> refDst = new List<ushort>();
+                                
+                                for (int p = 0; p < pCnt; p++)
+                                {
+                                    var srcInfo = localInfos[srcRegs[p]];
+                                    // For Newobj, the ILMethod paramInfos[0] is 'this', so we need to offset the dstInfo by 1
+                                    int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
+                                    var dstInfo = paramInfos[dstIndex];
+                                    
+                                    if (dstInfo.Size > 0)
+                                    {
+                                        primSrc.Add((ushort)srcInfo.Offset);
+                                        primDst.Add((ushort)dstInfo.Offset);
+                                        primSize.Add((ushort)dstInfo.Size);
+                                    }
+                                    for (int r = 0; r < dstInfo.RefCount; r++)
+                                    {
+                                        refSrc.Add((ushort)(srcInfo.RefOffset + r));
+                                        refDst.Add((ushort)(dstInfo.RefOffset + r));
+                                    }
+                                }
+                                
+                                NeoCallParamMap map = new NeoCallParamMap();
+                                if (primSrc.Count > 0)
+                                {
+                                    map.PrimitiveSrc = primSrc.ToArray();
+                                    map.PrimitiveDst = primDst.ToArray();
+                                    map.PrimitiveSize = primSize.ToArray();
+                                }
+                                if (refSrc.Count > 0)
+                                {
+                                    map.RefSrc = refSrc.ToArray();
+                                    map.RefDst = refDst.ToArray();
+                                }
+                                
+                                op.Operand = callParams.Count;
+                                callParams.Add(map);
                             }
                             
                             if (op.Code == OpCodeREnum.Newobj)

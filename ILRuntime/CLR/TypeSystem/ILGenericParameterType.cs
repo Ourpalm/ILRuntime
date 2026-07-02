@@ -158,7 +158,7 @@ namespace ILRuntime.CLR.TypeSystem
 
         public bool IsValueType
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         public bool IsPrimitive

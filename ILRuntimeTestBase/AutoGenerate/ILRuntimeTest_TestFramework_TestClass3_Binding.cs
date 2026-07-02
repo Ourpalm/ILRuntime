@@ -31,10 +31,18 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.TestClass3);
             args = new Type[]{typeof(System.Byte).MakeByRefType(), typeof(System.Int32), typeof(System.Int32)};
             method = type.GetMethod("setBit", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, setBit_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, setBit_0);
+#endif
             args = new Type[]{typeof(System.Int32).MakeByRefType(), typeof(System.Int32)};
             method = type.GetMethod("getString", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, getString_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, getString_1);
+#endif
 
             field = type.GetField("Struct", flag);
             app.RegisterCLRFieldGetter(field, get_Struct_0);
@@ -43,11 +51,26 @@ namespace ILRuntime.Runtime.Generated
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void setBit_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Byte @value = (byte)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Int32 @pos = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Int32 @bit = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            ILRuntimeTest.TestFramework.TestClass3.setBit(ref @value, @pos, @bit);
+        }
+#else
         static StackObject* setBit_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -118,7 +141,26 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void getString_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Int32 @startIndex = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Int32 @length = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestClass3.getString(ref @startIndex, @length);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* getString_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -184,6 +226,7 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
         static object get_Struct_0(ref object o)
@@ -211,6 +254,30 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            ILRuntimeTest.TestFramework.TestClass3 result_of_this_method = new ILRuntimeTest.TestFramework.TestClass3();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -228,6 +295,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
     }

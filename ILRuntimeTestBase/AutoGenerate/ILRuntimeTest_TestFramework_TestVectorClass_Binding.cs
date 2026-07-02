@@ -31,19 +31,39 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.TestVectorClass);
             args = new Type[]{};
             method = type.GetMethod("get_Vector2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_Vector2_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_Vector2_0);
+#endif
             args = new Type[]{typeof(System.Int32), typeof(System.String), typeof(ILRuntimeTest.TestFramework.TestVector3), typeof(ILRuntimeTest.TestFramework.TestVectorClass)};
             method = type.GetMethod("ValueTypePerfTest", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, ValueTypePerfTest_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, ValueTypePerfTest_1);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3)};
             method = type.GetMethod("set_Vector2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, set_Vector2_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, set_Vector2_2);
+#endif
             args = new Type[]{};
             method = type.GetMethod("get_Obj", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_Obj_3_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_Obj_3);
+#endif
             args = new Type[]{typeof(System.Int32), typeof(System.String), typeof(ILRuntimeTest.TestFramework.TestVectorClass), typeof(ILRuntimeTest.TestFramework.TestVectorClass)};
             method = type.GetMethod("ValueTypePerfTest2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, ValueTypePerfTest2_4_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, ValueTypePerfTest2_4);
+#endif
 
             field = type.GetField("vector", flag);
             app.RegisterCLRFieldGetter(field, get_vector_0);
@@ -52,11 +72,25 @@ namespace ILRuntime.Runtime.Generated
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void get_Vector2_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = instance_of_this_method.Vector2;
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* get_Vector2_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -76,7 +110,21 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
             }
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void ValueTypePerfTest_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Int32 @a = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.String @b = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestVector3 @c = default(ILRuntimeTest.TestFramework.TestVector3);
+            // TODO: CLR value type reflection fallback: Step 13
+            ILRuntimeTest.TestFramework.TestVectorClass @d = (ILRuntimeTest.TestFramework.TestVectorClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestVectorClass.ValueTypePerfTest(@a, @b, @c, @d);
+        }
+#else
         static StackObject* ValueTypePerfTest_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -108,7 +156,19 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void set_Vector2_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestVector3 @value = default(ILRuntimeTest.TestFramework.TestVector3);
+            // TODO: CLR value type reflection fallback: Step 13
+            instance_of_this_method.Vector2 = value;
+        }
+#else
         static StackObject* set_Vector2_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -132,7 +192,25 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void get_Obj_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestVectorClass instance_of_this_method = (ILRuntimeTest.TestFramework.TestVectorClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = instance_of_this_method.Obj;
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* get_Obj_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -147,7 +225,20 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void ValueTypePerfTest2_4_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Int32 @a = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.String @b = (System.String)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestVectorClass @c = (ILRuntimeTest.TestFramework.TestVectorClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestVectorClass @d = (ILRuntimeTest.TestFramework.TestVectorClass)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.TestVectorClass.ValueTypePerfTest2(@a, @b, @c, @d);
+        }
+#else
         static StackObject* ValueTypePerfTest2_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -174,6 +265,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
         static object get_vector_0(ref object o)
@@ -211,6 +303,30 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            ILRuntimeTest.TestFramework.TestVectorClass result_of_this_method = new ILRuntimeTest.TestFramework.TestVectorClass();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -228,6 +344,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
     }

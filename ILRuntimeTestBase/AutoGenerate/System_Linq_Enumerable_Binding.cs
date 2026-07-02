@@ -49,7 +49,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.IEnumerable<System.Int32>), typeof(System.Collections.Generic.IEnumerable<System.Int32>), typeof(System.Func<System.Int32, System.Boolean>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Where_0_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Where_0);
+#endif
 
                         break;
                     }
@@ -63,7 +67,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Int32), typeof(System.Collections.Generic.IEnumerable<System.Int32>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Count_1_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Count_1);
+#endif
 
                         break;
                     }
@@ -77,7 +85,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Single), typeof(System.Collections.Generic.IEnumerable<ILRuntimeTest.TestFramework.TestVector3>), typeof(System.Func<ILRuntimeTest.TestFramework.TestVector3, System.Single>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Sum_2_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Sum_2);
+#endif
 
                         break;
                     }
@@ -91,7 +103,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.IEnumerable<System.Int32>), typeof(System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>>), typeof(System.Func<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>, System.Collections.Generic.IEnumerable<System.Int32>>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, SelectMany_3_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, SelectMany_3);
+#endif
 
                         break;
                     }
@@ -105,7 +121,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.List<System.Int32>), typeof(System.Collections.Generic.IEnumerable<System.Int32>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, ToList_4_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, ToList_4);
+#endif
 
                         break;
                     }
@@ -119,7 +139,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.List<System.Reflection.FieldInfo>), typeof(System.Collections.Generic.IEnumerable<System.Reflection.FieldInfo>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, ToList_5_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, ToList_5);
+#endif
 
                         break;
                     }
@@ -133,7 +157,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.IEnumerable<System.String>), typeof(System.Collections.Generic.IEnumerable<System.Reflection.FieldInfo>), typeof(System.Func<System.Reflection.FieldInfo, System.String>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Select_6_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Select_6);
+#endif
 
                         break;
                     }
@@ -147,7 +175,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Boolean), typeof(System.Collections.Generic.IEnumerable<System.Int32[]>), typeof(System.Int32[])))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Contains_7_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Contains_7);
+#endif
 
                         break;
                     }
@@ -161,7 +193,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.IEnumerable<System.Byte>), typeof(System.Collections.Generic.IEnumerable<System.Byte>), typeof(System.Func<System.Byte, System.Boolean>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Where_8_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Where_8);
+#endif
 
                         break;
                     }
@@ -175,7 +211,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.IEnumerable<System.Linq.IGrouping<System.Byte, System.Byte>>), typeof(System.Collections.Generic.IEnumerable<System.Byte>), typeof(System.Func<System.Byte, System.Byte>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, GroupBy_9_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, GroupBy_9);
+#endif
 
                         break;
                     }
@@ -189,7 +229,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Collections.Generic.IEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance>), typeof(System.Collections.Generic.IEnumerable<System.Linq.IGrouping<System.Byte, System.Byte>>), typeof(System.Func<System.Linq.IGrouping<System.Byte, System.Byte>, ILRuntime.Runtime.Intepreter.ILTypeInstance>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Select_10_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Select_10);
+#endif
 
                         break;
                     }
@@ -203,7 +247,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Linq.IOrderedEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance>), typeof(System.Collections.Generic.IEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance>), typeof(System.Func<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, OrderBy_11_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, OrderBy_11);
+#endif
 
                         break;
                     }
@@ -217,7 +265,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(ILRuntime.Runtime.Intepreter.ILTypeInstance[]), typeof(System.Collections.Generic.IEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, ToArray_12_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, ToArray_12);
+#endif
 
                         break;
                     }
@@ -231,7 +283,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Int32), typeof(System.Collections.Generic.IEnumerable<System.Byte>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Count_13_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Count_13);
+#endif
 
                         break;
                     }
@@ -245,7 +301,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Int32), typeof(System.Collections.Generic.IEnumerable<System.Object>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, Count_14_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, Count_14);
+#endif
 
                         break;
                     }
@@ -256,6 +316,24 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Where_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Int32> @source = (System.Collections.Generic.IEnumerable<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<System.Int32, System.Boolean> @predicate = (System.Func<System.Int32, System.Boolean>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Where<System.Int32>(@source, @predicate);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Where_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -275,7 +353,18 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Count_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Int32> @source = (System.Collections.Generic.IEnumerable<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Count<System.Int32>(@source);
+            if (__retDst != null) *(int*)__retDst = (int)result_of_this_method;
+        }
+#else
         static StackObject* Count_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -293,7 +382,19 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Sum_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<ILRuntimeTest.TestFramework.TestVector3> @source = (System.Collections.Generic.IEnumerable<ILRuntimeTest.TestFramework.TestVector3>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<ILRuntimeTest.TestFramework.TestVector3, System.Single> @selector = (System.Func<ILRuntimeTest.TestFramework.TestVector3, System.Single>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Sum<ILRuntimeTest.TestFramework.TestVector3>(@source, @selector);
+            if (__retDst != null) *(float*)__retDst = (float)result_of_this_method;
+        }
+#else
         static StackObject* Sum_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -315,7 +416,26 @@ namespace ILRuntime.Runtime.Generated
             *(float*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void SelectMany_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>> @source = (System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>, System.Collections.Generic.IEnumerable<System.Int32>> @selector = (System.Func<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>, System.Collections.Generic.IEnumerable<System.Int32>>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.SelectMany<System.Collections.Generic.KeyValuePair<System.Int32, System.Collections.Generic.List<System.Int32>>, System.Int32>(@source, @selector);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* SelectMany_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -335,7 +455,25 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void ToList_4_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Int32> @source = (System.Collections.Generic.IEnumerable<System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.ToList<System.Int32>(@source);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* ToList_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -351,7 +489,25 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void ToList_5_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Reflection.FieldInfo> @source = (System.Collections.Generic.IEnumerable<System.Reflection.FieldInfo>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.ToList<System.Reflection.FieldInfo>(@source);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* ToList_5(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -367,7 +523,26 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Select_6_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Reflection.FieldInfo> @source = (System.Collections.Generic.IEnumerable<System.Reflection.FieldInfo>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<System.Reflection.FieldInfo, System.String> @selector = (System.Func<System.Reflection.FieldInfo, System.String>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Select<System.Reflection.FieldInfo, System.String>(@source, @selector);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Select_6(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -387,7 +562,19 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Contains_7_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Int32[]> @source = (System.Collections.Generic.IEnumerable<System.Int32[]>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Int32[] @value = (System.Int32[])ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Contains<System.Int32[]>(@source, @value);
+            if (__retDst != null) *(int*)__retDst = result_of_this_method ? 1 : 0;
+        }
+#else
         static StackObject* Contains_7(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -409,7 +596,26 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method ? 1 : 0;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Where_8_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Byte> @source = (System.Collections.Generic.IEnumerable<System.Byte>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<System.Byte, System.Boolean> @predicate = (System.Func<System.Byte, System.Boolean>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Where<System.Byte>(@source, @predicate);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Where_8(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -429,7 +635,26 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void GroupBy_9_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Byte> @source = (System.Collections.Generic.IEnumerable<System.Byte>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<System.Byte, System.Byte> @keySelector = (System.Func<System.Byte, System.Byte>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.GroupBy<System.Byte, System.Byte>(@source, @keySelector);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* GroupBy_9(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -449,7 +674,26 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Select_10_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Linq.IGrouping<System.Byte, System.Byte>> @source = (System.Collections.Generic.IEnumerable<System.Linq.IGrouping<System.Byte, System.Byte>>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<System.Linq.IGrouping<System.Byte, System.Byte>, ILRuntime.Runtime.Intepreter.ILTypeInstance> @selector = (System.Func<System.Linq.IGrouping<System.Byte, System.Byte>, ILRuntime.Runtime.Intepreter.ILTypeInstance>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Select<System.Linq.IGrouping<System.Byte, System.Byte>, ILRuntime.Runtime.Intepreter.ILTypeInstance>(@source, @selector);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Select_10(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -469,7 +713,26 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void OrderBy_11_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance> @source = (System.Collections.Generic.IEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Func<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32> @keySelector = (System.Func<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.OrderBy<ILRuntime.Runtime.Intepreter.ILTypeInstance, System.Int32>(@source, @keySelector);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* OrderBy_11(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -489,7 +752,25 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void ToArray_12_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance> @source = (System.Collections.Generic.IEnumerable<ILRuntime.Runtime.Intepreter.ILTypeInstance>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.ToArray<ILRuntime.Runtime.Intepreter.ILTypeInstance>(@source);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* ToArray_12(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -505,7 +786,18 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Count_13_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Byte> @source = (System.Collections.Generic.IEnumerable<System.Byte>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Count<System.Byte>(@source);
+            if (__retDst != null) *(int*)__retDst = (int)result_of_this_method;
+        }
+#else
         static StackObject* Count_13(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -523,7 +815,18 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Count_14_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.IEnumerable<System.Object> @source = (System.Collections.Generic.IEnumerable<System.Object>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Linq.Enumerable.Count<System.Object>(@source);
+            if (__retDst != null) *(int*)__retDst = (int)result_of_this_method;
+        }
+#else
         static StackObject* Count_14(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -541,6 +844,7 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
 
 

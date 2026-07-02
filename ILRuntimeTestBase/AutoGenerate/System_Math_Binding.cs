@@ -30,21 +30,47 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Math);
             args = new Type[]{typeof(System.Single)};
             method = type.GetMethod("Abs", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Abs_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Abs_0);
+#endif
             args = new Type[]{typeof(System.Double), typeof(System.Double)};
             method = type.GetMethod("Pow", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Pow_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Pow_1);
+#endif
             args = new Type[]{typeof(System.Double)};
             method = type.GetMethod("Abs", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Abs_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Abs_2);
+#endif
             args = new Type[]{typeof(System.Double)};
             method = type.GetMethod("Sqrt", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Sqrt_3_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Sqrt_3);
+#endif
 
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Abs_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Single @value = ILIntepreter.ReadNeoFloat(__frameBase, ref __curPrim);
+            var result_of_this_method = System.Math.Abs(@value);
+            if (__retDst != null) *(float*)__retDst = (float)result_of_this_method;
+        }
+#else
         static StackObject* Abs_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -61,7 +87,19 @@ namespace ILRuntime.Runtime.Generated
             *(float*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Pow_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Double @x = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);
+            System.Double @y = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);
+            var result_of_this_method = System.Math.Pow(@x, @y);
+            if (__retDst != null) *(double*)__retDst = (double)result_of_this_method;
+        }
+#else
         static StackObject* Pow_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -81,7 +119,18 @@ namespace ILRuntime.Runtime.Generated
             *(double*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Abs_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Double @value = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);
+            var result_of_this_method = System.Math.Abs(@value);
+            if (__retDst != null) *(double*)__retDst = (double)result_of_this_method;
+        }
+#else
         static StackObject* Abs_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -98,7 +147,18 @@ namespace ILRuntime.Runtime.Generated
             *(double*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void Sqrt_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Double @d = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);
+            var result_of_this_method = System.Math.Sqrt(@d);
+            if (__retDst != null) *(double*)__retDst = (double)result_of_this_method;
+        }
+#else
         static StackObject* Sqrt_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -115,6 +175,7 @@ namespace ILRuntime.Runtime.Generated
             *(double*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
 
 

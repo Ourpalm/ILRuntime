@@ -31,40 +31,88 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.DelegateTest);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.IntDelegate)};
             method = type.GetMethod("add_IntDelegateEventTest", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, add_IntDelegateEventTest_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, add_IntDelegateEventTest_0);
+#endif
             args = new Type[]{};
             method = type.GetMethod("TestEvent", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, TestEvent_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, TestEvent_1);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.IntDelegate)};
             method = type.GetMethod("remove_IntDelegateEventTest", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, remove_IntDelegateEventTest_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, remove_IntDelegateEventTest_2);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.IntDelegate)};
             method = type.GetMethod("add_IntDelegateEventTest2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, add_IntDelegateEventTest2_3_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, add_IntDelegateEventTest2_3);
+#endif
             args = new Type[]{};
             method = type.GetMethod("TestEvent2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, TestEvent2_4_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, TestEvent2_4);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.IntDelegate)};
             method = type.GetMethod("remove_IntDelegateEventTest2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, remove_IntDelegateEventTest2_5_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, remove_IntDelegateEventTest2_5);
+#endif
             args = new Type[]{};
             method = type.GetMethod("TestEnumDelegate", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, TestEnumDelegate_6_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, TestEnumDelegate_6);
+#endif
             args = new Type[]{};
             method = type.GetMethod("TestEnumDelegate2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, TestEnumDelegate2_7_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, TestEnumDelegate2_7);
+#endif
             args = new Type[]{typeof(System.Action<System.Single, System.Double, System.Int32>)};
             method = type.GetMethod("add_OnIntEvent", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, add_OnIntEvent_8_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, add_OnIntEvent_8);
+#endif
             args = new Type[]{typeof(System.Single), typeof(System.Double), typeof(System.Int32)};
             method = type.GetMethod("TestEvent3", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, TestEvent3_9_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, TestEvent3_9);
+#endif
             args = new Type[]{typeof(System.Action<System.Single, System.Double, System.Int32>)};
             method = type.GetMethod("remove_OnIntEvent", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, remove_OnIntEvent_10_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, remove_OnIntEvent_10);
+#endif
             args = new Type[]{};
             method = type.GetMethod("TestEvent4", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, TestEvent4_11_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, TestEvent4_11);
+#endif
 
             field = type.GetField("IntDelegateTest", flag);
             app.RegisterCLRFieldGetter(field, get_IntDelegateTest_0);
@@ -93,11 +141,24 @@ namespace ILRuntime.Runtime.Generated
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void add_IntDelegateEventTest_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.IntDelegate @value = (ILRuntimeTest.TestFramework.IntDelegate)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateEventTest += value;
+        }
+#else
         static StackObject* add_IntDelegateEventTest_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -113,7 +174,16 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void TestEvent_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.DelegateTest.TestEvent();
+        }
+#else
         static StackObject* TestEvent_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -124,7 +194,17 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void remove_IntDelegateEventTest_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.IntDelegate @value = (ILRuntimeTest.TestFramework.IntDelegate)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.DelegateTest.IntDelegateEventTest -= value;
+        }
+#else
         static StackObject* remove_IntDelegateEventTest_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -140,7 +220,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void add_IntDelegateEventTest2_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.DelegateTest instance_of_this_method = (ILRuntimeTest.TestFramework.DelegateTest)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.IntDelegate @value = (ILRuntimeTest.TestFramework.IntDelegate)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.IntDelegateEventTest2 += value;
+        }
+#else
         static StackObject* add_IntDelegateEventTest2_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -159,7 +250,17 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void TestEvent2_4_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.DelegateTest instance_of_this_method = (ILRuntimeTest.TestFramework.DelegateTest)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.TestEvent2();
+        }
+#else
         static StackObject* TestEvent2_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -174,7 +275,18 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void remove_IntDelegateEventTest2_5_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.DelegateTest instance_of_this_method = (ILRuntimeTest.TestFramework.DelegateTest)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.IntDelegate @value = (ILRuntimeTest.TestFramework.IntDelegate)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.IntDelegateEventTest2 -= value;
+        }
+#else
         static StackObject* remove_IntDelegateEventTest2_5(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -193,7 +305,16 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void TestEnumDelegate_6_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.DelegateTest.TestEnumDelegate();
+        }
+#else
         static StackObject* TestEnumDelegate_6(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -204,7 +325,16 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void TestEnumDelegate2_7_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.DelegateTest.TestEnumDelegate2();
+        }
+#else
         static StackObject* TestEnumDelegate2_7(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -215,7 +345,17 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void add_OnIntEvent_8_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Action<System.Single, System.Double, System.Int32> @value = (System.Action<System.Single, System.Double, System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.DelegateTest.OnIntEvent += value;
+        }
+#else
         static StackObject* add_OnIntEvent_8(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -231,7 +371,19 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void TestEvent3_9_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Single @a = ILIntepreter.ReadNeoFloat(__frameBase, ref __curPrim);
+            System.Double @b = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);
+            System.Int32 @c = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            ILRuntimeTest.TestFramework.DelegateTest.TestEvent3(@a, @b, @c);
+        }
+#else
         static StackObject* TestEvent3_9(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -252,7 +404,17 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void remove_OnIntEvent_10_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Action<System.Single, System.Double, System.Int32> @value = (System.Action<System.Single, System.Double, System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            ILRuntimeTest.TestFramework.DelegateTest.OnIntEvent -= value;
+        }
+#else
         static StackObject* remove_OnIntEvent_10(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -268,7 +430,17 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void TestEvent4_11_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            var result_of_this_method = ILRuntimeTest.TestFramework.DelegateTest.TestEvent4();
+            if (__retDst != null) *(int*)__retDst = result_of_this_method ? 1 : 0;
+        }
+#else
         static StackObject* TestEvent4_11(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -281,6 +453,7 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method ? 1 : 0;
             return __ret + 1;
         }
+#endif
 
 
         static object get_IntDelegateTest_0(ref object o)
@@ -428,6 +601,30 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            ILRuntimeTest.TestFramework.DelegateTest result_of_this_method = new ILRuntimeTest.TestFramework.DelegateTest();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -445,6 +642,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
     }

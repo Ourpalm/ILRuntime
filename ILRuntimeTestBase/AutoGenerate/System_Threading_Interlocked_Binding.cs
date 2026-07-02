@@ -49,7 +49,11 @@ namespace ILRuntime.Runtime.Generated
                     if(m.MatchGenericParameters(args, typeof(System.Action<System.Single, System.Double, System.Int32>), typeof(System.Action<System.Single, System.Double, System.Int32>).MakeByRefType(), typeof(System.Action<System.Single, System.Double, System.Int32>), typeof(System.Action<System.Single, System.Double, System.Int32>)))
                     {
                         method = m.MakeGenericMethod(args);
+#if ENABLE_NEO_MODE
+                        app.RegisterCLRMethodRedirectionNeo(method, CompareExchange_0_Neo);
+#else
                         app.RegisterCLRMethodRedirection(method, CompareExchange_0);
+#endif
 
                         break;
                     }
@@ -60,6 +64,25 @@ namespace ILRuntime.Runtime.Generated
         }
 
 
+#if ENABLE_NEO_MODE
+        static void CompareExchange_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Action<System.Single, System.Double, System.Int32> @location1 = (System.Action<System.Single, System.Double, System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<System.Single, System.Double, System.Int32> @value = (System.Action<System.Single, System.Double, System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Action<System.Single, System.Double, System.Int32> @comparand = (System.Action<System.Single, System.Double, System.Int32>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            var result_of_this_method = System.Threading.Interlocked.CompareExchange<System.Action<System.Single, System.Double, System.Int32>>(ref @location1, @value, @comparand);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* CompareExchange_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -139,6 +162,7 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
 

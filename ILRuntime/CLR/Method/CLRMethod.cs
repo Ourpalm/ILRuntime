@@ -1,4 +1,4 @@
-﻿using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.TypeSystem;
 using ILRuntime.CLR.Utils;
 using ILRuntime.Runtime.Enviorment;
 using ILRuntime.Runtime.Intepreter;
@@ -24,6 +24,7 @@ namespace ILRuntime.CLR.Method
         CLRType declaringType;
         bool isConstructor;
         CLRRedirectionDelegate redirect;
+        CLRRedirectionDelegateNeo redirectNeo;
         IType[] genericArguments;
         Type[] genericArgumentsCLR;
         object[] invocationParam;
@@ -104,29 +105,49 @@ namespace ILRuntime.CLR.Method
             }
         }
 
+        bool TryGetRedirection<T>(Dictionary<MethodBase, T> map, out T redirect)
+        {
+            redirect = default;
+            if (def != null)
+            {
+                if (def.IsGenericMethod && !def.IsGenericMethodDefinition)
+                {
+                    if (!map.TryGetValue(def.GetGenericMethodDefinition(), out redirect))
+                        map.TryGetValue(def, out redirect);
+                }
+                else
+                    map.TryGetValue(def, out redirect);
+                return redirect != null;
+            }
+            else if (cDef != null)
+            {
+                map.TryGetValue(cDef, out redirect);
+                return redirect != null;
+            }
+            return false;
+        }
+
         public CLRRedirectionDelegate Redirection
         {
             get
             {
                 if (redirect == null)
                 {
-                    if (def != null)
-                    {
-                        if (def.IsGenericMethod && !def.IsGenericMethodDefinition)
-                        {
-                            //Redirection of Generic method Definition will be prioritized
-                            if (!appdomain.RedirectMap.TryGetValue(def.GetGenericMethodDefinition(), out redirect))
-                                appdomain.RedirectMap.TryGetValue(def, out redirect);
-                        }
-                        else
-                            appdomain.RedirectMap.TryGetValue(def, out redirect);
-                    }
-                    else if (cDef != null)
-                    {
-                        appdomain.RedirectMap.TryGetValue(cDef, out redirect);
-                    }
+                    TryGetRedirection(appdomain.RedirectMap, out redirect);
                 }
                 return redirect;
+            }
+        }
+
+        public CLRRedirectionDelegateNeo RedirectionNeo
+        {
+            get
+            {
+                if (redirectNeo == null)
+                {
+                    TryGetRedirection(appdomain.RedirectMapNeo, out redirectNeo);
+                }
+                return redirectNeo;
             }
         }
 
@@ -274,6 +295,101 @@ namespace ILRuntime.CLR.Method
         unsafe StackObject* Minus(StackObject* a, int b)
         {
             return (StackObject*)((long)a - sizeof(StackObject) * b);
+        }
+
+        public unsafe object Invoke(byte* targetBase, AutoList mStack, bool isNewObj = false)
+        {
+            if (parameters == null)
+            {
+                InitParameters();
+            }
+            int paramCount = ParameterCount;
+            if (invocationParam == null)
+                invocationParam = new object[paramCount];
+            object[] param = invocationParam;
+
+            int curPrim = 0;
+            object instance = null;
+
+            if (isNewObj)
+            {
+                curPrim += 4; // Skip retRefBase
+            }
+            else if (HasThis)
+            {
+                int thisIdx = *(int*)(targetBase + curPrim);
+                instance = mStack[thisIdx];
+                curPrim += 4;
+            }
+
+            for (int i = 0; i < paramCount; i++)
+            {
+                var pt = Parameters[i];
+                Type t = pt.TypeForCLR;
+
+                if (pt is CLRType clrType && clrType.IsValueType && !clrType.TypeForCLR.IsPrimitive && !clrType.TypeForCLR.IsEnum)
+                {
+                    throw new NotImplementedException("CLR value type reflection fallback: Step 13");
+                }
+
+                if (pt is ILType || !t.IsPrimitive && !t.IsEnum)
+                {
+                    int idx = *(int*)(targetBase + curPrim);
+                    param[i] = mStack[idx];
+                    curPrim += 4;
+                }
+                else
+                {
+                    if (t == typeof(int) || t.IsEnum) { param[i] = *(int*)(targetBase + curPrim); curPrim += 4; }
+                    else if (t == typeof(long)) { param[i] = *(long*)(targetBase + curPrim); curPrim += 8; }
+                    else if (t == typeof(float)) { param[i] = *(float*)(targetBase + curPrim); curPrim += 4; }
+                    else if (t == typeof(double)) { param[i] = *(double*)(targetBase + curPrim); curPrim += 8; }
+                    else if (t == typeof(bool)) { param[i] = *(int*)(targetBase + curPrim) != 0; curPrim += 4; }
+                    else if (t == typeof(byte)) { param[i] = *(byte*)(targetBase + curPrim); curPrim += 4; }
+                    else if (t == typeof(sbyte)) { param[i] = *(sbyte*)(targetBase + curPrim); curPrim += 4; }
+                    else if (t == typeof(short)) { param[i] = *(short*)(targetBase + curPrim); curPrim += 4; }
+                    else if (t == typeof(ushort)) { param[i] = *(ushort*)(targetBase + curPrim); curPrim += 4; }
+                    else if (t == typeof(uint)) { param[i] = *(uint*)(targetBase + curPrim); curPrim += 4; }
+                    else if (t == typeof(ulong)) { param[i] = *(ulong*)(targetBase + curPrim); curPrim += 8; }
+                    else if (t == typeof(char)) { param[i] = (char)*(int*)(targetBase + curPrim); curPrim += 4; }
+                }
+            }
+
+            object res = null;
+            if (isConstructor)
+            {
+                if (!isNewObj)
+                {
+                    if (!cDef.IsStatic)
+                    {
+                        if (instance == null)
+                            throw new NullReferenceException();
+                        if (instance is CrossBindingAdaptorType && paramCount == 0)
+                            return null;
+                        cDef.Invoke(instance, param);
+                    }
+                    else
+                        throw new NotImplementedException();
+                }
+                else
+                {
+                    res = cDef.Invoke(param);
+                }
+            }
+            else
+            {
+                if (!def.IsStatic)
+                {
+                    if (!(instance is Reflection.ILRuntimeWrapperType))
+                        instance = declaringType.TypeForCLR.CheckCLRTypes(instance);
+                    if (instance == null)
+                        throw new NullReferenceException();
+                }
+                res = def.Invoke(instance, param);
+            }
+
+            Array.Clear(invocationParam, 0, invocationParam.Length);
+            return res;
         }
 
         public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, AutoList mStack, bool isNewObj = false)

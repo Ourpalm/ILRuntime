@@ -384,7 +384,7 @@ Step 6 smoke 临时在 [ILType.cs](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSy
 4. Neo 解释器中 Call CLR 方法的分派逻辑：
    - 有 Redirection → 直接调用
    - 无 Redirection → 通过反射 Invoke（临时 fallback）
-5. 实现若干核心 CLR 方法的 Neo Redirection（如 `Console.WriteLine`、基本数学函数）
+5. CLRRediretion自动代码生成器增加Neo模式的Redirection代码生成，当前仅实现到Step9已支持的feature，其他情况仅生成Redirection方法体和读取参数的stub即可
 
 ### 9z. Step 6 smoke 断言升级
 

@@ -90,6 +90,35 @@ namespace ILRuntime.Runtime.Intepreter
             int mStackBase = mStack.Count;
             StackObject* esp = stack.StackBase;
             stack.ResetValueTypePointer();
+            bool unhandledException;
+#if ENABLE_NEO_MODE
+            // Step 6 entry shim: only no-arg static methods are expected here
+            // (NeoStep6 smoke). The Neo call convention lands in Step 8.
+            ref readonly var nf = ref method.NeoFrame;
+            
+            byte* neoFrame = (byte*)esp;
+            esp += (nf.TotalStructSize / sizeof(StackObject)) + 1;
+            
+            int retSize = nf.ReturnPrimitiveSize;
+            byte* retDst = (byte*)esp;
+            esp += (retSize / sizeof(StackObject)) + 1;
+            
+            int retRefBase = stack.ManagedStack.Count;
+            if (nf.ReturnRefCount > 0)
+            {
+                for (int i = 0; i < nf.ReturnRefCount; i++)
+                    stack.ManagedStack.Add(null);
+            }
+            ExecuteNeo(method, neoFrame, retDst, retRefBase, out unhandledException);
+            
+            object result = null;
+            if (method.ReturnType != domain.VoidType && retSize > 0)
+            {
+                result = NeoBoxReturnValue(method.ReturnType, retDst, retSize);
+            }
+            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
+            return result;
+#else
             if (method.HasThis)
             {
                 if (instance is CrossBindingAdaptorType)
@@ -100,42 +129,16 @@ namespace ILRuntime.Runtime.Intepreter
             }
             bool useRegister = method.ShouldUseRegisterVM;
             esp = PushParameters(method, esp, p, useRegister);
-            bool unhandledException;
-#if ENABLE_NEO_MODE
-            if (useRegister)
-            {
-                // Step 6 entry shim: only no-arg static methods are expected here
-                // (NeoStep6 smoke). The Neo call convention lands in Step 8.
-                ref readonly var nf = ref method.NeoFrame;
-                int neoFrameSize = nf.TotalStructSize > 0 ? nf.TotalStructSize : 1;
-                byte* neoFrame = stackalloc byte[neoFrameSize];
-                int retSize = nf.ReturnPrimitiveSize;
-                byte* retDst = stackalloc byte[retSize > 0 ? retSize : 1];
-                int retRefBase = stack.ManagedStack.Count;
-                if (nf.ReturnRefCount > 0)
-                {
-                    for (int i = 0; i < nf.ReturnRefCount; i++)
-                        stack.ManagedStack.Add(null);
-                }
-                ExecuteNeo(method, neoFrame, retDst, retRefBase, out unhandledException);
-                if (method.ReturnType != domain.VoidType && retSize > 0)
-                {
-                    object boxed = NeoBoxReturnValue(method.ReturnType, retDst, retSize);
-                    esp = PushObject(esp, mStack, boxed, true);
-                }
-            }
-            else
-                esp = Execute(method, esp, out unhandledException);
-#else
             if (useRegister)
                 esp = ExecuteR(method, esp, out unhandledException);
             else
                 esp = Execute(method, esp, out unhandledException);
-#endif
+
             object result = method.ReturnType != domain.VoidType ? method.ReturnType.TypeForCLR.CheckCLRTypes(StackObject.ToObject((esp - 1), domain, mStack)) : null;
             //ClearStack
             mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
             return result;
+#endif
         }
         internal StackObject* Execute(ILMethod method, StackObject* esp, out bool unhandledException)
         {

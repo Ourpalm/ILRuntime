@@ -78,6 +78,9 @@
 >
 > 顺便发现并修复的 Move lowering bug：[JITCompiler.cs Move case](file:///f:/SVN/ILRuntime/ILRuntime/Runtime/Intepreter/RegisterVM/JITCompiler.cs#L1130-L1148) 之前只取 `src.Size`，当 stack register (`maxSize=8`) 写回 int local (`size=4`) 时会 `CopyBlock(8)` 覆盖相邻 slot，导致循环计数器被破坏（`NeoSumI4` 死循环）。改为 `min(src.Size, dst.Size)`。
 
+- [x] 冒烟测试断言已升级为 Console.WriteLine + throw Exception
+- [x] Step 6 smoke 升级: `NeoStep6Test` 改用 `Console.WriteLine` + throw 后仍全绿 (由 Step 9 回填)
+
 - [x] Neo `int Add(int a, int b)` 正确（I4 三槽 Add）— NeoAddI4
 - [x] Neo `int AddConst(int a) { return a + 5; }` 正确（I4 立即数 Addi）— NeoAddiI4
 - [x] Neo `int Max(int a, int b)` 正确 — NeoMaxI4

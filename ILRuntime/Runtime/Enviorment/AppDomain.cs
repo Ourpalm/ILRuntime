@@ -29,6 +29,7 @@ using AutoList = ILRuntime.Other.UncheckedList<object>;
 namespace ILRuntime.Runtime.Enviorment
 {
     public unsafe delegate StackObject* CLRRedirectionDelegate(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj);
+    public unsafe delegate void CLRRedirectionDelegateNeo(ILIntepreter intp, byte* frameBase, AutoList mStack, CLRMethod method, bool isNewObj, byte* retDst, int retRefBase);
     public delegate object CLRFieldGetterDelegate(ref object target);
     public unsafe delegate StackObject* CLRFieldBindingDelegate(ref object target, ILIntepreter __intp, StackObject* __esp, AutoList __mStack);
     public delegate void CLRFieldSetterDelegate(ref object target, object value);
@@ -63,6 +64,7 @@ namespace ILRuntime.Runtime.Enviorment
         ThreadSafeDictionary<int, Exception> mapException = new ThreadSafeDictionary<int, Exception>();
         ThreadSafeDictionary<long, string> mapString = new ThreadSafeDictionary<long, string>();
         Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate> redirectMap = new Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegate>();
+        Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegateNeo> redirectMapNeo = new Dictionary<System.Reflection.MethodBase, CLRRedirectionDelegateNeo>();
         Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate> fieldGetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate>();
         Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate> fieldSetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate>();
         Dictionary<System.Reflection.FieldInfo, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>> fieldBindingMap = new Dictionary<FieldInfo, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>>();
@@ -99,6 +101,14 @@ namespace ILRuntime.Runtime.Enviorment
         internal List<ModuleDefinition> LoadedModules { get { return loadedModules; } }
 
         public int DefaultJITFlags { get { return defaultJITFlags; } }
+
+        public bool IsNeoMode
+        {
+            get
+            {
+                return (defaultJITFlags & ILRuntimeJITFlags.JITNeo) != 0;
+            }
+        }
 
         public unsafe AppDomain(int defaultJITFlags = ILRuntimeJITFlags.None)
         {
@@ -221,7 +231,14 @@ namespace ILRuntime.Runtime.Enviorment
             RegisterCrossBindingAdaptor(new Adapters.AttributeAdapter());
 
             debugService = new Debugger.DebugService(this);
-            this.defaultJITFlags = defaultJITFlags & (ILRuntimeJITFlags.JITImmediately | ILRuntimeJITFlags.JITOnDemand);
+
+#if ENABLE_NEO_MODE
+            defaultJITFlags = ILRuntimeJITFlags.JITNeo | ILRuntimeJITFlags.JITImmediately;            
+#else
+            if ((defaultJITFlags & ILRuntimeJITFlags.JITNeo) != 0)
+                throw new NotSupportedException("Cannot use JITNeo flag without ENABLE_NEO_MODE macro.");
+#endif
+            this.defaultJITFlags = defaultJITFlags;
         }
 
         public void Dispose()
@@ -269,6 +286,23 @@ namespace ILRuntime.Runtime.Enviorment
                     lock(bindingLockObject)
                     {
                         return redirectMap;
+                    }
+                }
+            } 
+        }
+        internal Dictionary<MethodBase, CLRRedirectionDelegateNeo> RedirectMapNeo 
+        { 
+            get 
+            {
+                if (!IsThreadBinding && IsBindingDone)
+                {
+                    return redirectMapNeo;
+                }
+                else
+                {
+                    lock(bindingLockObject)
+                    {
+                        return redirectMapNeo;
                     }
                 }
             } 
@@ -692,6 +726,27 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     if (!redirectMap.ContainsKey(mi))
                         redirectMap[mi] = func;
+                }
+            }
+            
+        }
+
+        public void RegisterCLRMethodRedirectionNeo(MethodBase mi, CLRRedirectionDelegateNeo func)
+        {
+            if (mi == null)
+                return;
+
+            if (!IsThreadBinding)
+            {
+                if (!redirectMapNeo.ContainsKey(mi))
+                    redirectMapNeo[mi] = func;
+            }
+            else
+            {
+                lock (bindingLockObject)
+                {
+                    if (!redirectMapNeo.ContainsKey(mi))
+                        redirectMapNeo[mi] = func;
                 }
             }
             

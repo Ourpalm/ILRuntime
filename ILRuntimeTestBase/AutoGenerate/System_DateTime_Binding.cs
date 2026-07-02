@@ -30,10 +30,18 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.DateTime);
             args = new Type[]{};
             method = type.GetMethod("get_UtcNow", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_UtcNow_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_UtcNow_0);
+#endif
             args = new Type[]{};
             method = type.GetMethod("ToString", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, ToString_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, ToString_1);
+#endif
 
             app.RegisterCLRCreateDefaultInstance(type, () => new System.DateTime());
 
@@ -86,6 +94,15 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+#if ENABLE_NEO_MODE
+        static void get_UtcNow_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            var result_of_this_method = System.DateTime.UtcNow;
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* get_UtcNow_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -96,7 +113,26 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void ToString_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.DateTime instance_of_this_method = default(System.DateTime);
+            // TODO: ValueType instance in Neo
+            var result_of_this_method = instance_of_this_method.ToString();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* ToString_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -115,6 +151,7 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
 

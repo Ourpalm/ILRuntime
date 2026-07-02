@@ -30,19 +30,35 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.Fixed64);
             args = new Type[]{};
             method = type.GetMethod("get_RawValue", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_RawValue_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_RawValue_0);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.Fixed64), typeof(ILRuntimeTest.TestFramework.Fixed64)};
             method = type.GetMethod("op_LessThan", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, op_LessThan_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, op_LessThan_1);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.Fixed64), typeof(ILRuntimeTest.TestFramework.Fixed64)};
             method = type.GetMethod("op_GreaterThan", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, op_GreaterThan_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, op_GreaterThan_2);
+#endif
 
             app.RegisterCLRCreateDefaultInstance(type, () => new ILRuntimeTest.TestFramework.Fixed64());
 
             args = new Type[]{typeof(System.Int64)};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
 
         }
 
@@ -92,6 +108,17 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+#if ENABLE_NEO_MODE
+        static void get_RawValue_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.Fixed64 instance_of_this_method = default(ILRuntimeTest.TestFramework.Fixed64);
+            // TODO: ValueType instance in Neo
+            var result_of_this_method = instance_of_this_method.RawValue;
+            if (__retDst != null) *(long*)__retDst = (long)result_of_this_method;
+        }
+#else
         static StackObject* get_RawValue_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -121,7 +148,21 @@ namespace ILRuntime.Runtime.Generated
             *(long*)&__ret->Value = result_of_this_method;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void op_LessThan_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.Fixed64 @x = default(ILRuntimeTest.TestFramework.Fixed64);
+            // TODO: CLR value type reflection fallback: Step 13
+            ILRuntimeTest.TestFramework.Fixed64 @y = default(ILRuntimeTest.TestFramework.Fixed64);
+            // TODO: CLR value type reflection fallback: Step 13
+            var result_of_this_method = @x < @y;
+            if (__retDst != null) *(int*)__retDst = result_of_this_method ? 1 : 0;
+        }
+#else
         static StackObject* op_LessThan_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -153,7 +194,21 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method ? 1 : 0;
             return __ret + 1;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void op_GreaterThan_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.Fixed64 @x = default(ILRuntimeTest.TestFramework.Fixed64);
+            // TODO: CLR value type reflection fallback: Step 13
+            ILRuntimeTest.TestFramework.Fixed64 @y = default(ILRuntimeTest.TestFramework.Fixed64);
+            // TODO: CLR value type reflection fallback: Step 13
+            var result_of_this_method = @x > @y;
+            if (__retDst != null) *(int*)__retDst = result_of_this_method ? 1 : 0;
+        }
+#else
         static StackObject* op_GreaterThan_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -185,8 +240,27 @@ namespace ILRuntime.Runtime.Generated
             __ret->Value = result_of_this_method ? 1 : 0;
             return __ret + 1;
         }
+#endif
 
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            System.Int64 @value = ILIntepreter.ReadNeoInt64(__frameBase, ref __curPrim);
+            ILRuntimeTest.TestFramework.Fixed64 result_of_this_method = new ILRuntimeTest.TestFramework.Fixed64(@value);
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -216,6 +290,7 @@ namespace ILRuntime.Runtime.Generated
                 return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
             }
         }
+#endif
 
 
     }

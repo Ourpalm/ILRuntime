@@ -30,7 +30,11 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.TestStructB);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStructA)};
             method = type.GetMethod("GetOne", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, GetOne_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, GetOne_0);
+#endif
 
             app.RegisterCLRCreateDefaultInstance(type, () => new ILRuntimeTest.TestFramework.TestStructB());
 
@@ -83,6 +87,17 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+#if ENABLE_NEO_MODE
+        static void GetOne_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestStructA @a = default(ILRuntimeTest.TestFramework.TestStructA);
+            // TODO: CLR value type reflection fallback: Step 13
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestStructB.GetOne(@a);
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* GetOne_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -108,6 +123,7 @@ namespace ILRuntime.Runtime.Generated
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
             }
         }
+#endif
 
 
 

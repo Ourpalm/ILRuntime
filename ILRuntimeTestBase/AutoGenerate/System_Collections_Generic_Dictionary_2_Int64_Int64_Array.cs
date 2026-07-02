@@ -30,15 +30,34 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Collections.Generic.Dictionary<System.Int64, System.Int64[]>);
             args = new Type[]{typeof(System.Int64), typeof(System.Int64[])};
             method = type.GetMethod("Add", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Add_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Add_0);
+#endif
 
             args = new Type[]{};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void Add_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Collections.Generic.Dictionary<System.Int64, System.Int64[]> instance_of_this_method = (System.Collections.Generic.Dictionary<System.Int64, System.Int64[]>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Int64 @key = ILIntepreter.ReadNeoInt64(__frameBase, ref __curPrim);
+            System.Int64[] @value = (System.Int64[])ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            instance_of_this_method.Add(@key, @value);
+        }
+#else
         static StackObject* Add_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -60,8 +79,33 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            System.Collections.Generic.Dictionary<System.Int64, System.Int64[]> result_of_this_method = new System.Collections.Generic.Dictionary<System.Int64, System.Int64[]>();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -79,6 +123,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
     }

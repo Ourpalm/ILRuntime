@@ -31,16 +31,32 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding);
             args = new Type[]{};
             method = type.GetMethod("get_one", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_one_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_one_0);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding), typeof(System.Single)};
             method = type.GetMethod("op_Multiply", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, op_Multiply_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, op_Multiply_1);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding), typeof(ILRuntimeTest.TestFramework.TestVector3NoBinding)};
             method = type.GetMethod("op_Addition", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, op_Addition_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, op_Addition_2);
+#endif
             args = new Type[]{};
             method = type.GetMethod("get_zero", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, get_zero_3_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, get_zero_3);
+#endif
 
             field = type.GetField("x", flag);
             app.RegisterCLRFieldGetter(field, get_x_0);
@@ -108,6 +124,15 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+#if ENABLE_NEO_MODE
+        static void get_one_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestVector3NoBinding.one;
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* get_one_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -118,7 +143,20 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void op_Multiply_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestVector3NoBinding @a = default(ILRuntimeTest.TestFramework.TestVector3NoBinding);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            System.Single @b = ILIntepreter.ReadNeoFloat(__frameBase, ref __curPrim);
+            var result_of_this_method = @a * @b;
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* op_Multiply_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -137,7 +175,21 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void op_Addition_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestVector3NoBinding @a = default(ILRuntimeTest.TestFramework.TestVector3NoBinding);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            ILRuntimeTest.TestFramework.TestVector3NoBinding @b = default(ILRuntimeTest.TestFramework.TestVector3NoBinding);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            var result_of_this_method = @a + @b;
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* op_Addition_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -157,7 +209,17 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void get_zero_3_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestVector3NoBinding.zero;
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* get_zero_3(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -168,6 +230,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
         static object get_x_0(ref object o)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +24,10 @@ namespace ILRuntime.Runtime
         /// Method will always be inlined when called
         /// </summary>
         public const int ForceInline = 8;
+        /// <summary>
+        /// Method will be JIT compiled with Neo interpreter
+        /// </summary>
+        public const int JITNeo = 16;
     }
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class ILRuntimeJITAttribute : Attribute

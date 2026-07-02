@@ -413,7 +413,17 @@ namespace ILRuntime.CLR.Method
         }
 
 #if ENABLE_NEO_MODE
-        internal ref readonly Runtime.Intepreter.RegisterVM.CompiledFrame NeoFrame { get { return ref neoFrame; } }
+        internal ref readonly Runtime.Intepreter.RegisterVM.CompiledFrame NeoFrame
+        {
+            get
+            {
+                if(neoFrame.NeoExecuteBody == null)
+                {
+                    InitCodeBody(true);
+                }
+                return ref neoFrame;
+            }
+        }
 #endif
 
         public bool IsConstructor
@@ -653,14 +663,11 @@ namespace ILRuntime.CLR.Method
                 if (register && hasInstruction)
                 {
                     JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
-                    var compiledFrame = jit.Compile(addr);
-                    bodyRegister = compiledFrame.CodeBody;
-                    stackRegisterCnt = compiledFrame.StackRegisterCount;
-                    jumptablesR = compiledFrame.SwitchTargets;
-                    registerSymbols = compiledFrame.Symbols;
-#if ENABLE_NEO_MODE
-                    neoFrame = compiledFrame;
-#endif
+                    jit.Compile(addr, ref neoFrame);
+                    bodyRegister = neoFrame.CodeBody;
+                    stackRegisterCnt = neoFrame.StackRegisterCount;
+                    jumptablesR = neoFrame.SwitchTargets;
+                    registerSymbols = neoFrame.Symbols;
                 }
                 else
                 {

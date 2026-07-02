@@ -30,12 +30,35 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Attribute);
             args = new Type[]{typeof(System.Reflection.MemberInfo), typeof(System.Type), typeof(System.Boolean)};
             method = type.GetMethod("GetCustomAttribute", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, GetCustomAttribute_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, GetCustomAttribute_0);
+#endif
 
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void GetCustomAttribute_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Reflection.MemberInfo @element = (System.Reflection.MemberInfo)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Type @attributeType = (System.Type)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Boolean @inherit = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            var result_of_this_method = System.Attribute.GetCustomAttribute(@element, @attributeType, @inherit);
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* GetCustomAttribute_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -63,6 +86,7 @@ namespace ILRuntime.Runtime.Generated
             }
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
 

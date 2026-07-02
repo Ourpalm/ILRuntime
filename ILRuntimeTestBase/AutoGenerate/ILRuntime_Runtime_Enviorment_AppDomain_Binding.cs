@@ -30,12 +30,26 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntime.Runtime.Enviorment.AppDomain);
             args = new Type[]{typeof(System.Boolean)};
             method = type.GetMethod("set_AllowUnboundCLRMethod", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, set_AllowUnboundCLRMethod_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, set_AllowUnboundCLRMethod_0);
+#endif
 
 
         }
 
 
+#if ENABLE_NEO_MODE
+        static void set_AllowUnboundCLRMethod_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntime.Runtime.Enviorment.AppDomain instance_of_this_method = (ILRuntime.Runtime.Enviorment.AppDomain)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
+            System.Boolean @value = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            instance_of_this_method.AllowUnboundCLRMethod = value;
+        }
+#else
         static StackObject* set_AllowUnboundCLRMethod_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -53,6 +67,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
 

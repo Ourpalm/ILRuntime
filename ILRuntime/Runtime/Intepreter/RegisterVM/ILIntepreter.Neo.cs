@@ -22,6 +22,46 @@ namespace ILRuntime.Runtime.Intepreter
 {
     public unsafe partial class ILIntepreter
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ReadNeoInt32(byte* frameBase, ref int curPrim)
+        {
+            int res = *(int*)(frameBase + curPrim);
+            curPrim += 4;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long ReadNeoInt64(byte* frameBase, ref int curPrim)
+        {
+            long res = *(long*)(frameBase + curPrim);
+            curPrim += 8;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float ReadNeoFloat(byte* frameBase, ref int curPrim)
+        {
+            float res = *(float*)(frameBase + curPrim);
+            curPrim += 4;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double ReadNeoDouble(byte* frameBase, ref int curPrim)
+        {
+            double res = *(double*)(frameBase + curPrim);
+            curPrim += 8;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static object ReadNeoReference(byte* frameBase, ref int curPrim, AutoList mStack)
+        {
+            int idx = *(int*)(frameBase + curPrim);
+            curPrim += 4;
+            return mStack[idx];
+        }
+
         internal unsafe byte* ExecuteNeo(ILMethod method, byte* esp, byte* retDst, int retRefBase, out bool unhandledException)
         {
 #if DEBUG
@@ -76,10 +116,16 @@ namespace ILRuntime.Runtime.Intepreter
             // Frames stack placeholder: keep existing StackFrame plumbing alive.
             // BasePointer is interpreted as byte* via reinterpret cast; full debugger
             // adaptation is deferred to Step 14/26.
-            StackFrame frame;
-            stack.InitializeFrame(method, (StackObject*)frameBase, out frame);
+            StackFrame frame = new StackFrame();
+            frame.LocalVarPointer = (StackObject*)frameBase;
+            frame.BasePointer = (StackObject*)frameBase;
+            frame.Method = method;
             frame.IsRegister = true;
             frame.ManagedStackBase = frameRefBase;
+            frame.ValueTypeBasePointer = stack.ValueTypeStackPointer;
+#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
+            frame.Address = new IntegerReference();
+#endif
             stack.PushFrame(ref frame);
 
             int finallyEndAddress = 0;
@@ -1061,54 +1107,53 @@ namespace ILRuntime.Runtime.Intepreter
                                         *(int*)(frameBase + ip->DstOffset) = newobjDstIdx;
                                     }
 
+                                    int callParamIdx = ip->Operand;
+                                    ref var map = ref nf.NeoCallParams[callParamIdx];
+                                    byte* targetBase = newEsp;
+
+                                    if (ip->Code == OpCodeREnum.Newobj)
+                                    {
+                                        // Write 'this' index to param0
+                                        *(int*)(targetBase + map.PrimitiveDst[0]) = newobjDstIdx;
+                                        
+                                        if (map.PrimitiveSize != null)
+                                        {
+                                            for (int i = 1; i < map.PrimitiveSize.Length; i++)
+                                            {
+                                                Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (map.PrimitiveSize != null)
+                                        {
+                                            for (int i = 0; i < map.PrimitiveSize.Length; i++)
+                                            {
+                                                Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
+                                            }
+                                        }
+                                    }
+
+                                    if (map.RefSrc != null && map.RefSrc.Length > 0)
+                                    {
+                                        throw new NotImplementedException("Neo Call reference parameters require Step 7 RefOffset lowering");
+                                    }
+
+                                    int targetRetRefBase = mStack.Count;
+                                    byte* retDstPtr = null;
+
+                                    if (ip->Code == OpCodeREnum.Newobj)
+                                    {
+                                        mStack.Add(mStack[newobjDstIdx]); // push 'this'
+                                    }
+                                    else if (ip->Register1 >= 0)
+                                    {
+                                        retDstPtr = frameBase + ip->DstOffset;
+                                    }
+
                                     if (targetMethod is ILMethod ilm)
                                     {
-                                        int callParamIdx = ip->Operand;
-                                        ref var map = ref nf.NeoCallParams[callParamIdx];
-                                        byte* targetBase = newEsp;
-
-                                        if (ip->Code == OpCodeREnum.Newobj)
-                                        {
-                                            // Write 'this' index to param0
-                                            *(int*)(targetBase + map.PrimitiveDst[0]) = newobjDstIdx;
-                                            
-                                            if (map.PrimitiveSize != null)
-                                            {
-                                                for (int i = 1; i < map.PrimitiveSize.Length; i++)
-                                                {
-                                                    Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (map.PrimitiveSize != null)
-                                            {
-                                                for (int i = 0; i < map.PrimitiveSize.Length; i++)
-                                                {
-                                                    Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
-                                                }
-                                            }
-                                        }
-
-                                        if (map.RefSrc != null && map.RefSrc.Length > 0)
-                                        {
-                                            throw new NotImplementedException("Neo Call reference parameters require Step 7 RefOffset lowering");
-                                        }
-
-                                        int retSize = ilm.NeoFrame.ReturnPrimitiveSize;
-                                        int targetRetRefBase = mStack.Count;
-                                        byte* retDstPtr = null;
-
-                                        if (ip->Code == OpCodeREnum.Newobj)
-                                        {
-                                            mStack.Add(mStack[newobjDstIdx]); // push 'this'
-                                        }
-                                        else if (ip->Register1 >= 0)
-                                        {
-                                            retDstPtr = frameBase + ip->DstOffset;
-                                        }
-
                                         ExecuteNeo(ilm, targetBase, retDstPtr, targetRetRefBase, out unhandledException);
                                         if (unhandledException)
                                             return null;
@@ -1116,9 +1161,59 @@ namespace ILRuntime.Runtime.Intepreter
                                         ip++;
                                         continue;
                                     }
+                                    else if (targetMethod is CLRMethod clrMethod)
+                                    {
+                                        var redirectNeo = clrMethod.RedirectionNeo;
+                                        if (redirectNeo != null)
+                                        {
+                                            redirectNeo(this, targetBase, mStack, clrMethod, ip->Code == OpCodeREnum.Newobj, retDstPtr, targetRetRefBase);
+                                        }
+                                        else
+                                        {
+                                            object res = clrMethod.Invoke(targetBase, mStack, ip->Code == OpCodeREnum.Newobj);
+
+                                            if (ip->Code != OpCodeREnum.Newobj && retDstPtr != null)
+                                            {
+                                                IType retType = clrMethod.ReturnType;
+                                                if (retType != null && retType != AppDomain.VoidType)
+                                                {
+                                                    if (retType.TypeForCLR.IsPrimitive || retType.TypeForCLR.IsEnum)
+                                                    {
+                                                        if (retType.TypeForCLR == typeof(int) || retType.TypeForCLR.IsEnum) *(int*)retDstPtr = (int)res;
+                                                        else if (retType.TypeForCLR == typeof(long)) *(long*)retDstPtr = (long)res;
+                                                        else if (retType.TypeForCLR == typeof(float)) *(float*)retDstPtr = (float)res;
+                                                        else if (retType.TypeForCLR == typeof(double)) *(double*)retDstPtr = (double)res;
+                                                        else if (retType.TypeForCLR == typeof(bool)) *(int*)retDstPtr = (bool)res ? 1 : 0;
+                                                        else if (retType.TypeForCLR == typeof(byte)) *(int*)retDstPtr = (byte)res;
+                                                        else if (retType.TypeForCLR == typeof(sbyte)) *(int*)retDstPtr = (sbyte)res;
+                                                        else if (retType.TypeForCLR == typeof(short)) *(int*)retDstPtr = (short)res;
+                                                        else if (retType.TypeForCLR == typeof(ushort)) *(int*)retDstPtr = (ushort)res;
+                                                        else if (retType.TypeForCLR == typeof(uint)) *(uint*)retDstPtr = (uint)res;
+                                                        else if (retType.TypeForCLR == typeof(ulong)) *(ulong*)retDstPtr = (ulong)res;
+                                                        else if (retType.TypeForCLR == typeof(char)) *(int*)retDstPtr = (char)res;
+                                                    }
+                                                    else if (retType.IsValueType)
+                                                    {
+                                                        throw new NotImplementedException("CLR value type return in reflection fallback: Step 13");
+                                                    }
+                                                    else
+                                                    {
+                                                        if (targetRetRefBase >= mStack.Count)
+                                                            mStack.Add(res);
+                                                        else
+                                                            mStack[targetRetRefBase] = res;
+                                                        
+                                                        *(int*)retDstPtr = targetRetRefBase;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        ip++;
+                                        continue;
+                                    }
                                     else
                                     {
-                                        throw new NotImplementedException("CLRMethod call not supported in Neo mode yet.");
+                                        throw new NotImplementedException("Unknown method type in Neo mode.");
                                     }
                                 }
                                 break;

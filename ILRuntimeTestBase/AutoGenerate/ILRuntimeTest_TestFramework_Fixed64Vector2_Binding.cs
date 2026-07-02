@@ -41,7 +41,11 @@ namespace ILRuntime.Runtime.Generated
 
             args = new Type[]{typeof(System.Int32), typeof(System.Int32)};
             method = type.GetConstructor(flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, Ctor_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, Ctor_0);
+#endif
 
         }
 
@@ -138,6 +142,25 @@ namespace ILRuntime.Runtime.Generated
             return ins;
         }
 
+#if ENABLE_NEO_MODE
+        static void Ctor_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            if (isNewObj)
+            {
+                __curPrim += 4; // Skip retRefBase
+            }
+            else
+            {
+                // TODO: Constructor binding for non-newObj (e.g. value type init) in Neo
+            }
+            System.Int32 @x = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Int32 @y = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            ILRuntimeTest.TestFramework.Fixed64Vector2 result_of_this_method = new ILRuntimeTest.TestFramework.Fixed64Vector2(@x, @y);
+            // TODO: CLR value type return in reflection fallback: Step 13
+        }
+#else
         static StackObject* Ctor_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -170,6 +193,7 @@ namespace ILRuntime.Runtime.Generated
                 return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
             }
         }
+#endif
 
 
     }

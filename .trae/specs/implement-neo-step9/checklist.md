@@ -1,0 +1,13 @@
+- [x] `ILRuntimeJITFlags` 中增加了 `JITNeo`
+- [x] `AppDomain` 增加了 `IsNeoMode` 属性
+- [x] `AppDomain` 构造函数正确校验了 `ENABLE_NEO_MODE` 和 `JITNeo` flag
+- [x] 在 `AppDomain.cs` 中定义了 `CLRRedirectionDelegateNeo`
+- [x] 在 `AppDomain.cs` 中添加并集成了 `RedirectMapNeo`
+- [x] 在 Neo 模式下注册 Legacy 委托会抛出异常
+- [x] `CLRMethod.RedirectionNeo` 属性能够从 `RedirectMapNeo` 中正确解析
+- [x] `ExecuteNeo` 能够正确通过 `RedirectionNeo` 或回退的反射 `Invoke` 分派 CLR 方法
+- [x] CLR 绑定生成器能生成具有正确签名和存根的 Neo 重定向方法
+- [x] 生成的 Neo 重定向方法能够从 `byte* frameBase` 和 `AutoList mStack` 提取参数
+- [x] `NeoStep6Test.cs` 使用了 `Console.WriteLine` 和 `throw new Exception` 来处理失败断言
+- [x] 升级后 Step 6 冒烟测试能够全部通过
+- [x] 勾选了 Step 6 Checklist 中关于冒烟测试断言升级的待办事项

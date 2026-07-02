@@ -31,13 +31,25 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(ILRuntimeTest.TestFramework.TestStruct);
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct).MakeByRefType()};
             method = type.GetMethod("DoTest", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, DoTest_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, DoTest_0);
+#endif
             args = new Type[]{typeof(System.Int32).MakeByRefType()};
             method = type.GetMethod("DoTest", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, DoTest_1_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, DoTest_1);
+#endif
             args = new Type[]{typeof(ILRuntimeTest.TestFramework.TestStruct)};
             method = type.GetMethod("DoTest2", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, DoTest2_2_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, DoTest2_2);
+#endif
 
             field = type.GetField("value", flag);
             app.RegisterCLRFieldGetter(field, get_value_0);
@@ -101,6 +113,16 @@ namespace ILRuntime.Runtime.Generated
             }
         }
 
+#if ENABLE_NEO_MODE
+        static void DoTest_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestStruct @a = default(ILRuntimeTest.TestFramework.TestStruct);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            ILRuntimeTest.TestFramework.TestStruct.DoTest(ref @a);
+        }
+#else
         static StackObject* DoTest_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -170,7 +192,17 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void DoTest_1_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Int32 @a = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            ILRuntimeTest.TestFramework.TestStruct.DoTest(ref @a);
+        }
+#else
         static StackObject* DoTest_1(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -231,7 +263,18 @@ namespace ILRuntime.Runtime.Generated
             __intp.Free(ptr_of_this_method);
             return __ret;
         }
+#endif
 
+#if ENABLE_NEO_MODE
+        static void DoTest2_2_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            ILRuntimeTest.TestFramework.TestStruct @aaa = default(ILRuntimeTest.TestFramework.TestStruct);
+            // TODO: ByRef or unsupported ValueType parameters in Neo
+            ILRuntimeTest.TestFramework.TestStruct.DoTest2(@aaa);
+        }
+#else
         static StackObject* DoTest2_2(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -247,6 +290,7 @@ namespace ILRuntime.Runtime.Generated
 
             return __ret;
         }
+#endif
 
 
         static object get_value_0(ref object o)

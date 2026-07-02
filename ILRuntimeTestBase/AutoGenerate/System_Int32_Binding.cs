@@ -30,7 +30,11 @@ namespace ILRuntime.Runtime.Generated
             Type type = typeof(System.Int32);
             args = new Type[]{};
             method = type.GetMethod("ToString", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, ToString_0_Neo);
+#else
             app.RegisterCLRMethodRedirection(method, ToString_0);
+#endif
 
             app.RegisterCLRCreateArrayInstance(type, s => new System.Int32[s]);
 
@@ -83,6 +87,24 @@ namespace ILRuntime.Runtime.Generated
             return instance_of_this_method;
         }
 
+#if ENABLE_NEO_MODE
+        static void ToString_0_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Int32 instance_of_this_method = default(System.Int32);
+            // TODO: ValueType instance in Neo
+            var result_of_this_method = instance_of_this_method.ToString();
+            if (__retDst != null)
+            {
+                if (__retRefBase >= __mStack.Count)
+                    __mStack.Add(result_of_this_method);
+                else
+                    __mStack[__retRefBase] = result_of_this_method;
+                *(int*)__retDst = __retRefBase;
+            }
+        }
+#else
         static StackObject* ToString_0(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
@@ -96,6 +118,7 @@ namespace ILRuntime.Runtime.Generated
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
+#endif
 
 
 
