@@ -267,7 +267,7 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
-            System.Char @value = (char)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Char @value = ILIntepreter.ReadNeoChar(__frameBase, ref __curPrim);
             System.Console.WriteLine(@value);
         }
 #else
@@ -368,7 +368,7 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
-            System.Boolean @value = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @value = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             System.Console.WriteLine(@value);
         }
 #else
@@ -393,7 +393,7 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
-            System.UInt32 @value = (uint)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.UInt32 @value = ILIntepreter.ReadNeoUInt32(__frameBase, ref __curPrim);
             System.Console.WriteLine(@value);
         }
 #else
@@ -418,7 +418,7 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
-            System.UInt64 @value = (ulong)ILIntepreter.ReadNeoInt64(__frameBase, ref __curPrim);
+            System.UInt64 @value = ILIntepreter.ReadNeoUInt64(__frameBase, ref __curPrim);
             System.Console.WriteLine(@value);
         }
 #else

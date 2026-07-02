@@ -58,7 +58,7 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
-            System.UInt32 @key = (uint)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.UInt32 @key = ILIntepreter.ReadNeoUInt32(__frameBase, ref __curPrim);
             ILRuntimeTest.TestFramework.TestCLREnum @tag = (ILRuntimeTest.TestFramework.TestCLREnum)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
             ILRuntimeTest.TestFramework.TestCLREnumClass.TestCLREnumRef(out @key, out @tag);
         }

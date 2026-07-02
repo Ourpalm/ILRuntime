@@ -45,9 +45,7 @@ namespace ILRuntime.CLR.Method
         int warmupCounter = 0;
         Mono.Collections.Generic.Collection<Mono.Cecil.Cil.VariableDefinition> variables;
         int hashCode = -1;
-#if ENABLE_NEO_MODE
-        Runtime.Intepreter.RegisterVM.CompiledFrame neoFrame;
-#endif
+        Runtime.Intepreter.RegisterVM.CompiledFrame compiledFrame;
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
         bool isDebuggerStepThrough;
 #endif
@@ -412,19 +410,21 @@ namespace ILRuntime.CLR.Method
             }
         }
 
-#if ENABLE_NEO_MODE
-        internal ref readonly Runtime.Intepreter.RegisterVM.CompiledFrame NeoFrame
+        internal ref readonly Runtime.Intepreter.RegisterVM.CompiledFrame CompiledFrame
         {
             get
             {
-                if(neoFrame.NeoExecuteBody == null)
+#if ENABLE_NEO_MODE
+                if (compiledFrame.NeoExecuteBody == null)
+#else
+                if (compiledFrame.CodeBody == null)
+#endif
                 {
                     InitCodeBody(true);
                 }
-                return ref neoFrame;
+                return ref compiledFrame;
             }
         }
-#endif
 
         public bool IsConstructor
         {
@@ -663,11 +663,11 @@ namespace ILRuntime.CLR.Method
                 if (register && hasInstruction)
                 {
                     JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
-                    jit.Compile(addr, ref neoFrame);
-                    bodyRegister = neoFrame.CodeBody;
-                    stackRegisterCnt = neoFrame.StackRegisterCount;
-                    jumptablesR = neoFrame.SwitchTargets;
-                    registerSymbols = neoFrame.Symbols;
+                    jit.Compile(addr, ref compiledFrame);
+                    bodyRegister = compiledFrame.CodeBody;
+                    stackRegisterCnt = compiledFrame.StackRegisterCount;
+                    jumptablesR = compiledFrame.SwitchTargets;
+                    registerSymbols = compiledFrame.Symbols;
                 }
                 else
                 {

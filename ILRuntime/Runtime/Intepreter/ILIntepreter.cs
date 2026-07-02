@@ -94,7 +94,7 @@ namespace ILRuntime.Runtime.Intepreter
 #if ENABLE_NEO_MODE
             // Step 6 entry shim: only no-arg static methods are expected here
             // (NeoStep6 smoke). The Neo call convention lands in Step 8.
-            ref readonly var nf = ref method.NeoFrame;
+            ref readonly var nf = ref method.CompiledFrame;
             
             byte* neoFrame = (byte*)esp;
             esp += (nf.TotalStructSize / sizeof(StackObject)) + 1;

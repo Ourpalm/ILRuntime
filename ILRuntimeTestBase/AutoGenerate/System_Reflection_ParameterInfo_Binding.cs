@@ -206,7 +206,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
             System.Reflection.ParameterInfo instance_of_this_method = (System.Reflection.ParameterInfo)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.Boolean @inherit = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @inherit = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             var result_of_this_method = instance_of_this_method.GetCustomAttributes(@inherit);
             if (__retDst != null)
             {

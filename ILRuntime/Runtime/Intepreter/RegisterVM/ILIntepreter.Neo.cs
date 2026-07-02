@@ -31,9 +31,65 @@ namespace ILRuntime.Runtime.Intepreter
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint ReadNeoUInt32(byte* frameBase, ref int curPrim)
+        {
+            uint res = *(uint*)(frameBase + curPrim);
+            curPrim += 4;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static short ReadNeoInt16(byte* frameBase, ref int curPrim)
+        {
+            short res = *(short*)(frameBase + curPrim);
+            curPrim += 2;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ushort ReadNeoUInt16(byte* frameBase, ref int curPrim)
+        {
+            ushort res = *(ushort*)(frameBase + curPrim);
+            curPrim += 2;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static byte ReadNeoUInt8(byte* frameBase, ref int curPrim)
+        {
+            byte res = *(byte*)(frameBase + curPrim);
+            curPrim += 1;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static sbyte ReadNeoInt8(byte* frameBase, ref int curPrim)
+        {
+            sbyte res = *(sbyte*)(frameBase + curPrim);
+            curPrim += 1;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool ReadNeoBoolean(byte* frameBase, ref int curPrim)
+        {
+            bool res = *(byte*)(frameBase + curPrim) != 0;
+            curPrim += 1;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadNeoInt64(byte* frameBase, ref int curPrim)
         {
             long res = *(long*)(frameBase + curPrim);
+            curPrim += 8;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong ReadNeoUInt64(byte* frameBase, ref int curPrim)
+        {
+            ulong res = *(ulong*)(frameBase + curPrim);
             curPrim += 8;
             return res;
         }
@@ -51,6 +107,14 @@ namespace ILRuntime.Runtime.Intepreter
         {
             double res = *(double*)(frameBase + curPrim);
             curPrim += 8;
+            return res;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char ReadNeoChar(byte* frameBase, ref int curPrim)
+        {
+            char res = (char)*(int*)(frameBase + curPrim);
+            curPrim += 4;
             return res;
         }
 
@@ -80,9 +144,9 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             unhandledException = false;
 
-            OpCodeR[] body = method.NeoFrame.NeoExecuteBody;
+            OpCodeR[] body = method.CompiledFrame.NeoExecuteBody;
             AutoList mStack = stack.ManagedStack;
-            ref readonly var nf = ref method.NeoFrame;
+            ref readonly var nf = ref method.CompiledFrame;
             int frameSize = nf.TotalStructSize;
             int totalRefSize = nf.TotalRefSize;
             int returnPrimitiveSize = nf.ReturnPrimitiveSize;
@@ -1114,11 +1178,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (ip->Code == OpCodeREnum.Newobj)
                                     {
                                         // Write 'this' index to param0
-                                        *(int*)(targetBase + map.PrimitiveDst[0]) = newobjDstIdx;
+                                        *(int*)targetBase = newobjDstIdx;
                                         
                                         if (map.PrimitiveSize != null)
                                         {
-                                            for (int i = 1; i < map.PrimitiveSize.Length; i++)
+                                            for (int i = 0; i < map.PrimitiveSize.Length; i++)
                                             {
                                                 Unsafe.CopyBlock(targetBase + map.PrimitiveDst[i], frameBase + map.PrimitiveSrc[i], map.PrimitiveSize[i]);
                                             }
@@ -1135,10 +1199,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         }
                                     }
 
-                                    if (map.RefSrc != null && map.RefSrc.Length > 0)
-                                    {
-                                        throw new NotImplementedException("Neo Call reference parameters require Step 7 RefOffset lowering");
-                                    }
+                                    // Reference parameters are passed as existing mStack indices in the frame bytes.
+                                    // The primitive copy above has already copied those indices into targetBase.
 
                                     int targetRetRefBase = mStack.Count;
                                     byte* retDstPtr = null;

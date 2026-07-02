@@ -314,7 +314,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
             System.Byte[] @array = (System.Byte[])ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.Byte @value = (byte)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Byte @value = ILIntepreter.ReadNeoUInt8(__frameBase, ref __curPrim);
             var result_of_this_method = System.Array.IndexOf<System.Byte>(@array, @value);
             if (__retDst != null) *(int*)__retDst = (int)result_of_this_method;
         }

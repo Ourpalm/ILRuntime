@@ -46,7 +46,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
             ILRuntime.Runtime.Enviorment.AppDomain instance_of_this_method = (ILRuntime.Runtime.Enviorment.AppDomain)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.Boolean @value = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @value = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             instance_of_this_method.AllowUnboundCLRMethod = value;
         }
 #else

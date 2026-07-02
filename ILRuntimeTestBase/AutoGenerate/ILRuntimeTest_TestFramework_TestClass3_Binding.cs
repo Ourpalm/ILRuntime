@@ -65,7 +65,7 @@ namespace ILRuntime.Runtime.Generated
         {
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
-            System.Byte @value = (byte)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Byte @value = ILIntepreter.ReadNeoUInt8(__frameBase, ref __curPrim);
             System.Int32 @pos = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
             System.Int32 @bit = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
             ILRuntimeTest.TestFramework.TestClass3.setBit(ref @value, @pos, @bit);

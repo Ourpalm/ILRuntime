@@ -297,6 +297,7 @@ namespace ILRuntime.CLR.Method
             return (StackObject*)((long)a - sizeof(StackObject) * b);
         }
 
+#if ENABLE_NEO_MODE
         public unsafe object Invoke(byte* targetBase, AutoList mStack, bool isNewObj = false)
         {
             if (parameters == null)
@@ -340,18 +341,18 @@ namespace ILRuntime.CLR.Method
                 }
                 else
                 {
-                    if (t == typeof(int) || t.IsEnum) { param[i] = *(int*)(targetBase + curPrim); curPrim += 4; }
-                    else if (t == typeof(long)) { param[i] = *(long*)(targetBase + curPrim); curPrim += 8; }
-                    else if (t == typeof(float)) { param[i] = *(float*)(targetBase + curPrim); curPrim += 4; }
-                    else if (t == typeof(double)) { param[i] = *(double*)(targetBase + curPrim); curPrim += 8; }
-                    else if (t == typeof(bool)) { param[i] = *(int*)(targetBase + curPrim) != 0; curPrim += 4; }
-                    else if (t == typeof(byte)) { param[i] = *(byte*)(targetBase + curPrim); curPrim += 4; }
-                    else if (t == typeof(sbyte)) { param[i] = *(sbyte*)(targetBase + curPrim); curPrim += 4; }
-                    else if (t == typeof(short)) { param[i] = *(short*)(targetBase + curPrim); curPrim += 4; }
-                    else if (t == typeof(ushort)) { param[i] = *(ushort*)(targetBase + curPrim); curPrim += 4; }
-                    else if (t == typeof(uint)) { param[i] = *(uint*)(targetBase + curPrim); curPrim += 4; }
-                    else if (t == typeof(ulong)) { param[i] = *(ulong*)(targetBase + curPrim); curPrim += 8; }
-                    else if (t == typeof(char)) { param[i] = (char)*(int*)(targetBase + curPrim); curPrim += 4; }
+                    if (t == typeof(int) || t.IsEnum) { param[i] = ILIntepreter.ReadNeoInt32(targetBase, ref curPrim); }
+                    else if (t == typeof(long)) { param[i] = ILIntepreter.ReadNeoInt64(targetBase, ref curPrim); }
+                    else if (t == typeof(float)) { param[i] = ILIntepreter.ReadNeoFloat(targetBase, ref curPrim); }
+                    else if (t == typeof(double)) { param[i] = ILIntepreter.ReadNeoDouble(targetBase, ref curPrim); }
+                    else if (t == typeof(bool)) { param[i] = ILIntepreter.ReadNeoBoolean(targetBase, ref curPrim); }
+                    else if (t == typeof(byte)) { param[i] = ILIntepreter.ReadNeoUInt8(targetBase, ref curPrim); }
+                    else if (t == typeof(sbyte)) { param[i] = ILIntepreter.ReadNeoInt8(targetBase, ref curPrim); }
+                    else if (t == typeof(short)) { param[i] = ILIntepreter.ReadNeoInt16(targetBase, ref curPrim); }
+                    else if (t == typeof(ushort)) { param[i] = ILIntepreter.ReadNeoUInt16(targetBase, ref curPrim); }
+                    else if (t == typeof(uint)) { param[i] = ILIntepreter.ReadNeoUInt32(targetBase, ref curPrim); }
+                    else if (t == typeof(ulong)) { param[i] = ILIntepreter.ReadNeoUInt64(targetBase, ref curPrim); }
+                    else if (t == typeof(char)) { param[i] = ILIntepreter.ReadNeoChar(targetBase, ref curPrim); }
                 }
             }
 
@@ -391,6 +392,7 @@ namespace ILRuntime.CLR.Method
             Array.Clear(invocationParam, 0, invocationParam.Length);
             return res;
         }
+#endif
 
         public unsafe object Invoke(Runtime.Intepreter.ILIntepreter intepreter, StackObject* esp, AutoList mStack, bool isNewObj = false)
         {

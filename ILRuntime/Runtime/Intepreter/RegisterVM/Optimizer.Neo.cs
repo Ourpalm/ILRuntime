@@ -421,7 +421,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                              StackSlotInfo[] paramInfos = null;
                             if (targetMethod is ILRuntime.CLR.Method.ILMethod ilm)
                             {
-                                paramInfos = ilm.NeoFrame.ParamInfos;
+                                paramInfos = ilm.CompiledFrame.ParamInfos;
                             }
                             else if (targetMethod is ILRuntime.CLR.Method.CLRMethod clrMethod)
                             {
@@ -438,10 +438,26 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 for (int p = 0; p < pCnt; p++)
                                 {
                                     int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
-                                    var srcInfo = localInfos[srcRegs[p]];
-                                    paramInfos[dstIndex] = new StackSlotInfo { Offset = curPrim, Size = srcInfo.Size, RefOffset = curRef, RefCount = srcInfo.RefCount };
-                                    curPrim += srcInfo.Size;
-                                    curRef += srcInfo.RefCount;
+                                    CLR.TypeSystem.IType paramType;
+                                    if (targetMethod.HasThis && op.Code != OpCodeREnum.Newobj && p == 0)
+                                        paramType = targetMethod.DeclearingType;
+                                    else
+                                        paramType = clrMethod.Parameters[p - ((targetMethod.HasThis && op.Code != OpCodeREnum.Newobj) ? 1 : 0)];
+
+                                    if (paramType.IsValueType && !paramType.IsPrimitive && !(paramType is CLR.TypeSystem.ILType) && !(paramType.TypeForCLR != null && paramType.TypeForCLR.IsEnum))
+                                    {
+                                        // TODO Step 13: replace this CLR struct fallback with a real CLR value-type ABI.
+                                        // For now we keep the caller temp slot shape so unsupported CLR structs (for example TaskAwaiter)
+                                        // do not fail during JIT prewarm. Reference/primitive/IL value-type parameters use exact callee layout below.
+                                        var srcInfo = localInfos[srcRegs[p]];
+                                        paramInfos[dstIndex] = new StackSlotInfo { Offset = curPrim, Size = srcInfo.Size, RefOffset = curRef, RefCount = srcInfo.RefCount };
+                                        curPrim += srcInfo.Size;
+                                        curRef += srcInfo.RefCount;
+                                    }
+                                    else
+                                    {
+                                        paramInfos[dstIndex] = AllocateNeoCallParamSlot(paramType, ref curPrim, ref curRef, domain);
+                                    }
                                 }
                             }
 
@@ -523,6 +539,40 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             short r1 = op.Register1;
             int off1 = localInfos[r1].Offset;
             op.DstOffset = (ushort)off1;
+        }
+
+        static StackSlotInfo AllocateNeoCallParamSlot(CLR.TypeSystem.IType type, ref int offset, ref int refOffset, Enviorment.AppDomain domain)
+        {
+            StackSlotInfo slot = default;
+            slot.Offset = offset;
+            slot.RefOffset = refOffset;
+
+            if (type.IsPrimitive || (type.TypeForCLR != null && type.TypeForCLR.IsEnum))
+            {
+                slot.Size = domain.GetPrimitiveSize(type);
+                offset += slot.Size;
+            }
+            else if (type is CLR.TypeSystem.ILType il && type.IsValueType)
+            {
+                slot.Size = il.TotalPrimitiveSize;
+                slot.RefCount = il.TotalReferenceCount;
+                offset += slot.Size;
+                refOffset += slot.RefCount;
+            }
+            else if (type.IsValueType)
+            {
+                slot.Size = domain.GetPrimitiveSize(type);
+                offset += slot.Size;
+            }
+            else
+            {
+                slot.Size = 4;
+                slot.RefCount = 1;
+                offset += 4;
+                refOffset++;
+            }
+
+            return slot;
         }
 
         static void LowerR1R2(ref OpCodeR op, StackSlotInfo[] localInfos)

@@ -108,7 +108,7 @@ namespace ILRuntime.Runtime.Generated
             int __curPrim = 0;
             System.Reflection.MemberInfo instance_of_this_method = (System.Reflection.MemberInfo)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
             System.Type @attributeType = (System.Type)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.Boolean @inherit = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @inherit = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             var result_of_this_method = instance_of_this_method.GetCustomAttributes(@attributeType, @inherit);
             if (__retDst != null)
             {
@@ -149,7 +149,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
             System.Reflection.MemberInfo instance_of_this_method = (System.Reflection.MemberInfo)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.Boolean @inherit = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @inherit = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             var result_of_this_method = instance_of_this_method.GetCustomAttributes(@inherit);
             if (__retDst != null)
             {
@@ -187,7 +187,7 @@ namespace ILRuntime.Runtime.Generated
             int __curPrim = 0;
             System.Reflection.MemberInfo instance_of_this_method = (System.Reflection.MemberInfo)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
             System.Type @attributeType = (System.Type)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.Boolean @inherit = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @inherit = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             var result_of_this_method = instance_of_this_method.IsDefined(@attributeType, @inherit);
             if (__retDst != null) *(int*)__retDst = result_of_this_method ? 1 : 0;
         }

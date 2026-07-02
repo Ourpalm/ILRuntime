@@ -60,7 +60,7 @@ namespace ILRuntime.Runtime.Generated
             ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
             int __curPrim = 0;
             System.Collections.Generic.Dictionary<System.UInt32, ILRuntime.Runtime.Intepreter.ILTypeInstance> instance_of_this_method = (System.Collections.Generic.Dictionary<System.UInt32, ILRuntime.Runtime.Intepreter.ILTypeInstance>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.UInt32 @key = (uint)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.UInt32 @key = ILIntepreter.ReadNeoUInt32(__frameBase, ref __curPrim);
             ILRuntime.Runtime.Intepreter.ILTypeInstance @value = (ILRuntime.Runtime.Intepreter.ILTypeInstance)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
             instance_of_this_method.Add(@key, @value);
         }

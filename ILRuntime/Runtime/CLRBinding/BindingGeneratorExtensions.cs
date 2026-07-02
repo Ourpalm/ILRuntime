@@ -140,14 +140,14 @@ namespace ILRuntime.Runtime.CLRBinding
                         else if (pt == typeof(long)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoInt64(__frameBase, ref __curPrim);"); }
                         else if (pt == typeof(float)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoFloat(__frameBase, ref __curPrim);"); }
                         else if (pt == typeof(double)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoDouble(__frameBase, ref __curPrim);"); }
-                        else if (pt == typeof(bool)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;"); }
-                        else if (pt == typeof(byte)) { sb.AppendLine($"            {realClsName} {varName} = (byte)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
-                        else if (pt == typeof(sbyte)) { sb.AppendLine($"            {realClsName} {varName} = (sbyte)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
-                        else if (pt == typeof(short)) { sb.AppendLine($"            {realClsName} {varName} = (short)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
-                        else if (pt == typeof(ushort)) { sb.AppendLine($"            {realClsName} {varName} = (ushort)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
-                        else if (pt == typeof(uint)) { sb.AppendLine($"            {realClsName} {varName} = (uint)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
-                        else if (pt == typeof(ulong)) { sb.AppendLine($"            {realClsName} {varName} = (ulong)ILIntepreter.ReadNeoInt64(__frameBase, ref __curPrim);"); }
-                        else if (pt == typeof(char)) { sb.AppendLine($"            {realClsName} {varName} = (char)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(bool)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(byte)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoUInt8(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(sbyte)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoInt8(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(short)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoInt16(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(ushort)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoUInt16(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(uint)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoUInt32(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(ulong)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoUInt64(__frameBase, ref __curPrim);"); }
+                        else if (pt == typeof(char)) { sb.AppendLine($"            {realClsName} {varName} = ILIntepreter.ReadNeoChar(__frameBase, ref __curPrim);"); }
                         else 
                         { 
                             sb.AppendLine($"            {realClsName} {varName} = default({realClsName});");

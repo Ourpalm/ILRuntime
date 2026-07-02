@@ -48,7 +48,7 @@ namespace ILRuntime.Runtime.Generated
             System.Func<System.Int32, System.Single, System.Int16, System.Double> instance_of_this_method = (System.Func<System.Int32, System.Single, System.Int16, System.Double>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
             System.Int32 @arg1 = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
             System.Single @arg2 = ILIntepreter.ReadNeoFloat(__frameBase, ref __curPrim);
-            System.Int16 @arg3 = (short)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            System.Int16 @arg3 = ILIntepreter.ReadNeoInt16(__frameBase, ref __curPrim);
             var result_of_this_method = instance_of_this_method.Invoke(@arg1, @arg2, @arg3);
             if (__retDst != null) *(double*)__retDst = (double)result_of_this_method;
         }

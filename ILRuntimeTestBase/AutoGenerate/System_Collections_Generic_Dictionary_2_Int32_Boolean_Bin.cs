@@ -54,7 +54,7 @@ namespace ILRuntime.Runtime.Generated
             int __curPrim = 0;
             System.Collections.Generic.Dictionary<System.Int32, System.Boolean> instance_of_this_method = (System.Collections.Generic.Dictionary<System.Int32, System.Boolean>)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
             System.Int32 @key = (System.Int32)ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
-            System.Boolean @value = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @value = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             instance_of_this_method.Add(@key, @value);
         }
 #else

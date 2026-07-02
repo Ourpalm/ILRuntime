@@ -47,7 +47,7 @@ namespace ILRuntime.Runtime.Generated
             int __curPrim = 0;
             System.Reflection.MemberInfo @element = (System.Reflection.MemberInfo)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
             System.Type @attributeType = (System.Type)ILIntepreter.ReadNeoReference(__frameBase, ref __curPrim, __mStack);
-            System.Boolean @inherit = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim) != 0;
+            System.Boolean @inherit = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
             var result_of_this_method = System.Attribute.GetCustomAttribute(@element, @attributeType, @inherit);
             if (__retDst != null)
             {
