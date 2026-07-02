@@ -822,6 +822,17 @@ case Callvirt:
 | 编译时信息 | OpCodeR 存 method token hash | OpCodeR 存 vtable slot index |
 | 缓存 | 无（每次重新查找）| vtable 本身就是缓存 |
 
+### 13.5.1 VTable 签名匹配 TODO
+
+当前 Step 10 JIT 版本的 VTable 构建使用 `IMethod.SignatureString` 作为临时签名 key，并在 `ILMethod` / `CLRMethod` 内懒加载缓存，避免同一个 `IMethod` 反复字符串拼接。该方案只作为过渡实现，后续 AOT / 完整 Neo VTable 不能长期依赖字符串签名匹配。
+
+需要补齐的方向：
+- 参考 Legacy `ILType.GetVirtualMethod()` / `GetMethod(... exactMatch: true)` 的成熟查询逻辑，覆盖泛型实例、泛型类型参数、返回类型、参数类型可赋值性、显式接口实现等规则。
+- 将签名比较抽成结构化 `MethodSignatureKey` 或共享比较器，避免依赖类型 FullName 字符串格式。
+- `ref` / `out` / byref 参数必须纳入签名 identity；不能只比较元素类型名称。
+- CLR 方法与 IL 方法的跨模型匹配需要使用稳定的元数据 identity 或解析后的类型引用，而不是手写字符串拼接。
+- Step 11 接口分派和后续 AOT `.neo` VTableTemplate 应复用同一套签名比较规则，避免 JIT / AOT 行为分叉。
+
 ### 13.6 接口方法分派
 
 接口的 slot 编号系统独立于类的 vtable（一个类可能实现多个接口，各接口的 slot 不能直接映射到类的 vtable slot）。

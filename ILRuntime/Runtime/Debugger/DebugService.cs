@@ -203,6 +203,10 @@ namespace ILRuntime.Runtime.Debugger
         public unsafe string GetThisInfo(ILIntepreter intepreter)
         {
             var topFrame = intepreter.Stack.Frames.Peek();
+#if ENABLE_NEO_MODE
+            if (topFrame.IsRegister && topFrame.Method.CompiledFrame.NeoExecuteBody != null)
+                return "Neo this inspection is not supported yet.";
+#endif
             var arg = Minus(topFrame.LocalVarPointer, topFrame.Method.ParameterCount);
             if (topFrame.Method.HasThis)
                 arg--;
@@ -261,6 +265,10 @@ namespace ILRuntime.Runtime.Debugger
             StackFrame topFrame = intepreter.Stack.Frames.Peek();
             var m = topFrame.Method;
             StringBuilder sb = new StringBuilder();
+#if ENABLE_NEO_MODE
+            if (topFrame.IsRegister && m.CompiledFrame.NeoExecuteBody != null)
+                return "Neo local variable inspection is not supported yet.";
+#endif
             for (int i = 0; i < m.LocalVariableCount; i++)
             {
                 try

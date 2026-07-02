@@ -449,6 +449,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         Conv_U8,
         /// <summary>
         /// 对对象调用后期绑定方法，并且将返回值推送到计算堆栈上。
+        /// Neo mode encoding after LowerNeoOffsets:
+        /// Operand = NeoCallParamMap index; Operand2 = declared/fallback method hash;
+        /// Operand3 = return ref base when needed; Operand4 low16 = vtable slot, high16 = this arg offset in callee frame.
         /// </summary>
         Callvirt,
         /// <summary>
@@ -993,5 +996,17 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         Blti_Un_R4, Bgti_Un_R4, Blei_Un_R4, Bgei_Un_R4,
         Beqi_R8, Bnei_Un_R8, Blti_R8, Bgti_R8, Blei_R8, Bgei_R8,
         Blti_Un_R8, Bgti_Un_R8, Blei_Un_R8, Bgei_Un_R8,
+
+        // === Neo only - Step 10: callvirt 分派变体 ===
+        /// <summary>
+        /// Neo mode IL-object virtual call. Reuses Call/Newobj argument and return ABI;
+        /// dispatch metadata is encoded in Operand4.
+        /// </summary>
+        Callvirt_IL,
+        /// <summary>
+        /// Neo mode CLR-object virtual call. Reuses CLRMethod Neo invocation ABI.
+        /// Operand2 stores the resolved CLR method hash.
+        /// </summary>
+        Callvirt_CLR,
     }
 }

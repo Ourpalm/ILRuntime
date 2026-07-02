@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +17,8 @@ namespace ILRuntime.CLR.Method
 
         IType ReturnType { get; }
         List<IType> Parameters { get; }
+
+        string SignatureString { get; }
 
         int GenericParameterCount { get; }
 

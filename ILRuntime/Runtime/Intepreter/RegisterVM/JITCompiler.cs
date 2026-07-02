@@ -1479,6 +1479,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 if (!ilm.Definition.IsAbstract && !ilm.Definition.IsVirtual && !ilm.DeclearingType.IsInterface)
                                     op.Code = OpCodeREnum.Call;
                             }
+#if ENABLE_NEO_MODE
+                            if (code.Code == Code.Callvirt && op.Code == OpCodeREnum.Callvirt && !hasConstrained)
+                            {
+                                InitializeCallvirtDispatch(ref op, m);
+                            }
+#endif
                             int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - CallRegisterParamCount, 0);
                             for (int i = pCnt; i > pCnt - pushCnt; i--)
                             {
@@ -1523,7 +1529,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Register1 = baseRegIdx++;
                             else
                                 op.Register1 = -1;
-                            if (m is CLRMethod cm && cm.Redirection != null)
+                            if (m is CLRMethod cm && cm.Redirection != null &&
+                                op.Code != OpCodeREnum.Callvirt &&
+                                op.Code != OpCodeREnum.Callvirt_IL &&
+                                op.Code != OpCodeREnum.Callvirt_CLR)
                             {
                                 if (!cm.IsDelegateInvoke && !cm.IsDelegateDynamicInvoke)
                                 {
@@ -2091,6 +2100,53 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     res = OpCodeREnum.Stfld_Ref;
             }
             return res;
+        }
+#endif
+
+#if ENABLE_NEO_MODE
+        void InitializeCallvirtDispatch(ref OpCodes.OpCodeR op, IMethod targetMethod)
+        {
+            int slot = -1;
+            if (targetMethod is ILMethod ilMethod)
+            {
+                ILType declaringILType = ilMethod.DeclearingType as ILType;
+                if (declaringILType != null && !declaringILType.IsInterface && declaringILType.TryGetNeoVTableSlot(ilMethod, out slot))
+                {
+                    op.Code = OpCodeREnum.Callvirt_IL;
+                    op.Operand4 = EncodeCallvirtDispatch(slot, 0);
+                }
+                else
+                {
+                    op.Code = OpCodeREnum.Callvirt;
+                    op.Operand4 = EncodeCallvirtDispatch(slot, 0);
+                }
+            }
+            else if (targetMethod is CLRMethod clrMethod)
+            {
+                if (MayCallvirtTargetILObject(clrMethod))
+                    op.Code = OpCodeREnum.Callvirt;
+                else
+                    op.Code = OpCodeREnum.Callvirt_CLR;
+                op.Operand4 = EncodeCallvirtDispatch(slot, 0);
+            }
+        }
+
+        static int EncodeCallvirtDispatch(int slot, int thisArgOffset)
+        {
+            return ((thisArgOffset & 0xffff) << 16) | (slot & 0xffff);
+        }
+
+        static bool MayCallvirtTargetILObject(CLRMethod method)
+        {
+            IType declaringType = method.DeclearingType;
+            if (declaringType == null)
+                return true;
+
+            if (declaringType.IsInterface)
+                return true;
+
+            Type clrType = declaringType.TypeForCLR;
+            return clrType == typeof(object);
         }
 #endif
 

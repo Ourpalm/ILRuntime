@@ -6,6 +6,7 @@ using ILRuntime.Runtime.Stack;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 #if DEBUG && !DISABLE_ILRUNTIME_DEBUG
 using AutoList = System.Collections.Generic.List<object>;
@@ -250,6 +251,36 @@ namespace ILRuntime.CLR.Method
         {
             get;
             private set;
+        }
+
+        string signatureString;
+        public string SignatureString
+        {
+            get
+            {
+                if (signatureString == null)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(Name);
+                    sb.Append('|');
+                    sb.Append(GenericParameterCount);
+                    sb.Append('(');
+                    var ps = Parameters;
+                    if (ps != null)
+                    {
+                        for (int i = 0; i < ps.Count; i++)
+                        {
+                            if (i > 0)
+                                sb.Append(',');
+                            sb.Append(ps[i] != null ? ps[i].FullName : string.Empty);
+                        }
+                    }
+                    sb.Append(")->");
+                    sb.Append(ReturnType != null ? ReturnType.FullName : string.Empty);
+                    signatureString = sb.ToString();
+                }
+                return signatureString;
+            }
         }
 
         public bool IsConstructor

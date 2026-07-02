@@ -1,0 +1,22 @@
+- [x] `ILType` 拥有 Neo VTable 存储，并能为 IL 引用类型返回稳定的 slot 到 `IMethod` 映射
+- [x] VTable 构建正确继承基类虚方法 slot
+- [x] override 方法复用被 override 方法的 slot，不新增重复 slot
+- [x] 本类新增 virtual 方法会分配新的 VTable slot
+- [x] VTable slot 能保存并分派 IL 方法与 CLR 方法引用
+- [x] Neo Register VM 明确支持 `Callvirt_IL`、`Callvirt_CLR` 和通用 `Callvirt` 的编码
+- [x] Neo JIT 继承 Legacy devirtualize 规则：非 abstract、非 virtual、非 interface 声明类型的 ILMethod `callvirt` 会 lowering 为 direct `Call`
+- [x] Neo JIT 能为静态 IL 类型虚调用生成 `Callvirt_IL`
+- [x] Neo JIT 能为静态 CLR 类型虚调用生成 `Callvirt_CLR`
+- [x] Neo JIT 能为无法静态确定 IL/CLR 的对象虚调用生成通用 `Callvirt`
+- [x] sealed class / final override 的额外 devirtualize 已完成安全性评估；若未实现，结论记录为不影响 Step 10 正确性
+- [x] `Callvirt_IL` 在 `ILIntepreter.Neo.cs` 中通过 `instance.Type.VTable[slot]` 执行实际 IL 方法
+- [x] `Callvirt_CLR` 复用 Step 9 的 Neo CLR 调用路径，包含 Redirection 和反射 fallback
+- [x] 通用 `Callvirt` 能根据 `mStack` 中 this 的运行时对象类型正确分派
+- [x] null this、缺失 slot、非法对象类型会抛出明确异常，不会造成 ip 越界或 Legacy 栈模型混用
+- [x] 新增 Step 10 测试覆盖简单继承 virtual/override
+- [x] 新增 Step 10 测试覆盖多层继承链
+- [x] 新增 Step 10 测试覆盖 CLR 虚方法调用
+- [x] 新增 Step 10 测试覆盖 object 变量持有 IL/CLR 对象的通用分派
+- [x] 新增 Step 10 测试覆盖非 virtual IL instance method 的 `callvirt` devirtualize 为 direct `Call`
+- [x] Neo Step 10 测试在 `Debug_Neo` + `useRegister=true` 下通过
+- [x] 相关 Step 8/9 回归测试通过，确认非虚调用、引用类型 newobj、CLR 方法调用未被破坏

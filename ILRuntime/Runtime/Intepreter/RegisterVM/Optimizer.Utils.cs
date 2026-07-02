@@ -534,6 +534,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Constrained:
                     return false;
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Callvirt_IL:
+                case OpCodeREnum.Callvirt_CLR:
                 case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Newobj:
@@ -750,6 +752,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldstr:
                 case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Callvirt_IL:
+                case OpCodeREnum.Callvirt_CLR:
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Newobj:
                 case OpCodeREnum.Ldind_I:
@@ -935,7 +939,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     r1 = op.Register1;
                     return true;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(string.Format("GetOpcodeDestRegister does not support opcode {0}", op.Code));
             }
         }
 
@@ -1164,6 +1168,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Callvirt_IL:
+                case OpCodeREnum.Callvirt_CLR:
                 case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Newobj:
 
@@ -1332,6 +1338,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Unbox_Any:
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Callvirt_IL:
+                case OpCodeREnum.Callvirt_CLR:
                 case OpCodeREnum.Call_Redirect:
                 case OpCodeREnum.Newobj:
                 case OpCodeREnum.Ldind_I:

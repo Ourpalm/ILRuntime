@@ -410,6 +410,8 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     break;
                 case OpCodeREnum.Call:
                 case OpCodeREnum.Callvirt:
+                case OpCodeREnum.Callvirt_IL:
+                case OpCodeREnum.Callvirt_CLR:
                 case OpCodeREnum.Newobj:
                     {
                         string retR = Register1 >= 0 ? "r" + Register1 : "-";
@@ -422,7 +424,10 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
 
                         if (domain == null)
                         {
-                            param = string.Format("{0}, {1}", retR, Operand2);
+                            if (Code == OpCodeREnum.Callvirt_IL || Code == OpCodeREnum.Callvirt_CLR || Code == OpCodeREnum.Callvirt)
+                                param = string.Format("{0}, {1}, vslot={2}, thisArg={3}", retR, Operand2, Operand4 & 0xffff, (int)((uint)Operand4 >> 16));
+                            else
+                                param = string.Format("{0}, {1}", retR, Operand2);
                         }
                         else
                         {
@@ -431,6 +436,8 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                                 param = m != null ? string.Format("{0}, {1}::{2}", retR, m.DeclearingType.FullName, m) : string.Format("{0}, {1}", retR, Operand2);
                             else
                                 param = m != null ? string.Format("{0}, {1}", retR, m) : string.Format("{0}, {1}", retR, Operand2);
+                            if (Code == OpCodeREnum.Callvirt_IL || Code == OpCodeREnum.Callvirt_CLR || Code == OpCodeREnum.Callvirt)
+                                param = string.Format("{0}, vslot={1}, thisArg={2}", param, Operand4 & 0xffff, (int)((uint)Operand4 >> 16));
                         }
                     }
                     break;

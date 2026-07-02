@@ -374,6 +374,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         break;
                     case OpCodeREnum.Call:
                     case OpCodeREnum.Callvirt:
+                    case OpCodeREnum.Callvirt_IL:
+                    case OpCodeREnum.Callvirt_CLR:
                     case OpCodeREnum.Newobj:
                         {
                             var targetMethod = domain.GetMethod(op.Operand2);
@@ -383,7 +385,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             int pCnt = targetMethod.ParameterCount;
                             if (targetMethod.HasThis && op.Code != OpCodeREnum.Newobj) pCnt++;
                             
-                            bool hasConstrained = op.Operand4 == 1;
+                            bool hasConstrained = op.Code != OpCodeREnum.Callvirt_IL &&
+                                op.Code != OpCodeREnum.Callvirt_CLR &&
+                                op.Operand4 == 1;
                             int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - 3, 0);
                             int regCnt = pCnt - pushCnt;
                             
@@ -517,7 +521,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             }
                             else
                             {
-                                if (op.Register1 >= 0) LowerR1(ref op, localInfos);
+                                if (op.Register1 >= 0)
+                                {
+                                    short r1 = op.Register1;
+                                    op.Operand3 = localInfos[r1].RefOffset;
+                                    LowerR1(ref op, localInfos);
+                                }
                             }
                         }
                         break;

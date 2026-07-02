@@ -34,6 +34,10 @@ namespace ILRuntime.CLR.TypeSystem
 #if ENABLE_NEO_MODE
         ILTypeFieldOffset[] fieldOffsets;
         ILTypeFieldOffset[] staticFieldOffsets;
+        IMethod[] neoVTable;
+        Dictionary<string, int> neoVTableSlots;
+        string[] neoVTableSlotKeys;
+        bool neoVTableBuilding;
 #endif
         FieldReference[] fieldReferences;
         FieldDefinition[] fieldDefinitions;
@@ -321,6 +325,25 @@ namespace ILRuntime.CLR.TypeSystem
         }
 
 #if ENABLE_NEO_MODE
+        public IMethod[] NeoVTable
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                EnsureNeoVTable();
+                return neoVTable;
+            }
+        }
+
+        internal bool TryGetNeoVTableSlot(IMethod method, out int slot)
+        {
+            EnsureNeoVTable();
+            if (method != null && neoVTableSlots != null)
+                return neoVTableSlots.TryGetValue(method.SignatureString, out slot);
+            slot = -1;
+            return false;
+        }
+
         public int TotalPrimitiveSize
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -377,6 +400,182 @@ namespace ILRuntime.CLR.TypeSystem
                 return totalStaticReferenceCnt;
             }
         }
+
+        void EnsureNeoVTable()
+        {
+            if (neoVTable == null)
+                BuildNeoVTable();
+        }
+
+        void BuildNeoVTable()
+        {
+            if (neoVTableBuilding)
+                throw new InvalidOperationException(string.Format("Recursive Neo VTable build detected for type {0}", FullName));
+
+            neoVTableBuilding = true;
+            try
+            {
+                if (methods == null)
+                    InitializeMethods();
+
+                List<IMethod> slots = new List<IMethod>();
+                List<string> slotKeys = new List<string>();
+                Dictionary<string, int> slotMap = new Dictionary<string, int>();
+
+                if (!IsValueType && !IsInterface)
+                {
+                    IType baseForVTable = BaseType;
+                    if (baseForVTable is ILType baseILType)
+                    {
+                        var baseTable = baseILType.NeoVTable;
+                        for (int i = 0; i < baseTable.Length; i++)
+                        {
+                            slots.Add(baseTable[i]);
+                            string key = baseILType.neoVTableSlotKeys[i];
+                            slotKeys.Add(key);
+                            if (!slotMap.ContainsKey(key))
+                                slotMap.Add(key, i);
+                        }
+                    }
+                    else
+                    {
+                        if (baseForVTable == null)
+                            baseForVTable = appdomain.ObjectType;
+                        AddNeoBaseVirtualSlots(baseForVTable, slots, slotKeys, slotMap);
+                    }
+
+                    HashSet<ILMethod> added = new HashSet<ILMethod>();
+                    foreach (var pair in methods)
+                    {
+                        foreach (var method in pair.Value)
+                        {
+                            if (!added.Add(method) || !IsNeoVTableCandidate(method))
+                                continue;
+
+                            int slot = FindNeoOverrideSlot(method, slotMap);
+                            string key = method.SignatureString;
+                            if (slot >= 0)
+                            {
+                                slots[slot] = method;
+                                slotMap[key] = slot;
+                                slotKeys[slot] = key;
+                            }
+                            else
+                            {
+                                AddNeoVTableSlot(method, key, slots, slotKeys, slotMap);
+                            }
+                        }
+                    }
+                }
+
+                neoVTable = slots.ToArray();
+                neoVTableSlotKeys = slotKeys.ToArray();
+                neoVTableSlots = slotMap;
+            }
+            finally
+            {
+                neoVTableBuilding = false;
+            }
+        }
+
+        void AddNeoBaseVirtualSlots(IType baseType, List<IMethod> slots, List<string> slotKeys, Dictionary<string, int> slotMap)
+        {
+            if (baseType == null)
+                return;
+
+            foreach (var method in baseType.GetMethods())
+            {
+                if (!IsNeoVTableCandidate(method))
+                    continue;
+                AddNeoVTableSlot(method, method.SignatureString, slots, slotKeys, slotMap);
+            }
+        }
+
+        static void AddNeoVTableSlot(IMethod method, string key, List<IMethod> slots, List<string> slotKeys, Dictionary<string, int> slotMap)
+        {
+            if (slotMap.ContainsKey(key))
+                return;
+
+            slotMap.Add(key, slots.Count);
+            slots.Add(method);
+            slotKeys.Add(key);
+        }
+
+        int FindNeoOverrideSlot(ILMethod method, Dictionary<string, int> slotMap)
+        {
+            int slot;
+            if (slotMap.TryGetValue(method.SignatureString, out slot))
+                return slot;
+
+            if (method.Definition.HasOverrides)
+            {
+                foreach (var overrideRef in method.Definition.Overrides)
+                {
+                    IMethod overrideMethod = null;
+                    try
+                    {
+                        bool invalidToken;
+                        overrideMethod = appdomain.GetMethod(overrideRef, this, method, out invalidToken);
+                    }
+                    catch
+                    {
+                    }
+
+                    if (overrideMethod != null && slotMap.TryGetValue(overrideMethod.SignatureString, out slot))
+                        return slot;
+
+                    if (slotMap.TryGetValue(GetNeoVTableSlotKey(overrideRef), out slot))
+                        return slot;
+                }
+            }
+
+            if (!method.Definition.IsNewSlot)
+            {
+                if (slotMap.TryGetValue(method.SignatureString, out slot))
+                    return slot;
+            }
+
+            return -1;
+        }
+
+        static bool IsNeoVTableCandidate(IMethod method)
+        {
+            if (method == null || method.IsStatic || method.IsConstructor)
+                return false;
+
+            if (method is ILMethod ilMethod)
+                return ilMethod.Definition.IsVirtual;
+
+            if (method is CLRMethod clrMethod)
+            {
+                var info = clrMethod.MethodInfo;
+                return info != null && info.IsVirtual && !info.IsStatic;
+            }
+
+            return false;
+        }
+
+        static string GetNeoVTableSlotKey(MethodReference method)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(method.Name);
+            sb.Append('|');
+            sb.Append(method.GenericParameters != null ? method.GenericParameters.Count : 0);
+            sb.Append('(');
+            if (method.HasParameters)
+            {
+                for (int i = 0; i < method.Parameters.Count; i++)
+                {
+                    if (i > 0)
+                        sb.Append(',');
+                    sb.Append(method.Parameters[i].ParameterType.FullName);
+                }
+            }
+            sb.Append(")->");
+            sb.Append(method.ReturnType != null ? method.ReturnType.FullName : string.Empty);
+            return sb.ToString();
+        }
+
 #endif
 
         internal List<ILType> GenericInstances
