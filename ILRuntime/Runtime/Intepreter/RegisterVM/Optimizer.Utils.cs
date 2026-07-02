@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -340,6 +340,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
         public static bool IsBranching(OpCodeREnum op)
         {
+#if ENABLE_NEO_MODE
+            op = NeoNormalizeOpCode(op);
+#endif
             switch (op)
             {
                 case OpCodeREnum.Br_S:
@@ -374,6 +377,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
         public static bool IsIntermediateBranching(OpCodeREnum op)
         {
+#if ENABLE_NEO_MODE
+            op = NeoNormalizeOpCode(op);
+#endif
             switch (op)
             {
                 case OpCodeREnum.Beqi:

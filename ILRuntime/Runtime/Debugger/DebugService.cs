@@ -137,9 +137,17 @@ namespace ILRuntime.Runtime.Debugger
             {
                 if (frames[0].IsRegister)
                 {
-                    frames[0].Method.RegisterVMSymbols.TryGetValue(frames[0].Address.Value, out vmSymbol);
-                    ins = vmSymbol.Instruction;
-                    sb.AppendLine(string.Format("{0}(JIT_{1:0000}:{2})", ins, frames[0].Address.Value, frames[0].Method.BodyRegister[frames[0].Address.Value]));
+                    var addr = frames[0].Address.Value;
+                    if (frames[0].Method.RegisterVMSymbols != null && frames[0].Method.RegisterVMSymbols.TryGetValue(addr, out vmSymbol))
+                        ins = vmSymbol.Instruction;
+#if ENABLE_NEO_MODE
+                    var neoBody = frames[0].Method.CompiledFrame.NeoExecuteBody;
+                    if (neoBody != null && addr >= 0 && addr < neoBody.Length)
+                        sb.AppendLine(string.Format("{0}(JIT_{1:0000}:{2})", ins, addr, neoBody[addr]));
+                    else
+#endif
+                    if (frames[0].Method.BodyRegister != null && addr >= 0 && addr < frames[0].Method.BodyRegister.Length)
+                        sb.AppendLine(string.Format("{0}(JIT_{1:0000}:{2})", ins, addr, frames[0].Method.BodyRegister[addr]));
                 }
                 else if (frames[0].Method.Definition.Body.Instructions.Count > 0)
                 {
@@ -156,7 +164,7 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     if (f.Address != null)
                     {
-                        if (f.Method.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))
+                        if (f.Method.RegisterVMSymbols != null && f.Method.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))
                         {
                             RegisterVMSymbolLink link = null;
                             do
@@ -434,7 +442,7 @@ namespace ILRuntime.Runtime.Debugger
             {
                 basePointer = intp.Stack.Frames.Peek().LocalVarPointer;
                 RegisterVMSymbol vmSymbol;
-                if (method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
+                if (method.RegisterVMSymbols != null && method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
                 {
                     var paramCnt = method.HasThis ? method.ParameterCount + 1 : method.ParameterCount;
                     var frameBase = basePointer - paramCnt;
@@ -470,7 +478,7 @@ namespace ILRuntime.Runtime.Debugger
                 {
                     if (!method.IsRegisterVMSymbolFixed)
                         method.FixRegisterVMSymbol();
-                    if (method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
+                    if (method.RegisterVMSymbols != null && method.RegisterVMSymbols.TryGetValue(ip, out vmSymbol))
                     {
                         ins = vmSymbol.Instruction;
                         m = vmSymbol.Method;
@@ -589,7 +597,7 @@ namespace ILRuntime.Runtime.Debugger
                 if (f.IsRegister)
                 {
                     RegisterVMSymbol vmSymbol;
-                    if (m.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))
+                    if (m.RegisterVMSymbols != null && m.RegisterVMSymbols.TryGetValue(f.Address.Value, out vmSymbol))
                     {
                         RegisterVMSymbolLink link = null;
                         StackObject* basePointer;

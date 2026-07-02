@@ -115,6 +115,13 @@ namespace ILRuntime.Runtime.Generated
                     }
                 }
             }
+            args = new Type[]{typeof(System.Byte), typeof(System.SByte), typeof(System.Int16), typeof(System.UInt16), typeof(System.Boolean), typeof(System.Char), typeof(System.Int32)};
+            method = type.GetMethod("ValidateNeoSmallPrimitiveArgs", flag, null, args, null);
+#if ENABLE_NEO_MODE
+            app.RegisterCLRMethodRedirectionNeo(method, ValidateNeoSmallPrimitiveArgs_8_Neo);
+#else
+            app.RegisterCLRMethodRedirection(method, ValidateNeoSmallPrimitiveArgs_8);
+#endif
             args = new Type[]{};
             method = type.GetMethod("MissingMethod", flag, null, args, null);
 #if ENABLE_NEO_MODE
@@ -439,6 +446,58 @@ namespace ILRuntime.Runtime.Generated
             instance_of_this_method.MissingMethodGeneric<ILRuntimeTest.TestFramework.MissingType>(@obj);
 
             return __ret;
+        }
+#endif
+
+
+#if ENABLE_NEO_MODE
+        static void ValidateNeoSmallPrimitiveArgs_8_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            int __curPrim = 0;
+            System.Byte @b = ILIntepreter.ReadNeoUInt8(__frameBase, ref __curPrim);
+            System.SByte @sb = ILIntepreter.ReadNeoInt8(__frameBase, ref __curPrim);
+            System.Int16 @s = ILIntepreter.ReadNeoInt16(__frameBase, ref __curPrim);
+            System.UInt16 @us = ILIntepreter.ReadNeoUInt16(__frameBase, ref __curPrim);
+            System.Boolean @flag = ILIntepreter.ReadNeoBoolean(__frameBase, ref __curPrim);
+            System.Char @ch = ILIntepreter.ReadNeoChar(__frameBase, ref __curPrim);
+            System.Int32 @tail = ILIntepreter.ReadNeoInt32(__frameBase, ref __curPrim);
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestCLRBinding.ValidateNeoSmallPrimitiveArgs(@b, @sb, @s, @us, @flag, @ch, @tail);
+            if (__retDst != null) *(int*)__retDst = result_of_this_method;
+        }
+#else
+        static StackObject* ValidateNeoSmallPrimitiveArgs_8(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = __esp - 7;
+
+            ptr_of_this_method = __esp - 1;
+            System.Int32 @tail = ptr_of_this_method->Value;
+
+            ptr_of_this_method = __esp - 2;
+            System.Char @ch = (System.Char)ptr_of_this_method->Value;
+
+            ptr_of_this_method = __esp - 3;
+            System.Boolean @flag = ptr_of_this_method->Value == 1;
+
+            ptr_of_this_method = __esp - 4;
+            System.UInt16 @us = (System.UInt16)ptr_of_this_method->Value;
+
+            ptr_of_this_method = __esp - 5;
+            System.Int16 @s = (System.Int16)ptr_of_this_method->Value;
+
+            ptr_of_this_method = __esp - 6;
+            System.SByte @sb = (System.SByte)ptr_of_this_method->Value;
+
+            ptr_of_this_method = __esp - 7;
+            System.Byte @b = (System.Byte)ptr_of_this_method->Value;
+
+            var result_of_this_method = ILRuntimeTest.TestFramework.TestCLRBinding.ValidateNeoSmallPrimitiveArgs(@b, @sb, @s, @us, @flag, @ch, @tail);
+
+            __ret->ObjectType = ObjectTypes.Integer;
+            __ret->Value = result_of_this_method;
+            return __ret + 1;
         }
 #endif
 

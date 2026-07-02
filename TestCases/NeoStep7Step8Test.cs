@@ -63,6 +63,22 @@ namespace TestCases
             }
         }
 
+        public static void NeoTestCLRBindingSmallPrimitiveArgs()
+        {
+            int r = ILRuntimeTest.TestFramework.TestCLRBinding.ValidateNeoSmallPrimitiveArgs(
+                (byte)7,
+                (sbyte)-3,
+                (short)-200,
+                (ushort)500,
+                true,
+                'A',
+                90000);
+            if (r != 91369)
+            {
+                int z = 1; int d = 0; int _ = z / d;
+            }
+        }
+
         // --- Step 8: Call reference params and Ret
         public static string ConcatRef(Step7TargetClass obj)
         {

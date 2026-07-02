@@ -405,6 +405,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         body[j] = body[j + 1];
                                     }
                                     Array.Resize(ref body, body.Length - 1);
+                                    FixBranchTargetsAfterRemove(body, scanIdx, frame.SwitchTargets, frame.Symbols);
                                     // 因为当前指令(Call)的位置前移了，我们需要更新外层循环的 i 和当前 op
                                     i--;
                                     op = body[i];
@@ -573,6 +574,55 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 
             return slot;
+        }
+
+        static void FixBranchTargetsAfterRemove(OpCodeR[] body, int removedIndex, Dictionary<int, int[]> jumpTables, Dictionary<int, RegisterVMSymbol> symbols)
+        {
+            for (int i = 0; i < body.Length; i++)
+            {
+                var op = body[i];
+                if (IsBranching(op.Code))
+                {
+                    if (op.Operand > removedIndex)
+                    {
+                        op.Operand--;
+                        body[i] = op;
+                    }
+                }
+                else if (IsIntermediateBranching(op.Code))
+                {
+                    if (op.Operand4 > removedIndex)
+                    {
+                        op.Operand4--;
+                        body[i] = op;
+                    }
+                }
+                else if (op.Code == OpCodeREnum.Switch && jumpTables != null && jumpTables.TryGetValue(op.Operand, out var targets))
+                {
+                    for (int j = 0; j < targets.Length; j++)
+                    {
+                        if (targets[j] > removedIndex)
+                            targets[j]--;
+                    }
+                }
+            }
+
+            if (symbols != null && symbols.Count > 0)
+            {
+                var oldSymbols = new List<KeyValuePair<int, RegisterVMSymbol>>(symbols);
+                symbols.Clear();
+                foreach (var item in oldSymbols)
+                {
+                    if (item.Key < removedIndex)
+                    {
+                        symbols[item.Key] = item.Value;
+                    }
+                    else if (item.Key > removedIndex)
+                    {
+                        symbols[item.Key - 1] = item.Value;
+                    }
+                }
+            }
         }
 
         static void LowerR1R2(ref OpCodeR op, StackSlotInfo[] localInfos)

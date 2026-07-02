@@ -1,4 +1,4 @@
-﻿#define TEST_MISSING_METHOD
+#define TEST_MISSING_METHOD
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,6 +96,11 @@ namespace ILRuntimeTest.TestFramework
 
     public class TestCLRBinding
     {
+        public static int ValidateNeoSmallPrimitiveArgs(byte b, sbyte sb, short s, ushort us, bool flag, char ch, int tail)
+        {
+            return b + sb + s + us + (flag ? 1000 : 0) + ch + tail;
+        }
+
         public void LoadAsset<T>(string name, T obj)
         {
 

@@ -1296,7 +1296,7 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 mStack.RemoveRange(frameRefBase, mStack.Count - frameRefBase);
                                 returned = true;
-                                break;
+                                continue;
                             case OpCodeREnum.Initobj:
                                 t = AppDomain.GetType(ip->Operand);
                                 ilType = t as ILType;
