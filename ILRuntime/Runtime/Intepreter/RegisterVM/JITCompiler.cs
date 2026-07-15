@@ -2110,6 +2110,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             if (targetMethod is ILMethod ilMethod)
             {
                 ILType declaringILType = ilMethod.DeclearingType as ILType;
+                if (declaringILType != null && declaringILType.IsInterface)
+                {
+                    // 接口方法：走通用 Callvirt case，把接口内 slot 预编码进 Operand4 低 16 位。
+                    // 运行时 ResolveNeoGenericCallvirtTarget 根据 declaredMethod.DeclearingType.IsInterface
+                    // 与 instance.Type.neoInterfaceOffsets 合成实际 vtable slot。
+                    int ifaceSlot;
+                    if (!declaringILType.TryGetInterfaceMethodSlot(ilMethod, out ifaceSlot))
+                        ifaceSlot = -1;
+                    op.Code = OpCodeREnum.Callvirt;
+                    op.Operand4 = EncodeCallvirtDispatch(ifaceSlot, 0);
+                    return;
+                }
+
                 if (declaringILType != null && !declaringILType.IsInterface && declaringILType.TryGetNeoVTableSlot(ilMethod, out slot))
                 {
                     op.Code = OpCodeREnum.Callvirt_IL;

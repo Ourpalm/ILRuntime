@@ -35,8 +35,8 @@ namespace ILRuntime.CLR.TypeSystem
         ILTypeFieldOffset[] fieldOffsets;
         ILTypeFieldOffset[] staticFieldOffsets;
         IMethod[] neoVTable;
-        Dictionary<string, int> neoVTableSlots;
-        string[] neoVTableSlotKeys;
+        Dictionary<IMethod, int> neoVTableSlots;
+        Dictionary<IType, int> neoInterfaceOffsets;
         bool neoVTableBuilding;
 #endif
         FieldReference[] fieldReferences;
@@ -339,7 +339,25 @@ namespace ILRuntime.CLR.TypeSystem
         {
             EnsureNeoVTable();
             if (method != null && neoVTableSlots != null)
-                return neoVTableSlots.TryGetValue(method.SignatureString, out slot);
+                return neoVTableSlots.TryGetValue(method, out slot);
+            slot = -1;
+            return false;
+        }
+
+        internal bool TryGetNeoInterfaceOffset(IType interfaceType, out int baseSlot)
+        {
+            EnsureNeoVTable();
+            if (interfaceType != null && neoInterfaceOffsets != null)
+                return neoInterfaceOffsets.TryGetValue(interfaceType, out baseSlot);
+            baseSlot = -1;
+            return false;
+        }
+
+        internal bool TryGetInterfaceMethodSlot(IMethod interfaceMethod, out int slot)
+        {
+            EnsureNeoVTable();
+            if (interfaceMethod != null && neoVTableSlots != null)
+                return neoVTableSlots.TryGetValue(interfaceMethod, out slot);
             slot = -1;
             return false;
         }
@@ -419,58 +437,138 @@ namespace ILRuntime.CLR.TypeSystem
                     InitializeMethods();
 
                 List<IMethod> slots = new List<IMethod>();
-                List<string> slotKeys = new List<string>();
-                Dictionary<string, int> slotMap = new Dictionary<string, int>();
+                Dictionary<IMethod, int> slotMap = new Dictionary<IMethod, int>();
+                Dictionary<IType, int> interfaceOffsets = null;
 
-                if (!IsValueType && !IsInterface)
+                if (!IsValueType)
                 {
-                    IType baseForVTable = BaseType;
-                    if (baseForVTable is ILType baseILType)
+                    if (IsInterface)
                     {
-                        var baseTable = baseILType.NeoVTable;
-                        for (int i = 0; i < baseTable.Length; i++)
-                        {
-                            slots.Add(baseTable[i]);
-                            string key = baseILType.neoVTableSlotKeys[i];
-                            slotKeys.Add(key);
-                            if (!slotMap.ContainsKey(key))
-                                slotMap.Add(key, i);
-                        }
+                        BuildNeoInterfaceOwnSlots(slots, slotMap);
                     }
                     else
                     {
-                        if (baseForVTable == null)
-                            baseForVTable = appdomain.ObjectType;
-                        AddNeoBaseVirtualSlots(baseForVTable, slots, slotKeys, slotMap);
-                    }
-
-                    HashSet<ILMethod> added = new HashSet<ILMethod>();
-                    foreach (var pair in methods)
-                    {
-                        foreach (var method in pair.Value)
+                        // Base class slot 阶段
+                        IType baseForVTable = BaseType;
+                        if (baseForVTable is ILType baseILType)
                         {
-                            if (!added.Add(method) || !IsNeoVTableCandidate(method))
-                                continue;
-
-                            int slot = FindNeoOverrideSlot(method, slotMap);
-                            string key = method.SignatureString;
-                            if (slot >= 0)
+                            var baseTable = baseILType.NeoVTable;
+                            for (int i = 0; i < baseTable.Length; i++)
                             {
-                                slots[slot] = method;
-                                slotMap[key] = slot;
-                                slotKeys[slot] = key;
+                                var baseMethod = baseTable[i];
+                                slots.Add(baseMethod);
+                                if (baseMethod != null && !slotMap.ContainsKey(baseMethod))
+                                    slotMap.Add(baseMethod, i);
                             }
-                            else
+
+                            if (baseILType.neoInterfaceOffsets != null && baseILType.neoInterfaceOffsets.Count > 0)
                             {
-                                AddNeoVTableSlot(method, key, slots, slotKeys, slotMap);
+                                interfaceOffsets = new Dictionary<IType, int>(baseILType.neoInterfaceOffsets);
+                            }
+                        }
+                        else
+                        {
+                            if (baseForVTable == null)
+                                baseForVTable = appdomain.ObjectType;
+                            AddNeoBaseVirtualSlots(baseForVTable, slots, slotMap);
+                        }
+
+                        // 本类阶段：新增虚方法 + override 覆盖
+                        HashSet<ILMethod> added = new HashSet<ILMethod>();
+                        foreach (var pair in methods)
+                        {
+                            foreach (var method in pair.Value)
+                            {
+                                if (!added.Add(method) || !IsNeoVTableCandidate(method))
+                                    continue;
+
+                                int slot = FindNeoOverrideSlot(method, slots, slotMap);
+                                if (slot >= 0)
+                                {
+                                    // 用本类方法覆盖 slot。**保留基类 IMethod → slot 映射**：
+                                    // 运行时 callvirt 的 declaredMethod 可能是基类版本（如 CLR object.ToString），
+                                    // 仍要能通过 slotMap 查到 slot。
+                                    slots[slot] = method;
+                                    slotMap[method] = slot;
+                                }
+                                else
+                                {
+                                    AddNeoVTableSlot(method, slots, slotMap);
+                                }
+                            }
+                        }
+
+                        // 接口阶段：
+                        //  ① 从基类继承的 neoInterfaceOffsets 里，若本类 override 了对应实现方法，重新填充接口块 slot；
+                        //  ② 为本类直接声明的接口分配新的 slot 块。
+                        if (interfaceOffsets != null && interfaceOffsets.Count > 0)
+                        {
+                            // 复制一份 key，避免遍历时修改
+                            var inheritedIfaces = new List<KeyValuePair<IType, int>>(interfaceOffsets);
+                            foreach (var kv in inheritedIfaces)
+                            {
+                                if (!(kv.Key is ILType ilIface) || !ilIface.IsInterface)
+                                    continue;
+                                var ifaceVT = ilIface.NeoVTable;
+                                int baseSlot = kv.Value;
+                                for (int i = 0; i < ifaceVT.Length; i++)
+                                {
+                                    IMethod ifaceMethod = ifaceVT[i];
+                                    IMethod impl = ResolveNeoInterfaceImplementation(ifaceMethod, ilIface);
+                                    if (impl == null || ReferenceEquals(impl, ifaceMethod) ||
+                                        (impl.DeclearingType != null && impl.DeclearingType.IsInterface))
+                                        continue;  // 保持基类 slot 已有值
+                                    int idx = baseSlot + i;
+                                    if (idx >= 0 && idx < slots.Count)
+                                        slots[idx] = impl;
+                                }
+                            }
+                        }
+
+                        var directInterfaces = Implements;
+                        if (directInterfaces != null)
+                        {
+                            for (int idx = 0; idx < directInterfaces.Length; idx++)
+                            {
+                                IType iface = directInterfaces[idx];
+                                if (!(iface is ILType ilIface) || !ilIface.IsInterface)
+                                    continue;
+
+                                if (interfaceOffsets == null)
+                                    interfaceOffsets = new Dictionary<IType, int>();
+
+                                // 若基类已声明同一个接口，此处仍然为本类重新分配 slot 块，
+                                // 覆盖继承 offset，确保 slot 指向本类最新 impl（含 override）。
+                                int baseSlot = slots.Count;
+                                interfaceOffsets[ilIface] = baseSlot;
+
+                                var ifaceVTable = ilIface.NeoVTable;
+                                for (int i = 0; i < ifaceVTable.Length; i++)
+                                {
+                                    IMethod ifaceMethod = ifaceVTable[i];
+                                    IMethod impl = ResolveNeoInterfaceImplementation(ifaceMethod, ilIface);
+                                    if (impl == null || ReferenceEquals(impl, ifaceMethod) ||
+                                        (impl.DeclearingType != null && impl.DeclearingType.IsInterface))
+                                    {
+                                        throw new TypeLoadException(string.Format(
+                                            "Type {0} does not implement interface method {1}.{2}",
+                                            FullName, ilIface.FullName, ifaceMethod != null ? ifaceMethod.Name : "<null>"));
+                                    }
+                                    slots.Add(impl);
+                                }
+
+                                // 父接口继承：接口 VTable 前段是父接口方法（BuildNeoInterfaceOwnSlots 保证顺序）。
+                                // 为父接口注册同一个 baseSlot（父方法在 slot [baseSlot, baseSlot+parentSize) 内），
+                                // 使运行时通过父接口 IType 也能命中同一份实现。
+                                RegisterParentInterfaceOffsets(ilIface, baseSlot, interfaceOffsets);
                             }
                         }
                     }
                 }
 
                 neoVTable = slots.ToArray();
-                neoVTableSlotKeys = slotKeys.ToArray();
                 neoVTableSlots = slotMap;
+                neoInterfaceOffsets = interfaceOffsets;
             }
             finally
             {
@@ -478,7 +576,46 @@ namespace ILRuntime.CLR.TypeSystem
             }
         }
 
-        void AddNeoBaseVirtualSlots(IType baseType, List<IMethod> slots, List<string> slotKeys, Dictionary<string, int> slotMap)
+        void BuildNeoInterfaceOwnSlots(List<IMethod> slots, Dictionary<IMethod, int> slotMap)
+        {
+            // 递归展开父接口，父接口 slot 前置
+            var parents = Implements;
+            if (parents != null)
+            {
+                for (int idx = 0; idx < parents.Length; idx++)
+                {
+                    IType parent = parents[idx];
+                    if (!(parent is ILType parentIface) || !parentIface.IsInterface)
+                        continue;
+                    var parentVT = parentIface.NeoVTable;
+                    for (int i = 0; i < parentVT.Length; i++)
+                    {
+                        IMethod pm = parentVT[i];
+                        if (pm == null || slotMap.ContainsKey(pm))
+                            continue;
+                        slotMap.Add(pm, slots.Count);
+                        slots.Add(pm);
+                    }
+                }
+            }
+
+            // 本接口自身方法
+            HashSet<ILMethod> added = new HashSet<ILMethod>();
+            foreach (var pair in methods)
+            {
+                foreach (var method in pair.Value)
+                {
+                    if (!added.Add(method) || !IsNeoVTableCandidate(method))
+                        continue;
+                    if (slotMap.ContainsKey(method))
+                        continue;
+                    slotMap.Add(method, slots.Count);
+                    slots.Add(method);
+                }
+            }
+        }
+
+        void AddNeoBaseVirtualSlots(IType baseType, List<IMethod> slots, Dictionary<IMethod, int> slotMap)
         {
             if (baseType == null)
                 return;
@@ -487,26 +624,79 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (!IsNeoVTableCandidate(method))
                     continue;
-                AddNeoVTableSlot(method, method.SignatureString, slots, slotKeys, slotMap);
+                AddNeoVTableSlot(method, slots, slotMap);
             }
         }
 
-        static void AddNeoVTableSlot(IMethod method, string key, List<IMethod> slots, List<string> slotKeys, Dictionary<string, int> slotMap)
+        static void AddNeoVTableSlot(IMethod method, List<IMethod> slots, Dictionary<IMethod, int> slotMap)
         {
-            if (slotMap.ContainsKey(key))
+            if (method == null || slotMap.ContainsKey(method))
                 return;
 
-            slotMap.Add(key, slots.Count);
+            slotMap.Add(method, slots.Count);
             slots.Add(method);
-            slotKeys.Add(key);
         }
 
-        int FindNeoOverrideSlot(ILMethod method, Dictionary<string, int> slotMap)
+        void RegisterParentInterfaceOffsets(ILType ilIface, int childBaseSlot, Dictionary<IType, int> interfaceOffsets)
         {
-            int slot;
-            if (slotMap.TryGetValue(method.SignatureString, out slot))
-                return slot;
+            // BuildNeoInterfaceOwnSlots 保证：接口 VTable 前段是父接口方法（按 Implements 顺序展开）。
+            // 但父方法在 child slot 内的起始位置 = 该父接口在 child 里排在前面所有父接口的方法数总和。
+            // 简化：递归展开，每个父接口的 slot 起点 = childBaseSlot + 父接口方法在 child VTable 里的实际起始位置。
+            var parents = ilIface.Implements;
+            if (parents == null) return;
+            var childVT = ilIface.NeoVTable;
+            for (int p = 0; p < parents.Length; p++)
+            {
+                if (!(parents[p] is ILType parentIface) || !parentIface.IsInterface)
+                    continue;
+                var parentVT = parentIface.NeoVTable;
+                if (parentVT.Length == 0)
+                    continue;
+                // 在 child VTable 中找父接口第一个方法的位置（IMethod 引用相等）。
+                int startInChild = -1;
+                for (int i = 0; i < childVT.Length; i++)
+                {
+                    if (ReferenceEquals(childVT[i], parentVT[0]))
+                    {
+                        startInChild = i;
+                        break;
+                    }
+                }
+                if (startInChild < 0)
+                    continue;
+                int parentBaseSlot = childBaseSlot + startInChild;
+                // 覆盖式写入：本类多个直接接口都涉及同一父接口时，取最后一个（任意一个即可，都指向本类实现）。
+                interfaceOffsets[parentIface] = parentBaseSlot;
+                RegisterParentInterfaceOffsets(parentIface, parentBaseSlot, interfaceOffsets);
+            }
+        }
 
+        IMethod ResolveNeoInterfaceImplementation(IMethod ifaceMethod, ILType ilIface)
+        {
+            // 显式接口实现优先（C# 规范：接口调用应走显式实现，即使存在同名隐式实现）。
+            // Legacy GetVirtualMethod 在 GetMethod(name,...) 命中隐式实现后不再查显式命名 fallback，
+            // 这里显式重试 "{Iface.FullNameForNested}.{Name}" 命名 lookup。
+            if (ifaceMethod != null)
+            {
+                string explicitName = string.Format("{0}.{1}", ilIface.FullNameForNested, ifaceMethod.Name);
+                IType[] genericArgs = null;
+                if (ifaceMethod.IsGenericInstance)
+                {
+                    if (ifaceMethod is ILMethod ilm)
+                        genericArgs = ilm.GenericArugmentsArray;
+                    else if (ifaceMethod is CLRMethod clrm)
+                        genericArgs = clrm.GenericArguments;
+                }
+                var explicitImpl = GetMethod(explicitName, ifaceMethod.Parameters, genericArgs, ifaceMethod.ReturnType, true);
+                if (explicitImpl != null)
+                    return explicitImpl;
+            }
+
+            return this.GetVirtualMethod(ifaceMethod);
+        }
+
+        int FindNeoOverrideSlot(ILMethod method, List<IMethod> slots, Dictionary<IMethod, int> slotMap)
+        {
             if (method.Definition.HasOverrides)
             {
                 foreach (var overrideRef in method.Definition.Overrides)
@@ -521,17 +711,17 @@ namespace ILRuntime.CLR.TypeSystem
                     {
                     }
 
-                    if (overrideMethod != null && slotMap.TryGetValue(overrideMethod.SignatureString, out slot))
-                        return slot;
-
-                    if (slotMap.TryGetValue(GetNeoVTableSlotKey(overrideRef), out slot))
+                    if (overrideMethod != null && slotMap.TryGetValue(overrideMethod, out int slot))
                         return slot;
                 }
             }
 
-            if (!method.Definition.IsNewSlot)
+            // ② 隐式 override（!IsNewSlot）：借用 Legacy BaseType.GetVirtualMethod 拿基类方法
+            if (!method.Definition.IsNewSlot && BaseType != null)
             {
-                if (slotMap.TryGetValue(method.SignatureString, out slot))
+                IMethod baseMethod = BaseType.GetVirtualMethod(method);
+                if (baseMethod != null && !ReferenceEquals(baseMethod, method) &&
+                    slotMap.TryGetValue(baseMethod, out int slot))
                     return slot;
             }
 
@@ -553,27 +743,6 @@ namespace ILRuntime.CLR.TypeSystem
             }
 
             return false;
-        }
-
-        static string GetNeoVTableSlotKey(MethodReference method)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(method.Name);
-            sb.Append('|');
-            sb.Append(method.GenericParameters != null ? method.GenericParameters.Count : 0);
-            sb.Append('(');
-            if (method.HasParameters)
-            {
-                for (int i = 0; i < method.Parameters.Count; i++)
-                {
-                    if (i > 0)
-                        sb.Append(',');
-                    sb.Append(method.Parameters[i].ParameterType.FullName);
-                }
-            }
-            sb.Append(")->");
-            sb.Append(method.ReturnType != null ? method.ReturnType.FullName : string.Empty);
-            return sb.ToString();
         }
 
 #endif

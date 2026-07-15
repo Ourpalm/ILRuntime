@@ -256,8 +256,42 @@ namespace ILRuntime.Runtime.Intepreter
         static IMethod ResolveNeoGenericCallvirtTarget(OpCodeR* ip, IMethod declaredMethod, byte* targetBase, AutoList mStack)
         {
             object thisObj = ReadNeoCallThis(ip, targetBase, mStack);
-            if (thisObj is ILTypeInstance)
+            if (thisObj is ILTypeInstance instance)
+            {
+                // 接口方法快路径：Operand4 低 16 = 接口内 slot；DeclearingType 提供接口 identity
+                if (declaredMethod.DeclearingType is ILType declaringIL && declaringIL.IsInterface)
+                {
+                    if (!instance.Type.TryGetNeoInterfaceOffset(declaringIL, out int baseSlot))
+                        throw new MissingMethodException(string.Format(
+                            "Neo callvirt: type {0} does not implement interface {1}.",
+                            instance.Type.FullName, declaringIL.FullName));
+
+                    int methodSlot = ip->Operand4 & 0xffff;
+                    if (methodSlot == 0xffff)
+                    {
+                        // 兜底：lowering 期没查到 slot（不应发生），运行时补查
+                        if (!declaringIL.TryGetInterfaceMethodSlot(declaredMethod, out methodSlot))
+                            throw new MissingMethodException(string.Format(
+                                "Neo callvirt: interface {0} does not contain method {1}.",
+                                declaringIL.FullName, declaredMethod));
+                    }
+
+                    int actualSlot = baseSlot + methodSlot;
+                    var vtable = instance.Type.NeoVTable;
+                    if (actualSlot < 0 || actualSlot >= vtable.Length)
+                        throw new MissingMethodException(string.Format(
+                            "Neo callvirt: interface slot {0} out of range on {1}.",
+                            actualSlot, instance.Type.FullName));
+                    IMethod actual = vtable[actualSlot];
+                    if (actual == null)
+                        throw new MissingMethodException(string.Format(
+                            "Neo callvirt: interface slot {0} is null on {1}.",
+                            actualSlot, instance.Type.FullName));
+                    return actual;
+                }
+
                 return ResolveNeoCallvirtILTarget(ip, declaredMethod, targetBase, mStack);
+            }
             if (declaredMethod is CLRMethod)
                 return declaredMethod;
 

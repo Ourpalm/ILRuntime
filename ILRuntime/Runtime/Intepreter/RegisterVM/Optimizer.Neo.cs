@@ -1,4 +1,4 @@
-﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
@@ -385,8 +385,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             int pCnt = targetMethod.ParameterCount;
                             if (targetMethod.HasThis && op.Code != OpCodeREnum.Newobj) pCnt++;
                             
+                            // 接口 callvirt 已在 InitializeCallvirtDispatch 里把接口内 slot 编入 Operand4 低 16 位。
+                            // 若同时被 constrained 判定命中会误吞 slot=1 的接口方法，因此这里显式排除接口目标。
+                            bool targetIsInterface = targetMethod.DeclearingType != null && targetMethod.DeclearingType.IsInterface;
                             bool hasConstrained = op.Code != OpCodeREnum.Callvirt_IL &&
                                 op.Code != OpCodeREnum.Callvirt_CLR &&
+                                !(op.Code == OpCodeREnum.Callvirt && targetIsInterface) &&
                                 op.Operand4 == 1;
                             int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - 3, 0);
                             int regCnt = pCnt - pushCnt;
@@ -426,7 +430,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                              StackSlotInfo[] paramInfos = null;
                             if (targetMethod is ILRuntime.CLR.Method.ILMethod ilm)
                             {
-                                paramInfos = ilm.CompiledFrame.ParamInfos;
+                                // 接口方法无 body，CompiledFrame.ParamInfos 为 null。
+                                // 按 CLRMethod 分支思路手工分配 param slots；运行时会解析成实现方法（同签名），layout 兼容。
+                                if (ilm.Definition == null || !ilm.Definition.HasBody)
+                                {
+                                    paramInfos = BuildParamInfosForBodylessILMethod(ilm, pCnt, op.Code, domain);
+                                }
+                                else
+                                {
+                                    paramInfos = ilm.CompiledFrame.ParamInfos;
+                                }
                             }
                             else if (targetMethod is ILRuntime.CLR.Method.CLRMethod clrMethod)
                             {
@@ -549,6 +562,34 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             short r1 = op.Register1;
             int off1 = localInfos[r1].Offset;
             op.DstOffset = (ushort)off1;
+        }
+
+        static StackSlotInfo[] BuildParamInfosForBodylessILMethod(CLR.Method.ILMethod ilm, int pCnt, OpCodeREnum opCode, Enviorment.AppDomain domain)
+        {
+            // 用于接口方法（无 body）等场景：按签名手工分配 param slot 布局。
+            // 运行时会解析成实现方法（同签名），layout 兼容；实现方法的 CompiledFrame.ParamInfos 应产出相同 offset/size。
+            bool isNewobj = opCode == OpCodeREnum.Newobj;
+            int totalParams = pCnt + (isNewobj ? 1 : 0);
+            var infos = new StackSlotInfo[totalParams];
+            int curPrim = 0, curRef = 0;
+            if (isNewobj)
+            {
+                infos[0] = new StackSlotInfo { Offset = curPrim, Size = 4, RefOffset = curRef, RefCount = 1 };
+                curPrim += 4;
+                curRef += 1;
+            }
+            for (int p = 0; p < pCnt; p++)
+            {
+                int dstIndex = isNewobj ? p + 1 : p;
+                CLR.TypeSystem.IType paramType;
+                if (ilm.HasThis && !isNewobj && p == 0)
+                    paramType = ilm.DeclearingType;
+                else
+                    paramType = ilm.Parameters[p - ((ilm.HasThis && !isNewobj) ? 1 : 0)];
+
+                infos[dstIndex] = AllocateNeoCallParamSlot(paramType, ref curPrim, ref curRef, domain);
+            }
+            return infos;
         }
 
         static StackSlotInfo AllocateNeoCallParamSlot(CLR.TypeSystem.IType type, ref int offset, ref int refOffset, Enviorment.AppDomain domain)
