@@ -45,6 +45,55 @@ for (int i = 0; i < frame.StackRegisterCount; i++)
 
 ## What Changes
 
+### B-0. Stack register SSA rename（新增，前置于 B-1）
+
+**背景**：Step B 初次落地后运行 `NeoStep11Test` 命中 DEBUG 断言 `Move layout mismatch: src(sz=4,ref=0) dst(sz=4,ref=1)`。根因：C# 编译器生成的 IL 存在 stack tmp register 跨类型复用（例如 async state machine `MoveNext` 中 `r3` 先承载状态机 struct，后承载 Task 引用）。原 spec "每 stack register 单一类型" 的隐含假设不成立。
+
+**修复方向**：在 `CleanupRegister` 之后、`TypeSpecializeNeoOpcodes`（rename+推断合并版）之内，对每个 stack register 做**线性 SSA rename**：当同一物理 register 被写入两种 slot layout 不兼容的类型时，为后续用途分配一个新的物理 register 索引，把该次写入及其**后续读**改指向新索引，直到下一次不兼容的重写。
+
+**为什么这是正解**（相对 widest 分配 / min(src,dst) workaround）：
+- 每 slot 单一类型 = 帧最小、mStack 引用槽最少 → async/递归/深调用链场景显著受益
+- Move handler 的 `Operand2` / refMove 分支预测最优；无冗余 CopyBlock
+- 与 [object-model-neo-design.md §4.3/§4.4](file:///f:/SVN/ILRuntime/.trae/documents/object-model-neo-design.md#L237-L293) 严格对齐
+- DEBUG 断言得以永久保留作为未来 slot 分配 bug 的安全网
+- Step 6 `min(src,dst)` workaround 与 `IsNeoReferenceSlot` 判定路径**彻底消除**
+- Step 12/13 值类型完整 ABI / 泛型特化的地基天然就绪
+
+**算法**：
+
+1. **Slot 兼容性**：两类型兼容 ⇔ `AllocateSlotForType` 分配出的 `(Size, RefCount)` 相同。
+   - `int / float / uint` (`4, 0`) 相互兼容
+   - `long / double / ulong` (`8, 0`) 相互兼容
+   - 所有 `class / interface / string / delegate / object / 数组` (`4, 1`) 相互兼容
+   - 每种 ILType 值类型独占一个 `(TotalPrimitiveSize, TotalReferenceCount)` 桶
+   - `null` 状态兼容任何后续写入类型（首次写入决定 slot）
+   - Managed pointer（`Ldloca / Ldarga / Ldflda / Ldelema`）按 `(4, 0)` 归入 int 兼容桶
+
+2. **线性遍历**（在合并后的 `TypeSpecializeAndRenameNeoRegisters` pass 内）：
+   - 维护数组 `renameMap[r]`（初始 `r → r`）和 `currentType[r]`（初始 `null` 或 `BuildInitialRegisterTypes` 的值）
+   - 维护计数器 `nextVirtualReg`（初始 = `totalRegCnt`），用于分配新虚拟寄存器
+   - 对每条指令：
+     - **读端**：所有 src register 用当前 `renameMap[src]` 替换
+     - **写端**：确定结果类型 `T`（同现有 `TypeSpecializeNeoOpcodes` 推断逻辑）
+       - 令 `curReg = renameMap[dstOrig]`
+       - 若 `curReg` 是 param/local（`< baseRegStart`），**不 rename**，仅更新 `currentType[curReg]` = T
+       - 否则若 `currentType[curReg] == null` 或与 T `slot-兼容`，保留 `curReg`，更新 `currentType[curReg]` = T
+       - 否则分配新虚拟寄存器 `newReg = nextVirtualReg++`，`renameMap[dstOrig] = newReg`，`currentType[newReg] = T`，将本条指令的 dst 改为 `newReg`
+
+3. **跨基本块**：CIL 可验证性保证任一 join point 的 evaluation stack 类型跨路径一致，因此 `renameMap` 无需在基本块间做 merge。线性 pass 足够。
+
+4. **`nextVirtualReg` 上限**：新分配的虚拟寄存器索引 ≥ `totalRegCnt`。pass 结束后，返回新的 `totalRegCnt' = nextVirtualReg`；调用方（`Compile`）更新 `frame.StackRegisterCount = totalRegCnt' - baseRegStart`，`registerTypes` 数组扩容到 `totalRegCnt'`。
+
+5. **注意事项**：
+   - `Move r_dst, r_src` 也会被 rename（rename 后 src 已被 renameMap 重映射，dst 按 src 的当前类型判定）
+   - 首次为 `null` 状态的 dst 写入时不需要 rename（"首次写入决定 slot"）
+   - `BuildInitialRegisterTypes` 已为 `this + params + locals` 预置类型；这些位置属于 param/local 段，**不在 rename 范围内**，pass 只对 `r >= baseRegStart` 进行 rename
+
+**API 变更**：
+- `TypeSpecializeNeoOpcodes` → `TypeSpecializeAndRenameNeoRegisters`（合并 rename 与类型推断）
+- 签名改为 `(List<OpCodeR>, short locVarRegStart, int totalRegCnt, out IType[] registerTypes, out int newTotalRegCnt)` 或返回结构体
+- `Compile` 在 pass 后更新 `frame.StackRegisterCount` 与 `totalRegCnt`
+
 ### B-1. Stack register 按实际承载类型分配 slot
 
 对每个 stack register（`localInfos[baseRegStart + i]`），根据其**实际承载类型**独立分配 `Offset / Size / RefOffset / RefCount`：
@@ -148,6 +197,22 @@ break;
 7. **本 Spec 不包含**：Callvirt/Call 变体本身的重构（Step 12 议题）、Slot 复用（liveness / graph coloring）、值类型完整 lowering（Step 12/13）。
 
 ## ADDED Requirements
+
+### Requirement: Stack register SSA rename
+
+The system SHALL, in Neo mode, perform a linear SSA rename pass over stack registers (indices `>= baseRegStart`) before slot allocation. When a stack register is written with a type whose slot layout `(Size, RefCount)` is incompatible with its currently-tracked type, the pass SHALL allocate a new virtual register index and redirect the write plus all subsequent reads to the new index, until the next incompatible rewrite. Register indices below `baseRegStart` (this / params / locals) SHALL NOT be renamed. The pass SHALL emit a possibly-expanded `totalRegCnt` value for downstream slot allocation.
+
+#### Scenario: 跨类型复用 tmp register
+- **WHEN** stack register r5 首先被写入 Task 引用 (`4, 1`)，之后被写入 int (`4, 0`)
+- **THEN** 第二次写入及其后续读被 rename 到一个新的虚拟寄存器 r_new，`registerTypes[r_new] == appdomain.IntType`，原 r5 保持 Task 类型
+
+#### Scenario: 同类型复写
+- **WHEN** stack register r3 被两次写入不同的引用类型 (`Task` 后 `Exception`)，slot layout 均为 `(4, 1)`
+- **THEN** 不 rename；`registerTypes[r3]` 更新为最新写入类型；slot 分配为 `(4, 1)`
+
+#### Scenario: local / param 不 rename
+- **WHEN** 用户声明的 local 在 IL 中被 Stloc 多次赋值不同的兼容类型
+- **THEN** local slot layout 由 IL 声明类型决定，rename pass 不产生新虚拟寄存器
 
 ### Requirement: Neo stack register slot 按承载类型独立分配
 

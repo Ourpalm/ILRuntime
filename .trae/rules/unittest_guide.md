@@ -48,3 +48,10 @@
 - 单个 Neo 测试用例正常应在 5–20ms 完成。如果命令运行超过 10 秒，几乎肯定卡在解释器死循环里（lowering bug 居多）。立刻通过 `Stop-Process -Name ILRuntimeTestCLI -Force` 杀掉，然后查看已经写出的 JIT dump 与异常堆栈定位。
 - CLI 已经在 `Main` 外层加了 try/catch 输出未处理异常。否则 .NET 进程会直接以 `0xE0434352` 退出码崩溃，吞掉所有诊断。任何对 CLI 入口的改动都必须保留这层兜底。
 - ENABLE_NEO_MODE 下 `ILType.cs` 暂时跳过了 `appdomain.Invoke(staticConstructor)`（参见 Step 6 checklist），Step 7 实现完整的 `Stfld_*` / `Ldfld_*` 后会一并恢复。
+
+## Git操作铁律
+- **严禁**使用任何会改动working copy的文件和repo的操作，包括但不限于：
+  - git stash
+  - git reset
+  - git checkout
+  - git push

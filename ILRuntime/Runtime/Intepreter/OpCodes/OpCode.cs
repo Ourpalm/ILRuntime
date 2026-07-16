@@ -142,6 +142,12 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Conv_U8:
                 case OpCodeREnum.Not:
                 case OpCodeREnum.Neg:
+#if ENABLE_NEO_MODE
+                case OpCodeREnum.Neg_I8:
+                case OpCodeREnum.Not_I8:
+                case OpCodeREnum.Neg_R4:
+                case OpCodeREnum.Neg_R8:
+#endif
                     param = string.Format("r{0}, r{1}", Register1, Register2);
                     break;
                 case OpCodeREnum.Box:
@@ -208,6 +214,38 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Blei_Un:
                 case OpCodeREnum.Blti:
                 case OpCodeREnum.Blti_Un:
+#if ENABLE_NEO_MODE
+                case OpCodeREnum.Beqi_I8:
+                case OpCodeREnum.Bgei_I8:
+                case OpCodeREnum.Bgei_Un_I8:
+                case OpCodeREnum.Bgti_I8:
+                case OpCodeREnum.Bgti_Un_I8:
+                case OpCodeREnum.Bnei_Un_I8:
+                case OpCodeREnum.Blei_I8:
+                case OpCodeREnum.Blei_Un_I8:
+                case OpCodeREnum.Blti_I8:
+                case OpCodeREnum.Blti_Un_I8:
+                case OpCodeREnum.Beqi_R4:
+                case OpCodeREnum.Bgei_R4:
+                case OpCodeREnum.Bgei_Un_R4:
+                case OpCodeREnum.Bgti_R4:
+                case OpCodeREnum.Bgti_Un_R4:
+                case OpCodeREnum.Bnei_Un_R4:
+                case OpCodeREnum.Blei_R4:
+                case OpCodeREnum.Blei_Un_R4:
+                case OpCodeREnum.Blti_R4:
+                case OpCodeREnum.Blti_Un_R4:
+                case OpCodeREnum.Beqi_R8:
+                case OpCodeREnum.Bgei_R8:
+                case OpCodeREnum.Bgei_Un_R8:
+                case OpCodeREnum.Bgti_R8:
+                case OpCodeREnum.Bgti_Un_R8:
+                case OpCodeREnum.Bnei_Un_R8:
+                case OpCodeREnum.Blei_R8:
+                case OpCodeREnum.Blei_Un_R8:
+                case OpCodeREnum.Blti_R8:
+                case OpCodeREnum.Blti_Un_R8:
+#endif
                     if (Operand != 0)
                     {
                         param = string.Format("r{0},{1},{2}", Register1, Operand, Operand4);
@@ -246,6 +284,46 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Shli:
                 case OpCodeREnum.Shri:
                 case OpCodeREnum.Shri_Un:
+#if ENABLE_NEO_MODE
+                case OpCodeREnum.Ceqi_I8:
+                case OpCodeREnum.Cgti_I8:
+                case OpCodeREnum.Cgti_Un_I8:
+                case OpCodeREnum.Clti_I8:
+                case OpCodeREnum.Clti_Un_I8:
+                case OpCodeREnum.Ceqi_R4:
+                case OpCodeREnum.Cgti_R4:
+                case OpCodeREnum.Cgti_Un_R4:
+                case OpCodeREnum.Clti_R4:
+                case OpCodeREnum.Clti_Un_R4:
+                case OpCodeREnum.Ceqi_R8:
+                case OpCodeREnum.Cgti_R8:
+                case OpCodeREnum.Cgti_Un_R8:
+                case OpCodeREnum.Clti_R8:
+                case OpCodeREnum.Clti_Un_R8:
+                case OpCodeREnum.Addi_I8:
+                case OpCodeREnum.Subi_I8:
+                case OpCodeREnum.Muli_I8:
+                case OpCodeREnum.Divi_I8:
+                case OpCodeREnum.Divi_Un_I8:
+                case OpCodeREnum.Remi_I8:
+                case OpCodeREnum.Remi_Un_I8:
+                case OpCodeREnum.Andi_I8:
+                case OpCodeREnum.Ori_I8:
+                case OpCodeREnum.Xori_I8:
+                case OpCodeREnum.Shli_I8:
+                case OpCodeREnum.Shri_I8:
+                case OpCodeREnum.Shri_Un_I8:
+                case OpCodeREnum.Addi_R4:
+                case OpCodeREnum.Subi_R4:
+                case OpCodeREnum.Muli_R4:
+                case OpCodeREnum.Divi_R4:
+                case OpCodeREnum.Remi_R4:
+                case OpCodeREnum.Addi_R8:
+                case OpCodeREnum.Subi_R8:
+                case OpCodeREnum.Muli_R8:
+                case OpCodeREnum.Divi_R8:
+                case OpCodeREnum.Remi_R8:
+#endif
                     if (Operand != 0)
                     {
                         param = string.Format("r{0},r{1},{2}", Register1, Register2, Operand);
@@ -291,6 +369,46 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Cgt:
                 case OpCodeREnum.Cgt_Un:
                 case OpCodeREnum.Ceq:
+#if ENABLE_NEO_MODE
+                case OpCodeREnum.Add_I8:
+                case OpCodeREnum.Sub_I8:
+                case OpCodeREnum.Mul_I8:
+                case OpCodeREnum.Div_I8:
+                case OpCodeREnum.Div_Un_I8:
+                case OpCodeREnum.Rem_I8:
+                case OpCodeREnum.Rem_Un_I8:
+                case OpCodeREnum.And_I8:
+                case OpCodeREnum.Or_I8:
+                case OpCodeREnum.Xor_I8:
+                case OpCodeREnum.Shl_I8:
+                case OpCodeREnum.Shr_I8:
+                case OpCodeREnum.Shr_Un_I8:
+                case OpCodeREnum.Add_R4:
+                case OpCodeREnum.Sub_R4:
+                case OpCodeREnum.Mul_R4:
+                case OpCodeREnum.Div_R4:
+                case OpCodeREnum.Rem_R4:
+                case OpCodeREnum.Add_R8:
+                case OpCodeREnum.Sub_R8:
+                case OpCodeREnum.Mul_R8:
+                case OpCodeREnum.Div_R8:
+                case OpCodeREnum.Rem_R8:
+                case OpCodeREnum.Ceq_I8:
+                case OpCodeREnum.Cgt_I8:
+                case OpCodeREnum.Cgt_Un_I8:
+                case OpCodeREnum.Clt_I8:
+                case OpCodeREnum.Clt_Un_I8:
+                case OpCodeREnum.Ceq_R4:
+                case OpCodeREnum.Cgt_R4:
+                case OpCodeREnum.Cgt_Un_R4:
+                case OpCodeREnum.Clt_R4:
+                case OpCodeREnum.Clt_Un_R4:
+                case OpCodeREnum.Ceq_R8:
+                case OpCodeREnum.Cgt_R8:
+                case OpCodeREnum.Cgt_Un_R8:
+                case OpCodeREnum.Clt_R8:
+                case OpCodeREnum.Clt_Un_R8:
+#endif
                 case OpCodeREnum.Stelem_I1:
                 case OpCodeREnum.Stelem_I2:
                 case OpCodeREnum.Stelem_I:
@@ -461,6 +579,38 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Beq_S:
                 case OpCodeREnum.Bne_Un:
                 case OpCodeREnum.Bne_Un_S:
+#if ENABLE_NEO_MODE
+                case OpCodeREnum.Blt_I8:
+                case OpCodeREnum.Blt_Un_I8:
+                case OpCodeREnum.Ble_I8:
+                case OpCodeREnum.Ble_Un_I8:
+                case OpCodeREnum.Bgt_I8:
+                case OpCodeREnum.Bgt_Un_I8:
+                case OpCodeREnum.Bge_I8:
+                case OpCodeREnum.Bge_Un_I8:
+                case OpCodeREnum.Beq_I8:
+                case OpCodeREnum.Bne_Un_I8:
+                case OpCodeREnum.Blt_R4:
+                case OpCodeREnum.Blt_Un_R4:
+                case OpCodeREnum.Ble_R4:
+                case OpCodeREnum.Ble_Un_R4:
+                case OpCodeREnum.Bgt_R4:
+                case OpCodeREnum.Bgt_Un_R4:
+                case OpCodeREnum.Bge_R4:
+                case OpCodeREnum.Bge_Un_R4:
+                case OpCodeREnum.Beq_R4:
+                case OpCodeREnum.Bne_Un_R4:
+                case OpCodeREnum.Blt_R8:
+                case OpCodeREnum.Blt_Un_R8:
+                case OpCodeREnum.Ble_R8:
+                case OpCodeREnum.Ble_Un_R8:
+                case OpCodeREnum.Bgt_R8:
+                case OpCodeREnum.Bgt_Un_R8:
+                case OpCodeREnum.Bge_R8:
+                case OpCodeREnum.Bge_Un_R8:
+                case OpCodeREnum.Beq_R8:
+                case OpCodeREnum.Bne_Un_R8:
+#endif
                     param = string.Format("r{0}, r{1}, {2}", Register1, Register2, Operand);
                     break;
                 case OpCodeREnum.Br:

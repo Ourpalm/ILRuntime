@@ -2,7 +2,7 @@
   "profiles": {
     "ILRuntimeTestCLI": {
       "commandName": "Project",
-      "commandLineArgs": "../../../../TestCases/bin/Debug/netstandard2.1/TestCases.dll ../../../../HotfixAOT/Patched/HotfixAOT.patch false Neo"
+      "commandLineArgs": "../../../../TestCases/bin/Debug/netstandard2.1/TestCases.dll ../../../../HotfixAOT/Patched/HotfixAOT.patch false SumI8"
     }
   }
 }

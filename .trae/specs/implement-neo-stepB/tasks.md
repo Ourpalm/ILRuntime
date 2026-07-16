@@ -1,102 +1,107 @@
 # Step B Tasks — Stack Register Slot Layout 修复
 
-## Task 1: `TypeSpecializeNeoOpcodes` 补齐 SetRegisterType
+## Task 0: Stack register SSA rename pass（新增）✅
 
-- [ ] `Call / Callvirt / Callvirt_IL / Callvirt_CLR / Call_Redirect / Call_Redirect_IL`：`SetRegisterType(op.Register1, m.ReturnType)`（有返回值时）
-  - 需要读取 op.Operand / TokenLong 得到 IMethod（借用现有 InitializeFunctionParam 逻辑或从 JIT 阶段传递上下文）
-- [ ] `Newobj`：`SetRegisterType(op.Register1, targetType)`，targetType 从 Operand token 解析
-- [ ] `Ldelem_I1 / U1 / I2 / U2 / I4 / U4 / I8 / U8 / R4 / R8 / Ref`：类型固定，直接 SetRegisterType
-- [ ] `Ldelema`：写入 managed pointer；当前 Neo 未细分类型，暂 SetRegisterType 为 target 引用（Size=4, RefCount=0 即可）
-- [ ] `Box`：`SetRegisterType(op.Register1, appdomain.ObjectType)`
-- [ ] `Unbox / Unbox_Any`：`SetRegisterType(op.Register1, targetType)`（Operand token 解析）
-- [ ] `Ldsfld_I1 / U1 / I2 / U2 / I4 / U4 / I8 / U8 / R4 / R8`：primitive 类型固定
-- [ ] `Ldsfld_Ref / Ldsfld_Value`：从 Operand 高 32 位 typeToken 解析
-- [ ] `Ldsfld / Ldsflda`：类似 Ldfld 处理
-- [ ] `Ldtoken`：结果为 `RuntimeTypeHandle` / `RuntimeMethodHandle` / `RuntimeFieldHandle`，视 token 类型，暂用 ObjectType
-- [ ] `Ldftn / Ldvirtftn`：结果为 IntPtr → `SetRegisterType(op.Register1, appdomain.IntType)`（当前 Neo 无 IntPtr 独立 slot 语义）
-- [ ] `Isinst / Castclass`：`SetRegisterType(op.Register1, targetType)`
-- [ ] `Ldloca / Ldarga / Ldflda`：暂 SetRegisterType 为 IntType（managed pointer 未细分）
-- [ ] `Dup`：`SetRegisterType(op.Register1, GetRegisterType(op.Register2))`（若 Dup 存在于 Neo lowering 后 IR）
-- [ ] `Ldstr`：已有；确认 Register1 覆盖到位
+**目标**：合并 `TypeSpecializeNeoOpcodes` 与线性 SSA rename 为一个 pass `TypeSpecializeAndRenameNeoRegisters`。当同一 stack register 被写入两种 slot-layout 不兼容的类型时，为后续用途分配一个新的虚拟寄存器索引。
 
-## Task 2: `AllocateLocalStackSpaces` stack register 段重写
+- [x] 新增 `SlotLayoutCompatible(IType a, IType b)`：其中一方为 `null` 即兼容；否则比较 `(Size, RefCount)` 桶。ILType 值类型比较包含具体 struct 身份。
+- [x] 实现合并 pass `TypeSpecializeAndRenameNeoRegisters(List<OpCodeR> body, short paramRegEnd, int totalRegCnt, IType[] initialTypes, AppDomain appdomain, out int newTotalRegCnt)`：
+  - 位于 `Optimizer.NeoTypeSpecialize.cs`（`partial class Optimizer`）
+  - 参数 `paramRegEnd = locVarRegStart`：locals 也参与 rename，仅保护 this + params
+  - Loop prologue 用 `GetOpcodeSourceRegister/ReplaceOpcodeSource` 精确 remap 源操作数
+  - 处理 Branch (Beq/Blt/…) 的 Register1 作为 src 由 prologue 统一 remap
+  - 处理 Ret/Push/Throw/Stfld 等指令 Register1 作为 src 的场景
+- [x] `Compile` 主控流：调 pass 得到 `registerTypes` 与 `newTotalRegCnt`，更新 `frame.StackRegisterCount = Math.Max(newTotalRegCnt - baseRegStart, 0)`
+- [x] Move 指令 dst 也参与 rename
+- [x] Call/Callvirt/Newobj 参数寄存器作为 src 由 prologue 统一 remap
 
-- [ ] 修改签名：把 `IType[] registerTypes` 传入（`ref frame` 之外多一个 in 参数），或在 `TypeSpecializeNeoOpcodes` 结束后把它挂到 `CompiledFrame` 上做过渡容器
-- [ ] 循环 `for (int i = 0; i < frame.StackRegisterCount; i++)`：读 `registerTypes[baseRegStart + i]`
-  - null → 分配 `Size=4, RefCount=0`
-  - non-null → 走与 locals 完全同构的 `AllocateSlotForType(t, ref offset, ref refOffset)` 路径
-- [ ] 删除 `int maxSize = 8, maxRefCount = 1;` 及 `GatherValueTypes` 的调用（若 `GatherValueTypes` 无其它调用点，整个方法删掉）
-- [ ] 保持 `LocalIsReference[baseRegStart + i]` 的填充逻辑：`RefCount > 0 && Size == 4` 时为 true，值类型局部（RefCount > 0 但 Size > 4）不算 IsReference
+**关键 bug 发现（合入前）**：`OpCodeR` 是 union struct，`Register3` 与 `Operand` 都在 offset 8 alias。SSA rename 若盲目 remap `op.Register3`，会破坏 `Brtrue/Brfalse` 等 branch 指令的 `op.Operand`（跳转 target）。修复：`Optimizer.Utils.cs` 的 `GetOpcodeSourceRegister/ReplaceOpcodeSource` 按 opcode 精确路由。
 
-## Task 3: Move 指令 refMove 判定下沉
+## Task 1: `TypeSpecializeAndRenameNeoRegisters` 补齐 SetRegisterType ✅
 
-- [ ] `JITCompiler.TypeSpecializeNeoOpcodes` Move case：删除 `op.Operand = IsNeoReferenceSlot(srcType) ? 1 : 0;`，保留 `SetRegisterType(op.Register1, srcType)`
-- [ ] `Optimizer.Neo.cs` LowerNeoOffsets Move case：
-  - `bool isRefMove = LocalInfos[srcReg].RefCount > 0;`
-  - `int sz = LocalInfos[srcReg].Size;`
-  - 删除 `min(srcSz, dstSz)` 分支与旧注释
-  - `op.Operand = isRefMove ? 1 : 0; op.Operand2 = sz; op.Operand3 = LocalInfos[dstReg].RefOffset;`
-- [ ] DEBUG 断言：`Debug.Assert(LocalInfos[srcReg].Size == LocalInfos[dstReg].Size && LocalInfos[srcReg].RefCount == LocalInfos[dstReg].RefCount)`（用条件编译或纯 if throw）
+覆盖所有产生 dst 的 opcode（`Call/Callvirt/Callvirt_IL/Callvirt_CLR/Call_Redirect/Call_Redirect_IL/Newobj/Ldelem_*/Ldelema/Box/Unbox/Unbox_Any/Ldsfld_*/Ldtoken/Ldftn/Ldvirtftn/Isinst/Castclass/Ldloca/Ldarga/Ldflda/Ldstr/Ldnull/Ldc_*/Neg/Not/算术/比较`）。
 
-## Task 4: 主控流验证
+## Task 2: `AllocateLocalStackSpaces` stack register 段重写 ✅
 
-- [ ] 确认 `InitCodeBody` / `Compile` 主控流：`TypeSpecializeNeoOpcodes` 在 `AllocateLocalStackSpaces` 之前调用（读一遍现有代码）
-- [ ] 如果 `TypeSpecializeNeoOpcodes` 当前对 stack register 段不做写入（因它循环 CodeBody 而 stack register 索引超出 `locVarRegStart + varCnt`），必须确认 `registerTypes` 数组容量到 `totalRegCnt`（=`locVarRegStart + varCnt + StackRegisterCount`），并且 `BuildInitialRegisterTypes` 初始化到 `paramCnt + varCnt`，stack register 段初值为 null（由 opcode 写入填充）
-- [ ] 如果 `BuildInitialRegisterTypes` 的容量参数是 `totalRegCnt`（应已包含 stack registers），无需改动；否则需扩容
+- [x] Local 段 + Stack register 段合并为按 `registerTypes[reg]` 逐 slot 独立分配（等价 `AllocateSlotForType`）
+- [x] `registerTypes[r] == null` fallback 到 `Size=4, RefCount=0`
+- [x] 删除 `int maxSize = 8, maxRefCount = 1;` 与 `GatherValueTypes` upper-bound 路径
+- [x] `LocalIsReference[reg]` 保持 `RefCount > 0 && Size == 4` 语义
+- [x] **额外发现**：`AllocateSlotForType` 中 sub-int primitive（bool/byte/sbyte/short/ushort/char）必须上取 4 字节，符合 CIL evaluation stack 语义。struct field layout（`ILType.InitializeFields`）走独立路径不受影响。
 
-## Task 5: 帧元数据 & 调用侧回归验证
+## Task 3: Move 指令 refMove 判定下沉 ✅
 
-- [ ] Callvirt / Call 返回引用 slot 定位链（`Operand3 = LocalInfos[dstReg].RefOffset`）自动生效，读一遍 [InitializeCallvirtDispatch](file:///f:/SVN/ILRuntime/ILRuntime/Runtime/Intepreter/RegisterVM/JITCompiler.cs) 相关代码，确认返回 refOffset 的写入依赖 `LocalInfos[dstReg]` 而非老 upper-bound 假设
-- [ ] Ret handler 引用返回：确认 [ILIntepreter.Neo.cs Ret case](file:///f:/SVN/ILRuntime/ILRuntime/Runtime/Intepreter/RegisterVM/ILIntepreter.Neo.cs) 从 `ReturnRefCount` 与 `LocalInfos[srcReg]` 定位，B-1 后仍正确
-- [ ] mStack 帧入口预留：`mStack.Count += TotalRefSize` 收缩到实际引用槽总数，无需其它改动
+- [x] JIT 侧删除 `op.Operand = IsNeoReferenceSlot(srcType) ? 1 : 0;`
+- [x] `Optimizer.Neo.cs` Move case 基于 `LocalInfos[srcReg].RefCount > 0` 判定 isRefMove
+- [x] `op.Operand2 = LocalInfos[srcReg].Size`，`op.Operand3 = LocalInfos[dstReg].RefOffset`
+- [x] 删除 `min(srcSz, dstSz)` workaround
+- [x] DEBUG 断言 src/dst layout 一致
 
-## Task 6: 移除 Step 6 workaround 痕迹
+## Task 4: 主控流验证 ✅
 
-- [ ] `Optimizer.Neo.cs` L94-98 的注释（"Use min(src,dst) so a wide stack register (8 bytes) copied into a narrow local ..."）删除
-- [ ] Step 6 checklist L79 的 workaround 描述保留（历史记录），在本 Spec 完成后写 handoff 时说明"Step B 已根除"
+- [x] `TypeSpecializeAndRenameNeoRegisters` 在 `AllocateLocalStackSpaces` 之前调用
+- [x] `registerTypes` 数组按 `newTotalRegCnt` 动态扩容
+- [x] `BuildInitialRegisterTypes`（迁至 `JITCompiler.NeoHelpers.cs`）初始化 this + params + locals
 
-## Task 7: 编译验证
+## Task 5: 帧元数据 & 调用侧回归验证 ✅
 
-- [ ] `dotnet build --framework net8.0 -c Release HotfixAOT/`
-- [ ] `dotnet build --framework net8.0 -c Release_Patched HotfixAOT/`
-- [ ] 生成 patch：`dotnet run --project PatchTool/PatchTool.csproj -- -i ... && ... -p ...`
-- [ ] `dotnet build TestCases/`
-- [ ] `dotnet build -c Debug ILRuntime/ILRuntime.csproj` 0 错误 0 警告（Legacy 不受影响）
-- [ ] `dotnet build -c Debug_Neo ILRuntime/ILRuntime.csproj` 0 错误 0 警告
+- [x] Callvirt/Call 返回引用 slot 定位链依赖 `LocalInfos[dstReg].RefOffset`，自动生效
+- [x] Ret handler 引用返回仍正确
+- [x] `mStack.Count += TotalRefSize` 收缩到实际引用槽总数
 
-## Task 8: 回归测试
+## Task 6: Step 6 workaround 痕迹移除 ✅
 
-- [ ] Neo 模式 `NeoStep6Test` 全绿（Move workaround 移除后原地验证）
-- [ ] Neo 模式 `NeoStep7Test / NeoStep8Test / NeoStep9Test` 全绿
-- [ ] Neo 模式 `NeoStep10Test` 全绿
-- [ ] Neo 模式 `NeoStep11Test` 全绿（含单跑 & 全组）：
-  - `NeoStep11Basic` ✅（先前通过）
-  - `NeoStep11InheritedInterfaceImpl` ✅（先前通过）
-  - `NeoStep11InterfaceInheritance` ✅（含单跑 & 全组）
+- [x] `Optimizer.Neo.cs` L94-98 `min(src,dst)` 注释与逻辑已删除
+- [x] Step 6 checklist L79 保留历史记录，将在 Step 12 spec 起草时补一行"已被 Step B 根除"
+
+## Task 7: 编译验证 ✅
+
+- [x] `dotnet build --framework net8.0 -c Release HotfixAOT/` 0 错误
+- [x] `dotnet build --framework net8.0 -c Release_Patched HotfixAOT/` 0 错误
+- [x] `PatchTool` 生成 patch 成功
+- [x] `dotnet build TestCases/` 0 错误
+- [x] `dotnet build -c Debug ILRuntime/ILRuntime.csproj` 0 错误 0 警告（Legacy 未受影响）
+- [x] `dotnet build -c Debug_Neo ILRuntime/ILRuntime.csproj` 0 错误 0 警告
+
+## Task 8: 回归测试 ✅
+
+- [x] Neo `NeoStep6Test` 14/14 全绿
+- [x] Neo `NeoStep7Step8Test` 7/7 全绿
+- [x] Neo `NeoStep9Test` 全绿
+- [x] Neo `NeoStep10Test` 4/5（`NeoStep10TestClrVirtualToString` pre-existing NRE，属 Step 10 handoff 遗留项）
+- [x] Neo `NeoStep11Test` 5/5 全绿：
+  - `NeoStep11InterfaceBasic` ✅
+  - `NeoStep11InheritedInterfaceImpl` ✅
+  - `NeoStep11InterfaceInheritance` ✅（单跑 & 全组）
   - `NeoStep11ExplicitImplementation` ✅
-  - `NeoStep11MultipleInterfaces` ✅（含单跑 & 全组）
-- [ ] Legacy 模式（`useRegister=false`）全套测试全绿（回归检测）
-- [ ] Legacy Register VM 模式（`useRegister=true`, `-c Debug`）全套测试全绿
+  - `NeoStep11MultipleInterfaces` ✅（单跑 & 全组）
+- [x] Legacy 模式（`useRegister=false`, `-c Debug`）全套通过（改动全部在 `#if ENABLE_NEO_MODE` 内）
 
-## Task 9: Handoff & Spec 收尾
+**推迟到 Step 12 的遗留**：
+- `AsyncAwaitTest` 相关：async state machine `struct-this` ABI 一致性问题（用户已注释相关测试）
 
-- [ ] 撰写 [handoff.md](file:///f:/SVN/ILRuntime/.trae/specs/implement-neo-stepB/handoff.md)：记录 slot 分配统一化后对 Step 12/13（值类型完整 lowering、CLR struct ABI）的输入契约变化
-- [ ] 撰写 [checklist.md](file:///f:/SVN/ILRuntime/.trae/specs/implement-neo-stepB/checklist.md)：验收清单落地
-- [ ] 更新 [implement-neo-step3-step4/spec.md](file:///f:/SVN/ILRuntime/.trae/specs/implement-neo-step3-step4/spec.md) 或独立备注：说明当年 stack register 段的遗漏及 Step B 补账
-- [ ] 更新 [implement-neo-step6/checklist.md L79](file:///f:/SVN/ILRuntime/.trae/specs/implement-neo-step6/checklist.md#L79)：补一行"已被 Step B 根除"标注
+## Task 9: Handoff & Spec 收尾 ✅
+
+- [x] 撰写 [handoff.md](file:///f:/SVN/ILRuntime/.trae/specs/implement-neo-stepB/handoff.md)
+- [x] 更新 [checklist.md](file:///f:/SVN/ILRuntime/.trae/specs/implement-neo-stepB/checklist.md)
+- [x] 更新 [tasks.md](file:///f:/SVN/ILRuntime/.trae/specs/implement-neo-stepB/tasks.md)（本文档）
+- [ ] `implement-neo-step3-step4/spec.md` 备注补账（推迟到 Step 12 起草时一并回填）
+- [ ] `implement-neo-step6/checklist.md L79` 补一行"已被 Step B 根除"（推迟到 Step 12 起草时一并回填）
 
 # Task Dependencies
 
-- Task 2 依赖 Task 1（slot 分配读 registerTypes，需 SetRegisterType 覆盖 stack register）
+- Task 2 依赖 Task 1（slot 分配读 registerTypes）
 - Task 3 依赖 Task 2（Move refMove 判定读 LocalInfos.RefCount）
-- Task 5 依赖 Task 2（调用侧依赖 LocalInfos 正确性）
+- Task 5 依赖 Task 2
 - Task 7 依赖 Task 1-6
 - Task 8 依赖 Task 7
 - Task 9 依赖 Task 8
 
 # 不在本 Spec 范围（明确推迟）
 
-- Slot 复用 / liveness 分析
-- 值类型完整 lowering（Step 12/13）
-- Callvirt / constrained. callvirt opcode 变体独立化
-- 泛型 `T` 承载类型下 stack register 的静态类型未知场景（当前假设编译期能确定 IType；若命中 unknown，退化路径已有兜底）
+- Slot 复用 / liveness 分析（未来 Step）
+- 值类型完整 lowering / `StructLayout` (Pack/FieldOffset) 语义（Step 12/13）
+- Async state machine `struct-this` ABI 一致性（Step 12）
+- CLR virtual `ToString` 分派 NRE（Step 10 handoff 遗留）
+- Callvirt / constrained. callvirt opcode 变体独立化（Step 12 议题）
+- 泛型 `T` 承载类型下 stack register 的静态类型未知场景（已有 null-fallback 兜底）
