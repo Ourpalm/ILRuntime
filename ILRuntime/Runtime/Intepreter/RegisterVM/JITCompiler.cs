@@ -149,50 +149,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 return false;
         }
 
-#if ENABLE_NEO_MODE
-        List<IType> GatherValueTypes(ref CompiledFrame frame)
-        {
-            List<IType> valueTypes = new List<IType>();
-            var body = frame.CodeBody;
-            var domain = method.AppDomain;
-            for (int i = 0; i < body.Length; i++)
-            {
-                var code = body[i];
-                IType type = null;
-                switch (code.Code)
-                {
-                    case OpCodeREnum.Ldobj:
-                    case OpCodeREnum.Stobj:
-                    case OpCodeREnum.Box:
-                    case OpCodeREnum.Unbox:
-                    case OpCodeREnum.Unbox_Any:
-                    case OpCodeREnum.Isinst:
-                    case OpCodeREnum.Castclass:
-                    case OpCodeREnum.Constrained:
-                    case OpCodeREnum.Sizeof:
-                    case OpCodeREnum.Newarr:
-                    case OpCodeREnum.Ldfld_Ref:
-                    case OpCodeREnum.Ldfld_Value:
-                    case OpCodeREnum.Stfld_Ref:
-                    case OpCodeREnum.Stfld_Value:
-                        type = domain.GetType(code.Operand);
-                        break;
-                    case OpCodeREnum.Ldfld:
-                    case OpCodeREnum.Stfld:
-                    case OpCodeREnum.Ldsfld:
-                    case OpCodeREnum.Stsfld:
-                        type = domain.GetType((int)(code.OperandLong >> 32));
-                        break;
-                }
-                if (type != null && type.IsValueType && !type.IsPrimitive)
-                {
-                    valueTypes.Add(type);
-                }
-            }
-            return valueTypes;
-        }
-#endif
-
         public void Compile(Dictionary<Instruction, int> addr, ref CompiledFrame frame)
         {
 #if DEBUG && !NO_PROFILER
@@ -443,7 +399,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             var totalRegCnt = Optimizer.CleanupRegister(res, locVarRegStart, hasReturn);
             frame.StackRegisterCount = Math.Max(totalRegCnt - baseRegStart, 0);
 #if ENABLE_NEO_MODE
-            TypeSpecializeNeoOpcodes(res, locVarRegStart, totalRegCnt);
+            var registerTypes = TypeSpecializeNeoOpcodes(res, locVarRegStart, totalRegCnt);
 #endif
 #if OUTPUT_JIT_RESULT
             Console.WriteLine($"Final Results for {method}:");
@@ -457,7 +413,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             method.Compiling = false;
             frame.CodeBody = res.ToArray();
 #if ENABLE_NEO_MODE
-            AllocateLocalStackSpaces(ref frame);
+            AllocateLocalStackSpaces(ref frame, registerTypes);
             // Keep frame.CodeBody in register-index form (used by inliner,
             // debugger, optimization passes when this method is later inlined).
             // ExecuteNeo runs against a lowered copy where Register1/2/3 hold
@@ -477,7 +433,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         }
 
 #if ENABLE_NEO_MODE
-        void TypeSpecializeNeoOpcodes(List<OpCodeR> body, short locVarRegStart, int totalRegCnt)
+        IType[] TypeSpecializeNeoOpcodes(List<OpCodeR> body, short locVarRegStart, int totalRegCnt)
         {
             IType[] registerTypes = BuildInitialRegisterTypes(locVarRegStart, totalRegCnt);
             for (int i = 0; i < body.Count; i++)
@@ -517,7 +473,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Move:
                         {
                             IType srcType = GetRegisterType(registerTypes, op.Register2);
-                            op.Operand = IsNeoReferenceSlot(srcType) ? 1 : 0;
                             SetRegisterType(registerTypes, op.Register1, srcType);
                         }
                         break;
@@ -643,9 +598,94 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldfld_R8:
                         SetRegisterType(registerTypes, op.Register1, appdomain.DoubleType);
                         break;
+                    case OpCodeREnum.Call:
+                    case OpCodeREnum.Callvirt:
+                    case OpCodeREnum.Callvirt_IL:
+                    case OpCodeREnum.Callvirt_CLR:
+                    case OpCodeREnum.Call_Redirect:
+                        if (op.Register1 >= 0)
+                        {
+                            var callee = appdomain.GetMethod(op.Operand2);
+                            if (callee != null && callee.ReturnType != null && callee.ReturnType != appdomain.VoidType)
+                                SetRegisterType(registerTypes, op.Register1, callee.ReturnType);
+                        }
+                        break;
+                    case OpCodeREnum.Newobj:
+                        {
+                            var ctor = appdomain.GetMethod(op.Operand2);
+                            if (ctor != null && ctor.DeclearingType != null)
+                                SetRegisterType(registerTypes, op.Register1, ctor.DeclearingType);
+                        }
+                        break;
+                    case OpCodeREnum.Box:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.ObjectType);
+                        break;
+                    case OpCodeREnum.Unbox:
+                    case OpCodeREnum.Unbox_Any:
+                    case OpCodeREnum.Isinst:
+                    case OpCodeREnum.Castclass:
+                        {
+                            var t = appdomain.GetType(op.Operand);
+                            if (t != null)
+                                SetRegisterType(registerTypes, op.Register1, t);
+                        }
+                        break;
+                    case OpCodeREnum.Ldsfld:
+                    case OpCodeREnum.Ldsflda:
+                        // Safe over-approximation: static field type is not trivially recoverable here;
+                        // treat as reference so slot gets Size=4, RefCount=1.
+                        SetRegisterType(registerTypes, op.Register1, appdomain.ObjectType);
+                        break;
+                    case OpCodeREnum.Ldtoken:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.ObjectType);
+                        break;
+                    case OpCodeREnum.Ldftn:
+                    case OpCodeREnum.Ldvirtftn:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.IntType);
+                        break;
+                    case OpCodeREnum.Ldelem_I1:
+                    case OpCodeREnum.Ldelem_U1:
+                    case OpCodeREnum.Ldelem_I2:
+                    case OpCodeREnum.Ldelem_U2:
+                    case OpCodeREnum.Ldelem_I4:
+                    case OpCodeREnum.Ldelem_U4:
+                    case OpCodeREnum.Ldelem_I:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.IntType);
+                        break;
+                    case OpCodeREnum.Ldelem_I8:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.LongType);
+                        break;
+                    case OpCodeREnum.Ldelem_R4:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.FloatType);
+                        break;
+                    case OpCodeREnum.Ldelem_R8:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.DoubleType);
+                        break;
+                    case OpCodeREnum.Ldelem_Ref:
+                        SetRegisterType(registerTypes, op.Register1, appdomain.ObjectType);
+                        break;
+                    case OpCodeREnum.Ldelem_Any:
+                        {
+                            var t = appdomain.GetType(op.Operand);
+                            SetRegisterType(registerTypes, op.Register1, t ?? appdomain.ObjectType);
+                        }
+                        break;
+                    case OpCodeREnum.Ldelema:
+                    case OpCodeREnum.Ldloca:
+                    case OpCodeREnum.Ldloca_S:
+                    case OpCodeREnum.Ldarga:
+                    case OpCodeREnum.Ldarga_S:
+                    case OpCodeREnum.Ldflda:
+                        // Managed pointer: not further specialized in Neo; treat as IntType (4-byte primitive slot).
+                        SetRegisterType(registerTypes, op.Register1, appdomain.IntType);
+                        break;
+                    case OpCodeREnum.Dup:
+                        SetRegisterType(registerTypes, op.Register1, GetRegisterType(registerTypes, op.Register2));
+                        break;
                 }
                 body[i] = op;
             }
+            return registerTypes;
         }
 
         IType[] BuildInitialRegisterTypes(short locVarRegStart, int totalRegCnt)
@@ -1067,7 +1107,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             return code;
         }
 
-        void AllocateLocalStackSpaces(ref CompiledFrame frame)
+        void AllocateLocalStackSpaces(ref CompiledFrame frame, IType[] registerTypes)
         {
             var body = def.Body;
             int varCnt = body.Variables.Count;
@@ -1178,30 +1218,30 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 localInfo[locVarRegStart + i] = slot;
             }
-            var valueTypes = GatherValueTypes(ref frame);
-            int maxSize = 8, maxRefCount = 1;
-            foreach (var i in valueTypes)
-            {
-                if (i is ILType il)
-                {
-                    int size = il.TotalPrimitiveSize;
-                    int refSize = il.TotalReferenceCount;
-                    if (size > maxSize)
-                        maxSize = size;
-                    if (refSize > maxRefCount)
-                        maxRefCount = refSize;
-                }
-            }
             for (int i = 0; i < frame.StackRegisterCount; i++)
             {
-                StackSlotInfo slot = default;
-                slot.Offset = offset;
-                slot.RefOffset = refOffset;
-                slot.Size = maxSize;
-                slot.RefCount = maxRefCount;
-                offset += maxSize;
-                refOffset += maxRefCount;
-                localInfo[baseRegStart + i] = slot;
+                int reg = baseRegStart + i;
+                StackSlotInfo slot;
+                IType regType = (registerTypes != null && reg < registerTypes.Length) ? registerTypes[reg] : null;
+                if (regType != null)
+                {
+                    slot = AllocateSlotForType(regType, ref offset, ref refOffset);
+                    if (!regType.IsPrimitive && !regType.IsValueType)
+                    {
+                        localIsRef[reg] = true;
+                    }
+                }
+                else
+                {
+                    // Register never observed to hold a value (dead/eliminated); reserve minimal primitive slot.
+                    slot = default;
+                    slot.Offset = offset;
+                    slot.RefOffset = refOffset;
+                    slot.Size = 4;
+                    slot.RefCount = 0;
+                    offset += 4;
+                }
+                localInfo[reg] = slot;
             }
             frame.LocalInfos = localInfo;
             frame.LocalIsReference = localIsRef;

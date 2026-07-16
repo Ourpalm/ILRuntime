@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
@@ -92,28 +92,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         LowerR1R2(ref op, localInfos);
                         break;
                     case OpCodeREnum.Move:
-                        // Move emits Unsafe.CopyBlock at runtime, so it needs the
-                        // copy size (in bytes) in Operand2. Use min(src,dst) so a
-                        // wide stack register (8 bytes) copied into a narrow local
-                        // (e.g. int = 4 bytes) doesn't clobber neighbouring slots.
                         {
                             int srcReg = op.Register2;
                             int dstReg = op.Register1;
-                            bool isRefMove = op.Operand == 1;
-                            int srcSz = (srcReg >= 0 && srcReg < localInfos.Length) ? localInfos[srcReg].Size : 0;
-                            int dstSz = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].Size : 0;
-                            int dstRef = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].RefOffset : 0;
-                            int sz;
-                            if (isRefMove)
-                                sz = 4;
-                            else if (srcSz > 0 && dstSz > 0)
-                                sz = srcSz < dstSz ? srcSz : dstSz;
-                            else
-                                sz = srcSz > 0 ? srcSz : dstSz;
+                            int srcSz  = (srcReg >= 0 && srcReg < localInfos.Length) ? localInfos[srcReg].Size : 0;
+                            int srcRef = (srcReg >= 0 && srcReg < localInfos.Length) ? localInfos[srcReg].RefCount : 0;
+#if DEBUG
+                            int dstSz  = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].Size : 0;
+                            int dstRef = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].RefCount : 0;
+                            if (srcSz != dstSz || srcRef != dstRef)
+                                throw new System.Exception($"Move layout mismatch: src(sz={srcSz},ref={srcRef}) dst(sz={dstSz},ref={dstRef})");
+#endif
+                            bool isRefMove = srcRef > 0;
+                            int sz = srcSz;
                             LowerR1R2(ref op, localInfos);
                             op.Operand = isRefMove ? 1 : 0;
                             op.Operand2 = sz;
-                            op.Operand3 = dstRef;
+                            op.Operand3 = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].RefOffset : 0;
                         }
                         break;
                     case OpCodeREnum.Conv_I:
