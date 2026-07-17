@@ -16,6 +16,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public AsyncJITCompileWorker()
         {
             thread = new Thread(DoJob);
+            thread.IsBackground = true;
             thread.Name = "ILRuntime JIT Worker";
             thread.Start();
         }
