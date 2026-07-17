@@ -79,9 +79,23 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public string ToString(Enviorment.AppDomain domain)
         {
             string param = null;
+            string nameSuffix = "";
             switch (Code)
             {
                 case OpCodeREnum.Move:
+                    if (Operand == 0)
+                    {
+                        param = string.Format("r{0}, r{1}, size={2}", Register1, Register2, Operand2);
+                    }
+                    else if (Operand == 1)
+                    {
+                        param = string.Format("r{0}, r{1}", Register1, Register2);
+                    }
+                    else
+                    {
+                        param = string.Format("r{0}, r{1}, vt(sz={2}, refs={3})", Register1, Register2, Operand2, Operand);
+                    }
+                    break;
                 case OpCodeREnum.Ldind_I:
                 case OpCodeREnum.Ldind_I1:
                 case OpCodeREnum.Ldind_I2:
@@ -179,8 +193,6 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Ldfld_U8:
                 case OpCodeREnum.Ldfld_R4:
                 case OpCodeREnum.Ldfld_R8:
-                case OpCodeREnum.Ldfld_Ref:
-                case OpCodeREnum.Ldfld_Value:
                 case OpCodeREnum.Stfld_I1:
                 case OpCodeREnum.Stfld_I2:
                 case OpCodeREnum.Stfld_I4:
@@ -191,12 +203,42 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Stfld_U8:
                 case OpCodeREnum.Stfld_R4:
                 case OpCodeREnum.Stfld_R8:
-                case OpCodeREnum.Stfld_Ref:
-                case OpCodeREnum.Stfld_Value:
-                    if (domain != null)
-                        param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, domain.GetType(Operand), Operand2, Operand3);
+                    if (Operand4 != 0)
+                    {
+                        nameSuffix = ".inline";
+                        param = string.Format("r{0}, r{1}, primOff={2}", Register1, Register2, Operand2);
+                    }
                     else
-                        param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, Operand, Operand2, Operand3);
+                    {
+                        if (domain != null)
+                            param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, domain.GetType(Operand), Operand2, Operand3);
+                        else
+                            param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, Operand, Operand2, Operand3);
+                    }
+                    break;
+                case OpCodeREnum.Ldfld_Ref:
+                case OpCodeREnum.Stfld_Ref:
+                    if (Operand4 != 0)
+                    {
+                        nameSuffix = ".inline";
+                        param = string.Format("r{0}, r{1}, primOff={2},refOff={3},slotRO={4}", Register1, Register2, Operand2, Operand3, Operand4 - 1);
+                    }
+                    else
+                    {
+                        if (domain != null)
+                            param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, domain.GetType(Operand), Operand2, Operand3);
+                        else
+                            param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, Operand, Operand2, Operand3);
+                    }
+                    break;
+                case OpCodeREnum.Ldfld_Value:
+                case OpCodeREnum.Stfld_Value:
+                    if (Operand4 != 0)
+                        nameSuffix = ".inline";
+                    param = string.Format("r{0}, r{1}, sz={2}(fpo=0x{3:x},fro={4},o2h={5},refCnt={6})",
+                        Register1, Register2, Operand,
+                        Operand2 & 0xFFFF, Operand3 & 0xFFFF,
+                        (Operand2 >> 16) & 0xFFFF, (Operand3 >> 16) & 0xFFFF);
                     break;
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Ldsfld:
@@ -682,7 +724,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     }
                     break;
             }
-            return string.Format("{0} {1}", Code.ToString().ToLower().Replace('_', '.'), param);
+            return string.Format("{0}{1} {2}", Code.ToString().ToLower().Replace('_', '.'), nameSuffix, param);
         }
     }
 }

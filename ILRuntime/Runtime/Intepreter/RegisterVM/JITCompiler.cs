@@ -445,6 +445,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
             // 1) Parameter slots
             int paramCnt = method.ParameterCount + (method.HasThis ? 1 : 0);
+            int baseRegStart = paramCnt + varCnt;
+            int locVarRegStart = paramCnt;
+            int totalRegSlots = paramCnt + varCnt + frame.StackRegisterCount;
+            StackSlotInfo[] localInfo = new StackSlotInfo[totalRegSlots];
+            bool[] localIsRef = new bool[localInfo.Length];
             StackSlotInfo[] paramInfo = new StackSlotInfo[paramCnt];
             int offset = 0;
             int refOffset = 0;
@@ -471,15 +476,22 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     slot.RefCount = 1;
                     offset += 4;
                     refOffset++;
+                    localIsRef[paramIdx] = true;
                 }
-                paramInfo[paramIdx++] = slot;
+                paramInfo[paramIdx] = slot;
+                localInfo[paramIdx] = slot;
+                paramIdx++;
             }
             for (int i = 0; i < method.ParameterCount; i++)
             {
                 var pDef = def.Parameters[i];
                 var pt = appdomain.GetType(pDef.ParameterType, declaringType, method);
                 StackSlotInfo slot = AllocateSlotForType(pt, ref offset, ref refOffset);
-                paramInfo[paramIdx++] = slot;
+                if (!pt.IsPrimitive && !pt.IsValueType)
+                    localIsRef[paramIdx] = true;
+                paramInfo[paramIdx] = slot;
+                localInfo[paramIdx] = slot;
+                paramIdx++;
             }
             frame.ParamInfos = paramInfo;
             frame.ParamPrimitiveSize = offset;
@@ -497,15 +509,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             // routes such incompatible writes to a fresh virtual register; the resulting per-register
             // slot layout is what we honor here. Registers never observed (dead) fall back to a minimal
             // primitive slot.
-            int baseRegStart = paramCnt + varCnt;
-            int locVarRegStart = paramCnt;
-            int totalRegSlots = paramCnt + varCnt + frame.StackRegisterCount;
-            StackSlotInfo[] localInfo = new StackSlotInfo[totalRegSlots];
-            bool[] localIsRef = new bool[localInfo.Length];
-            for (int i = 0; i < paramCnt; i++)
-            {
-                localInfo[i] = paramInfo[i];
-            }
             for (int reg = locVarRegStart; reg < totalRegSlots; reg++)
             {
                 StackSlotInfo slot;
@@ -1193,9 +1196,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         if (type is ILType)
                         {
                             op.Code = GetLdfldCodeForType(fieldType);
-                            op.Operand = type.GetHashCode();
-                            op.Operand2 = offset.PrimitiveOffset;
-                            op.Operand3 = offset.ReferenceOffset;
+                            if (op.Code == OpCodeREnum.Ldfld_Value)
+                            {
+                                var ilFieldType = fieldType as ILType;
+                                op.Operand = ilFieldType.TotalPrimitiveSize;
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = ((ilFieldType.TotalReferenceCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
+                            }
+                            else
+                            {
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = offset.ReferenceOffset;
+                            }
+                            op.Operand4 = (type.IsValueType && !type.IsEnum) ? 1 : 0;
                         }
                         else
                             op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
@@ -1216,9 +1229,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         if(type is ILType)
                         {
                             op.Code = GetStfldCodeForType(fieldType);
-                            op.Operand = type.GetHashCode();
-                            op.Operand2 = offset.PrimitiveOffset;
-                            op.Operand3 = offset.ReferenceOffset;
+                            if (op.Code == OpCodeREnum.Stfld_Value)
+                            {
+                                var ilFieldType = fieldType as ILType;
+                                op.Operand = ilFieldType.TotalPrimitiveSize;
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = ((ilFieldType.TotalReferenceCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
+                            }
+                            else
+                            {
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = offset.ReferenceOffset;
+                            }
+                            op.Operand4 = (type.IsValueType && !type.IsEnum) ? 1 : 0;
                         }
                         else
                             op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
@@ -1344,7 +1367,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 else if (fieldType == appdomain.CharType)
                 {
-                    res = OpCodeREnum.Ldfld_U4;
+                    res = OpCodeREnum.Ldfld_U2;
                 }
                 else if (fieldType == appdomain.IntPtrType)
                 {
@@ -1415,7 +1438,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 else if (fieldType == appdomain.CharType)
                 {
-                    res = OpCodeREnum.Stfld_U4;
+                    res = OpCodeREnum.Stfld_U2;
                 }
                 else if (fieldType == appdomain.IntPtrType)
                 {

@@ -276,6 +276,20 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         resultType = appdomain.DoubleType;
                         hasResult = true;
                         break;
+                    case OpCodeREnum.Ldfld_Ref:
+                        resultType = appdomain.ObjectType;
+                        hasResult = true;
+                        break;
+                    case OpCodeREnum.Ldfld_Value:
+                        {
+                            var t = appdomain.GetType(op.Operand);
+                            if (t != null)
+                            {
+                                resultType = t;
+                                hasResult = true;
+                            }
+                        }
+                        break;
                     case OpCodeREnum.Call:
                     case OpCodeREnum.Callvirt:
                     case OpCodeREnum.Callvirt_IL:

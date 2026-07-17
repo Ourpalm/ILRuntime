@@ -454,11 +454,17 @@ namespace ILRuntime.Runtime.Enviorment
             if (cnt != paramCnt)
                 throw new ArgumentException("Argument count mismatch");
             bool unhandledException;
+#if ENABLE_NEO_MODE
+            // TODO(Neo/Step 13): route this entrypoint through InvocationFrame so
+            // Push*/Read* share the same marshalling path as ILIntepreter.Run.
+            throw new NotImplementedException("Neo mode: InvocationContext.Invoke has not been migrated to InvocationFrame yet (Step 13).");
+#else
             if (useRegister)
                 esp = intp.ExecuteR(method, esp, out unhandledException);
             else
                 esp = intp.Execute(method, esp, out unhandledException);
             esp--;
+#endif
         }
 
         void CheckReturnValue()

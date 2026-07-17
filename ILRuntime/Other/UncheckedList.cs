@@ -219,6 +219,22 @@ namespace ILRuntime.Other
             }
         }
 
+        // Reserves `count` uninitialized slots at the end in a single O(1) step
+        // (plus one amortised resize). The new slots keep whatever value the
+        // backing array holds; for reference types the CLR zero-inits the array
+        // on allocation, so callers get default(T) without an explicit loop.
+        // Used on the hot IL-call path where we would otherwise call Add(null)
+        // in a loop of length TotalRefSize.
+        public void ExpandBySize(int count)
+        {
+            if (count <= 0)
+                return;
+            int newSize = _size + count;
+            if (newSize > _items.Length)
+                EnsureCapacity(newSize);
+            _size = newSize;
+        }
+
         // Non-inline from UncheckedList.Add to improve its code quality as uncommon path
         private void AddWithResize(T item)
         {
@@ -998,6 +1014,25 @@ namespace ILRuntime.Other
                 index = 0;
                 current = default(T);
             }
+        }
+    }
+
+    // DEBUG builds swap UncheckedList<object> for the BCL List<object> via the
+    // AutoList type alias. This extension gives List<T> a matching ExpandBySize
+    // signature so hot-path call sites (ILIntepreter.Neo.cs) don't need
+    // #if branches. The BCL List has no way to bump _size without initialising
+    // slots, so we fall back to a loop; DEBUG builds already pay checked-index
+    // overhead so a per-slot Add(null) is not the bottleneck.
+    internal static class DebugAutoListExtensions
+    {
+        public static void ExpandBySize<T>(this System.Collections.Generic.List<T> list, int count)
+        {
+            if (count <= 0)
+                return;
+            if (list.Capacity < list.Count + count)
+                list.Capacity = list.Count + count;
+            for (int i = 0; i < count; i++)
+                list.Add(default);
         }
     }
 }

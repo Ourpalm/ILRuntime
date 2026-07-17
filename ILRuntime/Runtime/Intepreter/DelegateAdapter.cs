@@ -939,6 +939,12 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe StackObject* ILInvokeSub(ILIntepreter intp, StackObject* esp, AutoList mStack)
         {
+#if ENABLE_NEO_MODE
+            // TODO(Neo/Step 13): route delegate dispatch through InvocationFrame so
+            // it shares its marshalling path with ILIntepreter.Run and the future
+            // InvocationContext migration.
+            throw new NotImplementedException("Neo mode: DelegateAdapter.ILInvokeSub has not been migrated to InvocationFrame yet (Step 13).");
+#else
             var ebp = esp;
             bool unhandled;
             if (method.HasThis)
@@ -973,6 +979,7 @@ namespace ILRuntime.Runtime.Intepreter
 
             }
             return ret;
+#endif
         }
 
         unsafe StackObject* ClearStack(ILIntepreter intp, StackObject* esp, StackObject* ebp, AutoList mStack)

@@ -78,6 +78,7 @@ namespace ILRuntime.CLR.TypeSystem
         int totalReferenceCnt = -1;
         int totalStaticPrimitiveSize = -1;
         int totalStaticReferenceCnt = -1;
+        internal int[] refFieldPrimitiveOffsets;
 #endif
 
         public IMethod ToStringMethod
@@ -169,14 +170,7 @@ namespace ILRuntime.CLR.TypeSystem
                     staticConstructorCalled = true;
                     if ( staticConstructor != null && ( !TypeReference.HasGenericParameters || IsGenericInstance ) )
                     {
-#if ENABLE_NEO_MODE
-                        // TODO Step 7: Neo interpreter still lacks Stfld_*/Ldfld_* case handlers,
-                        // and ExecuteR (Legacy register VM) refuses the specialized field opcodes
-                        // that JITCompiler emits in Neo mode. Suppressing cctor invocation here
-                        // unblocks Step 6 smoke tests; restore once Step 7 lands.
-#else
                         appdomain.Invoke ( staticConstructor, null, null );
-#endif
                     }
                 }
                 return staticInstance;
@@ -1702,37 +1696,30 @@ namespace ILRuntime.CLR.TypeSystem
 
         void InitializeFields ()
         {
+#if ENABLE_NEO_MODE
+            InitializeFieldsForFlatLayout();
+#else
+            InitializeFieldsForStackObjectLayout();
+#endif
+        }
+
+#if !ENABLE_NEO_MODE
+        void InitializeFieldsForStackObjectLayout ()
+        {
             fieldMapping = new Dictionary<string, int> ();
             if (definition == null)
             {
                 fieldTypes = new IType[0];
                 fieldReferences = new FieldReference[0];
                 fieldDefinitions = new FieldDefinition[0];
-#if ENABLE_NEO_MODE
-                fieldOffsets = new ILTypeFieldOffset[0];
-                totalPrimitiveSize = 0;
-                totalReferenceCnt = 0;
-                totalStaticPrimitiveSize = 0;
-                totalStaticReferenceCnt = 0;
-#endif
                 return;
             }
             fieldTypes = new IType [ definition.Fields.Count ];
-#if ENABLE_NEO_MODE
-            fieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
-            staticFieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
-#endif
             fieldReferences = new FieldReference[definition.Fields.Count];
             fieldDefinitions = new FieldDefinition[definition.Fields.Count];
             var fields = definition.Fields;
             int idx = FieldStartIndex;
             int idxStatic = 0;
-#if ENABLE_NEO_MODE
-            int primitiveOffset = 0;
-            int referenceOffset = 0;
-            int staticPrimitiveOffset = 0;
-            int staticReferenceOffset = 0;
-#endif
             for (int i = 0; i < fields.Count; i++)
             {
                 var field = fields[i];
@@ -1758,44 +1745,10 @@ namespace ILRuntime.CLR.TypeSystem
                         FieldReference fr = field;
                         if (typeRef.IsGenericInstance)
                         {
-                            fr = new FieldReference(field.Name, staticFieldTypes[idxStatic].ToTypeReference(appdomain.LoadedModules[0]), typeRef);                            
+                            fr = new FieldReference(field.Name, staticFieldTypes[idxStatic].ToTypeReference(appdomain.LoadedModules[0]), typeRef);
                         }
                         staticFieldReferences[idxStatic] = fr;
                         staticFieldDefinitions[idxStatic] = field;
-#if ENABLE_NEO_MODE
-                        var staticFieldType = staticFieldTypes[idxStatic];
-                        if (staticFieldType.IsPrimitive)
-                        {
-                            staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
-                            {
-                                PrimitiveOffset = staticPrimitiveOffset,
-                                ReferenceOffset = staticReferenceOffset
-                            };
-                            staticPrimitiveOffset += AppDomain.GetPrimitiveSize(staticFieldType);
-                        }
-                        else
-                        {
-                            if (staticFieldType.IsValueType && staticFieldType is ILType sit)
-                            {
-                                staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
-                                {
-                                    PrimitiveOffset = staticPrimitiveOffset,
-                                    ReferenceOffset = staticReferenceOffset
-                                };
-                                staticPrimitiveOffset += sit.TotalPrimitiveSize;
-                                staticReferenceOffset += sit.TotalReferenceCount;
-                            }
-                            else
-                            {
-                                staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
-                                {
-                                    PrimitiveOffset = staticPrimitiveOffset,
-                                    ReferenceOffset = staticReferenceOffset
-                                };
-                                staticReferenceOffset++;
-                            }
-                        }
-#endif
                         idxStatic++;
                     }
                 }
@@ -1822,71 +1775,308 @@ namespace ILRuntime.CLR.TypeSystem
                         enumType = fieldType;
                     }
 
-#if ENABLE_NEO_MODE
-                    if (fieldType.IsPrimitive)
-                    {
-                        fieldOffsets[idx - FieldStartIndex] = new ILTypeFieldOffset()
-                        {
-                            PrimitiveOffset = primitiveOffset,
-                            ReferenceOffset = referenceOffset
-                        };
-                        primitiveOffset += AppDomain.GetPrimitiveSize(fieldType);
-                    }
-                    else
-                    {
-                        if(fieldType.IsValueType && fieldType is ILType it)
-                        {
-                            fieldOffsets[idx - FieldStartIndex] = new ILTypeFieldOffset()
-                            {
-                                PrimitiveOffset = primitiveOffset,
-                                ReferenceOffset = referenceOffset
-                            };
-                            primitiveOffset += it.TotalPrimitiveSize;
-                            referenceOffset += it.TotalReferenceCount;
-                        }
-                        else
-                        {
-                            fieldOffsets[idx - fieldStartIdx] = new ILTypeFieldOffset()
-                            {
-                                PrimitiveOffset = primitiveOffset,
-                                ReferenceOffset = referenceOffset
-                            };
-                            referenceOffset++;
-                        }
-                    }
-#endif
                     idx++;
                 }
             }
             Array.Resize ( ref fieldTypes, idx - FieldStartIndex );
             Array.Resize ( ref fieldDefinitions, idx - FieldStartIndex );
-#if ENABLE_NEO_MODE
-            Array.Resize(ref fieldOffsets, idx - FieldStartIndex );
-
-            totalPrimitiveSize = primitiveOffset;
-            totalReferenceCnt = referenceOffset;
-#endif
 
             if ( staticFieldTypes != null )
             {
                 Array.Resize ( ref staticFieldTypes, idxStatic );
                 Array.Resize ( ref staticFieldDefinitions, idxStatic );
-#if ENABLE_NEO_MODE
-                Array.Resize(ref staticFieldOffsets, idxStatic);
-                totalStaticPrimitiveSize = staticPrimitiveOffset;
-                totalStaticReferenceCnt = staticReferenceOffset;
-#endif
                 //staticInstance = new ILTypeStaticInstance(this);
             }
+        }
+#endif
+
 #if ENABLE_NEO_MODE
+        void InitializeFieldsForFlatLayout ()
+        {
+            fieldMapping = new Dictionary<string, int> ();
+            if (definition == null)
+            {
+                fieldTypes = new IType[0];
+                fieldReferences = new FieldReference[0];
+                fieldDefinitions = new FieldDefinition[0];
+                fieldOffsets = new ILTypeFieldOffset[0];
+                staticFieldOffsets = null;
+                refFieldPrimitiveOffsets = new int[0];
+                totalPrimitiveSize = 0;
+                totalReferenceCnt = 0;
+                totalStaticPrimitiveSize = 0;
+                totalStaticReferenceCnt = 0;
+                return;
+            }
+
+            int AlignUp(int offset, int alignment)
+            {
+                return (offset + alignment - 1) & ~(alignment - 1);
+            }
+
+            int GetPrimitiveSizeFromClrType(Type t)
+            {
+                if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte))
+                    return 1;
+                if (t == typeof(short) || t == typeof(ushort) || t == typeof(char))
+                    return 2;
+                if (t == typeof(int) || t == typeof(uint) || t == typeof(float))
+                    return 4;
+                if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr))
+                    return 8;
+                return 4;
+            }
+
+            int GetPrimitiveAlignmentFromClrType(Type t)
+            {
+                if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte))
+                    return 1;
+                if (t == typeof(short) || t == typeof(ushort) || t == typeof(char))
+                    return 2;
+                if (t == typeof(int) || t == typeof(uint) || t == typeof(float))
+                    return 4;
+                if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr))
+                    return 8;
+                return 4;
+            }
+
+            int GetFieldNaturalSize(IType type)
+            {
+                if (type.IsPrimitive)
+                {
+                    return GetPrimitiveSizeFromClrType(type.TypeForCLR);
+                }
+                if (type.IsEnum)
+                {
+                    Type ut;
+                    if (type is ILType ilEnum)
+                    {
+                        var _ = ilEnum.TotalFieldCount;
+                        ut = ilEnum.enumType.TypeForCLR;
+                    }
+                    else
+                    {
+                        ut = type.TypeForCLR.GetEnumUnderlyingType();
+                    }
+                    return GetPrimitiveSizeFromClrType(ut);
+                }
+                if (type.IsValueType && type is ILType it)
+                {
+                    return it.TotalPrimitiveSize;
+                }
+                return 4;
+            }
+
+            int GetFieldNaturalAlignment(IType type)
+            {
+                if (type.IsPrimitive)
+                {
+                    return GetPrimitiveAlignmentFromClrType(type.TypeForCLR);
+                }
+                if (type.IsEnum)
+                {
+                    Type ut;
+                    if (type is ILType ilEnum)
+                    {
+                        var _ = ilEnum.TotalFieldCount;
+                        ut = ilEnum.enumType.TypeForCLR;
+                    }
+                    else
+                    {
+                        ut = type.TypeForCLR.GetEnumUnderlyingType();
+                    }
+                    return GetPrimitiveAlignmentFromClrType(ut);
+                }
+                if (type.IsValueType && type is ILType it)
+                {
+                    return GetStructMaxAlignment(it);
+                }
+                return 4;
+            }
+
+            int GetStructMaxAlignment(ILType type)
+            {
+                return GetStructMaxAlignmentCore(type, new HashSet<ILType>());
+            }
+
+            int GetStructMaxAlignmentCore(ILType type, HashSet<ILType> visited)
+            {
+                if (!visited.Add(type))
+                    return 1;
+                var _ = type.TotalFieldCount;
+                int maxAlign = 1;
+                if (type.BaseType != null && type.BaseType is ILType baseIl)
+                {
+                    int baseAlign = GetStructMaxAlignmentCore(baseIl, visited);
+                    if (baseAlign > maxAlign)
+                        maxAlign = baseAlign;
+                }
+                for (int i = 0; i < type.fieldTypes.Length; i++)
+                {
+                    int a = GetFieldNaturalAlignment(type.fieldTypes[i]);
+                    if (a > maxAlign)
+                        maxAlign = a;
+                }
+                return maxAlign;
+            }
+
+            fieldTypes = new IType [ definition.Fields.Count ];
+            fieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
+            staticFieldOffsets = new ILTypeFieldOffset[definition.Fields.Count];
+            fieldReferences = new FieldReference[definition.Fields.Count];
+            fieldDefinitions = new FieldDefinition[definition.Fields.Count];
+            var fields = definition.Fields;
+            int idx = FieldStartIndex;
+            int idxStatic = 0;
+            int primitiveOffset = 0;
+            int referenceOffset = 0;
+            int staticPrimitiveOffset = 0;
+            int staticReferenceOffset = 0;
+            List<int> refFieldOffsets = new List<int>();
+            for (int i = 0; i < fields.Count; i++)
+            {
+                var field = fields[i];
+                if (field.IsStatic)
+                {
+                    if (!TypeReference.HasGenericParameters || IsGenericInstance)
+                    {
+                        if (staticFieldTypes == null)
+                        {
+                            staticFieldTypes = new IType[definition.Fields.Count];
+                            staticFieldReferences = new FieldReference[definition.Fields.Count];
+                            staticFieldDefinitions = new FieldDefinition[definition.Fields.Count];
+                            staticFieldMapping = new Dictionary<string, int>();
+                        }
+                        staticFieldMapping[field.Name] = idxStatic;
+                        IType staticFieldType;
+                        if (field.FieldType.IsGenericParameter)
+                        {
+                            staticFieldType = FindGenericArgument(field.FieldType.Name);
+                        }
+                        else
+                            staticFieldType = appdomain.GetType(field.FieldType, this, null);
+                        staticFieldTypes[idxStatic] = staticFieldType;
+                        FieldReference fr = field;
+                        if (typeRef.IsGenericInstance)
+                        {
+                            fr = new FieldReference(field.Name, staticFieldType.ToTypeReference(appdomain.LoadedModules[0]), typeRef);
+                        }
+                        staticFieldReferences[idxStatic] = fr;
+                        staticFieldDefinitions[idxStatic] = field;
+
+                        int fSize = GetFieldNaturalSize(staticFieldType);
+                        int fAlign = GetFieldNaturalAlignment(staticFieldType);
+                        staticPrimitiveOffset = AlignUp(staticPrimitiveOffset, fAlign);
+                        staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
+                        {
+                            PrimitiveOffset = staticPrimitiveOffset,
+                            ReferenceOffset = staticReferenceOffset
+                        };
+                        staticPrimitiveOffset += fSize;
+                        if (staticFieldType.IsPrimitive || staticFieldType.IsEnum)
+                        {
+                        }
+                        else if (staticFieldType.IsValueType && staticFieldType is ILType sit)
+                        {
+                            staticReferenceOffset += sit.TotalReferenceCount;
+                        }
+                        else
+                        {
+                            staticReferenceOffset++;
+                        }
+                        idxStatic++;
+                    }
+                }
+                else
+                {
+                    fieldMapping[field.Name] = idx;
+                    IType fieldType;
+                    if (field.FieldType.IsGenericParameter)
+                    {
+                        fieldType = FindGenericArgument(field.FieldType.Name);
+                    }
+                    else
+                        fieldType = appdomain.GetType(field.FieldType, this, null);
+                    fieldTypes[idx - FieldStartIndex] = fieldType;
+                    FieldReference fr = field;
+                    if (typeRef.IsGenericInstance)
+                    {
+                        fr = new FieldReference(field.Name, fieldType.ToTypeReference(appdomain.LoadedModules[0]), typeRef);
+                    }
+                    fieldReferences[idx - FieldStartIndex] = fr;
+                    fieldDefinitions[idx - FieldStartIndex] = field;
+                    if (IsEnum)
+                    {
+                        enumType = fieldType;
+                    }
+
+                    int fSize = GetFieldNaturalSize(fieldType);
+                    int fAlign = GetFieldNaturalAlignment(fieldType);
+                    primitiveOffset = AlignUp(primitiveOffset, fAlign);
+                    fieldOffsets[idx - FieldStartIndex] = new ILTypeFieldOffset()
+                    {
+                        PrimitiveOffset = primitiveOffset,
+                        ReferenceOffset = referenceOffset
+                    };
+                    bool fieldHasRefs = false;
+                    if (fieldType.IsPrimitive || fieldType.IsEnum)
+                    {
+                        primitiveOffset += fSize;
+                    }
+                    else if (fieldType.IsValueType && fieldType is ILType it)
+                    {
+                        primitiveOffset += fSize;
+                        referenceOffset += it.TotalReferenceCount;
+                        if (it.TotalReferenceCount > 0)
+                            fieldHasRefs = true;
+                    }
+                    else
+                    {
+                        primitiveOffset += fSize;
+                        referenceOffset++;
+                        fieldHasRefs = true;
+                    }
+                    if (fieldHasRefs)
+                    {
+                        refFieldOffsets.Add(primitiveOffset - fSize);
+                    }
+                    idx++;
+                }
+            }
+            Array.Resize ( ref fieldTypes, idx - FieldStartIndex );
+            Array.Resize ( ref fieldDefinitions, idx - FieldStartIndex );
+            Array.Resize(ref fieldOffsets, idx - FieldStartIndex );
+
+            int maxAlignment = GetStructMaxAlignment(this);
+            totalPrimitiveSize = AlignUp(primitiveOffset, maxAlignment);
+            if (totalPrimitiveSize < 1)
+                totalPrimitiveSize = 1;
+            totalReferenceCnt = referenceOffset;
+            refFieldPrimitiveOffsets = refFieldOffsets.ToArray();
+
+            if ( staticFieldTypes != null )
+            {
+                Array.Resize ( ref staticFieldTypes, idxStatic );
+                Array.Resize ( ref staticFieldDefinitions, idxStatic );
+                Array.Resize(ref staticFieldOffsets, idxStatic);
+                int maxStaticAlignment = 1;
+                for (int i = 0; i < staticFieldTypes.Length; i++)
+                {
+                    int a = GetFieldNaturalAlignment(staticFieldTypes[i]);
+                    if (a > maxStaticAlignment)
+                        maxStaticAlignment = a;
+                }
+                totalStaticPrimitiveSize = AlignUp(staticPrimitiveOffset, maxStaticAlignment);
+                totalStaticReferenceCnt = staticReferenceOffset;
+            }
             else
             {
                 staticFieldOffsets = null;
                 totalStaticPrimitiveSize = 0;
                 totalStaticReferenceCnt = 0;
             }
-#endif
         }
+#endif
 
         public IType FindGenericArgument ( string key )
         {

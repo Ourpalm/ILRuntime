@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
@@ -8,13 +8,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     partial class Optimizer
     {
-        public static void LowerNeoOffsets(ref CompiledFrame frame, Enviorment.AppDomain domain)
+        public static void LowerNeoOffsets(ref CompiledFrame frame, Enviorment.AppDomain domain, bool[] localIsRef = null)
         {
             if (frame.TotalStructSize > ushort.MaxValue)
             {
                 throw new NotSupportedException(string.Format("Neo frame primitive size {0} exceeds maximum byte offset {1}.", frame.TotalStructSize, ushort.MaxValue));
             }
 
+            if (localIsRef == null)
+                localIsRef = frame.LocalIsReference;
             var localInfos = frame.LocalInfos;
             var body = frame.NeoExecuteBody;
             List<NeoCallParamMap> callParams = new List<NeoCallParamMap>();
@@ -103,12 +105,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             if (srcSz != dstSz || srcRef != dstRef)
                                 throw new System.Exception($"Move layout mismatch: src(sz={srcSz},ref={srcRef}) dst(sz={dstSz},ref={dstRef})");
 #endif
-                            bool isRefMove = srcRef > 0;
+                            bool isStandaloneRef = (srcRef == 1 && srcSz == 4 && (localIsRef == null || (srcReg >= 0 && srcReg < localIsRef.Length && localIsRef[srcReg])));
                             int sz = srcSz;
                             LowerR1R2(ref op, localInfos);
-                            op.Operand = isRefMove ? 1 : 0;
+                            op.Operand = srcRef;
                             op.Operand2 = sz;
                             op.Operand3 = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].RefOffset : 0;
+                            op.Operand4 = isStandaloneRef ? -1 : ((srcReg >= 0 && srcReg < localInfos.Length) ? localInfos[srcReg].RefOffset : 0);
                         }
                         break;
                     case OpCodeREnum.Conv_I:
@@ -278,7 +281,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Blei_Un_R8:
                     case OpCodeREnum.Bgei_R8:
                     case OpCodeREnum.Bgei_Un_R8:
-                    case OpCodeREnum.Initobj:
                     case OpCodeREnum.Ldnull:
                     case OpCodeREnum.Ldstr:
                     case OpCodeREnum.Ldc_I4_M1:
@@ -300,9 +302,22 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.Operand = localInfos[op.Register1].RefOffset;
                         LowerR1(ref op, localInfos);
                         break;
+                    case OpCodeREnum.Initobj:
+                        {
+                            short r1 = op.Register1;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.Operand3 = localInfos[r1].RefOffset;
+                            op.Operand4 = localInfos[r1].RefOffset + 1;
+                        }
+                        break;
                     case OpCodeREnum.Ret:
                         if (op.Register1 >= 0)
+                        {
+                            short r1 = op.Register1;
                             LowerR1(ref op, localInfos);
+                            if (r1 < localInfos.Length)
+                                op.Operand3 = localInfos[r1].RefOffset;
+                        }
                         break;
                     case OpCodeREnum.Box:
                     case OpCodeREnum.Unbox:
@@ -343,6 +358,24 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Operand = localInfos[r1].RefOffset;
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            if (op.Operand4 == 1)
+                                op.Operand4 = localInfos[r2].RefOffset + 1;
+                            else
+                                op.Operand4 = 0;
+                        }
+                        break;
+                    case OpCodeREnum.Ldfld_Value:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            int fpo = op.Operand2 & 0xFFFF;
+                            op.Operand2 = (localInfos[r1].RefOffset << 16) | fpo;
+                            if (op.Operand4 == 1)
+                                op.Operand4 = localInfos[r2].RefOffset + 1;
+                            else
+                                op.Operand4 = 0;
                         }
                         break;
                     case OpCodeREnum.Stfld_I1:
@@ -361,6 +394,24 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             short r2 = op.Register2;
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            if (op.Operand4 == 1)
+                                op.Operand4 = localInfos[r1].RefOffset + 1;
+                            else
+                                op.Operand4 = 0;
+                        }
+                        break;
+                    case OpCodeREnum.Stfld_Value:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            int fpo = op.Operand2 & 0xFFFF;
+                            op.Operand2 = (localInfos[r2].RefOffset << 16) | fpo;
+                            if (op.Operand4 == 1)
+                                op.Operand4 = localInfos[r1].RefOffset + 1;
+                            else
+                                op.Operand4 = 0;
                         }
                         break;
                     case OpCodeREnum.Br:
@@ -482,10 +533,31 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 List<ushort> refSrc = new List<ushort>();
                                 List<ushort> refDst = new List<ushort>();
                                 
+                                bool isValueTypeNewobj = op.Code == OpCodeREnum.Newobj &&
+                                    targetMethod.DeclearingType is CLR.TypeSystem.ILType vtNewobjType &&
+                                    vtNewobjType.IsValueType && !vtNewobjType.IsEnum;
+
+                                if (isValueTypeNewobj)
+                                {
+                                    short dstReg = op.Register1;
+                                    var dstInfo = localInfos[dstReg];
+                                    var thisInfo = paramInfos[0];
+                                    if (thisInfo.Size > 0)
+                                    {
+                                        primSrc.Add((ushort)dstInfo.Offset);
+                                        primDst.Add((ushort)thisInfo.Offset);
+                                        primSize.Add((ushort)thisInfo.Size);
+                                    }
+                                    for (int r = 0; r < thisInfo.RefCount; r++)
+                                    {
+                                        refSrc.Add((ushort)(dstInfo.RefOffset + r));
+                                        refDst.Add((ushort)(thisInfo.RefOffset + r));
+                                    }
+                                }
+
                                 for (int p = 0; p < pCnt; p++)
                                 {
                                     var srcInfo = localInfos[srcRegs[p]];
-                                    // For Newobj, the ILMethod paramInfos[0] is 'this', so we need to offset the dstInfo by 1
                                     int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
                                     var dstInfo = paramInfos[dstIndex];
                                     

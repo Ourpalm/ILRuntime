@@ -86,39 +86,25 @@ namespace ILRuntime.Runtime.Intepreter
         }
         public object Run(ILMethod method, object instance, object[] p)
         {
+            bool unhandledException;
+#if ENABLE_NEO_MODE
+            using (var frame = InvocationFrame.Begin(this, method))
+            {
+                if (method.HasThis)
+                    frame.PushObject(instance);
+                if (p != null)
+                {
+                    for (int i = 0; i < p.Length; i++)
+                        frame.PushObject(p[i]);
+                }
+                frame.Execute(out unhandledException);
+                return frame.ReadObject();
+            }
+#else
             AutoList mStack = stack.ManagedStack;
             int mStackBase = mStack.Count;
             StackObject* esp = stack.StackBase;
             stack.ResetValueTypePointer();
-            bool unhandledException;
-#if ENABLE_NEO_MODE
-            // Step 6 entry shim: only no-arg static methods are expected here
-            // (NeoStep6 smoke). The Neo call convention lands in Step 8.
-            ref readonly var nf = ref method.CompiledFrame;
-            
-            byte* neoFrame = (byte*)esp;
-            esp += (nf.TotalStructSize / sizeof(StackObject)) + 1;
-            
-            int retSize = nf.ReturnPrimitiveSize;
-            byte* retDst = (byte*)esp;
-            esp += (retSize / sizeof(StackObject)) + 1;
-            
-            int retRefBase = stack.ManagedStack.Count;
-            if (nf.ReturnRefCount > 0)
-            {
-                for (int i = 0; i < nf.ReturnRefCount; i++)
-                    stack.ManagedStack.Add(null);
-            }
-            ExecuteNeo(method, neoFrame, retDst, retRefBase, out unhandledException);
-            
-            object result = null;
-            if (method.ReturnType != domain.VoidType && retSize > 0)
-            {
-                result = NeoBoxReturnValue(method.ReturnType, retDst, retSize);
-            }
-            mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
-            return result;
-#else
             if (method.HasThis)
             {
                 if (instance is CrossBindingAdaptorType)

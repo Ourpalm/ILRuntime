@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -895,6 +895,11 @@ namespace ILRuntime.Runtime.Enviorment
 
         public unsafe static StackObject* MethodInfoInvoke(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
+#if ENABLE_NEO_MODE
+            // TODO(Neo/Step 13): route MethodInfo.Invoke through ILIntepreter.InvocationFrame
+            // so reflective calls share the same marshalling path as ILIntepreter.Run.
+            throw new NotImplementedException("Neo mode: MethodInfoInvoke has not been migrated to InvocationFrame yet (Step 13).");
+#else
             AppDomain domain = intp.AppDomain;
             //Don't ask me why not esp - 3, unity won't return the right result
             var ret = ILIntepreter.Minus(esp, 3);
@@ -951,6 +956,7 @@ namespace ILRuntime.Runtime.Enviorment
             }
             else
                 return ILIntepreter.PushObject(ret, mStack, ((MethodInfo)instance).Invoke(obj, (object[])p));
+#endif
         }
 
         static object CheckCrossBindingAdapter(object obj)
