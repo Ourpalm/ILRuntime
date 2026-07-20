@@ -1311,19 +1311,16 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
+#if !ENABLE_NEO_MODE
             if (!appdomain.SuppressStaticConstructor && !staticConstructorCalled)
             {
                 staticConstructorCalled = true;
                 if (staticConstructor != null && (!TypeReference.HasGenericParameters || IsGenericInstance))
                 {
-#if ENABLE_NEO_MODE
-                    // TODO Step 7: see InitializeMethods entry above. Re-enable once
-                    // Neo Stfld_*/Ldfld_* handlers are wired up.
-#else
                     appdomain.Invoke(staticConstructor, null, null);
-#endif
                 }
             }
+#endif
         }
 
         public IMethod GetVirtualMethod ( IMethod method )

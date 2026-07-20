@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
@@ -307,7 +307,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             short r1 = op.Register1;
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.Operand3 = localInfos[r1].RefOffset;
-                            op.Operand4 = localInfos[r1].RefOffset + 1;
+                            // Initobj 三态编码同 Ldfld/Stfld（design §2.5 / §15，Step 12b）：
+                            //   Operand4 == 0  → boxed（Step 13）
+                            //   Operand4 >  0  → same-frame inline direct，值 = struct.RefOffset + 1
+                            //   Operand4 <  0  → Ref-Slot receiver，值 = -1 - receiverStructRefOffset
+                            if (localInfos[r1].IsRef)
+                                op.Operand4 = -1 - localInfos[r1].RefOffset;
+                            else
+                                op.Operand4 = localInfos[r1].RefOffset + 1;
                         }
                         break;
                     case OpCodeREnum.Ret:
@@ -335,6 +342,90 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.Operand4 = ref2;
                         }
                         break;
+                    case OpCodeREnum.Ldloca:
+                    case OpCodeREnum.Ldloca_S:
+                    case OpCodeREnum.Ldarga:
+                    case OpCodeREnum.Ldarga_S:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                        }
+                        break;
+                    case OpCodeREnum.Ldsfld:
+                        {
+                            short r1 = op.Register1;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.Register2 = (short)localInfos[r1].RefOffset;
+                        }
+                        break;
+                    case OpCodeREnum.Stsfld:
+                        {
+                            short r1 = op.Register1;
+                            op.SrcOffset = (ushort)localInfos[r1].Offset;
+                            op.Register2 = (short)localInfos[r1].RefOffset;
+                        }
+                        break;
+                    case OpCodeREnum.Ldflda:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            // Ldflda-specific receiver flag: 0 = heap object index,
+                            // 1 = source slot contains an 8-byte Ref Slot.
+                            op.Operand4 = localInfos[r2].IsRef ? 1 : 0;
+                        }
+                        break;
+                    case OpCodeREnum.Ldsflda:
+                        {
+                            short r1 = op.Register1;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            // Keep the Ref Slot itself at Size=8/RefCount=0. The static
+                            // instance needs one stable mStack anchor for the lifetime
+                            // of this frame, allocated here and encoded directly.
+                            op.Operand4 = frame.TotalRefSize++;
+                            frame.LocalsReferenceCount++;
+                        }
+                        break;
+                    case OpCodeREnum.Ldind_I:
+                    case OpCodeREnum.Ldind_I1:
+                    case OpCodeREnum.Ldind_I2:
+                    case OpCodeREnum.Ldind_I4:
+                    case OpCodeREnum.Ldind_I8:
+                    case OpCodeREnum.Ldind_R4:
+                    case OpCodeREnum.Ldind_R8:
+                    case OpCodeREnum.Ldind_U1:
+                    case OpCodeREnum.Ldind_U2:
+                    case OpCodeREnum.Ldind_U4:
+                    case OpCodeREnum.Ldind_Ref:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            if (op.Code == OpCodeREnum.Ldind_Ref)
+                                op.Operand = localInfos[r1].RefOffset;
+                        }
+                        break;
+                    case OpCodeREnum.Stind_I:
+                    case OpCodeREnum.Stind_I1:
+                    case OpCodeREnum.Stind_I2:
+                    case OpCodeREnum.Stind_I4:
+                    case OpCodeREnum.Stind_I8:
+                    case OpCodeREnum.Stind_R4:
+                    case OpCodeREnum.Stind_R8:
+                    case OpCodeREnum.Stind_Ref:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            if (op.Code == OpCodeREnum.Stind_Ref)
+                                op.Operand = localInfos[r2].RefOffset;
+                        }
+                        break;
                     case OpCodeREnum.Ldfld_I1:
                     case OpCodeREnum.Ldfld_I2:
                     case OpCodeREnum.Ldfld_I4:
@@ -346,11 +437,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldfld_R4:
                     case OpCodeREnum.Ldfld_R8:
                     case OpCodeREnum.Ldfld_Ref:
-                    case OpCodeREnum.Ldloca:
-                    case OpCodeREnum.Ldloca_S:
-                    case OpCodeREnum.Ldarga:
-                    case OpCodeREnum.Ldarga_S:
-                    case OpCodeREnum.Ldflda:
                         {
                             short r1 = op.Register1;
                             short r2 = op.Register2;
@@ -358,7 +444,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Operand = localInfos[r1].RefOffset;
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
-                            if (op.Operand4 == 1)
+                            // Ldfld/Stfld receiver 三态编码（design §2.5 / §15，Step 12b）：
+                            //   Operand4 == 0  → heap mStack index
+                            //   Operand4 >  0  → same-frame inline direct，值 = receiver struct 的 RefOffset + 1
+                            //   Operand4 <  0  → Ref-Slot receiver，值 = -1 - receiverStructRefOffset
+                            //                    receiverStructRefOffset 只在 FRAME_REF + same-method 场景有效
+                            if (localInfos[r2].IsRef)
+                                op.Operand4 = -1 - localInfos[r2].RefOffset;
+                            else if (op.Operand4 == 1)
                                 op.Operand4 = localInfos[r2].RefOffset + 1;
                             else
                                 op.Operand4 = 0;
@@ -372,7 +465,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
                             int fpo = op.Operand2 & 0xFFFF;
                             op.Operand2 = (localInfos[r1].RefOffset << 16) | fpo;
-                            if (op.Operand4 == 1)
+                            if (localInfos[r2].IsRef)
+                                op.Operand4 = -1 - localInfos[r2].RefOffset;
+                            else if (op.Operand4 == 1)
                                 op.Operand4 = localInfos[r2].RefOffset + 1;
                             else
                                 op.Operand4 = 0;
@@ -394,7 +489,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             short r2 = op.Register2;
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
-                            if (op.Operand4 == 1)
+                            if (localInfos[r1].IsRef)
+                                op.Operand4 = -1 - localInfos[r1].RefOffset;
+                            else if (op.Operand4 == 1)
                                 op.Operand4 = localInfos[r1].RefOffset + 1;
                             else
                                 op.Operand4 = 0;
@@ -408,7 +505,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
                             int fpo = op.Operand2 & 0xFFFF;
                             op.Operand2 = (localInfos[r2].RefOffset << 16) | fpo;
-                            if (op.Operand4 == 1)
+                            if (localInfos[r1].IsRef)
+                                op.Operand4 = -1 - localInfos[r1].RefOffset;
+                            else if (op.Operand4 == 1)
                                 op.Operand4 = localInfos[r1].RefOffset + 1;
                             else
                                 op.Operand4 = 0;
@@ -533,33 +632,19 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 List<ushort> refSrc = new List<ushort>();
                                 List<ushort> refDst = new List<ushort>();
                                 
-                                bool isValueTypeNewobj = op.Code == OpCodeREnum.Newobj &&
-                                    targetMethod.DeclearingType is CLR.TypeSystem.ILType vtNewobjType &&
-                                    vtNewobjType.IsValueType && !vtNewobjType.IsEnum;
-
-                                if (isValueTypeNewobj)
-                                {
-                                    short dstReg = op.Register1;
-                                    var dstInfo = localInfos[dstReg];
-                                    var thisInfo = paramInfos[0];
-                                    if (thisInfo.Size > 0)
-                                    {
-                                        primSrc.Add((ushort)dstInfo.Offset);
-                                        primDst.Add((ushort)thisInfo.Offset);
-                                        primSize.Add((ushort)thisInfo.Size);
-                                    }
-                                    for (int r = 0; r < thisInfo.RefCount; r++)
-                                    {
-                                        refSrc.Add((ushort)(dstInfo.RefOffset + r));
-                                        refDst.Add((ushort)(thisInfo.RefOffset + r));
-                                    }
-                                }
-
                                 for (int p = 0; p < pCnt; p++)
                                 {
                                     var srcInfo = localInfos[srcRegs[p]];
                                     int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
                                     var dstInfo = paramInfos[dstIndex];
+
+                                    if (srcInfo.IsRef != dstInfo.IsRef)
+                                        throw new InvalidProgramException(
+                                            "Neo call argument Ref Slot layout does not match the callee parameter ABI.");
+                                    if (dstInfo.IsRef && (srcInfo.Size != 8 || dstInfo.Size != 8 ||
+                                        srcInfo.RefCount != 0 || dstInfo.RefCount != 0))
+                                        throw new InvalidProgramException(
+                                            "Neo managed-pointer arguments must use an 8-byte Ref Slot.");
                                     
                                     if (dstInfo.Size > 0)
                                     {
@@ -650,7 +735,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 int dstIndex = isNewobj ? p + 1 : p;
                 CLR.TypeSystem.IType paramType;
                 if (ilm.HasThis && !isNewobj && p == 0)
-                    paramType = ilm.DeclearingType;
+                    paramType = ilm.DeclearingType.IsValueType
+                        ? ilm.DeclearingType.MakeByRefType()
+                        : ilm.DeclearingType;
                 else
                     paramType = ilm.Parameters[p - ((ilm.HasThis && !isNewobj) ? 1 : 0)];
 
@@ -665,7 +752,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             slot.Offset = offset;
             slot.RefOffset = refOffset;
 
-            if (type.IsPrimitive || (type.TypeForCLR != null && type.TypeForCLR.IsEnum))
+            if (type.IsByRef)
+            {
+                slot.Size = 8;
+                slot.RefCount = 0;
+                slot.IsRef = true;
+                offset += 8;
+            }
+            else if (type.IsPrimitive || (type.TypeForCLR != null && type.TypeForCLR.IsEnum))
             {
                 slot.Size = domain.GetPrimitiveSize(type);
                 offset += slot.Size;

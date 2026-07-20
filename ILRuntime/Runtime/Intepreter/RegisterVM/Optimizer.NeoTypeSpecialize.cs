@@ -280,6 +280,32 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         resultType = appdomain.ObjectType;
                         hasResult = true;
                         break;
+                    case OpCodeREnum.Ldind_I:
+                    case OpCodeREnum.Ldind_I1:
+                    case OpCodeREnum.Ldind_I2:
+                    case OpCodeREnum.Ldind_I4:
+                    case OpCodeREnum.Ldind_U1:
+                    case OpCodeREnum.Ldind_U2:
+                    case OpCodeREnum.Ldind_U4:
+                        resultType = appdomain.IntType;
+                        hasResult = true;
+                        break;
+                    case OpCodeREnum.Ldind_I8:
+                        resultType = appdomain.LongType;
+                        hasResult = true;
+                        break;
+                    case OpCodeREnum.Ldind_R4:
+                        resultType = appdomain.FloatType;
+                        hasResult = true;
+                        break;
+                    case OpCodeREnum.Ldind_R8:
+                        resultType = appdomain.DoubleType;
+                        hasResult = true;
+                        break;
+                    case OpCodeREnum.Ldind_Ref:
+                        resultType = appdomain.ObjectType;
+                        hasResult = true;
+                        break;
                     case OpCodeREnum.Ldfld_Value:
                         {
                             var t = appdomain.GetType(op.Operand);
@@ -333,9 +359,24 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         break;
                     case OpCodeREnum.Ldsfld:
+                        {
+                            var t = appdomain.GetType(op.Operand);
+                            if (t != null)
+                            {
+                                resultType = t;
+                                hasResult = true;
+                            }
+                        }
+                        break;
                     case OpCodeREnum.Ldsflda:
-                        resultType = appdomain.ObjectType;
-                        hasResult = true;
+                        {
+                            var t = appdomain.GetType(op.Operand);
+                            if (t != null)
+                            {
+                                resultType = t.MakeByRefType();
+                                hasResult = true;
+                            }
+                        }
                         break;
                     case OpCodeREnum.Ldtoken:
                         resultType = appdomain.ObjectType;
@@ -379,14 +420,29 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             hasResult = true;
                         }
                         break;
-                    case OpCodeREnum.Ldelema:
                     case OpCodeREnum.Ldloca:
                     case OpCodeREnum.Ldloca_S:
                     case OpCodeREnum.Ldarga:
                     case OpCodeREnum.Ldarga_S:
-                    case OpCodeREnum.Ldflda:
+                        {
+                            IType srcType = GetRegisterTypeFromList(currentTypes, op.Register2);
+                            resultType = srcType.MakeByRefType();
+                            hasResult = true;
+                        }
+                        break;
+                    case OpCodeREnum.Ldelema:
                         resultType = appdomain.IntType;
                         hasResult = true;
+                        break;
+                    case OpCodeREnum.Ldflda:
+                        {
+                            var t = appdomain.GetType(op.Operand);
+                            if (t != null)
+                            {
+                                resultType = t.MakeByRefType();
+                                hasResult = true;
+                            }
+                        }
                         break;
                     case OpCodeREnum.Dup:
                         resultType = GetRegisterTypeFromList(currentTypes, op.Register2);
@@ -435,6 +491,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         {
             if (a == null || b == null) return true;
             if (ReferenceEquals(a, b)) return true;
+            if (a.IsByRef || b.IsByRef)
+                return a.IsByRef && b.IsByRef;
             int aSize, aRef, bSize, bRef;
             ClassifySlot(a, out aSize, out aRef);
             ClassifySlot(b, out bSize, out bRef);
@@ -447,6 +505,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         static void ClassifySlot(IType t, out int size, out int refCount)
         {
+            if (t.IsByRef)
+            {
+                size = 8;
+                refCount = 0;
+                return;
+            }
             if (t.IsPrimitive)
             {
                 var clr = t.TypeForCLR;

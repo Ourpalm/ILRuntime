@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,6 +60,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         bool postPropagation = false;
                         bool ended = false;
                         bool propagationInline = false;
+                        // Tracks byref registers whose value currently points at xSrc's storage
+                        // (produced by Ldloca/Ldarga(xSrc), Ldflda(alias), Move(alias) within the
+                        // propagation window). An indirect write through any alias is semantically
+                        // equivalent to a direct write to xSrc, so it must terminate propagation
+                        // just like `yDst == xSrc` below. Preserves struct copy propagation while
+                        // preventing use-after-source-mutation reads from being rewritten.
+                        HashSet<short> xSrcAliases = null;
                         for (int j = i + 1; j < lst.Count; j++)
                         {
                             OpCodeR Y = lst[j];
@@ -70,7 +77,89 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 propagationInline = false;
                             }
                             short ySrc, ySrc2, ySrc3;
-                            if (GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3))
+                            bool hasYSrc = GetOpcodeSourceRegister(ref Y, hasReturn, out ySrc, out ySrc2, out ySrc3);
+                            // Update alias set BEFORE consuming Y so that a producer instruction
+                            // adds its dest, and an alias-consuming write in the same instruction
+                            // (writer receiver ∈ aliases) is detected together with alias updates.
+                            bool indirectWriteToXSrc = false;
+                            switch (Y.Code)
+                            {
+                                case OpCodeREnum.Ldloca:
+                                case OpCodeREnum.Ldloca_S:
+                                case OpCodeREnum.Ldarga:
+                                case OpCodeREnum.Ldarga_S:
+                                    if (Y.Register2 == xSrc || (xSrcAliases != null && xSrcAliases.Contains(Y.Register2)))
+                                    {
+                                        if (xSrcAliases == null) xSrcAliases = new HashSet<short>();
+                                        xSrcAliases.Add(Y.Register1);
+                                    }
+                                    else if (xSrcAliases != null)
+                                    {
+                                        xSrcAliases.Remove(Y.Register1);
+                                    }
+                                    break;
+                                case OpCodeREnum.Ldflda:
+                                    if (xSrcAliases != null && xSrcAliases.Contains(Y.Register2))
+                                    {
+                                        xSrcAliases.Add(Y.Register1);
+                                    }
+                                    else if (xSrcAliases != null)
+                                    {
+                                        xSrcAliases.Remove(Y.Register1);
+                                    }
+                                    break;
+                                case OpCodeREnum.Move:
+                                    if (xSrcAliases != null && xSrcAliases.Contains(Y.Register2))
+                                    {
+                                        xSrcAliases.Add(Y.Register1);
+                                    }
+                                    else if (xSrcAliases != null)
+                                    {
+                                        xSrcAliases.Remove(Y.Register1);
+                                    }
+                                    break;
+                                case OpCodeREnum.Stfld:
+                                case OpCodeREnum.Stfld_I1:
+                                case OpCodeREnum.Stfld_I2:
+                                case OpCodeREnum.Stfld_I4:
+                                case OpCodeREnum.Stfld_I8:
+                                case OpCodeREnum.Stfld_U1:
+                                case OpCodeREnum.Stfld_U2:
+                                case OpCodeREnum.Stfld_U4:
+                                case OpCodeREnum.Stfld_U8:
+                                case OpCodeREnum.Stfld_R4:
+                                case OpCodeREnum.Stfld_R8:
+                                case OpCodeREnum.Stfld_Ref:
+                                case OpCodeREnum.Stfld_Value:
+                                case OpCodeREnum.Stind_I:
+                                case OpCodeREnum.Stind_I1:
+                                case OpCodeREnum.Stind_I2:
+                                case OpCodeREnum.Stind_I4:
+                                case OpCodeREnum.Stind_I8:
+                                case OpCodeREnum.Stind_R4:
+                                case OpCodeREnum.Stind_R8:
+                                case OpCodeREnum.Stind_Ref:
+                                case OpCodeREnum.Stobj:
+                                case OpCodeREnum.Initobj:
+                                    if (xSrcAliases != null && xSrcAliases.Contains(Y.Register1))
+                                        indirectWriteToXSrc = true;
+                                    break;
+                                case OpCodeREnum.Call:
+                                case OpCodeREnum.Callvirt:
+                                case OpCodeREnum.Callvirt_IL:
+                                case OpCodeREnum.Callvirt_CLR:
+                                case OpCodeREnum.Call_Redirect:
+                                case OpCodeREnum.Newobj:
+                                    if (xSrcAliases != null && (
+                                        xSrcAliases.Contains(Y.Register2) ||
+                                        xSrcAliases.Contains(Y.Register3) ||
+                                        xSrcAliases.Contains(Y.Register4)))
+                                        indirectWriteToXSrc = true;
+                                    break;
+                            }
+                            if (indirectWriteToXSrc)
+                                postPropagation = true;
+                            if (hasYSrc)
                             {
                                 bool replaced = false;
                                 if (ySrc >= 0 && ySrc == xDst)

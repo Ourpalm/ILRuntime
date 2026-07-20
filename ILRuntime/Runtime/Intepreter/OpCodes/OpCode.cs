@@ -203,7 +203,12 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Stfld_U8:
                 case OpCodeREnum.Stfld_R4:
                 case OpCodeREnum.Stfld_R8:
-                    if (Operand4 != 0)
+                    if (Operand4 < 0)
+                    {
+                        nameSuffix = ".ref";
+                        param = string.Format("r{0}, r{1}, primOff={2}", Register1, Register2, Operand2);
+                    }
+                    else if (Operand4 > 0)
                     {
                         nameSuffix = ".inline";
                         param = string.Format("r{0}, r{1}, primOff={2}", Register1, Register2, Operand2);
@@ -218,7 +223,12 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     break;
                 case OpCodeREnum.Ldfld_Ref:
                 case OpCodeREnum.Stfld_Ref:
-                    if (Operand4 != 0)
+                    if (Operand4 < 0)
+                    {
+                        nameSuffix = ".ref";
+                        param = string.Format("r{0}, r{1}, primOff={2},refOff={3}", Register1, Register2, Operand2, Operand3);
+                    }
+                    else if (Operand4 > 0)
                     {
                         nameSuffix = ".inline";
                         param = string.Format("r{0}, r{1}, primOff={2},refOff={3},slotRO={4}", Register1, Register2, Operand2, Operand3, Operand4 - 1);
@@ -233,7 +243,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                     break;
                 case OpCodeREnum.Ldfld_Value:
                 case OpCodeREnum.Stfld_Value:
-                    if (Operand4 != 0)
+                    if (Operand4 < 0)
+                        nameSuffix = ".ref";
+                    else if (Operand4 > 0)
                         nameSuffix = ".inline";
                     param = string.Format("r{0}, r{1}, sz={2}(fpo=0x{3:x},fro={4},o2h={5},refCnt={6})",
                         Register1, Register2, Operand,

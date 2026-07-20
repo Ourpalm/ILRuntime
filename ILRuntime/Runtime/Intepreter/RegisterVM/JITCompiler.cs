@@ -23,6 +23,23 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         R8 = 5,
     }
 
+    internal enum NeoStaticFieldKind : int
+    {
+        I1 = 0,
+        U1 = 1,
+        I2 = 2,
+        U2 = 3,
+        I4 = 4,
+        U4 = 5,
+        I8 = 6,
+        U8 = 7,
+        R4 = 8,
+        R8 = 9,
+        Boolean = 10,
+        Reference = 11,
+        Value = 12,
+    }
+
     struct NeoCallParamMap
     {
         public ushort[] PrimitiveSrc;
@@ -38,6 +55,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public int RefOffset;
         public int Size;
         public int RefCount;
+#if ENABLE_NEO_MODE
+        // Neo mode: true when this slot holds an 8-byte Ref Slot (managed pointer,
+        // (objectIndex:int, offset:int)). Produced by ldloca/ldarga/ldflda/ldsflda
+        // and struct-this params. Lets Ldfld_*/Stfld_* lowering pick the
+        // Ref-Slot-receiver variant without a runtime table lookup (design §2.5/§15).
+        public bool IsRef;
+#endif
     }
     struct CompiledFrame
     {
@@ -418,6 +442,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             frame.CodeBody = res.ToArray();
 #if ENABLE_NEO_MODE
             AllocateLocalStackSpaces(ref frame, registerTypes);
+            PropagateByRefReferentOffsets(ref frame);
             // Keep frame.CodeBody in register-index form (used by inliner,
             // debugger, optimization passes when this method is later inlined).
             // ExecuteNeo runs against a lowered copy where Register1/2/3 hold
@@ -459,14 +484,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 StackSlotInfo slot = default;
                 if (declaringType.IsValueType)
                 {
-                    int size = declaringType.TotalPrimitiveSize;
-                    int refSize = declaringType.TotalReferenceCount;
                     slot.Offset = offset;
                     slot.RefOffset = refOffset;
-                    slot.Size = size;
-                    slot.RefCount = refSize;
-                    offset += size;
-                    refOffset += refSize;
+                    slot.Size = 8;
+                    slot.RefCount = 0;
+                    slot.IsRef = true;
+                    offset += 8;
                 }
                 else
                 {
@@ -487,7 +510,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 var pDef = def.Parameters[i];
                 var pt = appdomain.GetType(pDef.ParameterType, declaringType, method);
                 StackSlotInfo slot = AllocateSlotForType(pt, ref offset, ref refOffset);
-                if (!pt.IsPrimitive && !pt.IsValueType)
+                if (!pt.IsByRef && !pt.IsPrimitive && !pt.IsValueType)
                     localIsRef[paramIdx] = true;
                 paramInfo[paramIdx] = slot;
                 localInfo[paramIdx] = slot;
@@ -516,7 +539,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 if (regType != null)
                 {
                     slot = AllocateSlotForType(regType, ref offset, ref refOffset);
-                    if (!regType.IsPrimitive && !regType.IsValueType)
+                    if (!slot.IsRef && !regType.IsPrimitive && !regType.IsValueType)
                     {
                         localIsRef[reg] = true;
                     }
@@ -554,10 +577,93 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             frame.ReturnRefCount = retRef;
         }
 
+        // Fill IsRef=true byref slots' RefOffset field with the referent struct's RefOffset,
+        // which is the Neo Ref-Slot encoding's "receiverStructRefOffset" (see Optimizer.Neo.cs
+        // lowering: Operand4 = -1 - localInfos[reg].RefOffset for Ref-Slot receivers).
+        //
+        // Producers of byref slots and how the referent RefOffset is derived:
+        //   Ldloca/Ldarga: RefOffset of the source local/parameter slot
+        //   Ldflda:        RefOffset of the receiver + field.ReferenceOffset
+        //                  (encoded on the ldflda op at translate time)
+        //   Ldsflda:       0 (static storage lives on ILType.StaticInstance heap)
+        void PropagateByRefReferentOffsets(ref CompiledFrame frame)
+        {
+            var body = frame.CodeBody;
+            var locals = frame.LocalInfos;
+            for (int i = 0; i < body.Length; i++)
+            {
+                var op = body[i];
+                switch (op.Code)
+                {
+                    case OpCodeREnum.Ldloca:
+                    case OpCodeREnum.Ldloca_S:
+                    case OpCodeREnum.Ldarga:
+                    case OpCodeREnum.Ldarga_S:
+                        {
+                            short dst = op.Register1;
+                            short src = op.Register2;
+                            if (dst >= 0 && dst < locals.Length && src >= 0 && src < locals.Length && locals[dst].IsRef)
+                            {
+                                var slot = locals[dst];
+                                slot.RefOffset = locals[src].RefOffset;
+                                locals[dst] = slot;
+                            }
+                        }
+                        break;
+                    case OpCodeREnum.Ldflda:
+                        {
+                            short dst = op.Register1;
+                            if (dst >= 0 && dst < locals.Length && locals[dst].IsRef)
+                            {
+                                // Ldflda referent RefOffset = receiver.RefOffset + field.ReferenceOffset.
+                                // The field's ReferenceOffset is not yet encoded on the Ldflda op
+                                // (Operand3 currently stores declaring-type hash). Extending Ldflda
+                                // encoding is scheduled for the Ldflda-through-Ref-Slot path.
+                                // Leave RefOffset=0 default here; runtime paths that only need the
+                                // primitive-offset side (Operand2) are unaffected.
+#if DEBUG
+                                // Placeholder so producers of Ldflda that later feed Stfld_Ref via
+                                // a byref slot show up while this path is unimplemented.
+#endif
+                            }
+                        }
+                        break;
+                    case OpCodeREnum.Ldsflda:
+                        {
+                            short dst = op.Register1;
+                            if (dst >= 0 && dst < locals.Length && locals[dst].IsRef)
+                            {
+                                var slot = locals[dst];
+                                slot.RefOffset = 0;
+                                locals[dst] = slot;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
         StackSlotInfo AllocateSlotForType(IType t, ref int offset, ref int refOffset)
         {
             StackSlotInfo slot = default;
-            if (t.IsPrimitive)
+            if (t.IsByRef)
+            {
+                // Managed pointer (&T): an 8-byte Ref Slot holding (objectIndex:int, offset:int).
+                // Produced by ldloca/ldarga/ldflda/ldsflda. Design §15.5: byref slot is 8 bytes,
+                // no managed reference count (frame refs stay positional in mStack).
+                //
+                // For IsRef=true slots, StackSlotInfo.RefOffset is repurposed: it stores the
+                // referent struct's RefOffset (used by Neo Ref-Slot receiver encoding), not the
+                // allocator's counter. The real value is filled in later by
+                // PropagateByRefReferentOffsets after scanning ldloca/ldarga/ldflda producers.
+                slot.Offset = offset;
+                slot.RefOffset = 0;
+                slot.Size = 8;
+                slot.RefCount = 0;
+                slot.IsRef = true;
+                offset += 8;
+            }
+            else if (t.IsPrimitive)
             {
                 int size = appdomain.GetPrimitiveSize(t);
                 // Neo stack slots widen sub-int primitives (bool / byte / sbyte / short / ushort / char)
@@ -930,13 +1036,33 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                     break;
                 case Code.Ldsfld:
+                    op.Register1 = baseRegIdx++;
+#if ENABLE_NEO_MODE
+                    EncodeNeoStaticField(ref op, token);
+#else
+                    op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+#endif
+                    break;
                 case Code.Ldsflda:
                     op.Register1 = baseRegIdx++;
+#if ENABLE_NEO_MODE
+                    {
+                        var offset = appdomain.GetStaticFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
+                        op.Operand = method.GetTypeTokenHashCode(((FieldReference)token).FieldType);
+                        op.Operand2 = offset.PrimitiveOffset;
+                        op.Operand3 = type.GetHashCode();
+                    }
+#else
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+#endif
                     break;
                 case Code.Stsfld:
                     op.Register1 = --baseRegIdx;
+#if ENABLE_NEO_MODE
+                    EncodeNeoStaticField(ref op, token);
+#else
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+#endif
                     break;
                 case Code.Initobj:
                     op.Register1 = --baseRegIdx;
@@ -1168,6 +1294,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Conv_U8:
                 case Code.Ldlen:
                 case Code.Ldind_I:
+                case Code.Ldind_I1:
                 case Code.Ldind_I2:
                 case Code.Ldind_I4:
                 case Code.Ldind_I8:
@@ -1208,17 +1335,34 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Operand2 = offset.PrimitiveOffset;
                                 op.Operand3 = offset.ReferenceOffset;
                             }
+                            // Candidate only. LowerNeoOffsets makes the final receiver
+                            // decision from StackSlotInfo.IsRef:
+                            //   < 0 Ref Slot, > 0 same-frame inline, 0 heap object.
                             op.Operand4 = (type.IsValueType && !type.IsEnum) ? 1 : 0;
                         }
                         else
+                        {
+                            if (fieldType.IsPrimitive || !fieldType.IsValueType)
+                                op.Code = GetLdfldCodeForType(fieldType);
                             op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
+                            op.Operand4 = 0;
+                        }
                     }
                     break;
 #endif
                 case Code.Ldflda:
                     op.Register1 = (short)(baseRegIdx - 1);
                     op.Register2 = (short)(baseRegIdx - 1);
+#if ENABLE_NEO_MODE
+                    {
+                        var offset = appdomain.GetFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
+                        op.Operand = method.GetTypeTokenHashCode(((FieldReference)token).FieldType);
+                        op.Operand2 = offset.PrimitiveOffset;
+                        op.Operand3 = type.GetHashCode();
+                    }
+#else
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
+#endif
                     break;
                 case Code.Stfld:
                     op.Register1 = (short)(baseRegIdx - 2);
@@ -1241,10 +1385,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Operand2 = offset.PrimitiveOffset;
                                 op.Operand3 = offset.ReferenceOffset;
                             }
+                            // Candidate only; the receiver slot layout decides the
+                            // final heap / inline / Ref Slot variant during lowering.
                             op.Operand4 = (type.IsValueType && !type.IsEnum) ? 1 : 0;
                         }
                         else
+                        {
+                            if (fieldType.IsPrimitive || !fieldType.IsValueType)
+                                op.Code = GetStfldCodeForType(fieldType);
                             op.OperandLong = ((long)type.GetHashCode() << 32) | (uint)offset.PrimitiveOffset;
+                            op.Operand4 = 0;
+                        }
                     }
 #else
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
@@ -1316,6 +1467,66 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 block.NeedLoadConstantElimination = Optimizer.IsLoadConstant(op.Code);
         }
 #if ENABLE_NEO_MODE
+        void EncodeNeoStaticField(ref OpCodeR op, object token)
+        {
+            var offset = appdomain.GetStaticFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
+            op.Operand = method.GetTypeTokenHashCode(((FieldReference)token).FieldType);
+            op.Operand2 = type.GetHashCode();
+            if (type is ILType)
+                op.Operand3 = ((offset.ReferenceOffset & 0xFFFF) << 16) | (offset.PrimitiveOffset & 0xFFFF);
+            else
+                op.Operand3 = offset.PrimitiveOffset;
+
+            NeoStaticFieldKind kind;
+            if (fieldType.IsPrimitive || fieldType.IsEnum)
+            {
+                if (fieldType == appdomain.BoolType) kind = NeoStaticFieldKind.Boolean;
+                else if (fieldType == appdomain.SByteType) kind = NeoStaticFieldKind.I1;
+                else if (fieldType == appdomain.ByteType) kind = NeoStaticFieldKind.U1;
+                else if (fieldType == appdomain.ShortType) kind = NeoStaticFieldKind.I2;
+                else if (fieldType == appdomain.UShortType || fieldType == appdomain.CharType) kind = NeoStaticFieldKind.U2;
+                else if (fieldType == appdomain.IntType) kind = NeoStaticFieldKind.I4;
+                else if (fieldType == appdomain.UIntType) kind = NeoStaticFieldKind.U4;
+                else if (fieldType == appdomain.LongType || fieldType == appdomain.IntPtrType) kind = NeoStaticFieldKind.I8;
+                else if (fieldType == appdomain.ULongType) kind = NeoStaticFieldKind.U8;
+                else if (fieldType == appdomain.FloatType) kind = NeoStaticFieldKind.R4;
+                else if (fieldType == appdomain.DoubleType) kind = NeoStaticFieldKind.R8;
+                else
+                {
+                    Type clr = fieldType.TypeForCLR;
+                    if (clr != null && clr.IsEnum)
+                    {
+                        clr = Enum.GetUnderlyingType(clr);
+                        switch (Type.GetTypeCode(clr))
+                        {
+                            case TypeCode.SByte: kind = NeoStaticFieldKind.I1; break;
+                            case TypeCode.Byte: kind = NeoStaticFieldKind.U1; break;
+                            case TypeCode.Int16: kind = NeoStaticFieldKind.I2; break;
+                            case TypeCode.UInt16: kind = NeoStaticFieldKind.U2; break;
+                            case TypeCode.Int32: kind = NeoStaticFieldKind.I4; break;
+                            case TypeCode.UInt32: kind = NeoStaticFieldKind.U4; break;
+                            case TypeCode.Int64: kind = NeoStaticFieldKind.I8; break;
+                            case TypeCode.UInt64: kind = NeoStaticFieldKind.U8; break;
+                            default: throw new NotSupportedException("Neo static enum underlying type is unsupported: " + clr);
+                        }
+                    }
+                    else
+                        throw new NotSupportedException("Neo static primitive type is unsupported: " + fieldType);
+                }
+            }
+            else if (fieldType is ILType valueType && fieldType.IsValueType)
+            {
+                kind = NeoStaticFieldKind.Value;
+                op.Operand4 = ((valueType.TotalPrimitiveSize & 0xFFFF) << 16) |
+                    ((valueType.TotalReferenceCount & 0xFF) << 8);
+            }
+            else if (fieldType.IsValueType)
+                kind = NeoStaticFieldKind.Value;
+            else
+                kind = NeoStaticFieldKind.Reference;
+            op.Operand4 |= (int)kind;
+        }
+
         OpCodeREnum GetLdfldCodeForType(IType fieldType)
         {
             OpCodeREnum res = OpCodeREnum.Ldfld_Ref;

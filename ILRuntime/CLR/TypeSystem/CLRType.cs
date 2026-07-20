@@ -34,6 +34,7 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, CLRFieldGetterDelegate> fieldGetterCache;
         Dictionary<int, CLRFieldSetterDelegate> fieldSetterCache;
         Dictionary<int, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>> fieldBindingCache;
+        Dictionary<int, KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>> fieldNeoBindingCache;
         StackObject defaultObject;
 
         Dictionary<int, int> fieldIdxMapping;
@@ -449,6 +450,136 @@ namespace ILRuntime.CLR.TypeSystem
                 return false;
         }
 
+        /// <summary>
+        /// Read a CLR field into Neo's byte* frame layout: primitive fields fill their native width
+        /// (sub-int extended to a 4-byte slot), reference fields write into mStack[dstRefBase] and
+        /// store `dstRefBase` (or -1 for null) into the 4-byte primitive slot.
+        /// Prefers the registered <see cref="CLRFieldNeoGetterDelegate"/> (zero boxing).
+        /// Falls back to reflection + boxing dispatch by field type when no binding is registered.
+        /// </summary>
+#if ENABLE_NEO_MODE
+        public unsafe void CopyFieldToNeoFrame(int hash, object target, Runtime.Intepreter.ILIntepreter intp, byte* dst, int dstRefBase, AutoList mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            var neoBinding = GetFieldNeoBinding(hash);
+            if (neoBinding.Key != null)
+            {
+                neoBinding.Key(ref target, intp, dst, dstRefBase, mStack);
+                return;
+            }
+
+            var fi = GetField(hash);
+            if (fi == null)
+                throw new MissingFieldException($"CLR field 0x{hash:X8} not found on {TypeForCLR}");
+            CopyValueToNeoFrame(fi.FieldType, fi.GetValue(target), dst, dstRefBase, mStack);
+        }
+
+        /// <summary>
+        /// Write a CLR field from Neo's byte* frame layout, prefers the registered
+        /// <see cref="CLRFieldNeoSetterDelegate"/> (zero boxing) and falls back to reflection.
+        /// </summary>
+        public unsafe void AssignFieldFromNeoFrame(int hash, ref object target, Runtime.Intepreter.ILIntepreter intp, byte* src, AutoList mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            var neoBinding = GetFieldNeoBinding(hash);
+            if (neoBinding.Value != null)
+            {
+                neoBinding.Value(ref target, intp, src, mStack);
+                return;
+            }
+
+            var fi = GetField(hash);
+            if (fi == null)
+                throw new MissingFieldException($"CLR field 0x{hash:X8} not found on {TypeForCLR}");
+            object value = ReadValueFromNeoFrame(fi.FieldType, src, mStack);
+            fi.SetValue(target, value);
+        }
+
+        /// <summary>
+        /// Static-field variants of <see cref="CopyFieldToNeoFrame"/> / <see cref="AssignFieldFromNeoFrame"/>.
+        /// The bindings themselves ignore the target argument for static fields; the reflection
+        /// fallback passes null.
+        /// </summary>
+        public unsafe void CopyStaticFieldToNeoFrame(int hash, Runtime.Intepreter.ILIntepreter intp, byte* dst, int dstRefBase, AutoList mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            var neoBinding = GetFieldNeoBinding(hash);
+            if (neoBinding.Key != null)
+            {
+                object target = null;
+                neoBinding.Key(ref target, intp, dst, dstRefBase, mStack);
+                return;
+            }
+
+            var fi = GetField(hash);
+            if (fi == null)
+                throw new MissingFieldException($"CLR static field 0x{hash:X8} not found on {TypeForCLR}");
+            CopyValueToNeoFrame(fi.FieldType, fi.GetValue(null), dst, dstRefBase, mStack);
+        }
+
+        public unsafe void AssignStaticFieldFromNeoFrame(int hash, Runtime.Intepreter.ILIntepreter intp, byte* src, AutoList mStack)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            var neoBinding = GetFieldNeoBinding(hash);
+            if (neoBinding.Value != null)
+            {
+                object target = null;
+                neoBinding.Value(ref target, intp, src, mStack);
+                return;
+            }
+
+            var fi = GetField(hash);
+            if (fi == null)
+                throw new MissingFieldException($"CLR static field 0x{hash:X8} not found on {TypeForCLR}");
+            object value = ReadValueFromNeoFrame(fi.FieldType, src, mStack);
+            fi.SetValue(null, value);
+        }
+
+        unsafe void CopyValueToNeoFrame(Type ft, object value, byte* dst, int dstRefBase, AutoList mStack)
+        {
+            if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr))
+            {
+                // Reuse the shared Neo primitive marshaller (mirror of WriteNeoPrimitive used by
+                // InvocationFrame / CLR-return paths). Widening + enum semantics live there.
+                var it = appdomain.GetType(ft);
+                Runtime.Intepreter.ILIntepreter.WriteNeoPrimitive(dst, it, value);
+                return;
+            }
+            if (ft.IsValueType)
+                throw new NotImplementedException($"Neo CopyFieldToNeoFrame fallback for CLR value type field '{ft.FullName}' is not implemented (Step 15 binding generator will emit direct writers).");
+
+            // Reference type: reserve a stable slot and record either the index or -1 sentinel.
+            if (value != null)
+            {
+                mStack[dstRefBase] = value;
+                *(int*)dst = dstRefBase;
+            }
+            else
+            {
+                mStack[dstRefBase] = null;
+                *(int*)dst = -1;
+            }
+        }
+
+        unsafe object ReadValueFromNeoFrame(Type ft, byte* src, AutoList mStack)
+        {
+            if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr))
+            {
+                var it = appdomain.GetType(ft);
+                return Runtime.Intepreter.ILIntepreter.ReadNeoPrimitive(src, it);
+            }
+            if (ft.IsValueType)
+                throw new NotImplementedException($"Neo AssignFieldFromNeoFrame fallback for CLR value type field '{ft.FullName}' is not implemented (Step 15 binding generator will emit direct readers).");
+
+            int idx = *(int*)src;
+            return idx < 0 ? null : mStack[idx];
+        }
+#endif
+
         public void SetStaticFieldValue(int hash, object value)
         {
             if (fieldMapping == null)
@@ -500,6 +631,18 @@ namespace ILRuntime.CLR.TypeSystem
                 return ((CLRType)BaseType).GetFieldBinding(hash);
             else
                 return default(KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>);
+        }
+
+        KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate> GetFieldNeoBinding(int hash)
+        {
+            var dic = fieldNeoBindingCache;
+            KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate> res;
+            if (dic != null && dic.TryGetValue(hash, out res))
+                return res;
+            else if (BaseType != null)
+                return ((CLRType)BaseType).GetFieldNeoBinding(hash);
+            else
+                return default(KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>);
         }
 
         private CLRFieldGetterDelegate GetFieldGetter(int hash)
@@ -642,6 +785,13 @@ namespace ILRuntime.CLR.TypeSystem
                 {
                     if (fieldBindingCache == null) fieldBindingCache = new Dictionary<int, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>>();
                     fieldBindingCache[hashCode] = binding;
+                }
+
+                KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate> neoBinding;
+                if (AppDomain.FieldNeoBindingMap.TryGetValue(i, out neoBinding))
+                {
+                    if (fieldNeoBindingCache == null) fieldNeoBindingCache = new Dictionary<int, KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>>();
+                    fieldNeoBindingCache[hashCode] = neoBinding;
                 }
             }
             if (orderedFieldTypes != null)

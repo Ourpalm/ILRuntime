@@ -11,7 +11,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             IType[] registerTypes = new IType[totalRegCnt];
             int idx = 0;
             if (method.HasThis)
-                registerTypes[idx++] = declaringType;
+                registerTypes[idx++] = declaringType.IsValueType
+                    ? declaringType.MakeByRefType()
+                    : declaringType;
             for (int i = 0; i < method.ParameterCount && idx < registerTypes.Length; i++, idx++)
             {
                 registerTypes[idx] = appdomain.GetType(def.Parameters[i].ParameterType, declaringType, method);

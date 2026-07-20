@@ -111,6 +111,29 @@ if (objRef->ObjectType == ObjectTypes.ValueTypeObjectReference) {
 - 不再需要 `CopyToStack`/`PopToRegister` 的参数传递
 - 不再需要 `shouldFix` 的 mStack 补偿
 
+## 2.5 基础抽象：Ref Slot（managed pointer 表示）
+
+Ref Slot 是 Neo 模式对 CLR managed pointer（`&T`）的统一表示，是一个**跨多个 step 共享的基础抽象**。ldloca/ldarga/ldflda/ldsflda 产生 Ref Slot，stind/ldind 以及 Ref-Slot-receiver 版本的 ldfld/stfld 消费 Ref Slot；struct 实例方法的 `this`、ref/out 参数、数组元素引用（ldelema）都基于它。本节把定义前置，后续章节（§15 ref/out、§16 CLR 对象、§22 数组、§25 ldelema）引用时以本节为准。
+
+每个 Ref Slot 占 **8 字节** = `(objectIndex: int, offset: int)`：
+
+```
+objectIndex == -1（FRAME_REF，帧内非托管内存）：
+  → offset = 相对 runtime stack 起始基址（RuntimeStack.nativePointer / StackBase）的【绝对】字节偏移
+  → 读写 *(T*)(stackBase + offset)
+  → 之所以用绝对偏移而非相对 frameBase：Ref Slot 跨帧传递时，被调方 frameBase 与调用方不同，
+    必须用与帧无关的绝对基址才能在被调方正确还原目标地址
+
+objectIndex >= 0（mStack 中的对象）：
+  → objectIndex = mStack index
+  → 运行时按 mStack[objectIndex] 的实际类型分派：
+    - ILTypeInstance → offset = 字段在 Primitives 中的 primitiveOffset（每次重取 Primitives 的 managed ref，GC 移动安全）
+    - CLR 对象       → offset = 字段 hash（FieldInfo.GetHashCode()），走 CLRType.GetFieldValue/SetFieldValue，值类型需回写 mStack[objectIndex]
+    - Array          → offset = elementIndex（数组元素读写）
+```
+
+具体每条指令如何产出/消费 Ref Slot 的语义细节见 §15（ldloca/ldflda/ldsflda/stind/ldind）。本节仅定义 8 字节 `(objectIndex, offset)` 的编码含义，不重复指令语义。
+
 ---
 
 ## 3. Neo 解释器的 Call 设计方案（已确定）
@@ -276,6 +299,19 @@ RuntimeStack.nativePointer 内的布局:
 - 每个 slot（无论是用户 local 还是编译器 temp）通过 `StackSlotInfo.Offset` 确定在帧内的字节偏移
 - 退帧时 `esp -= frameSize` 回退即可
 - BCP/FCP 优化减少 temp slot 数量 → 减小帧大小（但不影响正确性）
+
+**两种宽度规则并存**：
+
+Neo 中存在两套并行的宽度/对齐规则，二者不冲突，分别约束不同的内存域：
+
+- **独立帧内 primitive slot**（用户声明的 local + 编译器生成的 temp）按 CIL evaluation-stack 宽度分配：`bool`/`byte`/`sbyte`/`short`/`ushort`/`char` 一律 widen 到 4 字节。这保证 SlotLayoutCompatible 约束成立，整数运算指令（`Add`/`Ceq`/`Brtrue` 等）按 4 字节读写不会污染相邻 slot。
+- **struct 内部字段布局**（无论 struct 在堆 `ILTypeInstance.Primitives` 还是在帧上）按 CLR StructLayout 自然对齐，sub-int 字段占实际字节数（`bool`/`byte`=1，`short`/`ushort`/`char`=2）。
+
+跨越这两个域的读写必须在指令 handler 内做宽度转换：
+
+- `Ldfld_*` / `Ldsfld_*` / `Ldind_*` 把 sub-int 字段（1/2 字节）加载到 4 字节独立 slot 时，**有符号类型做符号扩展**（`*(int*)dst = *(sbyte*)src` / `*(int*)dst = *(short*)src`），**无符号类型做零扩展**（`*(int*)dst = *(byte*)src` / `*(uint*)dst = *(ushort*)src`）。否则 4 字节 slot 的高位会保留上一次残值，后续按 4 字节读取时结果错误。
+- 反向 `Stfld_*` / `Stsfld_*` / `Stind_*` 从 4 字节独立 slot 写回 sub-int 字段时，按字段宽度截断写低位即可，高位丢弃是正常语义。
+- `Move` / `Move_Vt` 在独立 slot 之间搬运数据时按 slot 宽度整体拷贝，不涉及扩展/截断（源和目标都是 evaluation-stack 宽度）。
 
 ### 4.4 为什么不再区分栈寄存器和局部变量
 

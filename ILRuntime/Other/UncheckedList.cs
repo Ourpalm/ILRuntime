@@ -399,6 +399,17 @@ namespace ILRuntime.Other
             Array.Copy(_items, index, array, arrayIndex, count);
         }
 
+        /// <summary>
+        /// Copies <paramref name="count"/> elements starting at <paramref name="sourceIndex"/> into
+        /// <paramref name="destination"/> starting at <paramref name="destinationIndex"/>. Uses
+        /// <see cref="Array.Copy(Array, int, Array, int, int)"/> which honors overlapping ranges
+        /// (memmove semantics) even when <paramref name="destination"/> refers to the same list.
+        /// </summary>
+        public void CopyTo(int sourceIndex, UncheckedList<T> destination, int destinationIndex, int count)
+        {
+            Array.Copy(_items, sourceIndex, destination._items, destinationIndex, count);
+        }
+
         public void CopyTo(T[] array, int arrayIndex)
         {
             // Delegate rest of error checking to Array.Copy.
@@ -1033,6 +1044,25 @@ namespace ILRuntime.Other
                 list.Capacity = list.Count + count;
             for (int i = 0; i < count; i++)
                 list.Add(default);
+        }
+
+        /// <summary>
+        /// Copies <paramref name="count"/> elements starting at <paramref name="sourceIndex"/> into
+        /// <paramref name="destination"/> starting at <paramref name="destinationIndex"/>. Matches
+        /// the signature of <see cref="UncheckedList{T}.CopyTo(int, UncheckedList{T}, int, int)"/>
+        /// so Neo interpreter hot paths and the CLR binding code generator can emit a single
+        /// <c>mStack.CopyTo(...)</c> call regardless of which container the AutoList alias resolves
+        /// to under the current build.
+        ///
+        /// The Release counterpart is backed by <see cref="System.Array.Copy(System.Array, int, System.Array, int, int)"/>
+        /// (memmove-safe); this DEBUG implementation performs a straight forward-iterating element
+        /// copy and does NOT guarantee memmove semantics. Callers must ensure the source and
+        /// destination ranges do not overlap (or that any overlap tolerates forward copy).
+        /// </summary>
+        public static void CopyTo<T>(this System.Collections.Generic.List<T> source, int sourceIndex, System.Collections.Generic.List<T> destination, int destinationIndex, int count)
+        {
+            for (int i = 0; i < count; i++)
+                destination[destinationIndex + i] = source[sourceIndex + i];
         }
     }
 }

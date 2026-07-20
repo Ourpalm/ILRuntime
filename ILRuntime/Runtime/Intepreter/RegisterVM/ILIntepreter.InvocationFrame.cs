@@ -1,5 +1,7 @@
 #if ENABLE_NEO_MODE
 using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 using ILRuntime.CLR.Method;
 using ILRuntime.CLR.TypeSystem;
@@ -173,7 +175,7 @@ namespace ILRuntime.Runtime.Intepreter
                     return null;
 
                 if (retType.IsPrimitive || retType.IsEnum)
-                    return NeoBoxReturnValue(retType, retDst, method.CompiledFrame.ReturnPrimitiveSize);
+                    return ReadNeoPrimitive(retDst, retType);
 
                 if (retType.IsValueType)
                     throw new NotImplementedException("Neo InvocationFrame: value-type return is not yet implemented (Step 13).");
@@ -297,28 +299,6 @@ namespace ILRuntime.Runtime.Intepreter
                 mStack[argIdx] = value;
                 *(int*)pDst = argIdx;
             }
-
-            static object NeoBoxReturnValue(IType returnType, byte* retDst, int retSize)
-            {
-                Type clr = returnType.TypeForCLR;
-                if (returnType.IsEnum && clr.IsEnum)
-                    clr = Enum.GetUnderlyingType(clr);
-
-                if (clr == typeof(int)) return *(int*)retDst;
-                if (clr == typeof(uint)) return *(uint*)retDst;
-                if (clr == typeof(long)) return *(long*)retDst;
-                if (clr == typeof(ulong)) return *(ulong*)retDst;
-                if (clr == typeof(short)) return (short)*(int*)retDst;
-                if (clr == typeof(ushort)) return (ushort)*(int*)retDst;
-                if (clr == typeof(byte)) return (byte)*(int*)retDst;
-                if (clr == typeof(sbyte)) return (sbyte)*(int*)retDst;
-                if (clr == typeof(bool)) return *(int*)retDst != 0;
-                if (clr == typeof(char)) return (char)*(int*)retDst;
-                if (clr == typeof(float)) return *(float*)retDst;
-                if (clr == typeof(double)) return *(double*)retDst;
-
-                return retSize >= 4 ? (object)*(int*)retDst : (object)(int)*retDst;
-            }
         }
 
         // Unbox a boxed CLR primitive/enum value into a 4/8-byte Neo frame slot.
@@ -328,6 +308,27 @@ namespace ILRuntime.Runtime.Intepreter
         // return path in InvokeNeoClrMethod.
         internal static unsafe void WriteNeoPrimitive(byte* dst, IType type, object value)
         {
+            // IL-defined enums box as ILEnumTypeInstance (holds the underlying primitive bytes),
+            // not as CLR enum values. Unpack them by copying the underlying primitive bytes
+            // straight into the Neo slot (low-order bytes for sub-int widening).
+            if (type is ILType ilType && ilType.IsEnum)
+            {
+                var underlying = ilType.FieldTypes[0];
+                int usz = ilType.AppDomain.GetPrimitiveSize(underlying);
+                if (usz < 4) *(int*)dst = 0; // zero the 4-byte widened slot before writing sub-int bytes
+                if (value is ILEnumTypeInstance ins)
+                {
+                    ref byte srcP = ref MemoryMarshal.GetReference(ins.Primitives.AsSpan());
+                    Unsafe.CopyBlock(ref *dst, ref srcP, (uint)usz);
+                }
+                else
+                {
+                    // Caller passed a CLR-boxed primitive matching the underlying type.
+                    WriteNeoPrimitive(dst, underlying, value);
+                }
+                return;
+            }
+
             Type clr = type.TypeForCLR;
             if (type.IsEnum && clr.IsEnum)
                 clr = Enum.GetUnderlyingType(clr);
@@ -347,6 +348,41 @@ namespace ILRuntime.Runtime.Intepreter
                 case TypeCode.Single:  *(float*)dst  = Convert.ToSingle(value);  break;
                 case TypeCode.Double:  *(double*)dst = Convert.ToDouble(value);  break;
                 default:
+                    if (clr == typeof(IntPtr)) { *(long*)dst = ((IntPtr)value).ToInt64(); break; }
+                    if (clr == typeof(UIntPtr)) { *(ulong*)dst = ((UIntPtr)value).ToUInt64(); break; }
+                    throw new NotSupportedException("Neo: unsupported primitive type " + clr.FullName);
+            }
+        }
+
+        // Read a Neo-widened primitive slot into a boxed CLR value. Mirror of WriteNeoPrimitive:
+        // sub-int slots occupy 4 bytes; long/double/IntPtr occupy their native width. CLR enums box
+        // back to their declared enum type. IL-defined enums box to their boxed underlying primitive
+        // (matching Legacy StackObject.ToObject); ILEnumTypeInstance is only produced by explicit
+        // `box` opcodes, not by boundary marshalling.
+        internal static unsafe object ReadNeoPrimitive(byte* src, IType type)
+        {
+            Type declared = type.TypeForCLR;
+            Type clr = declared;
+            if (type.IsEnum && clr.IsEnum)
+                clr = Enum.GetUnderlyingType(clr);
+
+            switch (Type.GetTypeCode(clr))
+            {
+                case TypeCode.Int32:   return declared.IsEnum ? Enum.ToObject(declared, *(int*)src)    : (object)*(int*)src;
+                case TypeCode.UInt32:  return declared.IsEnum ? Enum.ToObject(declared, *(uint*)src)   : (object)*(uint*)src;
+                case TypeCode.Int64:   return declared.IsEnum ? Enum.ToObject(declared, *(long*)src)   : (object)*(long*)src;
+                case TypeCode.UInt64:  return declared.IsEnum ? Enum.ToObject(declared, *(ulong*)src)  : (object)*(ulong*)src;
+                case TypeCode.Int16:   return declared.IsEnum ? Enum.ToObject(declared, (short)*(int*)src)  : (object)(short)*(int*)src;
+                case TypeCode.UInt16:  return declared.IsEnum ? Enum.ToObject(declared, (ushort)*(int*)src) : (object)(ushort)*(int*)src;
+                case TypeCode.Byte:    return declared.IsEnum ? Enum.ToObject(declared, (byte)*(int*)src)   : (object)(byte)*(int*)src;
+                case TypeCode.SByte:   return declared.IsEnum ? Enum.ToObject(declared, (sbyte)*(int*)src)  : (object)(sbyte)*(int*)src;
+                case TypeCode.Boolean: return *(int*)src != 0;
+                case TypeCode.Char:    return (char)*(int*)src;
+                case TypeCode.Single:  return *(float*)src;
+                case TypeCode.Double:  return *(double*)src;
+                default:
+                    if (clr == typeof(IntPtr)) return new IntPtr(*(long*)src);
+                    if (clr == typeof(UIntPtr)) return new UIntPtr(*(ulong*)src);
                     throw new NotSupportedException("Neo: unsupported primitive type " + clr.FullName);
             }
         }

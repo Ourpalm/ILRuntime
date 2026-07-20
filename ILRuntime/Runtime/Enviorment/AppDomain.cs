@@ -33,6 +33,12 @@ namespace ILRuntime.Runtime.Enviorment
     public delegate object CLRFieldGetterDelegate(ref object target);
     public unsafe delegate StackObject* CLRFieldBindingDelegate(ref object target, ILIntepreter __intp, StackObject* __esp, AutoList __mStack);
     public delegate void CLRFieldSetterDelegate(ref object target, object value);
+    // Neo-mode field bindings: read/write CLR fields directly against the Neo byte* frame layout.
+    // Generator emits per-field getter/setter that writes primitive width native to the field type
+    // (sub-int fields extend to a 4-byte slot with the correct sign/zero semantics) and stores
+    // reference fields into mStack[dstRefBase] with the -1 null sentinel on the primitive slot.
+    public unsafe delegate void CLRFieldNeoGetterDelegate(ref object target, ILIntepreter __intp, byte* __dst, int __dstRefBase, AutoList __mStack);
+    public unsafe delegate void CLRFieldNeoSetterDelegate(ref object target, ILIntepreter __intp, byte* __src, AutoList __mStack);
     public delegate object CLRMemberwiseCloneDelegate(ref object target);
     public delegate object CLRCreateDefaultInstanceDelegate();
     public delegate object CLRCreateArrayInstanceDelegate(int size);
@@ -68,6 +74,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate> fieldGetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldGetterDelegate>();
         Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate> fieldSetterMap = new Dictionary<System.Reflection.FieldInfo, CLRFieldSetterDelegate>();
         Dictionary<System.Reflection.FieldInfo, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>> fieldBindingMap = new Dictionary<FieldInfo, KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>>();
+        Dictionary<System.Reflection.FieldInfo, KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>> fieldNeoBindingMap = new Dictionary<FieldInfo, KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>>();
         Dictionary<Type, CLRMemberwiseCloneDelegate> memberwiseCloneMap = new Dictionary<Type, CLRMemberwiseCloneDelegate>(new ByReferenceKeyComparer<Type>());
         Dictionary<Type, CLRCreateDefaultInstanceDelegate> createDefaultInstanceMap = new Dictionary<Type, CLRCreateDefaultInstanceDelegate>(new ByReferenceKeyComparer<Type>());
         Dictionary<Type, CLRCreateArrayInstanceDelegate> createArrayInstanceMap = new Dictionary<Type, CLRCreateArrayInstanceDelegate>(new ByReferenceKeyComparer<Type>());
@@ -354,6 +361,23 @@ namespace ILRuntime.Runtime.Enviorment
                     lock (bindingLockObject)
                     {
                         return fieldBindingMap;
+                    }
+                }
+            }
+        }
+        internal Dictionary<FieldInfo, KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>> FieldNeoBindingMap
+        {
+            get
+            {
+                if (!IsThreadBinding && IsBindingDone)
+                {
+                    return fieldNeoBindingMap;
+                }
+                else
+                {
+                    lock (bindingLockObject)
+                    {
+                        return fieldNeoBindingMap;
                     }
                 }
             }
@@ -799,6 +823,23 @@ namespace ILRuntime.Runtime.Enviorment
                 {
                     if (!fieldBindingMap.ContainsKey(f))
                         fieldBindingMap[f] = new KeyValuePair<CLRFieldBindingDelegate, CLRFieldBindingDelegate>(copyToStack, assignFromStack);
+                }
+            }
+        }
+
+        public void RegisterCLRFieldNeoBinding(FieldInfo f, CLRFieldNeoGetterDelegate copyToFrame, CLRFieldNeoSetterDelegate assignFromFrame)
+        {
+            if (!IsThreadBinding)
+            {
+                if (!fieldNeoBindingMap.ContainsKey(f))
+                    fieldNeoBindingMap[f] = new KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>(copyToFrame, assignFromFrame);
+            }
+            else
+            {
+                lock (bindingLockObject)
+                {
+                    if (!fieldNeoBindingMap.ContainsKey(f))
+                        fieldNeoBindingMap[f] = new KeyValuePair<CLRFieldNeoGetterDelegate, CLRFieldNeoSetterDelegate>(copyToFrame, assignFromFrame);
                 }
             }
         }
@@ -1874,6 +1915,21 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 return new ILTypeFieldOffset() { PrimitiveOffset = type.GetFieldIndex(token) }; 
             }
+        }
+
+        internal ILTypeFieldOffset GetStaticFieldOffset(object token, IType contextType, IMethod contextMethod, out IType type, out IType fieldType)
+        {
+            FieldReference f = token as FieldReference;
+            type = GetType(f.DeclaringType, contextType, contextMethod);
+            fieldType = GetType(f.FieldType, type, contextMethod);
+            if (type is ILType it)
+            {
+                if (it.TypeReference.HasGenericParameters)
+                    mapTypeToken[type.GetHashCode()] = it;
+                return it.GetStaticFieldOffset(it.GetFieldIndex(token));
+            }
+
+            return new ILTypeFieldOffset() { PrimitiveOffset = type.GetFieldIndex(token) };
         }
 
         internal int GetPrimitiveSize(IType fieldType)
