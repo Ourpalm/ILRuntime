@@ -56,7 +56,17 @@ namespace ILRuntime.CLR.Method
 
         public bool Compiling { get; set; }
 
-        public bool IsRegisterBodyReady { get { return bodyRegister != null; } }
+        public bool IsRegisterBodyReady
+        {
+            get
+            {
+#if ENABLE_NEO_MODE
+                return compiledFrame.NeoExecuteBody != null;
+#else
+                return bodyRegister != null;
+#endif
+            }
+        }
 
         public MethodDefinition Definition { get { return def; } }
 
@@ -179,6 +189,15 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
+#if ENABLE_NEO_MODE
+                // Neo mode always uses the register interpreter (ExecuteNeo). Trigger lazy JIT
+                // on the first probe so InvocationFrame can rely on CompiledFrame being ready.
+                if (compiledFrame.NeoExecuteBody == null && def.HasBody && def.Body.Instructions.Count > 0)
+                    InitCodeBody(true);
+                body = null;
+                exceptionHandler = null;
+                return true;
+#else
                 if (bodyRegister != null)
                 {
                     body = null;
@@ -208,6 +227,7 @@ namespace ILRuntime.CLR.Method
                         return false;
                     }
                 }
+#endif
             }
         }
         public ILMethod(MethodReference reference, MethodDefinition md, ILType type, ILRuntime.Runtime.Enviorment.AppDomain domain, int flags)
@@ -380,9 +400,19 @@ namespace ILRuntime.CLR.Method
         {
             get
             {
+#if ENABLE_NEO_MODE
+                // Neo mode proxies through CompiledFrame.CodeBody so callers (inliner,
+                // debugger, prewarm) share Legacy's "null means unavailable" contract.
+                // CodeBody is released post-JIT for methods above the inline threshold,
+                // so a non-null NeoExecuteBody + null CodeBody legitimately reports null.
+                if (compiledFrame.NeoExecuteBody == null)
+                    InitCodeBody(true);
+                return compiledFrame.CodeBody;
+#else
                 if (bodyRegister == null)
                     InitCodeBody(true);
                 return bodyRegister;
+#endif
             }
         }
 
@@ -600,6 +630,8 @@ namespace ILRuntime.CLR.Method
         {
             //当前方法用到的IType，提前InitializeMethods()。各个子调用，提前InitParameters()
             var body = BodyRegister;
+            if (body == null)
+                return;
 
             foreach (var ins in body)
             {
@@ -694,7 +726,9 @@ namespace ILRuntime.CLR.Method
                 {
                     JITCompiler jit = new JITCompiler(appdomain, declaringType, this);
                     jit.Compile(addr, ref compiledFrame);
+#if !ENABLE_NEO_MODE
                     bodyRegister = compiledFrame.CodeBody;
+#endif
                     stackRegisterCnt = compiledFrame.StackRegisterCount;
                     jumptablesR = compiledFrame.SwitchTargets;
                     registerSymbols = compiledFrame.Symbols;
@@ -771,7 +805,9 @@ namespace ILRuntime.CLR.Method
             else
             {
                 body = new OpCode[0];
+#if !ENABLE_NEO_MODE
                 bodyRegister = new OpCodeR[0];
+#endif
             }
         }
 

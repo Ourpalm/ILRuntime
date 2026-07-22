@@ -460,6 +460,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             // byte offsets after LowerNeoOffsets.
             frame.NeoExecuteBody = (OpCodeR[])frame.CodeBody.Clone();
             Optimizer.LowerNeoOffsets(ref frame, appdomain);
+            // CodeBody exists only to feed Optimizer.InlineMethod when this method is later
+            // considered as an inline callee. Methods above the inline threshold will never
+            // qualify, so drop the pre-lowered copy to halve the JIT-time memory footprint.
+            if (frame.CodeBody.Length > Optimizer.MaximalInlineInstructionCount / 2)
+            {
+                frame.CodeBody = null;
+            }
 #if OUTPUT_JIT_RESULT
             Console.WriteLine($"Neo Lowered Results for {method}:");
             for (int i = 0; i < frame.NeoExecuteBody.Length; i++)
@@ -930,7 +937,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         bool needInline = canInline && !hasConstrained;
                         if (needInline)
                         {
-                            if (toInline.BodyRegister.Length > Optimizer.MaximalInlineInstructionCount / 2)
+                            // BodyRegister returns null when the method was JITed but its
+                            // register-index body was released (over the inline threshold);
+                            // treat that as "too big to inline". Also handles small methods
+                            // via the length check.
+                            var inlineBody = toInline.BodyRegister;
+                            if (inlineBody == null || inlineBody.Length > Optimizer.MaximalInlineInstructionCount / 2)
                                 needInline = false;
                         }
                         if (!needInline)
@@ -1787,7 +1799,20 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         else
                         {
-                            bool codeSizeOK = ilm.IsRegisterBodyReady ? ilm.BodyRegister.Length <= Optimizer.MaximalInlineInstructionCount / 2 : def.Body.Instructions.Count <= Optimizer.MaximalInlineInstructionCount;
+                            // For already-JITed methods, BodyRegister returns null when the
+                            // body was released post-JIT for being over the inline threshold —
+                            // fall through to codeSizeOK=false. Un-JITed methods fall back to
+                            // the raw IL instruction count.
+                            bool codeSizeOK;
+                            if (ilm.IsRegisterBodyReady)
+                            {
+                                var cbody = ilm.BodyRegister;
+                                codeSizeOK = cbody != null && cbody.Length <= Optimizer.MaximalInlineInstructionCount / 2;
+                            }
+                            else
+                            {
+                                codeSizeOK = def.Body.Instructions.Count <= Optimizer.MaximalInlineInstructionCount;
+                            }
                             if(codeSizeOK)
                             {
                                 canInline = true;
