@@ -73,10 +73,90 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         public override string ToString()
         {
 
-            return ToString(null);
+            return ToString(null, null, false);
         }
 
         public string ToString(Enviorment.AppDomain domain)
+        {
+            return ToString(domain, null, false);
+        }
+
+        // Neo-aware pretty-print entrypoint. Passing a non-null `method` and `isNeoMode=true`
+        // enables receiver-slot type lookup so field-access opcodes can append `; Class.Field`.
+        public string ToString(ILMethod method, bool isNeoMode = false)
+        {
+            return ToString(method?.AppDomain, method, isNeoMode);
+        }
+
+        static bool IsStoreFieldOpcode(OpCodeREnum code)
+        {
+            switch (code)
+            {
+                case OpCodeREnum.Stfld_I1:
+                case OpCodeREnum.Stfld_I2:
+                case OpCodeREnum.Stfld_I4:
+                case OpCodeREnum.Stfld_I8:
+                case OpCodeREnum.Stfld_U1:
+                case OpCodeREnum.Stfld_U2:
+                case OpCodeREnum.Stfld_U4:
+                case OpCodeREnum.Stfld_U8:
+                case OpCodeREnum.Stfld_R4:
+                case OpCodeREnum.Stfld_R8:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Look up the field name behind a Neo-lowered Ldfld/Stfld primOff. `receiverReg` is the
+        // register-index form of the receiver operand pre-lowering; when the dump path has
+        // already lowered offsets it's actually the receiver's byte offset. We handle both by
+        // scanning LocalInfos for a matching Offset (byte-offset form) then falling back to
+        // treating the input as a register index. Returns null when the lookup cannot resolve
+        // to a concrete field name.
+        static string TryLookupFieldName(ILMethod method, int receiverIdx, int fieldPrimitiveOffset, bool isNeoLowered)
+        {
+#if ENABLE_NEO_MODE
+            if (method == null)
+                return null;
+            ref readonly var frame = ref method.CompiledFrame;
+            var locals = frame.LocalInfos;
+            var types = frame.LocalTypes;
+            if (locals == null || types == null)
+                return null;
+
+            int reg = -1;
+            if (isNeoLowered)
+            {
+                // Register fields hold byte offsets after LowerNeoOffsets; map back to reg idx.
+                for (int i = 0; i < locals.Length; i++)
+                {
+                    if (locals[i].Offset == receiverIdx)
+                    {
+                        reg = i;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                reg = receiverIdx;
+            }
+            if (reg < 0 || reg >= types.Length)
+                return null;
+            var recvType = types[reg];
+            if (recvType is CLR.TypeSystem.ILType ilType &&
+                ilType.TryGetFieldNameByPrimitiveOffset(fieldPrimitiveOffset, out string fname))
+            {
+                return string.Format("{0}.{1}", ilType.TypeDefinition.Name, fname);
+            }
+            return null;
+#else
+            return null;
+#endif
+        }
+
+        string ToString(Enviorment.AppDomain domain, ILMethod method, bool isNeoMode)
         {
             string param = null;
             string nameSuffix = "";
@@ -203,12 +283,12 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Stfld_U8:
                 case OpCodeREnum.Stfld_R4:
                 case OpCodeREnum.Stfld_R8:
-                    if (Operand4 < 0)
+                    if (isNeoMode && Operand4 < 0)
                     {
                         nameSuffix = ".ref";
                         param = string.Format("r{0}, r{1}, primOff={2}", Register1, Register2, Operand2);
                     }
-                    else if (Operand4 > 0)
+                    else if (isNeoMode && Operand4 > 0)
                     {
                         nameSuffix = ".inline";
                         param = string.Format("r{0}, r{1}, primOff={2}", Register1, Register2, Operand2);
@@ -220,15 +300,22 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                         else
                             param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, Operand, Operand2, Operand3);
                     }
+                    if (isNeoMode && method != null && Operand4 != 0)
+                    {
+                        int recv = IsStoreFieldOpcode(Code) ? Register1 : Register2;
+                        string fname = TryLookupFieldName(method, recv, Operand2, isNeoLowered: true);
+                        if (fname != null)
+                            param = string.Format("{0}  ; {1}", param, fname);
+                    }
                     break;
                 case OpCodeREnum.Ldfld_Ref:
                 case OpCodeREnum.Stfld_Ref:
-                    if (Operand4 < 0)
+                    if (isNeoMode && Operand4 < 0)
                     {
                         nameSuffix = ".ref";
                         param = string.Format("r{0}, r{1}, primOff={2},refOff={3}", Register1, Register2, Operand2, Operand3);
                     }
-                    else if (Operand4 > 0)
+                    else if (isNeoMode && Operand4 > 0)
                     {
                         nameSuffix = ".inline";
                         param = string.Format("r{0}, r{1}, primOff={2},refOff={3},slotRO={4}", Register1, Register2, Operand2, Operand3, Operand4 - 1);
@@ -240,17 +327,31 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                         else
                             param = string.Format("r{0}, r{1}, 0x{2:X8}, {3}({4},{5})", Register1, Register2, OperandLong, Operand, Operand2, Operand3);
                     }
+                    if (isNeoMode && method != null && Operand4 != 0)
+                    {
+                        int recv = Code == OpCodeREnum.Stfld_Ref ? Register1 : Register2;
+                        string fname = TryLookupFieldName(method, recv, Operand2, isNeoLowered: true);
+                        if (fname != null)
+                            param = string.Format("{0}  ; {1}", param, fname);
+                    }
                     break;
                 case OpCodeREnum.Ldfld_Value:
                 case OpCodeREnum.Stfld_Value:
-                    if (Operand4 < 0)
+                    if (isNeoMode && Operand4 < 0)
                         nameSuffix = ".ref";
-                    else if (Operand4 > 0)
+                    else if (isNeoMode && Operand4 > 0)
                         nameSuffix = ".inline";
                     param = string.Format("r{0}, r{1}, sz={2}(fpo=0x{3:x},fro={4},o2h={5},refCnt={6})",
                         Register1, Register2, Operand,
                         Operand2 & 0xFFFF, Operand3 & 0xFFFF,
                         (Operand2 >> 16) & 0xFFFF, (Operand3 >> 16) & 0xFFFF);
+                    if (isNeoMode && method != null && Operand4 != 0)
+                    {
+                        int recv = Code == OpCodeREnum.Stfld_Value ? Register1 : Register2;
+                        string fname = TryLookupFieldName(method, recv, Operand2 & 0xFFFF, isNeoLowered: true);
+                        if (fname != null)
+                            param = string.Format("{0}  ; {1}", param, fname);
+                    }
                     break;
                 case OpCodeREnum.Stsfld:
                 case OpCodeREnum.Ldsfld:

@@ -82,6 +82,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public int ReturnPrimitiveSize;
         public int ReturnRefCount;
         public bool[] LocalIsReference;
+        // Register-index -> IType for pretty printing (OpCodeR.ToString reverse-lookups
+        // receiver register byte offsets back to the owning IType so field-access opcodes
+        // can display `; Class.FieldName`). Populated by AllocateLocalStackSpaces.
+        public IType[] LocalTypes;
         // Body executed by ExecuteNeo. Same opcode shape as CodeBody but with
         // Register1/2/3 lowered to byte offsets via LowerNeoOffsets. CodeBody
         // itself stays in register-index form so inliner / debugger / future
@@ -291,6 +295,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.EliminateConstantLoad(blocks, hasReturn);
+#if ENABLE_NEO_MODE
+            // Neo Step 12c: fold `Ldloca V, R` + <Ldfld/Stfld/Initobj> R into a single
+            // inline-direct instruction that references V directly. Uses the same CanRemove
+            // channel as BCP/FCP, so the emit loop below handles addr / symbols / branch
+            // remap automatically.
+            Optimizer.FoldLdlocaFieldAccess(blocks, hasReturn);
+#endif
 
 #if OUTPUT_JIT_RESULT
             cnt = 1;
@@ -449,6 +460,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             // byte offsets after LowerNeoOffsets.
             frame.NeoExecuteBody = (OpCodeR[])frame.CodeBody.Clone();
             Optimizer.LowerNeoOffsets(ref frame, appdomain);
+#if OUTPUT_JIT_RESULT
+            Console.WriteLine($"Neo Lowered Results for {method}:");
+            for (int i = 0; i < frame.NeoExecuteBody.Length; i++)
+            {
+                Console.WriteLine($"    {i}:{frame.NeoExecuteBody[i].ToString(method, isNeoMode: true)}");
+            }
+#endif
 #endif
 
 #if DEBUG && !NO_PROFILER
@@ -558,6 +576,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             frame.LocalInfos = localInfo;
             frame.LocalIsReference = localIsRef;
+            frame.LocalTypes = registerTypes;
             frame.TotalStructSize = offset;
             frame.TotalRefSize = refOffset;
             frame.LocalsPrimitiveSize = offset - localsPrimStart;

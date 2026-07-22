@@ -1643,6 +1643,30 @@ namespace ILRuntime.CLR.TypeSystem
         {
             return staticFieldOffsets[idx];
         }
+
+        // Reverse lookup for JIT dump / debug pretty-print: given a struct-relative primitive
+        // byte offset, return the matching field's declared name (walks base types since fields
+        // are laid out contiguously). Returns false when no field lives at that offset.
+        internal bool TryGetFieldNameByPrimitiveOffset(int primitiveOffset, out string fieldName)
+        {
+            if (fieldMapping == null)
+                InitializeFields();
+            if (fieldOffsets != null)
+            {
+                for (int i = 0; i < fieldOffsets.Length; i++)
+                {
+                    if (fieldOffsets[i].PrimitiveOffset == primitiveOffset)
+                    {
+                        fieldName = fieldDefinitions[i].Name;
+                        return true;
+                    }
+                }
+            }
+            if (BaseType is ILType baseIL)
+                return baseIL.TryGetFieldNameByPrimitiveOffset(primitiveOffset, out fieldName);
+            fieldName = null;
+            return false;
+        }
 #endif
 
         public IType GetField(string name, out int fieldIdx)
