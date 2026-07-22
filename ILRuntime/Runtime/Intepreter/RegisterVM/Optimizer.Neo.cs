@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
@@ -351,6 +351,28 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             short r2 = op.Register2;
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            // Operand4 tags what the source local's primitive slot holds so the
+                            // runtime handler can choose the right receiver form:
+                            //   0 → flat-bytes value (primitive / IL value type / CLR Inline value type
+                            //       / a reference type when the intent is "byref into the slot itself")
+                            //       → produce a FRAME_REF Ref Slot (objectIndex = -1, offset = frame bytes).
+                            //   1 → the slot stores an mStack index into a boxed IL/CLR value that owns
+                            //       its own primitive/reference buffers → produce a heap-style Ref Slot
+                            //       (objectIndex = the stored index, offset = 0). Ldfld/Stfld with
+                            //       Operand4 < 0 will then take the objIndex-based branch and dispatch
+                            //       through fieldIns / clrType.
+                            var localTypes = frame.LocalTypes;
+                            ILRuntime.CLR.TypeSystem.IType srcType = (localTypes != null && r2 >= 0 && r2 < localTypes.Length) ? localTypes[r2] : null;
+                            bool holdsMStackIndex = false;
+                            if (srcType != null && !srcType.IsPrimitive && !srcType.IsByRef)
+                            {
+                                if (!srcType.IsValueType)
+                                    holdsMStackIndex = true; // reference type local
+                                else if (srcType is ILRuntime.CLR.TypeSystem.CLRType clrSrc &&
+                                         clrSrc.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Boxed)
+                                    holdsMStackIndex = true;
+                            }
+                            op.Operand4 = holdsMStackIndex ? 1 : 0;
                         }
                         break;
                     case OpCodeREnum.Ldsfld:
@@ -603,7 +625,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     int dstIndex = (op.Code == OpCodeREnum.Newobj) ? p + 1 : p;
                                     CLR.TypeSystem.IType paramType;
                                     if (targetMethod.HasThis && op.Code != OpCodeREnum.Newobj && p == 0)
+                                    {
                                         paramType = targetMethod.DeclearingType;
+                                        // ECMA-335 III.3.19: value-type instance methods receive `this`
+                                        // as a managed pointer (T&). The caller's `ldloca`/`ldarga`
+                                        // produces an 8-byte Ref Slot for `this` in that case, so the
+                                        // callee param must be classified as byref to keep the
+                                        // srcInfo.IsRef == dstInfo.IsRef ABI check consistent.
+                                        if (paramType.IsValueType)
+                                            paramType = paramType.MakeByRefType();
+                                    }
                                     else
                                         paramType = clrMethod.Parameters[p - ((targetMethod.HasThis && op.Code != OpCodeREnum.Newobj) ? 1 : 0)];
 

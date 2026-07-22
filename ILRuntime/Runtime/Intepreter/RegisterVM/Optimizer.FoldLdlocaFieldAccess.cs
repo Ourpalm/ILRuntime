@@ -63,6 +63,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     if (!TryGetFoldableReceiverSlot(consumer.Code, out bool receiverInReg1))
                         continue;
 
+                    // Boxed CLR value-type / reference-type receivers were emitted by Translate
+                    // with Operand4 == 0 (heap path, primitive/ref offsets packed into OperandLong).
+                    // Folding them to inline direct would misuse OperandLong as byte offsets and
+                    // corrupt the frame — leave those consumers alone and let the byref path go
+                    // through the Ref-Slot lowering (Step 12b) instead. Only fold when Translate
+                    // already tagged the consumer as an inline candidate.
+                    if (NeedsOperand4Hint(consumer.Code) && consumer.Operand4 == 0)
+                        continue;
+
                     short consumerReceiver = receiverInReg1 ? consumer.Register1 : consumer.Register2;
                     if (consumerReceiver != byrefReg)
                         continue;

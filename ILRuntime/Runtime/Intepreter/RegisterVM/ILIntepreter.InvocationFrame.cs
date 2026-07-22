@@ -116,10 +116,28 @@ namespace ILRuntime.Runtime.Intepreter
                 *(double*)(frameBase + slot.Offset) = value;
             }
 
-            public void WriteInt32<T>(int index, T value) { throw new NotImplementedException(GenericStubMsg); }
-            public void WriteInt64<T>(int index, T value) { throw new NotImplementedException(GenericStubMsg); }
-            public void WriteSingle<T>(int index, T value) { throw new NotImplementedException(GenericStubMsg); }
-            public void WriteDouble<T>(int index, T value) { throw new NotImplementedException(GenericStubMsg); }
+            // Generic-form writers. For primitive/enum T, route through PrimitiveConverter<T>
+            // so the compile-time-known converter delegate returns a boxed-free primitive value
+            // that the non-generic WriteXxx path writes straight into the frame.
+            public void WriteInt32<T>(int index, T value)
+            {
+                WriteInt32(index, ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeToInteger(value));
+            }
+
+            public void WriteInt64<T>(int index, T value)
+            {
+                WriteInt64(index, ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeToLong(value));
+            }
+
+            public void WriteSingle<T>(int index, T value)
+            {
+                WriteSingle(index, ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeToFloat(value));
+            }
+
+            public void WriteDouble<T>(int index, T value)
+            {
+                WriteDouble(index, ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeToDouble(value));
+            }
 
             // ---------------------------------------------------------------
             // Cursor-form writers
@@ -150,10 +168,10 @@ namespace ILRuntime.Runtime.Intepreter
                 WriteDouble(nextParamIdx++, value);
             }
 
-            public void PushInt32<T>(T value) { throw new NotImplementedException(GenericStubMsg); }
-            public void PushInt64<T>(T value) { throw new NotImplementedException(GenericStubMsg); }
-            public void PushSingle<T>(T value) { throw new NotImplementedException(GenericStubMsg); }
-            public void PushDouble<T>(T value) { throw new NotImplementedException(GenericStubMsg); }
+            public void PushInt32<T>(T value) { WriteInt32<T>(nextParamIdx++, value); }
+            public void PushInt64<T>(T value) { WriteInt64<T>(nextParamIdx++, value); }
+            public void PushSingle<T>(T value) { WriteSingle<T>(nextParamIdx++, value); }
+            public void PushDouble<T>(T value) { WriteDouble<T>(nextParamIdx++, value); }
 
             // ---------------------------------------------------------------
             // Execute + return-value readers
@@ -178,7 +196,22 @@ namespace ILRuntime.Runtime.Intepreter
                     return ReadNeoPrimitive(retDst, retType);
 
                 if (retType.IsValueType)
-                    throw new NotImplementedException("Neo InvocationFrame: value-type return is not yet implemented (Step 13).");
+                {
+                    // Dispatch by StructStorage: Inline reads Inline layout back into a boxed CLR object;
+                    // Boxed reads the mStack index and returns the boxed reference directly.
+                    var retClrType = retType as ILRuntime.CLR.TypeSystem.CLRType;
+                    if (retClrType == null)
+                        throw new NotSupportedException($"Neo InvocationFrame: unresolved CLR value type '{retType.FullName}'.");
+                    if (retClrType.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                    {
+                        var boxed = retClrType.CreateDefaultInstance();
+                        // Return-value ref base: retRefBase points into mStack for the caller-owned ref segment.
+                        ILIntepreter.CopyFrameToBoxedClrObjectStatic(boxed, retClrType, retDst, mStack, retRefBase);
+                        return boxed;
+                    }
+                    int boxedIdx = *(int*)retDst;
+                    return boxedIdx >= 0 ? mStack[boxedIdx] : null;
+                }
 
                 int refIdx = *(int*)retDst;
                 object refObj = refIdx >= 0 ? mStack[refIdx] : null;
@@ -213,10 +246,21 @@ namespace ILRuntime.Runtime.Intepreter
                 return *(double*)retDst;
             }
 
-            public T ReadInt32<T>() { throw new NotImplementedException(GenericStubMsg); }
-            public T ReadInt64<T>() { throw new NotImplementedException(GenericStubMsg); }
-            public T ReadSingle<T>() { throw new NotImplementedException(GenericStubMsg); }
-            public T ReadDouble<T>() { throw new NotImplementedException(GenericStubMsg); }
+            public T ReadInt32<T>() { return ReadGenericPrimitive<T>(); }
+            public T ReadInt64<T>() { return ReadGenericPrimitive<T>(); }
+            public T ReadSingle<T>() { return ReadGenericPrimitive<T>(); }
+            public T ReadDouble<T>() { return ReadGenericPrimitive<T>(); }
+
+            T ReadGenericPrimitive<T>()
+            {
+                if (!executed)
+                    throw new InvalidOperationException("Execute must be called before reading the return value.");
+                var tt = typeof(T);
+                if (!(tt.IsPrimitive || tt.IsEnum || tt == typeof(IntPtr) || tt == typeof(UIntPtr)))
+                    throw new NotSupportedException("Reference-type generic stub reserved for Step 13b.");
+                var it = intp.AppDomain.GetType(tt);
+                return (T)ILIntepreter.ReadNeoPrimitive(retDst, it);
+            }
 
             public void Dispose()
             {

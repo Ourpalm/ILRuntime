@@ -716,9 +716,22 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 offset += size;
                 refOffset += refSize;
             }
+            else if (t.IsValueType && !t.IsEnum && t is ILRuntime.CLR.TypeSystem.CLRType clr && clr.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+            {
+                // CLR value type with Inline storage: identical layout to IL value type flat layout.
+                int size = clr.TotalPrimitiveSize;
+                int refSize = clr.TotalReferenceCount;
+                slot.Offset = offset;
+                slot.RefOffset = refOffset;
+                slot.Size = size;
+                slot.RefCount = refSize;
+                offset += size;
+                refOffset += refSize;
+            }
             else
             {
-                // CLR value type / reference type -> stored as reference (mStack index)
+                // CLR value type (Boxed) / reference type -> stored as reference (mStack index).
+                // Byte-identical to a reference-type slot: 4-byte primitive slot + 1 mStack ref slot.
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
                 slot.Size = 4; // Need 4 bytes to store the mStack index in the primitive frame
@@ -1371,6 +1384,39 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             //   < 0 Ref Slot, > 0 same-frame inline, 0 heap object.
                             op.Operand4 = (type.IsValueType && !type.IsEnum) ? 1 : 0;
                         }
+                        else if (type is CLRType clrRecvT && clrRecvT.StructStorage == StructStorage.Inline)
+                        {
+                            // CLR Inline value type receiver: field byte offset is already resolved in offset.
+                            op.Code = GetLdfldCodeForType(fieldType);
+                            if (op.Code == OpCodeREnum.Ldfld_Value)
+                            {
+                                // Nested value-type field: encode Operand = fieldType.TotalPrimitiveSize
+                                // and pack ReferenceCount + ReferenceOffset into Operand3, matching the
+                                // ILType Ldfld_Value encoding so the runtime handler branches uniformly.
+                                int fieldPrimSize;
+                                int fieldRefCount;
+                                if (fieldType is ILType ilFieldType)
+                                {
+                                    fieldPrimSize = ilFieldType.TotalPrimitiveSize;
+                                    fieldRefCount = ilFieldType.TotalReferenceCount;
+                                }
+                                else
+                                {
+                                    var clrFieldType = (CLRType)fieldType;
+                                    fieldPrimSize = clrFieldType.TotalPrimitiveSize;
+                                    fieldRefCount = clrFieldType.TotalReferenceCount;
+                                }
+                                op.Operand = fieldPrimSize;
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = ((fieldRefCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
+                            }
+                            else
+                            {
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = offset.ReferenceOffset;
+                            }
+                            op.Operand4 = 1; // inline direct candidate
+                        }
                         else
                         {
                             if (fieldType.IsPrimitive || !fieldType.IsValueType)
@@ -1419,6 +1465,35 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             // Candidate only; the receiver slot layout decides the
                             // final heap / inline / Ref Slot variant during lowering.
                             op.Operand4 = (type.IsValueType && !type.IsEnum) ? 1 : 0;
+                        }
+                        else if (type is CLRType clrRecvT2 && clrRecvT2.StructStorage == StructStorage.Inline)
+                        {
+                            op.Code = GetStfldCodeForType(fieldType);
+                            if (op.Code == OpCodeREnum.Stfld_Value)
+                            {
+                                int fieldPrimSize;
+                                int fieldRefCount;
+                                if (fieldType is ILType ilFieldType)
+                                {
+                                    fieldPrimSize = ilFieldType.TotalPrimitiveSize;
+                                    fieldRefCount = ilFieldType.TotalReferenceCount;
+                                }
+                                else
+                                {
+                                    var clrFieldType = (CLRType)fieldType;
+                                    fieldPrimSize = clrFieldType.TotalPrimitiveSize;
+                                    fieldRefCount = clrFieldType.TotalReferenceCount;
+                                }
+                                op.Operand = fieldPrimSize;
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = ((fieldRefCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
+                            }
+                            else
+                            {
+                                op.Operand2 = offset.PrimitiveOffset;
+                                op.Operand3 = offset.ReferenceOffset;
+                            }
+                            op.Operand4 = 1; // inline direct candidate
                         }
                         else
                         {
@@ -1620,7 +1695,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             else
             {
-                if (fieldType is ILType && fieldType.IsValueType)
+                if (fieldType.IsValueType && (fieldType is ILType || (fieldType is CLR.TypeSystem.CLRType clrValueType && clrValueType.StructStorage == CLR.TypeSystem.StructStorage.Inline)))
                 {
                     res = OpCodeREnum.Ldfld_Value;
                 }
@@ -1691,7 +1766,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             else
             {
-                if (fieldType is ILType && fieldType.IsValueType)
+                if (fieldType.IsValueType && (fieldType is ILType || (fieldType is CLR.TypeSystem.CLRType clrValueType && clrValueType.StructStorage == CLR.TypeSystem.StructStorage.Inline)))
                 {
                     res = OpCodeREnum.Stfld_Value;
                 }

@@ -216,7 +216,22 @@ namespace ILRuntime.Runtime.Intepreter
             }
             else if (retType.IsValueType)
             {
-                throw new NotImplementedException("CLR value type return in reflection fallback: Step 13");
+                // CLR value type return. Dispatch by StructStorage.
+                var retClrType = retType as ILRuntime.CLR.TypeSystem.CLRType;
+                if (retClrType == null)
+                    throw new NotSupportedException($"Neo CLR value-type return: unresolved '{retType.FullName}'.");
+                if (retClrType.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                {
+                    CopyBoxedClrObjectToFrameStatic(res, retClrType, retDstPtr, mStack, targetRetRefBase);
+                }
+                else
+                {
+                    if (targetRetRefBase >= mStack.Count)
+                        mStack.Add(res);
+                    else
+                        mStack[targetRetRefBase] = res;
+                    *(int*)retDstPtr = res != null ? targetRetRefBase : -1;
+                }
             }
             else
             {
@@ -608,9 +623,28 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Ldloca_S:
                             case OpCodeREnum.Ldarga:
                             case OpCodeREnum.Ldarga_S:
-                                *(int*)(frameBase + ip->DstOffset) = -1;
-                                *(int*)(frameBase + ip->DstOffset + 4) =
-                                    (int)(frameBase - stackBase) + ip->SrcOffset;
+                                // Operand4 tag from lowering:
+                                //   0 → flat-bytes local (primitive / IL value type / CLR Inline
+                                //       value type / plain reference-type slot): the byref points
+                                //       into the frame itself. Emit FRAME_REF (objIndex = -1,
+                                //       offset = absolute byte offset in the whole stack).
+                                //   1 → Boxed IL / CLR value-type local (or reference-type local
+                                //       used as receiver): the local's primitive slot already
+                                //       stores an mStack index. Emit a heap-style Ref Slot
+                                //       (objIndex = stored index, offset = 0) so Ldfld/Stfld with
+                                //       Operand4 < 0 dispatch through the fieldIns / clrType path.
+                                if (ip->Operand4 == 1)
+                                {
+                                    *(int*)(frameBase + ip->DstOffset) =
+                                        *(int*)(frameBase + ip->SrcOffset);
+                                    *(int*)(frameBase + ip->DstOffset + 4) = 0;
+                                }
+                                else
+                                {
+                                    *(int*)(frameBase + ip->DstOffset) = -1;
+                                    *(int*)(frameBase + ip->DstOffset + 4) =
+                                        (int)(frameBase - stackBase) + ip->SrcOffset;
+                                }
                                 break;
                             case OpCodeREnum.Ldflda:
                                 t = AppDomain.GetType(ip->Operand);
@@ -2013,7 +2047,7 @@ namespace ILRuntime.Runtime.Intepreter
 
                                     var newobjType = targetMethod.DeclearingType as ILType;
                                     if (newobjType == null)
-                                        throw new NotImplementedException("Neo Newobj CLR type is not implemented (Step 9)");
+                                        throw new NotImplementedException("Neo Newobj CLR type is not implemented (Step 18)");
                                     if (newobjType.IsDelegate)
                                         throw new NotImplementedException("Neo Newobj delegate is not implemented");
 
@@ -2039,15 +2073,17 @@ namespace ILRuntime.Runtime.Intepreter
                                     byte* retDstPtr = null;
                                     int targetRetRefBase = -1;
 
-                                    ins = newobjType.Instantiate(false);
-                                    mStack[newobjDstIdx] = ins;
-                                    *(int*)(frameBase + ip->DstOffset) = newobjDstIdx;
+                                    // Save previous dst slot state so we can restore if the ctor throws.
+                                    // Newobj must only expose the new instance to the caller after the ctor
+                                    // returns successfully (ECMA-335 III.4.21).
+                                    object prevRefSlot = mStack[newobjDstIdx];
+                                    int prevPrimSlot = *(int*)(frameBase + ip->DstOffset);
 
+                                    ins = newobjType.Instantiate(false);
+                                    // Publish the new instance to mStack + callee arg0 so the ctor sees `this`.
+                                    // The caller-visible dst frame slot stays with prevPrimSlot until success.
+                                    mStack[newobjDstIdx] = ins;
                                     *(int*)targetBase = newobjDstIdx;
-                                    // Reference-type newobj: this is the freshly instantiated object,
-                                    // not a caller register, so the JIT-emitted NeoCallParamMap does
-                                    // not describe it. Seed callee r0 explicitly before CopyRefs
-                                    // fills in the actual argument refs.
                                     CopyNeoCallArguments(ref map, frameBase, targetBase);
                                     if (targetMethod is ILMethod ilmNewobj)
                                     {
@@ -2057,8 +2093,27 @@ namespace ILRuntime.Runtime.Intepreter
                                         CopyNeoCallRefs(ref map, mStack, frameRefBase, calleeRefBase);
                                     }
 
-                                    if (!InvokeNeoCallTarget(targetMethod, true, targetBase, mStack, retDstPtr, targetRetRefBase, out unhandledException, calleeRefBase))
-                                        return null;
+                                    bool ctorOk = false;
+                                    try
+                                    {
+                                        if (!InvokeNeoCallTarget(targetMethod, true, targetBase, mStack, retDstPtr, targetRetRefBase, out unhandledException, calleeRefBase))
+                                            return null;
+                                        ctorOk = true;
+                                    }
+                                    finally
+                                    {
+                                        if (ctorOk)
+                                        {
+                                            // Publish the newly constructed reference to the caller-visible slot.
+                                            *(int*)(frameBase + ip->DstOffset) = newobjDstIdx;
+                                        }
+                                        else
+                                        {
+                                            // Restore the previous state so the caller-visible slot is unchanged.
+                                            mStack[newobjDstIdx] = prevRefSlot;
+                                            *(int*)(frameBase + ip->DstOffset) = prevPrimSlot;
+                                        }
+                                    }
 
                                     ip++;
                                     continue;
@@ -2260,13 +2315,76 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else
                                     {
-                                        throw new NotImplementedException("Initobj boxed: Step 13");
+                                        // Operand4 == 0: heap-boxed IL value type receiver. The primitive
+                                        // slot holds an mStack index pointing to an existing ILTypeInstance.
+                                        // Zero it in place; do NOT re-Instantiate (preserves object identity).
+                                        objIndex = *(int*)(frameBase + ip->DstOffset);
+                                        if (objIndex < 0)
+                                            throw new NullReferenceException("Neo Initobj receiver is null.");
+                                        var ins2 = mStack[objIndex] as ILTypeInstance;
+                                        if (ins2 == null)
+                                            throw new InvalidCastException("Neo Initobj boxed receiver is not an IL value type instance.");
+                                        if (ins2.Primitives != null && ins2.Primitives.Length > 0)
+                                            Array.Clear(ins2.Primitives, 0, ins2.Primitives.Length);
+                                        if (ins2.ManagedObjects != null)
+                                        {
+                                            for (int i = 0; i < ins2.ManagedObjects.Count; i++)
+                                                ins2.ManagedObjects[i] = null;
+                                        }
                                     }
                                 }
                                 else
                                 {
-                                    // TODO Step 13: CLR value type Initobj (with/without ValueTypeBinder)
-                                    throw new NotImplementedException("CLR value type Initobj: Step 13");
+                                    // CLR value type initobj. Dispatch by StructStorage classification.
+                                    var clrType2 = t as ILRuntime.CLR.TypeSystem.CLRType;
+                                    if (clrType2 == null)
+                                        throw new NotImplementedException("Neo Initobj on non-IL, non-CLRType target.");
+                                    var storage = clrType2.StructStorage;
+                                    if (storage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                                    {
+                                        sz = clrType2.TotalPrimitiveSize;
+                                        refCnt = clrType2.TotalReferenceCount;
+                                        if (ip->Operand4 > 0)
+                                        {
+                                            if (sz > 0)
+                                                Unsafe.InitBlock(frameBase + ip->DstOffset, 0, (uint)sz);
+                                            dstRefOffset = ip->Operand3;
+                                            for (int i = 0; i < refCnt; i++)
+                                                mStack[frameRefBase + dstRefOffset + i] = null;
+                                        }
+                                        else if (ip->Operand4 < 0)
+                                        {
+                                            dstRefOffset = -1 - ip->Operand4;
+                                            objIndex = *(int*)(frameBase + ip->DstOffset);
+                                            dstIdx = *(int*)(frameBase + ip->DstOffset + 4);
+                                            if (objIndex == -1)
+                                            {
+                                                if (sz > 0)
+                                                    Unsafe.InitBlockUnaligned(
+                                                        ref ResolveNeoFrameTarget(stackBase, dstIdx),
+                                                        0, (uint)sz);
+                                                for (int i = 0; i < refCnt; i++)
+                                                    mStack[frameRefBase + dstRefOffset + i] = null;
+                                            }
+                                            else
+                                                throw new NotImplementedException(
+                                                    "Neo Initobj on CLR value type through non-frame Ref Slot: Step 17");
+                                        }
+                                        else
+                                        {
+                                            throw new NotImplementedException(
+                                                "Neo Initobj on CLR Inline value type via heap receiver: not expected.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Boxed: allocate a fresh default-boxed instance and store in mStack.
+                                        dstRefOffset = ip->Operand3;
+                                        obj = clrType2.CreateDefaultInstance();
+                                        dstIdx = frameRefBase + dstRefOffset;
+                                        mStack[dstIdx] = obj;
+                                        *(int*)(frameBase + ip->DstOffset) = dstIdx;
+                                    }
                                 }
                                 break;
                             case OpCodeREnum.Box:
@@ -2322,8 +2440,32 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 else
                                 {
-                                    // TODO Step 13: CLR value type Box (with/without ValueTypeBinder)
-                                    throw new NotImplementedException("CLR value type Box: Step 13");
+                                    // CLR value type Box. Dispatch by StructStorage classification.
+                                    var clrTypeBox = t as ILRuntime.CLR.TypeSystem.CLRType;
+                                    if (clrTypeBox == null)
+                                        throw new NotImplementedException("Neo Box on non-IL, non-CLRType target.");
+                                    if (clrTypeBox.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                                    {
+                                        // Framework-uniform Inline → boxed: iterate declared fields, read each
+                                        // from the frame layout (primitive by offset, reference by mStack index),
+                                        // and reflectively set it on a freshly-boxed CLR instance.
+                                        object boxed = clrTypeBox.CreateDefaultInstance();
+                                        CopyFrameToBoxedClrObject(boxed, clrTypeBox,
+                                                                  frameBase + ip->SrcOffset,
+                                                                  mStack, frameRefBase + srcRefOffset);
+                                        dstIdx = frameRefBase + dstRefOffset;
+                                        mStack[dstIdx] = boxed;
+                                        *(int*)(frameBase + ip->DstOffset) = dstIdx;
+                                    }
+                                    else
+                                    {
+                                        // Boxed storage: box is a no-op, propagate the mStack index.
+                                        srcIdx = *(int*)(frameBase + ip->SrcOffset);
+                                        obj = srcIdx >= 0 ? mStack[srcIdx] : null;
+                                        dstIdx = frameRefBase + dstRefOffset;
+                                        mStack[dstIdx] = obj;
+                                        *(int*)(frameBase + ip->DstOffset) = obj != null ? dstIdx : -1;
+                                    }
                                 }
                                 break;
                             case OpCodeREnum.Ldfld:
@@ -3024,8 +3166,29 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 else
                                 {
-                                    // TODO Step 13: CLR value type Unbox (with/without ValueTypeBinder)
-                                    throw new NotImplementedException("CLR value type Unbox: Step 13");
+                                    // CLR value type Unbox / Unbox_Any. Dispatch by StructStorage classification.
+                                    var clrTypeUnbox = t as ILRuntime.CLR.TypeSystem.CLRType;
+                                    if (clrTypeUnbox == null)
+                                        throw new NotImplementedException("Neo Unbox on non-IL, non-CLRType target.");
+                                    // Type check: the boxed CLR object must be assignable to the requested type.
+                                    if (!clrTypeUnbox.TypeForCLR.IsInstanceOfType(obj))
+                                        throw new InvalidCastException();
+                                    if (clrTypeUnbox.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                                    {
+                                        // Framework-uniform boxed → Inline: iterate declared fields, read each
+                                        // from the boxed CLR object via reflection, write into the frame view.
+                                        CopyBoxedClrObjectToFrame(obj, clrTypeUnbox,
+                                                                  frameBase + ip->DstOffset,
+                                                                  mStack, frameRefBase + dstRefOffset);
+                                    }
+                                    else
+                                    {
+                                        // Boxed storage: propagate the mStack index to the destination slot.
+                                        // The destination frame slot is (4-byte mStack index, 1 ref slot).
+                                        dstIdx = frameRefBase + dstRefOffset;
+                                        mStack[dstIdx] = obj;
+                                        *(int*)(frameBase + ip->DstOffset) = dstIdx;
+                                    }
                                 }
                                 break;
                             default:
@@ -3283,6 +3446,131 @@ namespace ILRuntime.Runtime.Intepreter
                 for (int i = 0; i < refCount; i++)
                     mStack[dstBase + i] = srcRefs[i];
             }
+        }
+
+        // Framework-uniform copy: reads a Neo Inline-layout frame view of a CLR value type and writes
+        // each declared instance field onto a freshly-boxed CLR object via reflection. Used by CLR Box (Inline).
+        // Primitive/enum fields are read from the frame at CLRType.GetFieldPrimitiveOffset(fieldHash) and
+        // boxed via WriteObjectToBoxedField; reference fields are read from mStack at
+        // CLRType.GetFieldReferenceOffset(fieldHash) and assigned via FieldInfo.SetValue.
+        static unsafe void CopyFrameToBoxedClrObject(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                     byte* frameBase, AutoList mStack, int refBase)
+        {
+            CopyFrameToBoxedClrObjectStatic(boxed, clrType, frameBase, mStack, refBase);
+        }
+
+        internal static unsafe void CopyFrameToBoxedClrObjectStatic(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                                    byte* frameBase, AutoList mStack, int refBase)
+        {
+            var fields = clrType.TypeForCLR.GetFields(System.Reflection.BindingFlags.Public
+                | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var fi = fields[i];
+                int hash = fi.GetHashCode();
+                int primOff = clrType.GetFieldPrimitiveOffset(hash);
+                int refOff = clrType.GetFieldReferenceOffset(hash);
+                var ft = fi.FieldType;
+                object value;
+                if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr))
+                {
+                    value = ReadPrimitiveFromFrame(frameBase + primOff, ft);
+                }
+                else
+                {
+                    // Reference field or nested Boxed/Inline CLR struct: value lives in mStack.
+                    int idx = *(int*)(frameBase + primOff);
+                    value = idx >= 0 ? mStack[refBase + refOff] : null;
+                }
+                fi.SetValue(boxed, value);
+            }
+        }
+
+        // Reverse of CopyFrameToBoxedClrObject: reads a boxed CLR value type via reflection and writes
+        // its fields into a Neo Inline-layout frame view. Used by CLR Unbox / Unbox_Any (Inline).
+        static unsafe void CopyBoxedClrObjectToFrame(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                     byte* frameBase, AutoList mStack, int refBase)
+        {
+            CopyBoxedClrObjectToFrameStatic(boxed, clrType, frameBase, mStack, refBase);
+        }
+
+        internal static unsafe void CopyBoxedClrObjectToFrameStatic(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                                    byte* frameBase, AutoList mStack, int refBase)
+        {
+            var fields = clrType.TypeForCLR.GetFields(System.Reflection.BindingFlags.Public
+                | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var fi = fields[i];
+                int hash = fi.GetHashCode();
+                int primOff = clrType.GetFieldPrimitiveOffset(hash);
+                int refOff = clrType.GetFieldReferenceOffset(hash);
+                var ft = fi.FieldType;
+                var value = fi.GetValue(boxed);
+                if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr))
+                {
+                    WritePrimitiveToFrame(frameBase + primOff, ft, value);
+                }
+                else
+                {
+                    // Reference field: store into mStack ref segment; primitive slot holds mStack index.
+                    int slotIdx = refBase + refOff;
+                    mStack[slotIdx] = value;
+                    *(int*)(frameBase + primOff) = value != null ? slotIdx : -1;
+                }
+            }
+        }
+
+        // Reads a primitive value of the given CLR type from a raw frame byte pointer, returning it boxed.
+        static unsafe object ReadPrimitiveFromFrame(byte* p, Type ft)
+        {
+            if (ft == typeof(bool)) return *(int*)p != 0;
+            if (ft == typeof(byte)) return (byte)(*(int*)p);
+            if (ft == typeof(sbyte)) return (sbyte)(*(int*)p);
+            if (ft == typeof(short)) return (short)(*(int*)p);
+            if (ft == typeof(ushort)) return (ushort)(*(int*)p);
+            if (ft == typeof(char)) return (char)(*(int*)p);
+            if (ft == typeof(int)) return *(int*)p;
+            if (ft == typeof(uint)) return *(uint*)p;
+            if (ft == typeof(float)) return *(float*)p;
+            if (ft == typeof(long)) return *(long*)p;
+            if (ft == typeof(ulong)) return *(ulong*)p;
+            if (ft == typeof(double)) return *(double*)p;
+            if (ft == typeof(IntPtr)) return new IntPtr(*(long*)p);
+            if (ft == typeof(UIntPtr)) return new UIntPtr(*(ulong*)p);
+            if (ft.IsEnum)
+            {
+                var ut = ft.GetEnumUnderlyingType();
+                var raw = ReadPrimitiveFromFrame(p, ut);
+                return Enum.ToObject(ft, raw);
+            }
+            throw new NotSupportedException($"Neo primitive read: unsupported type {ft.FullName}");
+        }
+
+        // Writes a boxed primitive value to a raw frame byte pointer at natural alignment.
+        static unsafe void WritePrimitiveToFrame(byte* p, Type ft, object value)
+        {
+            if (ft == typeof(bool)) { *(int*)p = ((bool)value) ? 1 : 0; return; }
+            if (ft == typeof(byte)) { *(int*)p = (byte)value; return; }
+            if (ft == typeof(sbyte)) { *(int*)p = (sbyte)value; return; }
+            if (ft == typeof(short)) { *(int*)p = (short)value; return; }
+            if (ft == typeof(ushort)) { *(int*)p = (ushort)value; return; }
+            if (ft == typeof(char)) { *(int*)p = (char)value; return; }
+            if (ft == typeof(int)) { *(int*)p = (int)value; return; }
+            if (ft == typeof(uint)) { *(uint*)p = (uint)value; return; }
+            if (ft == typeof(float)) { *(float*)p = (float)value; return; }
+            if (ft == typeof(long)) { *(long*)p = (long)value; return; }
+            if (ft == typeof(ulong)) { *(ulong*)p = (ulong)value; return; }
+            if (ft == typeof(double)) { *(double*)p = (double)value; return; }
+            if (ft == typeof(IntPtr)) { *(long*)p = ((IntPtr)value).ToInt64(); return; }
+            if (ft == typeof(UIntPtr)) { *(ulong*)p = ((UIntPtr)value).ToUInt64(); return; }
+            if (ft.IsEnum)
+            {
+                var ut = ft.GetEnumUnderlyingType();
+                WritePrimitiveToFrame(p, ut, Convert.ChangeType(value, ut));
+                return;
+            }
+            throw new NotSupportedException($"Neo primitive write: unsupported type {ft.FullName}");
         }
     }
 }

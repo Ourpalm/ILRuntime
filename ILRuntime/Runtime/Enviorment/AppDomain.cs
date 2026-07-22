@@ -1911,9 +1911,22 @@ namespace ILRuntime.Runtime.Enviorment
                 }
                 return it.GetFieldOffset(token);
             }
+            else if (type is CLRType clr && clr.StructStorage == StructStorage.Inline)
+            {
+                // Inline CLR value type: look up the field byte offset by field hash. This is
+                // the same layout table computed at CLRType.InitializeFields time.
+                int hash = clr.GetFieldIndex(token);
+                int primOff = clr.GetFieldPrimitiveOffset(hash);
+                int refOff = clr.GetFieldReferenceOffset(hash);
+                return new ILTypeFieldOffset()
+                {
+                    PrimitiveOffset = primOff,
+                    ReferenceOffset = refOff < 0 ? 0 : refOff,
+                };
+            }
             else
             {
-                return new ILTypeFieldOffset() { PrimitiveOffset = type.GetFieldIndex(token) }; 
+                return new ILTypeFieldOffset() { PrimitiveOffset = type.GetFieldIndex(token) };
             }
         }
 

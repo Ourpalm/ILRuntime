@@ -20,6 +20,31 @@ namespace ILRuntime.CLR.TypeSystem
         public int PrimitiveOffset;
         public int ReferenceOffset;
     }
+
+    /// <summary>
+    /// Compile-time classification of a value type's storage form in Neo mode.
+    /// Determines how Box / Unbox / Initobj / Ldfld / Stfld handlers dispatch,
+    /// and how AllocateSlotForType lays out registers/locals/parameters of this type.
+    /// </summary>
+    public enum StructStorage
+    {
+        /// <summary>
+        /// Type is not a value type (reference type, interface, delegate, array...).
+        /// </summary>
+        NotValueType,
+        /// <summary>
+        /// Frame-inlined layout: struct fields live in the frame's primitive + mStack ref segments,
+        /// identical to IL value type flat layout. Method invocation goes through registered
+        /// ValueTypeBinder redirections or generated CLR bindings that operate on frame bytes directly.
+        /// </summary>
+        Inline,
+        /// <summary>
+        /// mStack-boxed: struct is boxed as a CLR object in mStack. Frame slot is 4 bytes (mStack index)
+        /// + 1 ref segment slot (byte-identical to a reference-type slot). Method invocation uses
+        /// Unsafe.Unbox&lt;T&gt; in-place; box/unbox on this storage form is a no-op index propagation.
+        /// </summary>
+        Boxed,
+    }
 #endif
     public sealed class ILType : IType
     {
