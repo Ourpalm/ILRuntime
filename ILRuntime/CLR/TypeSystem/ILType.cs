@@ -1855,42 +1855,11 @@ namespace ILRuntime.CLR.TypeSystem
                 return;
             }
 
-            int AlignUp(int offset, int alignment)
-            {
-                return (offset + alignment - 1) & ~(alignment - 1);
-            }
-
-            int GetPrimitiveSizeFromClrType(Type t)
-            {
-                if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte))
-                    return 1;
-                if (t == typeof(short) || t == typeof(ushort) || t == typeof(char))
-                    return 2;
-                if (t == typeof(int) || t == typeof(uint) || t == typeof(float))
-                    return 4;
-                if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr))
-                    return 8;
-                return 4;
-            }
-
-            int GetPrimitiveAlignmentFromClrType(Type t)
-            {
-                if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte))
-                    return 1;
-                if (t == typeof(short) || t == typeof(ushort) || t == typeof(char))
-                    return 2;
-                if (t == typeof(int) || t == typeof(uint) || t == typeof(float))
-                    return 4;
-                if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr))
-                    return 8;
-                return 4;
-            }
-
             int GetFieldNaturalSize(IType type)
             {
                 if (type.IsPrimitive)
                 {
-                    return GetPrimitiveSizeFromClrType(type.TypeForCLR);
+                    return MemoryLayoutHelpers.GetPrimitiveSizeFromClrType(type.TypeForCLR);
                 }
                 if (type.IsEnum)
                 {
@@ -1904,7 +1873,7 @@ namespace ILRuntime.CLR.TypeSystem
                     {
                         ut = type.TypeForCLR.GetEnumUnderlyingType();
                     }
-                    return GetPrimitiveSizeFromClrType(ut);
+                    return MemoryLayoutHelpers.GetPrimitiveSizeFromClrType(ut);
                 }
                 if (type.IsValueType && type is ILType it)
                 {
@@ -1917,7 +1886,7 @@ namespace ILRuntime.CLR.TypeSystem
             {
                 if (type.IsPrimitive)
                 {
-                    return GetPrimitiveAlignmentFromClrType(type.TypeForCLR);
+                    return MemoryLayoutHelpers.GetPrimitiveAlignmentFromClrType(type.TypeForCLR);
                 }
                 if (type.IsEnum)
                 {
@@ -1931,7 +1900,7 @@ namespace ILRuntime.CLR.TypeSystem
                     {
                         ut = type.TypeForCLR.GetEnumUnderlyingType();
                     }
-                    return GetPrimitiveAlignmentFromClrType(ut);
+                    return MemoryLayoutHelpers.GetPrimitiveAlignmentFromClrType(ut);
                 }
                 if (type.IsValueType && type is ILType it)
                 {
@@ -2012,7 +1981,7 @@ namespace ILRuntime.CLR.TypeSystem
 
                         int fSize = GetFieldNaturalSize(staticFieldType);
                         int fAlign = GetFieldNaturalAlignment(staticFieldType);
-                        staticPrimitiveOffset = AlignUp(staticPrimitiveOffset, fAlign);
+                        staticPrimitiveOffset = MemoryLayoutHelpers.AlignUp(staticPrimitiveOffset, fAlign);
                         staticFieldOffsets[idxStatic] = new ILTypeFieldOffset()
                         {
                             PrimitiveOffset = staticPrimitiveOffset,
@@ -2058,7 +2027,7 @@ namespace ILRuntime.CLR.TypeSystem
 
                     int fSize = GetFieldNaturalSize(fieldType);
                     int fAlign = GetFieldNaturalAlignment(fieldType);
-                    primitiveOffset = AlignUp(primitiveOffset, fAlign);
+                    primitiveOffset = MemoryLayoutHelpers.AlignUp(primitiveOffset, fAlign);
                     fieldOffsets[idx - FieldStartIndex] = new ILTypeFieldOffset()
                     {
                         PrimitiveOffset = primitiveOffset,
@@ -2094,7 +2063,7 @@ namespace ILRuntime.CLR.TypeSystem
             Array.Resize(ref fieldOffsets, idx - FieldStartIndex );
 
             int maxAlignment = GetStructMaxAlignment(this);
-            totalPrimitiveSize = AlignUp(primitiveOffset, maxAlignment);
+            totalPrimitiveSize = MemoryLayoutHelpers.AlignUp(primitiveOffset, maxAlignment);
             if (totalPrimitiveSize < 1)
                 totalPrimitiveSize = 1;
             totalReferenceCnt = referenceOffset;
@@ -2112,7 +2081,7 @@ namespace ILRuntime.CLR.TypeSystem
                     if (a > maxStaticAlignment)
                         maxStaticAlignment = a;
                 }
-                totalStaticPrimitiveSize = AlignUp(staticPrimitiveOffset, maxStaticAlignment);
+                totalStaticPrimitiveSize = MemoryLayoutHelpers.AlignUp(staticPrimitiveOffset, maxStaticAlignment);
                 totalStaticReferenceCnt = staticReferenceOffset;
             }
             else

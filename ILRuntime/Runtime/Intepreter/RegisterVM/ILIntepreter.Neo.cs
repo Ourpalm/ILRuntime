@@ -3459,30 +3459,117 @@ namespace ILRuntime.Runtime.Intepreter
             CopyFrameToBoxedClrObjectStatic(boxed, clrType, frameBase, mStack, refBase);
         }
 
+        class RawObjectData { public byte Data; }
+
+        static bool IsReferenceOrBoxedField(Type ft, ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+        {
+            if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr)) return false;
+            if (!ft.IsValueType) return true; // Reference type
+            
+            var nestedType = appdomain.GetType(ft);
+            if (nestedType is ILType nt && nt.IsValueType) return false; // Nested Inline
+            if (nestedType is CLRType ct && ct.IsValueType && ct.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline) return false; // Nested Inline
+            
+            return true; // Boxed struct
+        }
+
         internal static unsafe void CopyFrameToBoxedClrObjectStatic(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
                                                                     byte* frameBase, AutoList mStack, int refBase)
         {
-            var fields = clrType.TypeForCLR.GetFields(System.Reflection.BindingFlags.Public
-                | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            for (int i = 0; i < fields.Length; i++)
+            ref byte payload = ref Unsafe.As<RawObjectData>(boxed).Data;
+            CopyFrameToClrObjectPayload(ref payload, clrType, frameBase, mStack, refBase);
+        }
+
+        internal static unsafe void CopyFrameToClrObjectStatic<T>(ref T value, ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                                  byte* frameBase, AutoList mStack, int refBase)
+            where T : struct
+        {
+            ref byte payload = ref Unsafe.As<T, byte>(ref value);
+            CopyFrameToClrObjectPayload(ref payload, clrType, frameBase, mStack, refBase);
+        }
+
+        static unsafe void CopyFrameToClrObjectPayload(ref byte payload, ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                       byte* frameBase, AutoList mStack, int refBase)
+        {
+            uint size = (uint)clrType.TotalPrimitiveSize;
+            if (size == 0)
+                return;
+
+            // Inline reference fields use the ref region as the source of truth.
+            // The frame entry path zeroes the locals primitive region, and field
+            // stores update only the ref region, so these placeholders remain zero.
+            Unsafe.CopyBlock(ref payload, ref *frameBase, size);
+            WriteInlineReferencesToClrPayload(clrType, ref payload, mStack, refBase);
+        }
+
+        // Copies CLR object payload into the Neo frame. Reference fields are never
+        // copied as raw CLR pointers; they are rooted in mStack and represented by
+        // zero-valued primitive placeholders in the frame.
+        static unsafe void CopyClrObjectPayloadToFrame(ref byte payload, object boxed,
+                                                       ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                       byte* frameBase, AutoList mStack, int refBase)
+        {
+            uint size = (uint)clrType.TotalPrimitiveSize;
+            if (size == 0)
+                return;
+
+            Unsafe.CopyBlock(ref *frameBase, ref payload, size);
+            CopyClrReferencesToFrame(clrType, ref payload, frameBase, mStack, refBase);
+        }
+
+        static unsafe void WriteInlineReferencesToClrPayload(ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                              ref byte payload, AutoList mStack, int refBase)
+        {
+            foreach (var kvp in clrType.Fields)
             {
-                var fi = fields[i];
-                int hash = fi.GetHashCode();
-                int primOff = clrType.GetFieldPrimitiveOffset(hash);
-                int refOff = clrType.GetFieldReferenceOffset(hash);
-                var ft = fi.FieldType;
-                object value;
-                if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr))
+                int primOff = clrType.GetFieldPrimitiveOffset(kvp.Key);
+                int refOff = clrType.GetFieldReferenceOffset(kvp.Key);
+                if (primOff < 0)
+                    continue;
+
+                var ft = kvp.Value.FieldType;
+                var nested = clrType.AppDomain.GetType(ft);
+                if (nested is ILRuntime.CLR.TypeSystem.CLRType nestedClr &&
+                    nestedClr.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
                 {
-                    value = ReadPrimitiveFromFrame(frameBase + primOff, ft);
+                    WriteInlineReferencesToClrPayload(
+                        nestedClr, ref Unsafe.Add(ref payload, primOff), mStack,
+                        refBase + Math.Max(refOff, 0));
                 }
-                else
+                else if (IsReferenceOrBoxedField(ft, clrType.AppDomain) && refOff >= 0)
                 {
-                    // Reference field or nested Boxed/Inline CLR struct: value lives in mStack.
-                    int idx = *(int*)(frameBase + primOff);
-                    value = idx >= 0 ? mStack[refBase + refOff] : null;
+                    Unsafe.As<byte, object>(ref Unsafe.Add(ref payload, primOff)) =
+                        mStack[refBase + refOff];
                 }
-                fi.SetValue(boxed, value);
+            }
+        }
+
+        static unsafe void CopyClrReferencesToFrame(ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                    ref byte payload, byte* frameBase,
+                                                    AutoList mStack, int refBase)
+        {
+            foreach (var kvp in clrType.Fields)
+            {
+                int primOff = clrType.GetFieldPrimitiveOffset(kvp.Key);
+                int refOff = clrType.GetFieldReferenceOffset(kvp.Key);
+                if (primOff < 0)
+                    continue;
+
+                var ft = kvp.Value.FieldType;
+                var nested = clrType.AppDomain.GetType(ft);
+                if (nested is ILRuntime.CLR.TypeSystem.CLRType nestedClr &&
+                    nestedClr.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                {
+                    CopyClrReferencesToFrame(
+                        nestedClr, ref Unsafe.Add(ref payload, primOff),
+                        frameBase + primOff, mStack, refBase + Math.Max(refOff, 0));
+                }
+                else if (IsReferenceOrBoxedField(ft, clrType.AppDomain) && refOff >= 0)
+                {
+                    mStack[refBase + refOff] =
+                        Unsafe.As<byte, object>(ref Unsafe.Add(ref payload, primOff));
+                    Unsafe.InitBlock(ref *(frameBase + primOff), 0, (uint)IntPtr.Size);
+                }
             }
         }
 
@@ -3497,80 +3584,26 @@ namespace ILRuntime.Runtime.Intepreter
         internal static unsafe void CopyBoxedClrObjectToFrameStatic(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
                                                                     byte* frameBase, AutoList mStack, int refBase)
         {
-            var fields = clrType.TypeForCLR.GetFields(System.Reflection.BindingFlags.Public
-                | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            for (int i = 0; i < fields.Length; i++)
-            {
-                var fi = fields[i];
-                int hash = fi.GetHashCode();
-                int primOff = clrType.GetFieldPrimitiveOffset(hash);
-                int refOff = clrType.GetFieldReferenceOffset(hash);
-                var ft = fi.FieldType;
-                var value = fi.GetValue(boxed);
-                if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr))
-                {
-                    WritePrimitiveToFrame(frameBase + primOff, ft, value);
-                }
-                else
-                {
-                    // Reference field: store into mStack ref segment; primitive slot holds mStack index.
-                    int slotIdx = refBase + refOff;
-                    mStack[slotIdx] = value;
-                    *(int*)(frameBase + primOff) = value != null ? slotIdx : -1;
-                }
-            }
-        }
-
-        // Reads a primitive value of the given CLR type from a raw frame byte pointer, returning it boxed.
-        static unsafe object ReadPrimitiveFromFrame(byte* p, Type ft)
-        {
-            if (ft == typeof(bool)) return *(int*)p != 0;
-            if (ft == typeof(byte)) return (byte)(*(int*)p);
-            if (ft == typeof(sbyte)) return (sbyte)(*(int*)p);
-            if (ft == typeof(short)) return (short)(*(int*)p);
-            if (ft == typeof(ushort)) return (ushort)(*(int*)p);
-            if (ft == typeof(char)) return (char)(*(int*)p);
-            if (ft == typeof(int)) return *(int*)p;
-            if (ft == typeof(uint)) return *(uint*)p;
-            if (ft == typeof(float)) return *(float*)p;
-            if (ft == typeof(long)) return *(long*)p;
-            if (ft == typeof(ulong)) return *(ulong*)p;
-            if (ft == typeof(double)) return *(double*)p;
-            if (ft == typeof(IntPtr)) return new IntPtr(*(long*)p);
-            if (ft == typeof(UIntPtr)) return new UIntPtr(*(ulong*)p);
-            if (ft.IsEnum)
-            {
-                var ut = ft.GetEnumUnderlyingType();
-                var raw = ReadPrimitiveFromFrame(p, ut);
-                return Enum.ToObject(ft, raw);
-            }
-            throw new NotSupportedException($"Neo primitive read: unsupported type {ft.FullName}");
-        }
-
-        // Writes a boxed primitive value to a raw frame byte pointer at natural alignment.
-        static unsafe void WritePrimitiveToFrame(byte* p, Type ft, object value)
-        {
-            if (ft == typeof(bool)) { *(int*)p = ((bool)value) ? 1 : 0; return; }
-            if (ft == typeof(byte)) { *(int*)p = (byte)value; return; }
-            if (ft == typeof(sbyte)) { *(int*)p = (sbyte)value; return; }
-            if (ft == typeof(short)) { *(int*)p = (short)value; return; }
-            if (ft == typeof(ushort)) { *(int*)p = (ushort)value; return; }
-            if (ft == typeof(char)) { *(int*)p = (char)value; return; }
-            if (ft == typeof(int)) { *(int*)p = (int)value; return; }
-            if (ft == typeof(uint)) { *(uint*)p = (uint)value; return; }
-            if (ft == typeof(float)) { *(float*)p = (float)value; return; }
-            if (ft == typeof(long)) { *(long*)p = (long)value; return; }
-            if (ft == typeof(ulong)) { *(ulong*)p = (ulong)value; return; }
-            if (ft == typeof(double)) { *(double*)p = (double)value; return; }
-            if (ft == typeof(IntPtr)) { *(long*)p = ((IntPtr)value).ToInt64(); return; }
-            if (ft == typeof(UIntPtr)) { *(ulong*)p = ((UIntPtr)value).ToUInt64(); return; }
-            if (ft.IsEnum)
-            {
-                var ut = ft.GetEnumUnderlyingType();
-                WritePrimitiveToFrame(p, ut, Convert.ChangeType(value, ut));
+            ref byte payload = ref Unsafe.As<RawObjectData>(boxed).Data;
+            uint size = (uint)clrType.TotalPrimitiveSize;
+            if (size == 0)
                 return;
-            }
-            throw new NotSupportedException($"Neo primitive write: unsupported type {ft.FullName}");
+
+            Unsafe.CopyBlock(ref *frameBase, ref payload, size);
+            CopyClrReferencesToFrame(clrType, ref payload, frameBase, mStack, refBase);
+        }
+
+        internal static unsafe void CopyClrObjectToFrameStatic<T>(ref T value, ILRuntime.CLR.TypeSystem.CLRType clrType,
+                                                                  byte* frameBase, AutoList mStack, int refBase)
+            where T : struct
+        {
+            ref byte payload = ref Unsafe.As<T, byte>(ref value);
+            uint size = (uint)clrType.TotalPrimitiveSize;
+            if (size == 0)
+                return;
+
+            Unsafe.CopyBlock(ref *frameBase, ref payload, size);
+            CopyClrReferencesToFrame(clrType, ref payload, frameBase, mStack, refBase);
         }
     }
 }

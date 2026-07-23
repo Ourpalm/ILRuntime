@@ -176,10 +176,11 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 | [ILIntepreter.Neo.cs L3396-L3499](file:///f:/SVN/ILRuntime/ILRuntime/Runtime/Intepreter/RegisterVM/ILIntepreter.Neo.cs#L3396-L3499) | `CopyFrameToBoxedClrObjectStatic` / `CopyBoxedClrObjectToFrameStatic` / `ReadPrimitiveFromFrame` / `WritePrimitiveToFrame` 通用反射拷贝 helper |
 | [ILIntepreter.InvocationFrame.cs L119-L258](file:///f:/SVN/ILRuntime/ILRuntime/Runtime/Intepreter/RegisterVM/ILIntepreter.InvocationFrame.cs#L119-L258) | 泛型 stub + value-type return 落地 |
 | [Other/ILRuntimeBlittableAttribute.cs](file:///f:/SVN/ILRuntime/ILRuntime/Other/ILRuntimeBlittableAttribute.cs) | 新增 |
+| [MemoryLayoutHelpers.cs](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSystem/MemoryLayoutHelpers.cs) | 抽取 `ILType` 与 `CLRType` 扁平布局算法中的公共 `AlignUp`/`GetPrimitiveSize`/`GetPrimitiveAlignment` 方法 |
 | [TestCases/NeoStep13Test.cs](file:///f:/SVN/ILRuntime/TestCases/NeoStep13Test.cs) | 新增(4 用例) |
 
 ---
 
 ## 12. 交给下一位的三行结论
 
-Step 13 通过一次编译期 `StructStorage` 分派统一了 CLR 值类型的 Box / Unbox / Initobj / 字段访问路径,handler 内不做运行时布局判断;`ValueTypeBinder` 在 Neo 模式下角色收窄为"只注册 CLR 方法 Redirection",布局与拷贝全部由框架自动完成。Newobj 半构造暴露问题通过 try/finally + dst 前值恢复解决;`Ldfld_Value` / `Stfld_Value` 穿越 CLR Ref Slot 的分支挂账 Step 17,CLR reference/value type newobj 挂账 Step 18,异常处理下的用例挂账 Step 14,数组用例挂账 Step 16。Neo 47/47 + Legacy 493/493 全绿,双配置 0 错误。
+Step 13 通过一次编译期 `StructStorage` 分派统一了 CLR 值类型的 Box / Unbox / Initobj / 字段访问路径,handler 内不做运行时布局判断;通过 `Unsafe.As` 强转堆对象和提取了公共类 `MemoryLayoutHelpers`，达成了与 IL2CPP/CoreCLR 高度一致且零 GC 压力的极速 `memcpy` 级操作。Newobj 半构造暴露问题通过 try/finally + dst 前值恢复解决;`Ldfld_Value` / `Stfld_Value` 穿越 CLR Ref Slot 的分支挂账 Step 17,CLR reference/value type newobj 挂账 Step 18,异常处理下的用例挂账 Step 14,数组用例挂账 Step 16。Neo 47/47 + Legacy 493/493 全绿,双配置 0 错误。

@@ -19,6 +19,7 @@
   - Redirection: `static readonly int` 缓存 offset
   - handler: JIT lowering 已把 offset 编到 Operand
   - CopyValueToNeoFrame: 整体反射 per-field 拷贝(未新增 per-field lookup)
+- [x] 将 ILType 和 CLRType 关于扁平布局计算的局部工具函数(`AlignUp`, `GetPrimitiveSizeFromClrType`, `GetPrimitiveAlignmentFromClrType`) 提取至公用的静态类 `MemoryLayoutHelpers` 中, 消除重复代码并统一布局计算规则。
 
 ## Slot 分配 / JIT
 - [x] `AllocateSlotForType` CLR value type 按 `StructStorage` 分派:Inline → (TotalPrimitiveSize, TotalReferenceCount);Boxed → (4, 1)

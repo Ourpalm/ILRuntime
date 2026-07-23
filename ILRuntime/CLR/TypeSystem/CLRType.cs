@@ -986,8 +986,8 @@ namespace ILRuntime.CLR.TypeSystem
             foreach (var fi in declaredFields)
             {
                 var ft = fi.FieldType;
-                int fSize = GetPrimitiveSizeFromClrType(ft);
-                int fAlign = GetPrimitiveAlignmentFromClrType(ft);
+                int fSize = MemoryLayoutHelpers.GetPrimitiveSizeFromClrType(ft);
+                int fAlign = MemoryLayoutHelpers.GetPrimitiveAlignmentFromClrType(ft);
                 bool nestedInlineStruct = false;
                 CLRType nestedClrType = null;
                 ILType nestedIlType = null;
@@ -1025,7 +1025,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
 
                 if (fAlign > maxAlignment) maxAlignment = fAlign;
-                primitiveOffset = AlignUp(primitiveOffset, fAlign);
+                primitiveOffset = MemoryLayoutHelpers.AlignUp(primitiveOffset, fAlign);
                 int fieldHash = fi.GetHashCode();
                 neoFieldOffsets[fieldHash] = new ILTypeFieldOffset
                 {
@@ -1057,43 +1057,11 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
-            totalPrimitiveSize = AlignUp(primitiveOffset, maxAlignment);
+            totalPrimitiveSize = MemoryLayoutHelpers.AlignUp(primitiveOffset, maxAlignment);
             if (totalPrimitiveSize < 1) totalPrimitiveSize = 1;
             totalReferenceCount = referenceOffset;
             inlineRefFieldInfos = refFieldInfos.ToArray();
-        }
-
-        static int AlignUp(int offset, int alignment)
-        {
-            return (offset + alignment - 1) & ~(alignment - 1);
-        }
-
-        static int GetPrimitiveSizeFromClrType(Type t)
-        {
-            if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte)) return 1;
-            if (t == typeof(short) || t == typeof(ushort) || t == typeof(char)) return 2;
-            if (t == typeof(int) || t == typeof(uint) || t == typeof(float)) return 4;
-            if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr)) return 8;
-            if (t.IsEnum)
-            {
-                var ut = t.GetEnumUnderlyingType();
-                return GetPrimitiveSizeFromClrType(ut);
-            }
-            return 4;
-        }
-
-        static int GetPrimitiveAlignmentFromClrType(Type t)
-        {
-            if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte)) return 1;
-            if (t == typeof(short) || t == typeof(ushort) || t == typeof(char)) return 2;
-            if (t == typeof(int) || t == typeof(uint) || t == typeof(float)) return 4;
-            if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr)) return 8;
-            if (t.IsEnum)
-            {
-                var ut = t.GetEnumUnderlyingType();
-                return GetPrimitiveAlignmentFromClrType(ut);
-            }
-            return 4;
+            this.MaxAlignment = maxAlignment;
         }
 
         /// <summary>
@@ -1115,6 +1083,12 @@ namespace ILRuntime.CLR.TypeSystem
                 return true;
             }
             return false;
+        }
+
+        bool HasPrivateFields()
+        {
+            var fields = clrType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+            return fields.Length > 0;
         }
 #endif
 
