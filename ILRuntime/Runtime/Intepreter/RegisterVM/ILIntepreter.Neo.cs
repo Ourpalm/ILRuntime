@@ -545,7 +545,7 @@ namespace ILRuntime.Runtime.Intepreter
             // Zero locals primitive region
             if (nf.LocalsPrimitiveSize > 0)
                 Unsafe.InitBlock(frameBase + nf.ParamPrimitiveSize, 0, (uint)nf.LocalsPrimitiveSize);
-            if (localInfos != null && localIsRef != null)
+            if (nf.LocalsReferenceCount > 0 && localInfos != null && localIsRef != null)
             {
                 for (int i = 0; i < localInfos.Length; i++)
                 {
@@ -688,10 +688,18 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeREnum.Ldsfld:
-                                t = AppDomain.GetType(ip->Operand);
-                                ilType = AppDomain.GetType(ip->Operand2) as ILType;
+                                t = AppDomain.GetType(ip->Operand2);
+                                ilType = t as ILType;
                                 if (ilType == null)
-                                    throw new NotImplementedException("Neo Ldsfld for CLR static fields: Step 12b CLR follow-up.");
+                                {
+                                    clrType = t as CLRType;
+                                    if (clrType == null)
+                                        throw new TypeLoadException("Neo Ldsfld static declaring type could not be resolved.");
+                                    dstIdx = frameRefBase + (ushort)ip->Register2;
+                                    clrType.CopyStaticFieldToNeoFrame(
+                                        ip->Operand3, this, frameBase + ip->DstOffset, dstIdx, mStack);
+                                    break;
+                                }
                                 ins = ilType.StaticInstance;
 #if DEBUG
                                 if (ins == null)
@@ -731,10 +739,17 @@ namespace ILRuntime.Runtime.Intepreter
                                 }
                                 break;
                             case OpCodeREnum.Stsfld:
-                                t = AppDomain.GetType(ip->Operand);
-                                ilType = AppDomain.GetType(ip->Operand2) as ILType;
+                                t = AppDomain.GetType(ip->Operand2);
+                                ilType = t as ILType;
                                 if (ilType == null)
-                                    throw new NotImplementedException("Neo Stsfld for CLR static fields: Step 12b CLR follow-up.");
+                                {
+                                    clrType = t as CLRType;
+                                    if (clrType == null)
+                                        throw new TypeLoadException("Neo Stsfld static declaring type could not be resolved.");
+                                    clrType.AssignStaticFieldFromNeoFrame(
+                                        ip->Operand3, this, frameBase + ip->SrcOffset, mStack);
+                                    break;
+                                }
                                 ins = ilType.StaticInstance;
 #if DEBUG
                                 if (ins == null)
