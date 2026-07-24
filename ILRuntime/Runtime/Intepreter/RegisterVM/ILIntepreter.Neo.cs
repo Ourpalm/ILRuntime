@@ -3459,8 +3459,6 @@ namespace ILRuntime.Runtime.Intepreter
             CopyFrameToBoxedClrObjectStatic(boxed, clrType, frameBase, mStack, refBase);
         }
 
-        class RawObjectData { public byte Data; }
-
         static bool IsReferenceOrBoxedField(Type ft, ILRuntime.Runtime.Enviorment.AppDomain appdomain)
         {
             if (ft.IsPrimitive || ft.IsEnum || ft == typeof(IntPtr) || ft == typeof(UIntPtr)) return false;
@@ -3476,7 +3474,7 @@ namespace ILRuntime.Runtime.Intepreter
         internal static unsafe void CopyFrameToBoxedClrObjectStatic(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
                                                                     byte* frameBase, AutoList mStack, int refBase)
         {
-            ref byte payload = ref Unsafe.As<RawObjectData>(boxed).Data;
+            ref byte payload = ref Unsafe.As<ILRuntime.CLR.TypeSystem.RawObjectPayload>(boxed).Data;
             CopyFrameToClrObjectPayload(ref payload, clrType, frameBase, mStack, refBase);
         }
 
@@ -3584,7 +3582,7 @@ namespace ILRuntime.Runtime.Intepreter
         internal static unsafe void CopyBoxedClrObjectToFrameStatic(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
                                                                     byte* frameBase, AutoList mStack, int refBase)
         {
-            ref byte payload = ref Unsafe.As<RawObjectData>(boxed).Data;
+            ref byte payload = ref Unsafe.As<ILRuntime.CLR.TypeSystem.RawObjectPayload>(boxed).Data;
             uint size = (uint)clrType.TotalPrimitiveSize;
             if (size == 0)
                 return;

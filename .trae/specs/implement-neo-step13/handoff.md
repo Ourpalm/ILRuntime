@@ -141,6 +141,7 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 | CLR reference type newobj / CLR value type newobj + Ref Slot 传 this | **Step 18** |
 | 异常处理 Leave_S / try/catch/finally | **Step 14** |
 | `object[]` / Array newarr / ldelem / stelem | **Step 16** |
+| ILType -> CLR Inline struct 的 size/alignment/ref count 与嵌套引用递归 | **Step 13B** |
 | `Initobj / Ldfld_Value / Stfld_Value` 通过非帧内 CLR Ref Slot(`objIndex >= 0` Ref-Slot receiver 分支) | **Step 17** |
 | 泛型 T 的 `constrained.callvirt` 特化(PatchKind.ConstrainedCall 完整实现) | **Step 15** |
 | Foreach 零 per-iteration alloc(`List<int>.Enumerator` 走 Boxed + `Unsafe.Unbox<T>` in-place) | **Step 15**(依赖 binding generator 改造) |

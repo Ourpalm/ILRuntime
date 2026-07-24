@@ -652,6 +652,32 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 ---
 
+## Step 13B: ILType 包含 CLRType 的 Inline 布局递归
+
+**目标**: 补齐 `ILType -> CLRType` 的嵌套值类型布局，使 ILType 中嵌套 CLR Inline struct 时，Neo frame 与 CLR payload 的 primitive/ref 布局保持 ECMA-335 一致。
+
+**类型边界**:
+- `CLRType` 不会静态包含 ILType 字段；CLR 中的热更对象只能以 `object` / `ILTypeInstance` 等引用形态出现。
+- `ILType` 可以包含 CLRType 字段，包括 CLR primitive、CLR Inline struct、CLR Boxed struct 和 CLR reference type。
+- 因此本步骤只处理 `ILType -> CLRType`，不新增 CLRType -> ILType 递归模型。
+
+**内容**:
+1. `ILType.InitializeFieldsForFlatLayout` 的 `GetFieldNaturalSize` 支持 CLR Inline struct，使用 `CLRType.TotalPrimitiveSize`。
+2. `GetFieldNaturalAlignment` 支持 CLR Inline struct 的最大对齐。
+3. 嵌套 CLR Inline struct 的 `TotalReferenceCount` 正确累加。
+4. `fieldOffsets` 的 primitive/ref offset 与嵌套 CLRType 布局一致。
+5. Box/Unbox、`Ldfld_Value`/`Stfld_Value` 和 Move_Vt 正确同步嵌套 CLR 引用字段。
+
+**依赖**: Step 12、Step 13（CLR StructStorage 与 Inline 布局基础）
+
+**验证方式**:
+- IL struct 包含 CLR Inline primitive struct，字段读写和整体复制正确。
+- IL struct 包含带引用字段的 CLR Inline struct，引用在 mStack ref region 中正确同步。
+- 嵌套 CLR Inline struct 的 Box/Unbox 往返正确。
+- Neo 指定测试通过，Legacy 全量测试无回归。
+
+---
+
 ## Step 14: 异常处理 Neo 适配
 
 **目标**: 在 Neo 解释器中完整支持 try/catch/finally。

@@ -10,6 +10,7 @@
   - [x] 其他 → Boxed
 - [x] `CLRType.TotalPrimitiveSize` / `TotalReferenceCount` / `GetFieldPrimitiveOffset` / `GetFieldReferenceOffset` 布局计算算法与 [ILType 自然对齐](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSystem/ILType.cs#L1794) 对齐,**总是计算**,与 Binder 无关
 - [x] 嵌套 Inline struct 递归展开(TestVectorStruct 包含 TestVectorStruct2 + TestVector3)
+- [ ] ILType -> CLR Inline struct 的布局递归(size/alignment/ref count) — **转 Step 13B**
 
 ## CLRType 布局查询 API
 - [x] `GetFieldPrimitiveOffset(int fieldHash)` / `GetFieldReferenceOffset(int fieldHash)` 已提供,基于 `_fieldLayoutCache` O(1) 查询
@@ -20,6 +21,10 @@
   - handler: JIT lowering 已把 offset 编到 Operand
   - CopyValueToNeoFrame: 整体反射 per-field 拷贝(未新增 per-field lookup)
 - [x] 将 ILType 和 CLRType 关于扁平布局计算的局部工具函数(`AlignUp`, `GetPrimitiveSizeFromClrType`, `GetPrimitiveAlignmentFromClrType`) 提取至公用的静态类 `MemoryLayoutHelpers` 中, 消除重复代码并统一布局计算规则。
+- [x] `CLRType.ClassifyStructStorageAndBuildLayout` 对一次性布局计算使用按 `MetadataToken` 排序的局部 instance field 数组, 不再重复从 `fieldInfoCache.Values` 筛选、排序和分配。
+- [x] `CLRType.GetFieldValue` 对 Inline CLR value type 的引用字段增加 payload 直接读取路径; primitive 仍由 typed Neo API 处理,避免伪装成无装箱的 `object` 返回值。
+- [x] `CLRType.CopyFieldToNeoFrame` 对 Inline CLR value type 的 primitive/reference 字段增加 payload 直接读取路径; Boxed/class 继续使用 CLRBinding 或反射 fallback。
+- [x] Inline primitive payload -> Neo frame 的无装箱读取逻辑统一收敛到 `MemoryLayoutHelpers.CopyPrimitiveToNeoFrame`, 不在 `CLRType` 保留重复类型 switch。
 
 ## Slot 分配 / JIT
 - [x] `AllocateSlotForType` CLR value type 按 `StructStorage` 分派:Inline → (TotalPrimitiveSize, TotalReferenceCount);Boxed → (4, 1)

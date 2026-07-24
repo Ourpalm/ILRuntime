@@ -70,7 +70,6 @@ namespace ILRuntime.CLR.TypeSystem
         Dictionary<int, ILTypeFieldOffset> neoFieldOffsets;
         // Per-field setter/getter delegates for reference fields in Inline layout (indexed by ref slot order).
         FieldInfo[] inlineRefFieldInfos;
-
         internal int MaxAlignment { get; private set; }
 
         /// <summary>
@@ -518,6 +517,19 @@ namespace ILRuntime.CLR.TypeSystem
             var fieldinfo = GetField(hash);
             if (fieldinfo != null)
             {
+#if ENABLE_NEO_MODE
+                if (structStorage == StructStorage.Inline && isValueType &&
+                    target != null && !fieldinfo.FieldType.IsValueType)
+                {
+                    int primOff = GetFieldPrimitiveOffset(hash);
+                    int refOff = GetFieldReferenceOffset(hash);
+                    if (primOff >= 0 && refOff >= 0)
+                    {
+                        ref byte payload = ref Unsafe.As<RawObjectPayload>(target).Data;
+                        return Unsafe.As<byte, object>(ref Unsafe.Add(ref payload, primOff));
+                    }
+                }
+#endif
                 return fieldinfo.GetValue(target);
             }
 
@@ -574,8 +586,40 @@ namespace ILRuntime.CLR.TypeSystem
             var fi = GetField(hash);
             if (fi == null)
                 throw new MissingFieldException($"CLR field 0x{hash:X8} not found on {TypeForCLR}");
+
+            if (structStorage == StructStorage.Inline && isValueType &&
+                target != null && !fi.FieldType.IsValueType)
+            {
+                int primOff = GetFieldPrimitiveOffset(hash);
+                int refOff = GetFieldReferenceOffset(hash);
+                if (primOff >= 0 && refOff >= 0)
+                {
+                    ref byte payload = ref Unsafe.As<RawObjectPayload>(target).Data;
+                    object value = Unsafe.As<byte, object>(
+                        ref Unsafe.Add(ref payload, primOff));
+                    mStack[dstRefBase] = value;
+                    *(int*)dst = value != null ? dstRefBase : -1;
+                    return;
+                }
+            }
+
+            if (structStorage == StructStorage.Inline && isValueType &&
+                target != null && (fi.FieldType.IsPrimitive || fi.FieldType.IsEnum ||
+                                   fi.FieldType == typeof(IntPtr) || fi.FieldType == typeof(UIntPtr)))
+            {
+                int primOff = GetFieldPrimitiveOffset(hash);
+                if (primOff >= 0)
+                {
+                    ref byte payload = ref Unsafe.As<RawObjectPayload>(target).Data;
+                    MemoryLayoutHelpers.CopyPrimitiveToNeoFrame(
+                        ref Unsafe.Add(ref payload, primOff), dst, fi.FieldType);
+                    return;
+                }
+            }
+
             CopyValueToNeoFrame(fi.FieldType, fi.GetValue(target), dst, dstRefBase, mStack);
         }
+
 
         /// <summary>
         /// Write a CLR field from Neo's byte* frame layout, prefers the registered
@@ -595,6 +639,37 @@ namespace ILRuntime.CLR.TypeSystem
             var fi = GetField(hash);
             if (fi == null)
                 throw new MissingFieldException($"CLR field 0x{hash:X8} not found on {TypeForCLR}");
+
+            if (structStorage == StructStorage.Inline && isValueType &&
+                target != null && (fi.FieldType.IsPrimitive || fi.FieldType.IsEnum ||
+                                   fi.FieldType == typeof(IntPtr) || fi.FieldType == typeof(UIntPtr)))
+            {
+                int primOff = GetFieldPrimitiveOffset(hash);
+                if (primOff >= 0)
+                {
+                    ref byte payload = ref Unsafe.As<RawObjectPayload>(target).Data;
+                    MemoryLayoutHelpers.CopyPrimitiveFromNeoFrame(
+                        src, ref Unsafe.Add(ref payload, primOff), fi.FieldType);
+                    return;
+                }
+            }
+
+            if (structStorage == StructStorage.Inline && isValueType &&
+                target != null && !fi.FieldType.IsValueType)
+            {
+                int primOff = GetFieldPrimitiveOffset(hash);
+                int refOff = GetFieldReferenceOffset(hash);
+                if (primOff >= 0 && refOff >= 0)
+                {
+                    int srcIdx = *(int*)src;
+                    object refValue = srcIdx >= 0 ? mStack[srcIdx] : null;
+                    ref byte payload = ref Unsafe.As<RawObjectPayload>(target).Data;
+                    Unsafe.As<byte, object>(
+                        ref Unsafe.Add(ref payload, primOff)) = refValue;
+                    return;
+                }
+            }
+
             object value = ReadValueFromNeoFrame(fi.FieldType, src, mStack);
             fi.SetValue(target, value);
         }
@@ -976,7 +1051,9 @@ namespace ILRuntime.CLR.TypeSystem
             structStorage = StructStorage.Inline;
 
             // Build flat layout for CLR value type. Mirrors ILType.InitializeFieldsForFlatLayout.
-            var declaredFields = clrType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var declaredFields = clrType.GetFields(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            Array.Sort(declaredFields, (a, b) => a.MetadataToken - b.MetadataToken);
             neoFieldOffsets = new Dictionary<int, ILTypeFieldOffset>();
             var refFieldInfos = new List<FieldInfo>();
             int primitiveOffset = 0;
