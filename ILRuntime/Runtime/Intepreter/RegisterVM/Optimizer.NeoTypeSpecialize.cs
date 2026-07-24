@@ -536,6 +536,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 refCount = il.TotalReferenceCount;
                 return;
             }
+            if (t.IsValueType && t is CLRType inlineClr &&
+                inlineClr.StructStorage == StructStorage.Inline)
+            {
+                size = inlineClr.TotalPrimitiveSize;
+                refCount = inlineClr.TotalReferenceCount;
+                return;
+            }
             size = 4;
             refCount = 1;
         }

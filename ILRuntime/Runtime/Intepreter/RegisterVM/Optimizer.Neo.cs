@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
@@ -105,7 +105,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             if (srcSz != dstSz || srcRef != dstRef)
                                 throw new System.Exception($"Move layout mismatch: src(sz={srcSz},ref={srcRef}) dst(sz={dstSz},ref={dstRef})");
 #endif
-                            bool isStandaloneRef = (srcRef == 1 && srcSz == 4 && (localIsRef == null || (srcReg >= 0 && srcReg < localIsRef.Length && localIsRef[srcReg])));
+                            CLR.TypeSystem.IType srcType = (frame.LocalTypes != null && srcReg >= 0 && srcReg < frame.LocalTypes.Length)
+                                ? frame.LocalTypes[srcReg]
+                                : null;
+                            bool isBoxedClrValue = srcType is CLR.TypeSystem.CLRType boxedClr &&
+                                boxedClr.StructStorage == CLR.TypeSystem.StructStorage.Boxed;
+                            bool isStandaloneRef = srcRef == 1 && srcSz == 4 &&
+                                (localIsRef == null ||
+                                 (srcReg >= 0 && srcReg < localIsRef.Length && localIsRef[srcReg]) ||
+                                 isBoxedClrValue);
                             int sz = srcSz;
                             LowerR1R2(ref op, localInfos);
                             op.Operand = srcRef;
@@ -386,7 +394,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         {
                             short r1 = op.Register1;
                             op.SrcOffset = (ushort)localInfos[r1].Offset;
-                            op.Register2 = (short)localInfos[r1].RefOffset;
+                            // Register2 aliases SrcOffset in OpCodeR. Keep the
+                            // primitive source offset there and carry the source
+                            // ref-slot base in Operand instead.
+                            op.Operand = localInfos[r1].RefOffset;
                         }
                         break;
                     case OpCodeREnum.Ldflda:
@@ -396,8 +407,27 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
                             // Ldflda-specific receiver flag: 0 = heap object index,
-                            // 1 = source slot contains an 8-byte Ref Slot.
-                            op.Operand4 = localInfos[r2].IsRef ? 1 : 0;
+                            // 1 = source slot contains an 8-byte Ref Slot, 2 =
+                            // an inline field containing a boxed CLR value, 3 =
+                            // an inline frame value. Preserve 2/3 so the runtime
+                            // can materialize the correct Ref Slot.
+                            if (localInfos[r2].IsRef)
+                            {
+                                // The receiver register is a byref result from
+                                // an earlier ldflda/ldloca. It contains a Ref
+                                // Slot, regardless of the field-storage tag
+                                // carried by the producer.
+                                op.Operand4 = 1;
+                            }
+                            else if (op.Operand4 == 2 || op.Operand4 == 3)
+                            {
+                                // Preserve the field-storage tag. A byref receiver can
+                                // point at an inline field whose primitive slot contains
+                                // a Boxed mStack index; tag 2 must reach the handler so it
+                                // does not reinterpret the following bytes as an offset.
+                            }
+                            else
+                                op.Operand4 = 0;
                         }
                         break;
                     case OpCodeREnum.Ldsflda:
@@ -511,6 +541,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             short r2 = op.Register2;
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            if (op.Code == OpCodeREnum.Stfld_Ref)
+                                op.Operand = localInfos[r2].RefOffset;
                             if (localInfos[r1].IsRef)
                                 op.Operand4 = -1 - localInfos[r1].RefOffset;
                             else if (op.Operand4 == 1)
@@ -638,15 +670,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     else
                                         paramType = clrMethod.Parameters[p - ((targetMethod.HasThis && op.Code != OpCodeREnum.Newobj) ? 1 : 0)];
 
-                                    if (paramType.IsValueType && !paramType.IsPrimitive && !(paramType is CLR.TypeSystem.ILType) && !(paramType.TypeForCLR != null && paramType.TypeForCLR.IsEnum))
+                                    if (paramType is CLR.TypeSystem.CLRType clrParam &&
+                                        paramType.IsValueType &&
+                                        clrParam.StructStorage == CLR.TypeSystem.StructStorage.Boxed)
                                     {
-                                        // TODO Step 13: replace this CLR struct fallback with a real CLR value-type ABI.
-                                        // For now we keep the caller temp slot shape so unsupported CLR structs (for example TaskAwaiter)
-                                        // do not fail during JIT prewarm. Reference/primitive/IL value-type parameters use exact callee layout below.
-                                        var srcInfo = localInfos[srcRegs[p]];
-                                        paramInfos[dstIndex] = new StackSlotInfo { Offset = curPrim, Size = srcInfo.Size, RefOffset = curRef, RefCount = srcInfo.RefCount };
-                                        curPrim += srcInfo.Size;
-                                        curRef += srcInfo.RefCount;
+                                        paramInfos[dstIndex] = AllocateNeoCallParamSlot(paramType, ref curPrim, ref curRef, domain);
                                     }
                                     else
                                     {
@@ -780,7 +808,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         static StackSlotInfo AllocateNeoCallParamSlot(CLR.TypeSystem.IType type, ref int offset, ref int refOffset, Enviorment.AppDomain domain)
         {
             StackSlotInfo slot = default;
-            slot.Offset = offset;
             slot.RefOffset = refOffset;
 
             if (type.IsByRef)
@@ -788,34 +815,78 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 slot.Size = 8;
                 slot.RefCount = 0;
                 slot.IsRef = true;
-                offset += 8;
+                slot.Offset = AlignNeoCallOffset(offset, 8);
+                offset = slot.Offset + slot.Size;
             }
             else if (type.IsPrimitive || (type.TypeForCLR != null && type.TypeForCLR.IsEnum))
             {
                 slot.Size = domain.GetPrimitiveSize(type);
-                offset += slot.Size;
+                slot.Offset = AlignNeoCallOffset(offset, GetNeoCallNaturalAlignment(type, slot.Size));
+                offset = slot.Offset + slot.Size;
             }
             else if (type is CLR.TypeSystem.ILType il && type.IsValueType)
             {
                 slot.Size = il.TotalPrimitiveSize;
                 slot.RefCount = il.TotalReferenceCount;
-                offset += slot.Size;
+                slot.Offset = AlignNeoCallOffset(offset, 4);
+                offset = slot.Offset + slot.Size;
+                refOffset += slot.RefCount;
+            }
+            else if (type is CLR.TypeSystem.CLRType clr && type.IsValueType &&
+                     clr.StructStorage == CLR.TypeSystem.StructStorage.Inline)
+            {
+                slot.Size = clr.TotalPrimitiveSize;
+                slot.RefCount = clr.TotalReferenceCount;
+                slot.Offset = AlignNeoCallOffset(offset, clr.MaxAlignment);
+                offset = slot.Offset + slot.Size;
                 refOffset += slot.RefCount;
             }
             else if (type.IsValueType)
             {
-                slot.Size = domain.GetPrimitiveSize(type);
-                offset += slot.Size;
+                // Boxed CLR value types use the reference slot ABI: the primitive
+                // region stores an mStack index and the ref region roots the object.
+                slot.Size = 4;
+                slot.RefCount = 1;
+                slot.Offset = AlignNeoCallOffset(offset, 4);
+                offset = slot.Offset + slot.Size;
+                refOffset++;
             }
             else
             {
                 slot.Size = 4;
                 slot.RefCount = 1;
-                offset += 4;
+                slot.Offset = AlignNeoCallOffset(offset, 4);
+                offset = slot.Offset + slot.Size;
                 refOffset++;
             }
 
             return slot;
+        }
+
+        static int AlignNeoCallOffset(int offset, int alignment)
+        {
+            if (alignment < 1)
+                alignment = 1;
+            return (offset + alignment - 1) & ~(alignment - 1);
+        }
+
+        static int GetNeoCallNaturalAlignment(CLR.TypeSystem.IType type, int slotSize)
+        {
+            Type clrType = type.TypeForCLR;
+            int alignment;
+            if (clrType == typeof(long) || clrType == typeof(ulong) ||
+                clrType == typeof(double) || clrType == typeof(IntPtr) ||
+                clrType == typeof(UIntPtr))
+                alignment = 8;
+            else if (clrType == typeof(short) || clrType == typeof(ushort) ||
+                     clrType == typeof(char))
+                alignment = 2;
+            else if (clrType == typeof(bool) || clrType == typeof(byte) ||
+                     clrType == typeof(sbyte))
+                alignment = 1;
+            else
+                alignment = 4;
+            return Math.Max(alignment, Math.Min(slotSize, 4));
         }
 
         static void FixBranchTargetsAfterRemove(OpCodeR[] body, int removedIndex, Dictionary<int, int[]> jumpTables, Dictionary<int, RegisterVMSymbol> symbols)

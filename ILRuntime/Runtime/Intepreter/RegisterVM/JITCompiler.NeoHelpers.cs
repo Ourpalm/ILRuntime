@@ -38,6 +38,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             op.Operand2 = type.GetHashCode();
             if (type is ILType)
                 op.Operand3 = ((offset.ReferenceOffset & 0xFFFF) << 16) | (offset.PrimitiveOffset & 0xFFFF);
+            else if (type is CLRType clrType)
+                op.Operand3 = clrType.GetFieldIndex(token);
             else
                 op.Operand3 = offset.PrimitiveOffset;
 
@@ -84,8 +86,20 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 op.Operand4 = ((valueType.TotalPrimitiveSize & 0xFFFF) << 16) |
                     ((valueType.TotalReferenceCount & 0xFF) << 8);
             }
-            else if (fieldType.IsValueType)
+            else if (fieldType is CLR.TypeSystem.CLRType clrValueType &&
+                     clrValueType.IsValueType &&
+                     clrValueType.StructStorage == CLR.TypeSystem.StructStorage.Inline)
+            {
                 kind = NeoStaticFieldKind.Value;
+                op.Operand4 = ((clrValueType.TotalPrimitiveSize & 0xFFFF) << 16) |
+                    ((clrValueType.TotalReferenceCount & 0xFF) << 8);
+            }
+            else if (fieldType.IsValueType)
+            {
+                // Boxed CLR value types have the same slot shape as references:
+                // a 4-byte mStack index plus one mStack reference slot.
+                kind = NeoStaticFieldKind.Reference;
+            }
             else
                 kind = NeoStaticFieldKind.Reference;
             op.Operand4 |= (int)kind;

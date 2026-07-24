@@ -413,15 +413,14 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 objectIndex = *(int*)receiverSlot;
             }
-#if DEBUG
             if (objectIndex < 0 || objectIndex >= mStack.Count)
-                throw new NullReferenceException("Neo field receiver is null.");
-#endif
+                throw new NullReferenceException(
+                    string.Format("Neo field receiver mStack index {0} is out of range [0,{1}).",
+                        objectIndex, mStack.Count));
             owner = mStack[objectIndex];
-#if DEBUG
             if (owner == null)
-                throw new NullReferenceException("Neo field receiver is null.");
-#endif
+                throw new NullReferenceException(
+                    string.Format("Neo field receiver mStack index {0} contains null.", objectIndex));
             ilOwner = owner as ILTypeInstance;
             if (ilOwner != null)
                 return;
@@ -656,24 +655,57 @@ namespace ILRuntime.Runtime.Intepreter
                                     throw new NotImplementedException("Neo Ldflda for reference fields requires the objectIndex=-2 marker (Step 17).");
                                 if (ip->Operand4 != 0)
                                 {
-                                    // Ref-Slot receiver：延续原 (objIndex, offset) 累加 field primitive offset。
-                                    objIndex = *(int*)(frameBase + ip->SrcOffset);
-                                    dstIdx = *(int*)(frameBase + ip->SrcOffset + 4);
+                                    // A boxed CLR field nested in an inline value stores
+                                    // only the object index in the field's primitive
+                                    // region; its ref slot roots that same object. Build
+                                    // the Ref Slot explicitly instead of reading the
+                                    // following primitive bytes as its offset.
+                                    if (ip->Operand4 == 2)
+                                    {
+                                        // The boxed field's primitive payload is already
+                                        // its mStack index. Operand2 is the field offset
+                                        // within the containing inline value; the outer
+                                        // frame bytes are not a Ref Slot here.
+                                        objIndex = *(int*)(frameBase + ip->SrcOffset + ip->Operand2);
+                                        dstIdx = 0;
+                                    }
+                                    else if (ip->Operand4 == 3)
+                                    {
+                                        // Inline value field: expose its primitive
+                                        // frame address as a FRAME_REF. SrcOffset
+                                        // points to the Ref Slot produced by
+                                        // Ldloca; its second int is the actual
+                                        // frame payload offset.
+                                        objIndex = -1;
+                                        dstIdx = (int)(frameBase - stackBase) + ip->SrcOffset;
+                                    }
+                                    else
+                                    {
+                                        // Ref-Slot receiver: preserve the existing
+                                        // (objectIndex, byteOffset) address semantics.
+                                        objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                        dstIdx = *(int*)(frameBase + ip->SrcOffset + 4);
+                                    }
+                                    if (ip->Operand4 == 2 &&
+                                        (objIndex < 0 || objIndex >= mStack.Count))
+                                        throw new NullReferenceException(
+                                            string.Format("Neo Ldflda boxed receiver mStack index {0} is out of range [0,{1}).",
+                                                objIndex, mStack.Count));
                                     if (objIndex == -1)
                                     {
                                         *(int*)(frameBase + ip->DstOffset) = -1;
-                                        *(int*)(frameBase + ip->DstOffset + 4) = dstIdx + ip->Operand2;
+                                        *(int*)(frameBase + ip->DstOffset + 4) =
+                                            ip->Operand4 == 2 ? 0 : dstIdx + ip->Operand2;
                                         break;
                                     }
-#if DEBUG
                                     if (objIndex < 0 || objIndex >= mStack.Count)
-                                        throw new NullReferenceException("Neo Ldflda receiver is null.");
-#endif
+                                        throw new NullReferenceException(
+                                            string.Format("Neo Ldflda receiver mStack index {0} is out of range [0,{1}).",
+                                                objIndex, mStack.Count));
                                     obj = mStack[objIndex];
-                                    if (!(obj is ILTypeInstance))
-                                        throw new NotImplementedException("Neo nested Ldflda through a CLR field Ref Slot: Step 17");
                                     *(int*)(frameBase + ip->DstOffset) = objIndex;
-                                    *(int*)(frameBase + ip->DstOffset + 4) = dstIdx + ip->Operand2;
+                                    *(int*)(frameBase + ip->DstOffset + 4) =
+                                        dstIdx + (ip->Operand4 == 2 ? 0 : ip->Operand2);
                                 }
                                 else
                                 {
@@ -774,7 +806,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref *(byte*)(frameBase + ip->SrcOffset),
                                             (uint)sz);
                                     }
-                                    srcIdx = frameRefBase + (ushort)ip->Register2;
+                                    srcIdx = frameRefBase + (ushort)ip->Operand;
                                     for (dstIdx = 0; dstIdx < refCnt; dstIdx++)
                                         ins.ManagedObjects[dstRefOffset + dstIdx] = mStack[srcIdx + dstIdx];
                                 }
@@ -2504,7 +2536,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(int*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<sbyte>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                     {
                                         obj = clrType.GetFieldValue(ip->Operand2, obj);
@@ -2527,7 +2559,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(int*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<byte>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2546,7 +2578,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(int*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<short>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2565,7 +2597,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(int*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<ushort>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2584,7 +2616,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(int*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<int>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2603,7 +2635,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(uint*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<uint>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2622,7 +2654,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(long*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<long>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2641,7 +2673,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(ulong*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<ulong>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2660,7 +2692,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(float*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<float>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2679,7 +2711,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             ref ResolveNeoFrameTarget(stackBase, dstIdx + ip->Operand2));
                                     else if (fieldIns != null)
                                         *(double*)(frameBase + ip->DstOffset) = Unsafe.ReadUnaligned<double>(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2));
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2));
                                     else
                                         clrType.CopyFieldToNeoFrame(ip->Operand2, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 }
@@ -2689,6 +2721,10 @@ namespace ILRuntime.Runtime.Intepreter
                                 {
                                     // inline direct: struct.RefOffset + 1
                                     srcIdx = frameRefBase + (ip->Operand4 - 1) + ip->Operand3;
+                                    if (srcIdx < 0 || srcIdx >= mStack.Count)
+                                        throw new InvalidProgramException(
+                                            string.Format("Neo Ldfld_Ref inline mStack index {0} is out of range [0,{1}).",
+                                                srcIdx, mStack.Count));
                                     obj = mStack[srcIdx];
                                 }
                                 else if (ip->Operand4 < 0)
@@ -2702,6 +2738,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     {
                                         // FRAME_REF：帧内 struct 的引用字段位于 mStack 的定位 ref 区。
                                         srcIdx = frameRefBase + srcRefOffset + ip->Operand3;
+                                        if (srcIdx < 0 || srcIdx >= mStack.Count)
+                                            throw new InvalidProgramException(
+                                                string.Format("Neo Ldfld_Ref frame mStack index {0} is out of range [0,{1}).",
+                                                    srcIdx, mStack.Count));
                                         obj = mStack[srcIdx];
                                     }
                                     else if (fieldIns != null)
@@ -2725,6 +2765,10 @@ namespace ILRuntime.Runtime.Intepreter
                                         obj = clrType.GetFieldValue(ip->Operand2, obj);
                                 }
                                 dstIdx = frameRefBase + ip->Operand;
+                                if (dstIdx < 0 || dstIdx >= mStack.Count)
+                                    throw new InvalidProgramException(
+                                        string.Format("Neo Ldfld_Ref destination mStack index {0} is out of range [0,{1}).",
+                                            dstIdx, mStack.Count));
                                 mStack[dstIdx] = obj;
                                 *(int*)(frameBase + ip->DstOffset) = obj != null ? dstIdx : -1;
                                 break;
@@ -2745,7 +2789,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(byte*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(byte*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2770,7 +2814,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(short*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(short*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2795,7 +2839,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(ushort*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(ushort*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2820,7 +2864,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(int*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(int*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2845,7 +2889,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(uint*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(uint*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2870,7 +2914,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(long*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(long*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2895,7 +2939,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(ulong*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(ulong*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2920,7 +2964,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(float*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(float*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2945,7 +2989,7 @@ namespace ILRuntime.Runtime.Intepreter
                                             *(double*)(frameBase + ip->SrcOffset));
                                     else if (fieldIns != null)
                                         Unsafe.WriteUnaligned(
-                                            ref ResolveNeoILTarget(fieldIns, ip->Operand2),
+                                            ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
                                             *(double*)(frameBase + ip->SrcOffset));
                                     else
                                     {
@@ -2956,11 +3000,28 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Stfld_Ref:
                                 srcIdx = *(int*)(frameBase + ip->SrcOffset);
+                                object srcObj;
+                                if (srcIdx < 0)
+                                    srcObj = null;
+                                else
+                                {
+                                    if (srcIdx >= mStack.Count)
+                                        throw new InvalidProgramException(
+                                            string.Format("Neo Stfld_Ref source mStack index {0} is out of range [0,{1}).",
+                                                srcIdx, mStack.Count));
+                                    srcObj = mStack[srcIdx];
+                                }
                                 if (ip->Operand4 > 0)
                                 {
                                     // inline direct: struct.RefOffset + 1
                                     dstIdx = frameRefBase + (ip->Operand4 - 1) + ip->Operand3;
-                                    mStack[dstIdx] = srcIdx >= 0 ? mStack[srcIdx] : null;
+                                    if (dstIdx < 0 || dstIdx >= mStack.Count)
+                                        throw new InvalidProgramException(
+                                            string.Format("Neo Stfld_Ref inline destination mStack index {0} is out of range [0,{1}).",
+                                                dstIdx, mStack.Count));
+                                    mStack[dstIdx] = srcObj;
+                                    *(int*)(frameBase + ip->DstOffset + ip->Operand2) =
+                                        srcObj != null ? dstIdx : -1;
                                 }
                                 else if (ip->Operand4 < 0)
                                 {
@@ -2972,7 +3033,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     if (objIndex == -1)
                                     {
                                         dstIdx = frameRefBase + dstRefOffset + ip->Operand3;
-                                        mStack[dstIdx] = srcIdx >= 0 ? mStack[srcIdx] : null;
+                                        mStack[dstIdx] = srcObj;
                                     }
                                     else if (fieldIns != null)
                                     {

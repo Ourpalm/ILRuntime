@@ -71,6 +71,9 @@ namespace ILRuntime.CLR.TypeSystem
         FieldDefinition[] staticFieldDefinitions;
         Dictionary<string, int> fieldMapping;
         Dictionary<string, int> staticFieldMapping;
+#if ENABLE_NEO_MODE
+        bool fieldsInitializing;
+#endif
         ILTypeStaticInstance staticInstance;
         Dictionary<int, int> fieldTokenMapping = new Dictionary<int, int> ();
         int fieldStartIdx = -1;
@@ -1743,7 +1746,20 @@ namespace ILRuntime.CLR.TypeSystem
         void InitializeFields ()
         {
 #if ENABLE_NEO_MODE
-            InitializeFieldsForFlatLayout();
+            if (fieldMapping != null)
+                return;
+            if (fieldsInitializing)
+                throw new InvalidOperationException("Recursive field layout initialization detected for type " + FullName);
+
+            fieldsInitializing = true;
+            try
+            {
+                InitializeFieldsForFlatLayout();
+            }
+            finally
+            {
+                fieldsInitializing = false;
+            }
 #else
             InitializeFieldsForStackObjectLayout();
 #endif
@@ -1875,6 +1891,12 @@ namespace ILRuntime.CLR.TypeSystem
                     }
                     return MemoryLayoutHelpers.GetPrimitiveSizeFromClrType(ut);
                 }
+                if (type is CLRType clrType)
+                {
+                    if (clrType.StructStorage == StructStorage.Inline)
+                        return clrType.TotalPrimitiveSize;
+                    return 4;
+                }
                 if (type.IsValueType && type is ILType it)
                 {
                     return it.TotalPrimitiveSize;
@@ -1901,6 +1923,12 @@ namespace ILRuntime.CLR.TypeSystem
                         ut = type.TypeForCLR.GetEnumUnderlyingType();
                     }
                     return MemoryLayoutHelpers.GetPrimitiveAlignmentFromClrType(ut);
+                }
+                if (type is CLRType clrType)
+                {
+                    if (clrType.StructStorage == StructStorage.Inline)
+                        return clrType.MaxAlignment;
+                    return 4;
                 }
                 if (type.IsValueType && type is ILType it)
                 {
@@ -1933,6 +1961,21 @@ namespace ILRuntime.CLR.TypeSystem
                         maxAlign = a;
                 }
                 return maxAlign;
+            }
+
+            int GetFieldReferenceCount(IType type)
+            {
+                if (type.IsPrimitive || type.IsEnum)
+                    return 0;
+                if (type is CLRType clrType)
+                {
+                    if (clrType.StructStorage == StructStorage.Inline)
+                        return clrType.TotalReferenceCount;
+                    return 1;
+                }
+                if (type.IsValueType && type is ILType ilType)
+                    return ilType.TotalReferenceCount;
+                return 1;
             }
 
             fieldTypes = new IType [ definition.Fields.Count ];
@@ -1988,17 +2031,7 @@ namespace ILRuntime.CLR.TypeSystem
                             ReferenceOffset = staticReferenceOffset
                         };
                         staticPrimitiveOffset += fSize;
-                        if (staticFieldType.IsPrimitive || staticFieldType.IsEnum)
-                        {
-                        }
-                        else if (staticFieldType.IsValueType && staticFieldType is ILType sit)
-                        {
-                            staticReferenceOffset += sit.TotalReferenceCount;
-                        }
-                        else
-                        {
-                            staticReferenceOffset++;
-                        }
+                        staticReferenceOffset += GetFieldReferenceCount(staticFieldType);
                         idxStatic++;
                     }
                 }
@@ -2033,24 +2066,10 @@ namespace ILRuntime.CLR.TypeSystem
                         PrimitiveOffset = primitiveOffset,
                         ReferenceOffset = referenceOffset
                     };
-                    bool fieldHasRefs = false;
-                    if (fieldType.IsPrimitive || fieldType.IsEnum)
-                    {
-                        primitiveOffset += fSize;
-                    }
-                    else if (fieldType.IsValueType && fieldType is ILType it)
-                    {
-                        primitiveOffset += fSize;
-                        referenceOffset += it.TotalReferenceCount;
-                        if (it.TotalReferenceCount > 0)
-                            fieldHasRefs = true;
-                    }
-                    else
-                    {
-                        primitiveOffset += fSize;
-                        referenceOffset++;
-                        fieldHasRefs = true;
-                    }
+                    int fieldReferenceCount = GetFieldReferenceCount(fieldType);
+                    primitiveOffset += fSize;
+                    referenceOffset += fieldReferenceCount;
+                    bool fieldHasRefs = fieldReferenceCount > 0;
                     if (fieldHasRefs)
                     {
                         refFieldOffsets.Add(primitiveOffset - fSize);

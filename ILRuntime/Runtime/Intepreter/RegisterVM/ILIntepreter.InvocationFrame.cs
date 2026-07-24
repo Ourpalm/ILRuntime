@@ -333,6 +333,20 @@ namespace ILRuntime.Runtime.Intepreter
                             mStack[pRefBase + r] = vt.ManagedObjects[r];
                         return;
                     }
+                    if (paramType is CLRType clrType)
+                    {
+                        if (clrType.StructStorage == StructStorage.Inline)
+                        {
+                            ILIntepreter.CopyBoxedClrObjectToFrameStatic(
+                                value, clrType, pDst, mStack, pRefBase);
+                        }
+                        else
+                        {
+                            mStack[pRefBase] = value;
+                            *(int*)pDst = pRefBase;
+                        }
+                        return;
+                    }
                     throw new NotSupportedException("Neo InvocationFrame: value-type argument must be an ILTypeInstance.");
                 }
 

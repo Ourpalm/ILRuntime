@@ -141,7 +141,7 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 | CLR reference type newobj / CLR value type newobj + Ref Slot 传 this | **Step 18** |
 | 异常处理 Leave_S / try/catch/finally | **Step 14** |
 | `object[]` / Array newarr / ldelem / stelem | **Step 16** |
-| ILType -> CLR Inline struct 的 size/alignment/ref count 与嵌套引用递归 | **Step 13B** |
+| ILType -> CLR Inline struct 的 size/alignment/ref count 与嵌套引用递归 | **已由 Step 13B 完成** |
 | `Initobj / Ldfld_Value / Stfld_Value` 通过非帧内 CLR Ref Slot(`objIndex >= 0` Ref-Slot receiver 分支) | **Step 17** |
 | 泛型 T 的 `constrained.callvirt` 特化(PatchKind.ConstrainedCall 完整实现) | **Step 15** |
 | Foreach 零 per-iteration alloc(`List<int>.Enumerator` 走 Boxed + `Unsafe.Unbox<T>` in-place) | **Step 15**(依赖 binding generator 改造) |
@@ -185,3 +185,21 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 ## 12. 交给下一位的三行结论
 
 Step 13 通过一次编译期 `StructStorage` 分派统一了 CLR 值类型的 Box / Unbox / Initobj / 字段访问路径,handler 内不做运行时布局判断;通过 `Unsafe.As` 强转堆对象和提取了公共类 `MemoryLayoutHelpers`，达成了与 IL2CPP/CoreCLR 高度一致且零 GC 压力的极速 `memcpy` 级操作。Newobj 半构造暴露问题通过 try/finally + dst 前值恢复解决;`Ldfld_Value` / `Stfld_Value` 穿越 CLR Ref Slot 的分支挂账 Step 17,CLR reference/value type newobj 挂账 Step 18,异常处理下的用例挂账 Step 14,数组用例挂账 Step 16。Neo 47/47 + Legacy 493/493 全绿,双配置 0 错误。
+
+---
+
+## Step13B 转移状态（更新）
+
+ILType -> CLR Inline 布局递归已完成,覆盖:
+
+- CLR Inline 的 size / alignment / ref count 计算
+- Boxed 的 `4 + 1` slot 布局
+- 实例字段与静态字段
+- `Ldflda` ABI 与 slot 分配
+
+验证结果:
+
+- `NeoStep13B`: **7/7**
+- `NeoStep12`: **10/10**
+- `NeoStep13`: **7/8**;唯一失败为已知的 **Step 18** 问题
+- Legacy 全量:已复现 **4 个已知基线失败**,均不归因于本次变更

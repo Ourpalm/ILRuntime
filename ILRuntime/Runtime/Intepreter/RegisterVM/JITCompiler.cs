@@ -547,6 +547,21 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
             int localsPrimStart = offset;
             int localsRefStart = refOffset;
+            Dictionary<int, int[]> forcedValueLayouts = null;
+            for (int i = 0; i < frame.CodeBody.Length; i++)
+            {
+                var op = frame.CodeBody[i];
+                if (op.Code == OpCodeREnum.Ldfld_Value && op.Register1 >= 0)
+                {
+                    if (forcedValueLayouts == null)
+                        forcedValueLayouts = new Dictionary<int, int[]>();
+                    forcedValueLayouts[op.Register1] = new int[]
+                    {
+                        op.Operand,
+                        (op.Operand3 >> 16) & 0xFFFF
+                    };
+                }
+            }
 
             // 2) Local + stack register slots
             //
@@ -559,9 +574,20 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             // primitive slot.
             for (int reg = locVarRegStart; reg < totalRegSlots; reg++)
             {
-                StackSlotInfo slot;
+                StackSlotInfo slot = default;
                 IType regType = (registerTypes != null && reg < registerTypes.Length) ? registerTypes[reg] : null;
-                if (regType != null)
+                int[] forcedLayout;
+                if (forcedValueLayouts != null && forcedValueLayouts.TryGetValue(reg, out forcedLayout))
+                {
+                    offset = AlignNeoOffset(offset, forcedLayout[0] >= 8 ? 8 : 4);
+                    slot.Offset = offset;
+                    slot.RefOffset = refOffset;
+                    slot.Size = forcedLayout[0];
+                    slot.RefCount = forcedLayout[1];
+                    offset += slot.Size;
+                    refOffset += slot.RefCount;
+                }
+                else if (regType != null)
                 {
                     slot = AllocateSlotForType(regType, ref offset, ref refOffset);
                     if (!slot.IsRef && !regType.IsPrimitive && !regType.IsValueType)
@@ -639,18 +665,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldflda:
                         {
                             short dst = op.Register1;
+                            short src = op.Register2;
                             if (dst >= 0 && dst < locals.Length && locals[dst].IsRef)
                             {
-                                // Ldflda referent RefOffset = receiver.RefOffset + field.ReferenceOffset.
-                                // The field's ReferenceOffset is not yet encoded on the Ldflda op
-                                // (Operand3 currently stores declaring-type hash). Extending Ldflda
-                                // encoding is scheduled for the Ldflda-through-Ref-Slot path.
-                                // Leave RefOffset=0 default here; runtime paths that only need the
-                                // primitive-offset side (Operand2) are unaffected.
-#if DEBUG
-                                // Placeholder so producers of Ldflda that later feed Stfld_Ref via
-                                // a byref slot show up while this path is unimplemented.
-#endif
+                                var slot = locals[dst];
+                                int receiverRefOffset = 0;
+                                if (src >= 0 && src < locals.Length)
+                                    receiverRefOffset = locals[src].RefOffset;
+                                slot.RefOffset = receiverRefOffset + op.Operand3;
+                                locals[dst] = slot;
                             }
                         }
                         break;
@@ -699,6 +722,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 // overwrite adjacent slots.
                 if (size < 4)
                     size = 4;
+                offset = AlignNeoOffset(offset, GetNeoNaturalAlignment(t, size));
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
                 slot.Size = size;
@@ -707,6 +731,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             else if (t.IsValueType && t is ILType il)
             {
+                offset = AlignNeoOffset(offset, 4);
                 int size = il.TotalPrimitiveSize;
                 int refSize = il.TotalReferenceCount;
                 slot.Offset = offset;
@@ -718,7 +743,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
             else if (t.IsValueType && !t.IsEnum && t is ILRuntime.CLR.TypeSystem.CLRType clr && clr.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
             {
-                // CLR value type with Inline storage: identical layout to IL value type flat layout.
+                // CLR Inline values use their flattened CLR layout, including the
+                // struct's natural alignment and its separate reference segment.
+                offset = AlignNeoOffset(offset, clr.MaxAlignment);
                 int size = clr.TotalPrimitiveSize;
                 int refSize = clr.TotalReferenceCount;
                 slot.Offset = offset;
@@ -732,6 +759,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             {
                 // CLR value type (Boxed) / reference type -> stored as reference (mStack index).
                 // Byte-identical to a reference-type slot: 4-byte primitive slot + 1 mStack ref slot.
+                offset = AlignNeoOffset(offset, 4);
                 slot.Offset = offset;
                 slot.RefOffset = refOffset;
                 slot.Size = 4; // Need 4 bytes to store the mStack index in the primitive frame
@@ -740,6 +768,35 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 refOffset++;
             }
             return slot;
+        }
+
+        static int AlignNeoOffset(int offset, int alignment)
+        {
+            if (alignment < 1)
+                alignment = 1;
+            return (offset + alignment - 1) & ~(alignment - 1);
+        }
+
+        static int GetNeoNaturalAlignment(IType type, int slotSize)
+        {
+            Type clrType = type.TypeForCLR;
+            int alignment;
+            if (clrType == typeof(long) || clrType == typeof(ulong) ||
+                clrType == typeof(double) || clrType == typeof(IntPtr) ||
+                clrType == typeof(UIntPtr))
+                alignment = 8;
+            else if (clrType == typeof(short) || clrType == typeof(ushort) ||
+                     clrType == typeof(char))
+                alignment = 2;
+            else if (clrType == typeof(bool) || clrType == typeof(byte) ||
+                     clrType == typeof(sbyte))
+                alignment = 1;
+            else
+                alignment = 4;
+
+            // Narrow primitives occupy an int-width frame slot, so their slot
+            // start must still be at least 4-byte aligned.
+            return Math.Max(alignment, Math.Min(slotSize, 4));
         }
 #endif
         void PrepareJumpTable(object token)
@@ -1369,10 +1426,27 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.Code = GetLdfldCodeForType(fieldType);
                             if (op.Code == OpCodeREnum.Ldfld_Value)
                             {
-                                var ilFieldType = fieldType as ILType;
-                                op.Operand = ilFieldType.TotalPrimitiveSize;
+                                int fieldPrimitiveSize;
+                                int fieldReferenceCount;
+                                if (fieldType is ILType ilFieldType)
+                                {
+                                    fieldPrimitiveSize = ilFieldType.TotalPrimitiveSize;
+                                    fieldReferenceCount = ilFieldType.TotalReferenceCount;
+                                }
+                                else if (fieldType is CLRType clrFieldType &&
+                                         clrFieldType.StructStorage == StructStorage.Inline)
+                                {
+                                    fieldPrimitiveSize = clrFieldType.TotalPrimitiveSize;
+                                    fieldReferenceCount = clrFieldType.TotalReferenceCount;
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException(
+                                        "Neo Ldfld_Value requires an Inline value type.");
+                                }
+                                op.Operand = fieldPrimitiveSize;
                                 op.Operand2 = offset.PrimitiveOffset;
-                                op.Operand3 = ((ilFieldType.TotalReferenceCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
+                                op.Operand3 = ((fieldReferenceCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
                             }
                             else
                             {
@@ -1428,14 +1502,29 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
 #endif
                 case Code.Ldflda:
-                    op.Register1 = (short)(baseRegIdx - 1);
+                    // Unlike ordinary stack load instructions, ldflda cannot
+                    // destructively reuse the receiver register. Its result is
+                    // a Ref Slot, while the receiver may be an inline payload
+                    // at the same frame offset. Reusing that register would
+                    // overwrite the first eight bytes of the referent.
                     op.Register2 = (short)(baseRegIdx - 1);
+                    op.Register1 = baseRegIdx++;
 #if ENABLE_NEO_MODE
                     {
                         var offset = appdomain.GetFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
                         op.Operand = method.GetTypeTokenHashCode(((FieldReference)token).FieldType);
                         op.Operand2 = offset.PrimitiveOffset;
-                        op.Operand3 = type.GetHashCode();
+                        op.Operand3 = offset.ReferenceOffset;
+                        // A boxed CLR value-type field is represented by an mStack index
+                        // in the containing inline value. Ldflda must materialize a
+                        // (objectIndex, 0) Ref Slot for the following field access.
+                        if (fieldType is CLRType clrField &&
+                            clrField.StructStorage == StructStorage.Boxed)
+                            op.Operand4 = 2;
+                        else if (fieldType.IsValueType)
+                            op.Operand4 = 3;
+                        else
+                            op.Operand4 = 0;
                     }
 #else
                     op.OperandLong = appdomain.GetStaticFieldIndex(token, declaringType, method);
@@ -1452,10 +1541,27 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.Code = GetStfldCodeForType(fieldType);
                             if (op.Code == OpCodeREnum.Stfld_Value)
                             {
-                                var ilFieldType = fieldType as ILType;
-                                op.Operand = ilFieldType.TotalPrimitiveSize;
+                                int fieldPrimitiveSize;
+                                int fieldReferenceCount;
+                                if (fieldType is ILType ilFieldType)
+                                {
+                                    fieldPrimitiveSize = ilFieldType.TotalPrimitiveSize;
+                                    fieldReferenceCount = ilFieldType.TotalReferenceCount;
+                                }
+                                else if (fieldType is CLRType clrFieldType &&
+                                         clrFieldType.StructStorage == StructStorage.Inline)
+                                {
+                                    fieldPrimitiveSize = clrFieldType.TotalPrimitiveSize;
+                                    fieldReferenceCount = clrFieldType.TotalReferenceCount;
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException(
+                                        "Neo Stfld_Value requires an Inline value type.");
+                                }
+                                op.Operand = fieldPrimitiveSize;
                                 op.Operand2 = offset.PrimitiveOffset;
-                                op.Operand3 = ((ilFieldType.TotalReferenceCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
+                                op.Operand3 = ((fieldReferenceCount & 0xFFFF) << 16) | (offset.ReferenceOffset & 0xFFFF);
                             }
                             else
                             {
