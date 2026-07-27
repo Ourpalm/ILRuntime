@@ -1502,13 +1502,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     break;
 #endif
                 case Code.Ldflda:
-                    // Unlike ordinary stack load instructions, ldflda cannot
-                    // destructively reuse the receiver register. Its result is
-                    // a Ref Slot, while the receiver may be an inline payload
-                    // at the same frame offset. Reusing that register would
-                    // overwrite the first eight bytes of the referent.
+                    // Ldflda pops the receiver and pushes a managed pointer,
+                    // so the CIL stack height is unchanged and Register1/Register2
+                    // must reuse the same stack slot to preserve stack->register
+                    // semantics. When the receiver is an inline value the result
+                    // Ref Slot has a different slot layout than the receiver;
+                    // Optimizer.TypeSpecializeAndRenameNeoRegisters detects this
+                    // via SlotLayoutCompatible and allocates a fresh virtual
+                    // register for Register1 so the byref does not overwrite the
+                    // inline payload.
                     op.Register2 = (short)(baseRegIdx - 1);
-                    op.Register1 = baseRegIdx++;
+                    op.Register1 = (short)(baseRegIdx - 1);
 #if ENABLE_NEO_MODE
                     {
                         var offset = appdomain.GetFieldOffset(token, declaringType, method, out IType type, out IType fieldType);

@@ -1487,3 +1487,263 @@ class ILAsyncContext<T> : IValueTaskSource<T>, IAsyncStateMachine
 | **ldobj/stobj** | 通过 Ref Slot（第 15 节）读写值类型：IL 值类型 CopyBlock + 引用字段拷贝，基本类型直接读写 |
 | **DebugService 变量检查** | Neo 帧无 ObjectType 标记。CompiledFrame 的 StackSlotInfo[]、TotalStructSize、TotalRefSize 仅在 `#if DEBUG` 下持久化到 ILMethod（当前编译后丢弃了），DebugService 通过 ILMethod.LocalInfos（类型 + 偏移）解读帧数据。解释器执行时不需要这些字段——帧布局已编码在指令 operand 中 |
 | **算术/比较/分支指令** | add/sub/ceq/beq 等直接操作帧 byte 区域，寄存器语义从 StackObject 索引统一改为 byte 偏移，所有特化变体（Add_I4 等）的 operand 编码需调整，无设计决策 |
+
+---
+
+## 27. Neo OpCodeR 编码总表与 ABI 约束（Step 13B 回填）
+
+本节是 Neo 指令编码的唯一总表。实现、JIT dump、调试器和后续 AOT 序列化都必须以本节为准；旧章节中的伪代码只描述语义，不再定义字段编码。
+
+### 27.1 OpCodeR 的物理布局
+
+`OpCodeR` 是 `LayoutKind.Explicit` union，字段不是彼此独立的。以下是 native layout 的固定偏移：
+
+| 字节偏移 | 字段 | 预 lowering 含义 | Neo lowering 后含义 |
+|---:|---|---|---|
+| 0 | `Code` | CIL/Register opcode | 不变 |
+| 4 | `Register1` / `DstOffset` | 第一个虚拟寄存器 | 目标 slot 的 frame byte offset |
+| 6 | `Register2` / `SrcOffset` | 第二个虚拟寄存器 | 源 slot 的 frame byte offset |
+| 8 | `Register3` / `OperandOffset` / `Operand` | 第三个寄存器或普通 int operand | 依 opcode 使用；禁止把 `Register3` 当作通用源寄存器盲目改写 |
+| 10 | `Register4` | 第四个虚拟寄存器 | 仅少数 pre-lowering 指令使用；不能与 `Operand` 混淆 |
+| 12 | `Operand2` / `OperandLong` 低 32 位 | 第二个普通 operand | 字段 primitive offset、方法 hash、打包 offset 等 |
+| 16 | `Operand3` / `OperandLong` 高 32 位 | 第三个普通 operand | 字段 ref offset、声明类型 hash、静态字段打包 offset 等 |
+| 20 | `Operand4` | 第四个普通 operand | receiver/storage/tag/引用基址等编码 |
+
+必须遵守的 union 规则：
+
+1. `Register3` 与 `Operand` 共享 offset 8；branch 的 `Operand` 是跳转目标时，不能通过通用 SSA 逻辑改写 `Register3`。
+2. `Register2` 与 `SrcOffset` 共享 offset 6；lowering 写入 `SrcOffset` 后，不能再用 `Register2` 保存 ref base。
+3. `OperandLong` 同时覆盖 `Operand2` 和 `Operand3`；只允许在 Legacy 的 `(typeHash << 32) | fieldHash/offset` 格式中整体使用。
+4. lowering 之后，所有运行时 handler 只能使用 `DstOffset`/`SrcOffset` 和已编码的 `Operand*`，不能回查 `LocalInfos`、字段表或寄存器类型。
+
+### 27.2 Frame slot 与 offset 的四个不同域
+
+Neo 中有四种经常被错误混用的“offset”：
+
+| 名称 | 所在域 | 含义 | 是否可直接作为指针 |
+|---|---|---|---|
+| `StackSlotInfo.Offset` | frame primitive 区 | slot 起始 byte offset，相对当前 `frameBase` | 只能 `frameBase + offset` |
+| `StackSlotInfo.RefOffset` | mStack ref 区 | slot 的第一个引用槽，相对 `frameRefBase` | 只能 `mStack[frameRefBase + refOffset]` |
+| `ILTypeFieldOffset.PrimitiveOffset` / CLR Inline field primitive offset | struct payload | 字段在 flat primitive payload 中的 byte offset | 需加 receiver payload base |
+| `Ref Slot.offset` | runtime stack 地址域或对象字段域 | `objectIndex=-1` 时是相对 `stackBase` 的绝对 byte offset；`objectIndex>=0` 时是对象字段 primitive offset 或字段 hash | 必须先按 `objectIndex` 分派 |
+
+`frameBase + fieldOffset`、`stackBase + refSlot.offset`、`mStack[frameRefBase + refOffset]` 三者不可互换。
+
+### 27.3 Ref Slot 的最终编码
+
+Ref Slot 固定为 8 字节：
+
+```text
+byte[0..3]  objectIndex
+byte[4..7]  offset
+```
+
+| `objectIndex` | `offset` 的含义 | handler 行为 |
+|---:|---|---|
+| `-1` | 相对 `stackBase` 的绝对 frame byte offset | `ResolveNeoFrameTarget(stackBase, offset)` |
+| `>= 0` 且 mStack 对象为 `ILTypeInstance` | `Primitives` 的 primitive offset | 重取 managed `Primitives` 引用后读写 |
+| `>= 0` 且 mStack 对象为 CLR object | CLR field hash | `CLRType.GetFieldValue/SetFieldValue`，值类型写回 mStack |
+| `>= 0` 且对象为 Array | element index | Step 16 处理 |
+
+`objectIndex=-1` 不是 null。null 的约定是 `(objectIndex=-1, offset=0)`，而合法帧引用通常是 `(-1, nonzeroOffset)`。任何把所有 `-1` 都当 null 的代码都是错误的。
+
+### 27.4 Slot 分配编码
+
+`AllocateLocalStackSpaces` 产生每个 slot 的四元组：
+
+```text
+(Offset, Size, RefOffset, RefCount)
+```
+
+| 类型 | `Size` | `RefCount` | 对齐 |
+|---|---:|---:|---:|
+| CIL evaluation-stack primitive | 至少 4 | 0 | primitive natural alignment，实际 slot 至少 4 |
+| IL Inline value type | `ILType.TotalPrimitiveSize` | `ILType.TotalReferenceCount` | struct 最大自然对齐 |
+| CLR Inline value type | `CLRType.TotalPrimitiveSize` | `CLRType.TotalReferenceCount` | `CLRType.MaxAlignment` |
+| CLR Boxed value type | 4（mStack index） | 1（boxed object root） | 4 |
+| reference type | 4（mStack index） | 1 | 4 |
+| managed pointer / Ref Slot | 8 | 0 | 8 |
+
+Boxed CLR value type 的 primitive 4 字节只存 mStack index，不能存 struct payload；payload 只存在 `mStack[index]` 的 boxed CLR object 中。
+
+### 27.5 `Ldfld_*` / `Stfld_*` 标量字段
+
+lowering 后的公共字段：
+
+| 字段 | `Ldfld_*` | `Stfld_*` |
+|---|---|---|
+| `DstOffset` | 目标 frame slot | receiver frame slot |
+| `SrcOffset` | receiver frame slot | source value slot |
+| `Operand2` | 字段 primitive offset；heap/CLR 路径为字段 hash | 同左 |
+| `Operand3` | IL/Inline 引用字段的 ref offset | 同左 |
+| `Operand4` | receiver 三态 | receiver 三态 |
+
+`Operand4` 三态：
+
+```text
+Operand4 == 0
+  heap receiver：frame slot 中存 mStack index
+
+Operand4 > 0
+  same-frame Inline receiver：
+  receiverRefBase = Operand4 - 1
+  primitive target = frameBase + receiverSlot.Offset + Operand2
+  ref target       = mStack[frameRefBase + receiverRefBase + Operand3]
+
+Operand4 < 0
+  Ref Slot receiver：
+  receiverRefBase = -1 - Operand4
+  receiver slot 内容为 (objectIndex, offset)
+```
+
+`Operand4 > 0` 只表示 receiver 是 frame Inline，不表示字段本身是 Inline；字段本身的 storage 由 opcode 和 `Operand2/3` 决定。
+
+### 27.6 `Ldfld_Value` / `Stfld_Value`
+
+值类型字段整体搬运使用以下打包：
+
+| 字段 | 编码 |
+|---|---|
+| `Operand` | 被加载/存储 value 的 primitive size |
+| `Operand2` 低 16 位 | 字段 primitive offset |
+| `Operand2` 高 16 位 | receiver 的 primitive/ref base 所需 ref offset（由 lowering 写入） |
+| `Operand3` 低 16 位 | 字段 reference offset |
+| `Operand3` 高 16 位 | 字段 reference count |
+| `Operand4` | 与标量字段相同的 0 / positive / negative receiver 三态 |
+
+Inline direct 路径执行：
+
+```text
+CopyBlock(dstPrimitive, srcPrimitive + fieldPrimitiveOffset, Operand)
+Copy refCount 个 mStack ref slot
+```
+
+Boxed CLR field 不得使用 CLR object payload 的 flat bytes；它只能作为 `Size=4, RefCount=1` 的 value slot 搬运 index 和 root。
+
+### 27.7 `Ldflda` / `Ldsflda`
+
+#### `Ldflda`
+
+| 字段 | 含义 |
+|---|---|
+| `Register1` / `DstOffset` | 新 Ref Slot 目标；不能与 receiver payload 共用 destructive slot |
+| `Register2` / `SrcOffset` | receiver slot |
+| `Operand` | 字段类型 hash |
+| `Operand2` | 字段 primitive offset |
+| `Operand3` | 字段 reference offset，用于 referent ref base 传播 |
+| `Operand4=0` | heap receiver |
+| `Operand4=1` | source slot 已经是 Ref Slot |
+| `Operand4=2` | Inline value 中的 CLR Boxed field，直接从 field primitive slot 取 mStack index，输出 `(index,0)` |
+| `Operand4=3` | Inline frame field，输出 `(-1, frameAbsoluteBase + Operand2)` |
+
+`Ldflda` 的结果寄存器必须是独立虚拟寄存器。若 source/destination 共用一个 slot，写入 8 字节 Ref Slot 会覆盖被引用 struct 的前 8 字节。
+
+#### `Ldsflda`
+
+| 字段 | 含义 |
+|---|---|
+| `DstOffset` | 新 Ref Slot 目标 |
+| `Operand` | 静态字段类型 hash |
+| `Operand2` | 静态字段 primitive offset |
+| `Operand3` | 声明类型 hash |
+| `Operand4` | 当前 frame 为该静态实例分配的 mStack anchor ref offset |
+
+运行时把 `ILType.StaticInstance` 放入 `mStack[frameRefBase + Operand4]`，Ref Slot 为 `(staticInstanceIndex, Operand2)`。
+
+### 27.8 `Ldsfld` / `Stsfld`
+
+| 字段 | ILType 声明类型 | CLR 声明类型 |
+|---|---|---|
+| `Operand` | 字段类型 hash | 字段类型 hash |
+| `Operand2` | 声明类型 hash | 声明类型 hash |
+| `Operand3` | `refOffset << 16 | primitiveOffset` | CLR field hash |
+| `Operand4` 低 8 位 | `NeoStaticFieldKind` | CLR 分支通常不使用该 kind |
+| `Operand4` 8..15 位 | value field reference count | 同左 |
+| `Operand4` 16..31 位 | value field primitive size | 同左 |
+
+`NeoStaticFieldKind`：
+
+```text
+primitive kinds：I1/U1/Boolean/I2/U2/I4/U4/I8/U8/R4/R8
+Reference       ：一个 mStack 引用槽
+Value           ：primitive payload + reference payload
+```
+
+ILType 的静态 Value 读写必须按 `Operand4` 搬运完整 primitive/ref 两段；CLR 声明类型则通过 `CLRType.CopyStaticFieldToNeoFrame` / `AssignStaticFieldFromNeoFrame` 使用 CLR field hash。
+
+### 27.9 `Box` / `Unbox` / `Unbox_Any`
+
+| 字段 | 含义 |
+|---|---|
+| `Operand` | 类型 hash |
+| `DstOffset` | 目标 primitive slot |
+| `SrcOffset` | 源 primitive slot |
+| `Operand3` | 目标 ref base |
+| `Operand4` | 源 ref base |
+
+IL value type：
+
+```text
+Box       = frame primitive/ref → ILTypeInstance.Primitives/ManagedObjects
+Unbox.Any = ILTypeInstance.Primitives/ManagedObjects → frame primitive/ref
+```
+
+CLR Inline：
+
+```text
+Box       = frame layout → boxed CLR object
+Unbox.Any = boxed CLR object → frame layout
+```
+
+CLR Boxed：
+
+```text
+Box / Unbox.Any = 透传 mStack index，不复制 flat bytes
+```
+
+### 27.10 `Initobj`
+
+| 字段 | 含义 |
+|---|---|
+| `Operand` | 目标类型 hash |
+| `DstOffset` | 目标 frame slot |
+| `Operand3` | 目标 ref base |
+| `Operand4 > 0` | frame Inline target，值为 `RefOffset + 1` |
+| `Operand4 == 0` | heap/boxed target |
+| `Operand4 < 0` | Ref Slot target，值为 `-1 - RefOffset` |
+
+Inline target 清零 primitive payload 并清空全部 ref slots；Boxed CLR target 创建 default boxed instance 并写入 mStack；boxed IL target 原地清零已有 `ILTypeInstance`。
+
+### 27.11 `Move` / value return / Call 参数
+
+`Move` lowering 后：
+
+| 字段 | 含义 |
+|---|---|
+| `DstOffset` | 目标 slot primitive offset |
+| `SrcOffset` | 源 slot primitive offset |
+| `Operand` | source ref count 或 move kind |
+| `Operand2` | primitive copy size |
+| `Operand3` | destination ref offset |
+
+值类型 Move 必须同时复制 primitive bytes 和 mStack refs；Boxed CLR 只复制 index/root。
+
+Call 参数不再依据“是不是 struct”猜测布局，而是使用 callee `ParamInfos` 的 `(Offset, Size, RefOffset, RefCount)`。Inline CLR 参数按完整 payload 传递，Boxed CLR 参数按 4+1 传递，byref 参数固定 8+0。
+
+### 27.12 初次实现出现问题的根因复盘
+
+本次问题不是单个 handler 的遗漏，而是编码契约没有集中定义，导致以下纰漏：
+
+1. **union 字段被当成独立字段使用**：`Register3`/`Operand`、`Register2`/`SrcOffset`、`OperandLong`/`Operand2+Operand3` 互相覆盖，曾出现 branch target、source offset、ref base 被覆盖。
+2. **offset 的域没有命名区分**：frame offset、payload offset、mStack ref offset、Ref Slot absolute offset、CLR field hash 都叫 offset，导致 `ResolveNeoFrameTarget` 被用于不属于 frame 的值。
+3. **`objectIndex=-1` 同时承载 FRAME_REF 和 null**：把合法 FRAME_REF 的 offset 清零，直接破坏嵌套 `ldflda/stfld`。
+4. **`Ldflda` 沿用栈机 destructive register 习惯**：源 receiver 与 Ref Slot 结果共用寄存器，写 Ref Slot 时覆盖 payload。
+5. **CLR Inline/Boxed 只在部分阶段分类**：`ILType`、JIT slot、static encoder、handler 曾各自使用不同判据，出现 CLR Inline 被当 4 字节、CLR Boxed 被错误 flat copy。
+6. **静态字段编码没有区分声明类型模型**：ILType 的 packed offset 与 CLRType 的 field hash 共用 `Operand3`，但 handler 端没有明确按 declaring type 分派。
+7. **slot 对齐只在 struct layout 中实现，未同步到临时/参数 slot**：long/double 曾出现奇数 byte offset，随后覆盖邻接数据。
+8. **Call 参数映射没有以 callee ABI 为准**：源寄存器布局与 callee 参数布局不一致，出现 long 参数读成 0。
+9. **测试路径混用了 Step 17/18 能力**：CLR value-type newobj、CLR Ref Slot、异常构造被 Step 13B 测试触发，失败信息又被 Step 18 `new Exception` 覆盖。
+10. **构建配置和输出目录复用**：Debug/Debug_Neo、Release/Release_Neo 共享部分 TestCases/TestBase 输出目录，增量构建可能混入宏不同的程序集；验证必须先按配置强制重建。
+11. **Legacy 与 Neo 测试入口混用**：NeoStep 用 `useRegister=false` 运行没有验证 Neo 功能；Legacy 回归必须使用普通测试名和正确的 target framework 输出。
+
+后续新增指令或 AOT 编码时，必须先补充本节的字段表和域说明，再修改 JIT/lowering/handler；任何只改其中一端的实现都视为 ABI 未完成。

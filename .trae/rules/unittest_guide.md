@@ -49,6 +49,9 @@
 - CLI 已经在 `Main` 外层加了 try/catch 输出未处理异常。否则 .NET 进程会直接以 `0xE0434352` 退出码崩溃，吞掉所有诊断。任何对 CLI 入口的改动都必须保留这层兜底。
 - ENABLE_NEO_MODE 下 `ILType.cs` 暂时跳过了 `appdomain.Invoke(staticConstructor)`（参见 Step 6 checklist），Step 7 实现完整的 `Stfld_*` / `Ldfld_*` 后会一并恢复。
 
+## NEO模式设计核对
+- 在涉及跟Neo模式指令编码相关内容时，需要核对Neo设计文档的"27.1 OpCodeR 的物理布局"章节。
+
 ## 测试用例问题排查铁律
 - 如果测试用例运行失败，根据错误日志和代码无法简单定位，并且需要做各种假设猜测才能定位问题，请勿浪费时间和Token，直接向用户求助，使用断点调试定位问题。需要告诉用户断点的位置，和需要观察的值。
 
