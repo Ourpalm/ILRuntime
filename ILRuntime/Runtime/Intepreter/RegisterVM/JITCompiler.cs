@@ -712,9 +712,30 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 slot.IsRef = true;
                 offset += 8;
             }
-            else if (t.IsPrimitive)
+            else if (t.IsPrimitive || t.IsEnum)
             {
-                int size = appdomain.GetPrimitiveSize(t);
+                // Enums (IL or CLR) are represented on the Neo evaluation stack as their
+                // underlying primitive (typically int32). Both live in a plain primitive
+                // slot with zero mStack ref count; falling through to the boxed-CLR-value
+                // branch below would incorrectly allocate an extra ref slot and desync
+                // the return-value marshalling paths (see Ret handler enum coverage).
+                int size;
+                if (t.IsEnum)
+                {
+                    // IL enum: fieldTypes[0] is the underlying primitive IType.
+                    // CLR enum: TypeForCLR is the enum type; Enum.GetUnderlyingType gives us
+                    //          the raw primitive, which we look up in the AppDomain type table.
+                    IType underlying;
+                    if (t is ILType ilEnum)
+                        underlying = ilEnum.FieldTypes[0];
+                    else
+                        underlying = appdomain.GetType(Enum.GetUnderlyingType(t.TypeForCLR));
+                    size = appdomain.GetPrimitiveSize(underlying);
+                }
+                else
+                {
+                    size = appdomain.GetPrimitiveSize(t);
+                }
                 // Neo stack slots widen sub-int primitives (bool / byte / sbyte / short / ushort / char)
                 // to 4 bytes so slot layout matches CIL evaluation-stack semantics and the SSA-rename
                 // pass's SlotLayoutCompatible check. Runtime read/write of these values uses

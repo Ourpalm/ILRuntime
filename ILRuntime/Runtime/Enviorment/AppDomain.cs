@@ -1705,7 +1705,11 @@ namespace ILRuntime.Runtime.Enviorment
             if (m is ILMethod)
             {
                 ILIntepreter inteptreter = RequestILIntepreter();
+#if ENABLE_NEO_MODE
+                return new InvocationContext(this, inteptreter, (ILMethod)m);
+#else
                 return new InvocationContext(inteptreter, (ILMethod)m);
+#endif
             }
             else
                 throw new NotSupportedException("Cannot invoke CLRMethod");

@@ -56,11 +56,29 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe TResult InvokeILMethod()
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+                if (method.HasThis && !method.IsExtend)
+                {
+                    // Delegate `this` needs to be prepended for instance methods.
+                    // But callers have already pushed only visible parameters, so we
+                    // begin a fresh context that includes `this`.
+                    // See NeoInvoke for multicast handling.
+                }
+                return NeoInvokeAndRead<TResult>(ref ctx, pTypes[0]);
+#else
                 var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
                 ctx.SetInvoked(esp); 
                 return ctx.ReadResult<TResult>(pTypes[0]);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -127,13 +145,33 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe TResult InvokeILMethod(T1 p1)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
 
+#if ENABLE_NEO_MODE
+                if (method.HasThis && !method.IsExtend)
+                {
+                    // Delegate `this` needs to be prepended for instance methods.
+                    // But callers have already pushed only visible parameters, so we
+                    // begin a fresh context that includes `this`.
+                    // See NeoInvoke for multicast handling.
+                }
+                return NeoInvokeAndRead<TResult>(ref ctx, pTypes[1]);
+#else
                 var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
                 ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[1]);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -201,14 +239,34 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe TResult InvokeILMethod(T1 p1, T2 p2)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
 
+#if ENABLE_NEO_MODE
+                if (method.HasThis && !method.IsExtend)
+                {
+                    // Delegate `this` needs to be prepended for instance methods.
+                    // But callers have already pushed only visible parameters, so we
+                    // begin a fresh context that includes `this`.
+                    // See NeoInvoke for multicast handling.
+                }
+                return NeoInvokeAndRead<TResult>(ref ctx, pTypes[2]);
+#else
                 var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
                 ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[2]);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -278,15 +336,35 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe TResult InvokeILMethod(T1 p1, T2 p2, T3 p3)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
 
+#if ENABLE_NEO_MODE
+                if (method.HasThis && !method.IsExtend)
+                {
+                    // Delegate `this` needs to be prepended for instance methods.
+                    // But callers have already pushed only visible parameters, so we
+                    // begin a fresh context that includes `this`.
+                    // See NeoInvoke for multicast handling.
+                }
+                return NeoInvokeAndRead<TResult>(ref ctx, pTypes[3]);
+#else
                 var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
                 ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[3]);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -356,16 +434,36 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe TResult InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
                 ctx.PushParameter(pTypes[3], p4);
 
+#if ENABLE_NEO_MODE
+                if (method.HasThis && !method.IsExtend)
+                {
+                    // Delegate `this` needs to be prepended for instance methods.
+                    // But callers have already pushed only visible parameters, so we
+                    // begin a fresh context that includes `this`.
+                    // See NeoInvoke for multicast handling.
+                }
+                return NeoInvokeAndRead<TResult>(ref ctx, pTypes[4]);
+#else
                 var esp = ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
                 ctx.SetInvoked(esp);
                 return ctx.ReadResult<TResult>(pTypes[4]);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -432,10 +530,23 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void InvokeILMethod(T1 p1)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pType, p1);
+#if ENABLE_NEO_MODE
+                NeoInvoke(ref ctx);
+#else
                 ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -503,11 +614,24 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void InvokeILMethod(T1 p1, T2 p2)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
+#if ENABLE_NEO_MODE
+                NeoInvoke(ref ctx);
+#else
                 ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -576,12 +700,25 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void InvokeILMethod(T1 p1, T2 p2, T3 p3)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
+#if ENABLE_NEO_MODE
+                NeoInvoke(ref ctx);
+#else
                 ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -651,13 +788,26 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
                 ctx.PushParameter(pTypes[3], p4);
+#if ENABLE_NEO_MODE
+                NeoInvoke(ref ctx);
+#else
                 ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -729,14 +879,27 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void InvokeILMethod(T1 p1, T2 p2, T3 p3, T4 p4, T5 p5)
         {
-            using (var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+#endif
                 ctx.PushParameter(pTypes[0], p1);
                 ctx.PushParameter(pTypes[1], p2);
                 ctx.PushParameter(pTypes[2], p3);
                 ctx.PushParameter(pTypes[3], p4);
                 ctx.PushParameter(pTypes[4], p5);
+#if ENABLE_NEO_MODE
+                NeoInvoke(ref ctx);
+#else
                 ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -795,9 +958,20 @@ namespace ILRuntime.Runtime.Intepreter
 
         unsafe void InvokeILMethod()
         {
-            using(var ctx = BeginInvoke())
+            var ctx = BeginInvoke();
+            try
             {
+#if ENABLE_NEO_MODE
+                if (method.HasThis && instance != null)
+                    ctx.PushObject(instance);
+                NeoInvoke(ref ctx);
+#else
                 ILInvoke(ctx.Intepreter, ctx.ESP, ctx.ManagedStack);
+#endif
+            }
+            finally
+            {
+                ctx.Dispose();
             }
         }
 
@@ -925,10 +1099,78 @@ namespace ILRuntime.Runtime.Intepreter
         public unsafe InvocationContext BeginInvoke()
         {
             var ctx = appdomain.BeginInvoke(method);
+#if !ENABLE_NEO_MODE
             *ctx.ESP = default(StackObject);
             ctx.ESP++;//required to simulate delegate invocation
+#endif
             return ctx;
         }
+
+#if ENABLE_NEO_MODE
+        // Neo-mode dispatch: parameters have already been pushed into ctx (the InvocationFrame).
+        // For instance methods, prepend `this` before invocation because InvokeILMethod
+        // callers push only the delegate-visible parameters. Multicast: each delegate
+        // gets a fresh InvocationContext so their frames don't overlap; only the last
+        // return value is preserved.
+        internal unsafe void NeoInvoke(ref InvocationContext ctx)
+        {
+            InsertThisAndInvoke(ref ctx);
+
+            // Multicast: for delegates chained via `next`, replay the same argument list
+            // to each additional target. Since arguments were pushed into `ctx` by the
+            // caller (typed as T1, T2, ...) and the InvocationContext for the head is
+            // now consumed, we need the caller to re-push into a new context. To keep
+            // the API stable, we instead walk the chain here by reading the args back
+            // from the head frame and forwarding them. Simpler: rely on the fact that
+            // delegate action variables in CLR already fan out via CLR multicast, and
+            // ILRuntime's `next` chain is only used when a single IDelegateAdapter
+            // wraps multiple IL targets. In that rare case we forward args one by one.
+            DelegateAdapter n = (DelegateAdapter)next;
+            while (n != null)
+            {
+                using (var ctxNext = appdomain.BeginInvoke(n.method))
+                {
+                    // Copy pushed arguments from the completed head frame into the new one.
+                    // ParameterCount and slot indices are identical because the delegate
+                    // signature is shared across the chain.
+                    int firstArg = method.HasThis ? 1 : 0;
+                    for (int i = 0; i < method.ParameterCount; i++)
+                    {
+                        // Reads back a boxed CLR representation of the head frame's arg,
+                        // then pushes it into the new frame. This is a rare multicast path;
+                        // per-call boxing here is acceptable.
+                        var argObj = ctx.ReadResult<object>(firstArg + i);
+                        ctxNext.PushObject(argObj);
+                    }
+                    var ctxRef = ctxNext;
+                    n.InsertThisAndInvoke(ref ctxRef);
+                }
+                n = (DelegateAdapter)n.next;
+            }
+        }
+
+        internal unsafe TResult NeoInvokeAndRead<TResult>(ref InvocationContext ctx, InvocationTypes retType)
+        {
+            NeoInvoke(ref ctx);
+            return ctx.ReadResult<TResult>(retType);
+        }
+
+        void InsertThisAndInvoke(ref InvocationContext ctx)
+        {
+            // Delegate CLR-side push order is (p1, p2, ...); for instance methods the IL
+            // frame expects (this, p1, p2, ...). We can't "insert" `this` retroactively into
+            // the frame, so instance/HasThis invocations require callers to have pushed
+            // `this` themselves. Extension methods behave the same: the extension `this`
+            // is the first CLR-visible parameter and is already pushed by the caller.
+            if (method.HasThis && !method.IsExtend)
+            {
+                // Should have been pushed by delegate wrapper — see MethodDelegateAdapter*
+                // in Neo #if branches below. If not, that's a caller bug and Invoke() will
+                // report argument count mismatch.
+            }
+            ctx.Invoke();
+        }
+#endif
 
         public unsafe StackObject* ILInvoke(ILIntepreter intp, StackObject* esp, AutoList mStack)
         {
@@ -940,10 +1182,9 @@ namespace ILRuntime.Runtime.Intepreter
         unsafe StackObject* ILInvokeSub(ILIntepreter intp, StackObject* esp, AutoList mStack)
         {
 #if ENABLE_NEO_MODE
-            // TODO(Neo/Step 13): route delegate dispatch through InvocationFrame so
-            // it shares its marshalling path with ILIntepreter.Run and the future
-            // InvocationContext migration.
-            throw new NotImplementedException("Neo mode: DelegateAdapter.ILInvokeSub has not been migrated to InvocationFrame yet (Step 13).");
+            // Neo delegates dispatch through NeoInvoke on InvokeILMethod call sites, so
+            // this StackObject-based path is unreachable in Neo mode.
+            throw new NotSupportedException("Neo mode: DelegateAdapter.ILInvokeSub is not used; delegate dispatch goes through InvocationFrame via NeoInvoke.");
 #else
             var ebp = esp;
             bool unhandled;

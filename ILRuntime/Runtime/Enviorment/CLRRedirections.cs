@@ -895,11 +895,6 @@ namespace ILRuntime.Runtime.Enviorment
 
         public unsafe static StackObject* MethodInfoInvoke(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
-#if ENABLE_NEO_MODE
-            // TODO(Neo/Step 13): route MethodInfo.Invoke through ILIntepreter.InvocationFrame
-            // so reflective calls share the same marshalling path as ILIntepreter.Run.
-            throw new NotImplementedException("Neo mode: MethodInfoInvoke has not been migrated to InvocationFrame yet (Step 13).");
-#else
             AppDomain domain = intp.AppDomain;
             //Don't ask me why not esp - 3, unity won't return the right result
             var ret = ILIntepreter.Minus(esp, 3);
@@ -917,11 +912,43 @@ namespace ILRuntime.Runtime.Enviorment
 
             if (instance is ILRuntimeMethodInfo)
             {
+                var ilmethod = ((ILRuntimeMethodInfo)instance).ILMethod;
+#if ENABLE_NEO_MODE
+                // Route IL-target reflection through InvocationFrame: push `this` (if
+                // any) then each entry of `arr` via the standard PushObject path, and
+                // read the boxed return value back through the frame's ReadObject.
+                object retObj;
+                bool hasRet;
+                {
+                    var ctx = domain.BeginInvoke(ilmethod);
+                    try
+                    {
+                        if (ilmethod.HasThis)
+                            ctx.PushObject(obj);
+                        if (p != null)
+                        {
+                            object[] arr = (object[])p;
+                            for (int i = 0; i < ilmethod.ParameterCount; i++)
+                                ctx.PushObject(CheckCrossBindingAdapter(arr[i]));
+                        }
+                        ctx.Invoke();
+                        var rt = ilmethod.ReturnType;
+                        hasRet = rt != null && rt != domain.VoidType;
+                        retObj = hasRet ? ctx.ReadObject(typeof(object)) : null;
+                    }
+                    finally
+                    {
+                        ctx.Dispose();
+                    }
+                }
+                if (hasRet)
+                    return ILIntepreter.PushObject(ret, mStack, retObj, true);
+                return ILIntepreter.PushNull(ret);
+#else
                 if (obj != null)
                     esp = ILIntepreter.PushObject(ret, mStack, obj);
                 else
                     esp = ret;
-                var ilmethod = ((ILRuntimeMethodInfo)instance).ILMethod;
                 bool useRegister = ilmethod.ShouldUseRegisterVM;
                 if (p != null)
                 {
@@ -940,23 +967,23 @@ namespace ILRuntime.Runtime.Enviorment
                 else
                     ret = intp.Execute(ilmethod, esp, out unhandled);
                 ILRuntimeMethodInfo imi = (ILRuntimeMethodInfo)instance;
-                var rt = imi.ILMethod.ReturnType;
-                if (rt != domain.VoidType)
+                var rt2 = imi.ILMethod.ReturnType;
+                if (rt2 != domain.VoidType)
                 {
                     var res = ret - 1;
                     if (res->ObjectType < ObjectTypes.Object)
                     {
-                        return ILIntepreter.PushObject(res, mStack, rt.TypeForCLR.CheckCLRTypes(StackObject.ToObject(res, domain, mStack)), true);
+                        return ILIntepreter.PushObject(res, mStack, rt2.TypeForCLR.CheckCLRTypes(StackObject.ToObject(res, domain, mStack)), true);
                     }
                     else
                         return ret;
                 }
                 else
                     return ILIntepreter.PushNull(ret);
+#endif
             }
             else
                 return ILIntepreter.PushObject(ret, mStack, ((MethodInfo)instance).Invoke(obj, (object[])p));
-#endif
         }
 
         static object CheckCrossBindingAdapter(object obj)

@@ -595,27 +595,6 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 ---
 
-## Step 13b: CLR ↔ IL 外部入口迁移到 InvocationFrame
-
-**目标**: 把所有从 CLR 侧进入 Neo 解释器的外部入口(反射调用、委托、CLRRedirection)统一改走 InvocationFrame + `WriteNeoPrimitive` / `ReadNeoPrimitive`,禁止再手写 `StackObject*` 封送。目前这些入口在 `#if ENABLE_NEO_MODE` 分支下 fail-fast NotImpl,属于 Step 12 handoff §7 挂账的兜底,尚未在原设计中编排(见 Step 12b handoff 说明)。
-
-**内容**:
-1. **InvocationContext** Neo 重写:内部持有 `InvocationFrame`,`Push*` / `Read*` / `Invoke` 全部一行转发;`PrimitiveConverter<T>` 泛型桥保留(零反射 CLR enum 转 int/long)。
-2. **PushReference(int)** Neo 语义决策:StackObject 引用在 Neo 中无对应物,建议 `throw NotSupportedException`。
-3. **DelegateAdapter.ILInvokeSub** Neo 路径改走 InvocationFrame(CLR → IL 方向的 marshalling)。
-4. **CLRRedirections.MethodInfoInvoke** Neo 路径改走 InvocationFrame。
-5. **InvocationFrame 泛型 stub 落地**:`WriteInt32<T>` / `PushInt32<T>` / `ReadInt32<T>` 等目前抛 GenericStubMsg,本 step 借 PrimitiveConverter<T> 桥补齐。
-6. **审计并清理** 所有 Step 12 handoff §7 里挂"Step 13" tag 的 NotImpl,改成 "Step 13b" 或直接实现覆盖。
-
-**依赖**: Step 12b(InvocationFrame 与 primitive marshalling 基础设施)、Step 13(CLR value-type 有/无 ValueTypeBinder 双路径)
-
-**验证方式**:
-- 外部 `InvocationContext` 调用一个 IL 方法,含 primitive/enum/reference/ILTypeInstance/CLR-with-binder/CLR-without-binder 参数,以及各种返回类型
-- 委托 / 反射 `MethodInfo.Invoke` 到 IL 方法同上
-- Legacy `InvocationContext.ReadResult<T>` 对 IL enum 返回值行为(boxed underlying primitive,非 `ILEnumTypeInstance`)一致
-
----
-
 ## Step 13: Box/Unbox 完整实现
 
 **目标**: 完善所有 Boxing/Unboxing 场景，含 CLR 值类型。
@@ -675,6 +654,27 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 - IL struct 包含带引用字段的 CLR Inline struct，引用在 mStack ref region 中正确同步。
 - 嵌套 CLR Inline struct 的 Box/Unbox 往返正确。
 - Neo 指定测试通过，Legacy 全量测试无回归。
+
+---
+
+## Step 13c: CLR ↔ IL 外部入口迁移到 InvocationFrame
+
+**目标**: 把所有从 CLR 侧进入 Neo 解释器的外部入口(反射调用、委托、CLRRedirection)统一改走 InvocationFrame + `WriteNeoPrimitive` / `ReadNeoPrimitive`,禁止再手写 `StackObject*` 封送。目前这些入口在 `#if ENABLE_NEO_MODE` 分支下 fail-fast NotImpl,属于 Step 12 handoff §7 挂账的兜底,尚未在原设计中编排(见 Step 12b handoff 说明)。
+
+**内容**:
+1. **InvocationContext** Neo 重写:内部持有 `InvocationFrame`,`Push*` / `Read*` / `Invoke` 全部一行转发;`PrimitiveConverter<T>` 泛型桥保留(零反射 CLR enum 转 int/long)。
+2. **PushReference(int)** Neo 语义决策:StackObject 引用在 Neo 中无对应物,建议 `throw NotSupportedException`。
+3. **DelegateAdapter.ILInvokeSub** Neo 路径改走 InvocationFrame(CLR → IL 方向的 marshalling)。
+4. **CLRRedirections.MethodInfoInvoke** Neo 路径改走 InvocationFrame。
+5. **InvocationFrame 泛型 stub 落地**:`WriteInt32<T>` / `PushInt32<T>` / `ReadInt32<T>` 等目前抛 GenericStubMsg,本 step 借 PrimitiveConverter<T> 桥补齐。
+6. **审计并清理** 所有 Step 12 handoff §7 里挂"Step 13" tag 的 NotImpl,改成 "Step 13b" 或直接实现覆盖。
+
+**依赖**: Step 12b(InvocationFrame 与 primitive marshalling 基础设施)、Step 13(CLR value-type 有/无 ValueTypeBinder 双路径)
+
+**验证方式**:
+- 外部 `InvocationContext` 调用一个 IL 方法,含 primitive/enum/reference/ILTypeInstance/CLR-with-binder/CLR-without-binder 参数,以及各种返回类型
+- 委托 / 反射 `MethodInfo.Invoke` 到 IL 方法同上
+- Legacy `InvocationContext.ReadResult<T>` 对 IL enum 返回值行为(boxed underlying primitive,非 `ILEnumTypeInstance`)一致
 
 ---
 

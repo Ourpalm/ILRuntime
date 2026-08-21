@@ -43,10 +43,7 @@ namespace ILRuntime.Runtime.Intepreter
             int nextParamIdx;
             bool executed;
 
-            const string GenericStubMsg =
-                "Generic non-boxing Push/Write/Read is reserved for InvocationContext migration (Step 13).";
-
-            internal static InvocationFrame Begin(ILIntepreter intp, ILMethod method)
+            internal static InvocationFrame Begin(ILIntepreter intp, ILMethod method, int frameStartOffset = 0)
             {
                 var stack = intp.Stack;
                 var mStack = stack.ManagedStack;
@@ -61,10 +58,16 @@ namespace ILRuntime.Runtime.Intepreter
                 f.mStackBase = mStack.Count;
 
                 // Neo frame lives on stack.StackBase as a flat byte region. The return
-                // primitive slot is placed immediately after the frame, sharing the
-                // same block; no StackObject alignment is needed because Neo addressing
-                // is entirely byte-offset based.
-                byte* baseAddr = (byte*)stack.StackBase;
+                // primitive slot is placed immediately after the frame, sharing the same
+                // block; no StackObject alignment is needed because Neo addressing is
+                // entirely byte-offset based.
+                //
+                // frameStartOffset lets the caller (e.g. InvocationContext) reserve a byte
+                // region at the low end of the stack for its own use (ref-argument backing
+                // storage) before the callee frame begins. The callee's `frameBase` is
+                // shifted forward accordingly so its nested Call opcodes (`newEsp = frameBase
+                // + TotalStructSize`) never overwrite the caller's reserved region.
+                byte* baseAddr = (byte*)stack.StackBase + frameStartOffset;
                 f.frameBase = baseAddr;
                 f.retDst = nf.ReturnPrimitiveSize > 0 || nf.ReturnRefCount > 0
                     ? baseAddr + nf.TotalStructSize
@@ -173,6 +176,30 @@ namespace ILRuntime.Runtime.Intepreter
             public void PushSingle<T>(T value) { WriteSingle<T>(nextParamIdx++, value); }
             public void PushDouble<T>(T value) { WriteDouble<T>(nextParamIdx++, value); }
 
+            // Emit an 8-byte Ref Slot `(objectIndex, offset)` into the current parameter slot
+            // and advance the parameter cursor. Callers (e.g. InvocationContext) that need to
+            // pass a `ref T` / `out T` argument construct the ref-slot encoding themselves:
+            // FRAME_REF uses `objectIndex = -1` with `offset` = an absolute byte offset from
+            // stack.StackBase; heap refs use `objectIndex = mStackIndex` with a field/element
+            // offset. This method is layout-agnostic: it does not know or care where the target
+            // memory lives.
+            public void PushByRefSlot(int objectIndex, int offset)
+            {
+                ref readonly var cf = ref method.CompiledFrame;
+                if (nextParamIdx >= cf.ParamInfos.Length)
+                    throw new InvalidOperationException(
+                        "Neo InvocationFrame: PushByRefSlot exceeds the target method's parameter count.");
+                var refSlot = cf.ParamInfos[nextParamIdx];
+                if (refSlot.Size != 8 || !refSlot.IsRef)
+                    throw new InvalidOperationException(
+                        "Neo InvocationFrame: parameter at position " + nextParamIdx +
+                        " is not a byref slot; verify the target IL method's signature has `ref T` / `out T` there.");
+                byte* pDst = frameBase + refSlot.Offset;
+                *(int*)pDst = objectIndex;
+                *(int*)(pDst + 4) = offset;
+                nextParamIdx++;
+            }
+
             // ---------------------------------------------------------------
             // Execute + return-value readers
             // ---------------------------------------------------------------
@@ -246,20 +273,141 @@ namespace ILRuntime.Runtime.Intepreter
                 return *(double*)retDst;
             }
 
-            public T ReadInt32<T>() { return ReadGenericPrimitive<T>(); }
-            public T ReadInt64<T>() { return ReadGenericPrimitive<T>(); }
-            public T ReadSingle<T>() { return ReadGenericPrimitive<T>(); }
-            public T ReadDouble<T>() { return ReadGenericPrimitive<T>(); }
+            public T ReadInt32<T>() { return ReadGenericPrimitive<T>(retDst); }
+            public T ReadInt64<T>() { return ReadGenericPrimitive<T>(retDst); }
+            public T ReadSingle<T>() { return ReadGenericPrimitive<T>(retDst); }
+            public T ReadDouble<T>() { return ReadGenericPrimitive<T>(retDst); }
 
-            T ReadGenericPrimitive<T>()
+            // ---------------------------------------------------------------
+            // Parameter-index readers (for observing ref/out writeback)
+            // ---------------------------------------------------------------
+
+            public int ReadInt32(int paramIndex)
+            {
+                if (!executed)
+                    throw new InvalidOperationException("Execute must be called before reading parameter values.");
+                var slot = method.CompiledFrame.ParamInfos[paramIndex];
+                return *(int*)(frameBase + slot.Offset);
+            }
+
+            public long ReadInt64(int paramIndex)
+            {
+                if (!executed)
+                    throw new InvalidOperationException("Execute must be called before reading parameter values.");
+                var slot = method.CompiledFrame.ParamInfos[paramIndex];
+                return *(long*)(frameBase + slot.Offset);
+            }
+
+            public float ReadSingle(int paramIndex)
+            {
+                if (!executed)
+                    throw new InvalidOperationException("Execute must be called before reading parameter values.");
+                var slot = method.CompiledFrame.ParamInfos[paramIndex];
+                return *(float*)(frameBase + slot.Offset);
+            }
+
+            public double ReadDouble(int paramIndex)
+            {
+                if (!executed)
+                    throw new InvalidOperationException("Execute must be called before reading parameter values.");
+                var slot = method.CompiledFrame.ParamInfos[paramIndex];
+                return *(double*)(frameBase + slot.Offset);
+            }
+
+            public T ReadInt32<T>(int paramIndex)
+            {
+                if (!executed)
+                    throw new InvalidOperationException("Execute must be called before reading parameter values.");
+                var slot = method.CompiledFrame.ParamInfos[paramIndex];
+                return ReadGenericPrimitive<T>(frameBase + slot.Offset);
+            }
+            public T ReadInt64<T>(int paramIndex) { return ReadInt32<T>(paramIndex); }
+            public T ReadSingle<T>(int paramIndex) { return ReadInt32<T>(paramIndex); }
+            public T ReadDouble<T>(int paramIndex) { return ReadInt32<T>(paramIndex); }
+
+            public object ReadObject(int paramIndex)
+            {
+                if (!executed)
+                    throw new InvalidOperationException("Execute must be called before reading parameter values.");
+                var slot = method.CompiledFrame.ParamInfos[paramIndex];
+                IType paramType = GetParamType(paramIndex);
+                byte* pSrc = frameBase + slot.Offset;
+
+                if (paramType.IsPrimitive || paramType.IsEnum)
+                    return ReadNeoPrimitive(pSrc, paramType);
+
+                if (paramType.IsValueType)
+                {
+                    if (paramType is ILType ilVt)
+                    {
+                        var vt = ilVt.Instantiate(false);
+                        if (slot.Size > 0)
+                        {
+                            fixed (byte* dstP = vt.Primitives)
+                                Buffer.MemoryCopy(pSrc, dstP, slot.Size, slot.Size);
+                        }
+                        int pRefBase = calleeRefBase + slot.RefOffset;
+                        for (int r = 0; r < slot.RefCount; r++)
+                            vt.ManagedObjects[r] = mStack[pRefBase + r];
+                        return vt;
+                    }
+                    if (paramType is CLRType clrType)
+                    {
+                        if (clrType.StructStorage == StructStorage.Inline)
+                        {
+                            var boxed = clrType.CreateDefaultInstance();
+                            int pRefBase = calleeRefBase + slot.RefOffset;
+                            ILIntepreter.CopyFrameToBoxedClrObjectStatic(boxed, clrType, pSrc, mStack, pRefBase);
+                            return boxed;
+                        }
+                        int boxedIdx = *(int*)pSrc;
+                        return boxedIdx >= 0 ? mStack[boxedIdx] : null;
+                    }
+                    throw new NotSupportedException(
+                        "Neo InvocationFrame: unresolved value type '" + paramType.FullName + "'.");
+                }
+
+                int refIdx = *(int*)pSrc;
+                object refObj = refIdx >= 0 ? mStack[refIdx] : null;
+                return paramType.TypeForCLR.CheckCLRTypes(refObj);
+            }
+
+            // Zero-boxing generic primitive reader:
+            //   * primitive/enum T with a registered PrimitiveConverter<T> → direct delegate invoke
+            //   * IntPtr/UIntPtr, or primitive/enum T without a converter (fallback) → box via
+            //     ReadNeoPrimitive then cast
+            //   * reference-type T → not supported (use ReadObject<T> instead)
+            T ReadGenericPrimitive<T>(byte* src)
             {
                 if (!executed)
                     throw new InvalidOperationException("Execute must be called before reading the return value.");
                 var tt = typeof(T);
-                if (!(tt.IsPrimitive || tt.IsEnum || tt == typeof(IntPtr) || tt == typeof(UIntPtr)))
-                    throw new NotSupportedException("Reference-type generic stub reserved for Step 13b.");
-                var it = intp.AppDomain.GetType(tt);
-                return (T)ILIntepreter.ReadNeoPrimitive(retDst, it);
+                if (tt == typeof(IntPtr))
+                    return (T)(object)new IntPtr(*(long*)src);
+                if (tt == typeof(UIntPtr))
+                    return (T)(object)new UIntPtr(*(ulong*)src);
+                if (!(tt.IsPrimitive || tt.IsEnum))
+                    throw new NotSupportedException(
+                        "Neo InvocationFrame: reference-type T is not supported by ReadGenericPrimitive<T>; use ReadObject<T> instead.");
+                // Zero-boxing path: PrimitiveConverter<T> is populated by
+                // InvocationContext.InitializeDefaultConverters for all built-in primitives
+                // and by user code (or generated bindings) for enum types.
+                var invType = ILRuntime.Runtime.Enviorment.InvocationContext.GetInvocationType<T>();
+                switch (invType)
+                {
+                    case ILRuntime.Runtime.Enviorment.InvocationTypes.Integer:
+                        return ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeFromInteger(*(int*)src);
+                    case ILRuntime.Runtime.Enviorment.InvocationTypes.Long:
+                        return ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeFromLong(*(long*)src);
+                    case ILRuntime.Runtime.Enviorment.InvocationTypes.Float:
+                        return ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeFromFloat(*(float*)src);
+                    case ILRuntime.Runtime.Enviorment.InvocationTypes.Double:
+                        return ILRuntime.Runtime.Enviorment.PrimitiveConverter<T>.CheckAndInvokeFromDouble(*(double*)src);
+                    default:
+                        // Enum without registered converter (or any other primitive path): fallback via boxing.
+                        var it = intp.AppDomain.GetType(tt);
+                        return (T)ILIntepreter.ReadNeoPrimitive(src, it);
+                }
             }
 
             public void Dispose()
