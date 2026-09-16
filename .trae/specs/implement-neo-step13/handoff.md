@@ -127,7 +127,7 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 | `NeoStep13BoxUnboxTestVector3` | TestVector3 有 static ctor `new TestVector3(1,1,1)`,需要 **Step 18**(CLR 值类型 newobj + Ref Slot 传 this) |
 | `NeoStep13BoxUnboxJInt` | JInt 有 property + operator,依赖 **Step 18**(CLR value type method dispatch) |
 | `NeoStep13UnboxNullThrowsNRE` / `NeoStep13UnboxMismatchThrowsICE` | try/catch 依赖 **Step 14**(异常处理 Leave_S) |
-| `NeoStep13NewobjCtorThrowsPreservesDst` | 依赖 CLR reference type newobj → **Step 18**;半构造保护逻辑本 step 已实现,当 CLR newobj 落地后可直接添加回归用例 |
+| `NeoStep13NewobjCtorThrowsPreservesDst` | 依赖 CLR reference type newobj → **Step 14.5**；半构造保护逻辑本 step 已实现，构造路径落地后可直接添加回归用例 |
 | `NeoStep13BoxRoundtripArray` | `object[]` 数组 → **Step 16**(Newarr) |
 
 ---
@@ -138,7 +138,8 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 |---|---|
 | CLRBinding 代码生成器改造(自动 emit `Unsafe.Unbox<T>` in-place 模式,消除 WriteBackInstance) | **Step 15** |
 | CLR ↔ IL 外部反射入口迁移(InvocationContext.Invoke / DelegateAdapter.ILInvokeSub / CLRRedirections.MethodInfoInvoke) | **Step 13b** |
-| CLR reference type newobj / CLR value type newobj + Ref Slot 传 this | **Step 18** |
+| CLR reference type newobj | **Step 14.5** |
+| IL/CLR value type newobj + Ref Slot/StructStorage | **Step 18** |
 | 异常处理 Leave_S / try/catch/finally | **Step 14** |
 | `object[]` / Array newarr / ldelem / stelem | **Step 16** |
 | ILType -> CLR Inline struct 的 size/alignment/ref count 与嵌套引用递归 | **已由 Step 13B 完成** |
@@ -153,7 +154,7 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 - ✅ **III.4.31 `box`**:CLR 值类型的 box 走 §3 的 Inline/Boxed 二态分派;返回堆装箱对象(存 mStack)
 - ✅ **III.4.32 `unbox`**:目前 Neo 侧 `Unbox` 与 `Unbox_Any` 共享 handler;`unbox` 产生 managed pointer 的语义留 Step 17(需 Ref Slot 基础)
 - ✅ **III.4.33 `unbox.any`**:值类型本身(帧内 flat bytes 或 mStack index)
-- ✅ **II.14.4.2 值类型 newobj this**:目前 IL 值类型的 newobj + Ref Slot 传 this 挂到 Step 18;CLR 类型的 newobj 挂到 Step 9(尚未在 Neo 落地)
+- ✅ **II.14.4.2 值类型 newobj this**:IL/CLR 值类型的 newobj + Ref Slot/StructStorage 挂到 Step 18；普通 CLR 引用类型 newobj 的调用 ABI 来自 Step 9，构造路径挂到 Step 14.5
 - ✅ **III.4.21 newobj**:dst slot 写入延后到 ctor 成功返回;ctor 异常时 dst slot 恢复到 prevPrimSlot
 
 ---
@@ -184,7 +185,7 @@ JIT emit 侧 [JITCompiler.cs L1361-L1462](file:///f:/SVN/ILRuntime/ILRuntime/Run
 
 ## 12. 交给下一位的三行结论
 
-Step 13 通过一次编译期 `StructStorage` 分派统一了 CLR 值类型的 Box / Unbox / Initobj / 字段访问路径,handler 内不做运行时布局判断;通过 `Unsafe.As` 强转堆对象和提取了公共类 `MemoryLayoutHelpers`，达成了与 IL2CPP/CoreCLR 高度一致且零 GC 压力的极速 `memcpy` 级操作。Newobj 半构造暴露问题通过 try/finally + dst 前值恢复解决;`Ldfld_Value` / `Stfld_Value` 穿越 CLR Ref Slot 的分支挂账 Step 17,CLR reference/value type newobj 挂账 Step 18,异常处理下的用例挂账 Step 14,数组用例挂账 Step 16。Neo 47/47 + Legacy 493/493 全绿,双配置 0 错误。
+Step 13 通过一次编译期 `StructStorage` 分派统一了 CLR 值类型的 Box / Unbox / Initobj / 字段访问路径,handler 内不做运行时布局判断;通过 `Unsafe.As` 强转堆对象和提取了公共类 `MemoryLayoutHelpers`，达成了与 IL2CPP/CoreCLR 高度一致且零 GC 压力的极速 `memcpy` 级操作。Newobj 半构造暴露问题通过 try/finally + dst 前值恢复解决;`Ldfld_Value` / `Stfld_Value` 穿越 CLR Ref Slot 的分支挂账 Step 17，CLR reference newobj 挂账 Step 14.5，IL/CLR value type newobj 挂账 Step 18，异常处理下的用例挂账 Step 14，数组用例挂账 Step 16。Neo 47/47 + Legacy 493/493 全绿,双配置 0 错误。
 
 ---
 

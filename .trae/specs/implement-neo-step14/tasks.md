@@ -15,3 +15,4 @@
 - [x] 改名及测试代码格式整理后重新验收：Debug_Neo、Release_Neo 的 Step14 均 27/27；完整 NeoStep 均为 94 项、仅保留 2 项基线失败。
 - [x] 移除热路径上的 `ExecuteNeoCore` 额外调用层；profiler 的异常安全 `try/finally` 仅在 `DEBUG && !NO_PROFILER` 下编译。
 - [x] 更新设计 §17 / §27.13、步骤状态、验收记录和 handoff。
+- [x] 复审后续顺序：新增 Step14.5 承接普通 CLR 引用类型 newobj；Step18 缩小为 IL/CLR 值类型 newobj，并修正 handoff 中既有失败的归属。

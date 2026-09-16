@@ -61,7 +61,7 @@
 
 # 不在本 Spec 范围的内容
 - CLR 方法调用与 `Console.WriteLine` 回填（Step9）
-- CLR 引用类型 `newobj` 完整实现（Step9/Step18）
+- CLR 引用类型 `newobj` 完整实现（Step9 提供调用 ABI，Step14.5 落地构造路径）
 - VTable / `Callvirt` 分派（Step10）
 - 帧内值类型 Inline 字段访问（Step12）
 - Ref/Out、`Ldloca`、`Ldflda`、`Ldind`、`Stind`（Step17）

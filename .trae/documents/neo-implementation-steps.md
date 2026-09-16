@@ -69,13 +69,16 @@ Step 1 (宏体系)
   │     │     │     │     │     │     │     │
   │     │     │     │     │     │     │     ├─→ Step 11 (接口分派)
   │     │     │     │     │     │     │     │
-  │     │     │     │     │     │     │     └─→ Step 19 (委托)
+  │     │     │     │     │     │     │     └─→ Step 19 (委托特殊 newobj)
   │     │     │     │     │     │     │
-  │     │     │     │     │     │     └─→ Step 15 (isinst/castclass)
   │     │     │     │     │     │
-  │     │     │     │     │     └─→ [后续所有引用类型场景均可验证]
+  │     │     │     │     │     ├─→ Step 14.5 (CLR 引用类型 newobj) ← 同时依赖 Step 14
+  │     │     │     │     │     │
+  │     │     │     │     │     └─→ Step 15 (isinst/castclass)
+  │     │     │     │     │     │
+  │     │     │     │     │     └─→ [后续 IL 引用类型场景均可验证]
   │     │     │     │     │
-  │     │     │     │     └─→ Step 14 (异常处理)
+  │     │     │     │     └─→ Step 14 (异常处理) ─→ Step 14.5
   │     │     │     │
   │     │     │     └─→ Step 16 (数组访问)
   │     │     │
@@ -87,7 +90,7 @@ Step 1 (宏体系)
   │     │
   │     └─→ Step 17 (Ref/Out + ldloca/ldflda)
   │           │
-  │           └─→ Step 18 (值类型 newobj + CLR newobj) ← 需要 Ref Slot 传 this
+  │           └─→ Step 18 (IL/CLR 值类型 newobj) ← 需要 Ref Slot 传 this/存储结果
   │
   └─→ Step 20 (Async/Await) ← 依赖 Step 13, 17, 19
 ```
@@ -351,7 +354,7 @@ Step 6 smoke 临时在 [ILType.cs](file:///f:/SVN/ILRuntime/ILRuntime/CLR/TypeSy
    - this 的 mStack index 写入 callee 帧 param0（作为第一个参数）
    - 按 Step 8 的 Call 约定调用构造函数（构造函数用 `call` 非 `callvirt`，不需要 VTable）
    - 构造函数返回后，caller 的目标 ref slot 已持有新对象的 index
-2. CLR 引用类型 newobj：通过 CLRMethod 构造（依赖 Step 9 完成后补充）
+2. CLR 引用类型 newobj：通过 CLRMethod 构造；基础能力依赖 Step 9，按调整后的顺序在 Step 14.5 补充
 
 **说明**: 无需新增指令。`Newobj` 操作码不变，operand 仍为目标构造方法引用，只是在 `ExecuteNeo` 的 case handler 中按 Neo 帧布局执行。
 
@@ -554,7 +557,7 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 - **Step 13b (新)** — CLR ↔ IL 外部入口迁移到 InvocationFrame:`InvocationContext.Invoke` / `DelegateAdapter.ILInvokeSub` / `CLRRedirections.MethodInfoInvoke` 目前在 Neo 分支下 fail-fast NotImpl,需要按 Step 12b 落地的 InvocationFrame + `WriteNeoPrimitive/ReadNeoPrimitive` 统一改造。value-type 参数/返回值走 Step 13 落地的 flat-bytes/boxed 二选一。
 - **Step 16**(数组元素访问):`ldelema` 产出 Ref Slot,复用 Step 12b 定义的 8 字节 `(objectIndex, offset)` 编码;`Ldind/Stind` 三分派新增 Array 分支(Step 12b 已在 handler 里以 `NotImplementedException("Step 16")` 占位)。
 - **Step 17**(Ref/Out 跨帧封送):Ref Slot 编码新增 `objectIndex = -2` marker(指向 mStack 引用槽本身),用于跨帧 struct 引用字段 ldflda + Ldflda 携带 `structRefOffset`;Step 12b 已把同帧场景通过 `PropagateByRefReferentOffsets` pass 提前闭环,Step 17 只需处理跨帧余量。
-- **Step 18**(值类型 newobj + CLR newobj):值类型构造函数需要 struct-this Ref Slot(Step 12b 已把 struct-this ABI 改为 by-ref)。
+- **Step 18**(IL/CLR 值类型 newobj):值类型构造函数需要 struct-this Ref Slot，CLR 值类型结果还需按 StructStorage 写入 inline/boxed 目标。普通 CLR 引用类型 newobj 已提前到 Step 14.5。
 
 ---
 
@@ -711,6 +714,47 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 ---
 
+## Step 14.5: CLR 引用类型 newobj
+
+**目标**: 补齐 Step 8b 在 Step 9 完成后留下的普通 CLR 引用类型构造路径，解除异常、类型检查、数组及后续步骤对 CLRHost 工厂方法的依赖。
+
+**拆分依据**:
+- 普通 CLR 引用类型构造的结果是对象引用，只需写入 caller 已预分配的 primitive 索引和 ref slot，不需要 struct-this Ref Slot。
+- IL/CLR 值类型构造涉及帧内目标、StructStorage、managed pointer this 和失败回滚，继续由 Step 18 负责。
+- Delegate 构造是 CLR 特殊 fastcall，必须结合 `ldftn` / `ldvirtftn` 和 DelegateManager，在 Step 19 单独实现。
+
+**内容**:
+1. `Newobj` 按 declaring type 和存储类别分派；本步只接受非 delegate 的 CLR 引用类型。
+2. 有 `CLRRedirectionDelegateNeo` 时传入真实 `retDst` / `retRefBase`，由 redirection 写入结果。
+3. 无 redirection 时调用 `CLRMethod.Invoke(..., isNewObj: true)`，取得构造结果后由公共提交路径写入 caller 的预分配引用槽。
+4. 构造成功后才提交目标 primitive 索引和引用；参数准备、redirection/反射调用任一阶段失败都恢复原目标槽。
+5. 参数能力与当前 Neo CLR Call 保持一致；尚未支持的复杂 CLR value-type、byref/out 参数继续明确 fail-fast，不以默认值静默调用。
+6. `System.String` 构造走专用 Neo redirection；不把 CLR 内部 fastcall 构造当作普通反射路径。
+7. Delegate 构造明确转交 Step 19；CLR value type 构造明确转交 Step 18，错误信息指出实际负责步骤。
+
+**依赖**: Step 9（CLR 调用和 Neo redirection ABI），Step 14（构造异常传播及事务回滚边界）。
+
+**验证方式**:
+- `new Exception("message")`：异常类型、Message 和 throw/catch 均正确。
+- `new List<int>()`：普通 CLR 引用类型构造成功；另用未注册 redirection 的测试 CLR class 覆盖反射 fallback。
+- 带 primitive、string、null 引用参数的构造函数。
+- 已生成 Neo constructor binding 的 CLR 类型走 redirection，结果写入正确 ref slot。
+- 构造函数抛异常时保留原异常身份和栈，caller 目标槽保持原值；异常后同一 interpreter 可继续调用。
+- string 专用构造路径；delegate 与 CLR value type 仍产生指向 Step 19/18 的明确诊断。
+
+**ECMA-335 合规检查项**:
+- [ ] **III.4.21 newobj 成功提交**：构造函数成功返回前，不得向 IL caller 暴露新对象；redirection 和反射路径失败时都恢复 primitive 索引及 ref slot。
+- [ ] **构造异常身份**：反射路径解包 `TargetInvocationException`，通过 EDI 传播原异常；不得用 wrapper 或重新 `throw ex` 改变异常身份和原始 CLR 栈。
+- [ ] **类型分类**：CLR value type、delegate 和 string 在进入普通 CLR 引用类型反射构造前完成分派，不能靠失败后的运行时类型猜测回退。
+- [ ] **参数完整性**：不支持的 CLR value-type/byref/out 参数必须在调用前 fail-fast，禁止以 `default` 参数继续执行构造函数。
+
+**对后续步骤的影响**:
+- Step 15/16/17 的核心语义不以本步为硬依赖，但排在本步之后，避免 CLR 测试对象必须由宿主注入。
+- Step 19 复用本步建立的 newobj 类型分派和事务提交框架，只增加 Delegate 特殊构造。
+- Step 18 缩小为 IL/CLR 值类型 newobj，不再承担普通 CLR class 构造。
+
+---
+
 ## Step 15: isinst / castclass
 
 **目标**: 实现类型检查指令，含编译期 peephole 优化。
@@ -800,31 +844,31 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 ---
 
-## Step 18: 值类型 newobj + CLR 类型 newobj
+## Step 18: IL/CLR 值类型 newobj
 
-**目标**: 补全 Step 8b 未覆盖的 newobj 路径（IL 值类型、CLR 类型）。
+**目标**: 补全需要值类型存储和 managed pointer this 的 newobj 路径。普通 CLR 引用类型已在 Step 14.5 完成。
 
 **内容**:
 1. **IL 值类型 newobj**：
    - 目标 slot 在帧上（编译期分配），zero-init
    - this 以 Ref Slot 传递给构造函数（ldloca 产生帧内引用）
    - 构造函数直接操作帧内数据
-2. **CLR 类型 newobj**（补充 Step 8b 中的占位）：
-   - 有 Redirection → 走 Neo Redirection
-   - 无 Redirection → CLRMethod.Invoke 反射创建
+2. **CLR 值类型 newobj**：
+   - 根据 `StructStorage.Inline/Boxed` 选择帧内 flat bytes 或 mStack boxed 存储
+   - 有 ValueTypeBinder/Neo Redirection 时走专用路径；无 Binder 时按既定 boxed fallback 处理
+   - 构造参数和结果均遵循 Step 13 的 CLR 值类型封送规则
 
-**依赖**: Step 8b（引用类型 newobj 基础）, Step 12b(Ref Slot 基础,值类型构造函数需要 ref this)
+**依赖**: Step 12b（Ref Slot 基础、值类型构造函数需要 ref this），Step 13（CLR 值类型存储与封送），Step 14.5（newobj 类型分派和事务提交框架）。
 
 **验证方式**:
 - `new MyILStruct(args)` — 帧上值正确
-- `new List<int>()` — CLR 类型创建
+- `new DateTime(...)` 或测试 CLR struct — 按 StructStorage 正确创建
 - 值类型构造函数中 `this.field = value` 赋值生效（通过 Ref Slot 回写帧）
 
 **ECMA-335 合规检查项**:
 - [ ] **II.14.4.2 值类型 newobj this 语义**:值类型 `newobj T(args)` 的 this 必须以 Ref Slot(`(-1, dstFrameOffset)`)传给构造函数,由 Step 12b 的 Ldfld/Stfld Ref Slot 分支处理字段访问
 - [ ] **III.4.21 newobj 返回值必须在 ctor 成功后才推给 caller**:见 Step 14 检查项(newobj ctor 异常时半构造对象不能暴露)。IL 值类型场景更严格 —— dst slot 上原有数据不能被半构造覆盖,ctor 异常时应保持 dst slot 原状(或恢复到 initobj 状态)
-- [ ] **CLR 类型 newobj 有 ValueTypeBinder**:直接 Instantiate + 拷贝 flat bytes 到帧;无 Binder 保持 boxed 在 mStack,遵循 Step 13 §18.2 规则
-- [ ] **String 特殊 newobj**:C# `new string(char[], int, int)` 等构造 IL 是 `newobj System.String::.ctor(char[], int, int)`,但实际由 CLR 内部 fastcall 创建。Neo 必须走 CLR Redirection,不能按普通 newobj 处理
+- [ ] **CLR 值类型 newobj 有 ValueTypeBinder**:直接构造并拷贝 flat bytes 到帧；无 Binder 保持 boxed 在 mStack，遵循 Step 13 §18.2 规则
 
 ---
 
@@ -839,7 +883,7 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
    - CLR → IL 方向：将 CLR 参数写入 byte* 帧 → ExecuteNeo → 读返回值
 4. 多播委托：沿用 next 链表
 
-**依赖**: Step 8（Call 约定）, Step 9（CLR 互调）, Step 10（虚方法用于 ldvirtftn）
+**依赖**: Step 8（Call 约定）, Step 9（CLR 互调）, Step 10（虚方法用于 ldvirtftn）, Step 14.5（newobj 分派和事务提交框架）
 
 **验证方式**:
 - `Action a = Foo; a();`
@@ -869,7 +913,7 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 5. SetResult / SetException 分同步/异步路径
 6. Task getter 分同步完成/异步路径
 
-**依赖**: Step 13（Box/Unbox，state machine 搬堆）, Step 18（Ref/Out）, Step 19（委托，continuation）
+**依赖**: Step 13（Box/Unbox，state machine 搬堆）, Step 17（Ref/Out）, Step 19（委托，continuation）
 
 **验证方式**:
 - 同步完成的 async 方法（所有 await 的 task 已完成）→ 零分配
@@ -1104,7 +1148,7 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 第二阶段（Neo 帧核心）:   Step 4 → Step 6 → Step 7 → Step 8 → Step 8b
 第三阶段（CLR 互操作）:   Step 9 → Step 10 → Step 11
 第四阶段（值类型完整）:   Step 12 → Step 12b → Step 5 → Step 13
-第五阶段（高级特性）:     Step 14 → Step 15 → Step 16 → Step 17 → Step 18
+第五阶段（高级特性）:     Step 14 → Step 14.5 → Step 15 → Step 16 → Step 17 → Step 18
 第六阶段（OOP 完整）:    Step 19 → Step 20
 第七阶段（工具链）:       Step 22 → Step 23 → Step 24 → Step 25
 第八阶段（收尾）:         Step 26
@@ -1112,6 +1156,7 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 注意事项：
 - Step 8b（引用类型 newobj）紧跟 Step 8，此后所有步骤都可创建 IL 对象进行完整验证
+- Step 14.5 补齐普通 CLR 引用类型 newobj；它只依赖 Step 9 的 CLR 调用 ABI 和 Step 14 的异常事务，不等待值类型 Ref Slot
 - Step 17（Ref Slot）在 Step 18（值类型 newobj）之前，因为值类型构造函数需要 ref this
 - Step 21（JIT 改造）贯穿第二至第六阶段，随各功能步骤同步推进
 
@@ -1137,10 +1182,11 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 | 12b | 中 | 编译器 pass + 一条指令 |
 | 13 | 高 | 多种 CLR 值类型路径 |
 | 14 | 中 | 复用已有逻辑，适配简化 |
+| 14.5 | 低-中 | 普通 CLR 引用类型构造、redirection/反射结果提交与失败回滚 |
 | 15 | 低 | peephole + 简单分派 |
 | 16 | 中 | 多种数组类型 |
 | 17 | 高 | Ref Slot 涉及面广 |
-| 18 | 中 | 值类型 newobj + CLR newobj（引用类型已在 8b 完成）|
+| 18 | 中 | IL/CLR 值类型 newobj，含 Ref Slot this 与 StructStorage |
 | 19 | 中 | DelegateAdapter 适配 |
 | 20 | 高 | 异步模型复杂 |
 | 21 | — | 贯穿各步骤 |

@@ -1225,9 +1225,12 @@ unsafe static void Enumerator_MoveNext_Neo(ILIntepreter intp, byte* frameBase, A
 
 行为由已确定的设计直接推导：
 
-- **引用类型 newobj**：分配 ILTypeInstance → 写入预分配的 mStack ref slot → `this` 作为 mStack index 写到 callee 帧 param0 → 按第 3 节 calling convention 调构造函数 → 结果为该 ref slot 的 index
+- **IL 引用类型 newobj**：分配 ILTypeInstance → 暂存到预分配的 mStack ref slot → `this` 作为 mStack index 写到 callee 帧 param0 → 按第 3 节 calling convention 调构造函数 → 构造成功后提交该 ref slot 的 index
+- **CLR 引用类型 newobj（Step 14.5）**：不需要 struct-this Ref Slot。有 Neo constructor redirection 时传入 caller 的 `retDst/retRefBase`；否则由 `CLRMethod.Invoke(..., isNewObj: true)` 创建对象，再由公共提交路径写入预分配 ref slot。参数准备或构造失败必须恢复 caller 原目标槽
 - **IL 值类型 newobj**：目标 slot 已在帧上（编译期分配），zero-init 后 `this` 以 Ref Slot（第 15 节）传递给构造函数，构造函数直接操作帧内数据
-- **CLR 类型 newobj**：有 ValueTypeBinder 走 Binder，无 Binder 走 CLR Redirection/反射，存储方式遵循第 18 节规则
+- **CLR 值类型 newobj（Step 18）**：有 ValueTypeBinder/Neo Redirection 时走专用路径，无 Binder 时按 boxed fallback 处理；存储方式遵循第 18 节的 `StructStorage` 规则
+- **Delegate newobj（Step 19）**：CLR 特殊 fastcall，不进入普通 CLR 引用类型反射构造路径；结合 `ldftn/ldvirtftn` 由 DelegateManager 创建
+- **String newobj（Step 14.5）**：CLR 内部特殊构造，必须走专用 Neo redirection，不按普通反射构造处理
 
 ---
 
@@ -1744,7 +1747,7 @@ Call 参数不再依据“是不是 struct”猜测布局，而是使用 callee 
 6. **静态字段编码没有区分声明类型模型**：ILType 的 packed offset 与 CLRType 的 field hash 共用 `Operand3`，但 handler 端没有明确按 declaring type 分派。
 7. **slot 对齐只在 struct layout 中实现，未同步到临时/参数 slot**：long/double 曾出现奇数 byte offset，随后覆盖邻接数据。
 8. **Call 参数映射没有以 callee ABI 为准**：源寄存器布局与 callee 参数布局不一致，出现 long 参数读成 0。
-9. **测试路径混用了 Step 17/18 能力**：CLR value-type newobj、CLR Ref Slot、异常构造被 Step 13B 测试触发，失败信息又被 Step 18 `new Exception` 覆盖。
+9. **测试路径混用了后续能力**：CLR value-type newobj、CLR Ref Slot、异常构造被 Step 13B 测试触发。普通 CLR 引用类型构造已从 Step 18 拆到 Step 14.5，避免 `new Exception` 的未实现错误覆盖原始测试失败；CLR value-type receiver 写回归 Step 17，IL/CLR 值类型 newobj 仍归 Step 18。
 10. **构建配置和输出目录复用**：Debug/Debug_Neo、Release/Release_Neo 共享部分 TestCases/TestBase 输出目录，增量构建可能混入宏不同的程序集；验证必须先按配置强制重建。
 11. **Legacy 与 Neo 测试入口混用**：NeoStep 用 `useRegister=false` 运行没有验证 Neo 功能；Legacy 回归必须使用普通测试名和正确的 target framework 输出。
 

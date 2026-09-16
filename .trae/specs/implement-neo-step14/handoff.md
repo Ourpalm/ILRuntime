@@ -34,7 +34,7 @@
 
 保留的失败，名称与开发前一致：
 
-1. `NeoStep13Test.NeoStep13ValueTypeInstanceMethodThis`：Neo CLR newobj，Step18。
+1. `NeoStep13Test.NeoStep13ValueTypeInstanceMethodThis`：测试使用 `default(TestVector3)`，并未执行 `newobj`；实际缺口是 CLR 值类型实例方法通过 byref receiver 修改后的 caller 帧写回，归 Step17。
 2. `NeoStep7Step8Test.NeoTestCLRBindingSmallPrimitiveArgs`：既有 DivideByZeroException。
 
 测试结构：27 项中 19 项直接在 `NeoStep14Test` 的 IL 方法执行，8 项由 CLRHost 驱动外部调用边界或 Cecil 特殊 IL。异常由 CLR 工具方法创建；身份断言用原生 `ReferenceEquals`，因为 Neo 当前把 CIL `ReferenceEquals` 折成按 mStack 索引的 ceq，同对象不同引用槽会误判。`AppDomain.Invoke` 不再参与普通异常控制流测试。
@@ -62,3 +62,14 @@ Legacy：两项目以 Debug 强制重建，CLI 路径 `bin/Debug/net8.0`，过�
 - 测试过程中发现既有引用比较问题：`ex != null` 可被编成 `cgt.un`，现有执行路径比较 mStack index 与 -1，不是正确的引用 null 比较。本步没有扩展引用比较指令；构造失败测试以 int 参数条件触发 throw，独立验证 ctor 事务。应在引用比较完善时修复并回补用例。
 - 原 step13c 手册与代码有差异：仓库已存在 CLR 测试宿主和 newobj 回滚。本步以实际代码为基准，不沿用历史 61/59 测试数量。
 - 没有进行性能基准、AOT 序列化或 Unity/IL2CPP 设备验证；本步验证主机为 .NET 8，测试程序集 netstandard2.1。
+
+## 下一步顺序修正（Step 14.5）
+
+规划复审后，普通 CLR 引用类型 `newobj` 不再整体挂到 Step18，而是在 Step15之前新增 Step14.5：
+
+- 普通 CLR class 构造只依赖 Step9 已有的 CLR call/redirection ABI，以及本步完成的异常传播和构造失败事务边界；它不需要值类型 struct-this Ref Slot。
+- Step14测试目前通过 CLR 工具方法创建异常，是当前能力缺口的测试绕行。Step14.5完成后，应补回 IL 内直接执行 `new Exception(...)`、构造后 throw/catch、构造失败回滚及解释器复用测试。
+- Step15/16/17 的核心实现并非全部硬依赖 CLR 引用构造，但提前补齐可让 CLR 对象、异常和多维数组测试直接从 IL 创建，不再依赖 CLRHost 工厂方法。
+- Step18 缩小为 IL/CLR 值类型 `newobj`；Step19继续负责 Delegate 特殊构造。`System.String` 构造在 Step14.5中作为专用 Neo redirection 处理。
+
+详细范围、依赖和验收项已写入 `neo-implementation-steps.md` 的 Step14.5。当前 Step14实现和测试结果没有因此变化。

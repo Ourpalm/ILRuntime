@@ -91,7 +91,7 @@
 - [ ] `NeoStep13BoxUnboxJInt` — JInt 有 property + operator,依赖 CLR value type newobj / method dispatch → **挂 Step 18**
 - [ ] `NeoStep13UnboxNullThrowsNRE` — try/catch → **挂 Step 14**(异常处理 Leave_S)
 - [ ] `NeoStep13UnboxMismatchThrowsICE` — 同上 → **挂 Step 14**
-- [ ] `NeoStep13NewobjCtorThrowsPreservesDst` — 依赖 CLR reference type newobj(`new ArgumentNullException`) → **挂 Step 18**;newobj 半构造保护逻辑本 step 已实现
+- [ ] `NeoStep13NewobjCtorThrowsPreservesDst` — 依赖 CLR reference type newobj(`new ArgumentNullException`) → **挂 Step 14.5**；newobj 半构造保护逻辑本 step 已实现
 - [ ] `NeoStep13BoxRoundtripArray` — `object[]` 数组 → **挂 Step 16**(Newarr)
 
 ## 回归 / 双配置

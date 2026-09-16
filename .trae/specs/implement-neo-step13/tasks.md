@@ -165,7 +165,7 @@ Task 1 (ILRuntimeBlittableAttribute + ValueTypeBinder Neo API + StructStorage �
 - **验收**:
   - `NeoStep13ConstrainedTestVector3ToString` — override 直接 Call
   - `NeoStep13ConstrainedTestVectorStructToString` — 无 override 走 Box + Callvirt
-  - `NeoStep13NewobjCtorThrowsPreservesDst`
+  - `NeoStep13NewobjCtorThrowsPreservesDst`（普通 CLR 引用类型构造，转 Step 14.5）
   - Neo 58/58 全绿
 
 ---
