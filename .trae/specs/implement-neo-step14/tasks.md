@@ -13,4 +13,5 @@
 - [x] 27 项测试：19 项普通异常控制流在 IL 方法中执行，8 项由 CLRHost 验证外部边界或特殊 IL。
 - [x] Legacy Debug 构建通过，Test05：register=true / false 各 23 项全通过。
 - [x] 改名及测试代码格式整理后重新验收：Debug_Neo、Release_Neo 的 Step14 均 27/27；完整 NeoStep 均为 94 项、仅保留 2 项基线失败。
+- [x] 移除热路径上的 `ExecuteNeoCore` 额外调用层；profiler 的异常安全 `try/finally` 仅在 `DEBUG && !NO_PROFILER` 下编译。
 - [x] 更新设计 §17 / §27.13、步骤状态、验收记录和 handoff。

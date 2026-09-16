@@ -12,7 +12,7 @@
 
 - **编译**：`EnterCatch` 定义 catch 的隐式引用输入，贯通 optimizer 与 SSA 类型重命名；异常槽 byte/ref offset 写入内部 ExceptionHandler。EH 边界显式分块；ret/rethrow/endfinally/throw 不产生正常 fallthrough。lowering 删除 Push 时同步修正 EH 和 leave 目标。null HandlerEnd 使用最终指令末尾。
 - **展开**：`ILIntepreter.Neo.Exceptions.cs` 中 `NeoExceptionState` 维护可嵌套 continuation 与 catch 上下文。保护区域按内到外匹配，同一区域保留子句顺序。finally 内嵌 catch 保留待执行操作，逃出 finally 的新异常替换旧操作。rethrow 使用 ExceptionDispatchInfo。
-- **清理**：未处理异常保留 Frames；进入上层 catch/finally 前截断 callee 帧和引用区。InvocationFrame.Dispose 恢复入口 Frames 深度、ManagedStack 数量与 ValueTypeStackPointer；编译发生在任何运行时状态变更之前。JIT/执行 profiler 用 finally 闭合。
+- **清理**：未处理异常保留 Frames；进入上层 catch/finally 前截断 callee 帧和引用区。InvocationFrame.Dispose 恢复入口 Frames 深度、ManagedStack 数量与 ValueTypeStackPointer；编译发生在任何运行时状态变更之前。`ExecuteNeo` 保持单层热路径，profiler 的异常安全 `try/finally` 仅在 `DEBUG && !NO_PROFILER` 下编译。
 - **构造**：恢复原有 caller 引用槽暂存和失败回滚结构。try/finally 现在从暂存对象起覆盖参数准备、callee 引用槽分配与构造调用；失败恢复原引用和 primitive 索引，成功提交目标索引。
 - **CLR 调用**：仅去除反射调用产生的一层 TargetInvocationException，EDI 保留原异常。参数准备或调用失败均清空缓存参数。CLR null 引用参数正确读取为 null。`NeoStep14CLRHost` 为普通 IL 用例创建异常并做 CLR 原生身份断言；只有外部传播、同一解释器复用及 Cecil 特殊 IL 用例从 CLRHost 调用 `AppDomain.Invoke`。
 - **诊断**：保留原 CLR Exception，通过与 Legacy 一致的 `Data["StackTrace"]` 追加解释执行的方法及指令地址；外部调用者无需区分执行模式，也不构造会触发 Legacy 栈解码的 ILRuntimeException。

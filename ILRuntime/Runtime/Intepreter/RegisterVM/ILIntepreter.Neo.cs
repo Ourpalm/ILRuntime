@@ -512,35 +512,18 @@ namespace ILRuntime.Runtime.Intepreter
                 throw new NullReferenceException();
 #endif
 #if DEBUG && !NO_PROFILER
-            if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
-
+            bool profiling = System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID;
+            if (profiling)
+            {
 #if UNITY_5_5_OR_NEWER
                 UnityEngine.Profiling.Profiler.BeginSample(method.ToString());
 #else
                 UnityEngine.Profiler.BeginSample(method.ToString());
 #endif
-
-#endif
+            }
             try
             {
-                return ExecuteNeoCore(method, esp, retDst, retRefBase, out unhandledException, preAllocatedRefBase);
-            }
-            finally
-            {
-#if DEBUG && !NO_PROFILER
-            if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
-#if UNITY_5_5_OR_NEWER
-                UnityEngine.Profiling.Profiler.EndSample();
-#else
-                UnityEngine.Profiler.EndSample();
 #endif
-#endif
-            }
-        }
-
-        byte* ExecuteNeoCore(ILMethod method, byte* esp, byte* retDst, int retRefBase,
-            out bool unhandledException, int preAllocatedRefBase)
-        {
             unhandledException = false;
 
             OpCodeR[] body = method.CompiledFrame.NeoExecuteBody;
@@ -3347,6 +3330,20 @@ namespace ILRuntime.Runtime.Intepreter
             }
 
             return frameBase;
+#if DEBUG && !NO_PROFILER
+            }
+            finally
+            {
+                if (profiling)
+                {
+#if UNITY_5_5_OR_NEWER
+                    UnityEngine.Profiling.Profiler.EndSample();
+#else
+                    UnityEngine.Profiler.EndSample();
+#endif
+                }
+            }
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
