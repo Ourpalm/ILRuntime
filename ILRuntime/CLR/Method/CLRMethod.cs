@@ -368,13 +368,12 @@ namespace ILRuntime.CLR.Method
 
                     if (pt is ILType || !t.IsPrimitive && !t.IsEnum)
                     {
-                        int idx = *(int*)(targetBase + curPrim);
-                        param[i] = idx < 0 ? null : mStack[idx];
-                        curPrim += 4;
+                        param[i] = ILIntepreter.ReadNeoReference(targetBase, ref curPrim, mStack);
                     }
                     else
                     {
-                        if (t == typeof(int) || t.IsEnum) { param[i] = ILIntepreter.ReadNeoInt32(targetBase, ref curPrim); }
+                        if (t.IsEnum) { param[i] = Enum.ToObject(t, ILIntepreter.ReadNeoInt32(targetBase, ref curPrim)); }
+                        else if (t == typeof(int)) { param[i] = ILIntepreter.ReadNeoInt32(targetBase, ref curPrim); }
                         else if (t == typeof(long)) { param[i] = ILIntepreter.ReadNeoInt64(targetBase, ref curPrim); }
                         else if (t == typeof(float)) { param[i] = ILIntepreter.ReadNeoFloat(targetBase, ref curPrim); }
                         else if (t == typeof(double)) { param[i] = ILIntepreter.ReadNeoDouble(targetBase, ref curPrim); }

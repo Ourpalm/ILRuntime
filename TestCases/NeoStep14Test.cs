@@ -656,7 +656,8 @@ namespace TestCases
 
         public static object Unsupported(int unused)
         {
-            return new Exception();
+            // CLR reference constructors are supported since Step14.5.
+            return new DateTime(2020, 1, 1);
         }
     }
 

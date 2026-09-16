@@ -20,6 +20,38 @@ namespace ILRuntime.Runtime.Enviorment
 {
     unsafe static class CLRRedirections
     {
+#if ENABLE_NEO_MODE
+        internal static void StringRepeatConstructorNeo(ILIntepreter intp, byte* frameBase, AutoList mStack,
+            CLRMethod method, bool isNewObj, byte* retDst, int retRefBase)
+        {
+            // Offset 0 is the return reference header; char occupies 4 bytes in the Neo ABI.
+            string result = new string((char)*(int*)(frameBase + 4), *(int*)(frameBase + 8));
+            ILIntepreter.CommitNeoReferenceResult(retDst, mStack, retRefBase, result);
+        }
+
+        internal static void StringArrayConstructorNeo(ILIntepreter intp, byte* frameBase, AutoList mStack,
+            CLRMethod method, bool isNewObj, byte* retDst, int retRefBase)
+        {
+            int index = *(int*)(frameBase + 4);
+            string result = new string(index < 0 ? null : (char[])mStack[index]);
+            ILIntepreter.CommitNeoReferenceResult(retDst, mStack, retRefBase, result);
+        }
+
+        internal static void StringArraySliceConstructorNeo(ILIntepreter intp, byte* frameBase, AutoList mStack,
+            CLRMethod method, bool isNewObj, byte* retDst, int retRefBase)
+        {
+            int index = *(int*)(frameBase + 4);
+            string result = new string(index < 0 ? null : (char[])mStack[index],
+                *(int*)(frameBase + 8), *(int*)(frameBase + 12));
+            ILIntepreter.CommitNeoReferenceResult(retDst, mStack, retRefBase, result);
+        }
+
+        internal static void UnsupportedStringConstructorNeo(ILIntepreter intp, byte* frameBase, AutoList mStack,
+            CLRMethod method, bool isNewObj, byte* retDst, int retRefBase)
+        {
+            throw new NotSupportedException("Neo string constructor overload is not supported: " + method);
+        }
+#endif
         public static StackObject* GetCurrentStackTrace(ILIntepreter intp, StackObject* esp, AutoList mStack, CLRMethod method, bool isNewObj)
         {
             StackObject* ret = esp - 2;

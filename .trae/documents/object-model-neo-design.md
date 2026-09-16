@@ -1769,3 +1769,11 @@ Call 参数不再依据“是不是 struct”猜测布局，而是使用 callee 
 `Leave.Operand` 与 `Register3` 共用 union 字节，不得按源寄存器 lowering。ExceptionHandler 的两个异常槽 offset 不可互换，Release 执行不依赖 LocalInfos 反查。
 
 构造事务：IL 引用类型 newobj 保留已有 caller 引用槽暂存和失败回滚方式。暂存新对象后，参数准备、callee 引用槽分配及构造调用都位于同一个 try/finally 内；任何失败恢复 caller 的原引用槽和 primitive 索引，构造成功后才提交目标索引。
+
+### 27.14 CLR 引用构造 ABI（Step14.5）
+
+性能约束：string 每个受支持构造重载注册独立 Neo redirection，签名匹配仅在 AppDomain 注册阶段进行。handler 按固定 offset 读取参数，不在调用热路径读取 ParametersCLR 或判断重载。首个参数 offset=4；char/count 为 4/8，char[]/start/length 为 4/8/12。
+
+`Newobj` 保持现有编码：`DstOffset` 是 caller 目标 primitive offset，`Operand` 是 `NeoCallParams` 索引，`Operand2` 是构造方法 hash，`Operand3` 是目标相对 frameRefBase 的 ref offset。CLR 参数区首 4 字节预留返回引用槽索引，显式参数从 offset 4 开始按 `AllocateNeoCallParamSlot` 的自然对齐排列；char 保持现有 4 字节 ABI。标量和引用读取 helper 必须执行相同对齐。
+
+普通 CLR 引用构造向 Neo redirection 传入真实 caller `retDst` 和绝对 `retRefBase`；反射返回对象通过同一引用结果提交 helper 写入。事务从参数准备前开始，保存目标 primitive index 和引用；失败恢复两者。redirection 只能在构造成功后写结果，解释器仍防御性回滚写结果后抛出的异常。类型分派先拒绝 delegate（Step19）和值类型（Step18），string 使用专用 Neo redirection（char/count、char[]、char[]/start/length）；不为未实现的 pointer、byref、复杂值类型等参数添加临时预检查，相关能力由后续实现及测试覆盖。

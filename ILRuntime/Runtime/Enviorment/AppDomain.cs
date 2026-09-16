@@ -122,6 +122,24 @@ namespace ILRuntime.Runtime.Enviorment
             AllowUnboundCLRMethod = true;
             InvocationContext.InitializeDefaultConverters();
             loadedAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+#if ENABLE_NEO_MODE
+            foreach (var constructor in typeof(string).GetConstructors())
+            {
+                var parameters = constructor.GetParameters();
+                CLRRedirectionDelegateNeo redirect;
+                if (parameters.Length == 2 && parameters[0].ParameterType == typeof(char) &&
+                    parameters[1].ParameterType == typeof(int))
+                    redirect = CLRRedirections.StringRepeatConstructorNeo;
+                else if (parameters.Length == 1 && parameters[0].ParameterType == typeof(char[]))
+                    redirect = CLRRedirections.StringArrayConstructorNeo;
+                else if (parameters.Length == 3 && parameters[0].ParameterType == typeof(char[]) &&
+                    parameters[1].ParameterType == typeof(int) && parameters[2].ParameterType == typeof(int))
+                    redirect = CLRRedirections.StringArraySliceConstructorNeo;
+                else
+                    redirect = CLRRedirections.UnsupportedStringConstructorNeo;
+                RegisterCLRMethodRedirectionNeo(constructor, redirect);
+            }
+#endif
             var mi = typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray");
             RegisterCLRMethodRedirection(mi, CLRRedirections.InitializeArray);
             mi = typeof(AppDomain).GetMethod("GetCurrentStackTrace");

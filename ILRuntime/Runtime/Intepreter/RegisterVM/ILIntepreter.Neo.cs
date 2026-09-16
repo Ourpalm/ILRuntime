@@ -27,6 +27,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ReadNeoInt32(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 3) & ~3;
             int res = *(int*)(frameBase + curPrim);
             curPrim += 4;
             return res;
@@ -35,6 +36,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint ReadNeoUInt32(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 3) & ~3;
             uint res = *(uint*)(frameBase + curPrim);
             curPrim += 4;
             return res;
@@ -43,6 +45,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short ReadNeoInt16(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 1) & ~1;
             short res = *(short*)(frameBase + curPrim);
             curPrim += 2;
             return res;
@@ -51,6 +54,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ushort ReadNeoUInt16(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 1) & ~1;
             ushort res = *(ushort*)(frameBase + curPrim);
             curPrim += 2;
             return res;
@@ -83,6 +87,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadNeoInt64(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 7) & ~7;
             long res = *(long*)(frameBase + curPrim);
             curPrim += 8;
             return res;
@@ -91,6 +96,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong ReadNeoUInt64(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 7) & ~7;
             ulong res = *(ulong*)(frameBase + curPrim);
             curPrim += 8;
             return res;
@@ -99,6 +105,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float ReadNeoFloat(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 3) & ~3;
             float res = *(float*)(frameBase + curPrim);
             curPrim += 4;
             return res;
@@ -107,6 +114,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double ReadNeoDouble(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 7) & ~7;
             double res = *(double*)(frameBase + curPrim);
             curPrim += 8;
             return res;
@@ -115,6 +123,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char ReadNeoChar(byte* frameBase, ref int curPrim)
         {
+            curPrim = (curPrim + 3) & ~3;
             char res = (char)*(int*)(frameBase + curPrim);
             curPrim += 4;
             return res;
@@ -123,6 +132,7 @@ namespace ILRuntime.Runtime.Intepreter
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static object ReadNeoReference(byte* frameBase, ref int curPrim, AutoList mStack)
         {
+            curPrim = (curPrim + 3) & ~3;
             int idx = *(int*)(frameBase + curPrim);
             curPrim += 4;
             return idx < 0 ? null : mStack[idx];
@@ -193,6 +203,35 @@ namespace ILRuntime.Runtime.Intepreter
             throw new NotImplementedException("Unknown method type in Neo mode.");
         }
 
+        internal static void CommitNeoReferenceResult(byte* destination, AutoList stack, int referenceIndex, object value)
+        {
+            stack[referenceIndex] = value;
+            *(int*)destination = value == null ? -1 : referenceIndex;
+        }
+
+        void InvokeNeoClrConstructor(CLRMethod constructor, ref NeoCallParamMap map,
+            byte* frameBase, byte* targetBase, AutoList stack, byte* destination, int referenceIndex)
+        {
+            object previousReference = stack[referenceIndex];
+            int previousIndex = *(int*)destination;
+            bool committed = false;
+            try
+            {
+                *(int*)targetBase = referenceIndex;
+                CopyNeoCallArguments(ref map, frameBase, targetBase);
+                InvokeNeoClrMethod(constructor, true, targetBase, stack, destination, referenceIndex);
+                committed = true;
+            }
+            finally
+            {
+                if (!committed)
+                {
+                    stack[referenceIndex] = previousReference;
+                    *(int*)destination = previousIndex;
+                }
+            }
+        }
+
         void InvokeNeoClrMethod(CLRMethod clrMethod, bool isNewobj, byte* targetBase, AutoList mStack, byte* retDstPtr, int targetRetRefBase)
         {
             var redirectNeo = clrMethod.RedirectionNeo;
@@ -204,7 +243,12 @@ namespace ILRuntime.Runtime.Intepreter
 
             object res = clrMethod.Invoke(targetBase, mStack, isNewobj);
 
-            if (isNewobj || retDstPtr == null)
+            if (isNewobj)
+            {
+                CommitNeoReferenceResult(retDstPtr, mStack, targetRetRefBase, res);
+                return;
+            }
+            if (retDstPtr == null)
                 return;
 
             IType retType = clrMethod.ReturnType;
@@ -2128,23 +2172,22 @@ namespace ILRuntime.Runtime.Intepreter
                                         continue;
                                     }
 
-                                    var newobjType = targetMethod.DeclearingType as ILType;
-                                    if (newobjType == null)
-                                        throw new NotImplementedException("Neo Newobj CLR type is not implemented (Step 18)");
-                                    if (newobjType.IsDelegate)
-                                        throw new NotImplementedException("Neo Newobj delegate is not implemented");
-
-                                    bool isValueTypeCtor = newobjType.IsValueType && !newobjType.IsEnum;
-                                    if (isValueTypeCtor)
+                                    if (targetMethod.DeclearingType.IsDelegate)
+                                        throw new NotImplementedException("Neo delegate Newobj: Step 19");
+                                    if (targetMethod.DeclearingType.IsValueType)
+                                        throw new NotImplementedException("Neo value-type Newobj Ref Slot this: Step 18");
+                                    if (targetMethod is CLRMethod clrConstructor)
                                     {
-                                        // Value-type constructors require the destination slot to be
-                                        // converted to a Ref Slot before invocation. The old path copied
-                                        // the struct bytes into the callee `this`, which violates the
-                                        // managed-pointer ABI. Implemented with the full newobj flow in Step 18.
-                                        throw new NotImplementedException(
-                                            "Neo value-type Newobj Ref Slot this: Step 18");
+                                        ref var clrMap = ref nf.NeoCallParams[ip->Operand];
+                                        InvokeNeoClrConstructor(clrConstructor, ref clrMap, frameBase, newEsp,
+                                            mStack, frameBase + ip->DstOffset, frameRefBase + ip->Operand3);
+                                        ip++;
+                                        continue;
                                     }
 
+                                    var newobjType = targetMethod.DeclearingType as ILType;
+                                    if (newobjType == null)
+                                        throw new NotSupportedException("Neo Newobj has an unsupported declaring type.");
                                     dstRefOffset = ip->Operand3;
                                     int newobjDstIdx = frameRefBase + dstRefOffset;
 

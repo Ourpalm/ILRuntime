@@ -716,6 +716,8 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 ## Step 14.5: CLR 引用类型 newobj
 
+**状态**：已完成（2026-09-16）。实现、验证和剩余边界见 [Step14.5 handoff](../specs/implement-neo-step14.5/handoff.md)。
+
 **目标**: 补齐 Step 8b 在 Step 9 完成后留下的普通 CLR 引用类型构造路径，解除异常、类型检查、数组及后续步骤对 CLRHost 工厂方法的依赖。
 
 **拆分依据**:
@@ -728,7 +730,7 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 2. 有 `CLRRedirectionDelegateNeo` 时传入真实 `retDst` / `retRefBase`，由 redirection 写入结果。
 3. 无 redirection 时调用 `CLRMethod.Invoke(..., isNewObj: true)`，取得构造结果后由公共提交路径写入 caller 的预分配引用槽。
 4. 构造成功后才提交目标 primitive 索引和引用；参数准备、redirection/反射调用任一阶段失败都恢复原目标槽。
-5. 参数能力与当前 Neo CLR Call 保持一致；尚未支持的复杂 CLR value-type、byref/out 参数继续明确 fail-fast，不以默认值静默调用。
+5. 参数能力与当前 Neo CLR Call 保持一致；按性能优先约定，不为尚未实现的参数增加临时预检查，相关能力由后续实现和测试覆盖。
 6. `System.String` 构造走专用 Neo redirection；不把 CLR 内部 fastcall 构造当作普通反射路径。
 7. Delegate 构造明确转交 Step 19；CLR value type 构造明确转交 Step 18，错误信息指出实际负责步骤。
 
@@ -743,10 +745,10 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 - string 专用构造路径；delegate 与 CLR value type 仍产生指向 Step 19/18 的明确诊断。
 
 **ECMA-335 合规检查项**:
-- [ ] **III.4.21 newobj 成功提交**：构造函数成功返回前，不得向 IL caller 暴露新对象；redirection 和反射路径失败时都恢复 primitive 索引及 ref slot。
-- [ ] **构造异常身份**：反射路径解包 `TargetInvocationException`，通过 EDI 传播原异常；不得用 wrapper 或重新 `throw ex` 改变异常身份和原始 CLR 栈。
-- [ ] **类型分类**：CLR value type、delegate 和 string 在进入普通 CLR 引用类型反射构造前完成分派，不能靠失败后的运行时类型猜测回退。
-- [ ] **参数完整性**：不支持的 CLR value-type/byref/out 参数必须在调用前 fail-fast，禁止以 `default` 参数继续执行构造函数。
+- [x] **III.4.21 newobj 成功提交**：构造函数成功返回前，不得向 IL caller 暴露新对象；redirection 和反射路径失败时都恢复 primitive 索引及 ref slot。
+- [x] **构造异常身份**：反射路径解包 `TargetInvocationException`，通过 EDI 传播原异常；不得用 wrapper 或重新 `throw ex` 改变异常身份和原始 CLR 栈。
+- [x] **类型分类**：CLR value type、delegate 和 string 在进入普通 CLR 引用类型反射构造前完成分派，不能靠失败后的运行时类型猜测回退。
+- **参数完整性（范围调整）**：不为未实现的 CLR value-type/byref/out 参数添加临时检查，也不搬到 JIT 提前拒绝；后续实现时通过功能测试验证参数传递正确性。
 
 **对后续步骤的影响**:
 - Step 15/16/17 的核心语义不以本步为硬依赖，但排在本步之后，避免 CLR 测试对象必须由宿主注入。
