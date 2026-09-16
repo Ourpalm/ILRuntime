@@ -74,6 +74,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         public int TotalRefSize;
 #if ENABLE_NEO_MODE
         public NeoCallParamMap[] NeoCallParams;
+        public CLR.Method.ExceptionHandler[] NeoExceptionHandlers;
         public StackSlotInfo[] ParamInfos;
         public int ParamPrimitiveSize;
         public int ParamReferenceCount;
@@ -179,6 +180,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
         public void Compile(Dictionary<Instruction, int> addr, ref CompiledFrame frame)
         {
+#if ENABLE_NEO_MODE
+            foreach (var clause in def.Body.ExceptionHandlers)
+                if (clause.HandlerType != Mono.Cecil.Cil.ExceptionHandlerType.Catch &&
+                    clause.HandlerType != Mono.Cecil.Cil.ExceptionHandlerType.Finally)
+                    throw new NotSupportedException($"Neo method {method}: {clause.HandlerType} exception clause is not supported (Step 14).");
+#endif
 #if DEBUG && !NO_PROFILER
             if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
 
@@ -189,6 +196,22 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
 
 #endif
+            try { CompileCore(addr, ref frame); }
+            finally
+            {
+#if DEBUG && !NO_PROFILER
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.EndSample();
+#else
+                UnityEngine.Profiler.EndSample();
+#endif
+#endif
+            }
+        }
+
+        void CompileCore(Dictionary<Instruction, int> addr, ref CompiledFrame frame)
+        {
             method.Compiling = true;
             Dictionary<int, RegisterVMSymbol> symbols = new Dictionary<int, RegisterVMSymbol>();
 
@@ -205,7 +228,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             {
                 baseRegIdx = baseRegStart;
                 if (IsCatchHandler(i, body))
+                {
+#if ENABLE_NEO_MODE
+                    var clause = body.ExceptionHandlers.First(e => e.HandlerStart == i.Instructions[0]);
+                    i.FinalInstructions.Add(new OpCodeR {
+                        Code = OpCodeREnum.EnterCatch, Register1 = baseRegIdx,
+                        Operand = body.ExceptionHandlers.IndexOf(clause),
+                        Operand2 = method.GetTypeTokenHashCode(clause.CatchType)
+                    });
+#endif
                     baseRegIdx++;
+                }
                 else
                 {
                     if (i.PreviousBlocks.Count > 0)
@@ -253,7 +286,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             OpCodeR code = new OpCodeR();
                             code.Code = OpCodeREnum.Initobj;
                             code.Register1 = r;
+#if ENABLE_NEO_MODE
+                            // EH roots have no normal predecessor. Reference locals still start
+                            // as null, never as a newly allocated instance of their declared type.
+                            var localType = appdomain.GetType(lt.VariableType, declaringType, method);
+                            if (!localType.IsValueType && !localType.IsByRef)
+                                code.Code = OpCodeREnum.Ldnull;
+                            code.Operand = method.GetTypeTokenHashCode(lt.VariableType);
+#else
                             code.Operand = method.GetTypeTokenHashCode(body.Variables[idx].VariableType);
+#endif
                             code.Operand2 = 1;
                             first.FinalInstructions.Insert(appendIdx++, code);
                             break;
@@ -395,6 +437,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                 }
             }
+#if ENABLE_NEO_MODE
+            foreach (var clause in body.ExceptionHandlers)
+            {
+                addr[clause.TryStart] = jumpTargets[entryMapping[clause.TryStart]];
+                if (clause.TryEnd != null) addr[clause.TryEnd] = jumpTargets[entryMapping[clause.TryEnd]];
+                addr[clause.HandlerStart] = jumpTargets[entryMapping[clause.HandlerStart]];
+                if (clause.HandlerEnd != null) addr[clause.HandlerEnd] = jumpTargets[entryMapping[clause.HandlerEnd]];
+            }
+#endif
             for (int i = 0; i < res.Count; i++)
             {
                 var op = res[i];
@@ -459,6 +510,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             // ExecuteNeo runs against a lowered copy where Register1/2/3 hold
             // byte offsets after LowerNeoOffsets.
             frame.NeoExecuteBody = (OpCodeR[])frame.CodeBody.Clone();
+            BuildNeoExceptionHandlers(ref frame, addr);
             Optimizer.LowerNeoOffsets(ref frame, appdomain);
             // CodeBody exists only to feed Optimizer.InlineMethod when this method is later
             // considered as an inline callee. Methods above the inline threshold will never
@@ -476,17 +528,39 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 #endif
 #endif
 
-#if DEBUG && !NO_PROFILER
-            if (System.Threading.Thread.CurrentThread.ManagedThreadId == method.AppDomain.UnityMainThreadID)
-#if UNITY_5_5_OR_NEWER
-                UnityEngine.Profiling.Profiler.EndSample();
-#else
-                UnityEngine.Profiler.EndSample();
-#endif
-#endif
         }
 
 #if ENABLE_NEO_MODE
+
+        void BuildNeoExceptionHandlers(ref CompiledFrame frame, Dictionary<Instruction, int> addr)
+        {
+            var clauses = def.Body.ExceptionHandlers;
+            if (clauses.Count == 0) return;
+            var handlers = new CLR.Method.ExceptionHandler[clauses.Count];
+            for (int i = 0; i < clauses.Count; i++)
+            {
+                var clause = clauses[i];
+                handlers[i] = new CLR.Method.ExceptionHandler {
+                    TryStart = addr[clause.TryStart],
+                    TryEnd = (clause.TryEnd == null ? frame.CodeBody.Length : addr[clause.TryEnd]) - 1,
+                    HandlerStart = addr[clause.HandlerStart],
+                    HandlerEnd = (clause.HandlerEnd == null ? frame.CodeBody.Length : addr[clause.HandlerEnd]) - 1,
+                    HandlerType = clause.HandlerType == Mono.Cecil.Cil.ExceptionHandlerType.Catch
+                        ? CLR.Method.ExceptionHandlerType.Catch : CLR.Method.ExceptionHandlerType.Finally,
+                    CatchType = clause.CatchType == null ? null : appdomain.GetType(clause.CatchType, declaringType, method)
+                };
+            }
+            foreach (var op in frame.CodeBody)
+                if (op.Code == OpCodeREnum.EnterCatch)
+                {
+                    var slot = frame.LocalInfos[op.Register1];
+                    if (slot.RefCount != 1 || slot.Size != 4)
+                        throw new InvalidProgramException($"Neo catch input is not a reference slot: {method}");
+                    handlers[op.Operand].ExceptionOffset = slot.Offset;
+                    handlers[op.Operand].ExceptionRefOffset = slot.RefOffset;
+                }
+            frame.NeoExceptionHandlers = handlers;
+        }
 
         void AllocateLocalStackSpaces(ref CompiledFrame frame, IType[] registerTypes)
         {

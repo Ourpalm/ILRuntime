@@ -40,6 +40,8 @@ namespace ILRuntime.Runtime.Intepreter
             int retRefBase;
             int calleeRefBase;
             int mStackBase;
+            int frameDepth;
+            StackObject* savedValueTypePointer;
             int nextParamIdx;
             bool executed;
 
@@ -47,8 +49,7 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 var stack = intp.Stack;
                 var mStack = stack.ManagedStack;
-                stack.ResetValueTypePointer();
-
+                // Compile before changing any runtime state: compilation can fail.
                 ref readonly var nf = ref method.CompiledFrame;
 
                 InvocationFrame f;
@@ -56,6 +57,9 @@ namespace ILRuntime.Runtime.Intepreter
                 f.method = method;
                 f.mStack = mStack;
                 f.mStackBase = mStack.Count;
+                f.frameDepth = stack.Frames.Count;
+                f.savedValueTypePointer = stack.ValueTypeStackPointer;
+                stack.ResetValueTypePointer();
 
                 // Neo frame lives on stack.StackBase as a flat byte region. The return
                 // primitive slot is placed immediately after the frame, sharing the same
@@ -414,7 +418,10 @@ namespace ILRuntime.Runtime.Intepreter
             {
                 if (mStack != null)
                 {
-                    mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
+                    while (intp.Stack.Frames.Count > frameDepth) intp.Stack.Frames.Pop();
+                    if (mStack.Count > mStackBase)
+                        mStack.RemoveRange(mStackBase, mStack.Count - mStackBase);
+                    intp.Stack.ValueTypeStackPointer = savedValueTypePointer;
                     mStack = null;
                 }
             }

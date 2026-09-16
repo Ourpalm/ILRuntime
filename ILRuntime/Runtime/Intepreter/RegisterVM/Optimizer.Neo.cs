@@ -567,6 +567,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Operand4 = 0;
                         }
                         break;
+                    case OpCodeREnum.EnterCatch:
+                        op.Operand3 = localInfos[op.Register1].RefOffset;
+                        LowerR1(ref op, localInfos);
+                        break;
+                    case OpCodeREnum.Throw:
+                        LowerR1(ref op, localInfos);
+                        break;
+                    case OpCodeREnum.Leave:
+                    case OpCodeREnum.Leave_S:
+                    case OpCodeREnum.Rethrow:
+                    case OpCodeREnum.Endfinally:
                     case OpCodeREnum.Br:
                     case OpCodeREnum.Br_S:
                     case OpCodeREnum.Nop:
@@ -613,6 +624,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     }
                                     Array.Resize(ref body, body.Length - 1);
                                     FixBranchTargetsAfterRemove(body, scanIdx, frame.SwitchTargets, frame.Symbols);
+                                    if (frame.NeoExceptionHandlers != null)
+                                        foreach (var eh in frame.NeoExceptionHandlers)
+                                        {
+                                            if (eh.TryStart > scanIdx) eh.TryStart--;
+                                            if (eh.TryEnd >= scanIdx) eh.TryEnd--;
+                                            if (eh.HandlerStart > scanIdx) eh.HandlerStart--;
+                                            if (eh.HandlerEnd >= scanIdx) eh.HandlerEnd--;
+                                        }
                                     // 因为当前指令(Call)的位置前移了，我们需要更新外层循环的 i 和当前 op
                                     i--;
                                     op = body[i];
@@ -894,7 +913,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             for (int i = 0; i < body.Length; i++)
             {
                 var op = body[i];
-                if (IsBranching(op.Code))
+                if (IsBranching(op.Code) || op.Code == OpCodeREnum.Leave || op.Code == OpCodeREnum.Leave_S)
                 {
                     if (op.Operand > removedIndex)
                     {

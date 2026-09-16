@@ -715,6 +715,22 @@ namespace ILRuntime.CLR.Method
 
         internal void InitCodeBody(bool register)
         {
+#if ENABLE_NEO_MODE
+            try { InitCodeBodyCore(register); }
+            catch
+            {
+                compiledFrame = default;
+                exceptionHandlerR = null;
+                Compiling = false;
+                throw;
+            }
+#else
+            InitCodeBodyCore(register);
+#endif
+        }
+
+        void InitCodeBodyCore(bool register)
+        {
             if (def.HasBody)
             {
                 localVarCnt = def.Body.Variables.Count;
@@ -752,6 +768,10 @@ namespace ILRuntime.CLR.Method
                     if (jitOnDemand)
                         noRelease = bodyRegister == null;
                 }
+#if ENABLE_NEO_MODE
+                if (register) exceptionHandlerR = compiledFrame.NeoExceptionHandlers;
+                else
+#endif
                 if (def.Body.ExceptionHandlers.Count > 0)
                 {
                     ExceptionHandler[] ehs;

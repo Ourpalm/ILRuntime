@@ -1123,7 +1123,9 @@ ILRuntime 执行时栈上出现 CLR 类型对象（`string`、`List<T>`、Unity 
 
 ### 17.1 整体思路
 
-Neo 的异常处理控制流与 Legacy Register VM 完全一致：C# `try-catch` 包裹执行循环，IL 的 `throw` 实际抛出 C# 异常，由执行循环的 `catch` 块调用 `HandleException` 查找匹配的 handler。`Leave`/`Endfinally` 的逻辑不变。
+Step14 已实现 Neo 专用控制流：C# `try-catch` 包裹执行循环，`throw` 抛出原 CLR 异常；`NeoExceptionState` 按保护区域由内向外、同一区域按元数据顺序匹配 catch。`Leave`/`Endfinally` 使用可嵌套 continuation，区分正常跳转、进入 catch 和向 caller 传播异常。finally 内的局部 catch 不覆盖外层 continuation；逃出 finally 的新异常替换原待执行操作。
+
+`rethrow` 通过当前 catch 的 `ExceptionDispatchInfo` 保留异常身份和 CLR 调用栈；解释执行的方法与指令位置追加到与 Legacy 一致的 `Exception.Data["StackTrace"]`，外部调用者无需区分执行模式。异常路径不调用 Legacy 局部变量解码器。filter/fault 在 Neo 编译入口以含方法名及子句类型的 `NotSupportedException` 明确拒绝，`endfilter` 不作为 `endfinally` 处理。
 
 ### 17.2 esp 恢复
 
@@ -1131,19 +1133,19 @@ esp 以参数方式传递（与 Legacy 一致），C# 异常展开自动恢复 e
 
 ### 17.3 mStack 恢复
 
-当 catch handler 捕获异常时，一行恢复：`mStack.Count = frameRefBase + method.TotalRefSize`。这会截断所有未正常退出的 callee 帧残留的 mStack 槽位，同时保留当前帧自己的引用槽。
+进入 catch 或 finally 前，将 mStack 截断到 `frameRefBase + CompiledFrame.TotalRefSize`，保留本帧引用槽、释放未正常退出的 callee 槽。实现使用 `RemoveRange`，兼容 Debug 的 `List<object>` 与 Release 的 `UncheckedList<object>`，同时清除失效 GC roots。
 
 ### 17.4 Frames 栈维护
 
-DebugService 通过 `RuntimeStack.Frames` 获取调用栈，Neo 需要继续维护。Push/Pop 时机与 Legacy 一致：方法入口 PushFrame，正常退出 PopFrame，异常未处理时不 Pop——由上层 HandleException 找到匹配 handler 后批量 Pop 中间帧。
+方法入口 PushFrame，正常退出 Pop；异常未处理时保留帧，进入上层 handler 时按记录的 frame depth 批量 Pop 中间帧。禁止调用按 `StackObject[]` 解码的 `RuntimeStack.PopFrame`。外部 `InvocationFrame.Dispose` 恢复入口 Frames 深度、ManagedStack 数量和 ValueTypeStackPointer；编译发生在运行时状态变更之前，编译失败不残留帧。
 
 ### 17.5 异常对象存储
 
-编译器为每个 catch 块的异常变量分配一个普通 temp ref slot（与其他引用类型 local/temp 统一）。ExceptionHandler 元数据中记录该 slot 的 ref offset，catch handler 进入时将异常对象写入 `mStack[frameRefBase + refOffset]`。catch 块内访问异常对象走普通引用 slot 读取，无需特殊指令。
+编译器在 catch 入口插入 `EnterCatch`，把隐式异常输入作为引用寄存器定义交给复制传播、寄存器压缩和类型重命名。完成槽位分配后，ExceptionHandler 记录 `ExceptionOffset` 与 `ExceptionRefOffset`。进入 catch 时写入 `mStack[frameRefBase + ExceptionRefOffset]` 并将其索引写到 `frameBase + ExceptionOffset`；入口标记执行时为空操作。空 catch 也保留有效的异常输入槽。
 
 ### 17.6 HandleException 复用
 
-核心查找逻辑（`GetCorrespondingExceptionHandler`、`FindExceptionHandlerByBranchTarget`）完全复用。栈清理部分 Neo 更简单：只需弹 Frames 栈条目 + 重置 mStack.Count，不需要 Legacy 中的 StackObject 清理和值类型释放。用条件编译或方法重载区分。
+Neo 复用 `CheckExceptionType` 的类型匹配能力，独立实现区域排序和展开，避免 Legacy“先精确类型、后基类类型”的全局查找跳过更内层 catch。Legacy handler 和栈清理路径保持原样。Neo 的帧元数据地址使用最终指令索引：lowering 删除 Push 时同步修正异常范围、leave/branch 目标和调试符号。
 
 ---
 
@@ -1747,3 +1749,20 @@ Call 参数不再依据“是不是 struct”猜测布局，而是使用 callee 
 11. **Legacy 与 Neo 测试入口混用**：NeoStep 用 `useRegister=false` 运行没有验证 Neo 功能；Legacy 回归必须使用普通测试名和正确的 target framework 输出。
 
 后续新增指令或 AOT 编码时，必须先补充本节的字段表和域说明，再修改 JIT/lowering/handler；任何只改其中一端的实现都视为 ABI 未完成。
+
+
+### 27.13 异常处理编码与元数据（Step14）
+
+| 指令 | lowering 前 | lowering 后 | 运行时语义 |
+|---|---|---|---|
+| `EnterCatch` | Register1=异常输入寄存器；Operand=clause index；Operand2=catch 类型 hash | DstOffset=异常槽 byte offset；Operand3=ref offset；Operand/Operand2 保留 | handler 分派已写入异常；指令本身为空操作 |
+| `Throw` | Register1=异常对象源寄存器 | DstOffset=源 slot byte offset；其余 operand 不使用 | 读取引用索引并抛出异常；null 转为 NullReferenceException |
+| `Rethrow` | 无寄存器输入 | 无 operand | 从当前活动 catch 取 ExceptionDispatchInfo，保留原调用栈 |
+| `Leave` / `Leave_S` | Operand=目标指令地址 | Operand=最终 Neo 指令地址 | 按内到外执行途中 finally，之后跳转 |
+| `Endfinally` | 无寄存器输入 | 无 operand | 恢复当前 continuation，继续 finally 链、进入 catch 或传播异常 |
+
+`ExceptionHandler`（Neo 内部）增加 `ExceptionOffset`（相对 frameBase）和 `ExceptionRefOffset`（相对 frameRefBase），仅 catch 使用。`CompiledFrame.NeoExceptionHandlers` 在 slot 分配后、lowering 前建立；lowering 删除 Push 时同步修正四个区域端点。`TryEnd`/`HandlerEnd` 均为 inclusive；Cecil 的 null 末尾边界转换为最终方法长度减一。
+
+`Leave.Operand` 与 `Register3` 共用 union 字节，不得按源寄存器 lowering。ExceptionHandler 的两个异常槽 offset 不可互换，Release 执行不依赖 LocalInfos 反查。
+
+构造事务：IL 引用类型 newobj 保留已有 caller 引用槽暂存和失败回滚方式。暂存新对象后，参数准备、callee 引用槽分配及构造调用都位于同一个 try/finally 内；任何失败恢复 caller 的原引用槽和 primitive 索引，构造成功后才提交目标索引。

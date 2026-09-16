@@ -680,6 +680,8 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 ## Step 14: 异常处理 Neo 适配
 
+**状态（2026-09-15）**：核心已完成。27 项新增测试在 Debug_Neo / Release_Neo 均通过；完整 NeoStep 回归 94 项，保留 2 项既有失败。filter/fault 明确拒绝，待后续扩展。实现细节、修正与验证命令见 [Step14 handoff](../specs/implement-neo-step14/handoff.md)。下面保留原始拆分要求；实际 Neo 专用分派及 ABI 以设计 §17 / §27.13 为准。
+
 **目标**: 在 Neo 解释器中完整支持 try/catch/finally。
 
 **内容**:

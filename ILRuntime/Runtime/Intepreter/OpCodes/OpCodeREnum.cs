@@ -1008,5 +1008,7 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         /// Operand2 stores the resolved CLR method hash.
         /// </summary>
         Callvirt_CLR,
+        // Defines the implicit exception input; the Neo dispatcher supplies its value.
+        EnterCatch,
     }
 }

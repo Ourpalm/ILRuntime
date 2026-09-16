@@ -340,88 +340,102 @@ namespace ILRuntime.CLR.Method
                 invocationParam = new object[paramCount];
             object[] param = invocationParam;
 
-            int curPrim = 0;
-            object instance = null;
-
-            if (isNewObj)
+            try
             {
-                curPrim += 4; // Skip retRefBase
-            }
-            else if (HasThis)
-            {
-                int thisIdx = *(int*)(targetBase + curPrim);
-                instance = mStack[thisIdx];
-                curPrim += 4;
-            }
+                int curPrim = 0;
+                object instance = null;
 
-            for (int i = 0; i < paramCount; i++)
-            {
-                var pt = Parameters[i];
-                Type t = pt.TypeForCLR;
-
-                if (pt is CLRType clrType && clrType.IsValueType && !clrType.TypeForCLR.IsPrimitive && !clrType.TypeForCLR.IsEnum)
+                if (isNewObj)
                 {
-                    throw new NotImplementedException("CLR value type reflection fallback: Step 13");
+                    curPrim += 4; // Skip retRefBase
                 }
-
-                if (pt is ILType || !t.IsPrimitive && !t.IsEnum)
+                else if (HasThis)
                 {
-                    int idx = *(int*)(targetBase + curPrim);
-                    param[i] = mStack[idx];
+                    int thisIdx = *(int*)(targetBase + curPrim);
+                    instance = mStack[thisIdx];
                     curPrim += 4;
                 }
-                else
-                {
-                    if (t == typeof(int) || t.IsEnum) { param[i] = ILIntepreter.ReadNeoInt32(targetBase, ref curPrim); }
-                    else if (t == typeof(long)) { param[i] = ILIntepreter.ReadNeoInt64(targetBase, ref curPrim); }
-                    else if (t == typeof(float)) { param[i] = ILIntepreter.ReadNeoFloat(targetBase, ref curPrim); }
-                    else if (t == typeof(double)) { param[i] = ILIntepreter.ReadNeoDouble(targetBase, ref curPrim); }
-                    else if (t == typeof(bool)) { param[i] = ILIntepreter.ReadNeoBoolean(targetBase, ref curPrim); }
-                    else if (t == typeof(byte)) { param[i] = ILIntepreter.ReadNeoUInt8(targetBase, ref curPrim); }
-                    else if (t == typeof(sbyte)) { param[i] = ILIntepreter.ReadNeoInt8(targetBase, ref curPrim); }
-                    else if (t == typeof(short)) { param[i] = ILIntepreter.ReadNeoInt16(targetBase, ref curPrim); }
-                    else if (t == typeof(ushort)) { param[i] = ILIntepreter.ReadNeoUInt16(targetBase, ref curPrim); }
-                    else if (t == typeof(uint)) { param[i] = ILIntepreter.ReadNeoUInt32(targetBase, ref curPrim); }
-                    else if (t == typeof(ulong)) { param[i] = ILIntepreter.ReadNeoUInt64(targetBase, ref curPrim); }
-                    else if (t == typeof(char)) { param[i] = ILIntepreter.ReadNeoChar(targetBase, ref curPrim); }
-                }
-            }
 
-            object res = null;
-            if (isConstructor)
-            {
-                if (!isNewObj)
+                for (int i = 0; i < paramCount; i++)
                 {
-                    if (!cDef.IsStatic)
+                    var pt = Parameters[i];
+                    Type t = pt.TypeForCLR;
+
+                    if (pt is CLRType clrType && clrType.IsValueType && !clrType.TypeForCLR.IsPrimitive && !clrType.TypeForCLR.IsEnum)
                     {
-                        if (instance == null)
-                            throw new NullReferenceException();
-                        if (instance is CrossBindingAdaptorType && paramCount == 0)
-                            return null;
-                        cDef.Invoke(instance, param);
+                        throw new NotImplementedException("CLR value type reflection fallback: Step 13");
+                    }
+
+                    if (pt is ILType || !t.IsPrimitive && !t.IsEnum)
+                    {
+                        int idx = *(int*)(targetBase + curPrim);
+                        param[i] = idx < 0 ? null : mStack[idx];
+                        curPrim += 4;
                     }
                     else
-                        throw new NotImplementedException();
+                    {
+                        if (t == typeof(int) || t.IsEnum) { param[i] = ILIntepreter.ReadNeoInt32(targetBase, ref curPrim); }
+                        else if (t == typeof(long)) { param[i] = ILIntepreter.ReadNeoInt64(targetBase, ref curPrim); }
+                        else if (t == typeof(float)) { param[i] = ILIntepreter.ReadNeoFloat(targetBase, ref curPrim); }
+                        else if (t == typeof(double)) { param[i] = ILIntepreter.ReadNeoDouble(targetBase, ref curPrim); }
+                        else if (t == typeof(bool)) { param[i] = ILIntepreter.ReadNeoBoolean(targetBase, ref curPrim); }
+                        else if (t == typeof(byte)) { param[i] = ILIntepreter.ReadNeoUInt8(targetBase, ref curPrim); }
+                        else if (t == typeof(sbyte)) { param[i] = ILIntepreter.ReadNeoInt8(targetBase, ref curPrim); }
+                        else if (t == typeof(short)) { param[i] = ILIntepreter.ReadNeoInt16(targetBase, ref curPrim); }
+                        else if (t == typeof(ushort)) { param[i] = ILIntepreter.ReadNeoUInt16(targetBase, ref curPrim); }
+                        else if (t == typeof(uint)) { param[i] = ILIntepreter.ReadNeoUInt32(targetBase, ref curPrim); }
+                        else if (t == typeof(ulong)) { param[i] = ILIntepreter.ReadNeoUInt64(targetBase, ref curPrim); }
+                        else if (t == typeof(char)) { param[i] = ILIntepreter.ReadNeoChar(targetBase, ref curPrim); }
+                    }
                 }
-                else
-                {
-                    res = cDef.Invoke(param);
-                }
-            }
-            else
-            {
-                if (!def.IsStatic)
-                {
-                    if (!(instance is Reflection.ILRuntimeWrapperType))
-                        instance = declaringType.TypeForCLR.CheckCLRTypes(instance);
-                    if (instance == null)
-                        throw new NullReferenceException();
-                }
-                res = def.Invoke(instance, param);
-            }
 
-            Array.Clear(invocationParam, 0, invocationParam.Length);
-            return res;
+                try
+                {
+                    object res = null;
+                    if (isConstructor)
+                    {
+                        if (!isNewObj)
+                        {
+                            if (!cDef.IsStatic)
+                            {
+                                if (instance == null)
+                                    throw new NullReferenceException();
+                                if (instance is CrossBindingAdaptorType && paramCount == 0)
+                                    return null;
+                                cDef.Invoke(instance, param);
+                            }
+                            else
+                                throw new NotImplementedException();
+                        }
+                        else
+                        {
+                            res = cDef.Invoke(param);
+                        }
+                    }
+                    else
+                    {
+                        if (!def.IsStatic)
+                        {
+                            if (!(instance is Reflection.ILRuntimeWrapperType))
+                                instance = declaringType.TypeForCLR.CheckCLRTypes(instance);
+                            if (instance == null)
+                                throw new NullReferenceException();
+                        }
+                        res = def.Invoke(instance, param);
+                    }
+
+                    return res;
+                }
+                catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException != null)
+                {
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                    throw;
+                }
+            }
+            finally
+            {
+                Array.Clear(param, 0, param.Length);
+            }
         }
 #endif
 

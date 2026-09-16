@@ -520,6 +520,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldc_I4_7:
                 case OpCodeREnum.Ldc_I4_8:
                 case OpCodeREnum.Ldc_I4_M1:
+                case OpCodeREnum.EnterCatch:
                 case OpCodeREnum.Ldnull:
                 case OpCodeREnum.Ldc_I4:
                 case OpCodeREnum.Ldc_I4_S:
@@ -743,6 +744,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldc_I4_7:
                 case OpCodeREnum.Ldc_I4_8:
                 case OpCodeREnum.Ldc_I4_M1:
+                case OpCodeREnum.EnterCatch:
                 case OpCodeREnum.Ldnull:
                 case OpCodeREnum.Ldc_I4:
                 case OpCodeREnum.Ldc_I4_S:
@@ -1267,6 +1269,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Ldc_I4_7:
                 case OpCodeREnum.Ldc_I4_8:
                 case OpCodeREnum.Ldc_I4_M1:
+                case OpCodeREnum.EnterCatch:
                 case OpCodeREnum.Ldnull:
                 case OpCodeREnum.Ldc_I4:
                 case OpCodeREnum.Ldc_I4_S:

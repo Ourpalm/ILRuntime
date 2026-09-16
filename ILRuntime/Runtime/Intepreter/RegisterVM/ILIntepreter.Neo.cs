@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -520,6 +521,26 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
 
 #endif
+            try
+            {
+                return ExecuteNeoCore(method, esp, retDst, retRefBase, out unhandledException, preAllocatedRefBase);
+            }
+            finally
+            {
+#if DEBUG && !NO_PROFILER
+            if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
+#if UNITY_5_5_OR_NEWER
+                UnityEngine.Profiling.Profiler.EndSample();
+#else
+                UnityEngine.Profiler.EndSample();
+#endif
+#endif
+            }
+        }
+
+        byte* ExecuteNeoCore(ILMethod method, byte* esp, byte* retDst, int retRefBase,
+            out bool unhandledException, int preAllocatedRefBase)
+        {
             unhandledException = false;
 
             OpCodeR[] body = method.CompiledFrame.NeoExecuteBody;
@@ -582,8 +603,9 @@ namespace ILRuntime.Runtime.Intepreter
 #endif
             stack.PushFrame(ref frame);
 
-            int finallyEndAddress = 0;
-            Exception lastCaughtEx = null;
+            int frameDepth = stack.Frames.Count;
+            NeoExceptionState exceptionState = null;
+            bool propagatingException = false;
             var ehs = method.ExceptionHandlerRegister;
 
             fixed (OpCodeR* ptr = body)
@@ -618,6 +640,37 @@ namespace ILRuntime.Runtime.Intepreter
                         OpCodeREnum code = ip->Code;
                         switch (code)
                         {
+                            case OpCodeREnum.EnterCatch:
+                                // The dispatcher has already supplied the implicit catch input.
+                                break;
+                            case OpCodeREnum.Throw:
+                                srcIdx = *(int*)(frameBase + ip->DstOffset);
+                                throw srcIdx < 0 || mStack[srcIdx] == null
+                                    ? new NullReferenceException() : (Exception)mStack[srcIdx];
+                            case OpCodeREnum.Rethrow:
+                                if (exceptionState == null)
+                                    throw new InvalidProgramException("Neo rethrow outside catch.");
+                                exceptionState.Rethrow((int)(ip - ptr)).Throw();
+                                break;
+                            case OpCodeREnum.Leave:
+                            case OpCodeREnum.Leave_S:
+                                if (exceptionState == null) exceptionState = new NeoExceptionState(this, ehs);
+                                ip = ptr + exceptionState.Leave((int)(ip - ptr), ip->Operand);
+                                EnterNeoExceptionTarget(exceptionState, frameDepth, frameBase, frameRefBase, totalRefSize, mStack);
+                                continue;
+                            case OpCodeREnum.Endfinally:
+                                if (exceptionState == null)
+                                    throw new InvalidProgramException("Neo endfinally outside finally.");
+                                int resume = exceptionState.EndFinally((int)(ip - ptr));
+                                if (resume < 0)
+                                {
+                                    propagatingException = true;
+                                    unhandledException = true;
+                                    exceptionState.Exception.Throw();
+                                }
+                                EnterNeoExceptionTarget(exceptionState, frameDepth, frameBase, frameRefBase, totalRefSize, mStack);
+                                ip = ptr + resume;
+                                continue;
                             case OpCodeREnum.Ldloca:
                             case OpCodeREnum.Ldloca_S:
                             case OpCodeREnum.Ldarga:
@@ -2120,29 +2173,23 @@ namespace ILRuntime.Runtime.Intepreter
                                     byte* retDstPtr = null;
                                     int targetRetRefBase = -1;
 
-                                    // Save previous dst slot state so we can restore if the ctor throws.
-                                    // Newobj must only expose the new instance to the caller after the ctor
-                                    // returns successfully (ECMA-335 III.4.21).
+                                    // Preserve the temporary caller root and original rollback contract.
                                     object prevRefSlot = mStack[newobjDstIdx];
                                     int prevPrimSlot = *(int*)(frameBase + ip->DstOffset);
-
                                     ins = newobjType.Instantiate(false);
-                                    // Publish the new instance to mStack + callee arg0 so the ctor sees `this`.
-                                    // The caller-visible dst frame slot stays with prevPrimSlot until success.
-                                    mStack[newobjDstIdx] = ins;
-                                    *(int*)targetBase = newobjDstIdx;
-                                    CopyNeoCallArguments(ref map, frameBase, targetBase);
-                                    if (targetMethod is ILMethod ilmNewobj)
-                                    {
-                                        calleeRefBase = mStack.Count;
-                                        mStack.ExpandBySize(ilmNewobj.CompiledFrame.TotalRefSize);
-                                        mStack[calleeRefBase] = mStack[newobjDstIdx];
-                                        CopyNeoCallRefs(ref map, mStack, frameRefBase, calleeRefBase);
-                                    }
-
                                     bool ctorOk = false;
                                     try
                                     {
+                                        mStack[newobjDstIdx] = ins;
+                                        *(int*)targetBase = newobjDstIdx;
+                                        CopyNeoCallArguments(ref map, frameBase, targetBase);
+                                        if (targetMethod is ILMethod ilmNewobj)
+                                        {
+                                            calleeRefBase = mStack.Count;
+                                            mStack.ExpandBySize(ilmNewobj.CompiledFrame.TotalRefSize);
+                                            mStack[calleeRefBase] = mStack[newobjDstIdx];
+                                            CopyNeoCallRefs(ref map, mStack, frameRefBase, calleeRefBase);
+                                        }
                                         if (!InvokeNeoCallTarget(targetMethod, true, targetBase, mStack, retDstPtr, targetRetRefBase, out unhandledException, calleeRefBase))
                                             return null;
                                         ctorOk = true;
@@ -2150,13 +2197,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     finally
                                     {
                                         if (ctorOk)
-                                        {
-                                            // Publish the newly constructed reference to the caller-visible slot.
                                             *(int*)(frameBase + ip->DstOffset) = newobjDstIdx;
-                                        }
                                         else
                                         {
-                                            // Restore the previous state so the caller-visible slot is unchanged.
                                             mStack[newobjDstIdx] = prevRefSlot;
                                             *(int*)(frameBase + ip->DstOffset) = prevPrimSlot;
                                         }
@@ -3274,37 +3317,20 @@ namespace ILRuntime.Runtime.Intepreter
                     }
                     catch (Exception ex)
                     {
-                        var oriESP = (StackObject*)newEsp;
-                        StackObject* tmpEsp = oriESP;
-                        bool isJmp = HandleException(ex, ref tmpEsp, ehs, method, (int)(ip - ptr), ref frame, ref lastCaughtEx, ref unhandledException, ref finallyEndAddress, out int jmpTarget, out bool isCatch);
-                        if (isCatch)
+                        // An Endfinally propagation has already exhausted this method's clauses.
+                        if (propagatingException) throw;
+                        RecordNeoException(ex, method, (int)(ip - ptr));
+                        if (exceptionState == null) exceptionState = new NeoExceptionState(this, ehs);
+                        int target = exceptionState.Raise(ExceptionDispatchInfo.Capture(ex), (int)(ip - ptr));
+                        if (target < 0)
                         {
-                            // Truncate mStack back to this frame's reserved region
-                            int targetCount = frameRefBase + totalRefSize;
-                            if (mStack.Count > targetCount)
-                            {
-                                mStack.RemoveRange(targetCount, mStack.Count - targetCount);
-                            }
-                            // TODO: write exception object into the catch handler's slot (Step 14)
-                        }
-                        if (isJmp)
-                        {
-                            ip = ptr + jmpTarget;
-                            continue;
-                        }
-                        if (unhandledException)
-                        {
+                            unhandledException = true;
                             throw;
                         }
-                        unhandledException = true;
-                        returned = true;
-#if DEBUG && !DISABLE_ILRUNTIME_DEBUG
-                        if (!AppDomain.DebugService.Break(this, ex))
-#endif
-                        {
-                            var newEx = new ILRuntimeException(ex.Message, this, method, oriESP, ex);
-                            throw newEx;
-                        }
+                        unhandledException = false;
+                        EnterNeoExceptionTarget(exceptionState, frameDepth, frameBase, frameRefBase, totalRefSize, mStack);
+                        ip = ptr + target;
+                        continue;
                     }
                 }
             }
@@ -3320,14 +3346,6 @@ namespace ILRuntime.Runtime.Intepreter
                 mStack.RemoveRange(frameRefBase, mStack.Count - frameRefBase);
             }
 
-#if DEBUG && !NO_PROFILER
-            if (System.Threading.Thread.CurrentThread.ManagedThreadId == AppDomain.UnityMainThreadID)
-#if UNITY_5_5_OR_NEWER
-                UnityEngine.Profiling.Profiler.EndSample();
-#else
-                UnityEngine.Profiler.EndSample();
-#endif
-#endif
             return frameBase;
         }
 

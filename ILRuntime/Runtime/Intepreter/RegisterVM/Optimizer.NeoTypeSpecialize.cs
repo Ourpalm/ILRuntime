@@ -103,6 +103,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         resultType = appdomain.DoubleType;
                         hasResult = true;
                         break;
+                    case OpCodeREnum.EnterCatch:
+                        resultType = appdomain.GetType(op.Operand2);
+                        hasResult = true;
+                        break;
                     case OpCodeREnum.Ldnull:
                         resultType = appdomain.ObjectType;
                         hasResult = true;

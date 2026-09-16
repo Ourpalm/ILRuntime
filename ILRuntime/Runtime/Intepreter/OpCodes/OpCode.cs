@@ -774,6 +774,12 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Leave_S:
                     param = string.Format("{0}", Operand);
                     break;
+                case OpCodeREnum.EnterCatch:
+                    param = string.Format("r{0}, clause={1}, ref={2}", Register1, Operand, Operand3);
+                    break;
+                case OpCodeREnum.Throw:
+                    param = string.Format("r{0}", Register1);
+                    break;
                 case OpCodeREnum.Ldc_I4:
                 case OpCodeREnum.Ldc_I4_S:
                     param = string.Format("r{0},{1}", Register1, Operand);

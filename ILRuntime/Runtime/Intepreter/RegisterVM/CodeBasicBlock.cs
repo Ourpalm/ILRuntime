@@ -94,6 +94,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
             }
 
+#if ENABLE_NEO_MODE
+            foreach (var clause in body.ExceptionHandlers)
+            {
+                branchTargets.Add(clause.TryStart);
+                branchTargets.Add(clause.HandlerStart);
+                if (clause.TryEnd != null) branchTargets.Add(clause.TryEnd);
+                if (clause.HandlerEnd != null) branchTargets.Add(clause.HandlerEnd);
+            }
+#endif
             List<CodeBasicBlock> res = new List<CodeBasicBlock>();
             CodeBasicBlock cur = new CodeBasicBlock();
             res.Add(cur);
@@ -109,7 +118,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     }
                 }
                 cur.AddInstruction(i);
-                if (i.OpCode.Code == Code.Switch || i.OpCode.Code == Code.Throw || i.OpCode.OperandType == OperandType.InlineBrTarget || i.OpCode.OperandType == OperandType.ShortInlineBrTarget || i.OpCode.Code == Code.Endfinally)
+                if (i.OpCode.Code == Code.Switch || i.OpCode.Code == Code.Throw ||
+#if ENABLE_NEO_MODE
+                    i.OpCode.Code == Code.Rethrow || i.OpCode.Code == Code.Ret ||
+#endif
+                    i.OpCode.OperandType == OperandType.InlineBrTarget || i.OpCode.OperandType == OperandType.ShortInlineBrTarget || i.OpCode.Code == Code.Endfinally)
                 {
                     if (cur.entry != null)
                     {
@@ -210,6 +223,13 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         break;
                 }
+#if ENABLE_NEO_MODE
+                if (lastIns.OpCode.FlowControl == FlowControl.Return || lastIns.OpCode.FlowControl == FlowControl.Throw)
+                    continue;
+                // Handler entry has an implicit stack input, never a fallthrough predecessor.
+                if (i < res.Count - 1 && body.ExceptionHandlers.Any(e => e.HandlerStart == res[i + 1].entry))
+                    continue;
+#endif
                 if (i < res.Count - 1)
                 {
                     var next = res[i + 1];

@@ -22,5 +22,9 @@ namespace ILRuntime.CLR.Method
         public int HandlerStart { get; set; }
         public int HandlerEnd { get; set; }
         public IType CatchType { get; set; }
+#if ENABLE_NEO_MODE
+        public int ExceptionOffset { get; set; }
+        public int ExceptionRefOffset { get; set; }
+#endif
     }
 }
