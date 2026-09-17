@@ -1485,9 +1485,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case OpCodeREnum.Not_I8: return OpCodeREnum.Not;
 
                 // Compare
-                case OpCodeREnum.Ceq_I8: case OpCodeREnum.Ceq_R4: case OpCodeREnum.Ceq_R8: return OpCodeREnum.Ceq;
+                case OpCodeREnum.Ceq_I8: case OpCodeREnum.Ceq_R4: case OpCodeREnum.Ceq_R8: case OpCodeREnum.Ceq_Ref: return OpCodeREnum.Ceq;
                 case OpCodeREnum.Cgt_I8: case OpCodeREnum.Cgt_R4: case OpCodeREnum.Cgt_R8: return OpCodeREnum.Cgt;
-                case OpCodeREnum.Cgt_Un_I8: case OpCodeREnum.Cgt_Un_R4: case OpCodeREnum.Cgt_Un_R8: return OpCodeREnum.Cgt_Un;
+                case OpCodeREnum.Cgt_Un_I8: case OpCodeREnum.Cgt_Un_R4: case OpCodeREnum.Cgt_Un_R8: case OpCodeREnum.Cgt_Un_Ref: return OpCodeREnum.Cgt_Un;
                 case OpCodeREnum.Clt_I8: case OpCodeREnum.Clt_R4: case OpCodeREnum.Clt_R8: return OpCodeREnum.Clt;
                 case OpCodeREnum.Clt_Un_I8: case OpCodeREnum.Clt_Un_R4: case OpCodeREnum.Clt_Un_R8: return OpCodeREnum.Clt_Un;
 

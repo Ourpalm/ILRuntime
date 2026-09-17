@@ -549,8 +549,10 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
                 case OpCodeREnum.Div_R8:
                 case OpCodeREnum.Rem_R8:
                 case OpCodeREnum.Ceq_I8:
+                case OpCodeREnum.Ceq_Ref:
                 case OpCodeREnum.Cgt_I8:
                 case OpCodeREnum.Cgt_Un_I8:
+                case OpCodeREnum.Cgt_Un_Ref:
                 case OpCodeREnum.Clt_I8:
                 case OpCodeREnum.Clt_Un_I8:
                 case OpCodeREnum.Ceq_R4:

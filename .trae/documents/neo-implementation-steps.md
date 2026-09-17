@@ -763,7 +763,7 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 **内容**:
 1. 编译期 peephole：检测 `box T; isinst U` 模式，静态消解
-2. 泛型参数场景：加入 patch 表（`PatchKind.IsinstResult`）
+2. 泛型参数场景：运行时 JIT 在每个泛型 `ILMethod` 实例上解析具体 token 并静态消解；供预编译模板共享的 `PatchKind.IsinstResult` 随 Step 22 patch 表统一落地
 3. 运行时路径（操作数为 object/接口类型时）：
    - `ILTypeInstance` → `CanAssignTo`
    - CLR 对象 → `IsAssignableFrom`
@@ -778,10 +778,10 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 - 继承链中的类型检查
 
 **ECMA-335 合规检查项**:
-- [ ] **III.4.6 `castclass` 失败必须抛 `InvalidCastException`,而非返回 null**(与 `isinst` 语义区别)
-- [ ] **`isinst` 对 null 输入**:返回 null(不是 false),因为其压栈类型仍是引用
-- [ ] **对接口/泛型/协变泛型的类型检查**:C# 4+ 泛型协变(`IEnumerable<Derived>` 可赋给 `IEnumerable<Base>`)必须正确处理,复用 `CanAssignTo` 或 CLR `IsAssignableFrom`
-- [ ] **值类型 boxed 后的类型检查**:`box int32; isinst object` 应返回原引用,`box int32; isinst int64` 应返回 null(严格类型匹配,不做数值转换)
+- [x] **III.4.6 `castclass` 失败必须抛 `InvalidCastException`,而非返回 null**(与 `isinst` 语义区别)
+- [x] **`isinst` 对 null 输入**:返回 null(不是 false),因为其压栈类型仍是引用
+- [x] **对接口/泛型/协变泛型的类型检查**:C# 4+ 泛型协变(`IEnumerable<Derived>` 可赋给 `IEnumerable<Base>`)必须正确处理,复用 `CanAssignTo` 或 CLR `IsAssignableFrom`
+- [x] **值类型 boxed 后的类型检查**:`box int32; isinst object` 应返回原引用,`box int32; isinst int64` 应返回 null(严格类型匹配,不做数值转换)
 
 ---
 

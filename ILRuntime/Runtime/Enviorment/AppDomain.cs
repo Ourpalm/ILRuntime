@@ -78,7 +78,7 @@ namespace ILRuntime.Runtime.Enviorment
         Dictionary<Type, CLRMemberwiseCloneDelegate> memberwiseCloneMap = new Dictionary<Type, CLRMemberwiseCloneDelegate>(new ByReferenceKeyComparer<Type>());
         Dictionary<Type, CLRCreateDefaultInstanceDelegate> createDefaultInstanceMap = new Dictionary<Type, CLRCreateDefaultInstanceDelegate>(new ByReferenceKeyComparer<Type>());
         Dictionary<Type, CLRCreateArrayInstanceDelegate> createArrayInstanceMap = new Dictionary<Type, CLRCreateArrayInstanceDelegate>(new ByReferenceKeyComparer<Type>());
-        IType voidType, sbyteType, shortType, intType, longType, byteType, ushortType, uintType, ulongType,intptrType, boolType, floatType, doubleType, charType, objectType, jitAttributeType;
+        IType voidType, sbyteType, shortType, intType, longType, byteType, ushortType, uintType, ulongType, intptrType, uintptrType, boolType, floatType, doubleType, charType, objectType, jitAttributeType;
         DelegateManager dMgr;
         Assembly[] loadedAssemblies;
         Dictionary<string, byte[]> references = new Dictionary<string, byte[]>();
@@ -282,6 +282,7 @@ namespace ILRuntime.Runtime.Enviorment
         public IType UIntType { get { return uintType; } }
         public IType ULongType { get { return ulongType; } }
         public IType IntPtrType { get { return intptrType; } }
+        public IType UIntPtrType { get { return uintptrType; } }
         public IType CharType { get { return charType; } }
         public IType BoolType { get { return boolType; } }
         public IType FloatType { get { return floatType; } }
@@ -725,6 +726,7 @@ namespace ILRuntime.Runtime.Enviorment
                 uintType = GetType("System.UInt32");
                 ulongType = GetType("System.UInt64");
                 intptrType = GetType("System.IntPtr");
+                uintptrType = GetType("System.UIntPtr");
                 charType = GetType("System.Char");
                 boolType = GetType("System.Boolean");
                 floatType = GetType("System.Single");
@@ -2017,9 +2019,9 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 return 4;
             }
-            else if (fieldType == IntPtrType)
+            else if (fieldType == IntPtrType || fieldType == UIntPtrType)
             {
-                return 8;
+                return IntPtr.Size;
             }
             else
                 throw new NotImplementedException();

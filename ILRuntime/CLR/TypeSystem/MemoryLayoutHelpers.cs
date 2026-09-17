@@ -20,7 +20,8 @@ namespace ILRuntime.CLR.TypeSystem
             if (t == typeof(int) || t == typeof(uint) || t == typeof(float)) return 4;
             if (t == typeof(short) || t == typeof(ushort) || t == typeof(char)) return 2;
             if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte)) return 1;
-            if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr)) return 8;
+            if (t == typeof(long) || t == typeof(ulong) || t == typeof(double)) return 8;
+            if (t == typeof(IntPtr) || t == typeof(UIntPtr)) return IntPtr.Size;
             if (t.IsEnum)
             {
                 var ut = t.GetEnumUnderlyingType();
@@ -34,7 +35,8 @@ namespace ILRuntime.CLR.TypeSystem
             if (t == typeof(int) || t == typeof(uint) || t == typeof(float)) return 4;
             if (t == typeof(short) || t == typeof(ushort) || t == typeof(char)) return 2;
             if (t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte)) return 1;
-            if (t == typeof(long) || t == typeof(ulong) || t == typeof(double) || t == typeof(IntPtr) || t == typeof(UIntPtr)) return 8;
+            if (t == typeof(long) || t == typeof(ulong) || t == typeof(double)) return 8;
+            if (t == typeof(IntPtr) || t == typeof(UIntPtr)) return IntPtr.Size;
             if (t.IsEnum)
             {
                 var ut = t.GetEnumUnderlyingType();
@@ -62,8 +64,18 @@ namespace ILRuntime.CLR.TypeSystem
             if (fieldType == typeof(char)) { *(int*)dst = Unsafe.ReadUnaligned<ushort>(ref src); return; }
             if (fieldType == typeof(sbyte)) { *(int*)dst = Unsafe.ReadUnaligned<sbyte>(ref src); return; }
             if (fieldType == typeof(ulong)) { *(ulong*)dst = Unsafe.ReadUnaligned<ulong>(ref src); return; }
-            if (fieldType == typeof(IntPtr)) { *(long*)dst = Unsafe.ReadUnaligned<long>(ref src); return; }
-            if (fieldType == typeof(UIntPtr)) { *(ulong*)dst = Unsafe.ReadUnaligned<ulong>(ref src); return; }
+            if (fieldType == typeof(IntPtr))
+            {
+                if (IntPtr.Size == 8) *(long*)dst = Unsafe.ReadUnaligned<long>(ref src);
+                else *(int*)dst = Unsafe.ReadUnaligned<int>(ref src);
+                return;
+            }
+            if (fieldType == typeof(UIntPtr))
+            {
+                if (IntPtr.Size == 8) *(ulong*)dst = Unsafe.ReadUnaligned<ulong>(ref src);
+                else *(uint*)dst = Unsafe.ReadUnaligned<uint>(ref src);
+                return;
+            }
             throw new NotSupportedException($"Neo primitive read: unsupported type {fieldType.FullName}");
         }
 
@@ -79,11 +91,14 @@ namespace ILRuntime.CLR.TypeSystem
                 CopyPrimitiveFromNeoFrame(src, ref dst, fieldType.GetEnumUnderlyingType());
                 return;
             }
-            if (fieldType == typeof(long) || fieldType == typeof(double) ||
-                fieldType == typeof(ulong) || fieldType == typeof(IntPtr) ||
-                fieldType == typeof(UIntPtr))
+            if (fieldType == typeof(long) || fieldType == typeof(double) || fieldType == typeof(ulong))
             {
                 Unsafe.CopyBlock(ref dst, ref *src, 8);
+                return;
+            }
+            if (fieldType == typeof(IntPtr) || fieldType == typeof(UIntPtr))
+            {
+                Unsafe.CopyBlock(ref dst, ref *src, (uint)IntPtr.Size);
                 return;
             }
             if (fieldType == typeof(bool) || fieldType == typeof(byte) || fieldType == typeof(sbyte))

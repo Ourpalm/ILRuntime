@@ -2152,6 +2152,46 @@ namespace ILRuntime.CLR.TypeSystem
                 return true;
             }
 
+            // ECMA-335 II.9.5/II.9.9: constructed interface and delegate types
+            // with the same generic definition are assignment-compatible according
+            // to the declared variance of each generic parameter. Variance never
+            // converts value-type arguments; those must match exactly.
+            var targetILType = type as ILType;
+            if (genericDefinition != null && targetILType != null &&
+                targetILType.genericDefinition == genericDefinition &&
+                genericArguments != null && targetILType.genericArguments != null &&
+                genericArguments.Length == targetILType.genericArguments.Length)
+            {
+                bool varianceMatch = true;
+                var parameters = genericDefinition.definition.GenericParameters;
+                for (int i = 0; i < genericArguments.Length; i++)
+                {
+                    IType sourceArgument = genericArguments[i].Value;
+                    IType targetArgument = targetILType.genericArguments[i].Value;
+                    if (sourceArgument == targetArgument)
+                        continue;
+
+                    if (sourceArgument.IsValueType || targetArgument.IsValueType)
+                    {
+                        varianceMatch = false;
+                        break;
+                    }
+
+                    var variance = parameters[i].Attributes & GenericParameterAttributes.VarianceMask;
+                    if (variance == GenericParameterAttributes.Covariant)
+                        varianceMatch = sourceArgument.CanAssignTo(targetArgument);
+                    else if (variance == GenericParameterAttributes.Contravariant)
+                        varianceMatch = targetArgument.CanAssignTo(sourceArgument);
+                    else
+                        varianceMatch = false;
+
+                    if (!varianceMatch)
+                        break;
+                }
+                if (varianceMatch)
+                    return true;
+            }
+
             if ( IsEnum )
             {
                 if ( type.TypeForCLR == typeof ( Enum ) )

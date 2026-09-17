@@ -53,8 +53,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 else if (fieldType == appdomain.UShortType || fieldType == appdomain.CharType) kind = NeoStaticFieldKind.U2;
                 else if (fieldType == appdomain.IntType) kind = NeoStaticFieldKind.I4;
                 else if (fieldType == appdomain.UIntType) kind = NeoStaticFieldKind.U4;
-                else if (fieldType == appdomain.LongType || fieldType == appdomain.IntPtrType) kind = NeoStaticFieldKind.I8;
+                else if (fieldType == appdomain.LongType) kind = NeoStaticFieldKind.I8;
                 else if (fieldType == appdomain.ULongType) kind = NeoStaticFieldKind.U8;
+                else if (fieldType == appdomain.IntPtrType) kind = IntPtr.Size == 8 ? NeoStaticFieldKind.I8 : NeoStaticFieldKind.I4;
+                else if (fieldType == appdomain.UIntPtrType) kind = IntPtr.Size == 8 ? NeoStaticFieldKind.U8 : NeoStaticFieldKind.U4;
                 else if (fieldType == appdomain.FloatType) kind = NeoStaticFieldKind.R4;
                 else if (fieldType == appdomain.DoubleType) kind = NeoStaticFieldKind.R8;
                 else
@@ -160,7 +162,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 else if (fieldType == appdomain.IntPtrType)
                 {
-                    res = OpCodeREnum.Ldfld_U8;
+                    res = IntPtr.Size == 8 ? OpCodeREnum.Ldfld_I8 : OpCodeREnum.Ldfld_I4;
+                }
+                else if (fieldType == appdomain.UIntPtrType)
+                {
+                    res = IntPtr.Size == 8 ? OpCodeREnum.Ldfld_U8 : OpCodeREnum.Ldfld_U4;
                 }
                 else
                     throw new NotImplementedException();
@@ -231,7 +237,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 }
                 else if (fieldType == appdomain.IntPtrType)
                 {
-                    res = OpCodeREnum.Stfld_U8;
+                    res = IntPtr.Size == 8 ? OpCodeREnum.Stfld_I8 : OpCodeREnum.Stfld_I4;
+                }
+                else if (fieldType == appdomain.UIntPtrType)
+                {
+                    res = IntPtr.Size == 8 ? OpCodeREnum.Stfld_U8 : OpCodeREnum.Stfld_U4;
                 }
                 else
                     throw new NotImplementedException();

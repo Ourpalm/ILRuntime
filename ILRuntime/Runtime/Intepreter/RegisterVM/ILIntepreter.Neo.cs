@@ -647,6 +647,7 @@ namespace ILRuntime.Runtime.Intepreter
                 ILTypeInstance fieldIns;
                 CLRType clrType;
                 object obj = null;
+                object otherObject = null;
                 int sz, refCnt, srcIdx, dstIdx, srcRefOffset, dstRefOffset;
                 // Ref Slot (managed pointer) working locals, shared across all
                 // ldloca/ldarga/ldflda/ldsflda/ldind/stind and Ref-Slot-receiver
@@ -1416,6 +1417,20 @@ namespace ILRuntime.Runtime.Intepreter
                                 break;
                             case OpCodeREnum.Cgt_Un:
                                 *(int*)(frameBase + ip->DstOffset) = *(uint*)(frameBase + ip->SrcOffset) > *(uint*)(frameBase + ip->OperandOffset) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Ceq_Ref:
+                                srcIdx = *(int*)(frameBase + ip->SrcOffset);
+                                dstIdx = *(int*)(frameBase + ip->OperandOffset);
+                                obj = srcIdx >= 0 ? mStack[srcIdx] : null;
+                                otherObject = dstIdx >= 0 ? mStack[dstIdx] : null;
+                                *(int*)(frameBase + ip->DstOffset) = ReferenceEquals(obj, otherObject) ? 1 : 0;
+                                break;
+                            case OpCodeREnum.Cgt_Un_Ref:
+                                srcIdx = *(int*)(frameBase + ip->SrcOffset);
+                                dstIdx = *(int*)(frameBase + ip->OperandOffset);
+                                obj = srcIdx >= 0 ? mStack[srcIdx] : null;
+                                otherObject = dstIdx >= 0 ? mStack[dstIdx] : null;
+                                *(int*)(frameBase + ip->DstOffset) = !ReferenceEquals(obj, otherObject) ? 1 : 0;
                                 break;
                             case OpCodeREnum.Clt:
                                 *(int*)(frameBase + ip->DstOffset) = *(int*)(frameBase + ip->SrcOffset) < *(int*)(frameBase + ip->OperandOffset) ? 1 : 0;
@@ -2560,7 +2575,14 @@ namespace ILRuntime.Runtime.Intepreter
                                     var clrTypeBox = t as ILRuntime.CLR.TypeSystem.CLRType;
                                     if (clrTypeBox == null)
                                         throw new NotImplementedException("Neo Box on non-IL, non-CLRType target.");
-                                    if (clrTypeBox.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                                    if (clrTypeBox.IsPrimitive)
+                                    {
+                                        object boxed = ReadNeoPrimitive(frameBase + ip->SrcOffset, clrTypeBox);
+                                        dstIdx = frameRefBase + dstRefOffset;
+                                        mStack[dstIdx] = boxed;
+                                        *(int*)(frameBase + ip->DstOffset) = dstIdx;
+                                    }
+                                    else if (clrTypeBox.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
                                     {
                                         // Framework-uniform Inline → boxed: iterate declared fields, read each
                                         // from the frame layout (primitive by offset, reference by mStack index),
@@ -2582,6 +2604,46 @@ namespace ILRuntime.Runtime.Intepreter
                                         mStack[dstIdx] = obj;
                                         *(int*)(frameBase + ip->DstOffset) = obj != null ? dstIdx : -1;
                                     }
+                                }
+                                break;
+                            case OpCodeREnum.Isinst:
+                            case OpCodeREnum.Castclass:
+                                dstRefOffset = ip->Operand3;
+                                t = AppDomain.GetType(ip->Operand);
+                                if (t == null)
+                                    throw new NullReferenceException();
+
+                                srcIdx = *(int*)(frameBase + ip->SrcOffset);
+                                obj = srcIdx >= 0 ? mStack[srcIdx] : null;
+                                bool canAssign = obj == null;
+                                if (obj is ILTypeInstance typeInstance)
+                                    canAssign = typeInstance.CanAssignTo(t);
+                                else if (obj != null)
+                                    canAssign = t.TypeForCLR.IsAssignableFrom(obj.GetType());
+
+                                if (!canAssign)
+                                {
+                                    if (code == OpCodeREnum.Castclass)
+                                        throw new InvalidCastException(string.Format(
+                                            "Cannot cast {0} to {1}.", obj.GetType().FullName, t.FullName));
+
+                                    dstIdx = frameRefBase + dstRefOffset;
+                                    mStack[dstIdx] = null;
+                                    *(int*)(frameBase + ip->DstOffset) = -1;
+                                    break;
+                                }
+
+                                if (obj == null)
+                                {
+                                    dstIdx = frameRefBase + dstRefOffset;
+                                    mStack[dstIdx] = null;
+                                    *(int*)(frameBase + ip->DstOffset) = -1;
+                                }
+                                else
+                                {
+                                    dstIdx = frameRefBase + dstRefOffset;
+                                    mStack[dstIdx] = obj;
+                                    *(int*)(frameBase + ip->DstOffset) = dstIdx;
                                 }
                                 break;
                             case OpCodeREnum.Ldfld:
@@ -3267,10 +3329,29 @@ namespace ILRuntime.Runtime.Intepreter
                             case OpCodeREnum.Unbox_Any:
                                 dstRefOffset = ip->Operand3;
                                 t = AppDomain.GetType(ip->Operand);
-                                srcIdx = *(int*)(frameBase + ip->SrcOffset);
-                                if (srcIdx < 0)
+                                if (t == null)
                                     throw new NullReferenceException();
-                                obj = mStack[srcIdx];
+                                srcIdx = *(int*)(frameBase + ip->SrcOffset);
+                                obj = srcIdx >= 0 ? mStack[srcIdx] : null;
+                                if (code == OpCodeREnum.Unbox_Any && !t.IsValueType)
+                                {
+                                    if (obj == null)
+                                    {
+                                        dstIdx = frameRefBase + dstRefOffset;
+                                        mStack[dstIdx] = null;
+                                        *(int*)(frameBase + ip->DstOffset) = -1;
+                                        break;
+                                    }
+                                    bool referenceMatch = obj is ILTypeInstance referenceInstance
+                                        ? referenceInstance.CanAssignTo(t)
+                                        : t.TypeForCLR.IsAssignableFrom(obj.GetType());
+                                    if (!referenceMatch)
+                                        throw new InvalidCastException();
+                                    dstIdx = frameRefBase + dstRefOffset;
+                                    mStack[dstIdx] = obj;
+                                    *(int*)(frameBase + ip->DstOffset) = dstIdx;
+                                    break;
+                                }
                                 if (obj == null)
                                     throw new NullReferenceException();
                                 ilType = t as ILType;
@@ -3318,7 +3399,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     // Type check: the boxed CLR object must be assignable to the requested type.
                                     if (!clrTypeUnbox.TypeForCLR.IsInstanceOfType(obj))
                                         throw new InvalidCastException();
-                                    if (clrTypeUnbox.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
+                                    if (clrTypeUnbox.IsPrimitive)
+                                    {
+                                        WriteNeoPrimitive(frameBase + ip->DstOffset, clrTypeUnbox, obj);
+                                    }
+                                    else if (clrTypeUnbox.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Inline)
                                     {
                                         // Framework-uniform boxed → Inline: iterate declared fields, read each
                                         // from the boxed CLR object via reflection, write into the frame view.
@@ -3582,11 +3667,6 @@ namespace ILRuntime.Runtime.Intepreter
             }
         }
 
-        // Framework-uniform copy: reads a Neo Inline-layout frame view of a CLR value type and writes
-        // each declared instance field onto a freshly-boxed CLR object via reflection. Used by CLR Box (Inline).
-        // Primitive/enum fields are read from the frame at CLRType.GetFieldPrimitiveOffset(fieldHash) and
-        // boxed via WriteObjectToBoxedField; reference fields are read from mStack at
-        // CLRType.GetFieldReferenceOffset(fieldHash) and assigned via FieldInfo.SetValue.
         static unsafe void CopyFrameToBoxedClrObject(object boxed, ILRuntime.CLR.TypeSystem.CLRType clrType,
                                                      byte* frameBase, AutoList mStack, int refBase)
         {

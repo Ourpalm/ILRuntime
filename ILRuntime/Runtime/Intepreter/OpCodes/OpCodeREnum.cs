@@ -1010,5 +1010,9 @@ namespace ILRuntime.Runtime.Intepreter.OpCodes
         Callvirt_CLR,
         // Defines the implicit exception input; the Neo dispatcher supplies its value.
         EnterCatch,
+
+        // === Neo only - Step 15: managed-reference identity comparisons ===
+        Ceq_Ref,
+        Cgt_Un_Ref,
     }
 }

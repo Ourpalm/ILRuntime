@@ -1,4 +1,5 @@
 ﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,67 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
     partial class Optimizer
     {
+        internal static void FoldBoxTypeTests(List<CodeBasicBlock> blocks, Enviorment.AppDomain domain)
+        {
+            foreach (var block in blocks)
+            {
+                var body = block.FinalInstructions;
+                for (int i = 0; i + 1 < body.Count; i++)
+                {
+                    OpCodeR box = body[i];
+                    OpCodeR test = body[i + 1];
+                    if (box.Code != OpCodeREnum.Box ||
+                        (test.Code != OpCodeREnum.Isinst && test.Code != OpCodeREnum.Castclass) ||
+                        box.Register1 != test.Register2)
+                        continue;
+
+                    IType boxedType = domain.GetType(box.Operand);
+                    IType targetType = domain.GetType(test.Operand);
+                    if (boxedType == null || targetType == null || !boxedType.IsValueType ||
+                        Nullable.GetUnderlyingType(boxedType.TypeForCLR) != null)
+                        continue;
+
+                    bool compatible = boxedType.CanAssignTo(targetType);
+                    if (compatible && i + 2 < body.Count)
+                    {
+                        OpCodeR unbox = body[i + 2];
+                        if (unbox.Code == OpCodeREnum.Unbox_Any &&
+                            unbox.Register2 == test.Register1 &&
+                            domain.GetType(unbox.Operand) == boxedType)
+                        {
+                            // The complete round trip is an identity operation over the
+                            // original flat value. Keeping the original register also
+                            // avoids allocating an otherwise immediately-discarded box.
+                            body[i] = new OpCodeR { Code = OpCodeREnum.Nop };
+                            body[i + 1] = new OpCodeR { Code = OpCodeREnum.Nop };
+                            body[i + 2] = new OpCodeR { Code = OpCodeREnum.Nop };
+                            i += 2;
+                            continue;
+                        }
+                    }
+
+                    if (compatible)
+                    {
+                        // The box is still required because the result of isinst/castclass
+                        // is an object reference. Only the now-redundant check is removed.
+                        body[i + 1] = new OpCodeR { Code = OpCodeREnum.Nop };
+                    }
+                    else if (test.Code == OpCodeREnum.Isinst)
+                    {
+                        // A boxed non-nullable T can never satisfy the requested type.
+                        // Materialize the specified null result without allocating a box.
+                        body[i] = new OpCodeR { Code = OpCodeREnum.Nop };
+                        body[i + 1] = new OpCodeR {
+                            Code = OpCodeREnum.Ldnull,
+                            Register1 = test.Register1
+                        };
+                    }
+                    // An incompatible castclass is intentionally retained so its runtime
+                    // failure remains an InvalidCastException at the original IL point.
+                }
+            }
+        }
+
         public static void LowerNeoOffsets(ref CompiledFrame frame, Enviorment.AppDomain domain, bool[] localIsRef = null)
         {
             if (frame.TotalStructSize > ushort.MaxValue)
@@ -40,8 +102,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Shr:
                     case OpCodeREnum.Shr_Un:
                     case OpCodeREnum.Ceq:
+                    case OpCodeREnum.Ceq_Ref:
                     case OpCodeREnum.Cgt:
                     case OpCodeREnum.Cgt_Un:
+                    case OpCodeREnum.Cgt_Un_Ref:
                     case OpCodeREnum.Clt:
                     case OpCodeREnum.Clt_Un:
                     case OpCodeREnum.Add_I8:
@@ -337,6 +401,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Box:
                     case OpCodeREnum.Unbox:
                     case OpCodeREnum.Unbox_Any:
+                    case OpCodeREnum.Isinst:
+                    case OpCodeREnum.Castclass:
                         {
                             short r1 = op.Register1;
                             short r2 = op.Register2;
@@ -893,10 +959,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         {
             Type clrType = type.TypeForCLR;
             int alignment;
-            if (clrType == typeof(long) || clrType == typeof(ulong) ||
-                clrType == typeof(double) || clrType == typeof(IntPtr) ||
-                clrType == typeof(UIntPtr))
+            if (clrType == typeof(long) || clrType == typeof(ulong) || clrType == typeof(double))
                 alignment = 8;
+            else if (clrType == typeof(IntPtr) || clrType == typeof(UIntPtr))
+                alignment = IntPtr.Size;
             else if (clrType == typeof(short) || clrType == typeof(ushort) ||
                      clrType == typeof(char))
                 alignment = 2;

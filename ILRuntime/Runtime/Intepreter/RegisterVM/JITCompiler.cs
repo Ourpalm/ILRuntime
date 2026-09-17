@@ -333,6 +333,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             }
 #endif
 
+#if ENABLE_NEO_MODE
+            // Resolve adjacent box/type-test patterns while both operands still carry
+            // their concrete metadata tokens. The pass only performs transformations
+            // that preserve Neo's flat-value/reference-slot representation.
+            Optimizer.FoldBoxTypeTests(blocks, appdomain);
+#endif
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.BackwardsCopyPropagation(blocks, hasReturn, baseRegStart);
             Optimizer.ForwardCopyPropagation(blocks, hasReturn, baseRegStart);
@@ -876,10 +882,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
         {
             Type clrType = type.TypeForCLR;
             int alignment;
-            if (clrType == typeof(long) || clrType == typeof(ulong) ||
-                clrType == typeof(double) || clrType == typeof(IntPtr) ||
-                clrType == typeof(UIntPtr))
+            if (clrType == typeof(long) || clrType == typeof(ulong) || clrType == typeof(double))
                 alignment = 8;
+            else if (clrType == typeof(IntPtr) || clrType == typeof(UIntPtr))
+                alignment = IntPtr.Size;
             else if (clrType == typeof(short) || clrType == typeof(ushort) ||
                      clrType == typeof(char))
                 alignment = 2;

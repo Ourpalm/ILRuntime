@@ -386,10 +386,8 @@ namespace ILRuntime.Runtime.Intepreter
                 if (!executed)
                     throw new InvalidOperationException("Execute must be called before reading the return value.");
                 var tt = typeof(T);
-                if (tt == typeof(IntPtr))
-                    return (T)(object)new IntPtr(*(long*)src);
-                if (tt == typeof(UIntPtr))
-                    return (T)(object)new UIntPtr(*(ulong*)src);
+                if (tt == typeof(IntPtr) || tt == typeof(UIntPtr))
+                    return (T)ILIntepreter.ReadNeoPrimitive(src, intp.AppDomain.GetType(tt));
                 if (!(tt.IsPrimitive || tt.IsEnum))
                     throw new NotSupportedException(
                         "Neo InvocationFrame: reference-type T is not supported by ReadGenericPrimitive<T>; use ReadObject<T> instead.");
@@ -561,8 +559,18 @@ namespace ILRuntime.Runtime.Intepreter
                 case TypeCode.Single:  *(float*)dst  = Convert.ToSingle(value);  break;
                 case TypeCode.Double:  *(double*)dst = Convert.ToDouble(value);  break;
                 default:
-                    if (clr == typeof(IntPtr)) { *(long*)dst = ((IntPtr)value).ToInt64(); break; }
-                    if (clr == typeof(UIntPtr)) { *(ulong*)dst = ((UIntPtr)value).ToUInt64(); break; }
+                    if (clr == typeof(IntPtr))
+                    {
+                        if (IntPtr.Size == 8) *(long*)dst = ((IntPtr)value).ToInt64();
+                        else *(int*)dst = ((IntPtr)value).ToInt32();
+                        break;
+                    }
+                    if (clr == typeof(UIntPtr))
+                    {
+                        if (IntPtr.Size == 8) *(ulong*)dst = ((UIntPtr)value).ToUInt64();
+                        else *(uint*)dst = ((UIntPtr)value).ToUInt32();
+                        break;
+                    }
                     throw new NotSupportedException("Neo: unsupported primitive type " + clr.FullName);
             }
         }
@@ -594,8 +602,10 @@ namespace ILRuntime.Runtime.Intepreter
                 case TypeCode.Single:  return *(float*)src;
                 case TypeCode.Double:  return *(double*)src;
                 default:
-                    if (clr == typeof(IntPtr)) return new IntPtr(*(long*)src);
-                    if (clr == typeof(UIntPtr)) return new UIntPtr(*(ulong*)src);
+                    if (clr == typeof(IntPtr))
+                        return IntPtr.Size == 8 ? new IntPtr(*(long*)src) : new IntPtr(*(int*)src);
+                    if (clr == typeof(UIntPtr))
+                        return IntPtr.Size == 8 ? new UIntPtr(*(ulong*)src) : new UIntPtr(*(uint*)src);
                     throw new NotSupportedException("Neo: unsupported primitive type " + clr.FullName);
             }
         }

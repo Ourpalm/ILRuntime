@@ -1305,6 +1305,10 @@ C# 编译器对值类型做 isinst/castclass 前会先 emit `box` 指令。Legac
 | `box T; castclass U` | T 不兼容 U | 编译期报错或保留 |
 | 涉及泛型参数 T | 实例化时确定 | 加入 patch 表（PatchKind.IsinstResult） |
 
+实际 JIT 落地时必须保留 Neo 的表示约束：`isinst` / `castclass` 的结果始终是 O（4 字节 mStack index + 1 个引用槽），即使目标 token 是值类型。因而当结果仍作为对象使用时，兼容的 `box T; isinst/castclass U` 只能删除重复类型检查，不能删除 `box`；只有 `box T; isinst/castclass U; unbox.any T` 的完整可逆链才能全部消除并保留原 flat value。不兼容的 `box T; isinst U` 可直接改写为 null，不兼容的 `castclass` 保留到运行时抛 `InvalidCastException`。
+
+当前运行时 JIT 针对每个已实例化 `ILMethod` 独立编译，`GetTypeTokenHashCode` 已把泛型参数解析为具体类型，因此在本阶段直接完成上述静态消解。供 `.neo` 模板共享使用的 `PatchKind.IsinstResult` 与通用 patch 表仍由 Step 22 统一落地。
+
 ### 24.3 运行时残留路径
 
 编译期无法消解的情况（操作数静态类型为 object/接口等），操作数**已在 mStack 中**（是引用类型或 boxed 值类型），isinst/castclass 直接对 mStack 中的对象做类型检查：
@@ -1312,6 +1316,8 @@ C# 编译器对值类型做 isinst/castclass 前会先 emit `box` 指令。Legac
 - CLR 对象 → `IsAssignableFrom`
 
 不涉及帧内 flat bytes，不需要额外 box。
+
+`isinst` 常与 `ldnull; cgt.un` 组合实现 C# `is`。Neo 必须将引用 `ceq/cgt.un` 特化为对象身份比较，不能把 mStack index 当普通有符号/无符号整数比较；同一对象可以位于不同引用槽，null 则由 `-1` 表示。
 
 ---
 

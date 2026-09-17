@@ -158,10 +158,29 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Clt_Un:
                         {
                             IType srcType = GetRegisterTypeFromList(currentTypes, op.Register2);
-                            op.Code = GetTypedCompareOpcode(op.Code, InferPrimTag(srcType, appdomain));
+                            IType otherType = GetRegisterTypeFromList(currentTypes, op.Register3);
+                            if (IsNeoReferenceType(srcType) || IsNeoReferenceType(otherType))
+                            {
+                                if (op.Code == OpCodeREnum.Ceq)
+                                    op.Code = OpCodeREnum.Ceq_Ref;
+                                else if (op.Code == OpCodeREnum.Cgt_Un)
+                                    op.Code = OpCodeREnum.Cgt_Un_Ref;
+                                else
+                                    throw new InvalidProgramException("Only ceq and cgt.un are valid managed-reference comparisons.");
+                            }
+                            else
+                                op.Code = GetTypedCompareOpcode(op.Code, InferPrimTag(srcType, appdomain));
                             resultType = appdomain.IntType;
                             hasResult = true;
                         }
+                        break;
+                    case OpCodeREnum.Ceq_Ref:
+                    case OpCodeREnum.Cgt_Un_Ref:
+                        // Inlining runs before this pass and can import an already-specialized
+                        // callee body. Preserve the opcode while still teaching SSA rename that
+                        // its result is a 4-byte Boolean/int32 slot.
+                        resultType = appdomain.IntType;
+                        hasResult = true;
                         break;
                     case OpCodeREnum.Beq:
                     case OpCodeREnum.Beq_S:
@@ -351,8 +370,6 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         break;
                     case OpCodeREnum.Unbox:
                     case OpCodeREnum.Unbox_Any:
-                    case OpCodeREnum.Isinst:
-                    case OpCodeREnum.Castclass:
                         {
                             var t = appdomain.GetType(op.Operand);
                             if (t != null)
@@ -361,6 +378,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 hasResult = true;
                             }
                         }
+                        break;
+                    case OpCodeREnum.Isinst:
+                    case OpCodeREnum.Castclass:
+                        // Both instructions produce an O (managed-reference) stack value,
+                        // including `isinst` whose metadata target is a boxed value type.
+                        // The target token controls the check, not the destination layout.
+                        resultType = appdomain.ObjectType;
+                        hasResult = true;
                         break;
                     case OpCodeREnum.Ldsfld:
                         {
@@ -505,6 +530,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             bool bStruct = b.IsValueType && !b.IsPrimitive;
             if (aStruct || bStruct) return ReferenceEquals(a, b);
             return true;
+        }
+
+        static bool IsNeoReferenceType(IType type)
+        {
+            return type != null && !type.IsByRef && !type.IsValueType && !type.IsPrimitive;
         }
 
         static void ClassifySlot(IType t, out int size, out int refCount)
