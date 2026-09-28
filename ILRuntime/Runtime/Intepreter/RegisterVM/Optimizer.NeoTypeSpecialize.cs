@@ -7,6 +7,13 @@ using ILRuntime.Runtime.Intepreter.OpCodes;
 namespace ILRuntime.Runtime.Intepreter.RegisterVM
 {
 #if ENABLE_NEO_MODE
+    // TypeCode has no native-int entries; these tags occupy values outside its range.
+    internal static class NeoArrayKind
+    {
+        internal const int IntPtr = 100;
+        internal const int UIntPtr = 101;
+    }
+
     partial class Optimizer
     {
         // NEW: merged type-specialize + SSA-rename pass for Neo mode.
@@ -73,6 +80,8 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
                 IType resultType = null;
                 bool hasResult = false;
+
+                TagNeoArrayAccess(ref op, currentTypes);
 
                 switch (op.Code)
                 {
@@ -304,6 +313,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         hasResult = true;
                         break;
                     case OpCodeREnum.Ldind_I:
+                        resultType = appdomain.IntPtrType;
+                        hasResult = true;
+                        break;
                     case OpCodeREnum.Ldind_I1:
                     case OpCodeREnum.Ldind_I2:
                     case OpCodeREnum.Ldind_I4:
@@ -411,6 +423,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         resultType = appdomain.ObjectType;
                         hasResult = true;
                         break;
+                    case OpCodeREnum.Newarr:
+                        resultType = appdomain.GetType(op.Operand)?.MakeArrayType(1);
+                        hasResult = true;
+                        break;
                     case OpCodeREnum.Ldftn:
                     case OpCodeREnum.Ldvirtftn:
                         resultType = appdomain.IntType;
@@ -422,8 +438,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldelem_U2:
                     case OpCodeREnum.Ldelem_I4:
                     case OpCodeREnum.Ldelem_U4:
-                    case OpCodeREnum.Ldelem_I:
                         resultType = appdomain.IntType;
+                        hasResult = true;
+                        break;
+                    case OpCodeREnum.Ldelem_I:
+                        resultType = op.Operand4 == NeoArrayKind.UIntPtr ? appdomain.UIntPtrType : appdomain.IntPtrType;
                         hasResult = true;
                         break;
                     case OpCodeREnum.Ldelem_I8:
@@ -439,12 +458,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         hasResult = true;
                         break;
                     case OpCodeREnum.Ldelem_Ref:
-                        resultType = appdomain.ObjectType;
+                        {
+                            IType arrayType = GetRegisterTypeFromList(currentTypes, op.Register2);
+                            IType elementType = arrayType != null && arrayType.IsArray ? arrayType.ElementType : null;
+                            resultType = elementType != null && !elementType.IsValueType
+                                ? elementType : appdomain.ObjectType;
+                        }
                         hasResult = true;
                         break;
                     case OpCodeREnum.Ldelem_Any:
                         {
-                            var t = appdomain.GetType(op.Operand);
+                            var t = appdomain.GetType(op.Operand2);
                             resultType = t ?? appdomain.ObjectType;
                             hasResult = true;
                         }
@@ -460,7 +484,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         break;
                     case OpCodeREnum.Ldelema:
-                        resultType = appdomain.IntType;
+                        resultType = appdomain.GetType(op.Operand2)?.MakeByRefType();
                         hasResult = true;
                         break;
                     case OpCodeREnum.Ldflda:
@@ -514,6 +538,161 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
 
             newTotalRegCnt = currentTypes.Count;
             return currentTypes.ToArray();
+        }
+
+        // Tag CLR array storage for the existing typed element opcodes. Indirect
+        // accesses keep the kind because the receiver may be a frame slot or field.
+        static void TagNeoArrayAccess(ref OpCodeR op, List<IType> currentTypes)
+        {
+            IType container;
+            switch (op.Code)
+            {
+                case OpCodeREnum.Ldelem_I1:
+                case OpCodeREnum.Ldelem_U1:
+                case OpCodeREnum.Ldelem_I2:
+                case OpCodeREnum.Ldelem_U2:
+                case OpCodeREnum.Ldelem_I4:
+                case OpCodeREnum.Ldelem_U4:
+                case OpCodeREnum.Ldelem_I8:
+                case OpCodeREnum.Ldelem_I:
+                case OpCodeREnum.Ldelem_R4:
+                case OpCodeREnum.Ldelem_R8:
+                case OpCodeREnum.Ldelem_Any:
+                case OpCodeREnum.Ldelem_Ref:
+                case OpCodeREnum.Ldelema:
+                    container = GetRegisterTypeFromList(currentTypes, op.Register2);
+                    op.Operand4 = container != null && container.IsArray
+                        ? GetNeoArrayPrimitiveKind(container.ElementType) : 0;
+                    if (op.Code == OpCodeREnum.Ldelem_Any)
+                    {
+                        if (container != null && container.IsArray &&
+                            container.ElementType != null && !container.ElementType.IsValueType)
+                            op.Code = OpCodeREnum.Ldelem_Ref;
+                        else
+                            op.Code = SpecializeNeoArrayLoad(op.Operand4);
+                    }
+                    return;
+                case OpCodeREnum.Stelem_I:
+                case OpCodeREnum.Stelem_I1:
+                case OpCodeREnum.Stelem_I2:
+                case OpCodeREnum.Stelem_I4:
+                case OpCodeREnum.Stelem_I8:
+                case OpCodeREnum.Stelem_R4:
+                case OpCodeREnum.Stelem_R8:
+                case OpCodeREnum.Stelem_Any:
+                case OpCodeREnum.Stelem_Ref:
+                    container = GetRegisterTypeFromList(currentTypes, op.Register1);
+                    op.Operand4 = container != null && container.IsArray
+                        ? GetNeoArrayPrimitiveKind(container.ElementType) : 0;
+                    if (op.Code == OpCodeREnum.Stelem_Any)
+                    {
+                        if (container != null && container.IsArray &&
+                            container.ElementType != null && !container.ElementType.IsValueType)
+                            op.Code = OpCodeREnum.Stelem_Ref;
+                        else
+                            op.Code = SpecializeNeoArrayStore(op.Operand4);
+                    }
+                    return;
+                case OpCodeREnum.Ldind_I:
+                case OpCodeREnum.Ldind_I1:
+                case OpCodeREnum.Ldind_U1:
+                case OpCodeREnum.Ldind_I2:
+                case OpCodeREnum.Ldind_U2:
+                case OpCodeREnum.Ldind_I4:
+                case OpCodeREnum.Ldind_U4:
+                case OpCodeREnum.Ldind_I8:
+                case OpCodeREnum.Ldind_R4:
+                case OpCodeREnum.Ldind_R8:
+                case OpCodeREnum.Ldind_Ref:
+                    container = GetRegisterTypeFromList(currentTypes, op.Register2);
+                    op.Operand4 = container != null && container.IsByRef
+                        ? GetNeoArrayPrimitiveKind(container.ElementType) : 0;
+                    return;
+                case OpCodeREnum.Stind_I:
+                case OpCodeREnum.Stind_I1:
+                case OpCodeREnum.Stind_I2:
+                case OpCodeREnum.Stind_I4:
+                case OpCodeREnum.Stind_I8:
+                case OpCodeREnum.Stind_R4:
+                case OpCodeREnum.Stind_R8:
+                case OpCodeREnum.Stind_Ref:
+                    container = GetRegisterTypeFromList(currentTypes, op.Register1);
+                    op.Operand4 = container != null && container.IsByRef
+                        ? GetNeoArrayPrimitiveKind(container.ElementType) : 0;
+                    return;
+            }
+        }
+
+        // Only ldelem.any / stelem.any need a compile-time choice of an existing typed opcode.
+        static OpCodeREnum SpecializeNeoArrayLoad(int kind)
+        {
+            switch (kind)
+            {
+                case (int)TypeCode.Boolean:
+                case (int)TypeCode.Byte: return OpCodeREnum.Ldelem_U1;
+                case (int)TypeCode.SByte: return OpCodeREnum.Ldelem_I1;
+                case (int)TypeCode.Char:
+                case (int)TypeCode.UInt16: return OpCodeREnum.Ldelem_U2;
+                case (int)TypeCode.Int16: return OpCodeREnum.Ldelem_I2;
+                case (int)TypeCode.Int32: return OpCodeREnum.Ldelem_I4;
+                case (int)TypeCode.UInt32: return OpCodeREnum.Ldelem_U4;
+                case (int)TypeCode.Int64:
+                case (int)TypeCode.UInt64: return OpCodeREnum.Ldelem_I8;
+                case (int)TypeCode.Single: return OpCodeREnum.Ldelem_R4;
+                case (int)TypeCode.Double: return OpCodeREnum.Ldelem_R8;
+                case NeoArrayKind.IntPtr:
+                case NeoArrayKind.UIntPtr: return OpCodeREnum.Ldelem_I;
+                default: return OpCodeREnum.Ldelem_Any;
+            }
+        }
+
+        static OpCodeREnum SpecializeNeoArrayStore(int kind)
+        {
+            switch (kind)
+            {
+                case (int)TypeCode.Boolean:
+                case (int)TypeCode.SByte:
+                case (int)TypeCode.Byte: return OpCodeREnum.Stelem_I1;
+                case (int)TypeCode.Char:
+                case (int)TypeCode.Int16:
+                case (int)TypeCode.UInt16: return OpCodeREnum.Stelem_I2;
+                case (int)TypeCode.Int32:
+                case (int)TypeCode.UInt32: return OpCodeREnum.Stelem_I4;
+                case (int)TypeCode.Int64:
+                case (int)TypeCode.UInt64: return OpCodeREnum.Stelem_I8;
+                case (int)TypeCode.Single: return OpCodeREnum.Stelem_R4;
+                case (int)TypeCode.Double: return OpCodeREnum.Stelem_R8;
+                case NeoArrayKind.IntPtr:
+                case NeoArrayKind.UIntPtr: return OpCodeREnum.Stelem_I;
+                default: return OpCodeREnum.Stelem_Any;
+            }
+        }
+
+        static int GetNeoArrayPrimitiveKind(IType elementType)
+        {
+            if (elementType == null || elementType is ILType || elementType.IsEnum)
+                return 0;
+            Type clr = elementType.TypeForCLR;
+            if (clr == typeof(IntPtr)) return NeoArrayKind.IntPtr;
+            if (clr == typeof(UIntPtr)) return NeoArrayKind.UIntPtr;
+            switch (Type.GetTypeCode(clr))
+            {
+                case TypeCode.Boolean:
+                case TypeCode.Char:
+                case TypeCode.SByte:
+                case TypeCode.Byte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                    return (int)Type.GetTypeCode(clr);
+                default:
+                    return 0;
+            }
         }
 
         static bool SlotLayoutCompatible(IType a, IType b)

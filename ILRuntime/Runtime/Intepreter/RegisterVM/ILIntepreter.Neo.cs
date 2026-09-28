@@ -24,6 +24,143 @@ namespace ILRuntime.Runtime.Intepreter
 {
     public unsafe partial class ILIntepreter
     {
+        sealed class NeoArrayElementType
+        {
+            internal IType Type;
+        }
+
+        static readonly ConditionalWeakTable<Array, NeoArrayElementType> neoArrayTypes =
+            new ConditionalWeakTable<Array, NeoArrayElementType>();
+
+        IType GetNeoArrayElementType(Array array)
+        {
+            if (neoArrayTypes.TryGetValue(array, out NeoArrayElementType entry))
+                return entry.Type;
+            return AppDomain.GetType(array.GetType().GetElementType());
+        }
+
+        static Array GetNeoArray(AutoList mStack, int index)
+        {
+            if (index < 0 || index >= mStack.Count || mStack[index] == null)
+                throw new NullReferenceException();
+            if (!(mStack[index] is Array array) || array.Rank != 1)
+                throw new InvalidProgramException("Neo array opcode requires a single-dimensional array.");
+            return array;
+        }
+
+        static void CheckNeoArrayIndex(Array array, int index)
+        {
+            if ((uint)index >= (uint)array.Length)
+                throw new IndexOutOfRangeException();
+        }
+
+        static void CommitNeoFieldReceiver(AutoList mStack, int objectIndex, int offset, object value)
+        {
+            if (mStack[objectIndex] is Array array)
+            {
+                CheckNeoArrayIndex(array, offset);
+                array.SetValue(value, offset);
+            }
+            else
+                mStack[objectIndex] = value;
+        }
+
+        // Typed ldelem reaches this only when the array's CLR storage is not the
+        // ordinary primitive array for its opcode (for example, an enum array).
+        void LoadNeoTypedArraySlow(AutoList mStack, int objectIndex, int index,
+            OpCodeREnum code, byte* dst)
+        {
+            Array array = GetNeoArray(mStack, objectIndex);
+            CheckNeoArrayIndex(array, index);
+            object value = array.GetValue(index);
+            IType elementType = GetNeoArrayElementType(array);
+            if (elementType is ILType enumType && enumType.IsEnum)
+            {
+                var enumValue = (ILTypeInstance)value;
+                int enumSize = AppDomain.GetPrimitiveSize(enumType.FieldTypes[0]);
+                *(int*)dst = 0;
+                ref byte enumBytes = ref MemoryMarshal.GetReference(enumValue.Primitives.AsSpan());
+                Unsafe.CopyBlockUnaligned(ref *dst, ref enumBytes, (uint)enumSize);
+                if (code == OpCodeREnum.Ldelem_I1)
+                    *(int*)dst = *(sbyte*)dst;
+                else if (code == OpCodeREnum.Ldelem_I2)
+                    *(int*)dst = *(short*)dst;
+            }
+            else
+            {
+                switch (code)
+                {
+                    case OpCodeREnum.Ldelem_I1: *(int*)dst = unchecked((sbyte)Convert.ToInt32(value)); break;
+                    case OpCodeREnum.Ldelem_U1: *(int*)dst = unchecked((byte)Convert.ToInt32(value)); break;
+                    case OpCodeREnum.Ldelem_I2: *(int*)dst = unchecked((short)Convert.ToInt32(value)); break;
+                    case OpCodeREnum.Ldelem_U2: *(int*)dst = unchecked((ushort)Convert.ToInt32(value)); break;
+                    default: WriteNeoPrimitive(dst, elementType, value); break;
+                }
+            }
+        }
+
+        void StoreNeoTypedArraySlow(AutoList mStack, int objectIndex, int index,
+            byte* frameBase, OpCodeR* ip, int frameRefBase)
+        {
+            Array array = GetNeoArray(mStack, objectIndex);
+            CheckNeoArrayIndex(array, index);
+            IType elementType = GetNeoArrayElementType(array);
+            if (elementType is ILType ilType && ilType.IsValueType)
+            {
+                var element = (ILTypeInstance)array.GetValue(index);
+                CopyFrameToIL(frameBase, ip->OperandOffset, ip->Operand3,
+                    ilType.TotalPrimitiveSize, ilType.TotalReferenceCount,
+                    mStack, frameRefBase, element);
+            }
+            else
+                array.SetValue(ReadNeoPrimitive(frameBase + ip->OperandOffset, elementType), index);
+        }
+
+        void LoadNeoArrayIndirect(Array array, int index, OpCodeREnum code,
+            byte* dst, AutoList mStack, int refIndex)
+        {
+            object value = array.GetValue(index);
+            switch (code)
+            {
+                case OpCodeREnum.Ldind_I1: *(int*)dst = unchecked((sbyte)Convert.ToInt32(value)); return;
+                case OpCodeREnum.Ldind_U1: *(int*)dst = unchecked((byte)Convert.ToInt32(value)); return;
+                case OpCodeREnum.Ldind_I2: *(int*)dst = unchecked((short)Convert.ToInt32(value)); return;
+                case OpCodeREnum.Ldind_U2: *(int*)dst = unchecked((ushort)Convert.ToInt32(value)); return;
+                case OpCodeREnum.Ldind_I:
+                    WriteNeoPrimitive(dst, GetNeoArrayElementType(array), value);
+                    return;
+                case OpCodeREnum.Ldind_I4: *(int*)dst = Convert.ToInt32(value); return;
+                case OpCodeREnum.Ldind_U4: *(uint*)dst = Convert.ToUInt32(value); return;
+                case OpCodeREnum.Ldind_I8: *(long*)dst = Convert.ToInt64(value); return;
+                case OpCodeREnum.Ldind_R4: *(float*)dst = Convert.ToSingle(value); return;
+                case OpCodeREnum.Ldind_R8: *(double*)dst = Convert.ToDouble(value); return;
+                case OpCodeREnum.Ldind_Ref:
+                    mStack[refIndex] = value;
+                    *(int*)dst = value == null ? -1 : refIndex;
+                    return;
+            }
+            throw new InvalidProgramException("Unsupported Neo array indirect load.");
+        }
+
+        void StoreNeoArrayIndirect(Array array, int index, OpCodeREnum code,
+            byte* src, AutoList mStack)
+        {
+            IType elementType = GetNeoArrayElementType(array);
+            object value;
+            if (code == OpCodeREnum.Stind_Ref)
+            {
+                int sourceIndex = *(int*)src;
+                value = sourceIndex < 0 ? null : mStack[sourceIndex];
+                if (elementType is ILType ilElement && value != null &&
+                    (!(value is ILTypeInstance candidate) || !candidate.CanAssignTo(ilElement)))
+                    throw new ArrayTypeMismatchException();
+            }
+            else
+                value = ReadNeoPrimitive(src, elementType);
+            try { array.SetValue(value, index); }
+            catch (InvalidCastException) { throw new ArrayTypeMismatchException(); }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ReadNeoInt32(byte* frameBase, ref int curPrim)
         {
@@ -469,6 +606,20 @@ namespace ILRuntime.Runtime.Intepreter
             ilOwner = owner as ILTypeInstance;
             if (ilOwner != null)
                 return;
+            if (receiverKind < 0 && owner is ILTypeInstance[] ilArray)
+            {
+                CheckNeoArrayIndex(ilArray, baseOffset);
+                ilOwner = ilArray[baseOffset];
+                baseOffset = 0;
+                return;
+            }
+            if (receiverKind < 0 && owner is Array array)
+            {
+                CheckNeoArrayIndex(array, baseOffset);
+                owner = array.GetValue(baseOffset);
+                if (owner == null)
+                    throw new NullReferenceException();
+            }
             ownerType = ResolveNeoClrOwnerType(owner);
         }
 
@@ -504,8 +655,11 @@ namespace ILRuntime.Runtime.Intepreter
             ilOwner = owner as ILTypeInstance;
             if (ilOwner != null)
                 return;
-            if (owner is Array)
-                throw new NotImplementedException("Neo indirect array access: Step 16");
+            if (owner is Array array)
+            {
+                CheckNeoArrayIndex(array, offset);
+                return;
+            }
             ownerType = ResolveNeoClrOwnerType(owner);
         }
 
@@ -648,6 +802,7 @@ namespace ILRuntime.Runtime.Intepreter
                 CLRType clrType;
                 object obj = null;
                 object otherObject = null;
+                Array array;
                 int sz, refCnt, srcIdx, dstIdx, srcRefOffset, dstRefOffset;
                 // Ref Slot (managed pointer) working locals, shared across all
                 // ldloca/ldarga/ldflda/ldsflda/ldind/stind and Ref-Slot-receiver
@@ -930,6 +1085,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(int*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<sbyte>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.SByte) *(int*)(frameBase + ip->DstOffset) = ((sbyte[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.Byte) *(int*)(frameBase + ip->DstOffset) = (sbyte)((byte[])array)[dstIdx];
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -943,6 +1105,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(int*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<byte>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Byte) *(int*)(frameBase + ip->DstOffset) = ((byte[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.SByte) *(int*)(frameBase + ip->DstOffset) = (byte)((sbyte[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.Boolean) *(int*)(frameBase + ip->DstOffset) = ((bool[])array)[dstIdx] ? 1 : 0;
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -956,6 +1126,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(int*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<short>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Int16) *(int*)(frameBase + ip->DstOffset) = ((short[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.UInt16) *(int*)(frameBase + ip->DstOffset) = (short)((ushort[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.Char) *(int*)(frameBase + ip->DstOffset) = (short)((char[])array)[dstIdx];
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -969,6 +1147,14 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(int*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<ushort>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.UInt16) *(int*)(frameBase + ip->DstOffset) = ((ushort[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.Int16) *(int*)(frameBase + ip->DstOffset) = (ushort)((short[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.Char) *(int*)(frameBase + ip->DstOffset) = ((char[])array)[dstIdx];
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -983,6 +1169,15 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(int*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<int>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Int32) *(int*)(frameBase + ip->DstOffset) = ((int[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.UInt32) *(uint*)(frameBase + ip->DstOffset) = ((uint[])array)[dstIdx];
+                                    else if (ip->Operand4 == NeoArrayKind.IntPtr) { if (IntPtr.Size == 8) *(long*)(frameBase + ip->DstOffset) = ((IntPtr[])array)[dstIdx].ToInt64(); else *(int*)(frameBase + ip->DstOffset) = ((IntPtr[])array)[dstIdx].ToInt32(); }
+                                    else if (ip->Operand4 == NeoArrayKind.UIntPtr) { if (IntPtr.Size == 8) *(ulong*)(frameBase + ip->DstOffset) = ((UIntPtr[])array)[dstIdx].ToUInt64(); else *(uint*)(frameBase + ip->DstOffset) = ((UIntPtr[])array)[dstIdx].ToUInt32(); }
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -996,6 +1191,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(uint*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<uint>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.UInt32) *(uint*)(frameBase + ip->DstOffset) = ((uint[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.Int32) *(int*)(frameBase + ip->DstOffset) = ((int[])array)[dstIdx];
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -1009,6 +1211,13 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(long*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<long>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Int64) *(long*)(frameBase + ip->DstOffset) = ((long[])array)[dstIdx];
+                                    else if (ip->Operand4 == (int)TypeCode.UInt64) *(ulong*)(frameBase + ip->DstOffset) = ((ulong[])array)[dstIdx];
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -1022,6 +1231,12 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(float*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<float>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Single) *(float*)(frameBase + ip->DstOffset) = ((float[])array)[dstIdx];
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -1035,6 +1250,12 @@ namespace ILRuntime.Runtime.Intepreter
                                 else if (fieldIns != null)
                                     *(double*)(frameBase + ip->DstOffset) =
                                         Unsafe.ReadUnaligned<double>(ref ResolveNeoILTarget(fieldIns, dstIdx));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Double) *(double*)(frameBase + ip->DstOffset) = ((double[])array)[dstIdx];
+                                    else LoadNeoArrayIndirect(array, dstIdx, code, frameBase + ip->DstOffset,
+                                            mStack, frameRefBase + ip->Operand);
+                                }
                                 else
                                     clrType.CopyFieldToNeoFrame(dstIdx, obj, this, frameBase + ip->DstOffset, 0, mStack);
                                 break;
@@ -1062,6 +1283,10 @@ namespace ILRuntime.Runtime.Intepreter
                                     throw new NotImplementedException(
                                         "Neo Ldind_Ref for IL reference fields requires the objectIndex=-2 marker (Step 17).");
                                 }
+                                else if ((array = obj as Array) != null)
+                                {
+                                    obj = array.GetValue(dstIdx);
+                                }
                                 else
                                 {
                                     obj = clrType.GetFieldValue(dstIdx, obj);
@@ -1082,6 +1307,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     Unsafe.WriteUnaligned(
                                         ref ResolveNeoILTarget(fieldIns, dstIdx),
                                         *(sbyte*)(frameBase + ip->SrcOffset));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.SByte) ((sbyte[])array)[dstIdx] = *(sbyte*)(frameBase + ip->SrcOffset);
+                                    else if (ip->Operand4 == (int)TypeCode.Byte) ((byte[])array)[dstIdx] = *(byte*)(frameBase + ip->SrcOffset);
+                                    else if (ip->Operand4 == (int)TypeCode.Boolean) ((bool[])array)[dstIdx] = *(byte*)(frameBase + ip->SrcOffset) != 0;
+                                    else StoreNeoArrayIndirect(array, dstIdx, code, frameBase + ip->SrcOffset, mStack);
+                                }
                                 else
                                 {
                                     clrType.AssignFieldFromNeoFrame(dstIdx, ref obj, this, frameBase + ip->SrcOffset, mStack);
@@ -1100,6 +1332,13 @@ namespace ILRuntime.Runtime.Intepreter
                                     Unsafe.WriteUnaligned(
                                         ref ResolveNeoILTarget(fieldIns, dstIdx),
                                         *(short*)(frameBase + ip->SrcOffset));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Int16) ((short[])array)[dstIdx] = *(short*)(frameBase + ip->SrcOffset);
+                                    else if (ip->Operand4 == (int)TypeCode.UInt16) ((ushort[])array)[dstIdx] = *(ushort*)(frameBase + ip->SrcOffset);
+                                    else if (ip->Operand4 == (int)TypeCode.Char) ((char[])array)[dstIdx] = *(char*)(frameBase + ip->SrcOffset);
+                                    else StoreNeoArrayIndirect(array, dstIdx, code, frameBase + ip->SrcOffset, mStack);
+                                }
                                 else
                                 {
                                     clrType.AssignFieldFromNeoFrame(dstIdx, ref obj, this, frameBase + ip->SrcOffset, mStack);
@@ -1119,6 +1358,14 @@ namespace ILRuntime.Runtime.Intepreter
                                     Unsafe.WriteUnaligned(
                                         ref ResolveNeoILTarget(fieldIns, dstIdx),
                                         *(int*)(frameBase + ip->SrcOffset));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Int32) ((int[])array)[dstIdx] = *(int*)(frameBase + ip->SrcOffset);
+                                    else if (ip->Operand4 == (int)TypeCode.UInt32) ((uint[])array)[dstIdx] = *(uint*)(frameBase + ip->SrcOffset);
+                                    else if (ip->Operand4 == NeoArrayKind.IntPtr) ((IntPtr[])array)[dstIdx] = IntPtr.Size == 8 ? new IntPtr(*(long*)(frameBase + ip->SrcOffset)) : new IntPtr(*(int*)(frameBase + ip->SrcOffset));
+                                    else if (ip->Operand4 == NeoArrayKind.UIntPtr) ((UIntPtr[])array)[dstIdx] = IntPtr.Size == 8 ? new UIntPtr(*(ulong*)(frameBase + ip->SrcOffset)) : new UIntPtr(*(uint*)(frameBase + ip->SrcOffset));
+                                    else StoreNeoArrayIndirect(array, dstIdx, code, frameBase + ip->SrcOffset, mStack);
+                                }
                                 else
                                 {
                                     clrType.AssignFieldFromNeoFrame(dstIdx, ref obj, this, frameBase + ip->SrcOffset, mStack);
@@ -1137,6 +1384,12 @@ namespace ILRuntime.Runtime.Intepreter
                                     Unsafe.WriteUnaligned(
                                         ref ResolveNeoILTarget(fieldIns, dstIdx),
                                         *(long*)(frameBase + ip->SrcOffset));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Int64) ((long[])array)[dstIdx] = *(long*)(frameBase + ip->SrcOffset);
+                                    else if (ip->Operand4 == (int)TypeCode.UInt64) ((ulong[])array)[dstIdx] = *(ulong*)(frameBase + ip->SrcOffset);
+                                    else StoreNeoArrayIndirect(array, dstIdx, code, frameBase + ip->SrcOffset, mStack);
+                                }
                                 else
                                 {
                                     clrType.AssignFieldFromNeoFrame(dstIdx, ref obj, this, frameBase + ip->SrcOffset, mStack);
@@ -1155,6 +1408,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     Unsafe.WriteUnaligned(
                                         ref ResolveNeoILTarget(fieldIns, dstIdx),
                                         *(float*)(frameBase + ip->SrcOffset));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Single) ((float[])array)[dstIdx] = *(float*)(frameBase + ip->SrcOffset);
+                                    else StoreNeoArrayIndirect(array, dstIdx, code, frameBase + ip->SrcOffset, mStack);
+                                }
                                 else
                                 {
                                     clrType.AssignFieldFromNeoFrame(dstIdx, ref obj, this, frameBase + ip->SrcOffset, mStack);
@@ -1173,6 +1431,11 @@ namespace ILRuntime.Runtime.Intepreter
                                     Unsafe.WriteUnaligned(
                                         ref ResolveNeoILTarget(fieldIns, dstIdx),
                                         *(double*)(frameBase + ip->SrcOffset));
+                                else if ((array = obj as Array) != null)
+                                {
+                                    if (ip->Operand4 == (int)TypeCode.Double) ((double[])array)[dstIdx] = *(double*)(frameBase + ip->SrcOffset);
+                                    else StoreNeoArrayIndirect(array, dstIdx, code, frameBase + ip->SrcOffset, mStack);
+                                }
                                 else
                                 {
                                     clrType.AssignFieldFromNeoFrame(dstIdx, ref obj, this, frameBase + ip->SrcOffset, mStack);
@@ -1196,11 +1459,329 @@ namespace ILRuntime.Runtime.Intepreter
                                     throw new NotImplementedException(
                                         "Neo Stind_Ref for IL reference fields requires the objectIndex=-2 marker (Step 17).");
                                 }
+                                else if ((array = obj as Array) != null)
+                                    StoreNeoArrayIndirect(array, dstIdx, code, frameBase + ip->SrcOffset, mStack);
                                 else
                                 {
                                     clrType.AssignFieldFromNeoFrame(dstIdx, ref obj, this, frameBase + ip->SrcOffset, mStack);
                                     mStack[objIndex] = obj;
                                 }
+                                break;
+                            case OpCodeREnum.Newarr:
+                                t = AppDomain.GetType(ip->Operand);
+                                if (t == null)
+                                    throw new TypeLoadException("Neo newarr element type could not be resolved.");
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (sz < 0)
+                                    throw new OverflowException();
+                                ilType = t as ILType;
+                                if (ilType != null)
+                                {
+                                    var elements = new ILTypeInstance[sz];
+                                    if (ilType.IsValueType)
+                                        for (int i = 0; i < sz; i++)
+                                            elements[i] = ilType.Instantiate(true);
+                                    array = elements;
+                                    neoArrayTypes.Add(array, new NeoArrayElementType { Type = t });
+                                }
+                                else
+                                    array = Array.CreateInstance(t.TypeForCLR, sz);
+                                dstIdx = frameRefBase + ip->Operand3;
+                                mStack[dstIdx] = array;
+                                *(int*)(frameBase + ip->DstOffset) = dstIdx;
+                                break;
+                            case OpCodeREnum.Ldlen:
+                                array = GetNeoArray(mStack, *(int*)(frameBase + ip->SrcOffset));
+                                *(int*)(frameBase + ip->DstOffset) = array.Length;
+                                break;
+                            case OpCodeREnum.Ldelem_I1:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.SByte)
+                                    *(int*)(frameBase + ip->DstOffset) = ((sbyte[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_U1:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.Byte)
+                                    *(int*)(frameBase + ip->DstOffset) = ((byte[])mStack[objIndex])[sz];
+                                else if (ip->Operand4 == (int)TypeCode.Boolean)
+                                    *(int*)(frameBase + ip->DstOffset) = ((bool[])mStack[objIndex])[sz] ? 1 : 0;
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_I2:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.Int16)
+                                    *(int*)(frameBase + ip->DstOffset) = ((short[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_U2:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.UInt16)
+                                    *(int*)(frameBase + ip->DstOffset) = ((ushort[])mStack[objIndex])[sz];
+                                else if (ip->Operand4 == (int)TypeCode.Char)
+                                    *(int*)(frameBase + ip->DstOffset) = ((char[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_I4:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.Int32)
+                                    *(int*)(frameBase + ip->DstOffset) = ((int[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_U4:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.UInt32)
+                                    *(uint*)(frameBase + ip->DstOffset) = ((uint[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_I8:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.Int64)
+                                    *(long*)(frameBase + ip->DstOffset) = ((long[])mStack[objIndex])[sz];
+                                else if (ip->Operand4 == (int)TypeCode.UInt64)
+                                    *(ulong*)(frameBase + ip->DstOffset) = ((ulong[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_I:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == NeoArrayKind.IntPtr)
+                                {
+                                    if (IntPtr.Size == 8)
+                                        *(long*)(frameBase + ip->DstOffset) = ((IntPtr[])mStack[objIndex])[sz].ToInt64();
+                                    else
+                                        *(int*)(frameBase + ip->DstOffset) = ((IntPtr[])mStack[objIndex])[sz].ToInt32();
+                                }
+                                else if (ip->Operand4 == NeoArrayKind.UIntPtr)
+                                {
+                                    if (IntPtr.Size == 8)
+                                        *(ulong*)(frameBase + ip->DstOffset) = ((UIntPtr[])mStack[objIndex])[sz].ToUInt64();
+                                    else
+                                        *(uint*)(frameBase + ip->DstOffset) = ((UIntPtr[])mStack[objIndex])[sz].ToUInt32();
+                                }
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_R4:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.Single)
+                                    *(float*)(frameBase + ip->DstOffset) = ((float[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelem_R8:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                if (ip->Operand4 == (int)TypeCode.Double)
+                                    *(double*)(frameBase + ip->DstOffset) = ((double[])mStack[objIndex])[sz];
+                                else LoadNeoTypedArraySlow(mStack, objIndex, sz, code, frameBase + ip->DstOffset);
+                                break;
+                            case OpCodeREnum.Ldelema:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                array = GetNeoArray(mStack, objIndex);
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                CheckNeoArrayIndex(array, sz);
+                                t = AppDomain.GetType(ip->Operand2);
+                                if (t == null || GetNeoArrayElementType(array) != t)
+                                    throw new ArrayTypeMismatchException();
+                                *(int*)(frameBase + ip->DstOffset) = objIndex;
+                                *(int*)(frameBase + ip->DstOffset + 4) = sz;
+                                break;
+                            case OpCodeREnum.Ldelem_Ref:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                otherObject = ((object[])mStack[objIndex])[sz];
+                                dstIdx = frameRefBase + ip->Operand3;
+                                mStack[dstIdx] = otherObject;
+                                *(int*)(frameBase + ip->DstOffset) = otherObject == null ? -1 : dstIdx;
+                                break;
+                            case OpCodeREnum.Ldelem_Any:
+                                objIndex = *(int*)(frameBase + ip->SrcOffset);
+                                array = GetNeoArray(mStack, objIndex);
+                                sz = *(int*)(frameBase + ip->OperandOffset);
+                                CheckNeoArrayIndex(array, sz);
+                                otherObject = array.GetValue(sz);
+                                t = GetNeoArrayElementType(array);
+                                if (t is ILType valueType && valueType.IsValueType)
+                                {
+                                    CopyILToFrame((ILTypeInstance)otherObject, frameBase, ip->DstOffset,
+                                        ip->Operand3, valueType.TotalPrimitiveSize,
+                                        valueType.TotalReferenceCount, mStack, frameRefBase);
+                                }
+                                else if (!t.IsValueType)
+                                {
+                                    dstIdx = frameRefBase + ip->Operand3;
+                                    mStack[dstIdx] = otherObject;
+                                    *(int*)(frameBase + ip->DstOffset) = otherObject == null ? -1 : dstIdx;
+                                }
+                                else if (t.IsEnum)
+                                    WriteNeoPrimitive(frameBase + ip->DstOffset, t, otherObject);
+                                else if (t is CLRType inlineType && inlineType.IsValueType && !inlineType.IsPrimitive &&
+                                         inlineType.StructStorage == StructStorage.Inline)
+                                    CopyBoxedClrObjectToFrame(otherObject, inlineType,
+                                        frameBase + ip->DstOffset, mStack, frameRefBase + ip->Operand3);
+                                else if (t is CLRType boxedType && boxedType.IsValueType && !boxedType.IsPrimitive)
+                                {
+                                    dstIdx = frameRefBase + ip->Operand3;
+                                    mStack[dstIdx] = otherObject;
+                                    *(int*)(frameBase + ip->DstOffset) = dstIdx;
+                                }
+                                else
+                                    WriteNeoPrimitive(frameBase + ip->DstOffset, t, otherObject);
+                                break;
+                            case OpCodeREnum.Stelem_I1:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (ip->Operand4 == (int)TypeCode.SByte)
+                                    ((sbyte[])mStack[objIndex])[sz] = (sbyte)*(int*)(frameBase + ip->OperandOffset);
+                                else if (ip->Operand4 == (int)TypeCode.Byte)
+                                    ((byte[])mStack[objIndex])[sz] = (byte)*(int*)(frameBase + ip->OperandOffset);
+                                else if (ip->Operand4 == (int)TypeCode.Boolean)
+                                    ((bool[])mStack[objIndex])[sz] = *(int*)(frameBase + ip->OperandOffset) != 0;
+                                else StoreNeoTypedArraySlow(mStack, objIndex, sz, frameBase, ip, frameRefBase);
+                                break;
+                            case OpCodeREnum.Stelem_I2:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (ip->Operand4 == (int)TypeCode.Int16)
+                                    ((short[])mStack[objIndex])[sz] = (short)*(int*)(frameBase + ip->OperandOffset);
+                                else if (ip->Operand4 == (int)TypeCode.UInt16)
+                                    ((ushort[])mStack[objIndex])[sz] = (ushort)*(int*)(frameBase + ip->OperandOffset);
+                                else if (ip->Operand4 == (int)TypeCode.Char)
+                                    ((char[])mStack[objIndex])[sz] = (char)*(int*)(frameBase + ip->OperandOffset);
+                                else StoreNeoTypedArraySlow(mStack, objIndex, sz, frameBase, ip, frameRefBase);
+                                break;
+                            case OpCodeREnum.Stelem_I4:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (ip->Operand4 == (int)TypeCode.Int32)
+                                    ((int[])mStack[objIndex])[sz] = *(int*)(frameBase + ip->OperandOffset);
+                                else if (ip->Operand4 == (int)TypeCode.UInt32)
+                                    ((uint[])mStack[objIndex])[sz] = *(uint*)(frameBase + ip->OperandOffset);
+                                else StoreNeoTypedArraySlow(mStack, objIndex, sz, frameBase, ip, frameRefBase);
+                                break;
+                            case OpCodeREnum.Stelem_I8:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (ip->Operand4 == (int)TypeCode.Int64)
+                                    ((long[])mStack[objIndex])[sz] = *(long*)(frameBase + ip->OperandOffset);
+                                else if (ip->Operand4 == (int)TypeCode.UInt64)
+                                    ((ulong[])mStack[objIndex])[sz] = *(ulong*)(frameBase + ip->OperandOffset);
+                                else StoreNeoTypedArraySlow(mStack, objIndex, sz, frameBase, ip, frameRefBase);
+                                break;
+                            case OpCodeREnum.Stelem_I:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (ip->Operand4 == NeoArrayKind.IntPtr)
+                                    ((IntPtr[])mStack[objIndex])[sz] = IntPtr.Size == 8 ? new IntPtr(*(long*)(frameBase + ip->OperandOffset)) : new IntPtr(*(int*)(frameBase + ip->OperandOffset));
+                                else if (ip->Operand4 == NeoArrayKind.UIntPtr)
+                                    ((UIntPtr[])mStack[objIndex])[sz] = IntPtr.Size == 8 ? new UIntPtr(*(ulong*)(frameBase + ip->OperandOffset)) : new UIntPtr(*(uint*)(frameBase + ip->OperandOffset));
+                                else StoreNeoTypedArraySlow(mStack, objIndex, sz, frameBase, ip, frameRefBase);
+                                break;
+                            case OpCodeREnum.Stelem_R4:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (ip->Operand4 == (int)TypeCode.Single)
+                                    ((float[])mStack[objIndex])[sz] = *(float*)(frameBase + ip->OperandOffset);
+                                else StoreNeoTypedArraySlow(mStack, objIndex, sz, frameBase, ip, frameRefBase);
+                                break;
+                            case OpCodeREnum.Stelem_R8:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                if (ip->Operand4 == (int)TypeCode.Double)
+                                    ((double[])mStack[objIndex])[sz] = *(double*)(frameBase + ip->OperandOffset);
+                                else StoreNeoTypedArraySlow(mStack, objIndex, sz, frameBase, ip, frameRefBase);
+                                break;
+                            case OpCodeREnum.Stelem_Ref:
+                                objIndex = *(int*)(frameBase + ip->DstOffset);
+                                if (objIndex < 0) throw new NullReferenceException();
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                srcIdx = *(int*)(frameBase + ip->OperandOffset);
+                                if (srcIdx >= mStack.Count)
+                                    throw new InvalidProgramException(string.Format(
+                                        "Neo stelem.ref source index {0} exceeds mStack count {1}.",
+                                        srcIdx, mStack.Count));
+                                otherObject = srcIdx < 0 ? null : mStack[srcIdx];
+                                if (mStack[objIndex] is ILTypeInstance[])
+                                {
+                                    array = GetNeoArray(mStack, objIndex);
+                                    CheckNeoArrayIndex(array, sz);
+                                    t = GetNeoArrayElementType(array);
+                                    if (t is ILType ilElement && otherObject != null &&
+                                        (!(otherObject is ILTypeInstance candidate) || !candidate.CanAssignTo(ilElement)))
+                                        throw new ArrayTypeMismatchException();
+                                    try { array.SetValue(otherObject, sz); }
+                                    catch (InvalidCastException) { throw new ArrayTypeMismatchException(); }
+                                }
+                                else
+                                    ((object[])mStack[objIndex])[sz] = otherObject;
+                                break;
+                            case OpCodeREnum.Stelem_Any:
+                                array = GetNeoArray(mStack, *(int*)(frameBase + ip->DstOffset));
+                                sz = *(int*)(frameBase + ip->SrcOffset);
+                                CheckNeoArrayIndex(array, sz);
+                                t = GetNeoArrayElementType(array);
+                                if (t is ILType structType && structType.IsValueType)
+                                {
+                                    var element = (ILTypeInstance)array.GetValue(sz);
+                                    CopyFrameToIL(frameBase, ip->OperandOffset, ip->Operand3,
+                                        structType.TotalPrimitiveSize, structType.TotalReferenceCount,
+                                        mStack, frameRefBase, element);
+                                }
+                                else if (!t.IsValueType)
+                                {
+                                    srcIdx = *(int*)(frameBase + ip->OperandOffset);
+                                    if (srcIdx >= mStack.Count)
+                                        throw new InvalidProgramException(string.Format(
+                                            "Neo stelem.ref source index {0} exceeds mStack count {1}.", srcIdx, mStack.Count));
+                                    otherObject = srcIdx < 0 ? null : mStack[srcIdx];
+                                    if (t is ILType ilElement && otherObject != null &&
+                                        (!(otherObject is ILTypeInstance candidate) || !candidate.CanAssignTo(ilElement)))
+                                        throw new ArrayTypeMismatchException();
+                                    try { array.SetValue(otherObject, sz); }
+                                    catch (InvalidCastException) { throw new ArrayTypeMismatchException(); }
+                                }
+                                else if (t.IsEnum)
+                                    array.SetValue(ReadNeoPrimitive(frameBase + ip->OperandOffset, t), sz);
+                                else if (t is CLRType clrElement && clrElement.IsValueType &&
+                                         !clrElement.IsPrimitive && clrElement.StructStorage == StructStorage.Inline)
+                                {
+                                    otherObject = Activator.CreateInstance(t.TypeForCLR);
+                                    CopyFrameToBoxedClrObject(otherObject, clrElement,
+                                        frameBase + ip->OperandOffset, mStack, frameRefBase + ip->Operand3);
+                                    array.SetValue(otherObject, sz);
+                                }
+                                else if (t is CLRType boxedElement && boxedElement.IsValueType && !boxedElement.IsPrimitive)
+                                {
+                                    srcIdx = *(int*)(frameBase + ip->OperandOffset);
+                                    array.SetValue(srcIdx < 0 ? null : mStack[srcIdx], sz);
+                                }
+                                else
+                                    array.SetValue(ReadNeoPrimitive(frameBase + ip->OperandOffset, t), sz);
                                 break;
                             case OpCodeREnum.Ldc_I4_M1:
                                 *(int*)(frameBase + ip->DstOffset) = -1;
@@ -2877,8 +3458,9 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else if (fieldIns != null)
                                     {
-                                        throw new NotImplementedException(
-                                            "Neo Ldfld_Ref through an IL Ref Slot: Step 17");
+                                        if (!(obj is Array))
+                                            throw new NotImplementedException("Neo Ldfld_Ref through an IL Ref Slot: Step 17");
+                                        obj = fieldIns.ManagedObjects[ip->Operand3];
                                     }
                                     else
                                     {
@@ -2925,7 +3507,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -2950,7 +3532,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -2975,7 +3557,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -3000,7 +3582,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -3025,7 +3607,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -3050,7 +3632,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -3075,7 +3657,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -3100,7 +3682,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -3125,7 +3707,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;
@@ -3168,13 +3750,16 @@ namespace ILRuntime.Runtime.Intepreter
                                     }
                                     else if (fieldIns != null)
                                     {
-                                        throw new NotImplementedException(
-                                            "Neo Stfld_Ref through an IL Ref Slot: Step 17");
+                                        if (!(obj is Array))
+                                            throw new NotImplementedException("Neo Stfld_Ref through an IL Ref Slot: Step 17");
+                                        fieldIns.ManagedObjects[ip->Operand3] = srcObj;
+                                        Unsafe.WriteUnaligned(ref ResolveNeoILTarget(fieldIns, dstIdx + ip->Operand2),
+                                            srcObj == null ? -1 : ip->Operand3);
                                     }
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 else
@@ -3188,7 +3773,7 @@ namespace ILRuntime.Runtime.Intepreter
                                     else
                                     {
                                         clrType.AssignFieldFromNeoFrame(ip->Operand2, ref obj, this, frameBase + ip->SrcOffset, mStack);
-                                        mStack[objIndex] = obj;
+                                        CommitNeoFieldReceiver(mStack, objIndex, dstIdx, obj);
                                     }
                                 }
                                 break;

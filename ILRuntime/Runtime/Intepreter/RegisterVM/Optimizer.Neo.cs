@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
@@ -544,6 +544,52 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Operand = localInfos[r2].RefOffset;
                         }
                         break;
+                    case OpCodeREnum.Newarr:
+                        {
+                            short r1 = op.Register1;
+                            short r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            op.Operand3 = localInfos[r1].RefOffset;
+                        }
+                        break;
+                    case OpCodeREnum.Ldlen:
+                        LowerR1R2(ref op, localInfos);
+                        break;
+                    case OpCodeREnum.Ldelema:
+                    case OpCodeREnum.Ldelem_I1:
+                    case OpCodeREnum.Ldelem_U1:
+                    case OpCodeREnum.Ldelem_I2:
+                    case OpCodeREnum.Ldelem_U2:
+                    case OpCodeREnum.Ldelem_I4:
+                    case OpCodeREnum.Ldelem_U4:
+                    case OpCodeREnum.Ldelem_I8:
+                    case OpCodeREnum.Ldelem_I:
+                    case OpCodeREnum.Ldelem_R4:
+                    case OpCodeREnum.Ldelem_R8:
+                    case OpCodeREnum.Ldelem_Ref:
+                    case OpCodeREnum.Ldelem_Any:
+                        {
+                            short r1 = op.Register1;
+                            op.Operand3 = localInfos[r1].RefOffset;
+                            LowerR1R2R3(ref op, localInfos);
+                        }
+                        break;
+                    case OpCodeREnum.Stelem_I:
+                    case OpCodeREnum.Stelem_I1:
+                    case OpCodeREnum.Stelem_I2:
+                    case OpCodeREnum.Stelem_I4:
+                    case OpCodeREnum.Stelem_I8:
+                    case OpCodeREnum.Stelem_R4:
+                    case OpCodeREnum.Stelem_R8:
+                    case OpCodeREnum.Stelem_Ref:
+                    case OpCodeREnum.Stelem_Any:
+                        {
+                            short valueReg = op.Register3;
+                            op.Operand3 = localInfos[valueReg].RefOffset;
+                            LowerR1R2R3(ref op, localInfos);
+                        }
+                        break;
                     case OpCodeREnum.Ldfld_I1:
                     case OpCodeREnum.Ldfld_I2:
                     case OpCodeREnum.Ldfld_I4:
@@ -657,10 +703,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             var targetMethod = domain.GetMethod(op.Operand2);
                             if (targetMethod == null)
                                 break;
-                            
+
                             int pCnt = targetMethod.ParameterCount;
                             if (targetMethod.HasThis && op.Code != OpCodeREnum.Newobj) pCnt++;
-                            
+
                             // 接口 callvirt 已在 InitializeCallvirtDispatch 里把接口内 slot 编入 Operand4 低 16 位。
                             // 若同时被 constrained 判定命中会误吞 slot=1 的接口方法，因此这里显式排除接口目标。
                             bool targetIsInterface = targetMethod.DeclearingType != null && targetMethod.DeclearingType.IsInterface;
@@ -670,12 +716,12 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 op.Operand4 == 1;
                             int pushCnt = hasConstrained ? pCnt : Math.Max(pCnt - 3, 0);
                             int regCnt = pCnt - pushCnt;
-                            
+
                             short[] srcRegs = new short[pCnt];
                             if (regCnt > 0) srcRegs[pCnt - regCnt] = op.Register2;
                             if (regCnt > 1) srcRegs[pCnt - regCnt + 1] = op.Register3;
                             if (regCnt > 2) srcRegs[pCnt - regCnt + 2] = op.Register4;
-                            
+
                             int foundPushes = 0;
                             int scanIdx = i - 1;
                             while (scanIdx >= 0 && foundPushes < pushCnt)
@@ -707,10 +753,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 }
                                 scanIdx--;
                             }
-                            
+
                             if (foundPushes != pushCnt)
                                 throw new Exception("Neo lowering could not find expected Push instructions for Call/Newobj.");
-                            
+
                              StackSlotInfo[] paramInfos = null;
                             if (targetMethod is ILRuntime.CLR.Method.ILMethod ilm)
                             {
@@ -775,7 +821,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 List<ushort> primSize = new List<ushort>();
                                 List<ushort> refSrc = new List<ushort>();
                                 List<ushort> refDst = new List<ushort>();
-                                
+
                                 for (int p = 0; p < pCnt; p++)
                                 {
                                     var srcInfo = localInfos[srcRegs[p]];
@@ -789,7 +835,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         srcInfo.RefCount != 0 || dstInfo.RefCount != 0))
                                         throw new InvalidProgramException(
                                             "Neo managed-pointer arguments must use an 8-byte Ref Slot.");
-                                    
+
                                     if (dstInfo.Size > 0)
                                     {
                                         primSrc.Add((ushort)srcInfo.Offset);
@@ -802,7 +848,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                         refDst.Add((ushort)(dstInfo.RefOffset + r));
                                     }
                                 }
-                                
+
                                 NeoCallParamMap map = new NeoCallParamMap();
                                 if (primSrc.Count > 0)
                                 {
@@ -815,11 +861,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                     map.RefSrc = refSrc.ToArray();
                                     map.RefDst = refDst.ToArray();
                                 }
-                                
+
                                 op.Operand = callParams.Count;
                                 callParams.Add(map);
                             }
-                            
+
                             if (op.Code == OpCodeREnum.Newobj)
                             {
                                 short r1 = op.Register1; // Destination

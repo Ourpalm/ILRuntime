@@ -1309,6 +1309,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                 case Code.Ldelem_I4:
                 case Code.Ldelem_U4:
                 case Code.Ldelem_I8:
+#if ENABLE_NEO_MODE
+                case Code.Ldelem_I:
+#endif
                 case Code.Ldelem_R4:
                 case Code.Ldelem_R8:
                 case Code.Ldelem_Any:
@@ -1316,6 +1319,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     op.Register1 = (short)(baseRegIdx - 2); //explicit use dest register for optimization
                     op.Register2 = (short)(baseRegIdx - 2);
                     op.Register3 = (short)(baseRegIdx - 1);
+#if ENABLE_NEO_MODE
+                    if (code.Code == Code.Ldelem_Any || code.Code == Code.Ldelema)
+                        op.Operand2 = method.GetTypeTokenHashCode(token);
+#endif
                     baseRegIdx--;
                     break;
                 case Code.Nop:
