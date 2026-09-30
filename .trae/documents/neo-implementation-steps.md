@@ -818,6 +818,8 @@ Step 9 落地后，CLR 方法（包括 `Console.WriteLine`、`Assert.AreEqual` �
 
 ## Step 17: Ref/Out 参数 + ldloca/ldflda(跨帧封送)
 
+**实现记录**：[Step17 handoff](../specs/implement-neo-step17/handoff.md)。Debug_Neo / Release_Neo 各 147 项通过；CLR 反射与历史生成绑定的剩余边界见 handoff，不能视为完整 CLR alias 合规。
+
 **目标**: **在 Step 12b 已建立的 Ref Slot 基础上**,补齐 ref/out 参数在方法边界跨帧传递时的封送/回写逻辑,以及 CLR 对象字段和数组元素的 stind/ldind 分派。
 
 > **注意**:Ref Slot 8 字节 `(objectIndex, offset)` 编码格式、`Ldloca / Ldarga / Ldflda / Ldsflda / Stind / Ldind` 主 handler、struct-this ABI 已在 Step 12b 完成。本 step 只处理**跨方法边界**的额外约束。

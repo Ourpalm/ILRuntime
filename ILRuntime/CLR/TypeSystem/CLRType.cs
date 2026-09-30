@@ -518,7 +518,7 @@ namespace ILRuntime.CLR.TypeSystem
             if (fieldinfo != null)
             {
 #if ENABLE_NEO_MODE
-                if (structStorage == StructStorage.Inline && isValueType &&
+                if (structStorage == StructStorage.Inline && isValueType && totalReferenceCount == 0 &&
                     target != null && !fieldinfo.FieldType.IsValueType)
                 {
                     int primOff = GetFieldPrimitiveOffset(hash);
@@ -587,7 +587,7 @@ namespace ILRuntime.CLR.TypeSystem
             if (fi == null)
                 throw new MissingFieldException($"CLR field 0x{hash:X8} not found on {TypeForCLR}");
 
-            if (structStorage == StructStorage.Inline && isValueType &&
+            if (structStorage == StructStorage.Inline && isValueType && totalReferenceCount == 0 &&
                 target != null && !fi.FieldType.IsValueType)
             {
                 int primOff = GetFieldPrimitiveOffset(hash);
@@ -603,7 +603,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
-            if (structStorage == StructStorage.Inline && isValueType &&
+            if (structStorage == StructStorage.Inline && isValueType && totalReferenceCount == 0 &&
                 target != null && (fi.FieldType.IsPrimitive || fi.FieldType.IsEnum ||
                                    fi.FieldType == typeof(IntPtr) || fi.FieldType == typeof(UIntPtr)))
             {
@@ -640,7 +640,7 @@ namespace ILRuntime.CLR.TypeSystem
             if (fi == null)
                 throw new MissingFieldException($"CLR field 0x{hash:X8} not found on {TypeForCLR}");
 
-            if (structStorage == StructStorage.Inline && isValueType &&
+            if (structStorage == StructStorage.Inline && isValueType && totalReferenceCount == 0 &&
                 target != null && (fi.FieldType.IsPrimitive || fi.FieldType.IsEnum ||
                                    fi.FieldType == typeof(IntPtr) || fi.FieldType == typeof(UIntPtr)))
             {
@@ -654,7 +654,7 @@ namespace ILRuntime.CLR.TypeSystem
                 }
             }
 
-            if (structStorage == StructStorage.Inline && isValueType &&
+            if (structStorage == StructStorage.Inline && isValueType && totalReferenceCount == 0 &&
                 target != null && !fi.FieldType.IsValueType)
             {
                 int primOff = GetFieldPrimitiveOffset(hash);

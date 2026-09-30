@@ -71,9 +71,15 @@ namespace ILRuntime.Runtime.CLRBinding
             for (int j = 0; j < param.Length; j++)
             {
                 var p = param[j];
-                p.ParameterType.AppendArgumentCodeNeo(sb, j + 1, p.Name, valueTypeBinders, isMultiArr);
+                p.ParameterType.AppendArgumentCodeNeo(sb, j + 1, p.Name, valueTypeBinders, isMultiArr, p.IsOut);
             }
 
+            bool writeBack = Array.Exists(param, p => p.ParameterType.IsByRef);
+            if (writeBack)
+            {
+                sb.AppendLine("            try");
+                sb.AppendLine("            {");
+            }
             if (isMultiArr)
             {
                 string clsName, realClsName;
@@ -103,6 +109,19 @@ namespace ILRuntime.Runtime.CLRBinding
 
             type.GetReturnValueCodeNeo(sb);
 
+            if (writeBack)
+            {
+                sb.AppendLine("            }");
+                sb.AppendLine("            finally");
+                sb.AppendLine("            {");
+                for (int j = 0; j < param.Length; j++)
+                    if (param[j].ParameterType.IsByRef && !param[j].IsIn)
+                    {
+                        string name = isMultiArr ? "a" + (j + 1) : "@" + param[j].Name;
+                        sb.AppendLine($"                __intp.WriteRef(__frameBase + __refOffset{j + 1}, __mStack, {name});");
+                    }
+                sb.AppendLine("            }");
+            }
             sb.AppendLine("        }");
         }
 

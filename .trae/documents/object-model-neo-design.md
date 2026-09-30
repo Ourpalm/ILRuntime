@@ -1089,7 +1089,7 @@ struct Foo { public object bar; }
 ref object x = ref foo.bar;
 ```
 
-这种场景中"字段地址"指向 mStack 中的一个槽位本身。需要第三种 marker（如 objectIndex = -2），极罕见，后续遇到时再设计。
+Step17 已实现：Ref Slot 仍指向帧字节位置或 IL 对象字段 primitive offset，消费时通过所属活动帧/对象的类型布局找到引用区槽位，不增加第三种 marker。跨帧写入必须更新地址所属帧的稳定引用槽，不能保存 callee 的临时 mStack index。详见 [Step17 设计补充](../specs/implement-neo-step17/design-notes.md)。
 
 ---
 
@@ -1353,7 +1353,9 @@ stind_i4           → CLRType.SetFieldValue(xFieldIdx, ...) + 回写 mStack
 
 ### 25.4 stind 回写
 
-与 Legacy 的 `StoreValueToFieldReference` 一致：CLR 值类型通过 `ref obj` 模式，修改后写回 `mStack[objectIndex] = obj`。
+Step17 修正：仅写回中间 box 的 mStack 槽不能修改原数组/外层 struct。复杂 CLR 字段地址在 mStack 中保存 `CLRFieldAddressFallback`，记录父位置及稳定的父 owner；每次读取重新获取父值，修改后逐层提交到原字段或数组。普通帧/IL 字段路径仍直接使用原来的两整数编码。
+
+`CLRFieldAddressFallback` 仅用于 CLR 特殊地址路径，当前 CLR 静态字段取址也使用它并产生一次托管分配；纯 IL 嵌套字段不需要该机制。运行时先处理栈、IL 实例和数组，再进入 CLR 地址分派，避免通用引用访问优先检查这一特殊描述类型。
 
 ### 25.5 不需要额外字段的原因
 

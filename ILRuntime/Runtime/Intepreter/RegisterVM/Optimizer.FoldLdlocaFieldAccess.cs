@@ -95,7 +95,10 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         consumer.Operand4 = 1;
 
                     lst[j] = consumer;
-                    canRemove.Add(i);
+                    // A store does not kill its byref receiver. Inlined methods may
+                    // use the same address for several field stores.
+                    if (!receiverInReg1)
+                        canRemove.Add(i);
                 }
             }
         }

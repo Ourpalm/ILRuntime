@@ -104,7 +104,7 @@ namespace ILRuntime.Runtime.CLRBinding
             }
         }
 
-        internal static void AppendArgumentCodeNeo(this Type p, StringBuilder sb, int idx, string name, List<Type> valueTypeBinders, bool isMultiArr)
+        internal static void AppendArgumentCodeNeo(this Type p, StringBuilder sb, int idx, string name, List<Type> valueTypeBinders, bool isMultiArr, bool isOut = false)
         {
             string clsName, realClsName;
             bool isByRef;
@@ -120,6 +120,15 @@ namespace ILRuntime.Runtime.CLRBinding
                 varName = (name != null ? "@" + name : "a" + idx);
             }
 
+            if (p.IsByRef)
+            {
+                sb.AppendLine($"            int __refOffset{idx} = (__curPrim + 7) & ~7;");
+                sb.AppendLine($"            __curPrim = __refOffset{idx} + 8;");
+                sb.AppendLine(isOut
+                    ? $"            {realClsName} {varName} = default({realClsName});"
+                    : $"            {realClsName} {varName} = __intp.ReadRef<{realClsName}>(__frameBase + __refOffset{idx}, __mStack);");
+                return;
+            }
             if (pt.IsValueType && !pt.IsPrimitive && valueTypeBinders != null && valueTypeBinders.Contains(pt))
             {
                 sb.AppendLine($"            {realClsName} {varName} = default({realClsName});");

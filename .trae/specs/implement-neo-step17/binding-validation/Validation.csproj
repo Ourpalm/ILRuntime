@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><AllowUnsafeBlocks>true</AllowUnsafeBlocks><DefineConstants>ENABLE_NEO_MODE</DefineConstants></PropertyGroup>
+  <PropertyGroup><RuntimeConfiguration Condition="'$(RuntimeConfiguration)' == ''">Debug_Neo</RuntimeConfiguration></PropertyGroup>
+  <ItemGroup Condition="'$(GenerateBindings)' == 'true'"><Compile Remove="Generated/**/*.cs" /></ItemGroup>
+  <ItemGroup>
+    <Reference Include="ILRuntime"><HintPath>../../../../ILRuntimeTestCLI/bin/$(RuntimeConfiguration)/net8.0/ILRuntime.dll</HintPath></Reference>
+    <Reference Include="ILRuntimeTestBase"><HintPath>../../../../ILRuntimeTestCLI/bin/$(RuntimeConfiguration)/net8.0/ILRuntimeTestBase.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

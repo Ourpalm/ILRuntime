@@ -433,11 +433,9 @@ namespace ILRuntime.Runtime.Generated
 #if ENABLE_NEO_MODE
         static void Normalize_4_Neo(ILIntepreter __intp, byte* __frameBase, AutoList __mStack, CLRMethod __method, bool isNewObj, byte* __retDst, int __retRefBase)
         {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = __intp.AppDomain;
-            int __curPrim = 0;
-            ILRuntimeTest.TestFramework.TestVector3 instance_of_this_method = default(ILRuntimeTest.TestFramework.TestVector3);
-            // TODO: ValueType instance in Neo
-            instance_of_this_method.Normalize();
+            var value = __intp.ReadRef<ILRuntimeTest.TestFramework.TestVector3>(__frameBase, __mStack);
+            try { value.Normalize(); }
+            finally { __intp.WriteRef(__frameBase, __mStack, value); }
         }
 #else
         static StackObject* Normalize_4(ILIntepreter __intp, StackObject* __esp, AutoList __mStack, CLRMethod __method, bool isNewObj)

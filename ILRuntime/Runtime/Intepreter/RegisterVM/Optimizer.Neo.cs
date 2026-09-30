@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#if ENABLE_NEO_MODE
 using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Runtime.Intepreter.OpCodes;
 using System;
@@ -184,6 +184,15 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             op.Operand2 = sz;
                             op.Operand3 = (dstReg >= 0 && dstReg < localInfos.Length) ? localInfos[dstReg].RefOffset : 0;
                             op.Operand4 = isStandaloneRef ? -1 : ((srcReg >= 0 && srcReg < localInfos.Length) ? localInfos[srcReg].RefOffset : 0);
+                            if (localInfos[srcReg].IsRef)
+                            {
+                                // Keep the pointed-to owner alive independently of a
+                                // producer's scratch anchor when a ref local is copied.
+                                op.Operand = 1;
+                                op.Operand3 = frame.TotalRefSize++;
+                                op.Operand4 = -1;
+                                frame.LocalsReferenceCount++;
+                            }
                         }
                         break;
                     case OpCodeREnum.Conv_I:
@@ -390,12 +399,21 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         }
                         break;
                     case OpCodeREnum.Ret:
-                        if (op.Register1 >= 0)
+                        if (op.Register1 >= 0 && frame.ReturnPrimitiveSize > 0)
                         {
                             short r1 = op.Register1;
                             LowerR1(ref op, localInfos);
                             if (r1 < localInfos.Length)
                                 op.Operand3 = localInfos[r1].RefOffset;
+                        }
+                        break;
+                    case OpCodeREnum.Ldobj:
+                    case OpCodeREnum.Stobj:
+                        {
+                            short r1 = op.Register1, r2 = op.Register2;
+                            op.DstOffset = (ushort)localInfos[r1].Offset;
+                            op.SrcOffset = (ushort)localInfos[r2].Offset;
+                            op.Operand3 = localInfos[op.Code == OpCodeREnum.Ldobj ? r1 : r2].RefOffset;
                         }
                         break;
                     case OpCodeREnum.Box:
@@ -441,7 +459,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             if (srcType != null && !srcType.IsPrimitive && !srcType.IsByRef)
                             {
                                 if (!srcType.IsValueType)
-                                    holdsMStackIndex = true; // reference type local
+                                    holdsMStackIndex = false; // ref addresses the variable, not its current object
                                 else if (srcType is ILRuntime.CLR.TypeSystem.CLRType clrSrc &&
                                          clrSrc.StructStorage == ILRuntime.CLR.TypeSystem.StructStorage.Boxed)
                                     holdsMStackIndex = true;
@@ -468,32 +486,17 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         break;
                     case OpCodeREnum.Ldflda:
                         {
+                            op.Operand3 = frame.TotalRefSize++;
+                            frame.LocalsReferenceCount++;
                             short r1 = op.Register1;
                             short r2 = op.Register2;
+                            var receiverType = domain.GetType(op.Operand4);
+                            op.Operand = op.Operand4;
+
                             op.DstOffset = (ushort)localInfos[r1].Offset;
                             op.SrcOffset = (ushort)localInfos[r2].Offset;
-                            // Ldflda-specific receiver flag: 0 = heap object index,
-                            // 1 = source slot contains an 8-byte Ref Slot, 2 =
-                            // an inline field containing a boxed CLR value, 3 =
-                            // an inline frame value. Preserve 2/3 so the runtime
-                            // can materialize the correct Ref Slot.
-                            if (localInfos[r2].IsRef)
-                            {
-                                // The receiver register is a byref result from
-                                // an earlier ldflda/ldloca. It contains a Ref
-                                // Slot, regardless of the field-storage tag
-                                // carried by the producer.
-                                op.Operand4 = 1;
-                            }
-                            else if (op.Operand4 == 2 || op.Operand4 == 3)
-                            {
-                                // Preserve the field-storage tag. A byref receiver can
-                                // point at an inline field whose primitive slot contains
-                                // a Boxed mStack index; tag 2 must reach the handler so it
-                                // does not reinterpret the following bytes as an offset.
-                            }
-                            else
-                                op.Operand4 = 0;
+                            op.Operand4 = localInfos[r2].IsRef ? 1 :
+                                receiverType.IsValueType && !(receiverType is CLRType boxed && boxed.StructStorage == StructStorage.Boxed) ? 3 : 0;
                         }
                         break;
                     case OpCodeREnum.Ldsflda:
@@ -572,6 +575,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         {
                             short r1 = op.Register1;
                             op.Operand3 = localInfos[r1].RefOffset;
+                            if (op.Code == OpCodeREnum.Ldelema)
+                            {
+                                op.Operand3 = frame.TotalRefSize++;
+                                frame.LocalsReferenceCount++;
+                            }
                             LowerR1R2R3(ref op, localInfos);
                         }
                         break;
@@ -588,6 +596,16 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                             short valueReg = op.Register3;
                             op.Operand3 = localInfos[valueReg].RefOffset;
                             LowerR1R2R3(ref op, localInfos);
+                        }
+                        break;
+                    case OpCodeREnum.Ldfld:
+                    case OpCodeREnum.Stfld:
+                        {
+                            short r1 = op.Register1, r2 = op.Register2;
+                            bool load = op.Code == OpCodeREnum.Ldfld;
+                            op.Operand = localInfos[load ? r1 : r2].RefOffset;
+                            op.Operand4 = localInfos[load ? r2 : r1].IsRef ? -1 : 0;
+                            LowerR1R2(ref op, localInfos);
                         }
                         break;
                     case OpCodeREnum.Ldfld_I1:
@@ -880,6 +898,11 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                                 {
                                     short r1 = op.Register1;
                                     op.Operand3 = localInfos[r1].RefOffset;
+                                    if (targetMethod.ReturnType.IsByRef)
+                                    {
+                                        op.Operand3 = frame.TotalRefSize++;
+                                        frame.LocalsReferenceCount++;
+                                    }
                                     LowerR1(ref op, localInfos);
                                 }
                             }
@@ -936,7 +959,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
             return infos;
         }
 
-        static StackSlotInfo AllocateNeoCallParamSlot(CLR.TypeSystem.IType type, ref int offset, ref int refOffset, Enviorment.AppDomain domain)
+        internal static StackSlotInfo AllocateNeoCallParamSlot(CLR.TypeSystem.IType type, ref int offset, ref int refOffset, Enviorment.AppDomain domain)
         {
             StackSlotInfo slot = default;
             slot.RefOffset = refOffset;

@@ -257,8 +257,8 @@ namespace ILRuntime.Runtime.CLRBinding
             {
                 if (type.IsValueType)
                 {
-                    sb.AppendLine(string.Format("            {0} instance_of_this_method = default({0});", typeClsName));
-                    sb.AppendLine("            // TODO: ValueType instance in Neo");
+                    sb.AppendLine(string.Format("            {0} instance_of_this_method = __intp.ReadRef<{0}>(__frameBase, __mStack);", typeClsName));
+                    sb.AppendLine("            __curPrim = 8;");
                 }
                 else
                 {
@@ -269,9 +269,16 @@ namespace ILRuntime.Runtime.CLRBinding
             for (int j = 0; j < param.Length; j++)
             {
                 var p = param[j];
-                p.ParameterType.AppendArgumentCodeNeo(sb, j + 1, p.Name, valueTypeBinders, isMultiArr);
+                p.ParameterType.AppendArgumentCodeNeo(sb, j + 1, p.Name, valueTypeBinders, isMultiArr, p.IsOut);
             }
 
+            bool writeBackThis = !i.IsStatic && type.IsValueType;
+            bool writeBack = writeBackThis || Array.Exists(param, p => p.ParameterType.IsByRef);
+            if (writeBack)
+            {
+                sb.AppendLine("            try");
+                sb.AppendLine("            {");
+            }
             if (isMultiArr)
             {
                 if (i.Name == "Get")
@@ -394,6 +401,21 @@ namespace ILRuntime.Runtime.CLRBinding
                 i.ReturnType.GetReturnValueCodeNeo(sb);
             }
 
+            if (writeBack)
+            {
+                sb.AppendLine("            }");
+                sb.AppendLine("            finally");
+                sb.AppendLine("            {");
+                if (writeBackThis)
+                    sb.AppendLine("                __intp.WriteRef(__frameBase, __mStack, instance_of_this_method);");
+                for (int j = 0; j < param.Length; j++)
+                    if (param[j].ParameterType.IsByRef && !param[j].IsIn)
+                    {
+                        string name = isMultiArr ? "a" + (j + 1) : "@" + param[j].Name;
+                        sb.AppendLine($"                __intp.WriteRef(__frameBase + __refOffset{j + 1}, __mStack, {name});");
+                    }
+                sb.AppendLine("            }");
+            }
             sb.AppendLine("        }");
         }
 

@@ -1965,6 +1965,8 @@ namespace ILRuntime.CLR.TypeSystem
 
             int GetFieldReferenceCount(IType type)
             {
+                if (type.IsByRef)
+                    throw new NotSupportedException("Neo does not support managed-pointer fields in heap storage.");
                 if (type.IsPrimitive || type.IsEnum)
                     return 0;
                 if (type is CLRType clrType)

@@ -1251,7 +1251,7 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     {
                         var offset = appdomain.GetStaticFieldOffset(token, declaringType, method, out IType type, out IType fieldType);
                         op.Operand = method.GetTypeTokenHashCode(((FieldReference)token).FieldType);
-                        op.Operand2 = offset.PrimitiveOffset;
+                        op.Operand2 = type is CLRType staticClr ? staticClr.GetFieldIndex(token) : offset.PrimitiveOffset;
                         op.Operand3 = type.GetHashCode();
                     }
 #else
@@ -1816,6 +1816,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     isILMethod = !m.IsDelegateInvoke;
                     var ilm = (ILMethod)m;
                     bool noJIT = (ilm.JITFlags & ILRuntimeJITFlags.NoJIT) != ILRuntimeJITFlags.None;
+#if ENABLE_NEO_MODE
+                    noJIT |= ilm.Definition.NoInlining;
+#endif
                     bool forceInline = (ilm.JITFlags & ILRuntimeJITFlags.ForceInline) != ILRuntimeJITFlags.None;
                     bool hasExceptionHandler = ilm.Definition.HasBody && ilm.Definition.Body.HasExceptionHandlers;
                     if (!ilm.IsDelegateInvoke && !ilm.IsVirtual && !noJIT && !hasExceptionHandler && !ilm.Compiling && !ilm.IsEventAdd && !ilm.IsEventRemove)

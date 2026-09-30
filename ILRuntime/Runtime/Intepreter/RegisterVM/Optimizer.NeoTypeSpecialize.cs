@@ -399,6 +399,14 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                         resultType = appdomain.ObjectType;
                         hasResult = true;
                         break;
+                    case OpCodeREnum.Ldfld:
+                        {
+                            var owner = (CLRType)appdomain.GetType(op.Operand3);
+                            resultType = appdomain.GetType(owner.Fields[op.Operand2].FieldType);
+                            hasResult = true;
+                        }
+                        break;
+                    case OpCodeREnum.Ldobj:
                     case OpCodeREnum.Ldsfld:
                         {
                             var t = appdomain.GetType(op.Operand);
@@ -490,6 +498,9 @@ namespace ILRuntime.Runtime.Intepreter.RegisterVM
                     case OpCodeREnum.Ldflda:
                         {
                             var t = appdomain.GetType(op.Operand);
+                            var ownerType = GetRegisterTypeFromList(currentTypes, op.Register2);
+                            if (ownerType.IsByRef) ownerType = ownerType.ElementType;
+                            op.Operand4 = ownerType.GetHashCode();
                             if (t != null)
                             {
                                 resultType = t.MakeByRefType();

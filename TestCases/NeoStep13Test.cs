@@ -95,12 +95,7 @@ namespace TestCases
         // branch, the `srcInfo.IsRef != dstInfo.IsRef` check throws InvalidProgramException
         // at JIT prewarm and blocks any struct instance-method invocation.
         //
-        // Known failing today (kept intentionally): the JIT-prewarm regression is fixed
-        // (Normalize's method body is now reached), but the assertions below currently fail
-        // because Normalize's field writes through `this` (a CLR value-type byref receiver)
-        // do not propagate back to the caller's frame. Whichever later step owns
-        // "CLR value-type instance method mutation write-back through Ref Slot receiver"
-        // must re-run this test and turn it green — do NOT weaken the assertions.
+        // Step17 marshals the CLR byref receiver and commits mutations to its original location.
         public static void NeoStep13ValueTypeInstanceMethodThis()
         {
             TestVector3 v = default(TestVector3);

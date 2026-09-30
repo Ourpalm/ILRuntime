@@ -329,65 +329,42 @@ namespace ILRuntime.CLR.Method
         }
 
 #if ENABLE_NEO_MODE
-        public unsafe object Invoke(byte* targetBase, AutoList mStack, bool isNewObj = false)
+        public unsafe object Invoke(ILIntepreter interpreter, byte* targetBase, AutoList mStack, bool isNewObj = false)
         {
-            if (parameters == null)
-            {
-                InitParameters();
-            }
+            if (parameters == null) InitParameters();
+            if (ReturnType.IsByRef)
+                throw new NotSupportedException("Neo CLR ref returns require a managed-pointer redirection; reflection cannot preserve their identity.");
             int paramCount = ParameterCount;
-            if (invocationParam == null)
-                invocationParam = new object[paramCount];
-            object[] param = invocationParam;
-
+            // Reflection can reenter the same CLRMethod through an IL callback.
+            object[] param = new object[paramCount];
+            int[] byrefOffsets = new int[paramCount];
+            object instance = null;
+            bool invoked = false;
             try
             {
-                int curPrim = 0;
-                object instance = null;
-
-                if (isNewObj)
+                int curPrim = isNewObj ? 4 : 0, curRef = 0;
+                if (!isNewObj && HasThis)
                 {
-                    curPrim += 4; // Skip retRefBase
-                }
-                else if (HasThis)
-                {
-                    int thisIdx = *(int*)(targetBase + curPrim);
-                    instance = mStack[thisIdx];
-                    curPrim += 4;
-                }
-
-                for (int i = 0; i < paramCount; i++)
-                {
-                    var pt = Parameters[i];
-                    Type t = pt.TypeForCLR;
-
-                    if (pt is CLRType clrType && clrType.IsValueType && !clrType.TypeForCLR.IsPrimitive && !clrType.TypeForCLR.IsEnum)
+                    if (declaringType.IsValueType)
                     {
-                        throw new NotImplementedException("CLR value type reflection fallback: Step 13");
-                    }
-
-                    if (pt is ILType || !t.IsPrimitive && !t.IsEnum)
-                    {
-                        param[i] = ILIntepreter.ReadNeoReference(targetBase, ref curPrim, mStack);
+                        instance = interpreter.ReadAddress(*(int*)targetBase, *(int*)(targetBase + 4), declaringType, mStack);
+                        curPrim = 8;
                     }
                     else
                     {
-                        if (t.IsEnum) { param[i] = Enum.ToObject(t, ILIntepreter.ReadNeoInt32(targetBase, ref curPrim)); }
-                        else if (t == typeof(int)) { param[i] = ILIntepreter.ReadNeoInt32(targetBase, ref curPrim); }
-                        else if (t == typeof(long)) { param[i] = ILIntepreter.ReadNeoInt64(targetBase, ref curPrim); }
-                        else if (t == typeof(float)) { param[i] = ILIntepreter.ReadNeoFloat(targetBase, ref curPrim); }
-                        else if (t == typeof(double)) { param[i] = ILIntepreter.ReadNeoDouble(targetBase, ref curPrim); }
-                        else if (t == typeof(bool)) { param[i] = ILIntepreter.ReadNeoBoolean(targetBase, ref curPrim); }
-                        else if (t == typeof(byte)) { param[i] = ILIntepreter.ReadNeoUInt8(targetBase, ref curPrim); }
-                        else if (t == typeof(sbyte)) { param[i] = ILIntepreter.ReadNeoInt8(targetBase, ref curPrim); }
-                        else if (t == typeof(short)) { param[i] = ILIntepreter.ReadNeoInt16(targetBase, ref curPrim); }
-                        else if (t == typeof(ushort)) { param[i] = ILIntepreter.ReadNeoUInt16(targetBase, ref curPrim); }
-                        else if (t == typeof(uint)) { param[i] = ILIntepreter.ReadNeoUInt32(targetBase, ref curPrim); }
-                        else if (t == typeof(ulong)) { param[i] = ILIntepreter.ReadNeoUInt64(targetBase, ref curPrim); }
-                        else if (t == typeof(char)) { param[i] = ILIntepreter.ReadNeoChar(targetBase, ref curPrim); }
+                        instance = ILIntepreter.ReadNeoReference(targetBase, ref curPrim, mStack);
                     }
                 }
-
+                for (int i = 0; i < paramCount; i++)
+                {
+                    var pt = Parameters[i];
+                    var slot = ILRuntime.Runtime.Intepreter.RegisterVM.Optimizer.AllocateNeoCallParamSlot(pt, ref curPrim, ref curRef, appdomain);
+                    byrefOffsets[i] = pt.IsByRef ? slot.Offset : -1;
+                    byte* source = targetBase + slot.Offset;
+                    param[i] = pt.IsByRef
+                        ? interpreter.ReadAddress(*(int*)source, *(int*)(source + 4), pt.ElementType, mStack)
+                        : interpreter.ReadValue(source, pt, mStack, 0);
+                }
                 try
                 {
                     object res = null;
@@ -401,6 +378,7 @@ namespace ILRuntime.CLR.Method
                                     throw new NullReferenceException();
                                 if (instance is CrossBindingAdaptorType && paramCount == 0)
                                     return null;
+                                invoked = true;
                                 cDef.Invoke(instance, param);
                             }
                             else
@@ -408,6 +386,7 @@ namespace ILRuntime.CLR.Method
                         }
                         else
                         {
+                            invoked = true;
                             res = cDef.Invoke(param);
                         }
                     }
@@ -420,6 +399,7 @@ namespace ILRuntime.CLR.Method
                             if (instance == null)
                                 throw new NullReferenceException();
                         }
+                        invoked = true;
                         res = def.Invoke(instance, param);
                     }
 
@@ -433,6 +413,17 @@ namespace ILRuntime.CLR.Method
             }
             finally
             {
+                if (invoked)
+                {
+                    for (int i = 0; i < paramCount; i++)
+                        if (byrefOffsets[i] >= 0)
+                        {
+                            byte* address = targetBase + byrefOffsets[i];
+                            interpreter.WriteAddress(*(int*)address, *(int*)(address + 4), Parameters[i].ElementType, param[i], mStack);
+                        }
+                    if (!isNewObj && HasThis && declaringType.IsValueType)
+                        interpreter.WriteAddress(*(int*)targetBase, *(int*)(targetBase + 4), declaringType, instance, mStack);
+                }
                 Array.Clear(param, 0, param.Length);
             }
         }
