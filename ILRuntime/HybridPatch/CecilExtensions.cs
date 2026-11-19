@@ -311,6 +311,13 @@ namespace ILRuntime.Hybrid
 
         public static bool ShouldIncludeInPatch(this MethodDefinition method)
         {
+            // InvocationContext cannot return a managed reference to the caller.
+            var returnType = method.ReturnType;
+            while (returnType is IModifierType modifier)
+                returnType = modifier.ElementType;
+            if (returnType.IsByReference)
+                return false;
+
             if (method.HasCustomAttributes)
             {
                 foreach (var attr in method.CustomAttributes)

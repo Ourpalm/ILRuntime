@@ -237,6 +237,28 @@ namespace HotfixAOT
         }
     }
 
+    [ILRuntimePatch]
+    public class HotfixRefReturn
+    {
+        public struct State
+        {
+            public int Value;
+        }
+
+        private State state;
+
+        public ref State Writable => ref state;
+        public ref readonly State ReadOnly => ref state;
+
+        public void Update(int value)
+        {
+#if PATCHED
+            value++;
+#endif
+            state = new State { Value = value };
+        }
+    }
+
     public class HotfixAdvancedTestCases
     {
         static bool TestReturnTypes(bool patched)
@@ -352,6 +374,26 @@ namespace HotfixAOT
                 return withTrue == null && withFalse == 42;
         }
 
+        static bool TestRefReturn(bool patched)
+        {
+            var obj = new HotfixRefReturn();
+            ref var state = ref obj.Writable;
+            state.Value = 42;
+            if (obj.Writable.Value != 42)
+                return false;
+
+            obj.Update(10);
+            return state.Value == (patched ? 11 : 10);
+        }
+
+        static bool TestRefReadonlyReturn(bool patched)
+        {
+            var obj = new HotfixRefReturn();
+            ref readonly var state = ref obj.ReadOnly;
+            obj.Update(20);
+            return state.Value == (patched ? 21 : 20);
+        }
+
         public static IEnumerable<ITestCase> GetTestCases()
         {
             yield return new DelegateTestCase($"{nameof(HotfixAdvancedTestCases)}.{nameof(TestReturnTypes)}", TestReturnTypes);
@@ -362,6 +404,8 @@ namespace HotfixAOT
             yield return new DelegateTestCase($"{nameof(HotfixAdvancedTestCases)}.{nameof(TestMultiGeneric)}", TestMultiGeneric);
             yield return new DelegateTestCase($"{nameof(HotfixAdvancedTestCases)}.{nameof(TestFieldTypes)}", TestFieldTypes);
             yield return new DelegateTestCase($"{nameof(HotfixAdvancedTestCases)}.{nameof(TestNullable)}", TestNullable);
+            yield return new DelegateTestCase($"{nameof(HotfixAdvancedTestCases)}.{nameof(TestRefReturn)}", TestRefReturn);
+            yield return new DelegateTestCase($"{nameof(HotfixAdvancedTestCases)}.{nameof(TestRefReadonlyReturn)}", TestRefReadonlyReturn);
         }
     }
 }
