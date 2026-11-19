@@ -15,17 +15,20 @@ namespace ILRuntime.Hybrid
         public static bool CheckTypeReferenceEqual(this TypeReference a, TypeReference b)
         {
             if(a == b) return true;
+            if (a is GenericParameter ga && b is GenericParameter gb && ga.Position >= 0 && gb.Position >= 0)
+                return ga.Type == gb.Type && ga.Position == gb.Position;
             if (a is TypeSpecification specA)
             {
                 if (b is TypeSpecification specB)
                 {
                     if (a is ByReferenceType)
                     {
-                        return b is ByReferenceType && CheckTypeReferenceEqual(a.GetElementType(), b.GetElementType());
+                        return b is ByReferenceType && CheckTypeReferenceEqual(specA.ElementType, specB.ElementType);
                     }
-                    else if (a is ArrayType)
+                    else if (a is ArrayType arrayA)
                     {
-                        return b is ArrayType && CheckTypeReferenceEqual(a.GetElementType(), b.GetElementType());
+                        return b is ArrayType arrayB && arrayA.Rank == arrayB.Rank && arrayA.IsVector == arrayB.IsVector &&
+                            CheckTypeReferenceEqual(specA.ElementType, specB.ElementType);
                     }
                     else if (a is GenericInstanceType gitA)
                     {
@@ -49,8 +52,16 @@ namespace ILRuntime.Hybrid
                         else
                             return false;
                     }
+                    else if (a is PointerType)
+                        return b is PointerType && CheckTypeReferenceEqual(specA.ElementType, specB.ElementType);
+                    else if (a is OptionalModifierType optionalA)
+                        return b is OptionalModifierType optionalB && CheckTypeReferenceEqual(optionalA.ModifierType, optionalB.ModifierType) &&
+                            CheckTypeReferenceEqual(specA.ElementType, specB.ElementType);
+                    else if (a is RequiredModifierType requiredA)
+                        return b is RequiredModifierType requiredB && CheckTypeReferenceEqual(requiredA.ModifierType, requiredB.ModifierType) &&
+                            CheckTypeReferenceEqual(specA.ElementType, specB.ElementType);
                     else
-                        throw new NotImplementedException();
+                        return a.FullName == b.FullName;
                 }
                 else
                     return false;
@@ -469,7 +480,7 @@ namespace ILRuntime.Hybrid
 
         public static MethodReference GetMethod(this GenericInstanceType self, MethodReference method)
         {
-            if (self.Resolve() != method.DeclaringType)
+            if (self.Resolve() != method.DeclaringType.Resolve())
                 throw new NotSupportedException();
             var result = new MethodReference(method.Name, method.ReturnType)
             {
@@ -478,6 +489,8 @@ namespace ILRuntime.Hybrid
                 ExplicitThis = method.ExplicitThis,
                 CallingConvention = method.CallingConvention,
             };
+            foreach (var parameter in method.GenericParameters)
+                result.GenericParameters.Add(new GenericParameter(parameter.Name, result));
             for (int i = 0; i < method.Parameters.Count; i++)
             {
                 var p = method.Parameters[i];

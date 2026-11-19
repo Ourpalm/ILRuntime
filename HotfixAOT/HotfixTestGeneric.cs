@@ -100,6 +100,62 @@ namespace HotfixAOT
         }
     }
 
+    // The injected base call must use the derived type's T in its declaring
+    // type and the base method's own generic parameter position in its signature.
+    public abstract class GenericContainerBase<T>
+    {
+        protected List<T> items = new List<T>();
+
+        public virtual void Add(T item)
+        {
+            items.Add(item);
+        }
+
+        public virtual int Count => items.Count;
+
+        public T this[int index] => items[index];
+    }
+
+    public abstract class GenericContainerMiddle<TUnused, T> : GenericContainerBase<T>
+    {
+        public override void Add(T item)
+        {
+            base.Add(item);
+        }
+    }
+
+    [ILRuntimePatch]
+    public class GenericContainer<T> : GenericContainerMiddle<int, T>
+    {
+#if PATCHED
+        private int added;
+#endif
+
+        public override void Add(T item)
+        {
+#if PATCHED
+            base.Add(item);
+            added++;
+#else
+            base.Add(item);
+#endif
+        }
+
+        public int GetAddedCount()
+        {
+#if PATCHED
+            return added;
+#else
+            return Count;
+#endif
+        }
+
+        public void CallBaseAddDirectly(T item)
+        {
+            base.Add(item);
+        }
+    }
+
     public class HotfixTestGenericTestCases
     {
         static bool Test01(bool patched)
@@ -132,12 +188,32 @@ namespace HotfixAOT
                 return obj.GenericMethod<int>(99) == 99 && obj.GenericMethod<string>("test") == "test";
         }
 
+        static bool Test05(bool patched)
+        {
+            var obj = new GenericContainer<int>();
+            obj.Add(1);
+            obj.Add(2);
+            obj.Add(3);
+            int sum = obj[0] + obj[1] + obj[2];
+            return sum == 6 && obj.GetAddedCount() == 3;
+        }
+
+        static bool Test06(bool patched)
+        {
+            var obj = new GenericContainer<string>();
+            obj.CallBaseAddDirectly("a");
+            obj.CallBaseAddDirectly("b");
+            return obj.Count == 2 && obj[0] == "a" && obj[1] == "b";
+        }
+
         public static IEnumerable<ITestCase> GetTestCases()
         {
             yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test01)}", Test01);
             yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test02)}", Test02);
             yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test03)}", Test03);
             yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test04)}", Test04);
+            yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test05)}", Test05);
+            yield return new DelegateTestCase($"{nameof(HotfixTestGenericTestCases)}.{nameof(Test06)}", Test06);
         }
     }
 }

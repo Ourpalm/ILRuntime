@@ -14,6 +14,7 @@ namespace ILRuntime.Hybrid
     public class AssemblyPatch
     {
         AssemblyPatchInfo patchInfo;
+        Assembly targetAssembly;
         const string PatchedTypeName = "ILRuntime.Hybrid.Patched";
         List<KeyValuePair<ILType, int>> patchedTypes = new List<KeyValuePair<ILType, int>>();
         List<KeyValuePair<ILMethod, int>> patchedMethods = new List<KeyValuePair<ILMethod, int>>();
@@ -106,24 +107,26 @@ namespace ILRuntime.Hybrid
             }
             else
             {
-                var it = domain.GetType(info.Name);
-                TypeDefinition type = null;
-                TypeReference res = null;
-                preferInternal = preferInternal || it == null;
-                if (preferInternal && internalTypes.TryGetValue(info.Name, out type))
+                TypeReference res;
+                if (preferInternal && internalTypes.TryGetValue(info.Name, out var internalType))
+                    res = internalType;
+                else if (targetAssembly.GetType(info.Name) is Type clrType)
                 {
-                    res = type;
+                    // The same assembly may also be loaded for interpretation in this domain.
+                    res = module.ImportReference(clrType);
+                    domain.CacheType(domain.GetType(clrType), res);
                 }
-                if (res == null)
+                else
                 {
+                    var it = domain.GetType(info.Name);
                     if (it is ILType iltype)
-                    {
                         res = iltype.TypeDefinition;
-                    }
+                    else if (it is CLRType externalType)
+                        res = module.ImportReference(externalType.TypeForCLR);
+                    else if (internalTypes.TryGetValue(info.Name, out internalType))
+                        res = internalType;
                     else
-                    {
-                        res = module.ImportReference(((CLRType)it).TypeForCLR);
-                    }
+                        throw new TypeLoadException(info.Name);
                 }
                 if (res.HasGenericParameters && ctxType != null)
                 {
@@ -314,7 +317,12 @@ namespace ILRuntime.Hybrid
                                 }
                                 return res;
                             }
-                            return i;
+                            if (dtr is TypeDefinition)
+                                return i;
+
+                            var reference = module.ImportReference(i);
+                            reference.DeclaringType = dtr;
+                            return reference;
                         }
                     }
                 }
@@ -499,6 +507,7 @@ namespace ILRuntime.Hybrid
                 throw new NotSupportedException("The specified assembly is not patchable");
             if (attr.Name != patchInfo.Name || attr.AssemblyHash != patchInfo.BaseHash)
                 throw new NotSupportedException($"Patch not compatible, expected:{attr.Name}({attr.AssemblyHash}) got:{patchInfo.Name}({patchInfo.BaseHash})");
+            targetAssembly = assembly;
             domain.AddReferenceAssembly(assembly);
             MethodInfo getTypesMI = type.GetMethod(AssemblyInjector.PatchTypeGetPatchableTypesMethodName);
             Type[] types = getTypesMI.Invoke(null, null) as Type[];

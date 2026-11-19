@@ -87,6 +87,44 @@ namespace HotfixAOT
 #endif
             return fn(input);
         }
+
+        // Regression test: a local function that captures variables generates a
+        // <>c__DisplayClass closure accessed via ldfld instructions inside the
+        // local function body. BuildClosureNameMapping previously only handled
+        // ldsfld (the <>c singleton pattern), so such closures were missed and
+        // FixClosureNameConsistency threw NotImplementedException.
+        public int ProcessWithLocalFunction(int input)
+        {
+            int captured = 20;
+#if PATCHED
+            captured = 30;
+#endif
+            return LocalFunc(input);
+
+            int LocalFunc(int x)
+            {
+                return x * factor + captured;
+            }
+        }
+
+        public int SumWithLocalFunction(int[] values)
+        {
+            int total = 0;
+            for (int i = 0; i < values.Length; i++)
+            {
+                total = AddToTotal(values[i]);
+            }
+#if PATCHED
+            total += 100;
+#endif
+            return total;
+
+            int AddToTotal(int v)
+            {
+                total += v;
+                return total;
+            }
+        }
     }
 
     public class HotfixIteratorAndClosureTestCases
@@ -147,6 +185,20 @@ namespace HotfixAOT
             return patched ? result == 25 : result == 20;
         }
 
+        static bool TestClosureLocalFunction(bool patched)
+        {
+            var obj = new HotfixClosureThis(3, "");
+            int result = obj.ProcessWithLocalFunction(5);
+            return patched ? result == 45 : result == 35;
+        }
+
+        static bool TestClosureLocalFunctionMutate(bool patched)
+        {
+            var obj = new HotfixClosureThis(1, "");
+            int result = obj.SumWithLocalFunction(new int[] { 1, 2, 3 });
+            return patched ? result == 106 : result == 6;
+        }
+
         static bool TestLambdaNoCapture(bool patched)
         {
             int result = HotfixClass.TestLambdaExp3(50);
@@ -167,6 +219,8 @@ namespace HotfixAOT
             yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureThis)), TestClosureThis);
             yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureFormatter)), TestClosureFormatter);
             yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureLocalAndThis)), TestClosureLocalAndThis);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureLocalFunction)), TestClosureLocalFunction);
+            yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestClosureLocalFunctionMutate)), TestClosureLocalFunctionMutate);
             yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestLambdaNoCapture)), TestLambdaNoCapture);
             yield return new DelegateTestCase(string.Format("{0}.{1}", nameof(HotfixIteratorAndClosureTestCases), nameof(TestLambdaCaptureSingle)), TestLambdaCaptureSingle);
         }

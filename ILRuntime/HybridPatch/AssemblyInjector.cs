@@ -1190,43 +1190,18 @@ namespace ILRuntime.Hybrid
                 methodCtx.GenericMethodCacheField = cacheField;
             }
 
-            bool isOverride = method.IsVirtual && !method.IsNewSlot;
+            var baseMethod = method.IsVirtual && !method.IsNewSlot ? ResolveBaseMethod(method) : null;
+            bool isOverride = baseMethod != null;
             FieldReference invokingField = null;
-            TypeReference methodDeclaringType = ctx.DeclaringType;
             if (isOverride)
             {
-                MethodReference overrideMethod = null;
-                do
-                {
-                    var dt = methodDeclaringType.Resolve();
-                    if (dt != null)
-                    {
-                        methodDeclaringType = dt.BaseType;
-                        overrideMethod = methodDeclaringType.GetMethod(method.Name);
-                    }
-                    else
-                        break;
-                }
-                while (overrideMethod == null);
-                methodDeclaringType = module.ImportReference(methodDeclaringType);
-                var omd = overrideMethod?.Resolve();
-                if (omd != null && omd.IsAbstract)
-                {
-                    isOverride = false;
-                }
-                else
-                {
-                    var fd = new FieldDefinition($"___@invoking_{method.Name}_{methodInfo.Index}", FieldAttributes.Private, module.TypeSystem.Boolean);
-                    ctx.DeclaringType.Fields.Add(fd);
-                    if (ctx.IsGenericType)
-                    {
-                        invokingField = new FieldReference(fd.Name, module.TypeSystem.Boolean, ctx.DeclaringTypeGenericInstance);
-                    }
-                    else
-                        invokingField = fd;
-                }
+                var field = new FieldDefinition($"___@invoking_{method.Name}_{methodInfo.Index}", FieldAttributes.Private, module.TypeSystem.Boolean);
+                ctx.DeclaringType.Fields.Add(field);
+                invokingField = ctx.IsGenericType
+                    ? new FieldReference(field.Name, field.FieldType, ctx.DeclaringTypeGenericInstance)
+                    : field;
             }
-            
+
             VariableDefinition invokeCtx = new VariableDefinition(reflection.InvocationCtxType);
             method.Body.Variables.Add(invokeCtx);
             bool hasReturn = method.ReturnType != module.TypeSystem.Void;
@@ -1327,12 +1302,6 @@ namespace ILRuntime.Hybrid
                 for (int i = 0; i < method.Parameters.Count; i++)
                 {
                     processor.AppendInstruction(first, processor.Create(OpCodes.Ldarg, i + 1));
-                }
-                MethodReference baseMethod = new MethodReference(method.Name, method.ReturnType, methodDeclaringType);
-                baseMethod.HasThis = true;
-                foreach (var i in method.Parameters)
-                {
-                    baseMethod.Parameters.Add(new ParameterDefinition(i.ParameterType));
                 }
                 processor.AppendInstruction(first, processor.Create(OpCodes.Call, baseMethod));
                 processor.AppendInstruction(first, processor.Create(OpCodes.Ret));
@@ -1477,6 +1446,90 @@ namespace ILRuntime.Hybrid
 
             return methodCtx;
         }
+
+        MethodReference ResolveBaseMethod(MethodDefinition method)
+        {
+            var baseType = method.DeclaringType.BaseType;
+            while (baseType != null)
+            {
+                var baseDefinition = baseType.Resolve();
+                if (baseDefinition == null)
+                    return null;
+
+                var arguments = new Dictionary<TypeReference, TypeReference>();
+                if (baseType is GenericInstanceType genericBase)
+                {
+                    for (int i = 0; i < genericBase.GenericArguments.Count; i++)
+                        arguments.Add(baseDefinition.GenericParameters[i], genericBase.GenericArguments[i]);
+                }
+
+                foreach (var candidate in baseDefinition.Methods)
+                {
+                    if (!candidate.IsVirtual || candidate.Name != method.Name ||
+                        candidate.CallingConvention != method.CallingConvention ||
+                        candidate.GenericParameters.Count != method.GenericParameters.Count ||
+                        candidate.Parameters.Count != method.Parameters.Count ||
+                        !ReplaceGenericArguments(candidate.ReturnType, arguments).CheckTypeReferenceEqual(method.ReturnType))
+                        continue;
+
+                    if (candidate.Parameters.Where((p, i) => !ReplaceGenericArguments(p.ParameterType, arguments)
+                        .CheckTypeReferenceEqual(method.Parameters[i].ParameterType)).Any())
+                        continue;
+                    if (candidate.IsAbstract)
+                        return null;
+
+                    // The parent type carries the instantiated arguments. The member signature
+                    // still refers to the base declaration's generic parameter positions.
+                    var reference = module.ImportReference(candidate);
+                    if (baseType is GenericInstanceType)
+                        reference = ((GenericInstanceType)module.ImportReference(baseType, method)).GetMethod(reference);
+                    if (method.HasGenericParameters)
+                        reference = reference.MakeGenericInstanceMethod(method.GenericParameters.ToArray());
+                    return reference;
+                }
+
+                baseType = ReplaceGenericArguments(baseDefinition.BaseType, arguments);
+            }
+
+            return null;
+        }
+
+        static TypeReference ReplaceGenericArguments(TypeReference type, Dictionary<TypeReference, TypeReference> arguments)
+        {
+            if (type == null || !type.ContainsGenericParameter || arguments.Count == 0)
+                return type;
+
+            if (type is GenericParameter)
+                return arguments.TryGetValue(type, out var argument) ? argument : type;
+
+            if (type is GenericInstanceType genericType)
+                return genericType.ElementType.MakeGenericInstanceType(genericType.GenericArguments
+                    .Select(arg => ReplaceGenericArguments(arg, arguments)).ToArray());
+
+            if (type is TypeSpecification specification)
+            {
+                var element = ReplaceGenericArguments(specification.ElementType, arguments);
+                if (type is ByReferenceType)
+                    return new ByReferenceType(element);
+                if (type is ArrayType array)
+                {
+                    if (array.IsVector)
+                        return new ArrayType(element);
+                    var result = new ArrayType(element, array.Rank);
+                    for (int i = 0; i < array.Rank; i++)
+                        result.Dimensions[i] = array.Dimensions[i];
+                    return result;
+                }
+                if (type is PointerType)
+                    return new PointerType(element);
+                if (type is OptionalModifierType optional)
+                    return new OptionalModifierType(ReplaceGenericArguments(optional.ModifierType, arguments), element);
+                if (type is RequiredModifierType required)
+                    return new RequiredModifierType(ReplaceGenericArguments(required.ModifierType, arguments), element);
+            }
+            return type;
+        }
+
         public static AssemblyInjector CreateInjector(Stream srcAsm, Stream pdbStream = null, IPatchSettings settings = null, IAssemblyResolver resolver = null)
         {
             return new AssemblyInjector(srcAsm, pdbStream, resolver, settings);

@@ -1132,6 +1132,7 @@ namespace ILRuntime.Runtime.Enviorment
             KeyValuePair<string, IType>[] genericArguments = null;
             string typename = null;
             string scope = null;
+            IType genericDefinition = null;
             bool dummyGenericInstance = false;
             if (token is Mono.Cecil.TypeDefinition)
             {
@@ -1225,6 +1226,7 @@ namespace ILRuntime.Runtime.Enviorment
                     typename = gType.ElementType.FullName;
                     scope = GetAssemblyName(gType.ElementType.Scope);
                     TypeReference tr = gType.ElementType;
+                    mapTypeToken.TryGetValue(tr.GetHashCode(), out genericDefinition);
                     genericArguments = new KeyValuePair<string, IType>[gType.GenericArguments.Count];
                     for (int i = 0; i < genericArguments.Length; i++)
                     {
@@ -1271,7 +1273,7 @@ namespace ILRuntime.Runtime.Enviorment
             {
                 throw new NotImplementedException();
             }
-            res = GetType(typename);
+            res = genericDefinition ?? GetType(typename);
             if (res == null)
             {
                 typename = typename.Replace("/", "+");
@@ -1631,7 +1633,13 @@ namespace ILRuntime.Runtime.Enviorment
         {
             mapTypeToken[type.GetHashCode()] = type;
         }
-        
+
+        internal void CacheType(IType type, TypeReference reference)
+        {
+            CacheType(type);
+            mapTypeToken[reference.GetHashCode()] = type;
+        }
+
         
         internal IMethod GetMethod(object token, ILType contextType, ILMethod contextMethod, out bool invalidToken)
         {
