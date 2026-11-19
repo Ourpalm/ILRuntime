@@ -49,6 +49,8 @@ namespace HotfixAOT
                 yield return i;
             foreach (var i in HotfixInteractionTestCases.GetTestCases())
                 yield return i;
+            foreach (var i in HotfixFieldDispatchTestCases.GetTestCases())
+                yield return i;
         }
     }
 }

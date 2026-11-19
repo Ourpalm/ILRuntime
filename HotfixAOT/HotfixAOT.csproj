@@ -18,6 +18,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ILRuntime\ILRuntime.csproj" />
+    <Reference Include="ILRuntime.Mono.Cecil">
+      <HintPath>..\Dependencies\netstandard2.0\ILRuntime.Mono.Cecil.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

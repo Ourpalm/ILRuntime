@@ -386,32 +386,16 @@ namespace ILRuntime.Hybrid
                     case OpCodeEnum.Stfld:
                     case OpCodeEnum.Ldfld:
                     case OpCodeEnum.Ldflda:
-                        {
-                            var fr = patchInfo.FieldReferences[(int)opcode.TokenLong];
-                            var ft = domain.GetType(ResolveType(fr.DeclaringType, domain, null, fr.IsInternal), method.DeclearingType, method);
-                            int fieldIndex = fr.FieldIndex;
-                            if (fieldIndex == 0)
-                            {
-                                fieldIndex = GetFieldIndex(ft, fr.Name);
-                            }
-                            else
-                                fieldIndex |= 0x10000000;
-                            opcode.TokenLong = ((long)ft.GetHashCode() << 32) | (uint)fieldIndex;
-                        }
-                        break;
                     case OpCodeEnum.Stsfld:
                     case OpCodeEnum.Ldsfld:
                     case OpCodeEnum.Ldsflda:
                         {
                             var fr = patchInfo.FieldReferences[(int)opcode.TokenLong];
                             var ft = domain.GetType(ResolveType(fr.DeclaringType, domain, null, fr.IsInternal), method.DeclearingType, method);
-                            int fieldIndex = fr.FieldIndex;
-                            if (fieldIndex == 0)
-                            {
-                                fieldIndex = GetFieldIndex(ft, fr.Name);
-                            }
-                            else
-                                fieldIndex |= 0x10000000;
+                            // Keep the injected accessor index separate from the runtime field token.
+                            bool takesAddress = opcode.Code == OpCodeEnum.Ldflda || opcode.Code == OpCodeEnum.Ldsflda;
+                            opcode.TokenInteger = takesAddress ? 0 : fr.FieldIndex;
+                            int fieldIndex = GetFieldIndex(ft, fr.Name);
                             opcode.TokenLong = ((long)ft.GetHashCode() << 32) | (uint)fieldIndex;
                         }
                         break;
@@ -428,13 +412,7 @@ namespace ILRuntime.Hybrid
                                 case 0:
                                     var fr = patchInfo.FieldReferences[(int)opcode.TokenLong];
                                     var ft = domain.GetType(ResolveType(fr.DeclaringType, domain, null, fr.IsInternal), method.DeclearingType, method);
-                                    int fieldIndex = fr.FieldIndex;
-                                    if (fieldIndex == 0)
-                                    {
-                                        fieldIndex = GetFieldIndex(ft, fr.Name);
-                                    }
-                                    else
-                                        fieldIndex |= 0x10000000;
+                                    int fieldIndex = GetFieldIndex(ft, fr.Name);
                                     opcode.TokenLong = ((long)ft.GetHashCode() << 32) | (uint)fieldIndex;
                                     break;
                                 case 1:

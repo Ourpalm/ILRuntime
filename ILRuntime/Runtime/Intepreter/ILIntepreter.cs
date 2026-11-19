@@ -2213,9 +2213,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                     val = esp - 1;
                                                     var fieldToken = (int)ip->TokenLong;
                                                     IPatchableType patchable = obj as IPatchableType;
-                                                    if (patchable != null && ((fieldToken & 0x10000000) != 0))
+                                                    if (patchable != null && ip->TokenInteger != 0)
                                                     {
-                                                        patchable.ILRuntimeSetFieldValue(fieldToken & 0xFFFFFFF, this, val, mStack);
+                                                        patchable.ILRuntimeSetFieldValue(ip->TokenInteger, this, val, mStack);
                                                     }
                                                     else if (patchable != null && type is ILType)
                                                     {
@@ -2356,9 +2356,9 @@ namespace ILRuntime.Runtime.Intepreter
                                                 {
                                                     var fieldToken = (int)ip->TokenLong;
                                                     IPatchableType patchable = obj as IPatchableType;
-                                                    if (patchable != null && ((fieldToken & 0x10000000) != 0))
+                                                    if (patchable != null && ip->TokenInteger != 0)
                                                     {
-                                                        patchable.ILRuntimeGetFieldValue(fieldToken & 0xFFFFFFF, this, ret, mStack);
+                                                        patchable.ILRuntimeGetFieldValue(ip->TokenInteger, this, ret, mStack);
                                                     }
                                                     else if (patchable != null && type is ILType)
                                                     {
@@ -2445,8 +2445,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             CLRType t = type as CLRType;
                                             int idx = (int)ip->TokenLong;
-                                            if (t.SetStaticFieldCallback != null && (idx & 0x10000000) == 0x10000000)
-                                                t.SetStaticFieldCallback(idx & 0xFFFFFFF, this, val, mStack);
+                                            if (t.SetStaticFieldCallback != null && ip->TokenInteger != 0)
+                                                t.SetStaticFieldCallback(ip->TokenInteger, this, val, mStack);
                                             else
                                             {
                                                 var f = t.GetField(idx);
@@ -2477,8 +2477,8 @@ namespace ILRuntime.Runtime.Intepreter
                                         {
                                             CLRType t = type as CLRType;
                                             int idx = (int)ip->TokenLong;
-                                            if (t.GetStaticFieldCallback != null && (idx & 0x10000000) == 0x10000000)
-                                                esp = t.GetStaticFieldCallback(idx & 0xFFFFFFF, this, esp, mStack);
+                                            if (t.GetStaticFieldCallback != null && ip->TokenInteger != 0)
+                                                esp = t.GetStaticFieldCallback(ip->TokenInteger, this, esp, mStack);
                                             else
                                             {
                                                 if (!((CLRType)type).CopyFieldToStack(idx, null, this, ref esp, mStack))
