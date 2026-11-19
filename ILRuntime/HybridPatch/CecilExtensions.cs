@@ -259,10 +259,11 @@ namespace ILRuntime.Hybrid
                             res[mr.Resolve()] = hash;
                         }
                     }
-                    else if (ins.OpCode.Code == Code.Ldsfld && ins.Operand is FieldReference fr)
+                    else if (ins.Operand is FieldReference fr)
                     {
+                        //局部函数(local function)捕获变量时会通过 ldfld/stfld 等指令访问闭包字段
                         var dt = fr.DeclaringType.Resolve();
-                        if (dt.IsClosureType())
+                        if (dt != null && dt.IsClosureType())
                         {
                             res[dt] = hash;
                             res[fr.Resolve()] = hash;
