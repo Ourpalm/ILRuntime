@@ -81,7 +81,7 @@ namespace ILRuntime.Runtime.Generated
                     string registerValueTypeCode = i.GenerateValueTypeRegisterCode(realClsName);
                     string registerMiscCode = i.GenerateMiscRegisterCode(realClsName, true, true);
                     string commonCode = i.GenerateCommonCode(realClsName);
-                    ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                    ConstructorInfo[] ctors = i.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
                     string ctorRegisterCode = i.GenerateConstructorRegisterCode(ctors, excludeMethods);
                     string methodWraperCode = i.GenerateMethodWraperCode(methods, realClsName, excludeMethods, valueTypeBinders, null);
                     string fieldWraperCode = i.GenerateFieldWraperCode(fields, realClsName, excludeFields, valueTypeBinders, null);

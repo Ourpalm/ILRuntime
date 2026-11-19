@@ -15,8 +15,8 @@ namespace ILRuntime.Runtime.CLRBinding
 
             if (defaultCtor && !type.IsPrimitive && !type.IsAbstract)
             {
-                var constructorFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
-                var hasDefaultConstructor = type.GetConstructor(constructorFlags, null, new Type[0], null) != null;
+                var constructorFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+                var hasDefaultConstructor = type.GetConstructor(constructorFlags, null, Type.EmptyTypes, null) != null;
 
                 if (hasDefaultConstructor || type.IsValueType)
                 {

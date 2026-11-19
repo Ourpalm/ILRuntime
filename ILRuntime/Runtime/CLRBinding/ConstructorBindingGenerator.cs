@@ -17,7 +17,7 @@ namespace ILRuntime.Runtime.CLRBinding
             {
                 if (excludes != null && excludes.Contains(i))
                     continue;
-                if (type.ShouldSkipMethod(i))
+                if (type.ShouldSkipMethod(i) || i.IsStatic)
                     continue;
                 var param = i.GetParameters();
                 StringBuilder sb2 = new StringBuilder();
@@ -40,7 +40,7 @@ namespace ILRuntime.Runtime.CLRBinding
                 }
                 sb2.Append("}");
                 sb.AppendLine(string.Format("            args = new Type[]{0};", sb2));
-                sb.AppendLine("            method = type.GetConstructor(flag, null, args, null);");
+                sb.AppendLine("            method = type.GetConstructor(flag & ~BindingFlags.Static, null, args, null);");
                 sb.AppendLine(string.Format("            app.RegisterCLRMethodRedirection(method, Ctor_{0});",idx));
 
                 idx++;
